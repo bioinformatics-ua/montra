@@ -1,0 +1,17 @@
+Django==1.4.5
+PIL==1.1.7
+PyYAML==3.10
+autopep8==0.8.6
+distribute==0.6.30
+django-guardian==1.0.4
+django-transmeta==0.6.9
+django-userena==1.2.0
+docutils==0.10
+easy-thumbnails==1.2
+pep8==1.4.1
+pymongo==2.4.2
+pyparsing==1.5.6
+pytz==2012j
+-e git://github.com/seantis/seantis-questionnaire.git@73b80dce498de36ea6e8d383e32469c85fb97af1#egg=seantis_questionnaire-dev
+textile==2.1.5
+wsgiref==0.1.2

@@ -128,15 +128,40 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.markup',
-    # Uncomment the next line to enable the admin:
+
+    # Admin area
     'django.contrib.admin',
-    # Uncomment the next line to enable admin documentation:
     'django.contrib.admindocs',
 
+    # Questionnaires
     'transmeta',
     'questionnaire',
     'questionnaire.page',
+
+    # User signup/signin/management
+    'userena',
+    'guardian',
+    'easy_thumbnails',
+    'accounts',
 )
+
+# Userena settings
+
+AUTHENTICATION_BACKENDS = (
+    'userena.backends.UserenaAuthenticationBackend',
+    'guardian.backends.ObjectPermissionBackend',
+    'django.contrib.auth.backends.ModelBackend',
+)
+
+EMAIL_BACKEND = 'django.core.mail.backends.dummy.EmailBackend'
+
+ANONYMOUS_USER_ID = -1
+
+AUTH_PROFILE_MODULE = 'accounts.EmifProfile'
+
+LOGIN_REDIRECT_URL = '/accounts/%(username)s/'
+LOGIN_URL = '/accounts/signin/'
+LOGOUT_URL = '/accounts/signout/'
 
 # A sample logging configuration. The only tangible logging
 # performed by this configuration is to send an email to
