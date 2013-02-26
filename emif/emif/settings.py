@@ -1,4 +1,6 @@
 # Django settings for emif project.
+import os.path
+
 
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
@@ -11,8 +13,8 @@ MANAGERS = ADMINS
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': '',                      # Or path to database file if using sqlite3.
+        'ENGINE': 'django.db.backends.sqlite3', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
+        'NAME': 'emif.db',                      # Or path to database file if using sqlite3.
         'USER': '',                      # Not used with sqlite3.
         'PASSWORD': '',                  # Not used with sqlite3.
         'HOST': '',                      # Set to empty string for localhost. Not used with sqlite3.
@@ -28,11 +30,11 @@ ALLOWED_HOSTS = []
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
 # although not all choices may be available on all operating systems.
 # In a Windows environment this must be set to your system time zone.
-TIME_ZONE = 'America/Chicago'
+TIME_ZONE = 'Europe/Lisbon'
 
 # Language code for this installation. All choices can be found here:
 # http://www.i18nguy.com/unicode/language-identifiers.html
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'en'
 
 SITE_ID = 1
 
@@ -71,6 +73,8 @@ STATICFILES_DIRS = (
     # Put strings here, like "/home/html/static" or "C:/www/django/static".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
+    os.path.abspath('./static'),
+    os.path.abspath('./apps/seantis-questionnaire/questionnaire/static/')
 )
 
 # List of finder classes that know how to find static files in
@@ -82,7 +86,7 @@ STATICFILES_FINDERS = (
 )
 
 # Make this unique, and don't share it with anybody.
-SECRET_KEY = 'j*zdirg7yy9@q1k=c*q!*kovkae#id04pyta=yz@w34m6rvwfe'
+SECRET_KEY = 'j*zdirg7yy9@q1k=c*q!*kovfsd#$FDFfsdfkae#id04pyta=yz@w34m6rvwfe'
 
 # List of callables that know how to import templates from various sources.
 TEMPLATE_LOADERS = (
@@ -97,6 +101,8 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
+    'django.middleware.locale.LocaleMiddleware',
+    'questionnaire.request_cache.RequestCacheMiddleware',
     # Uncomment the next line for simple clickjacking protection:
     # 'django.middleware.clickjacking.XFrameOptionsMiddleware',
 )
@@ -110,6 +116,8 @@ TEMPLATE_DIRS = (
     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
+    os.path.abspath('./apps/seantis-questionnaire/questionnaire/templates'),
+    os.path.abspath('./emif/templates'),
 )
 
 INSTALLED_APPS = (
@@ -119,10 +127,15 @@ INSTALLED_APPS = (
     'django.contrib.sites',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.markup',
     # Uncomment the next line to enable the admin:
-    # 'django.contrib.admin',
+    'django.contrib.admin',
     # Uncomment the next line to enable admin documentation:
-    # 'django.contrib.admindocs',
+    'django.contrib.admindocs',
+
+    'transmeta',
+    'questionnaire',
+    'questionnaire.page',
 )
 
 # A sample logging configuration. The only tangible logging
@@ -153,3 +166,32 @@ LOGGING = {
         },
     }
 }
+
+# Questionaire languages
+LANGUAGES = (
+    ('en', 'English'),
+)
+
+# Defines the progressbar behavior in the questionnaire
+# the possible options are 'default', 'async' and 'none'
+#
+#   'default'
+#   The progressbar will be rendered in each questionset together with the 
+#   questions. This is a good choice for smaller questionnaires as the 
+#   progressbar will always be up to date.
+#
+#   'async'
+#   The progressbar value is updated using ajax once the questions have been
+#   rendered. This approach is the right choice for bigger questionnaires which
+#   result in a long time spent on updating the progressbar with each request.
+#   (The progress calculation is by far the most time consuming method in 
+#    bigger questionnaires as all questionsets and questions need to be
+#    parsed to decide if they play a role in the current run or not)
+#
+#   'none'
+#   Completely omits the progressbar. Good if you don't want one or if the
+#   questionnaire is so huge that even the ajax request takes too long.
+QUESTIONNAIRE_PROGRESS = 'async'
+
+try: from local_settings import *
+except: pass
