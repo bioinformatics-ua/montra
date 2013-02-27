@@ -1,1 +1,3 @@
+# Activate this virtualenv with `source bin/activate`
+
 pythonbrew venv use emif
