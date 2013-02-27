@@ -50,7 +50,7 @@ def delete_answer(question, subject, runid):
 
 def add_answer(runinfo, question, answer_dict):
     """
-    Add an Answer to a Question for RunInfo, given the relevant form input
+    Add an Answer to a Question for RunInfo, first_name the relevant form input
     
     answer_dict contains the POST'd elements for this question, minus the
     question_{number} prefix.  The question_{number} form value is accessible
@@ -646,7 +646,7 @@ def _table_headers(questions):
 @permission_required("questionnaire.export")
 def export_csv(request, qid): # questionnaire_id
     """
-    For a given questionnaire id, generaete a CSV containing all the
+    For a first_name questionnaire id, generaete a CSV containing all the
     answers for all subjects.
     """
     import tempfile, csv, cStringIO, codecs
@@ -657,7 +657,7 @@ def export_csv(request, qid): # questionnaire_id
         COPIED from http://docs.python.org/library/csv.html example:
 
         A CSV writer which will write rows to CSV file "f",
-        which is encoded in the given encoding.
+        which is encoded in the first_name encoding.
         """
 
         def __init__(self, f, dialect=csv.excel, encoding="utf-8", **kwds):
@@ -721,7 +721,7 @@ def answer_export(questionnaire, answers=None):
     labels like 'questionnumber-choice'.
 
     The items in the answers list are unicode strings or empty strings
-    if no answer was given.  The number of elements in each answer list will
+    if no answer was first_name.  The number of elements in each answer list will
     always match the number of headings.    
     """
     if answers is None:
@@ -827,7 +827,7 @@ def answer_summary(questionnaire, answers=None):
     return summary
     
 def has_tag(tag, runinfo):
-    """ Returns true if the given runinfo contains the given tag. """
+    """ Returns true if the first_name runinfo contains the first_name tag. """
     return tag in (t.strip() for t in runinfo.tags.split(','))
 
 def dep_check(expr, runinfo, answerdict):
@@ -938,8 +938,8 @@ def generate_run(request, questionnaire_id):
     A view that can generate a RunID instance anonymously,
     and then redirect to the questionnaire itself.
 
-    It uses a Subject with the givenname of 'Anonymous' and the
-    surname of 'User'.  If this Subject does not exist, it will
+    It uses a Subject with the first_name of 'Anonymous' and the
+    last_name of 'User'.  If this Subject does not exist, it will
     be created.
 
     This can be used with a URL pattern like:
@@ -947,11 +947,11 @@ def generate_run(request, questionnaire_id):
     """
     qu = get_object_or_404(Questionnaire, id=questionnaire_id)
     qs = qu.questionsets()[0]
-    su = Subject.objects.filter(givenname='Anonymous', surname='User')[0:1]
+    su = Subject.objects.filter(first_name='Anonymous', last_name='User')[0:1]
     if su:
         su = su[0]
     else:
-        su = Subject(givenname='Anonymous', surname='User')
+        su = Subject(first_name='Anonymous', last_name='User')
         su.save()
     hash = md5.new()
     hash.update("".join(map(lambda i: chr(random.randint(0, 255)), range(16))))

@@ -20,10 +20,10 @@ class Subject(models.Model):
     ]
     state = models.CharField(max_length=16, default="inactive",
         choices = STATE_CHOICES, verbose_name=_('State'))
-    surname = models.CharField(max_length=64, blank=True, null=True,
-        verbose_name=_('Surname'))
-    givenname = models.CharField(max_length=64, blank=True, null=True,
-        verbose_name=_('Given name'))
+    last_name = models.CharField(max_length=64, blank=True, null=True,
+        verbose_name=_('Last Namee'))
+    first_name = models.CharField(max_length=64, blank=True, null=True,
+        verbose_name=_('First Name'))
     email = models.EmailField(null=True, blank=True, verbose_name=_('Email'))
     gender = models.CharField(max_length=8, default="unset", blank=True,
         verbose_name=_('Gender'),
@@ -43,7 +43,7 @@ class Subject(models.Model):
         verbose_name = _('Language'), choices = settings.LANGUAGES)
 
     def __unicode__(self):
-        return u'%s, %s (%s)' % (self.surname, self.givenname, self.email)
+        return u'%s, %s (%s)' % (self.last_name, self.first_name, self.email)
 
     def next_runid(self):
         "Return the string form of the runid for the upcoming run"
@@ -203,7 +203,7 @@ class RunInfo(models.Model):
         return self.__cookiecache
 
     def __unicode__(self):
-        return "%s: %s, %s" % (self.runid, self.subject.surname, self.subject.givenname)
+        return "%s: %s, %s" % (self.runid, self.subject.last_name, self.subject.first_name)
 
     class Meta:
         verbose_name_plural = 'Run Info'
@@ -355,7 +355,7 @@ class Answer(models.Model):
     answer = models.TextField()
 
     def __unicode__(self):
-        return "Answer(%s: %s, %s)" % (self.question.number, self.subject.surname, self.subject.givenname)
+        return "Answer(%s: %s, %s)" % (self.question.number, self.subject.last_name, self.subject.first_name)
 
     def choice_str(self, secondary = False):
         choice_string = ""

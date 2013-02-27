@@ -1,7 +1,7 @@
 - fields: {
     state: active,
-    surname: TestSurname,
-    givenname: TestGivenname,
+    last_name: TestSurname,
+    first_name: TestGivenname,
     email: test@example.com,
     gender: male,
     formtype: email,

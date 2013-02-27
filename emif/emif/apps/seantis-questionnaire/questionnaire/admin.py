@@ -7,8 +7,8 @@ from models import *
 adminsite = admin.site
 
 class SubjectAdmin(admin.ModelAdmin):
-    search_fields = ['surname', 'givenname', 'email']
-    list_display = ['surname', 'givenname', 'email']
+    search_fields = ['last_name', 'first_name', 'email']
+    list_display = ['last_name', 'first_name', 'email']
 
 class ChoiceAdmin(admin.ModelAdmin):
     list_display = ['sortid', 'text', 'value', 'question']

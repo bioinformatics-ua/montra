@@ -33,9 +33,9 @@ def _new_random(subject):
     """
     Create a short unique randomized string.
     Returns: subject_id + 'z' +
-        md5 hexdigest of subject's surname, nextrun date, and a random number
+        md5 hexdigest of subject's last_name, nextrun date, and a random number
     """
-    return "%dz%s" % (subject.id, md5(subject.surname + str(subject.nextrun) + hex(random.randint(1,999999))).hexdigest()[:6])
+    return "%dz%s" % (subject.id, md5(subject.last_name + str(subject.nextrun) + hex(random.randint(1,999999))).hexdigest()[:6])
 
 
 def _new_runinfo(subject, questionset):
@@ -72,8 +72,8 @@ def _send_email(runinfo):
     translation.activate(subject.language)
     tmpl = loader.get_template(settings.QUESTIONNAIRE_EMAIL_TEMPLATE)
     c = Context()
-    c['surname'] = subject.surname
-    c['givenname'] = subject.givenname
+    c['last_name'] = subject.last_name
+    c['first_name'] = subject.first_name
     c['gender'] = subject.gender
     c['email'] = subject.email
     c['random'] = runinfo.random
@@ -85,7 +85,7 @@ def _send_email(runinfo):
     emailSubject, email = email.split("\n",1) # subject must be on first line
     emailSubject = emailSubject.strip()
     emailFrom = emailFrom.replace("$RUNINFO", runinfo.random)
-    emailTo = '"%s, %s" <%s>' % (subject.surname, subject.givenname, subject.email)
+    emailTo = '"%s, %s" <%s>' % (subject.last_name, subject.first_name, subject.email)
 
     emailTo = encode_emailaddress(emailTo)
     emailFrom = encode_emailaddress(emailFrom)
@@ -148,11 +148,11 @@ def send_emails(request=None, qname=None):
         if r.emailcount == 0 or time.mktime(r.emailsent.timetuple()) < WEEKAGO:
             try:
                 if _send_email(r):
-                    outlog.append(u"[%s] %s, %s: OK" % (r.runid, r.subject.surname, r.subject.givenname))
+                    outlog.append(u"[%s] %s, %s: OK" % (r.runid, r.subject.last_name, r.subject.first_name))
                 else:
-                    outlog.append(u"[%s] %s, %s: %s" % (r.runid, r.subject.surname, r.subject.givenname, r.lastemailerror))
+                    outlog.append(u"[%s] %s, %s: %s" % (r.runid, r.subject.last_name, r.subject.first_name, r.lastemailerror))
             except Exception, e:
-                outlog.append("Exception: [%s] %s: %s" % (r.runid, r.subject.surname, str(e)))
+                outlog.append("Exception: [%s] %s: %s" % (r.runid, r.subject.last_name, str(e)))
     if request:
         return HttpResponse("Sent Questionnaire Emails:\n  "
             +"\n  ".join(outlog), mimetype="text/plain")
