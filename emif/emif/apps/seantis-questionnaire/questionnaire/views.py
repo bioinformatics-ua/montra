@@ -5,6 +5,7 @@ from django.template import RequestContext
 from django.core.urlresolvers import reverse
 from django.core.cache import cache
 from django.contrib.auth.decorators import permission_required
+from django.contrib import messages
 from django.shortcuts import render_to_response, get_object_or_404
 from django.db import transaction
 from django.conf import settings
@@ -269,6 +270,10 @@ def questionnaire(request, runcode=None, qs=None):
     We only commit on success, to maintain consistency.  We also specifically
     rollback if there were errors processing the answers for this questionset.
     """
+
+    if not request.user.is_authenticated():
+        messages.add_message(request, messages.INFO, 'Please sign in to answer the questionnaire.')
+        return HttpResponseRedirect('/accounts/signin/')
 
     # if runcode provided as query string, redirect to the proper page
     if not runcode:
