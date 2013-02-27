@@ -143,6 +143,9 @@ INSTALLED_APPS = (
     'guardian',
     'easy_thumbnails',
     'accounts',
+
+    # Countries drop-down support for user profile
+    'countries',
 )
 
 # Userena settings
