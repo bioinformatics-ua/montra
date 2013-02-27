@@ -56,7 +56,12 @@ body {
       <p><a class="btn btn-small" href="http://www.imi.europa.eu/content/emif">Read more &raquo;</a></p>
 
       <h4>Answer the sample questionnaire</h4>
-      <p>Start by answering the sample <a href="/take/1/">questionnaire</a>. You need to be <a href="{% url 'userena_signin' %}">signed in</a>, so if you don't have an account, <a href="{% url 'userena_signup' %}">sign up</a> now.</p>
+      <p>
+        Start by answering the sample <a href="/take/1/">questionnaire</a>.
+        {% if not request.user.is_authenticated %}
+        You need to be <a href="{% url 'userena_signin' %}">signed in</a>, so if you don't have an account, <a href="{% url 'userena_signup' %}">sign up</a> now.
+        {% endif %}
+      </p>
     </div>
 
     <div class="span6" style="text-align:center; padding-top: 40px">
