@@ -66,20 +66,20 @@
                             </li>
                         </ul>
                         {% endcomment %}
-                        {% if not request.user.is_authenticated %}
                         {% block headerlogin %}
+                        {% if not request.user.is_authenticated %}
                         <form class="navbar-form pull-right" method="post" action="{% url 'userena_signin' %}">
                             {% csrf_token %}
                             <input name="identification" class="span2" type="text" placeholder="Email">
                             <input name="password" class="span2" type="password" placeholder="Password">
                             <button type="submit" class="btn">Sign in</button>
                         </form>
-                        {% endblock %}
                         {% else %}
                         <p class="navbar-text pull-right">
                           <em>{{ request.user.get_full_name }}</em> [ <a href="{% url 'userena_signout' %}" class="navbar-link">Sign out</a> ]
                         </p>
                         {% endif %}
+                        {% endblock %}
                     </div><!--/.nav-collapse -->
                 </div>
             </div>
