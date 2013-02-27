@@ -12,3 +12,4 @@ class EmifProfile(UserenaBaseProfile):
                                 verbose_name=_('user'),
                                 related_name='emif_profile')
     country = CountryField()
+    organization = models.CharField(_('organization'), max_length=255)
