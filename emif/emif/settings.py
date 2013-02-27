@@ -130,6 +130,7 @@ INSTALLED_APPS = (
     'django.contrib.markup',
 
     # Admin area
+    'django_admin_bootstrapped',
     'django.contrib.admin',
     'django.contrib.admindocs',
 
