@@ -1,3 +1,4 @@
+{% load url from future %}
 <!DOCTYPE html>
 <!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
 <!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
@@ -10,6 +11,7 @@
         <meta name="description" content="EMIF Platform">
         <meta name="viewport" content="width=device-width">
 
+        <link rel="shortcut icon" href="/static/img/favicon.ico" type="image/x-icon" />
         <link rel="stylesheet" href="/static/css/bootstrap.min.css">
         <style>
             body {
@@ -22,7 +24,6 @@
 
         <style type="text/css">
         {% block styleextra %}
-            
         {% endblock %}
         </style>
         
@@ -45,7 +46,8 @@
                         <span class="icon-bar"></span>
                     </a>
                     <a class="brand" href="/">EMIF Platform</a>
-                    <!--<div class="nav-collapse collapse">
+                    <div class="nav-collapse collapse">
+                        {% comment %}
                         <ul class="nav">
                             <li class="active"><a href="/">Home</a></li>
                             <li><a href="http://www.imi.europa.eu/content/emif">About</a></li>
@@ -63,48 +65,28 @@
                                 </ul>
                             </li>
                         </ul>
-                        <form class="navbar-form pull-right">
-                            <input class="span2" type="text" placeholder="Email">
-                            <input class="span2" type="password" placeholder="Password">
+                        {% endcomment %}
+                        {% if not request.user.is_authenticated %}
+                        {% block headerlogin %}
+                        <form class="navbar-form pull-right" method="post" action="{% url 'userena_signin' %}">
+                            {% csrf_token %}
+                            <input name="identification" class="span2" type="text" placeholder="Email">
+                            <input name="password" class="span2" type="password" placeholder="Password">
                             <button type="submit" class="btn">Sign in</button>
                         </form>
-                    </div>--><!--/.nav-collapse -->
+                        {% endblock %}
+                        {% else %}
+                        <p class="navbar-text pull-right">
+                          <em>{{ request.user.get_full_name }}</em> [ <a href="{% url 'userena_signout' %}" class="navbar-link">Sign out</a> ]
+                        </p>
+                        {% endif %}
+                    </div><!--/.nav-collapse -->
                 </div>
             </div>
         </div>
 
         <div class="container">
             {% block content %}
-
-            <div class="hero-unit">
-                <h1>Welcome to the EMIF Platform</h1>
-                <p>This is a working prototype of EMIF Platform v1, which is currently under-development.</p>
-                <p><a class="btn btn-primary btn-large" href="http://www.imi.europa.eu/content/emif">Learn more about the project &raquo;</a></p>
-            </div>
-
-            <!-- Example row of columns -->
-            <div class="row">
-                <div class="span12">
-                    <p>The system presently features three simple preview modules:</p>
-                </div>
-            </div>
-            <div class="row">
-                <div class="span4">
-                    <h2>Accounts</h2>
-                    <p>The accounts module allows you to <a href="/accounts/signup/">sign up</a> for an account or <a href="/accounts/signin/">sign in</a> if you already have one.</p>
-                </div>
-                <div class="span4">
-                    <h2>Questionnaires</h2>
-                    <p>The questionnaires module is where you can answer questionnaires.</p>
-                    <p><a class="btn" href="/take/1/">Take sample questionnaire &raquo;</a></p>
-                </div>
-                <div class="span4">
-                    <h2>Administration Area</h2>
-                    <p>The admin module lets administrators manage the platform.</p>
-                    <p><a class="btn" href="/admin/">Go to admin zone &raquo;</a></p>
-                </div>
-            </div>
-
             {% endblock %}
 
             <hr>

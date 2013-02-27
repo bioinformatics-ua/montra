@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+{% load url from future %}
+
+{% block styleextra %}
+body {
+  padding-top: 20px;
+  padding-bottom: 40px;
+}
+
+/* Custom container */
+.container-narrow {
+  margin: 0 auto;
+  max-width: 700px;
+}
+.container-narrow > hr {
+  margin: 30px 0;
+}
+
+/* Main marketing message and sign up button */
+.jumbotron {
+  margin: 60px 0;
+  text-align: center;
+}
+.jumbotron h1 {
+  font-size: 72px;
+  line-height: 1;
+}
+.jumbotron .btn {
+  font-size: 21px;
+  padding: 14px 24px;
+}
+
+/* Supporting marketing content */
+.marketing {
+  margin: 60px 0;
+}
+.marketing p + h4 {
+  margin-top: 28px;
+}
+{% endblock %}
+
+{% block content %}
+<div class="container-narrow">
+<div class="jumbotron">
+        <h1>Welcome to the EMIF Platform!</h1>
+        <p class="lead">This is a preview prototype of EMIF Platform v1, which is currently being developed.</p>
+        <a class="btn btn-large btn-success" href="http://www.imi.europa.eu/content/emif">Learn more about the project &raquo;</a>
+      </div>
+
+      <hr>
+
+      <div class="row-fluid marketing">
+        <div class="span6">
+          <h4>European Medical Information Framework</h4>
+          <p>The EMIF project aims to develop a common information framework of patient-level data that will link up and facilitate access to diverse medical and research data sources, opening up new avenues of research for scientists. To provide a focus and guidance for the development of the framework, the project will focus initially on questions relating to obesity and Alzheimer’s disease.</p>
+          <p><a class="btn btn-small" href="http://www.imi.europa.eu/content/emif">Read more &raquo;</a></p>
+
+          <h4>Answer the sample questionnaire</h4>
+          <p>Start by answering the sample <a href="/take/1/">questionnaire</a>. You need to be <a href="{% url 'userena_signin' %}">signed in</a>, so if you don't have an account, <a href="{% url 'userena_signup' %}">sign up</a> now.</p>
+        </div>
+
+        <div class="span6" style="text-align:center; padding-top: 40px">
+          <img src="/static/img/emif_logo.png" alt="EMIF Logo" style="width: 180px; height: 163px;" />
+        </div>
+      </div>
+    </div>
+{% endblock %}

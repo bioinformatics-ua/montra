@@ -20,14 +20,17 @@ urlpatterns = patterns('',
     # Uncomment the next line to enable the admin:
     url(r'^admin/', include(admin.site.urls)),
 
+    # Index page
+    url(r'^$', 'emif.views.index'),
+
     # Questionnaire URLs
     url(r'q/', include('questionnaire.urls')),
 
     url(r'^take/(?P<questionnaire_id>[0-9]+)/$', 'questionnaire.views.generate_run'),
-    url(r'^$', 'questionnaire.page.views.page', {'page': 'index'}),
-    url(r'^(?P<page>.*)\.html$', 'questionnaire.page.views.page'),
-    url(r'^(?P<lang>..)/(?P<page>.*)\.html$', 'questionnaire.page.views.langpage'),
-    url(r'^setlang/$', 'questionnaire.views.set_language'),
+    # url(r'^$', 'questionnaire.page.views.page', {'page': 'index'}),
+    # url(r'^(?P<page>.*)\.html$', 'questionnaire.page.views.page'),
+    # url(r'^(?P<lang>..)/(?P<page>.*)\.html$', 'questionnaire.page.views.langpage'),
+    # url(r'^setlang/$', 'questionnaire.views.set_language'),
 
     #
     # User accounts URLs
