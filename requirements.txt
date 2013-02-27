@@ -6,6 +6,7 @@ autopep8==0.8.6
 distribute==0.6.30
 django-admin-bootstrapped==0.3.2
 django-countries==1.5
+django-crispy-forms==1.2.3
 django-guardian==1.0.4
 django-transmeta==0.6.9
 django-userena==1.2.0

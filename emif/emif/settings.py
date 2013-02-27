@@ -147,6 +147,9 @@ INSTALLED_APPS = (
 
     # DB migrations
     'south',
+
+    # Bootstrap layouts and forms
+    'crispy_forms',
 )
 
 # Userena settings

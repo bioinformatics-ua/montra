@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% load crispy_forms_tags %}
+
+{% block title %}{% trans "Signup" %}{% endblock %}
+
+{% block content %}
+<div class="row">
+  <div class="span6 center">
+    <form method="post" id="signup_form">
+        {% csrf_token %}
+        <fieldset>
+          <legend>{% trans "Signup" %}</legend>
+          <span class="help-block">
+            <em>Please fill in the form bellow to sign up for an account in the EMIF Platform.</em>
+          </span>
+          {{ form|crispy }}
+        </fieldset>
+        <div class="form-actions">
+          <button class="btn btn-primary" type="submit">{% trans "Signup"%}</button>
+          <button class="btn" type="reset">{% trans "Clear"%}</button>
+        </div>
+    </form>
+  </div>
+</div>
+{% endblock %}
+
+{% block scriptextra %}
+<script>
+  var focusFirstField = function () {
+      $('#signup_form input:nth(1)').focus();
+  };
+  $('#signup_form input[type="text"], #signup_form input[type="password"], #signup_form select').addClass('span6');
+  $('#signup_form button[type="reset"]').on('click', focusFirstField);
+  focusFirstField();
+</script>
+{% endblock %}
+  
