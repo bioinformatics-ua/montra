@@ -144,8 +144,6 @@ INSTALLED_APPS = (
     'easy_thumbnails',
     'accounts',
 
-    # Countries drop-down support for user profile
-    'countries',
 )
 
 # Userena settings

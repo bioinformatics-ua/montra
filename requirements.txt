@@ -3,6 +3,7 @@ PIL==1.1.7
 PyYAML==3.10
 autopep8==0.8.6
 distribute==0.6.30
+django-countries==1.5
 django-guardian==1.0.4
 django-transmeta==0.6.9
 django-userena==1.2.0
