@@ -271,7 +271,9 @@ def questionnaire(request, runcode=None, qs=None):
     rollback if there were errors processing the answers for this questionset.
     """
 
-    assure_authenticated_or_redirect(request)
+    r = assure_authenticated_or_redirect(request)
+    if r:
+        return r
 
     # if runcode provided as query string, redirect to the proper page
     if not runcode:
@@ -944,7 +946,9 @@ def generate_run(request, questionnaire_id):
     (r'^take/(?P<questionnaire_id>[0-9]+)/$', 'questionnaire.views.generate_run'),
     """
 
-    assure_authenticated_or_redirect(request)
+    r = assure_authenticated_or_redirect(request)
+    if r:
+        return r
 
     qu = get_object_or_404(Questionnaire, id=questionnaire_id)
     qs = qu.questionsets()[0]
