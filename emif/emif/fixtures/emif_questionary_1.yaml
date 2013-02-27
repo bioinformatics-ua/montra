@@ -33,13 +33,13 @@
 
 - pk: 1
   fields: {checks: 'required', extra_en: '', number: '1', questionset: 1,
- text_en: ' Please provide contact information. We ask three contacts (name, address, email, and phone number). First, the administrative contact; typically a secretariat. Second, the scientific content contact; this is the person(s) who are familiar with the data in the data base and are have experience in conducting scientific studies with the data. Third, technical contact; this is the person who is familiar with the IT platform of the data source and will be our contact point if we will install software locally.',
+ text_en: 'Please provide contact information. We ask three contacts (name, address, email, and phone number). First, the administrative contact; typically a secretariat. Second, the scientific content contact; this is the person(s) who are familiar with the data in the data base and are have experience in conducting scientific studies with the data. Third, technical contact; this is the person who is familiar with the IT platform of the data source and will be our contact point if we will install software locally.',
   type: open-textfield}
   model: questionnaire.question
 
 - pk: 2
   fields: {checks: 'required', extra_en: '', number: '2', questionset: 2,
- text_en: ' In the platform, we have a wide range of data bases. Could you indicate what of the below would characterize your data base? More answers are possible.',
+ text_en: 'In the platform, we have a wide range of data bases. Could you indicate what of the below would characterize your data base? More answers are possible.',
   type: choice-multiple-freeform}
   model: questionnaire.question
 
@@ -84,7 +84,6 @@
   value: "8"}
   model: questionnaire.choice
   pk: 8
-
 - fields: {question: 2, sortid: 9,
   text_en: "it can be linked to other data bases",
   value: "9"}
@@ -93,13 +92,21 @@
 
 
 - pk: 3
+  fields: {checks: 'requiredif=2,5', extra_en: '', number: '2a', questionset: 1,
+ text_en: 'If disease specific registry, please specify disease or event:',
+  type: open-textfield}
+  model: questionnaire.question
+
+
+
+- pk: 4
   fields: {checks: 'required', extra_en: '', number: '3', questionset: 3,
  text_en: 'How would you briefly (in say five of six lines of text) describe the population of your database? ',
   type: open-textfield}
   model: questionnaire.question
 
 
-- pk: 4
+- pk: 5
   fields: {checks: 'required', extra_en: '', number: '4', questionset: 3,
  text_en: 'For a study, often a population table is required typically consisting of:
 - Patient ID (some personal identifier for each subject in your data base)
@@ -108,14 +115,24 @@
   type: choice-yesnocomment}
   model: questionnaire.question
 
-- pk: 5
+
+
+- pk: 6
+  fields: {checks: 'requiredif=4,no', extra_en: '', number: '4a', questionset: 1,
+ text_en: 'Why not be able to create such a table for the population of in your database?',
+  type: open-textfield}
+  model: questionnaire.question
+
+
+
+- pk: 7
   fields: {checks: 'required', extra_en: '', number: '5', questionset: 3,
  text_en: 'What are the possible causes for a person to enter/exit your database? ',
   type: choice-multiple-freeform}
   model: questionnaire.question
 
 - fields: {question: 5, sortid: 1,
-  text_en: "the subject enters or leaves the practice of a general practitioner", 
+  text_en: "the subject enters or leaves the practice of a general practitioner",
   value: "1"}
   model: questionnaire.choice
   pk: 10
@@ -160,50 +177,165 @@
   model: questionnaire.choice
   pk: 18
 
-
-
-- pk: 6
+- pk: 8
   fields: {checks: 'required', extra_en: '', number: '6', questionset: 3,
  text_en: 'What is the total (cumulative) number of subjects in your data source?',
   type: open-textfield}
   model: questionnaire.question
 
 
-- pk: 7
+- pk: 9
   fields: {checks: 'required', extra_en: '', number: '7', questionset: 3,
  text_en: 'What was the number of active patients in January 2012?',
   type: open-textfield}
   model: questionnaire.question
 
 
-- pk: 8
-  fields: {checks: 'required', extra_en: '', number: '8', questionset: 3,
+- pk: 10
+  fields: {checks: 'required', extra_en: '', number: '8', questionset: 4,
  text_en: 'Can you estimate the average time of follow up (that is, the time when you are actively collecting data) for a subject in your data base?',
   type: open-textfield}
   model: questionnaire.question
 
 
-- pk: 9
-  fields: {checks: 'required', extra_en: '', number: '9', questionset: 3,
+- pk: 11
+  fields: {checks: 'required', extra_en: '', number: '9', questionset: 4,
  text_en: 'During the follow-up period (that is, after a subject enters you data base), what information do you have? More answers are possible. ',
-  type: open-textfield}
+  type: choice-multiple}
+  model: questionnaire.question
+
+- pk: 19
+  fields: {question: 9, sortid: 1,
+  text_en: "Diagnosis",
+  value: "1"}
+  model: questionnaire.choice
+
+
+- pk: 20
+  fields: {question: 9, sortid: 2,
+  text_en: "Medication",
+  value: "2"}
+  model: questionnaire.choice
+
+- pk: 21
+  fields: {question: 9, sortid: 3,
+  text_en: "Procedures",
+  value: "3"}
+  model: questionnaire.choice
+
+
+
+- pk: 12
+  fields: {checks: 'shownif=9,1', extra_en: '', number: '10', questionset: 4,
+ text_en: 'If diagnosis is checked:',
+  type: choice-multiple}
   model: questionnaire.question
 
 
-- pk: 10
+
+- pk: 22
+  fields: {question: 10, sortid: 1,
+  text_en: "diagnosis from GP records",
+  value: "1"}
+  model: questionnaire.choice
+
+- pk: 23
+  fields: {question: 10, sortid: 1,
+  text_en: "diagnosis from pediatrician in general practice",
+  value: "2"}
+  model: questionnaire.choice
+
+
+- pk: 24
+  fields: {question: 10, sortid: 1,
+  text_en: "diagnosis from specialist outpatient records",
+  value: "3"}
+  model: questionnaire.choice
+
+- pk: 25
+  fields: {question: 10, sortid: 1,
+  text_en: "diagnosis from in-patient hospital records",
+  value: "4"}
+  model: questionnaire.choice
+
+- pk: 26
+  fields: {question: 10, sortid: 1,
+  text_en: "diagnosis from in-patient hospital records",
+  value: "4"}
+  model: questionnaire.choice
+
+
+- pk: 27
+  fields: {question: 10, sortid: 1,
+  text_en: "diagnosis in ICPC",
+  value: "4"}
+  model: questionnaire.choice
+
+
+- pk: 27
+  fields: {question: 10, sortid: 1,
+  text_en: "diagnosis in ICD",
+  value: "4"}
+  model: questionnaire.choice
+
+
+- pk: 28
+  fields: {question: 10, sortid: 1,
+  text_en: "diagnosis in READ",
+  value: "4"}
+  model: questionnaire.choice
+
+
+
+- pk: 29
+  fields: {question: 10, sortid: 1,
+  text_en: "diagnosis in Snomed",
+  value: "4"}
+  model: questionnaire.choice
+
+- pk: 30
+  fields: {question: 10, sortid: 1,
+  text_en: "diagnosis in other coding system",
+  value: "4"}
+  model: questionnaire.choice
+
+- pk: 31
+  fields: {question: 10, sortid: 1,
+  text_en: "diagnosis in free text",
+  value: "4"}
+  model: questionnaire.choice
+
+- pk: 13
+  fields: {checks: 'required', extra_en: '', number: '9b', questionset: 4,
+  text_en: 'If medication is checked:',
+  type: choice-multiple}
+  model: questionnaire.question
+
+
+- pk: 14
+  fields: {checks: 'required', extra_en: '', number: '9c', questionset: 4,
+  text_en: 'if procedures is checked',
+  type: choice-multiple}
+  model: questionnaire.question
+
+
+
+
+
+- pk: 15
   fields: {checks: 'required', extra_en: '', number: '10', questionset: 4,
  text_en: 'Has the patient given informed consent for including his/her data in your data collection?',
   type: choice-yesno}
   model: questionnaire.question
 
-- pk: 11
+- pk: 16
   fields: {checks: 'required', extra_en: '', number: '11', questionset: 4,
  text_en: 'Do you have an ethical/review committee?',
   type: choice-yesno}
   model: questionnaire.question
 
 
-- pk: 12
+- pk: 17
   fields: {checks: 'required', extra_en: '', number: '12', questionset: 4,
  text_en: 'Do you have a publically available document that details the procedure by which approval can be requested?',
   type: choice-yesno}
@@ -211,28 +343,28 @@
 
 
 
-- pk: 13
+- pk: 18
   fields: {checks: 'required', extra_en: '', number: '13', questionset: 4,
  text_en: 'Are you able to contact the care provider for additional information?',
   type: choice-yesno}
   model: questionnaire.question
 
 
-- pk: 14
+- pk: 19
   fields: {checks: 'required', extra_en: '', number: '14', questionset: 4,
  text_en: 'Are you able to contact the patient for additional information?',
   type: choice-yesno}
   model: questionnaire.question
 
 
-- pk: 15
+- pk: 20
   fields: {checks: 'required', extra_en: '', number: '15', questionset: 5,
  text_en: 'Can you assess the prevalence of diabetes mellitus in the population who enters your data base?',
   type: open-textfield}
   model: questionnaire.question
 
 
-- pk: 16
+- pk: 21
   fields: {checks: 'required', extra_en: '', number: '16', questionset: 5,
  text_en: 'Could you provide a list of peer-reviewed papers based on your data base covering the last 3 years?',
   type: open-textfield}
