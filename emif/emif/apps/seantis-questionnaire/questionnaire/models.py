@@ -21,7 +21,7 @@ class Subject(models.Model):
     state = models.CharField(max_length=16, default="inactive",
         choices = STATE_CHOICES, verbose_name=_('State'))
     last_name = models.CharField(max_length=64, blank=True, null=True,
-        verbose_name=_('Last Namee'))
+        verbose_name=_('Last Name'))
     first_name = models.CharField(max_length=64, blank=True, null=True,
         verbose_name=_('First Name'))
     email = models.EmailField(null=True, blank=True, verbose_name=_('Email'))
