@@ -1,0 +1,8 @@
+# !/bin/sh
+
+BIN_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+EMIF_DIR=$BIN_DIR/../emif
+
+pushd . > /dev/null && cd $EMIF_DIR
+python manage.py migrate
+popd > /dev/null

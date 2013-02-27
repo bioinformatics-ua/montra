@@ -144,6 +144,8 @@ INSTALLED_APPS = (
     'easy_thumbnails',
     'accounts',
 
+    # DB migrations
+    'south',
 )
 
 # Userena settings
