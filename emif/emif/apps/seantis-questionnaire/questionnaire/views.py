@@ -271,9 +271,7 @@ def questionnaire(request, runcode=None, qs=None):
     rollback if there were errors processing the answers for this questionset.
     """
 
-    if not request.user.is_authenticated():
-        messages.add_message(request, messages.INFO, 'Please sign in to answer the questionnaire.')
-        return HttpResponseRedirect('/accounts/signin/')
+    assure_authenticated_or_redirect(request)
 
     # if runcode provided as query string, redirect to the proper page
     if not runcode:
@@ -940,23 +938,26 @@ def send_email(request, runinfo_id):
 
 def generate_run(request, questionnaire_id):
     """
-    A view that can generate a RunID instance anonymously,
-    and then redirect to the questionnaire itself.
-
-    It uses a Subject with the first_name of 'Anonymous' and the
-    last_name of 'User'.  If this Subject does not exist, it will
-    be created.
+    A view that can generate a RunID instance to an authenticated user.
 
     This can be used with a URL pattern like:
     (r'^take/(?P<questionnaire_id>[0-9]+)/$', 'questionnaire.views.generate_run'),
     """
+
+    assure_authenticated_or_redirect(request)
+
     qu = get_object_or_404(Questionnaire, id=questionnaire_id)
     qs = qu.questionsets()[0]
-    su = Subject.objects.filter(first_name='Anonymous', last_name='User')[0:1]
+    user = request.user
+    su = Subject.objects.filter(user=user)
     if su:
         su = su[0]
     else:
-        su = Subject(first_name='Anonymous', last_name='User')
+        su = Subject(user=user,
+                     first_name=user.first_name,
+                     last_name=user.last_name,
+                     email=user.email,
+                     state='active')
         su.save()
     hash = md5.new()
     hash.update("".join(map(lambda i: chr(random.randint(0, 255)), range(16))))
@@ -966,3 +967,9 @@ def generate_run(request, questionnaire_id):
     run.save()
     return HttpResponseRedirect(reverse('questionnaire', kwargs={'runcode': key}))
 
+
+def assure_authenticated_or_redirect(request):
+    # Redirect user if not authenticated
+    if not request.user.is_authenticated():
+        messages.add_message(request, messages.INFO, 'Please sign in to answer the questionnaire.')
+        return HttpResponseRedirect('/accounts/signin/')

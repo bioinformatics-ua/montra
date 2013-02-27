@@ -7,6 +7,7 @@ from utils import split_numal
 from django.utils import simplejson as json
 from parsers import parse_checks, ParseException
 from django.conf import settings
+from django.contrib.auth.models import User
 
 _numre = re.compile("(\d+)([a-z]+)", re.I)
 
@@ -41,6 +42,9 @@ class Subject(models.Model):
     )
     language = models.CharField(max_length=2, default=settings.LANGUAGE_CODE,
         verbose_name = _('Language'), choices = settings.LANGUAGES)
+
+    # Integrate subject with Django auth user
+    user = models.ForeignKey(User, blank=False, null=False)
 
     def __unicode__(self):
         return u'%s, %s (%s)' % (self.last_name, self.first_name, self.email)
