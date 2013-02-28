@@ -208,7 +208,7 @@ Would you be able to create such a table for the population of in your database?
 
 - pk: 11
   fields: {checks: 'required', extra_en: '', number: '9', questionset: 4,
- text_en: 'During the follow-up period (that is, after a subject enters you data base), what information do you have? More answers are possible. ',
+ text_en: 'During the follow-up period (that is, after a subject enters you data base), what information do you have?',
   type: choice-multiple}
   model: questionnaire.question
 
@@ -232,7 +232,7 @@ Would you be able to create such a table for the population of in your database?
 
 - pk: 12
   fields: {checks: 'requiredif=9,1', extra_en: '', number: '9a', questionset: 4,
- text_en: 'If diagnosis is checked:',
+ text_en: 'Choose available diagnosis information',
   type: choice-multiple}
   model: questionnaire.question
 
@@ -304,7 +304,7 @@ Would you be able to create such a table for the population of in your database?
 
 - pk: 13
   fields: {checks: 'requiredif=9,2', extra_en: '', number: '9b', questionset: 4,
-  text_en: 'If medication is checked:',
+  text_en: 'Choose available prescription information',
   type: choice-multiple}
   model: questionnaire.question
 
@@ -382,7 +382,7 @@ Would you be able to create such a table for the population of in your database?
 
 - pk: 14
   fields: {checks: 'requiredif=9,3', extra_en: '', number: '9c', questionset: 4,
-  text_en: 'if procedures is checked',
+  text_en: 'Choose available procedures information',
   type: choice-multiple}
   model: questionnaire.question
 
@@ -465,7 +465,7 @@ Would you be able to create such a table for the population of in your database?
   model: questionnaire.question
 
 - pk: 17
-  fields: {checks: 'required', extra_en: '', number: '12', questionset: 4,
+  fields: {checks: 'requiredif=11,yes', extra_en: '', number: '11a', questionset: 4,
  text_en: 'If yes, does the committee',
   type: choice-multiple}
   model: questionnaire.question
@@ -489,31 +489,31 @@ Would you be able to create such a table for the population of in your database?
   model: questionnaire.choice
 
 - pk: 18
-  fields: {checks: 'required', extra_en: '', number: '13', questionset: 4,
+  fields: {checks: 'required', extra_en: '', number: '12', questionset: 4,
  text_en: 'Do you have a publically available document that details the procedure by which approval can be requested?',
   type: choice-yesno}
   model: questionnaire.question
 
 - pk: 19
-  fields: {checks: 'required', extra_en: '', number: '14', questionset: 4,
+  fields: {checks: 'required', extra_en: '', number: '13', questionset: 4,
  text_en: 'Are you able to contact the care provider for additional information?',
   type: choice-yesno}
   model: questionnaire.question
 
 - pk: 20
-  fields: {checks: 'required', extra_en: '', number: '15', questionset: 4,
+  fields: {checks: 'required', extra_en: '', number: '14', questionset: 4,
  text_en: 'Are you able to contact the patient for additional information?',
   type: choice-yesno}
   model: questionnaire.question
 
 - pk: 21
-  fields: {checks: 'required', extra_en: '', number: '16', questionset: 5,
+  fields: {checks: 'required', extra_en: '', number: '15', questionset: 5,
  text_en: 'Can you assess the prevalence of diabetes mellitus in the population who enters your data base?',
   type: open-textfield}
   model: questionnaire.question
 
 - pk: 22
-  fields: {checks: 'required', extra_en: '', number: '17', questionset: 5,
+  fields: {checks: 'required', extra_en: '', number: '16', questionset: 5,
  text_en: 'Could you provide a list of peer-reviewed papers based on your data base covering the last 3 years?',
   type: open-textfield}
   model: questionnaire.question
