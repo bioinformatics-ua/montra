@@ -7,7 +7,9 @@ except ImportError:
 
 from django import forms
 from django.utils.translation import ugettext_lazy as _
+from django.shortcuts import redirect
 
+import userena.views
 from userena.forms import SignupForm
 from userena.utils import get_user_model
 from django_countries.countries import COUNTRIES
@@ -82,3 +84,18 @@ class SignupFormExtra(SignupForm):
         # Userena expects to get the new user from this form, so return the new
         # user.
         return new_user
+
+
+# Prevent access to signup/signin pages by logged in users
+def signup(request, **kwargs):
+    if request.user.is_authenticated():
+        return redirect('/')
+
+    return userena.views.signup(request, **kwargs)
+
+
+def signin(request, **kwargs):
+    if request.user.is_authenticated():
+        return redirect('/')
+
+    return userena.views.signin(request, **kwargs)

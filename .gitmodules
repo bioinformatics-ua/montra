@@ -1,3 +1,0 @@
-[submodule "seantis-questionnaire"]
-	path = emif/emif/apps/seantis-questionnaire
-	url = git://github.com/seantis/seantis-questionnaire.git
