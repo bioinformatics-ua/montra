@@ -222,7 +222,7 @@ Would you be able to create such a table for the population of in your database?
   model: questionnaire.choice
 
 - pk: 12
-  fields: {checks: '', extra_en: '', number: '10a', questionset: 4,
+  fields: {checks: 'requiredif=9,1', extra_en: '', number: '9a', questionset: 4,
  text_en: 'If diagnosis is checked:',
   type: choice-multiple}
   model: questionnaire.question
@@ -294,7 +294,7 @@ Would you be able to create such a table for the population of in your database?
   model: questionnaire.choice
 
 - pk: 13
-  fields: {checks: 'required', extra_en: '', number: '10b', questionset: 4,
+  fields: {checks: 'requiredif=9,2', extra_en: '', number: '9b', questionset: 4,
   text_en: 'If medication is checked:',
   type: choice-multiple}
   model: questionnaire.question
@@ -372,7 +372,7 @@ Would you be able to create such a table for the population of in your database?
   model: questionnaire.choice
 
 - pk: 14
-  fields: {checks: 'required', extra_en: '', number: '10c', questionset: 4,
+  fields: {checks: 'requiredif=9,3', extra_en: '', number: '9c', questionset: 4,
   text_en: 'if procedures is checked',
   type: choice-multiple}
   model: questionnaire.question
@@ -444,19 +444,19 @@ Would you be able to create such a table for the population of in your database?
   model: questionnaire.choice
 
 - pk: 15
-  fields: {checks: 'required', extra_en: '', number: '11', questionset: 4,
+  fields: {checks: 'required', extra_en: '', number: '10', questionset: 4,
  text_en: 'Has the patient given informed consent for including his/her data in your data collection?',
   type: choice-yesno}
   model: questionnaire.question
 
 - pk: 16
-  fields: {checks: 'required', extra_en: '', number: '12', questionset: 4,
+  fields: {checks: 'required', extra_en: '', number: '11', questionset: 4,
  text_en: 'Do you have an ethical/review committee?',
   type: choice-yesno}
   model: questionnaire.question
 
 - pk: 17
-  fields: {checks: 'required', extra_en: '', number: '13', questionset: 4,
+  fields: {checks: 'required', extra_en: '', number: '12', questionset: 4,
  text_en: 'If yes, does the committee',
   type: choice-multiple}
   model: questionnaire.question
@@ -480,31 +480,31 @@ Would you be able to create such a table for the population of in your database?
   model: questionnaire.choice
 
 - pk: 18
-  fields: {checks: 'required', extra_en: '', number: '14', questionset: 4,
+  fields: {checks: 'required', extra_en: '', number: '13', questionset: 4,
  text_en: 'Do you have a publically available document that details the procedure by which approval can be requested?',
   type: choice-yesno}
   model: questionnaire.question
 
 - pk: 19
-  fields: {checks: 'required', extra_en: '', number: '15', questionset: 4,
+  fields: {checks: 'required', extra_en: '', number: '14', questionset: 4,
  text_en: 'Are you able to contact the care provider for additional information?',
   type: choice-yesno}
   model: questionnaire.question
 
 - pk: 20
-  fields: {checks: 'required', extra_en: '', number: '16', questionset: 4,
+  fields: {checks: 'required', extra_en: '', number: '15', questionset: 4,
  text_en: 'Are you able to contact the patient for additional information?',
   type: choice-yesno}
   model: questionnaire.question
 
 - pk: 21
-  fields: {checks: 'required', extra_en: '', number: '17', questionset: 5,
+  fields: {checks: 'required', extra_en: '', number: '16', questionset: 5,
  text_en: 'Can you assess the prevalence of diabetes mellitus in the population who enters your data base?',
   type: open-textfield}
   model: questionnaire.question
 
 - pk: 22
-  fields: {checks: 'required', extra_en: '', number: '18', questionset: 5,
+  fields: {checks: 'required', extra_en: '', number: '17', questionset: 5,
  text_en: 'Could you provide a list of peer-reviewed papers based on your data base covering the last 3 years?',
   type: open-textfield}
   model: questionnaire.question
