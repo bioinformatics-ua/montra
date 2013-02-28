@@ -13,8 +13,12 @@
    ========================================================================== */
 
 /* question numbers are always bold, the whole question if it is required */
-.required, .qnumber {
+.qnumber {
     font-weight: bold;
+}
+
+.required:after {
+    content: "*";
 }
 
 .questionset-title {
@@ -127,5 +131,13 @@ input.sending {
     -webkit-transition: 0.3s linear all !important;  
        -moz-transition: 0.3s linear all !important;
          -o-transition: 0.3s linear all !important;
-            transition: 0.3s linear all !important;   
+            transition: 0.3s linear all !important;  
+}
+
+.block-message {
+    margin: 5px 0;
+}
+
+.question-text ul {
+    margin: 5px 0 5px 50px;
 }
