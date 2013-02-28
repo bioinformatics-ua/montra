@@ -69,17 +69,17 @@
   value: "5"}
   model: questionnaire.choice
   pk: 5
-- fields: {question: 2, sortid: 5,
+- fields: {question: 2, sortid: 6,
   text_en: "it is a study specific registry (e.g., a cohort meeting certain criteria)",
   value: "6"}
   model: questionnaire.choice
   pk: 6
-- fields: {question: 2, sortid: 6,
+- fields: {question: 2, sortid: 7,
   text_en: "it is a biobank (it has material/DNA stored)",
   value: "7"}
   model: questionnaire.choice
   pk: 7
-- fields: {question: 2, sortid: 7,
+- fields: {question: 2, sortid: 8,
   text_en: "it is a record-linkage system",
   value: "8"}
   model: questionnaire.choice
@@ -92,11 +92,10 @@
 
 
 - pk: 3
-  fields: {checks: '', extra_en: '', number: '2a', questionset: 2,
+  fields: {checks: 'shownif=2,5', extra_en: '', number: '2a', questionset: 2,
  text_en: 'If disease specific registry, please specify disease or event:',
   type: open-textfield}
   model: questionnaire.question
-
 
 
 - pk: 4
@@ -108,10 +107,9 @@
 
 - pk: 5
   fields: {checks: 'required', extra_en: '', number: '4', questionset: 3,
- text_en: 'For a study, often a population table is required typically consisting of:
-- Patient ID (some personal identifier for each subject in your data base)
-- Start Date (the date the subject enters your data base – possibly the subject enters/exist more than once)
-- End Date (the date the person exits your data base). Would you be able to create such a table for the population of in your database?',
+ text_en: 'For a study, often a population table is required typically consisting of: Patient ID (some personal identifier for each subject in your data base)
+ Start Date (the date the subject enters your data base – possibly the subject enters/exist more than once)
+ End Date (the date the person exits your data base). Would you be able to create such a table for the population of in your database?',
   type: choice-yesnocomment}
   model: questionnaire.question
 
@@ -131,47 +129,47 @@
   type: choice-multiple-freeform}
   model: questionnaire.question
 
-- fields: {question: 5, sortid: 1,
+- fields: {question: 7, sortid: 1,
   text_en: "the subject enters or leaves the practice of a general practitioner",
   value: "1"}
   model: questionnaire.choice
   pk: 10
-- fields: {question: 5, sortid: 2,
+- fields: {question: 7, sortid: 2,
   text_en: "the subject enters or leaves the practice of a pediatrician in primary care",
   value: "2"}
   model: questionnaire.choice
   pk: 11
-- fields: {question: 5, sortid: 3,
+- fields: {question: 7, sortid: 3,
   text_en: "the subject enters or leaves the practice of a pharmacist",
   value: "3"}
   model: questionnaire.choice
   pk: 12
-- fields: {question: 5, sortid: 4,
+- fields: {question: 7, sortid: 4,
   text_en: "the subject is admitted to or discharged from an specialist outpatient clinic",
   value: "4"}
   model: questionnaire.choice
   pk: 13
-- fields: {question: 5, sortid: 5,
+- fields: {question: 7, sortid: 5,
   text_en: "the subject  is admitted to or discharged from a hospitals",
   value: "5"}
   model: questionnaire.choice
   pk: 14
-- fields: {question: 5, sortid: 6,
+- fields: {question: 7, sortid: 6,
   text_en: "the subject moves in or out a specific city or region",
   value: "6"}
   model: questionnaire.choice
   pk: 15
-- fields: {question: 5, sortid: 7,
+- fields: {question: 7, sortid: 7,
   text_en: "the subject enters or leaves a health insurance company of benefit plan",
   value: "7"}
   model: questionnaire.choice
   pk: 16
-- fields: {question: 5, sortid: 8,
+- fields: {question: 7, sortid: 8,
   text_en: "the subject is a specific disease and is included in a cohort",
   value: "8"}
   model: questionnaire.choice
   pk: 17
-- fields: {question: 5, sortid: 9,
+- fields: {question: 7, sortid: 9,
   text_en: "the subject underwent a specific therapy/intervention and is included in a cohort",
   value: "8"}
   model: questionnaire.choice
@@ -240,47 +238,47 @@
   model: questionnaire.choice
 
 - pk: 23
-  fields: {question: 10, sortid: 1,
+  fields: {question: 10, sortid: 2,
   text_en: "diagnosis from pediatrician in general practice",
   value: "2"}
   model: questionnaire.choice
 
 
 - pk: 24
-  fields: {question: 10, sortid: 1,
+  fields: {question: 10, sortid: 3,
   text_en: "diagnosis from specialist outpatient records",
   value: "3"}
   model: questionnaire.choice
 
 - pk: 25
-  fields: {question: 10, sortid: 1,
+  fields: {question: 10, sortid: 4,
   text_en: "diagnosis from in-patient hospital records",
   value: "4"}
   model: questionnaire.choice
 
 - pk: 26
-  fields: {question: 10, sortid: 1,
+  fields: {question: 10, sortid: 5,
   text_en: "diagnosis from in-patient hospital records",
   value: "4"}
   model: questionnaire.choice
 
 
 - pk: 27
-  fields: {question: 10, sortid: 1,
+  fields: {question: 10, sortid: 6,
   text_en: "diagnosis in ICPC",
   value: "4"}
   model: questionnaire.choice
 
 
 - pk: 27
-  fields: {question: 10, sortid: 1,
+  fields: {question: 10, sortid: 7,
   text_en: "diagnosis in ICD",
   value: "4"}
   model: questionnaire.choice
 
 
 - pk: 28
-  fields: {question: 10, sortid: 1,
+  fields: {question: 10, sortid: 8,
   text_en: "diagnosis in READ",
   value: "4"}
   model: questionnaire.choice
@@ -288,19 +286,19 @@
 
 
 - pk: 29
-  fields: {question: 10, sortid: 1,
+  fields: {question: 10, sortid: 9,
   text_en: "diagnosis in Snomed",
   value: "4"}
   model: questionnaire.choice
 
 - pk: 30
-  fields: {question: 10, sortid: 1,
+  fields: {question: 10, sortid: 10,
   text_en: "diagnosis in other coding system",
   value: "4"}
   model: questionnaire.choice
 
 - pk: 31
-  fields: {question: 10, sortid: 1,
+  fields: {question: 10, sortid: 11,
   text_en: "diagnosis in free text",
   value: "4"}
   model: questionnaire.choice
@@ -314,76 +312,76 @@
 
 
 - pk: 32
-  fields: {question: 10, sortid: 1,
+  fields: {question: '9b', sortid: 1,
   text_en: "prescription as recorded in GP records",
   value: "4"}
   model: questionnaire.choice
 
 - pk: 33
-  fields: {question: 10, sortid: 1,
+  fields: {question: '9b', sortid: 1,
   text_en: "prescriptions from pediatrician in general practice",
   value: "4"}
   model: questionnaire.choice
 
 - pk: 34
-  fields: {question: 10, sortid: 1,
+  fields: {question: '9b', sortid: 1,
   text_en: "prescriptions as recorded pharmacies",
   value: "4"}
   model: questionnaire.choice
 
 - pk: 35
-  fields: {question: 10, sortid: 1,
+  fields: {question: '9b', sortid: 1,
   text_en: "prescriptions from specialist outpatient records",
   value: "4"}
   model: questionnaire.choice
 
 - pk: 36
-  fields: {question: 10, sortid: 1,
+  fields: {question: '9b', sortid: 1,
   text_en: "prescriptions from in-patient hospital records",
   value: "4"}
   model: questionnaire.choice
 
 - pk: 37
-  fields: {question: 10, sortid: 1,
+  fields: {question: '9b', sortid: 1,
   text_en: "prescriptions in ICPC",
   value: "4"}
   model: questionnaire.choice
 
 
 - pk: 38
-  fields: {question: 10, sortid: 1,
+  fields: {question: '9b', sortid: 1,
   text_en: "prescriptions in ICD",
   value: "4"}
   model: questionnaire.choice
 
 
 - pk: 39
-  fields: {question: 10, sortid: 1,
+  fields: {question: '9b', sortid: 1,
   text_en: "prescriptions in READ",
   value: "4"}
   model: questionnaire.choice
 
 - pk: 40
-  fields: {question: 10, sortid: 1,
+  fields: {question: '9b', sortid: 1,
   text_en: "prescriptions in Snomed",
   value: "4"}
   model: questionnaire.choice
 
 - pk: 41
-  fields: {question: 10, sortid: 1,
+  fields: {question: '9b', sortid: 1,
   text_en: "prescriptions in other coding system: (please fill in coding system)",
   value: "4"}
   model: questionnaire.choice
 
 - pk: 42
-  fields: {question: 10, sortid: 1,
+  fields: {question: '9b', sortid: 1,
   text_en: "prescriptions in free text",
   value: "4"}
   model: questionnaire.choice
 
 
 - pk: 43
-  fields: {question: 10, sortid: 1,
+  fields: {question: '9b', sortid: 1,
   text_en: "prescriptions from other source",
   value: "4"}
   model: questionnaire.choice
