@@ -68,13 +68,13 @@
                     {% endif %}
                     {% include qdict.template %}
                 {% else %}
-                    <div class="question-text {% if qdict.required %}required{% endif %}">
+                    <div class="question-text {% if qdict.required %}required{% endif %} {% if error %}text-error{% endif %}">
                         <span class="qnumber">{{ question.display_number }}.</span> 
-                        {{ question.text }}
+                        {{ question.text|safe }}
                     </div>
                     <div class="answer">
                         {% if error %}
-                            <div class="alert-message block-message error input"><strong>{{ error }}</strong></div>
+                            <div class="alert-message block-message text-error input">{{ error }}</div>
                         {% endif %}
                         {% include qdict.template %}
                     </div>
