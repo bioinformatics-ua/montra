@@ -51,51 +51,60 @@
   type: choice-multiple-freeform}
   model: questionnaire.question
 
-- fields: {question: 2, sortid: 1,
+- pk: 1
+  fields: {question: 2, sortid: 1,
   text_en: "the source of data is primary care records maintained by GP or pediatrician",
   value: "1"}
   model: questionnaire.choice
-  pk: 1
-- fields: {question: 2, sortid: 2,
+
+- pk: 2
+  fields: {question: 2, sortid: 2,
   text_en: "the source of data is care provided by specialist in an outpatient setting",
   value: "2"}
   model: questionnaire.choice
-  pk: 2
-- fields: {question: 2, sortid: 3,
+
+- pk: 3
+  fields: {question: 2, sortid: 3,
   text_en: "the source of data is the general pharmacy that issues medication",
   value: "3"}
   model: questionnaire.choice
-  pk: 3
-- fields: {question: 2, sortid: 4,
+
+- pk: 4
+  fields: {question: 2, sortid: 4,
   text_en: "the source of data is administrative/ billing data",
   value: "4"}
   model: questionnaire.choice
-  pk: 4
-- fields: {question: 2, sortid: 5,
+
+- pk: 5
+  fields: {question: 2, sortid: 5,
   text_en: "it is a disease or event specific registry",
   value: "5"}
   model: questionnaire.choice
-  pk: 5
-- fields: {question: 2, sortid: 6,
+
+- pk: 6
+  fields: {question: 2, sortid: 6,
   text_en: "it is a study specific registry (e.g., a cohort meeting certain criteria)",
   value: "6"}
   model: questionnaire.choice
-  pk: 6
-- fields: {question: 2, sortid: 7,
+
+- pk: 7
+  fields: {question: 2, sortid: 7,
   text_en: "it is a biobank (it has material/DNA stored)",
   value: "7"}
   model: questionnaire.choice
-  pk: 7
-- fields: {question: 2, sortid: 8,
+
+- pk: 8
+  fields: {question: 2, sortid: 8,
   text_en: "it is a record-linkage system",
   value: "8"}
   model: questionnaire.choice
-  pk: 8
-- fields: {question: 2, sortid: 9,
+
+- pk: 9
+  fields: {question: 2, sortid: 9,
   text_en: "it can be linked to other data bases",
   value: "9"}
   model: questionnaire.choice
-  pk: 9
+
 
 - pk: 3
   fields: {checks: 'requiredif=2a,5', extra_en: '', number: '2b', questionset: 2,
