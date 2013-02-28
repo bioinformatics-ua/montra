@@ -6,7 +6,7 @@ from django.contrib import admin
 admin.autodiscover()
 
 from userena import views as userena_views
-from accounts.views import SignupFormExtra
+from accounts.views import SignupFormExtra, signup, signin
 
 
 urlpatterns = patterns('',
@@ -20,14 +20,17 @@ urlpatterns = patterns('',
     # Uncomment the next line to enable the admin:
     url(r'^admin/', include(admin.site.urls)),
 
+    # Index page
+    url(r'^$', 'emif.views.index'),
+
     # Questionnaire URLs
     url(r'q/', include('questionnaire.urls')),
 
     url(r'^take/(?P<questionnaire_id>[0-9]+)/$', 'questionnaire.views.generate_run'),
-    url(r'^$', 'questionnaire.page.views.page', {'page': 'index'}),
-    url(r'^(?P<page>.*)\.html$', 'questionnaire.page.views.page'),
-    url(r'^(?P<lang>..)/(?P<page>.*)\.html$', 'questionnaire.page.views.langpage'),
-    url(r'^setlang/$', 'questionnaire.views.set_language'),
+    # url(r'^$', 'questionnaire.page.views.page', {'page': 'index'}),
+    # url(r'^(?P<page>.*)\.html$', 'questionnaire.page.views.page'),
+    # url(r'^(?P<lang>..)/(?P<page>.*)\.html$', 'questionnaire.page.views.langpage'),
+    # url(r'^setlang/$', 'questionnaire.views.set_language'),
 
     #
     # User accounts URLs
@@ -35,34 +38,34 @@ urlpatterns = patterns('',
 
     # Signup, signin and signout
     url(r'^accounts/signup/$',
-        userena_views.signup,
+        signup,
         {'signup_form': SignupFormExtra,
-         'success_url': '/'},
+         'success_url': '/take/1/'},
         name='userena_signup'),
     url(r'^accounts/signin/$',
-        userena_views.signin,
+        signin,
         name='userena_signin'),
     url(r'^accounts/signout/$',
         userena_views.signout,
         name='userena_signout'),
 
     # Reset password
-    url(r'^accounts/password/reset/$',
-        auth_views.password_reset,
-        {'template_name': 'userena/password_reset_form.html',
-         'email_template_name': 'userena/emails/password_reset_message.txt'},
-        name='userena_password_reset'),
-    url(r'^accounts/password/reset/done/$',
-        auth_views.password_reset_done,
-        {'template_name': 'userena/password_reset_done.html'},
-        name='userena_password_reset_done'),
-    url(r'^accounts/password/reset/confirm/(?P<uidb36>[0-9A-Za-z]+)-(?P<token>.+)/$',
-        auth_views.password_reset_confirm,
-        {'template_name': 'userena/password_reset_confirm_form.html'},
-        name='userena_password_reset_confirm'),
-    url(r'^accounts/password/reset/confirm/complete/$',
-        auth_views.password_reset_complete,
-        {'template_name': 'userena/password_reset_complete.html'}),
+    # url(r'^accounts/password/reset/$',
+    #     auth_views.password_reset,
+    #     {'template_name': 'userena/password_reset_form.html',
+    #      'email_template_name': 'userena/emails/password_reset_message.txt'},
+    #     name='userena_password_reset'),
+    # url(r'^accounts/password/reset/done/$',
+    #     auth_views.password_reset_done,
+    #     {'template_name': 'userena/password_reset_done.html'},
+    #     name='userena_password_reset_done'),
+    # url(r'^accounts/password/reset/confirm/(?P<uidb36>[0-9A-Za-z]+)-(?P<token>.+)/$',
+    #     auth_views.password_reset_confirm,
+    #     {'template_name': 'userena/password_reset_confirm_form.html'},
+    #     name='userena_password_reset_confirm'),
+    # url(r'^accounts/password/reset/confirm/complete/$',
+    #     auth_views.password_reset_complete,
+    #     {'template_name': 'userena/password_reset_complete.html'}),
 
     # Change email and confirm it
     url(r'^accounts/(?P<username>[^/]+)/email/$',

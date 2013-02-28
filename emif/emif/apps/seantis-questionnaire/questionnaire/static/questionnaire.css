@@ -1,17 +1,3 @@
-/* ==========================================================================
-   Author's custom styles
-   ========================================================================== */
-
-.center {
-    float: none;
-    margin-left: auto;
-    margin-right: auto;
-}
-
-/* ==========================================================================
-   Questionnaire styles
-   ========================================================================== */
-
 /* question numbers are always bold, the whole question if it is required */
 .required, .qnumber {
     font-weight: bold;
@@ -73,6 +59,10 @@ div.error {
 #languages {
     float: right;
     margin: 15px 0px 0px 0px;
+}
+
+html, body {
+    background-color: #cdcdcd;
 }
 
 .content {
