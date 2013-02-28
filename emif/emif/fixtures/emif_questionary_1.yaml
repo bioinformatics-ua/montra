@@ -98,7 +98,7 @@
   pk: 9
 
 - pk: 3
-  fields: {checks: '', extra_en: '', number: '2b', questionset: 2,
+  fields: {checks: 'requiredif=2a,5', extra_en: '', number: '2b', questionset: 2,
   text_en: 'If disease specific registry, please specify disease or event.',
   type: open-textfield}
   model: questionnaire.question
