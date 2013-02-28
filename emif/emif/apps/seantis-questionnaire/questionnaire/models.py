@@ -299,10 +299,10 @@ class Question(models.Model):
 
     def display_number(self):
         "Return either the number alone or the non-number part of the question number indented"
-        m = _numre.match(self.number)
-        if m:
-            sub = m.group(2)
-            return "&nbsp;&nbsp;&nbsp;" + sub
+        # m = _numre.match(self.number)
+        # if m:
+        #     sub = m.group(2)
+        #     return "&nbsp;&nbsp;&nbsp;" + sub
         return self.number
 
     def choices(self):
