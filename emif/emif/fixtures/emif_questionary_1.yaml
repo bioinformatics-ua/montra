@@ -306,67 +306,67 @@ Would you be able to create such a table for the population of in your database?
   model: questionnaire.choice
 
 - pk: 33
-  fields: {question: 13, sortid: 1,
+  fields: {question: 13, sortid: 2,
   text_en: "prescriptions from pediatrician in general practice",
   value: "4"}
   model: questionnaire.choice
 
 - pk: 34
-  fields: {question: 13, sortid: 1,
+  fields: {question: 13, sortid: 3,
   text_en: "prescriptions as recorded pharmacies",
   value: "4"}
   model: questionnaire.choice
 
 - pk: 35
-  fields: {question: 13, sortid: 1,
+  fields: {question: 13, sortid: 4,
   text_en: "prescriptions from specialist outpatient records",
   value: "4"}
   model: questionnaire.choice
 
 - pk: 36
-  fields: {question: 13, sortid: 1,
+  fields: {question: 13, sortid: 5,
   text_en: "prescriptions from in-patient hospital records",
   value: "4"}
   model: questionnaire.choice
 
 - pk: 37
-  fields: {question: 13, sortid: 1,
+  fields: {question: 13, sortid: 6,
   text_en: "prescriptions in ICPC",
   value: "4"}
   model: questionnaire.choice
 
 - pk: 38
-  fields: {question: 13, sortid: 1,
+  fields: {question: 13, sortid: 7,
   text_en: "prescriptions in ICD",
   value: "4"}
   model: questionnaire.choice
 
 - pk: 39
-  fields: {question: 13, sortid: 1,
+  fields: {question: 13, sortid: 8,
   text_en: "prescriptions in READ",
   value: "4"}
   model: questionnaire.choice
 
 - pk: 40
-  fields: {question: 13, sortid: 1,
+  fields: {question: 13, sortid: 9,
   text_en: "prescriptions in Snomed",
   value: "4"}
   model: questionnaire.choice
 
 - pk: 41
-  fields: {question: 13, sortid: 1,
+  fields: {question: 13, sortid: 10,
   text_en: "prescriptions in other coding system: (please fill in coding system)",
   value: "4"}
   model: questionnaire.choice
 
 - pk: 42
-  fields: {question: 13, sortid: 1,
+  fields: {question: 13, sortid: 11,
   text_en: "prescriptions in free text",
   value: "4"}
   model: questionnaire.choice
 
 - pk: 43
-  fields: {question: 13, sortid: 1,
+  fields: {question: 13, sortid: 12,
   text_en: "prescriptions from other source",
   value: "4"}
   model: questionnaire.choice
@@ -378,67 +378,67 @@ Would you be able to create such a table for the population of in your database?
   model: questionnaire.question
 
 - pk: 44
-  fields: {question: 10, sortid: 1,
+  fields: {question: 14, sortid: 1,
   text_en: "Procedures from GP records",
   value: "4"}
   model: questionnaire.choice
 
 - pk: 45
-  fields: {question: 10, sortid: 1,
+  fields: {question: 14, sortid: 1,
   text_en: "Procedures from pediatrician in general practice",
   value: "4"}
   model: questionnaire.choice
 
 - pk: 46
-  fields: {question: 10, sortid: 1,
+  fields: {question: 14, sortid: 1,
   text_en: "Procedures from specialist outpatient records ",
   value: "4"}
   model: questionnaire.choice
 
 - pk: 47
-  fields: {question: 10, sortid: 1,
+  fields: {question: 14, sortid: 1,
   text_en: "Procedures from in-patient hospital records",
   value: "4"}
   model: questionnaire.choice
 
 - pk: 48
-  fields: {question: 10, sortid: 1,
+  fields: {question: 14, sortid: 1,
   text_en: "Procedures coded in ICPC",
   value: "4"}
   model: questionnaire.choice
 
 - pk: 49
-  fields: {question: 10, sortid: 1,
+  fields: {question: 14, sortid: 1,
   text_en: "Procedures coded in ICD",
   value: "4"}
   model: questionnaire.choice
 
 - pk: 50
-  fields: {question: 10, sortid: 1,
+  fields: {question: 14, sortid: 1,
   text_en: "Procedures coded in READ",
   value: "4"}
   model: questionnaire.choice
 
 - pk: 51
-  fields: {question: 10, sortid: 1,
+  fields: {question: 14, sortid: 1,
   text_en: "Procedures coded in Snomed",
   value: "4"}
   model: questionnaire.choice
 
 - pk: 52
-  fields: {question: 10, sortid: 1,
+  fields: {question: 14, sortid: 1,
   text_en: "Procedures other coding system: (please fill in coding system)",
   value: "4"}
   model: questionnaire.choice
 
 - pk: 53
-  fields: {question: 10, sortid: 1,
+  fields: {question: 14, sortid: 1,
   text_en: "Procedures in free text",
   value: "4"}
   model: questionnaire.choice
 
 - pk: 54
-  fields: {question: 10, sortid: 1,
+  fields: {question: 14, sortid: 1,
   text_en: "Procedures from other source: (please fill in source)",
   value: "4"}
   model: questionnaire.choice
