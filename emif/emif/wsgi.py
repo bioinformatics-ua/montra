@@ -13,7 +13,10 @@ middleware here, or combine a Django application with an application of another
 framework.
 
 """
-import os
+import os, sys
+
+sys.path.append(os.path.abspath(os.path.dirname(os.path.abspath(__file__)) + '/..'))
+sys.path.append(os.path.abspath(os.path.dirname(os.path.abspath(__file__)) + '/templates'))
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "emif.settings")
 
