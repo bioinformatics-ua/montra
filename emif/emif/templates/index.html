@@ -57,7 +57,7 @@ body {
 
       <h4>Answer the sample questionnaire</h4>
       <p>
-        Start by answering the sample <a href="/take/1/">questionnaire</a>.
+        Start by answering the sample <a href="take/1/">questionnaire</a>.
         {% if not request.user.is_authenticated %}
         You need to be <a href="{% url 'userena_signin' %}">signed in</a>, so if you don't have an account, <a href="{% url 'userena_signup' %}">sign up</a> now.
         {% endif %}
@@ -65,7 +65,7 @@ body {
     </div>
 
     <div class="span6" style="text-align:center; padding-top: 40px">
-      <img src="/static/img/emif_logo.png" alt="EMIF Logo" style="width: 180px; height: 163px;" />
+      <img src="static/img/emif_logo.png" alt="EMIF Logo" style="width: 180px; height: 163px;" />
     </div>
   </div>
 </div>

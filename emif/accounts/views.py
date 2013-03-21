@@ -14,6 +14,8 @@ from userena.forms import SignupForm
 from userena.utils import get_user_model
 from django_countries.countries import COUNTRIES
 
+from django.conf import settings
+
 
 class SignupFormExtra(SignupForm):
     """
@@ -89,13 +91,13 @@ class SignupFormExtra(SignupForm):
 # Prevent access to signup/signin pages by logged in users
 def signup(request, **kwargs):
     if request.user.is_authenticated():
-        return redirect('/')
+        return redirect(settings.BASE_URL)
 
     return userena.views.signup(request, **kwargs)
 
 
 def signin(request, **kwargs):
     if request.user.is_authenticated():
-        return redirect('/')
+        return redirect(settings.BASE_URL)
 
     return userena.views.signin(request, **kwargs)

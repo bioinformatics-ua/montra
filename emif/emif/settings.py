@@ -62,11 +62,13 @@ MEDIA_URL = ''
 # Don't put anything in this directory yourself; store your static files
 # in apps' "static/" subdirectories and in STATICFILES_DIRS.
 # Example: "/home/media/media.lawrence.com/static/"
+
+BASE_URL = '/'
 STATIC_ROOT = ''
 
 # URL prefix for static files.
 # Example: "http://media.lawrence.com/static/"
-STATIC_URL = '/static/'
+STATIC_URL = BASE_URL + 'static/'
 
 # Additional locations of static files
 STATICFILES_DIRS = (
@@ -171,12 +173,12 @@ USERENA_SIGNIN_AFTER_SIGNUP = True
 USERENA_WITHOUT_USERNAMES = True
 USERENA_DISABLE_PROFILE_LIST = True
 USERENA_USE_MESSAGES = False
-USERENA_REDIRECT_ON_SIGNOUT = '/'
-USERENA_SIGNIN_REDIRECT_URL = '/take/1/'
+USERENA_REDIRECT_ON_SIGNOUT = BASE_URL
+USERENA_SIGNIN_REDIRECT_URL = BASE_URL + 'take/1/'
 
 LOGIN_REDIRECT_URL = USERENA_SIGNIN_REDIRECT_URL
-LOGIN_URL = '/accounts/signin/'
-LOGOUT_URL = '/accounts/signout/'
+LOGIN_URL = BASE_URL + 'accounts/signin/'
+LOGOUT_URL = BASE_URL + 'accounts/signout/'
 
 # A sample logging configuration. The only tangible logging
 # performed by this configuration is to send an email to

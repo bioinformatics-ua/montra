@@ -976,4 +976,4 @@ def assure_authenticated_or_redirect(request):
     # Redirect user if not authenticated
     if not request.user.is_authenticated():
         messages.add_message(request, messages.INFO, 'Please sign in to answer the questionnaire.')
-        return HttpResponseRedirect('/accounts/signin/')
+        return HttpResponseRedirect(settings.BASE_URL + 'accounts/signin/')
