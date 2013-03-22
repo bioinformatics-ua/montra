@@ -13,9 +13,15 @@ middleware here, or combine a Django application with an application of another
 framework.
 
 """
-import os
+import os, sys
+
+sys.path.append(os.path.abspath(os.path.dirname(os.path.abspath(__file__)) + '/..'))
+sys.path.append(os.path.abspath(os.path.dirname(os.path.abspath(__file__)) + '/templates'))
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "emif.settings")
+
+
+
 
 # This application object is used by any WSGI server configured to use this
 # file. This includes Django's development server, if the WSGI_APPLICATION

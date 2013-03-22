@@ -14,7 +14,7 @@ MANAGERS = ADMINS
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': 'emif.db',                      # Or path to database file if using sqlite3.
+        'NAME': '/projects/emif-dev/emif/emif.db',                      # Or path to database file if using sqlite3.
         'USER': '',                      # Not used with sqlite3.
         'PASSWORD': '',                  # Not used with sqlite3.
         'HOST': '',                      # Set to empty string for localhost. Not used with sqlite3.
@@ -63,8 +63,8 @@ MEDIA_URL = ''
 # in apps' "static/" subdirectories and in STATICFILES_DIRS.
 # Example: "/home/media/media.lawrence.com/static/"
 
-BASE_URL = '/'
-STATIC_ROOT = ''
+BASE_URL = '/emif-dev'
+STATIC_ROOT = '/projects/emif-dev/emif/emif/collected-static'
 
 # URL prefix for static files.
 # Example: "http://media.lawrence.com/static/"
@@ -75,8 +75,8 @@ STATICFILES_DIRS = (
     # Put strings here, like "/home/html/static" or "C:/www/django/static".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
-    os.path.abspath('./emif/static'),
-    os.path.abspath('./apps/seantis-questionnaire/questionnaire/static/')
+    os.path.abspath('/projects/emif-dev/emif/emif/static'),
+    os.path.abspath('/projects/emif-dev/emif/emif/apps/seantis-questionnaire/questionnaire/static/')
 )
 
 # List of finder classes that know how to find static files in
@@ -118,8 +118,8 @@ TEMPLATE_DIRS = (
     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
-    os.path.abspath('./apps/seantis-questionnaire/questionnaire/templates'),
-    os.path.abspath('./emif/templates'),
+    os.path.abspath('/projects/emif-dev/emif/emif/apps/seantis-questionnaire/questionnaire/templates'),
+    os.path.abspath('/projects/emif-dev/emif/emif/templates'),
 )
 
 INSTALLED_APPS = (
