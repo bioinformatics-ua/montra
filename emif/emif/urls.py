@@ -7,12 +7,10 @@ admin.autodiscover()
 
 from userena import views as userena_views
 from accounts.views import SignupFormExtra, signup, signin
-
+from views import *
 
 urlpatterns = patterns('',
-    # Examples:
-    # url(r'^$', 'emif.views.home', name='home'),
-    # url(r'^emif/', include('emif.foo.urls')),
+    
 
     # Uncomment the admin/doc line below to enable admin documentation:
     url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
@@ -22,6 +20,30 @@ urlpatterns = patterns('',
 
     # Index page
     url(r'^$', 'emif.views.index'),
+
+    # Quick Search 
+    url(r'^search$', 'emif.views.quick_search'),
+
+    # Advanced Search 
+    url(r'^advancedSearch/(?P<questionnaire_id>[0-9]+)/$$', 'emif.views.advanced_search'),
+    url(r'^q2/(?P<runcode>[^/]+)/$', questionaries_with_sets, name='questionaries_with_sets'),
+    url(r'^q2/(?P<runcode>[^/]+)/(?P<qs>[-]{0,1}\d+)/$',
+            questionaries_with_sets, name='questionset_sets'),
+
+    # Results
+    url(r'^results$', 'emif.views.results'),
+
+
+    # List Databases 
+    url(r'^databases$', 'emif.views.databases'),
+
+
+    # Documentation 
+    url(r'^docs/api$', 'emif.views.docs_api'),
+
+
+    # API 
+    #url(r'^api/', include('api.urls')),
 
     # Questionnaire URLs
     url(r'q/', include('questionnaire.urls')),

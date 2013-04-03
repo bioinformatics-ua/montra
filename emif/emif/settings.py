@@ -5,16 +5,32 @@ import os.path
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
+
+#BASE_URL = '/emif-dev'
+BASE_URL = '/'
+PROJECT_DIR_ROOT = '/projects/emif-dev/'
+
+if DEBUG:
+    PROJECT_DIR_ROOT = "./"
+    MIDDLE_DIR = ""
+else:
+    MIDDLE_DIR = "emif/emif/"
+
 ADMINS = (
-    # ('Your Name', 'your_email@example.com'),
+     ('Luis A. Bastiao Silva', 'bastiao@ua.pt'),
 )
 
 MANAGERS = ADMINS
 
+DATABASE_PATH_SQLITE3 = "emif.db"
+
+if not DEBUG:
+    DATABASE_PATH_SQLITE3 = PROJECT_DIR_ROOT + "emif/" +  DATABASE_PATH_SQLITE3
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': '/projects/emif-dev/emif/emif.db',                      # Or path to database file if using sqlite3.
+        'NAME': DATABASE_PATH_SQLITE3,                      # Or path to database file if using sqlite3.
         'USER': '',                      # Not used with sqlite3.
         'PASSWORD': '',                  # Not used with sqlite3.
         'HOST': '',                      # Set to empty string for localhost. Not used with sqlite3.
@@ -63,8 +79,12 @@ MEDIA_URL = ''
 # in apps' "static/" subdirectories and in STATICFILES_DIRS.
 # Example: "/home/media/media.lawrence.com/static/"
 
-BASE_URL = '/emif-dev'
-STATIC_ROOT = '/projects/emif-dev/emif/emif/collected-static'
+if DEBUG:
+    STATIC_ROOT = ''    
+else:
+    STATIC_ROOT = PROJECT_DIR_ROOT + 'emif/emif/collected-static'
+
+
 
 # URL prefix for static files.
 # Example: "http://media.lawrence.com/static/"
@@ -75,8 +95,8 @@ STATICFILES_DIRS = (
     # Put strings here, like "/home/html/static" or "C:/www/django/static".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
-    os.path.abspath('/projects/emif-dev/emif/emif/static'),
-    os.path.abspath('/projects/emif-dev/emif/emif/apps/seantis-questionnaire/questionnaire/static/')
+    os.path.abspath(PROJECT_DIR_ROOT + MIDDLE_DIR + 'emif/static'),
+    os.path.abspath(PROJECT_DIR_ROOT +MIDDLE_DIR +'apps/seantis-questionnaire/questionnaire/static/')
 )
 
 # List of finder classes that know how to find static files in
@@ -118,9 +138,10 @@ TEMPLATE_DIRS = (
     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
-    os.path.abspath('/projects/emif-dev/emif/emif/apps/seantis-questionnaire/questionnaire/templates'),
-    os.path.abspath('/projects/emif-dev/emif/emif/templates'),
+    os.path.abspath(PROJECT_DIR_ROOT +MIDDLE_DIR + 'apps/seantis-questionnaire/questionnaire/templates'),
+    os.path.abspath(PROJECT_DIR_ROOT + MIDDLE_DIR + 'emif/templates'),
 )
+
 
 INSTALLED_APPS = (
     'django.contrib.auth',
@@ -152,6 +173,8 @@ INSTALLED_APPS = (
 
     # Bootstrap layouts and forms
     'crispy_forms',
+    'emif',
+
 )
 
 # Userena settings

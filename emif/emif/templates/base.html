@@ -10,7 +10,7 @@
         <title>{% block title %}EMIF Platform{% endblock title %}</title>
         <meta name="description" content="EMIF Platform">
         <meta name="viewport" content="width=device-width">
-        <base href="/emif-dev/">
+        <base href="/">
         <link rel="shortcut icon" href="static/img/favicon.ico" type="image/x-icon" />
         <link rel="stylesheet" href="static/css/bootstrap.min.css">
         <style>
@@ -47,25 +47,25 @@
                     </a>
                     <a class="brand" href="">EMIF Platform</a>
                     <div class="nav-collapse collapse">
-                        {% comment %}
+                   
+
                         <ul class="nav">
                             <li class="active"><a href="/">Home</a></li>
-                            <li><a href="http://www.imi.europa.eu/content/emif">About</a></li>
-                            <li><a href="http://www.imi.europa.eu/content/emif">Contact</a></li>
-                            <li class="dropdown">
-                                <a href="#" class="dropdown-toggle" data-toggle="dropdown">Dropdown <b class="caret"></b></a>
-                                <ul class="dropdown-menu">
-                                    <li><a href="#">Action</a></li>
-                                    <li><a href="#">Another action</a></li>
-                                    <li><a href="#">Something else here</a></li>
-                                    <li class="divider"></li>
-                                    <li class="nav-header">Nav header</li>
-                                    <li><a href="#">Separated link</a></li>
-                                    <li><a href="#">One more separated link</a></li>
-                                </ul>
-                            </li>
+                            <li><a href="databases">My databases</a></li>
+                            <li><a href="search">Search</a></li>
+                            <li><a href="advancedSearch/1">Advanced Search</a></li>
+                           
                         </ul>
-                        {% endcomment %}
+                            <ul class="nav pull-right">
+
+                            <li><a href="http://www.imi.europa.eu/content/emif">Contact</a></li>
+                            <li><a href="http://www.imi.europa.eu/content/emif">About</a></li>
+                            
+
+                </ul>
+
+
+
                         {% block headerlogin %}
                         {% if not request.user.is_authenticated %}
                         <form class="navbar-form pull-right" method="post" action="{% url 'userena_signin' %}">
