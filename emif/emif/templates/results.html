@@ -1,0 +1,98 @@
+{% extends 'base.html' %}
+{% load url from future %}
+
+{% block styleextra %}
+body {
+  padding-top: 20px;
+  padding-bottom: 40px;
+}
+
+/* Custom container */
+.container-narrow {
+  margin: 0 auto;
+  max-width: 700px;
+}
+.container-narrow > hr {
+  margin: 30px 0;
+}
+
+/* Main marketing message and sign up button */
+.jumbotron {
+  margin: 60px 0;
+  text-align: center;
+}
+.jumbotron h1 {
+  font-size: 72px;
+  line-height: 1;
+}
+.jumbotron .btn {
+  font-size: 21px;
+  padding: 14px 24px;
+}
+
+/* Supporting marketing content */
+.marketing {
+  margin: 60px 0;
+}
+.marketing p + h4 {
+  margin-top: 28px;
+}
+{% endblock %}
+
+{% block content %}
+<div class="container-narrow">
+  <div class="jumbotron">
+
+    <div class="span6" style="text-align:center; padding-top: 40px">
+      <img src="static/img/emif_logo.png" alt="EMIF Logo" style="width: 180px; height: 163px;" />
+      <h2>Quick Search </h2>    
+    </div>
+
+
+  </div>
+<hr>
+  
+<div class="span6" style="text-align:center">
+
+ <div class="container" id="search">
+        <!-- search errors -->
+        <div class="row-fluid center" id="errors">
+            <div class="alert span6" id="alert_short">
+                <button type="button" class="close" data-dismiss="alert">&times;</button>
+                <strong>Warning!</strong> Your search query must be at least 4 characters long.
+            </div> 
+            <div class="alert alert-error span6" id="alert_noresults">
+                <button type="button" class="close" data-dismiss="alert">&times;</button>
+                <strong>Warning!</strong> Diseasecard found no results for you search query <span class="label label-important">Test</span>.
+            </div>
+        </div>
+        <div class="navbar" id="loading">
+            <div class="navbar-inner">
+                <div class="pull-left">
+                    <h4><span>Your results are loading... <i class="icon-angle-right icon-spin"></i></span></h4>
+                </div>
+            </div>
+        </div>
+        <div class="navbar" id="meta">
+            <div class="navbar-inner">
+                <div class="pull-left">
+                    <h4><span id="results_size"></span> total results for <span class="label label-inverse">Test</span></h4>
+                </div>
+                <form class="pull-right navbar-form" id="tour_filter">
+                    <label>
+                        <input class="input-large" type="text" placeholder="Filter" id="filter">
+                    </label>
+                </form> 
+            </div>
+
+        </div>
+      </div>
+    </div>
+    
+
+
+</div>
+  
+  </div>
+</div>
+{% endblock %}
