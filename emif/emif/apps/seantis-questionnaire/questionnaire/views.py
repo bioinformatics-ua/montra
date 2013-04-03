@@ -2,7 +2,7 @@
 # vim: set fileencoding=utf-8
 from django.http import HttpResponse, HttpResponseRedirect
 from django.template import RequestContext
-from django.core.urlresolvers import reverse
+
 from django.core.cache import cache
 from django.contrib.auth.decorators import permission_required
 from django.contrib import messages
@@ -563,6 +563,8 @@ def show_questionnaire(request, runinfo, errors={}):
     r['Cache-Control'] = 'no-cache'
     r['Expires'] = "Thu, 24 Jan 1980 00:00:00 GMT"
     return r
+
+
 
 def substitute_answer(qvalues, obj):
     """Objects with a 'text/text_xx' attribute can contain magic strings

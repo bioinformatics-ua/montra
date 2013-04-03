@@ -16,3 +16,6 @@ urlpatterns = patterns('',
     url(r'^q/manage/manage/sendemails/$',
         'questionnaire.views.send_emails'),
 )
+
+
+
