@@ -2,7 +2,7 @@
 # vim: set fileencoding=utf-8
 from django.http import HttpResponse, HttpResponseRedirect
 from django.template import RequestContext
-
+from django.core.urlresolvers import reverse
 from django.core.cache import cache
 from django.contrib.auth.decorators import permission_required
 from django.contrib import messages
@@ -423,6 +423,7 @@ def questionnaire(request, runcode=None, qs=None):
     return redirect_to_qs(runinfo)
 
 def finish_questionnaire(runinfo, questionnaire):
+
     hist = RunInfoHistory()
     hist.subject = runinfo.subject
     hist.runid = runinfo.runid
@@ -656,9 +657,10 @@ def export_csv(request, qid): # questionnaire_id
     For a first_name questionnaire id, generaete a CSV containing all the
     answers for all subjects.
     """
+    print "export_csv"
     import tempfile, csv, cStringIO, codecs
     from django.core.servers.basehttp import FileWrapper
-
+    print qid
     class UnicodeWriter:
         """
         COPIED from http://docs.python.org/library/csv.html example:
@@ -979,3 +981,4 @@ def assure_authenticated_or_redirect(request):
     if not request.user.is_authenticated():
         messages.add_message(request, messages.INFO, 'Please sign in to answer the questionnaire.')
         return HttpResponseRedirect(settings.BASE_URL + 'accounts/signin/')
+

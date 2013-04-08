@@ -1,3 +1,23 @@
+# -*- coding: utf-8 -*-
+
+# Copyright (C) 2013 Luís A. Bastião Silva and Universidade de Aveiro
+#
+# Authors: Luís A. Bastião Silva <bastiao@ua.pt>
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
+
 from django.shortcuts import render
 from django.http import HttpResponse, HttpResponseRedirect
 from django.core.urlresolvers import reverse
@@ -13,7 +33,6 @@ import md5
 import random
 
 
-
 def index(request, template_name='index.html'):
     return render(request, template_name, {'request': request})
 
@@ -23,8 +42,12 @@ def quick_search(request, template_name='quick_search.html'):
 def results(request, template_name='results.html'):
     return render(request, template_name, {'request': request})
 
+def results_diff(request, template_name='results_diff.html'):
+    return render(request, template_name, {'request': request})
+
 def advanced_search(request, questionnaire_id ):
     #return render(request, template_name, {'request': request})
+    print questionnaire_id
     return show_full_questionnaire(request, questionnaire_id)
 
 # Documentation 
@@ -50,24 +73,38 @@ def show_full_questionnaire(request, runinfo, errors={}):
 
     Also add the javascript dependency code.
     """
-
+    print "in show_full_questionnaire - head"
     r = assure_authenticated_or_redirect(request)
+    print "in show_full_questionnaire - head2"
     #if r:
     #    return r
     questionnaire_id = runinfo
     qu = get_object_or_404(Questionnaire, id=questionnaire_id)
+    print "in show_full_questionnaire - head3"
+    print qu.questionsets().__class__.__name__
+    if isinstance(qu.questionsets(), (list, tuple)):
+        print "is list or tuple"
+    else:
+        print "is list or tuple - not"
+    #qs = qu.questionsets()
     qs = qu.questionsets()[0]
+    print "in show_full_questionnaire - head3.5"
     user = request.user
+    print "in show_full_questionnaire - head3.6"
     su = Subject.objects.filter(user=user)
+    print "in show_full_questionnaire - head3.7"
     if su:
         su = su[0]
+        print "in show_full_questionnaire - head5"
     else:
         su = Subject(user=user,
                      first_name=user.first_name,
                      last_name=user.last_name,
                      email=user.email,
                      state='active')
+        print "in show_full_questionnaire - head4"
         su.save()
+    print "in show_full_questionnaire"
     hash = md5.new()
     hash.update("".join(map(lambda i: chr(random.randint(0, 255)), range(16))))
     hash.update(settings.SECRET_KEY)
@@ -116,20 +153,26 @@ def redirect_to_qs(runinfo):
     url = reverse("questionset_sets",
                 args=[ runinfo.random, runinfo.questionset.sortid ])
 
-    print url
+    print "redirect to url: " + url
     return HttpResponseRedirect(url)
 
 @transaction.commit_on_success
 def questionaries_with_sets(request, runcode=None, qs=None):
-
+    print "questionaries_with_sets"
+    print "RunCode: " + str(runcode)
+    print "Qs: " + str(qs)
     # if runcode provided as query string, redirect to the proper page
     if not runcode:
         runcode = request.GET.get('runcode')
+        print "RunCode inside: " + runcode
         if not runcode:
             return HttpResponseRedirect("/")
         else:
-            return HttpResponseRedirect(reverse("questionaries_with_sets",args=[runcode]))
-
+            
+            __qs = int(qs) + 1
+            __qs += 1
+            print HttpResponseRedirect(reverse("questionaries_with_sets",args=[runcode,str(__qs)]))
+            return HttpResponseRedirect(reverse("questionaries_with_sets",args=[runcode, str(__qs)]))
 
     runinfo = get_runinfo(runcode)
     print "Runinfo:" + str(runinfo)
@@ -376,4 +419,7 @@ def show_fingerprint_page(request, runinfo, errors={}):
     r['Cache-Control'] = 'no-cache'
     r['Expires'] = "Thu, 24 Jan 1980 00:00:00 GMT"
     return r
+
+
+
 

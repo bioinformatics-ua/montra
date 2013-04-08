@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-
 # Copyright (C) 2013 Luís A. Bastião Silva and Universidade de Aveiro
 #
 # Authors: Luís A. Bastião Silva <bastiao@ua.pt>
@@ -29,8 +28,13 @@
 from __future__ import print_function
 import pysolr
 
+from questionnaire.models import RunInfoHistory
+#from questionnaire.models import Answer, Question
 
-from questionnaire.models import Answer, Question
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+
+
 
 """
 Convert a answer from questionarie to a JSON document to be indexed by SOLR
@@ -40,31 +44,39 @@ def convert_answer_to_json(question_id,answers):
 
 	response = dict()
 
-	for answer in answers:
-		question_key = answer.question.text
-		question_value = answer.answer 
-		response[question_key] = question_value
+	# for answer in answers:
+	# 	question_key = answer.question.text
+	# 	question_value = answer.answer 
+	# 	response[question_key] = question_value
 
-	# Convert to JSON
-	response_json =  JSONEncoder().encode(response)
+	# # Convert to JSON
+	# response_json =  JSONEncoder().encode(response)
 
-	return response_json
+	# return response_json
 
 
 """It is responsible for index the documents and search over them
 It also connects to SOLR
 """
-class IndexEngine:
+class CoreEngine:
 	CONNECTION_TIMEOUT_DEFAULT = 10
 	def __init__(self, timeout=CONNECTION_TIMEOUT_DEFAULT):
 		# Setup a Solr instance. The timeout is optional.
-		self.solr = pysolr.Solr('http://localhost:8983/solr/', timeout=timeout)
+		self.solr = pysolr.Solr('http://localhost:8983/solr', timeout=timeout)
 
 	def index_fingerprint(self, doc):
 		"""Index fingerprint 
 		"""
 		# index document
-		self.solr.add(convert_answer_to_json(doc))
+		self.index_fingerprint_as_json(convert_answer_to_json(doc))
+	
+	def index_fingerprint_as_json(self, d):
+		"""Index fingerprint as json
+		"""
+		# index document
+		
+		xlm_answer = self.solr.add([d])
+		print(xlm_answer)
 		self.optimize()
 
 	def optimize(self):
@@ -91,34 +103,88 @@ class IndexEngine:
 		# query is fine.
 		results = self.solr.search(query)
 
-		# # The ``Results`` object stores total results found, by default the top
-		# # ten most relevant results and any additional data like
-		# # facets/highlighting/spelling/etc.
-		# print("Saw {0} result(s).".format(len(results)))
-
-		# # Just loop over it to access the results.
-		# for result in results:
-		#     print("The title is '{0}'.".format(result['title'])
-
-		# For a more advanced query, say involving highlighting, you can pass
-		# additional options to Solr.
-		results = self.solr.search('bananas', **{
-		    'hl': 'true',
-		    'hl.fragsize': 10,
-		})
 		return results
 
 	def more_like_this(self, id_doc):
-		pass
-
-		# You can optimize the index when it gets fragmented, for better speed.
-
-		# You can also perform More Like This searches, if your Solr is configured
-		# correctly.
 		similar = self.solr.more_like_this(q='id:doc_2', mltfl='text')
+		return similar
 
-		# Finally, you can delete either individual documents...
-		solr.delete(id='doc_1')
 
-		# ...or all documents.
-		solr.delete(q='*:*')
+
+@receiver(post_save, sender=RunInfoHistory)
+def my_handler(sender, **kwargs):
+	pass
+	print("you're fucked")
+	pass
+
+post_save.connect(my_handler, sender=RunInfoHistory)
+
+
+
+
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+from searchengine.search_indexes import CoreEngine
+from questionnaire.models import *
+
+def convert_answers_to_solr(runinfo):
+    c = CoreEngine()
+    _m = {'id':'Luis', 'title': 'dam', 'my_stat_t': 'lol'}
+    import json
+    _mm=json.dumps(_m)
+    print(_mm)
+    c.index_fingerprint_as_json(_m)
+    results = c.search_fingerprint("my_stat_t:locals()")
+    print(results)
+    for r in results:
+        print(r)
+
+
+    runid = runinfo.runid
+    answers = RunInfo.objects.filter(runid=runid)
+    print answers
+
+
+
+
+
+
+
+
+@receiver(post_save, sender=RunInfoHistory)
+def my_handler(sender, **kwargs):
+    print "#### Indexing now ###############"
+    print sender
+    for key in kwargs:
+        print "another keyword arg: %s: %s" % (key, kwargs[key])
+    runinfo = kwargs["instance"]
+    
+    print runinfo.questionnaire.questionsets()
+    print runinfo.subject
+    print runinfo.skipped
+    print runinfo.tags
+    print runinfo.completed
+    print runinfo.runid
+    convert_answers_to_solr(runinfo)
+
+
+
+
+def main():
+
+	c = CoreEngine()
+	_m = {'id':'Luis', 'title': 'dam', 'my_stat_t': 'lol'}
+	import json
+	_mm=json.dumps(_m)
+	print(_mm)
+	c.index_fingerprint_as_json(_m)
+	results = c.search_fingerprint("my_stat_t:locals()")
+	print(results)
+	for r in results:
+		print(r)
+
+
+
+
+if __name__=="__main__":
+	main()

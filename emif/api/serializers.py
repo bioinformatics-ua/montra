@@ -1,4 +1,3 @@
-
 # -*- coding: utf-8 -*-
 # Copyright (C) 2013 Luís A. Bastião Silva and Universidade de Aveiro
 #
@@ -19,30 +18,15 @@
 #
 
 
-
-"""
-This file demonstrates writing tests using the unittest module. These will pass
-when you run "manage.py test".
-
-Replace this with more appropriate tests for your application.
-"""
-
-from django.test import TestCase
-import unittest
+from django.contrib.auth.models import User, Group, Permission
+from rest_framework import serializers
 
 
-class SimpleTest(TestCase):
-    def test_basic_addition(self):
-        """
-        Tests that 1 + 1 always equals 2.
-        """
-        self.assertEqual(1 + 1, 2)
 
+class SearchSerializer(serializers.Serializer):
 
-class CoreIndex(unittest.TestCase):
-    def testBasic(self):
-        a = ['larry', 'curly', 'moe']
-        self.assertEqual(my_func(a, 0), 'larry')
-        self.assertEqual(my_func(a, 1), 'curly')
+    title = serializers.CharField(max_length=100)
+    text = serializers.CharField()
+    
 
 

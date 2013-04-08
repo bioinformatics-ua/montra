@@ -19,3 +19,4 @@ pytz==2012j
 -e git://github.com/seantis/seantis-questionnaire.git@73b80dce498de36ea6e8d383e32469c85fb97af1#egg=seantis_questionnaire-dev
 textile==2.1.5
 wsgiref==0.1.2
+djangorestframework

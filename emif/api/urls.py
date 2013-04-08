@@ -1,4 +1,4 @@
-
+#!python
 # -*- coding: utf-8 -*-
 # Copyright (C) 2013 Luís A. Bastião Silva and Universidade de Aveiro
 #
@@ -19,30 +19,11 @@
 #
 
 
+from django.conf.urls import patterns, url
+from rest_framework.urlpatterns import format_suffix_patterns
 
-"""
-This file demonstrates writing tests using the unittest module. These will pass
-when you run "manage.py test".
+urlpatterns = patterns('api.views',
+    url(r'^root/$', 'api_root'),
+)
 
-Replace this with more appropriate tests for your application.
-"""
-
-from django.test import TestCase
-import unittest
-
-
-class SimpleTest(TestCase):
-    def test_basic_addition(self):
-        """
-        Tests that 1 + 1 always equals 2.
-        """
-        self.assertEqual(1 + 1, 2)
-
-
-class CoreIndex(unittest.TestCase):
-    def testBasic(self):
-        a = ['larry', 'curly', 'moe']
-        self.assertEqual(my_func(a, 0), 'larry')
-        self.assertEqual(my_func(a, 1), 'curly')
-
-
+urlpatterns = format_suffix_patterns(urlpatterns)
