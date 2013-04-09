@@ -1,2 +1,12 @@
 .DS_Store
 *.pyc
+
+*.db2
+
+emif/emif/emif.db
+
+emif/questionnaire
+
+emif/emif/questions.to.print.py
+
+emif/run.sh
