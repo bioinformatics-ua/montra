@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # Copyright (C) 2013 Luís A. Bastião Silva and Universidade de Aveiro
 #
@@ -34,6 +33,8 @@ from questionnaire.models import RunInfoHistory
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
+
+import logging
 
 
 """
@@ -127,47 +128,59 @@ from django.dispatch import receiver
 from searchengine.search_indexes import CoreEngine
 from questionnaire.models import *
 
+
+def convert_text_to_slug(text):
+	#TODO: optimize
+	return text.replace(' ', '_').replace('?','').replace('.', '').replace(',','')
+
+def clean_answer(answer):
+	#TODO: optimize
+	return answer
+
+
 def convert_answers_to_solr(runinfo):
     c = CoreEngine()
-    _m = {'id':'Luis', 'title': 'dam', 'my_stat_t': 'lol'}
-    import json
-    _mm=json.dumps(_m)
-    print(_mm)
-    c.index_fingerprint_as_json(_m)
-    results = c.search_fingerprint("my_stat_t:locals()")
-    print(results)
-    for r in results:
-        print(r)
-
-
+    
     runid = runinfo.runid
-    answers = RunInfo.objects.filter(runid=runid)
-    print answers
+    answers = Answer.objects.filter(runid=runid)
 
+    print(answers)
+    d = {}
+    for a in answers:
+    	logging.debug("Answer text: " + a.answer)
+    	logging.debug("Q: " + a.question.text)
+    	logging.debug("Slug:" + a.question.slug)
+    	slug = a.question.slug	
+    	
+    	if len(slug)>2:
+    		slug = a.question.slug	
+    		logging.debug("Slug@"+slug)
+    		logging.debug("Slug@len"+str(len(slug)))
+    	else:
+    		slug = convert_text_to_slug(a.question.text)
+    		logging.debug("Slug@@"+slug)
 
-
-
-
-
+    	d[slug+"_t"] = a.answer	
+    print(d)
+    d['id']=runid
+    c.index_fingerprint_as_json(d)
 
 
 @receiver(post_save, sender=RunInfoHistory)
 def my_handler(sender, **kwargs):
-    print "#### Indexing now ###############"
-    print sender
+    logging.debug("#### Indexing now ###############")
+    logging.debug(sender)
     for key in kwargs:
-        print "another keyword arg: %s: %s" % (key, kwargs[key])
+        logging.debug("another keyword arg: %s: %s" % (key, kwargs[key]))
     runinfo = kwargs["instance"]
     
-    print runinfo.questionnaire.questionsets()
-    print runinfo.subject
-    print runinfo.skipped
-    print runinfo.tags
-    print runinfo.completed
-    print runinfo.runid
+    logging.debug(runinfo.questionnaire.questionsets())
+    logging.debug(runinfo.subject)
+    logging.debug(runinfo.skipped)
+    logging.debug(runinfo.tags)
+    logging.debug(runinfo.completed)
+    logging.debug(runinfo.runid)
     convert_answers_to_solr(runinfo)
-
-
 
 
 def main():
@@ -182,9 +195,6 @@ def main():
 	print(results)
 	for r in results:
 		print(r)
-
-
-
 
 if __name__=="__main__":
 	main()

@@ -71,7 +71,7 @@ class Subject(models.Model):
 class Questionnaire(models.Model):
     name = models.CharField(max_length=128)
     redirect_url = models.CharField(max_length=128, help_text="URL to redirect to when Questionnaire is complete. Macros: $SUBJECTID, $RUNID, $LANG", default="/static/complete.html")
-    #slug = models.CharField(max_length=128)
+    slug = models.CharField(max_length=128)
 
     def __unicode__(self):
         return self.name
@@ -268,7 +268,7 @@ class Question(models.Model):
         "by joining them with the words <tt>and</tt> or <tt>or</tt>, "
         'eg. <tt>requiredif="Q1,A or Q2,B"</tt>')
     footer = models.TextField(u"Footer", help_text="Footer rendered below the question interpreted as textile", blank=True)
-
+    slug = models.CharField(max_length=128)
 
     def questionnaire(self):
         return self.questionset.questionnaire

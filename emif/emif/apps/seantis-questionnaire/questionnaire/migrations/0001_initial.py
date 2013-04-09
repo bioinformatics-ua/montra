@@ -26,6 +26,7 @@ class Migration(SchemaMigration):
         db.create_table('questionnaire_questionnaire', (
             ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
             ('name', self.gf('django.db.models.fields.CharField')(max_length=128)),
+            ('slug', self.gf('django.db.models.fields.CharField')(max_length=128)),
             ('redirect_url', self.gf('django.db.models.fields.CharField')(default='/static/complete.html', max_length=128)),
         ))
         db.send_create_signal('questionnaire', ['Questionnaire'])
@@ -81,6 +82,7 @@ class Migration(SchemaMigration):
             ('extra_en', self.gf('django.db.models.fields.CharField')(max_length=128, null=True, blank=True)),
             ('checks', self.gf('django.db.models.fields.CharField')(max_length=128, null=True, blank=True)),
             ('footer_en', self.gf('django.db.models.fields.TextField')(blank=True)),
+            ('slug', self.gf('django.db.models.fields.CharField')(max_length=128)),
         ))
         db.send_create_signal('questionnaire', ['Question'])
 
@@ -157,12 +159,14 @@ class Migration(SchemaMigration):
             'number': ('django.db.models.fields.CharField', [], {'max_length': '8'}),
             'questionset': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['questionnaire.QuestionSet']"}),
             'text_en': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
+            'slug': ('django.db.models.fields.CharField', [], {'max_length': '128'}),
             'type': ('django.db.models.fields.CharField', [], {'max_length': '32'})
         },
         'questionnaire.questionnaire': {
             'Meta': {'object_name': 'Questionnaire'},
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'name': ('django.db.models.fields.CharField', [], {'max_length': '128'}),
+            'slug': ('django.db.models.fields.CharField', [], {'max_length': '128'}),
             'redirect_url': ('django.db.models.fields.CharField', [], {'default': "'/static/complete.html'", 'max_length': '128'})
         },
         'questionnaire.questionset': {

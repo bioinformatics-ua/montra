@@ -28,6 +28,8 @@ from questionnaire.parsers import *
 
 from questionnaire.views import *
 from questionnaire.models import *
+from searchengine.search_indexes import CoreEngine
+
 
 import md5
 import random

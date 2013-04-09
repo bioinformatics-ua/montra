@@ -79,12 +79,14 @@ class Migration(SchemaMigration):
             'number': ('django.db.models.fields.CharField', [], {'max_length': '8'}),
             'questionset': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['questionnaire.QuestionSet']"}),
             'text_en': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
+            'slug': ('django.db.models.fields.CharField', [], {'max_length': '128'}),
             'type': ('django.db.models.fields.CharField', [], {'max_length': '32'})
         },
         'questionnaire.questionnaire': {
             'Meta': {'object_name': 'Questionnaire'},
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'name': ('django.db.models.fields.CharField', [], {'max_length': '128'}),
+            'slug': ('django.db.models.fields.CharField', [], {'max_length': '128'}),
             'redirect_url': ('django.db.models.fields.CharField', [], {'default': "'/static/complete.html'", 'max_length': '128'})
         },
         'questionnaire.questionset': {
