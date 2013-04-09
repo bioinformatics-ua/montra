@@ -29,6 +29,9 @@ from rest_framework.response import Response
 from rest_framework.reverse import reverse
 from rest_framework import serializers
 from rest_framework.views import APIView
+from rest_framework import status
+
+
 
 # Import Search Engine 
 
@@ -47,12 +50,26 @@ def api_root(request, format=None):
     print request
 
     return Response({
-        'users': reverse('user-list', request=request),
-        'groups': reverse('group-list', request=request),
+        'search': reverse('search', request=request),
+        
     })
     if request.method == 'GET':
         print "it is get"
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     else:
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class SearchView(APIView):
+    def get(self, request, *args, **kw):
+        # Process any get params that you may need
+        # If you don't need to process get params,
+        # you can skip this part
+        get_arg1 = request.GET.get('arg1', None)
+        get_arg2 = request.GET.get('arg2', None)
+
+        result = {'myValue': 'lol', 'myValue2': 'lol', }
+        response = Response(result, status=status.HTTP_200_OK)
+        return response
+
 

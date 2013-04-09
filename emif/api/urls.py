@@ -18,12 +18,15 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-
 from django.conf.urls import patterns, url
 from rest_framework.urlpatterns import format_suffix_patterns
 
+from api.views import SearchView
+
 urlpatterns = patterns('api.views',
     url(r'^root/$', 'api_root'),
+    url(r'^search$', SearchView.as_view(), name='search'),
+ 
 )
 
 urlpatterns = format_suffix_patterns(urlpatterns)
