@@ -32,7 +32,6 @@ from rest_framework.views import APIView
 from rest_framework import status
 
 
-
 # Import Search Engine 
 
 class JSONResponse(HttpResponse):
@@ -46,15 +45,12 @@ class JSONResponse(HttpResponse):
 
 @api_view(('GET',))
 def api_root(request, format=None):
-    print "api_root is called"
-    print request
-
+    
     return Response({
         'search': reverse('search', request=request),
         
     })
     if request.method == 'GET':
-        print "it is get"
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     else:
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -65,11 +61,31 @@ class SearchView(APIView):
         # Process any get params that you may need
         # If you don't need to process get params,
         # you can skip this part
+        query = request.GET.get('query', None)
+
+        for param in request.GET:
+            print(param)
+            print(request.GET.get(param))
+
+        if query!=None:
+
+            result = {'myValue': 'lol', 'myValue2': 'lol', }
+            response = Response(result, status=status.HTTP_200_OK)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return response
+
+class AdvancedSearchView(APIView):
+    def get(self, request, *args, **kw):
+        # Process any get params that you may need
+        # If you don't need to process get params,
+        # you can skip this part
         get_arg1 = request.GET.get('arg1', None)
         get_arg2 = request.GET.get('arg2', None)
 
         result = {'myValue': 'lol', 'myValue2': 'lol', }
         response = Response(result, status=status.HTTP_200_OK)
         return response
+
 
 

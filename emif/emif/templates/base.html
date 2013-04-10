@@ -30,13 +30,11 @@
         {% block headextra %}
         {% endblock %}
 
-        <script src="static/js/vendor/modernizr-2.6.2.min.js"></script>
+        <script src="static/js/vendor/modernizr-2.6.2.min.js">
+        </script>
     </head>
     <body>
-        <!--[if lt IE 7]>
-            <p class="chromeframe">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">activate Google Chrome Frame</a> to improve your experience.</p>
-        <![endif]-->
-
+        
         <div class="navbar navbar-fixed-top">
             <div class="navbar-inner">
                 <div class="container">
@@ -47,23 +45,19 @@
                     </a>
                     <a class="brand" href="">EMIF Platform</a>
                     <div class="nav-collapse collapse">
-                   
 
                         <ul class="nav">
                             <li id="li_home"><a href="/">Home</a></li>
                             <li id="li_databases"><a href="databases">My databases</a></li>
-                            <li id="li_search"><a href="search">Search</a></li>
+                            <li id="li_search"><a href="search">Quick Search</a></li>
                             <li id="li_advanced_search"><a href="advancedSearch/1">Advanced Search</a></li>
                         </ul>
                             <ul class="nav pull-right">
 
                             <li><a href="http://www.imi.europa.eu/content/emif">Contact</a></li>
                             <li><a href="http://www.imi.europa.eu/content/emif">About</a></li>
-                            
 
                 </ul>
-
-
 
                         {% block headerlogin %}
                         {% if not request.user.is_authenticated %}
@@ -99,6 +93,15 @@
         <script src="static/js/vendor/jquery-1.9.1.min.js"></script>
         <script src="static/js/vendor/bootstrap.min.js"></script>
         <script src="static/js/main.js"></script>
+
+
+        <!-- backbone -->
+        <script type="text/javascript" src="{{ STATIC_URL }}contrib/backbone/ICanHaz.min.js"></script>
+        <script type="text/javascript" src="{{ STATIC_URL }}contrib/backbone/json2.js"></script>
+        <script type="text/javascript" src="{{ STATIC_URL }}contrib/backbone/underscore-min.js"></script>
+        <script type="text/javascript" src="{{ STATIC_URL }}contrib/backbone/backbone-min.js"></script>
+         
+
         <script type="text/javascript">
         {% block scriptextra %}
         {% endblock %}

@@ -29,8 +29,13 @@ from questionnaire.parsers import *
 from questionnaire.views import *
 from questionnaire.models import *
 from searchengine.search_indexes import CoreEngine
+from searchengine.models import Slugs
+import searchengine.search_indexes
 
+from emif.utils import clean_value
 
+import logging
+import re
 import md5
 import random
 
@@ -42,10 +47,65 @@ def quick_search(request, template_name='quick_search.html'):
     return render(request, template_name, {'request': request})
 
 def results(request, template_name='results.html'):
-    return render(request, template_name, {'request': request})
+
+
+    
+    user = request.user
+    su = Subject.objects.filter(user=user)
+    databases = RunInfoHistory.objects.filter(subject=su)
+
+    class Database:
+        id = ''
+        name = ''
+        date = ''
+
+    class Results:
+        num_results=0
+        list_results= []
+
+    list_databases = []
+    for database in databases:
+        database_aux = Database()
+        database_aux.id = database.runid
+        database_aux.date = database.completed
+        answers = Answer.objects.filter(runid=database.runid)
+        text = clean_value(str(answers[1].answer))
+        info = text[:75] + (text[75:] and '..')
+        database_aux.name = info
+        list_databases.append(database_aux)
+    
+    list_results = Results()
+    list_results.num_results=len(list_databases)
+    list_results.list_results=list_databases
+
+    return render(request, template_name, {'request': request, 
+        'list_results': list_results})
+
 
 def results_diff(request, template_name='results_diff.html'):
-    return render(request, template_name, {'request': request})
+    
+    user = request.user
+    su = Subject.objects.filter(user=user)
+    databases = RunInfoHistory.objects.filter(subject=su)
+
+    class Database:
+        id = ''
+        name = ''
+        date = ''
+
+    list_databases = []
+    for database in databases:
+        database_aux = Database()
+        database_aux.id = database.runid
+        database_aux.date = database.completed
+        answers = Answer.objects.filter(runid=database.runid)
+        text = clean_value(str(answers[1].answer))
+        info = text[:75] + (text[75:] and '..')
+        database_aux.name = info
+        list_databases.append(database_aux)
+
+    return render(request, template_name, {'request': request, 
+        'list_databases': list_databases})
 
 def advanced_search(request, questionnaire_id ):
     #return render(request, template_name, {'request': request})
@@ -57,10 +117,62 @@ def docs_api(request, template_name='docs/api.html'):
     return render(request, template_name, {'request': request})
 
 def databases(request, template_name='databases.html'):
-
     # Get the list of databases for a specific user
+    user = request.user
+    su = Subject.objects.filter(user=user)
+    databases = RunInfoHistory.objects.filter(subject=su)
 
-    return render(request, template_name, {'request': request})
+    class Database:
+        id = ''
+        name = ''
+        date = ''
+
+    list_databases = []
+    for database in databases:
+        database_aux = Database()
+        database_aux.id = database.runid
+        database_aux.date = database.completed
+        answers = Answer.objects.filter(runid=database.runid)
+        text = clean_value(str(answers[1].answer))
+        info = text[:75] + (text[75:] and '..')
+        database_aux.name = info
+        list_databases.append(database_aux)
+
+    return render(request, template_name, {'request': request, 
+        'list_databases': list_databases})
+
+
+def fingerprint(request, runcode, qs, template_name='database_info.html'):    
+    
+
+    c = CoreEngine()
+
+    results = c.search_fingerprint('id:'+runcode)
+
+    class Tag:
+        tag = ''
+        value = ''
+
+    list_values = []    
+    for result in results:
+        for k in result:
+            t = Tag()
+            results = Slugs.objects.filter(slug1=k)
+            if len(results)>0:
+                text = results[0].description 
+            else:
+                text = k
+            info = text[:75] + (text[75:] and '..')
+
+            t.tag = info
+
+            value = clean_value(str(result[k]))
+            value = value[:75] + (value[75:] and '..')
+            t.value = value
+            list_values.append(t)
+    
+    return render(request, template_name,
+     {'request': request, 'value_list': list_values})
 
 
 def get_questionsets_list(runinfo):

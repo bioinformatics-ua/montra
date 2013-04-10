@@ -43,7 +43,7 @@ body {
 <div class="container-narrow">
   <div class="jumbotron">
 
-    <div class="span6" style="text-align:center; padding-top: 40px">
+    <div class="span6"  >
       <img src="static/img/emif_logo.png" alt="EMIF Logo" style="width: 180px; height: 163px;" />
       <h2>Quick Search </h2>    
     </div>
@@ -52,47 +52,61 @@ body {
   </div>
 <hr>
   
-<div class="span6" style="text-align:center">
+<div class="span2" style="text-align:center">
 
- <div class="container" id="search">
-        <!-- search errors -->
-        <div class="row-fluid center" id="errors">
-            <div class="alert span6" id="alert_short">
-                <button type="button" class="close" data-dismiss="alert">&times;</button>
-                <strong>Warning!</strong> Your search query must be at least 4 characters long.
-            </div> 
-            <div class="alert alert-error span6" id="alert_noresults">
-                <button type="button" class="close" data-dismiss="alert">&times;</button>
-                <strong>Warning!</strong> Diseasecard found no results for you search query <span class="label label-important">Test</span>.
-            </div>
-        </div>
-        <div class="navbar" id="loading">
-            <div class="navbar-inner">
-                <div class="pull-left">
-                    <h4><span>Your results are loading... <i class="icon-angle-right icon-spin"></i></span></h4>
-                </div>
-            </div>
-        </div>
-        <div class="navbar" id="meta">
-            <div class="navbar-inner">
-                <div class="pull-left">
-                    <h4><span id="results_size"></span> total results for <span class="label label-inverse">Test</span></h4>
-                </div>
-                <form class="pull-right navbar-form" id="tour_filter">
-                    <label>
-                        <input class="input-large" type="text" placeholder="Filter" id="filter">
-                    </label>
-                </form> 
-            </div>
+  <div class="span6" id="search">
+    <!-- search errors -->
+    <div class="row-fluid center" id="errors">
+      <div class="alert span6" id="alert_short">
+        <button type="button" class="close" data-dismiss="alert">&times;</button> <strong>Warning!</strong>
+        Your search query must be at least 4 characters long.
+      </div>
 
+    </div>
+    <div class="navbar" id="loading">
+      <div class="navbar-inner">
+        <div class="pull-left">
+          <h4>
+            <span>
+              Your results are loading... <i class="icon-angle-right icon-spin"></i>
+            </span>
+          </h4>
         </div>
       </div>
     </div>
-    
+    <div class="navbar" id="meta">
+      <div class="navbar-inner">
+        <div class="pull-left">
+          <h4>
+            <span id="results_size"></span>
+            total results for
+            <span class="label label-inverse">{{list_results.num_results}}</span>
+          </h4>
+        </div>
+
+      </div>
+      {% for result in list_results.list_results %}
+      <div class="navbar-inner">
+        <div class="pull-left" style="text-align:left">
+            
+            {{result.name}}
+            <span class="label label-inverse">{{result.date}}</span>
+            <br />
+            <div style="text-align:right">
+          <a class="btn btn-small btn-success" href="advancedSearch/1">Contact</a>
+          <a class="btn btn-small btn-success" href="advancedSearch/1">More like this</a>
+          </div>
+        </div>
+        </div>
+        <br />
+      {% endfor %}
 
 
-</div>
-  
+
+    </div>
+    </div>
   </div>
+</div>
+
 </div>
 {% endblock %}

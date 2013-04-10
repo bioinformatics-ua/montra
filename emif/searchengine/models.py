@@ -18,18 +18,14 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-
 from django.db import models
 
+from questionnaire.models import *
+
+class Slugs(models.Model):
+	slug1 = models.CharField(max_length=128)
+	description = models.CharField(max_length=256)
+	question = models.ForeignKey(Question, help_text = u"The question that this is an answer to")
 
 
-
-from django.db import models
-
-class Document(models.Model):
-    name = models.CharField(max_length=40)
-    body = models.TextField()
-
-    def __unicode__(self):
-        return self.name
-
+    

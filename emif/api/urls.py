@@ -26,7 +26,6 @@ from api.views import SearchView
 urlpatterns = patterns('api.views',
     url(r'^root/$', 'api_root'),
     url(r'^search$', SearchView.as_view(), name='search'),
- 
 )
 
 urlpatterns = format_suffix_patterns(urlpatterns)

@@ -33,7 +33,6 @@ from questionnaire.models import RunInfoHistory
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
-
 import logging
 
 
@@ -112,21 +111,11 @@ class CoreEngine:
 
 
 
-@receiver(post_save, sender=RunInfoHistory)
-def my_handler(sender, **kwargs):
-	pass
-	print("you're fucked")
-	pass
-
-post_save.connect(my_handler, sender=RunInfoHistory)
-
-
-
-
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from searchengine.search_indexes import CoreEngine
 from questionnaire.models import *
+from searchengine.models import Slugs
 
 
 def convert_text_to_slug(text):
@@ -152,15 +141,27 @@ def convert_answers_to_solr(runinfo):
     	logging.debug("Slug:" + a.question.slug)
     	slug = a.question.slug	
     	
+    	slug_aux = ""
     	if len(slug)>2:
-    		slug = a.question.slug	
+    		slug = a.question.slug
     		logging.debug("Slug@"+slug)
     		logging.debug("Slug@len"+str(len(slug)))
     	else:
     		slug = convert_text_to_slug(a.question.text)
     		logging.debug("Slug@@"+slug)
+    	slug_final = slug+"_t"
 
-    	d[slug+"_t"] = a.answer	
+    	results = Slugs.objects.filter(description=a.question.text)
+    	print("Slugs:")
+    	print(results)
+    	if results==None or len(results)==0:
+    		slugs = Slugs()
+    		slugs.slug1 = slug_final
+    		slugs.description = a.question.text
+    		slugs.question = a.question
+    		slugs.save()
+
+    	d[slug_final] = a.answer	
     print(d)
     d['id']=runid
     c.index_fingerprint_as_json(d)
@@ -168,7 +169,11 @@ def convert_answers_to_solr(runinfo):
 
 @receiver(post_save, sender=RunInfoHistory)
 def my_handler(sender, **kwargs):
-    logging.debug("#### Indexing now ###############")
+	# Check if it is advanced search or not.
+	# If it is advanced search, it is not necessary to index
+	# Otherwise the index will be necessary
+
+    print("#### Indexing now ###############")
     logging.debug(sender)
     for key in kwargs:
         logging.debug("another keyword arg: %s: %s" % (key, kwargs[key]))
@@ -181,7 +186,6 @@ def my_handler(sender, **kwargs):
     logging.debug(runinfo.completed)
     logging.debug(runinfo.runid)
     convert_answers_to_solr(runinfo)
-
 
 def main():
 

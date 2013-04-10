@@ -55,11 +55,14 @@ body {
 <div class="span6" style="text-align:center">
     
 
-                    <form class="form" id="home_search" >
+                    <form class="form" id="home_search" action="results" method="POST">{% csrf_token %}
                         <div class="input-append center" id="home_form">
                             <input class="input-xlarge" id="text_search" class="home_search" placeholder="Search here..."  type="text">
                             <div class="btn-group" id="search_button">
-                                <button class="btn btn-inverse" type="button"  id="button_search">GO!</button>
+                                
+                                   <input type="submit" class="btn btn-inverse" value="Search" >
+
+
                                 <button class="btn btn-inverse dropdown-toggle" id="button_search_toggle" data-toggle="dropdown" tabindex="-1" rel="tooltip" title="Select search type">
                                     <span class="caret"></span>
                                 </button>
@@ -71,7 +74,7 @@ body {
                                     </li>
                                     <li>
                                         <label rel="tooltip" data-placement="right" title="Search for full text in all connected content" class="radio">
-                                            <input type="radio" name="search_full" id="search_full" value="search_full">Full text search
+                                            <input type="radio" name="search_full" id="search_full"  value="search_full">Full text search
                                         </label>
                                     </li>
                                 </ul>
