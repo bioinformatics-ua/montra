@@ -51,6 +51,13 @@ urlpatterns = patterns('',
     url(r'^q2/(?P<runcode>[^/]+)/(?P<qs>[-]{0,1}\d+)/$',
             questionaries_with_sets, name='questionset_sets'),
 
+    # Database Edit
+    url(r'^dbEdit/(?P<questionnaire_id>[0-9]+)/$$', 'emif.views.database_edit'),
+    url(r'^q3/(?P<runcode>[^/]+)/$', questionaries_with_sets, name='database_edit'),
+    url(r'^q3/(?P<runcode>[^/]+)/(?P<qs>[-]{0,1}\d+)/$',
+            questionaries_with_sets, name='database_edit_sets'),
+
+
     # Results
     url(r'^results$', 'emif.views.results'),
     url(r'^resultsdiff$', 'emif.views.results_diff'),

@@ -1,6 +1,6 @@
 # Questionnaire 
 - pk: 1
-  fields: {name: "EMIF Questionnaire Databases", redirect_url: /}
+  fields: {name: "Observational data sources", redirect_url: /}
   model: questionnaire.questionnaire
 
 # Question Sets 
@@ -45,6 +45,42 @@
   type: open-textfield, slug: 'contact'}
   model: questionnaire.question
 
+# Contact for Administrative
+- pk: 23
+  fields: {checks: 'required', extra_en: '', number: '1a', questionset: 1,
+ text_en: 'Administrative contact',
+  type: open-textfield, slug: 'contact_administrative'}
+  model: questionnaire.question
+
+# Contact for Scientific contact
+
+- pk: 24
+  fields: {checks: 'required', extra_en: '', number: '1b', questionset: 1,
+ text_en: 'Scientific contact',
+  type: open-textfield, slug: 'contact_scientific'}
+  model: questionnaire.question
+
+
+# Contact for Technical contact
+
+- pk: 25
+  fields: {checks: 'required', extra_en: '', number: '1c', questionset: 1,
+ text_en: 'Technical contact',
+  type: open-textfield, slug: 'contact_technical'}
+  model: questionnaire.question
+
+
+
+# Database name
+
+- pk: 26
+  fields: {checks: 'type=open-button', extra_en: '', number: '2', questionset: 2,
+ text_en: 'Database Name',
+  type: custom, slug: 'database_name'}
+  model: questionnaire.question
+
+
+
 - pk: 2
   fields: {checks: 'required', extra_en: '', number: '2a', questionset: 2,
  text_en: 'In the platform, we have a wide range of databases. Could you indicate what of the below would characterize your database? More answers are possible.',
@@ -54,69 +90,70 @@
 - pk: 1
   fields: {question: 2, sortid: 1,
   text_en: "the source of data is primary care records maintained by GP or pediatrician",
-  value: "1"}
+  value: "primary care records GP pediatrician"}
   model: questionnaire.choice
 
 - pk: 2
   fields: {question: 2, sortid: 2,
   text_en: "the source of data is care provided by specialist in an outpatient setting",
-  value: "2"}
+  value: "care provided by specialist in an outpatient setting"}
   model: questionnaire.choice
 
 - pk: 3
   fields: {question: 2, sortid: 3,
   text_en: "the source of data is the general pharmacy that issues medication",
-  value: "3"}
+  value: "general pharmacy issues medication"}
   model: questionnaire.choice
 
 - pk: 4
   fields: {question: 2, sortid: 4,
   text_en: "the source of data is administrative/ billing data",
-  value: "4"}
+  value: "administrative billing data"}
   model: questionnaire.choice
 
 - pk: 5
   fields: {question: 2, sortid: 5,
   text_en: "it is a disease or event specific registry",
-  value: "5"}
+  value: "disease event specific registry"}
   model: questionnaire.choice
 
 - pk: 6
   fields: {question: 2, sortid: 6,
   text_en: "it is a study specific registry (e.g., a cohort meeting certain criteria)",
-  value: "6"}
+  value: "study specific registry"}
   model: questionnaire.choice
 
 - pk: 7
   fields: {question: 2, sortid: 7,
   text_en: "it is a biobank (it has material/DNA stored)",
-  value: "7"}
+  value: "biobank DNA"}
   model: questionnaire.choice
 
 - pk: 8
   fields: {question: 2, sortid: 8,
   text_en: "it is a record-linkage system",
-  value: "8"}
+  value: "record linkage"}
   model: questionnaire.choice
 
 - pk: 9
   fields: {question: 2, sortid: 9,
   text_en: "it can be linked to other data bases",
-  value: "9"}
+  value: "linked to other databases"}
   model: questionnaire.choice
 
 
 - pk: 3
   fields: {checks: 'requiredif=2a,5', extra_en: '', number: '2b', questionset: 2,
   text_en: 'If disease specific registry, please specify disease or event.',
-  type: open-textfield}
+  type: open-textfield, slug: 'disease_registry'}
   model: questionnaire.question
 
 - pk: 4
   fields: {checks: 'required', extra_en: '', number: '3', questionset: 3,
- text_en: 'How would you briefly (in say five of six lines of text) describe the population of your database? ',
-  type: open-textfield}
+  text_en: 'How would you briefly (in say five of six lines of text) describe the population of your database?',
+  type: open-textfield, slug: 'population_description'}
   model: questionnaire.question
+
 
 - pk: 5
   fields: {checks: 'required', extra_en: '', number: '4', questionset: 3,
@@ -127,132 +164,134 @@
   <li>End Date (the date the person exits your data base).</li>
 </ul>
 Would you be able to create such a table for the population of in your database?',
-  type: choice-yesnocomment}
+  type: choice-yesnocomment, slug: 'matching_table'}
   model: questionnaire.question
 
 - pk: 6
   fields: {checks: 'requiredif=4,no', extra_en: '', number: '4a', questionset: 3,
  text_en: 'Why not be able to create such a table for the population of in your database?',
-  type: open-textfield}
+  type: open-textfield,slug: 'table_population'}
   model: questionnaire.question
 
 - pk: 7
   fields: {checks: 'required', extra_en: '', number: '5', questionset: 3,
  text_en: 'What are the possible causes for a person to enter/exit your database? ',
-  type: choice-multiple-freeform}
+  type: choice-multiple-freeform, slug: 'causes_person_database'}
   model: questionnaire.question
 
 - fields: {question: 7, sortid: 1,
   text_en: "the subject enters or leaves the practice of a general practitioner",
-  value: "1"}
+  value: "subject practice general practitioner"}
   model: questionnaire.choice
   pk: 10
 - fields: {question: 7, sortid: 2,
   text_en: "the subject enters or leaves the practice of a pediatrician in primary care",
-  value: "2"}
+  value: "subject pediatrician primary care"}
   model: questionnaire.choice
   pk: 11
 - fields: {question: 7, sortid: 3,
   text_en: "the subject enters or leaves the practice of a pharmacist",
-  value: "3"}
+  value: "subject practice pharmacist"}
   model: questionnaire.choice
   pk: 12
 - fields: {question: 7, sortid: 4,
   text_en: "the subject is admitted to or discharged from an specialist outpatient clinic",
-  value: "4"}
+  value: "subject admitted discharged specialist outpatient clinic"}
   model: questionnaire.choice
   pk: 13
 - fields: {question: 7, sortid: 5,
   text_en: "the subject  is admitted to or discharged from a hospitals",
-  value: "5"}
+  value: "subject admitted to or discharged from a hospitals"}
   model: questionnaire.choice
   pk: 14
 - fields: {question: 7, sortid: 6,
   text_en: "the subject moves in or out a specific city or region",
-  value: "6"}
+  value: "subject moves city region"}
   model: questionnaire.choice
   pk: 15
 - fields: {question: 7, sortid: 7,
   text_en: "the subject enters or leaves a health insurance company of benefit plan",
-  value: "7"}
+  value: "subject health insurance company  benefit plan"}
   model: questionnaire.choice
   pk: 16
 - fields: {question: 7, sortid: 8,
   text_en: "the subject is a specific disease and is included in a cohort",
-  value: "8"}
+  value: "subject  disease cohort"}
   model: questionnaire.choice
   pk: 17
 - fields: {question: 7, sortid: 9,
   text_en: "the subject underwent a specific therapy/intervention and is included in a cohort",
-  value: "8"}
+  value: "subject therapy intervention cohort"}
   model: questionnaire.choice
   pk: 18
 
 - pk: 8
   fields: {checks: 'required', extra_en: '', number: '6', questionset: 3,
  text_en: 'What is the total (cumulative) number of subjects in your data source?',
-  type: open}
+  type: open, slug: 'total_number_subjects'}
   model: questionnaire.question
 
 - pk: 9
   fields: {checks: 'required', extra_en: '', number: '7', questionset: 3,
  text_en: 'What was the number of active patients in January 2012?',
-  type: open}
+  type: open, slug: 'number_active_patients_jan2012'}
   model: questionnaire.question
 
 - pk: 10
   fields: {checks: 'required', extra_en: '', number: '8', questionset: 4,
  text_en: 'Can you estimate the average time of follow up (that is, the time when you are actively collecting data) for a subject in your database?',
-  type: open}
+  type: open, slug: 'average_time_follow_up'}
   model: questionnaire.question
 
 - pk: 11
   fields: {checks: 'required', extra_en: '', number: '9', questionset: 4,
  text_en: 'During the follow-up period (that is, after a subject enters you data base), what information do you have?',
-  type: choice-multiple}
+  type: choice-multiple, slug: 'information_follow_up'}
   model: questionnaire.question
 
 - pk: 19
   fields: {question: 11, sortid: 1,
   text_en: "Diagnosis",
-  value: "1"}
+  value: "diagnosis"}
   model: questionnaire.choice
 
 - pk: 20
   fields: {question: 11, sortid: 2,
   text_en: "Medication",
-  value: "2"}
+  value: "medication"}
   model: questionnaire.choice
 
 - pk: 21
   fields: {question: 11, sortid: 3,
   text_en: "Procedures",
-  value: "3"}
+  value: "procedures"}
   model: questionnaire.choice
 
 - pk: 12
-  fields: {checks: 'requiredif=9,1', extra_en: '', number: '9a', questionset: 4,
+  fields: {checks: 'requiredif=9,diagnosis', extra_en: '', number: '9a', questionset: 4,
  text_en: 'Choose available diagnosis information',
-  type: choice-multiple}
+  type: choice-multiple, slug: 'diagnosis_information'}
   model: questionnaire.question
 
 - pk: 22
   fields: {question: 12, sortid: 1,
   text_en: "diagnosis from GP records",
-  value: "1"}
+  value: "diagnosis GP records"}
   model: questionnaire.choice
 
 - pk: 23
   fields: {question: 12, sortid: 2,
   text_en: "diagnosis from pediatrician in general practice",
-  value: "2"}
+  value: "diagnosis pediatrician general practice"}
   model: questionnaire.choice
 
 - pk: 24
   fields: {question: 12, sortid: 3,
   text_en: "diagnosis from specialist outpatient records",
-  value: "3"}
+  value: "diagnosis specialist outpatient records"}
   model: questionnaire.choice
+
+# Stopped here. TODO
 
 - pk: 25
   fields: {question: 12, sortid: 4,
@@ -303,7 +342,7 @@ Would you be able to create such a table for the population of in your database?
   model: questionnaire.choice
 
 - pk: 13
-  fields: {checks: 'requiredif=9,2', extra_en: '', number: '9b', questionset: 4,
+  fields: {checks: 'requiredif=9,medication', extra_en: '', number: '9b', questionset: 4,
   text_en: 'Choose available prescription information',
   type: choice-multiple}
   model: questionnaire.question
@@ -381,7 +420,7 @@ Would you be able to create such a table for the population of in your database?
   model: questionnaire.choice
 
 - pk: 14
-  fields: {checks: 'requiredif=9,3', extra_en: '', number: '9c', questionset: 4,
+  fields: {checks: 'requiredif=9,procedures', extra_en: '', number: '9c', questionset: 4,
   text_en: 'Choose available procedures information',
   type: choice-multiple}
   model: questionnaire.question
@@ -517,3 +556,342 @@ Would you be able to create such a table for the population of in your database?
  text_en: 'Could you provide a list of peer-reviewed papers based on your data base covering the last 3 years?',
   type: open-textfield}
   model: questionnaire.question
+
+
+
+# Questionaries
+
+
+- pk: 2
+  fields: {name: "Research Cohorts", redirect_url: /}
+  model: questionnaire.questionnaire
+
+
+# Question Sets 
+- pk: 7
+  fields: {checks: 'required', heading: cohort_q0_Intro, questionnaire: 2, sortid: 0, text_en: h1. Research Cohorts Questionnaire }
+  model: questionnaire.questionset
+
+- pk: 8
+  fields: {checks: 'required', heading: cohort_q1_Administrative, questionnaire: 2, sortid: 1, text_en: h1. Contact details }
+  model: questionnaire.questionset
+
+- pk: 9
+  fields: {checks: 'required', heading: cohort_q1_Datasource, questionnaire: 2, sortid: 2, text_en: h1. Datasource features}
+  model: questionnaire.questionset
+
+- pk: 10
+  fields: {checks: 'required', heading: cohort_q1_Population, questionnaire: 2, sortid: 3, text_en: h1. Population}
+  model: questionnaire.questionset
+
+- pk: 11
+  fields: {checks: 'required', heading: "cohort_q1_PrivacyPolicies", questionnaire: 2, sortid: 4, text_en: h1. Privacy and Policies}
+  model: questionnaire.questionset
+
+- pk: 12
+  fields: {checks: 'required', heading: "cohort_q1_DiagnosisMedicationProcedures", questionnaire: 2, sortid: 5, text_en: "h1. Diagnosis, Medication and Procedures"}
+  model: questionnaire.questionset
+
+- pk: 13
+  fields: {checks: '', heading: cohort_q1_Thankyou, questionnaire: 2, sortid: 99, text_en: "h1. Thank you! \n \n"}
+  model: questionnaire.questionset
+
+
+# Questions
+- pk: 50
+  fields: {checks: '', extra_en: '', number: '0', questionset: 7,
+ text_en: 'The purpose of this questionnaire is to get some initial information on the databases available for the EMIF Platform. In the first months of the project, we will start a process of “fingerprinting”. The first version of a deliverable (the so-called initial fingerprinting) is already due in march. The process of fingerprinting will be led by Miriam Sturkenboom. To have some information available on the databases in the platform and to identify the points of contact, we ask you to fill in this questionnaire. It will form the bases of a short presentation during the kick-off meeting in Barcelona. Please click "Continue" to procceed.',
+  type: comment, slug: 'purpose'}
+  model: questionnaire.question
+
+- pk: 51
+  fields: {checks: 'required', extra_en: '', number: '1', questionset: 8,
+ text_en: 'Please provide contact information. We ask three contacts (name, address, email, and phone number). First, the administrative contact; typically a secretariat. Second, the scientific content contact; this is the person(s) who are familiar with the data in the database and are have experience in conducting scientific studies with the data. Third, technical contact; this is the person who is familiar with the IT platform of the data source and will be our contact point if we will install software locally.',
+  type: comment, slug: 'contact'}
+  model: questionnaire.question
+
+
+# Institution Name
+- pk: 52
+  fields: {checks: 'required', extra_en: '', number: '1a', questionset: 8,
+ text_en: 'Institution Name',
+  type: open, slug: 'institution_name'}
+  model: questionnaire.question
+
+# Location 
+- pk: 53
+  fields: {checks: 'required', extra_en: '', number: '1b', questionset: 8,
+ text_en: 'Location',
+  type: open, slug: 'location'}
+  model: questionnaire.question
+
+
+
+# Contact for Administrative
+- pk: 54
+  fields: {checks: 'required', extra_en: '', number: '1c', questionset: 8,
+ text_en: 'Administrative email',
+  type: open, slug: 'contact_administrative'}
+  model: questionnaire.question
+
+# Contact for Scientific contact
+
+- pk: 55
+  fields: {checks: 'required', extra_en: '', number: '1d', questionset: 8,
+ text_en: 'Scientific contact',
+  type: open, slug: 'contact_scientific'}
+  model: questionnaire.question
+
+
+# Contact for Technical contact
+
+- pk: 56
+  fields: {checks: 'required', extra_en: '', number: '1e', questionset: 8,
+ text_en: 'Technical contact',
+  type: open, slug: 'contact_technical'}
+  model: questionnaire.question
+
+
+
+# Database name
+
+- pk: 57
+  fields: {checks: 'type=open-button', extra_en: '', number: '2', questionset: 9,
+ text_en: 'Database Name',
+  type: custom, slug: 'database_name'}
+  model: questionnaire.question
+
+
+- pk: 58
+  fields: {checks: 'required', extra_en: '', number: '2a', questionset: 9,
+ text_en: 'In the platform, we have a wide range of databases. Could you indicate what of the below would characterize your database? More answers are possible.',
+  type: choice-multiple-freeform, slug: 'range_databases'}
+  model: questionnaire.question
+
+- pk: 101
+  fields: {question: 58, sortid: 1,
+  text_en: "the source of data is primary care records maintained by GP or pediatrician",
+  value: "primary care records GP pediatrician"}
+  model: questionnaire.choice
+
+- pk: 102
+  fields: {question: 58, sortid: 2,
+  text_en: "the source of data is care provided by specialist in an outpatient setting",
+  value: "care provided by specialist in an outpatient setting"}
+  model: questionnaire.choice
+
+- pk: 103
+  fields: {question: 58, sortid: 3,
+  text_en: "the source of data is the general pharmacy that issues medication",
+  value: "general pharmacy issues medication"}
+  model: questionnaire.choice
+
+- pk: 104
+  fields: {question: 58, sortid: 4,
+  text_en: "the source of data is administrative/ billing data",
+  value: "administrative billing data"}
+  model: questionnaire.choice
+
+- pk: 105
+  fields: {question: 58, sortid: 5,
+  text_en: "it is a disease or event specific registry",
+  value: "disease event specific registry"}
+  model: questionnaire.choice
+
+- pk: 106
+  fields: {question: 58, sortid: 6,
+  text_en: "it is a study specific registry (e.g., a cohort meeting certain criteria)",
+  value: "study specific registry"}
+  model: questionnaire.choice
+
+- pk: 107
+  fields: {question: 58, sortid: 7,
+  text_en: "it is a biobank (it has material/DNA stored)",
+  value: "biobank DNA"}
+  model: questionnaire.choice
+
+- pk: 108
+  fields: {question: 58, sortid: 8,
+  text_en: "it is a record-linkage system",
+  value: "record linkage"}
+  model: questionnaire.choice
+
+- pk: 109
+  fields: {question: 58, sortid: 9,
+  text_en: "it can be linked to other data bases",
+  value: "linked to other databases"}
+  model: questionnaire.choice
+
+
+############################################################################
+
+
+# Questionaries
+
+# - pk: 3
+#   fields: {name: "Observational data sources", redirect_url: /}
+#   model: questionnaire.questionnaire
+
+
+
+# # Question Sets 
+# - pk: 14
+#   fields: {checks: 'required', heading: observ_q0_Intro, questionnaire: 3, sortid: 0, text_en: h1. Observational Questionnaire }
+#   model: questionnaire.questionset
+
+# - pk: 15
+#   fields: {checks: 'required', heading: observ_q1_Administrative, questionnaire: 3, sortid: 1, text_en: h1. Contact details }
+#   model: questionnaire.questionset
+
+# - pk: 16
+#   fields: {checks: 'required', heading: observ_q1_Datasource, questionnaire: 3, sortid: 2, text_en: h1. Datasource features}
+#   model: questionnaire.questionset
+
+# - pk: 17
+#   fields: {checks: 'required', heading: observ_q1_Population, questionnaire: 3, sortid: 3, text_en: h1. Population}
+#   model: questionnaire.questionset
+
+# - pk: 18
+#   fields: {checks: 'required', heading: "observ_q1_PrivacyPolicies", questionnaire: 3, sortid: 4, text_en: h1. Privacy and Policies}
+#   model: questionnaire.questionset
+
+# - pk: 19
+#   fields: {checks: 'required', heading: "observ_q1_DiagnosisMedicationProcedures", questionnaire: 3, sortid: 5, text_en: "h1. Diagnosis, Medication and Procedures"}
+#   model: questionnaire.questionset
+
+# - pk: 20
+#   fields: {checks: '', heading: observ_q1_Thankyou, questionnaire: 3, sortid: 99, text_en: "h1. Thank you! \n \n"}
+#   model: questionnaire.questionset
+
+
+# # Questions
+
+
+
+
+
+# # Questions
+# - pk: 150
+#   fields: {checks: '', extra_en: '', number: '0', questionset: 7,
+#  text_en: 'The purpose of this questionnaire is to get some initial information on the databases available for the EMIF Platform. In the first months of the project, we will start a process of “fingerprinting”. The first version of a deliverable (the so-called initial fingerprinting) is already due in march. The process of fingerprinting will be led by Miriam Sturkenboom. To have some information available on the databases in the platform and to identify the points of contact, we ask you to fill in this questionnaire. It will form the bases of a short presentation during the kick-off meeting in Barcelona. Please click "Continue" to procceed.',
+#   type: comment, slug: 'purpose'}
+#   model: questionnaire.question
+
+# - pk: 151
+#   fields: {checks: 'required', extra_en: '', number: '1', questionset: 8,
+#  text_en: 'Please provide contact information. We ask three contacts (name, address, email, and phone number). First, the administrative contact; typically a secretariat. Second, the scientific content contact; this is the person(s) who are familiar with the data in the database and are have experience in conducting scientific studies with the data. Third, technical contact; this is the person who is familiar with the IT platform of the data source and will be our contact point if we will install software locally.',
+#   type: comment, slug: 'contact'}
+#   model: questionnaire.question
+
+
+# # Institution Name
+# - pk: 152
+#   fields: {checks: 'required', extra_en: '', number: '1a', questionset: 8,
+#  text_en: 'Institution Name',
+#   type: open, slug: 'institution_name'}
+#   model: questionnaire.question
+
+# # Location 
+# - pk: 153
+#   fields: {checks: 'required', extra_en: '', number: '1b', questionset: 8,
+#  text_en: 'Location',
+#   type: open, slug: 'location'}
+#   model: questionnaire.question
+
+
+
+# # Contact for Administrative
+# - pk: 154
+#   fields: {checks: 'required', extra_en: '', number: '1a', questionset: 8,
+#  text_en: 'Administrative email',
+#   type: open, slug: 'contact_administrative'}
+#   model: questionnaire.question
+
+# # Contact for Scientific contact
+
+# - pk: 155
+#   fields: {checks: 'required', extra_en: '', number: '1b', questionset: 8,
+#  text_en: 'Scientific contact',
+#   type: open, slug: 'contact_scientific'}
+#   model: questionnaire.question
+
+
+# # Contact for Technical contact
+
+# - pk: 156
+#   fields: {checks: 'required', extra_en: '', number: '1c', questionset: 8,
+#  text_en: 'Technical contact',
+#   type: open, slug: 'contact_technical'}
+#   model: questionnaire.question
+
+
+
+# # Database name
+
+# - pk: 157
+#   fields: {checks: 'type=open-button', extra_en: '', number: '2', questionset: 9,
+#  text_en: 'Database Name',
+#   type: custom, slug: 'database_name'}
+#   model: questionnaire.question
+
+
+
+# - pk: 158
+#   fields: {checks: 'required', extra_en: '', number: '2a', questionset: 9,
+#  text_en: 'In the platform, we have a wide range of databases. Could you indicate what of the below would characterize your database? More answers are possible.',
+#   type: choice-multiple-freeform, slug: 'range_databases'}
+#   model: questionnaire.question
+
+# - pk: 201
+#   fields: {question: 158, sortid: 1,
+#   text_en: "the source of data is primary care records maintained by GP or pediatrician",
+#   value: "primary care records GP pediatrician"}
+#   model: questionnaire.choice
+
+# - pk: 202
+#   fields: {question: 158, sortid: 2,
+#   text_en: "the source of data is care provided by specialist in an outpatient setting",
+#   value: "care provided by specialist in an outpatient setting"}
+#   model: questionnaire.choice
+
+# - pk: 203
+#   fields: {question: 158, sortid: 3,
+#   text_en: "the source of data is the general pharmacy that issues medication",
+#   value: "general pharmacy issues medication"}
+#   model: questionnaire.choice
+
+# - pk: 204
+#   fields: {question: 158, sortid: 4,
+#   text_en: "the source of data is administrative/ billing data",
+#   value: "administrative billing data"}
+#   model: questionnaire.choice
+
+# - pk: 205
+#   fields: {question: 158, sortid: 5,
+#   text_en: "it is a disease or event specific registry",
+#   value: "disease event specific registry"}
+#   model: questionnaire.choice
+
+# - pk: 206
+#   fields: {question: 158, sortid: 6,
+#   text_en: "it is a study specific registry (e.g., a cohort meeting certain criteria)",
+#   value: "study specific registry"}
+#   model: questionnaire.choice
+
+# - pk: 207
+#   fields: {question: 158, sortid: 7,
+#   text_en: "it is a biobank (it has material/DNA stored)",
+#   value: "biobank DNA"}
+#   model: questionnaire.choice
+
+# - pk: 208
+#   fields: {question: 158, sortid: 8,
+#   text_en: "it is a record-linkage system",
+#   value: "record linkage"}
+#   model: questionnaire.choice
+
+# - pk: 209
+#   fields: {question: 158, sortid: 9,
+#   text_en: "it can be linked to other data bases",
+#   value: "linked to other databases"}
+#   model: questionnaire.choice

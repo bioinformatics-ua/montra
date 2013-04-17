@@ -25,12 +25,12 @@ from django.db import transaction
 from django.core.urlresolvers import *
 from questionnaire.models import *
 from questionnaire.parsers import *
-
 from questionnaire.views import *
 from questionnaire.models import *
 from searchengine.search_indexes import CoreEngine
 from searchengine.models import Slugs
 import searchengine.search_indexes
+
 
 from emif.utils import clean_value
 
@@ -38,6 +38,16 @@ import logging
 import re
 import md5
 import random
+
+
+def list_questions():
+    print "list_questions"
+    objs = Questionnaire.objects.all()
+    results = {}
+    for q in objs:
+        results[q.id] = q.name
+    print results
+    return results
 
 
 def index(request, template_name='index.html'):
@@ -48,8 +58,6 @@ def quick_search(request, template_name='quick_search.html'):
 
 def results(request, template_name='results.html'):
 
-
-    
     user = request.user
     su = Subject.objects.filter(user=user)
     databases = RunInfoHistory.objects.filter(subject=su)
@@ -107,25 +115,64 @@ def results_diff(request, template_name='results_diff.html'):
     return render(request, template_name, {'request': request, 
         'list_databases': list_databases})
 
+
+def statistics(request, template_name='statistics.html'):
+
+    pass
+
+
+def generate_statistics_from_multiple_choice(question_slug):
+
+    choices = Choice.objects.filter(question=q)
+    total_values = calculate_total_values() 
+    c = CoreEngine()
+    for choice in choices:
+        query = "question_slug:"+"choice.value"
+        results = c.search_fingerprint(query)
+        number_results = len(results)
+
+def calculate_databases_per_location():
+    users = EmifProfile.objects.all()
+    c = CoreEngine()
+    contries = []
+    for u in users:
+        # Count number of DB's for each user
+        query = "subject_id_t:"+u.user.id
+        results = c.search_fingerprint(query)
+        # Number of dbs
+        number_of_dbs = len(results)
+        if contries.has_key(u.contry.name):
+            contries[u.contry.name] = contries[u.contry.name] + number_of_dbs
+        else:
+            contries[u.contry.name] =  number_of_dbs
+
 def advanced_search(request, questionnaire_id ):
     #return render(request, template_name, {'request': request})
     print questionnaire_id
+    logging.debug("Debugger")
     return show_full_questionnaire(request, questionnaire_id)
+
+
+def database_edit(request, questionnaire_id ):
+    #return render(request, template_name, {'request': request})
+    print questionnaire_id
+    logging.debug("Debugger")
+    return show_full_questionnaire(request, questionnaire_id, 
+        reverse_name='database_edit')
+
 
 # Documentation 
 def docs_api(request, template_name='docs/api.html'):
     return render(request, template_name, {'request': request})
 
-def databases(request, template_name='databases.html'):
-    # Get the list of databases for a specific user
+class Database:
+    id = ''
+    name = ''
+    date = ''
+def get_databases_from_db(request):
     user = request.user
     su = Subject.objects.filter(user=user)
     databases = RunInfoHistory.objects.filter(subject=su)
-
-    class Database:
-        id = ''
-        name = ''
-        date = ''
 
     list_databases = []
     for database in databases:
@@ -137,9 +184,23 @@ def databases(request, template_name='databases.html'):
         info = text[:75] + (text[75:] and '..')
         database_aux.name = info
         list_databases.append(database_aux)
+    return list_databases
 
+def get_databases_from_solr(request):
+    c = CoreEngine()
+    results = c.search_fingerprint("*:*")
+    print "Solr"
+    print results
+    for r in results:
+        print r
+
+def databases(request, template_name='databases.html'):
+    # Get the list of databases for a specific user
+
+    list_databases = get_databases_from_db(request)
+    get_databases_from_solr(request)
     return render(request, template_name, {'request': request, 
-        'list_databases': list_databases})
+        'list_databases': list_databases, 'breadcrumb': True})
 
 
 def fingerprint(request, runcode, qs, template_name='database_info.html'):    
@@ -148,7 +209,6 @@ def fingerprint(request, runcode, qs, template_name='database_info.html'):
     c = CoreEngine()
 
     results = c.search_fingerprint('id:'+runcode)
-
     class Tag:
         tag = ''
         value = ''
@@ -181,44 +241,36 @@ def get_questionsets_list(runinfo):
     sets = current.questionnaire.questionsets()
     return sets
 
-def show_full_questionnaire(request, runinfo, errors={}):
+def show_full_questionnaire(request, runinfo, errors={}, 
+    reverse_name='questionaries_with_sets'):
     """
     Return the QuestionSet template
 
     Also add the javascript dependency code.
     """
-    print "in show_full_questionnaire - head"
-    r = assure_authenticated_or_redirect(request)
-    print "in show_full_questionnaire - head2"
+    
+    #r = assure_authenticated_or_redirect(request)
+    
     #if r:
     #    return r
     questionnaire_id = runinfo
     qu = get_object_or_404(Questionnaire, id=questionnaire_id)
-    print "in show_full_questionnaire - head3"
-    print qu.questionsets().__class__.__name__
-    if isinstance(qu.questionsets(), (list, tuple)):
-        print "is list or tuple"
-    else:
-        print "is list or tuple - not"
+
     #qs = qu.questionsets()
     qs = qu.questionsets()[0]
-    print "in show_full_questionnaire - head3.5"
     user = request.user
-    print "in show_full_questionnaire - head3.6"
     su = Subject.objects.filter(user=user)
-    print "in show_full_questionnaire - head3.7"
+
     if su:
         su = su[0]
-        print "in show_full_questionnaire - head5"
     else:
         su = Subject(user=user,
                      first_name=user.first_name,
                      last_name=user.last_name,
                      email=user.email,
                      state='active')
-        print "in show_full_questionnaire - head4"
         su.save()
-    print "in show_full_questionnaire"
+
     hash = md5.new()
     hash.update("".join(map(lambda i: chr(random.randint(0, 255)), range(16))))
     hash.update(settings.SECRET_KEY)
@@ -227,16 +279,10 @@ def show_full_questionnaire(request, runinfo, errors={}):
     run.save()
     questionsets = run.questionset.questionnaire.questionsets()
 
-    for qs in questionsets:
-        questions = qs.questions()
-        print qs.text
-        for q in questions:
-            print q
 
-    print questions
-    print reverse('questionaries_with_sets', kwargs={'runcode': key})
 
-    return HttpResponseRedirect(reverse('questionaries_with_sets', kwargs={'runcode': key}))
+    return HttpResponseRedirect(reverse(reverse_name, 
+        kwargs={'runcode': key}))
 
 def redirect_to_qs(runinfo):
     "Redirect to the correct and current questionset URL for this RunInfo"
@@ -271,7 +317,7 @@ def redirect_to_qs(runinfo):
     return HttpResponseRedirect(url)
 
 @transaction.commit_on_success
-def questionaries_with_sets(request, runcode=None, qs=None):
+def questionaries_with_sets(request, runcode=None, qs=None, template_name='database_edit.html'):
     print "questionaries_with_sets"
     print "RunCode: " + str(runcode)
     print "Qs: " + str(qs)
@@ -418,7 +464,7 @@ def questionaries_with_sets(request, runcode=None, qs=None):
     transaction.commit()
     return redirect_to_qs(runinfo)
 
-def show_fingerprint_page(request, runinfo, errors={}):
+def show_fingerprint_page(request, runinfo, errors={}, template_name='advanced_search.html'):
     """
     Return the QuestionSet template
 
@@ -516,7 +562,7 @@ def show_fingerprint_page(request, runinfo, errors={}):
                 else:
                     qvalues[s[1]] = v
     errors = {}
-    r = r2r("advanced_search.html", request,
+    r = r2r(template_name, request,
         questionset=runinfo.questionset,
         questionsets=runinfo.questionset.questionnaire.questionsets,
         runinfo=runinfo,

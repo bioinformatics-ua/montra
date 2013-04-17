@@ -33,32 +33,22 @@ from questionnaire.models import RunInfoHistory
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
+from questionnaire.models import *
+from searchengine.models import Slugs
+
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+
 import logging
+import ast
 
+logger = logging.getLogger()
 
-"""
-Convert a answer from questionarie to a JSON document to be indexed by SOLR
-"""
-def convert_answer_to_json(question_id,answers):
-	# Get the questions
-
-	response = dict()
-
-	# for answer in answers:
-	# 	question_key = answer.question.text
-	# 	question_value = answer.answer 
-	# 	response[question_key] = question_value
-
-	# # Convert to JSON
-	# response_json =  JSONEncoder().encode(response)
-
-	# return response_json
-
-
-"""It is responsible for index the documents and search over them
-It also connects to SOLR
-"""
 class CoreEngine:
+	"""It is responsible for index the documents and search over them
+	It also connects to SOLR
+	"""
+
 	CONNECTION_TIMEOUT_DEFAULT = 10
 	def __init__(self, timeout=CONNECTION_TIMEOUT_DEFAULT):
 		# Setup a Solr instance. The timeout is optional.
@@ -68,15 +58,15 @@ class CoreEngine:
 		"""Index fingerprint 
 		"""
 		# index document
-		self.index_fingerprint_as_json(convert_answer_to_json(doc))
+		self.index_fingerprint_as_json(doc)
 	
 	def index_fingerprint_as_json(self, d):
 		"""Index fingerprint as json
 		"""
 		# index document
 		
-		xlm_answer = self.solr.add([d])
-		print(xlm_answer)
+		xml_answer = self.solr.add([d])
+		print(xml_answer)
 		self.optimize()
 
 	def optimize(self):
@@ -110,14 +100,6 @@ class CoreEngine:
 		return similar
 
 
-
-from django.db.models.signals import post_save
-from django.dispatch import receiver
-from searchengine.search_indexes import CoreEngine
-from questionnaire.models import *
-from searchengine.models import Slugs
-
-
 def convert_text_to_slug(text):
 	#TODO: optimize
 	return text.replace(' ', '_').replace('?','').replace('.', '').replace(',','')
@@ -125,6 +107,13 @@ def convert_text_to_slug(text):
 def clean_answer(answer):
 	#TODO: optimize
 	return answer
+
+
+def get_slug_from_choice(v, q):
+    choice = Choice.objects.filter(question=q).filter(value=v)
+    if (len(choice)>0):
+        print(choice[0].text)
+        print(choice[0].value)
 
 
 def convert_answers_to_solr(runinfo):
@@ -135,25 +124,23 @@ def convert_answers_to_solr(runinfo):
 
     print(answers)
     d = {}
+    text = ""
     for a in answers:
-    	logging.debug("Answer text: " + a.answer)
-    	logging.debug("Q: " + a.question.text)
-    	logging.debug("Slug:" + a.question.slug)
+    	print("Answer text: " + a.answer)
+    	print("Q: " + a.question.text)
+    	print("Slug:" + a.question.slug)
+
     	slug = a.question.slug	
     	
     	slug_aux = ""
     	if len(slug)>2:
     		slug = a.question.slug
-    		logging.debug("Slug@"+slug)
-    		logging.debug("Slug@len"+str(len(slug)))
     	else:
     		slug = convert_text_to_slug(a.question.text)
-    		logging.debug("Slug@@"+slug)
     	slug_final = slug+"_t"
 
     	results = Slugs.objects.filter(description=a.question.text)
-    	print("Slugs:")
-    	print(results)
+    	
     	if results==None or len(results)==0:
     		slugs = Slugs()
     		slugs.slug1 = slug_final
@@ -161,44 +148,60 @@ def convert_answers_to_solr(runinfo):
     		slugs.question = a.question
     		slugs.save()
 
-    	d[slug_final] = a.answer	
+    	text_aux = ""
+        print(a.question.get_type() )
+    	# Verify the question type
+
+    	if a.question.get_type() == "open" or \
+        a.question.get_type() == "open-button" \
+        or a.question.get_type() == "open-textfield" :
+            x = ast.literal_eval(a.answer)
+            text_aux = x[0]
+
+    	elif a.question.get_type() == "choice-yesnocomment" or \
+        a.question.get_type() == "choice-yesnodontknow" or \
+        a.question.get_type() == "choice" or \
+        a.question.get_type() == "choice-freeform" or \
+        a.question.get_type() == "choice-multiple" or \
+        a.question.get_type() == "choice-multiple-freeform" or \
+        a.question.get_type() == "comment":
+
+    	    #text_aux = a.answer
+            if (len(text_aux)>0):
+                x = ast.literal_eval(text_aux)
+       
+                continue
+            print(x)
+            for v in x:
+                print(get_slug_from_choice(v, a.question))
+                text_aux += v + " "
+    		
+    	
+    	else:    		text_aux = a.answer
+
+
+    	d[slug_final] = text_aux
     print(d)
     d['id']=runid
+    d['type_t']=runinfo.questionnaire.name.replace(" ", "").lower()
+    d['created_t']=str(runinfo.created)
     c.index_fingerprint_as_json(d)
 
 
 @receiver(post_save, sender=RunInfoHistory)
-def my_handler(sender, **kwargs):
+def index_handler(sender, **kwargs):
 	# Check if it is advanced search or not.
 	# If it is advanced search, it is not necessary to index
 	# Otherwise the index will be necessary
 
     print("#### Indexing now ###############")
-    logging.debug(sender)
+    logger.debug(sender)
     for key in kwargs:
-        logging.debug("another keyword arg: %s: %s" % (key, kwargs[key]))
+        logger.debug("another keyword arg: %s: %s" % (key, kwargs[key]))
     runinfo = kwargs["instance"]
-    
-    logging.debug(runinfo.questionnaire.questionsets())
-    logging.debug(runinfo.subject)
-    logging.debug(runinfo.skipped)
-    logging.debug(runinfo.tags)
-    logging.debug(runinfo.completed)
-    logging.debug(runinfo.runid)
-    convert_answers_to_solr(runinfo)
+    try:
+        convert_answers_to_solr(runinfo)
+    except:
+        print("Error, go here")
+        raise
 
-def main():
-
-	c = CoreEngine()
-	_m = {'id':'Luis', 'title': 'dam', 'my_stat_t': 'lol'}
-	import json
-	_mm=json.dumps(_m)
-	print(_mm)
-	c.index_fingerprint_as_json(_m)
-	results = c.search_fingerprint("my_stat_t:locals()")
-	print(results)
-	for r in results:
-		print(r)
-
-if __name__=="__main__":
-	main()

@@ -140,6 +140,7 @@ def questionset_satisfies_checks(questionset, runinfo, checks=None):
     here. Thankfully the benefits outweigh the costs in my tests.
     """
 
+
     passes = check_parser(runinfo)
 
     if not passes(questionset.checks):
@@ -166,6 +167,8 @@ def questionset_satisfies_checks(questionset, runinfo, checks=None):
             return True
 
     return False
+
+        
 
 def get_progress(runinfo):
 

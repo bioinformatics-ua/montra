@@ -18,6 +18,8 @@ def question_custom(request, question):
         d['template'] = 'questionnaire/%s.html' % _type
     return d
 
+
+
 @answer_proc('custom')
 def process_custom(question, answer):
     cd = question.getcheckdict()
@@ -25,4 +27,10 @@ def process_custom(question, answer):
     if _type in Processors:
         return Processors[_type](question, answer)
     raise AnswerException(_(u"Processor not defined for this question"))
+
+add_type('custom', 'Custom')
+
+
+
+
 

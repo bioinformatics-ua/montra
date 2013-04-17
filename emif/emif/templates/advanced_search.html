@@ -38,14 +38,24 @@
 <div class="well" style="max-width: 340px; padding: 8px 0;">
 
             
-<ul class="nav nav-list">
+<ul class="nav nav-list nav-pills nav-stacked ">
     <li class="nav-header">Step-by-Step</li>
 
     
 {% for qs in questionset.questionnaire.questionsets %}
   
-  <li{% if questionset.text == qs.text %} class="active" {% endif %}><a href="q2/{{runinfo.random}}/{{ qs.sortid }}">{{ qs.text|removeh1 }}</a></li>
+  <li{% if questionset.text == qs.text %} class="active" {% endif %}>
+  <a href="q2/{{runinfo.random}}/{{ qs.sortid }}">
+      <table><tr><td width="80%">
+          {{ qs.text|removeh1 }}</td>
+          <td width="10%">
+          <span style="float:right; vertical-align: middle " class="badge badge-warning">2</span>
+        </td>
+      </tr>
+      </table></a>
 
+      
+  </li>
 
 {% endfor %}
 </ul>

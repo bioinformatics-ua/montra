@@ -4,49 +4,35 @@
 
 {% block content %}
 
-  
-<div class="span6" style="text-align:center">
 
- <div class="container" id="search">
-    <div class="bs-docs-example">
-            <table class="table">
+<div class="span12" style="text-align:center">
+
+<table class="table table-bordered  table-hover">
               <thead>
                 <tr>
-                  <th>#</th>
-                  <th>Product</th>
-                  <th>Payment Taken</th>
-                  <th>Status</th>
+                  <th>Tag</th>
+                  <th>{{results.d1.name}}</th>
+                  <th>{{results.d2.name}}</th>
+                  <th>{{results.d3.name}}</th>
                 </tr>
               </thead>
+
               <tbody>
-                <tr class="success">
-                  <td>1</td>
-                  <td>TB - Monthly</td>
-                  <td>01/04/2012</td>
-                  <td>Approved</td>
+              {% for t in value_list %}
+                <tr>
+                  <td>{{ t.tag }}</td>
+                  <td>{{ t.value }}</td>
+                  <td>{{ t.value }}</td>
+                  <td>{{ t.value }}</td>
                 </tr>
-                <tr class="error">
-                  <td>2</td>
-                  <td>TB - Monthly</td>
-                  <td>02/04/2012</td>
-                  <td>Declined</td>
-                </tr>
-                <tr class="warning">
-                  <td>3</td>
-                  <td>TB - Monthly</td>
-                  <td>03/04/2012</td>
-                  <td>Pending</td>
-                </tr>
-                <tr class="info">
-                  <td>4</td>
-                  <td>TB - Monthly</td>
-                  <td>04/04/2012</td>
-                  <td>Call in to confirm</td>
-                </tr>
+                {% endfor %}
+
               </tbody>
             </table>
-          </div>
+
+
 
 </div>
-</div>
+
+
 {% endblock %}

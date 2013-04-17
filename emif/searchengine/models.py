@@ -28,4 +28,6 @@ class Slugs(models.Model):
 	question = models.ForeignKey(Question, help_text = u"The question that this is an answer to")
 
 
-    
+class Nomenclature(models.Model):
+	name = models.CharField(max_length=256)
+

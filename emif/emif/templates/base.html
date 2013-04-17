@@ -1,4 +1,7 @@
 {% load url from future %}
+{% load extra_tags %}
+{% load django_bootstrap_breadcrumbs %}
+
 <!DOCTYPE html>
 <!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
 <!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
@@ -47,10 +50,26 @@
                     <div class="nav-collapse collapse">
 
                         <ul class="nav">
-                            <li id="li_home"><a href="/">Home</a></li>
-                            <li id="li_databases"><a href="databases">My databases</a></li>
+
+                            <li id="li_workspace" class="dropdown">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">Workspace <b class="caret"></b></a>
+                            <ul class="dropdown-menu">
+                              <li><a href="databases">List Databases</a></li>
+                              <li><a href="databases">Edit Databases</a></li>
+                              <li><a href="databases">Query History</a></li>
+                              <li><a href="databases">Timeline</a></li>
+                              <li class="divider"></li>
+                              <li class="nav-header">Add new databases</li>
+                              
+                              </li>
+                              {% show_fingerprints %}
+
+                            </ul>
+                          </li>
+
                             <li id="li_search"><a href="search">Quick Search</a></li>
                             <li id="li_advanced_search"><a href="advancedSearch/1">Advanced Search</a></li>
+                           
                         </ul>
                             <ul class="nav pull-right">
 
@@ -78,16 +97,43 @@
             </div>
         </div>
 
+
         <div class="container">
-            {% block content %}
+
+
+
+
+            {% if request.user.is_authenticated and breadcrumb %}
+                
+
+            {% block breadcrumbs %}
+                {% breadcrumb "Workspace" "/" %}
+
             {% endblock %}
+
+
+
+
+            {% endif %}
+            <div class="pull-left">
+            {% render_breadcrumbs %}
+            </div>
+            <div class="pull-right">
+            {% block toolbar %}
+            {% endblock %}
+            </div>
+            {% block content %}
+                
+            {% endblock %}
+
 
             <hr>
 
+        <div class="row" style="text-align:center">
             <footer>
                 <p>&copy; EMIF Project 2013</p>
             </footer>
-
+        </div>
         </div> <!-- /container -->
 
         <script src="static/js/vendor/jquery-1.9.1.min.js"></script>

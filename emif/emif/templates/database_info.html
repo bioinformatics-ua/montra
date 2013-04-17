@@ -2,9 +2,16 @@
 {% extends 'base.html' %}
 {% load url from future %}
 
+
+
+
+
 {% block content %}
+
+
+{% if value_list %}
+
 <div class="span12">
-   
 
 <table class="table table-bordered  table-hover">
               <thead>
@@ -28,4 +35,17 @@
             </table>
 </div>
 </div>
+
+
+{% else %}
+<div class="row">  
+<div class="span4">  
+<div class="alert">  
+  <a class="close" data-dismiss="error">×</a>  
+  <strong>Warning!</strong> You don't have results. 
+</div>  
+</div>  
+</div>  
+{% endif %}
+
 {% endblock %}
