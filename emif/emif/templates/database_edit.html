@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+{% load extra_tags %}
+
+{% load markup questionnaire i18n %}
+
+
+
+
+{% block breadcrumbs %}
+    {{ block.super }}
+    {% breadcrumb "Databases" "/databases" %}
+    {% breadcrumb "List" "/databases" %}
+
+{% endblock %}
+
+
+
+{% block toolbar %}
+{% include "menu_toolbar.html" %}
+
+{% endblock %}
+
+
+
+{% block headextra %}
+    <script type="text/javascript" src="{{ STATIC_URL }}jquery.min.js"></script>
+    <script type="text/javascript" src="{{ STATIC_URL }}questionset.js"></script>
+    <link rel="stylesheet" href="{{ STATIC_URL }}progressbar.css"></script>
+
+    {% for x in jsinclude %}
+        <script type="text/javascript" src="{{ x }}"></script>
+    {% endfor %}
+    
+    {% for x in cssinclude %}
+        <link rel="stylesheet" href="{{ x }}" type="text/css" />
+    {% endfor %}
+
+    {% if async_progress %}
+        <script type="text/javascript">
+            var progress_url = "{{ async_url }}";
+        </script>
+        <script type="text/javascript" src="{{ STATIC_URL }}progress.js"></script>
+    {% endif %}
+{% endblock %}
+
+{% block language %}
+    {% for lang in LANGUAGES %}{% if not forloop.first %} |{% endif %}
+        <a href="{{request.path}}?lang={{ lang.0 }}">{{ lang.1 }}</a>
+    {% endfor %}
+{% endblock %}
+
+{% block content %}
+
+<div class="row">
+    <div class="span3">
+<div class="well" style="max-width: 340px; padding: 8px 0;">
+
+            
+<ul class="nav nav-list nav-pills nav-stacked ">
+    <li class="nav-header">Step-by-Step</li>
+
+    
+{% for qs in questionset.questionnaire.questionsets %}
+  
+  <li{% if questionset.text == qs.text %} class="active" {% endif %}>
+  <a href="q2/{{runinfo.random}}/{{ qs.sortid }}">
+      <table><tr><td width="80%">
+          {{ qs.text|removeh1 }}</td>
+          <td width="10%">
+          <span style="float:right; vertical-align: middle " class="badge badge-warning">2</span>
+        </td>
+      </tr>
+      </table></a>
+
+      
+  </li>
+
+{% endfor %}
+</ul>
+</div>
+</div>
+
+{% include "fingerprint.html" %}
+
+
+</div>
+    <script type="text/javascript">
+        {% for trigger in triggers %}
+            addtrigger("{{trigger}}");
+        {% endfor %}
+        
+        {% for k,v in qvalues.items %}
+            qvalues['{{ k|escapejs }}'] = '{{ v|escapejs }}';
+        {% endfor %}
+        
+        for(key in qvalues) {
+            valchanged(key, qvalues[key]);
+        }
+    </script>
+{% endblock %}
+
+
+{% block scriptextra %}
+$('#li_workspace').addClass("active");
+{% endblock %}

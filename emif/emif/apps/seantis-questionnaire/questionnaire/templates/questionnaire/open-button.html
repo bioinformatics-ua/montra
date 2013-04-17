@@ -1,0 +1,24 @@
+{% load i18n %}
+<div class="clearfix">
+
+  <div class="input">
+    <div class="pull-left" >
+      <input type="text" class="span5 " size="50" id="{{ question.number }}" name="question_{{ question.number }}" value="{{ qdict.value }}">
+      {% if question.extra %}
+      <span class="help-block">{{ question.extra }}</span>
+      {% endif %}
+    </div>
+
+    
+  </div>
+  {% if question.slug == "database_name" %}
+                 
+      <div class="pull-right" style="vertical-align:center;padding-top:12px">
+   
+        <a class="btn btn-small btn-success span4" href="#validate">Verify if this name is available</a>
+
+      </div>
+      {% endif %}
+</div>
+
+
