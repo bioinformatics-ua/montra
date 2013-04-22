@@ -86,12 +86,15 @@ class CoreEngine:
 		# Index the new document
 		self.index(doc)
 
-	def search_fingerprint(self, query):
+	def search_fingerprint(self, query, start=0, rows=100):
 		"""search the fingerprint
 		"""
 		# Later, searching is easy. In the simple case, just a plain Lucene-style
 		# query is fine.
-		results = self.solr.search(query)
+		results = self.solr.search(query,**{
+                'rows': rows,
+                'start': start
+            })
 
 		return results
 
@@ -167,24 +170,28 @@ def convert_answers_to_solr(runinfo):
         a.question.get_type() == "comment":
 
     	    #text_aux = a.answer
+            x = None 
             if (len(text_aux)>0):
                 x = ast.literal_eval(text_aux)
        
                 continue
-            print(x)
-            for v in x:
-                print(get_slug_from_choice(v, a.question))
-                text_aux += v + " "
+            if not x is None:
+                for v in x:
+                    print(get_slug_from_choice(v, a.question))
+                    text_aux += v + " "
     		
     	
     	else:    		text_aux = a.answer
 
 
     	d[slug_final] = text_aux
+        text += text_aux + " " 
     print(d)
     d['id']=runid
     d['type_t']=runinfo.questionnaire.name.replace(" ", "").lower()
-    d['created_t']=str(runinfo.created)
+    d['created_t']=str(runinfo.completed)
+    text += text_aux + runid + " " +str(runinfo.completed)
+    d['text_t']= text
     c.index_fingerprint_as_json(d)
 
 
