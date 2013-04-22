@@ -23,6 +23,11 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.core.urlresolvers import reverse
 from django.db import transaction
 from django.core.urlresolvers import *
+
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+
+
+
 from questionnaire.models import *
 from questionnaire.parsers import *
 from questionnaire.views import *
@@ -32,12 +37,14 @@ from searchengine.models import Slugs
 import searchengine.search_indexes
 
 
-from emif.utils import clean_value
+from emif.utils import clean_value, convert_date
 
 import logging
 import re
 import md5
 import random
+
+
 
 
 def list_questions():
@@ -56,7 +63,7 @@ def index(request, template_name='index.html'):
 def quick_search(request, template_name='quick_search.html'):
     return render(request, template_name, {'request': request})
 
-def results(request, template_name='results.html'):
+def results_db(request, template_name='results.html'):
 
     user = request.user
     su = Subject.objects.filter(user=user)
@@ -89,36 +96,194 @@ def results(request, template_name='results.html'):
     return render(request, template_name, {'request': request, 
         'list_results': list_results})
 
+class Database:
+    id = ''
+    name = ''
+    date = ''
 
-def results_diff(request, template_name='results_diff.html'):
+
+def results_fulltext(request, page=1, template_name='results.html'):
+
+    rows = 10
+
+    query = ""
+    in_post = True
+    try:
+        query = request.POST['query']
+        request.session['query'] =  query
+    except:
+        in_post = False
+        #raise
+
+    if not in_post:
+        query = request.session.get('query', "")
+
+    if query == "":
+        return render(request, "results.html", {'request': request, 
+            'list_results': [], 'page_obj': None})
     
-    user = request.user
-    su = Subject.objects.filter(user=user)
-    databases = RunInfoHistory.objects.filter(subject=su)
+    class Results:
+        num_results=0
+        list_results= []
+        paginator = None
+        
 
-    class Database:
+    c = CoreEngine()
+    #results = c.search_fingerprint("text_t:"+query,str(((int(page)-1)*rows)))
+    results = c.search_fingerprint("text_t:"+query,str(0))
+    #results = c.search_fingerprint("database_name_t:"+query)
+    print "Solr"
+    print results
+    list_databases = []
+    for r in results:
+        try:
+            database_aux = Database()
+            print r['id']
+            print r['created_t']
+            print r['database_name_t']
+            database_aux.id = r['id']
+            database_aux.date = convert_date(r['created_t'])
+           
+            database_aux.name = r['database_name_t']
+            list_databases.append(database_aux)
+        except:
+            pass
+
+    pp = Paginator(list_databases, rows) 
+    list_results = Results()
+    list_results.num_results=results.hits
+    list_results.list_results=pp.page(page)
+    list_results.paginator = pp
+
+    return render(request, template_name, {'request': request, 
+        'list_results': list_results, 'page_obj': pp.page(page)})
+
+
+def results_diff(request, page=1, template_name='results_diff.html'):
+
+    query = ""
+    in_post = True
+    try:
+        query = request.POST['query']
+        request.session['query'] =  query
+    except:
+        in_post = False
+        #raise
+
+    if not in_post:
+        query = request.session.get('query', "")
+
+    if query == "":
+        return render(request, "results.html", {'request': request, 
+            'list_results': [], 'page_obj': None})
+        
+
+
+
+
+    try:
+
+        search_full = request.POST['search_full']
+
+        if search_full == "search_full":
+            return results_fulltext(request, page)
+    except: 
+        return results_fulltext(request, page)
+
+    
+    class Results:
+        num_results=0
+        list_results= []
+        d1 = None
+        d2 = None 
+        d3 = None
+
+
+    class DatabaseFields:
         id = ''
         name = ''
         date = ''
+        fields = None
 
+
+
+    c = CoreEngine()
+    results = c.search_fingerprint("text_t:"+query)
+    #results = c.search_fingerprint("database_name_t:"+query)
+    print "Solr"
+    print results
     list_databases = []
-    for database in databases:
-        database_aux = Database()
-        database_aux.id = database.runid
-        database_aux.date = database.completed
-        answers = Answer.objects.filter(runid=database.runid)
-        text = clean_value(str(answers[1].answer))
-        info = text[:75] + (text[75:] and '..')
-        database_aux.name = info
-        list_databases.append(database_aux)
+
+    for r in results:
+        try:
+            database_aux = Database()
+            print r['id']
+            print r['created_t']
+            print r['database_name_t']
+            database_aux.id = r['id']
+            database_aux.date = convert_date(r['created_t'])
+           
+            database_aux.name = r['database_name_t']
+            list_databases.append(database_aux)
+            if (len(list_databases)==3):
+                break
+        except:
+            pass
+
+    c = CoreEngine()
+    list_databases_final = []
+    list_results = Results()
+    for db in list_databases:
+
+        results = c.search_fingerprint('id:'+db.id)
+        class Tag:
+            tag = ''
+            value = ''
+
+        list_values = []
+        blacklist = ['created_t', 'type_t', '_version_']
+        name = "Not defined"
+        for result in results:
+            for k in result:
+                if k in blacklist:
+                    continue
+                t = Tag()
+                results = Slugs.objects.filter(slug1=k)
+                if len(results)>0:
+                    text = results[0].description 
+                else:
+                    text = k
+                info = text[:75] + (text[75:] and '..')
+
+                t.tag = info
+
+                value = clean_value(str(result[k]))
+                value = value[:75] + (value[75:] and '..')
+                t.value = value
+                if k== "database_name_t":
+                    name = t.value
+                list_values.append(t)
+        db.fields = list_values
+        list_databases_final.append(db)
+
+
+
+    list_results.d1 = list_databases_final[0]
+    list_results.d2 = list_databases_final[1]
+    list_results.d3 = list_databases_final[2]
+
+    
+    list_results.num_results=len(list_databases)
+    
+    
 
     return render(request, template_name, {'request': request, 
-        'list_databases': list_databases})
+        'results': list_results})
 
 
 def statistics(request, template_name='statistics.html'):
 
-    pass
+    return render(request, template_name, {'request': request})
 
 
 def generate_statistics_from_multiple_choice(question_slug):
@@ -191,14 +356,27 @@ def get_databases_from_solr(request):
     results = c.search_fingerprint("*:*")
     print "Solr"
     print results
+    list_databases = []
     for r in results:
-        print r
-
+        try:
+            database_aux = Database()
+            print r['id']
+            print r['created_t']
+            print r['database_name_t']
+            database_aux.id = r['id']
+            database_aux.date = convert_date(r['created_t'])
+           
+            database_aux.name = r['database_name_t']
+            list_databases.append(database_aux)
+        except:
+            pass
+    return list_databases
 def databases(request, template_name='databases.html'):
     # Get the list of databases for a specific user
 
-    list_databases = get_databases_from_db(request)
-    get_databases_from_solr(request)
+    #list_databases = get_databases_from_db(request)
+    list_databases = get_databases_from_solr(request)
+
     return render(request, template_name, {'request': request, 
         'list_databases': list_databases, 'breadcrumb': True})
 
@@ -213,9 +391,13 @@ def fingerprint(request, runcode, qs, template_name='database_info.html'):
         tag = ''
         value = ''
 
-    list_values = []    
+    list_values = []
+    blacklist = ['created_t', 'type_t', '_version_']
+    name = "Not defined"
     for result in results:
         for k in result:
+            if k in blacklist:
+                continue
             t = Tag()
             results = Slugs.objects.filter(slug1=k)
             if len(results)>0:
@@ -229,10 +411,13 @@ def fingerprint(request, runcode, qs, template_name='database_info.html'):
             value = clean_value(str(result[k]))
             value = value[:75] + (value[75:] and '..')
             t.value = value
+            if k== "database_name_t":
+                name = t.value
             list_values.append(t)
     
     return render(request, template_name,
-     {'request': request, 'value_list': list_values})
+     {'request': request, 'value_list': list_values, 
+     'breadcrumb': True, 'breadcrumb_name':name })
 
 
 def get_questionsets_list(runinfo):

@@ -59,8 +59,12 @@ urlpatterns = patterns('',
 
 
     # Results
-    url(r'^results$', 'emif.views.results'),
-    url(r'^resultsdiff$', 'emif.views.results_diff'),
+    #url(r'^results/(?P<query>[a-zA-Z0-9]+)/$', 'emif.views.results'),
+    url(r'^results$', 'emif.views.results_fulltext'),
+
+    url(r'^statistics$', 'emif.views.statistics'),
+
+    url(r'^resultsdiff/(?P<page>[-]{0,1}\d+)?$', 'emif.views.results_diff'),
     url(r'^fingerprint/(?P<runcode>[^/]+)/(?P<qs>[-]{0,1}\d+)/$', 'emif.views.fingerprint'),
 
     # List Databases 

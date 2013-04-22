@@ -54,9 +54,9 @@ body {
 <div class="span6" style="text-align:center">
     
 
-                    <form class="form" id="home_search" action="results" method="POST">{% csrf_token %}
+                    <form class="form" id="home_search" action="resultsdiff/1" method="POST">{% csrf_token %}
                         <div class="input-append center" id="home_form">
-                            <input class="input-xlarge" id="text_search" class="home_search" placeholder="Search here..."  type="text">
+                            <input class="input-xlarge" id="text_search" class="home_search" placeholder="Search here..."  type="text" name='query'>
                             <div class="btn-group" id="search_button">
                                 
                                    <input type="submit" class="btn btn-inverse" value="Search" >
@@ -68,12 +68,12 @@ body {
                                 <ul class="dropdown-menu radios">
                                     <li>
                                         <label rel="tooltip" data-placement="right" title="Search for identifiers and disease name only" class="radio">
-                                            <input type="radio" name="search_id" id="search_id" value="search_id" checked>Identifiers only
+                                            <input type="radio" name="search_full" id="search_full" value="search_full" checked>Full
                                         </label>
                                     </li>
                                     <li>
                                         <label rel="tooltip" data-placement="right" title="Search for full text in all connected content" class="radio">
-                                            <input type="radio" name="search_full" id="search_full"  value="search_full">Full text search
+                                            <input type="radio" name="search_full" id="search_comp"  value="search_comp">Comparative
                                         </label>
                                     </li>
                                 </ul>

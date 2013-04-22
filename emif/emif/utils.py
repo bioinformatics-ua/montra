@@ -1,7 +1,7 @@
 import logging
 import re
 from searchengine.models import Nomenclature
-
+from datetime import datetime
 
 
 def convert_text_to_slug(text):
@@ -21,6 +21,10 @@ def clean_value(v):
         for v_aux in v:
             v += v_aux + " "
     return v
+
+def convert_date(d):
+    new_date = datetime.strptime(d, '%Y-%m-%d %H:%M:%S.%f')
+    return new_date.strftime("%Y-%m-%d %H:%M")
 
 
 def get_nomenclature(institution_name, database_name):

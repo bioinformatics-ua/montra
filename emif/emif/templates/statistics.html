@@ -4,15 +4,6 @@
 {% block content %}
 
 
-<div class"row">
-  <div class="span12" style="text-align:center">
-   
-  </div>
-
-
-
-</div>
-
 {% endblock %}
 
 
@@ -25,59 +16,97 @@
 
 
 {% block scriptextra%}
-<script>
 
-var diameter = 960,
-    format = d3.format(",d"),
-    color = d3.scale.category20c();
 
-var bubble = d3.layout.pack()
+var width = 960,
+    height = 500,
+    radius = Math.min(width, height) / 2;
+
+var color = d3.scale.ordinal()
+    .range(["#98abc5", "#8a89a6", "#7b6888", "#6b486b", "#a05d56", "#d0743c", "#ff8c00"]);
+
+var arc = d3.svg.arc()
+    .outerRadius(radius - 10)
+    .innerRadius(0);
+
+var pie = d3.layout.pie()
     .sort(null)
-    .size([diameter, diameter])
-    .padding(1.5);
+    .value(function(d) { return d.population; });
 
 var svg = d3.select("body").append("svg")
-    .attr("width", diameter)
-    .attr("height", diameter)
-    .attr("class", "bubble");
+    .attr("width", width)
+    .attr("height", height)
+  .append("g")
+    .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
 
-d3.json("flare.json", function(error, root) {
-  var node = svg.selectAll(".node")
-      .data(bubble.nodes(classes(root))
-      .filter(function(d) { return !d.children; }))
-    .enter().append("g")
-      .attr("class", "node")
-      .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
+d3.json("http://127.0.0.1:8000/api/stats", function(error, data) {
 
-  node.append("title")
-      .text(function(d) { return d.className + ": " + format(d.value); });
 
-  node.append("circle")
-      .attr("r", function(d) { return d.r; })
-      .style("fill", function(d) { return color(d.packageName); });
+      var w = 620;
+      var h = 480;
 
-  node.append("text")
-      .attr("dy", ".3em")
-      .style("text-anchor", "middle")
-      .text(function(d) { return d.className.substring(0, d.r / 3); });
+      var radius = Math.min(w, h) / 2; //change 2 to 1.4. It's hilarious.
+
+      //TODO: Generate colors randomly, but have them be apart.
+
+      var color = d3.scale.ordinal().range(["#7b4173", "#9ecae1", "#ff7f0e", "#bcbd22", "#8c564b", "#d62728"])
+
+      var arc = d3.svg.arc() //each datapoint will create one later.
+      .outerRadius(radius - 20)
+          .innerRadius(0);
+      //well, if you set this to not 0 it becomes a donut chart!
+
+
+      var pie = d3.layout.pie()
+          .sort(function (d) {
+          return d.score;
+      })
+          .value(function (d) {
+          return d.score;
+      });
+
+
+      var svg = d3.select("body").append("svg")
+          .attr("width", w)
+          .attr("height", h)
+          .attr("class", "chart")
+          .append("g") //someone to transform. Groups data.
+      .attr("transform", "translate(" + w / 2 + "," + h / 2 + ")");
+      //transform to the center.
+
+
+      //create the slices
+      var slices = svg.selectAll(".arc")
+          .data(pie(data.charts))
+          .enter().append("g")
+          .attr("class", "slice");
+
+      //and fill them
+      slices.append("path")
+          .attr("d", arc)
+          .style("fill", function (d, i) {
+          return color(i);
+      });
+
+      //add text, even
+      slices.append("text")
+          .attr("transform", function (d) {
+          return "translate(" + arc.centroid(d) + ")";
+      })
+          .attr("class", "data-title")
+          .text(function (d) {
+          return d.data.name;
+      });
+
+
+
+
 });
 
-// Returns a flattened hierarchy containing all leaf nodes under the root.
-function classes(root) {
-  var classes = [];
 
-  function recurse(name, node) {
-    if (node.children) node.children.forEach(function(child) { recurse(node.name, child); });
-    else classes.push({packageName: name, className: node.name, value: node.size});
-  }
 
-  recurse(null, root);
-  return {children: classes};
-}
 
-d3.select(self.frameElement).style("height", diameter + "px");
 
-</script>
 {% endblock %}
 
 
