@@ -200,6 +200,7 @@ INSTALLED_APPS = (
     'api',
 
     'django_bootstrap_breadcrumbs',
+    'bootstrap-pagination',
 
 )
 
