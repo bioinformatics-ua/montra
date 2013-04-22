@@ -58,7 +58,14 @@
                               <li><a href="databases">Edit Databases</a></li>
                               <li><a href="databases">Query History</a></li>
                               <li><a href="databases">Timeline</a></li>
+                              
+
+                              <li><a href="statistics">Statistics</a></li>
                               <li class="divider"></li>
+
+                              <li><a href="databases">Subscribe interests</a></li>
+                              <li class="divider"></li>
+
                               <li class="nav-header">Add new databases</li>
                               
                               </li>
@@ -68,8 +75,17 @@
                           </li>
 
                             <li id="li_search"><a href="search">Quick Search</a></li>
-                            <li id="li_advanced_search"><a href="advancedSearch/1">Advanced Search</a></li>
                            
+                           <li id="li_advanced_search" class="dropdown">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">Advanced Search <b class="caret"></b></a>
+                            <ul class="dropdown-menu">
+                              
+                              {% show_fingerprints %}
+
+                            </ul>
+                          </li>
+
+
                         </ul>
                             <ul class="nav pull-right">
 
@@ -147,13 +163,13 @@
         <script type="text/javascript" src="{{ STATIC_URL }}contrib/backbone/underscore-min.js"></script>
         <script type="text/javascript" src="{{ STATIC_URL }}contrib/backbone/backbone-min.js"></script>
          
-
+        {% block scriptextraincludes %}
+        {% endblock %}
         <script type="text/javascript">
         {% block scriptextra %}
         {% endblock %}
         </script>
-        {% block scriptextraincludes %}
-        {% endblock %}
+        
         <script type="text/javascript">
         
           var _gaq = _gaq || [];
