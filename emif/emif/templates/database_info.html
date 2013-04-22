@@ -1,7 +1,21 @@
 
 {% extends 'base.html' %}
 {% load url from future %}
+{% load django_bootstrap_breadcrumbs %}
 
+
+{% block breadcrumbs %}
+    {{ block.super }}
+    {% breadcrumb "Databases" "/databases" %}
+    {% breadcrumb "List" "/databases" %}
+    {% breadcrumb breadcrumb_name "" %}
+{% endblock %}
+
+
+
+{% block toolbar %}
+{% include "menu_toolbar.html" %}
+{% endblock %}
 
 
 

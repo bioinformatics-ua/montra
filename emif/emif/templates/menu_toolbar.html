@@ -1,12 +1,30 @@
+{% load extra_tags %}
 <div class="span6">
-            <div class="btn-group pull-right">
-                
-              <a class="btn btn-success" href="advancedSearch/2">Add Cohort</a>
-              <a class="btn btn-success" href="advancedSearch/1">Add Observation</a>
-                <button type="button" class="btn" onclick="window.print();" title="Print"><i class="icon-print"></i></button>
-                <a href="" role="button" class="btn" title="Editar"><i class="icon-edit"></i></a>
-               
-                <a href="" class="btn btn-danger" title="" data-toggle="modal"><i class="icon-remove"></i></a>
+	<div class="btn-group pull-right">
+		<div class="btn-group">
+			<a class="btn btn" href="" onclick="return false;"> <i class="icon-plus icon"></i>
+				Add
+			</a>
+			<a class="btn btn dropdown-toggle" data-toggle="dropdown" href="#">
+				<span class="caret" ></span>
+			</a>
+			<ul class="dropdown-menu">
+				
+				{% show_fingerprints %}
 
-            </div>
-        </div>
+			</ul>
+		</div>
+
+		<button type="button" class="btn btn" onclick="window.print();" title="Print">
+			<i class="icon-print"></i>
+		</button>
+		<a href="" role="button" class="btn" title="Editar">
+			<i class="icon-edit"></i>
+		</a>
+
+		<a href="" class="btn btn-danger" title="" data-toggle="modal">
+			<i class="icon-remove"></i>
+		</a>
+
+	</div>
+</div>
