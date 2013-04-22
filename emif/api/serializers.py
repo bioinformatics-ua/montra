@@ -29,4 +29,3 @@ class SearchSerializer(serializers.Serializer):
     text = serializers.CharField()
     
 
-
