@@ -26,7 +26,7 @@ TEMPLATE_DEBUG = DEBUG
 
 
 
-#BASE_URL = '/emif-dev'
+#BASE_URL = '/emif-dev/'
 BASE_URL = '/'
 PROJECT_DIR_ROOT = '/projects/emif-dev/'
 
@@ -39,6 +39,9 @@ else:
 ADMINS = (
      ('Luis A. Bastiao Silva', 'bastiao@ua.pt'),
 )
+
+SOLR_HOST = "localhost"
+SOLR_PORT = "8983"
 
 MANAGERS = ADMINS
 

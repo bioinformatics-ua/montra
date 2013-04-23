@@ -5,6 +5,8 @@ import md5
 import random
 
 
+from settings import SOLRSOLR_HOST, SOLR_PORT
+
 
 
 # Make this unique, and don't share it with anybody.
@@ -53,7 +55,8 @@ data = {
 
 import pysolr
 import random
-solr = pysolr.Solr('http://localhost:8983/solr', timeout=10)
+
+solr = pysolr.Solr('http://' + SOLRSOLR_HOST + ':' + SOLR_PORT+ '/solr', timeout=10)
 for i in range(10):
         index_db = random.randint(1, len(databasenames))
         index_institutionnames = random.randint(1, len(institutionnames))

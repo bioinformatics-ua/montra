@@ -40,6 +40,11 @@ from django.dispatch import receiver
 import logging
 import ast
 
+
+
+from django.conf import settings
+
+
 logger = logging.getLogger()
 
 class CoreEngine:
@@ -50,7 +55,7 @@ class CoreEngine:
     CONNECTION_TIMEOUT_DEFAULT = 10
     def __init__(self, timeout=CONNECTION_TIMEOUT_DEFAULT):
         # Setup a Solr instance. The timeout is optional.
-        self.solr = pysolr.Solr('http://localhost:8983/solr', timeout=timeout)
+        self.solr = pysolr.Solr('http://' +settings.SOLR_HOST+ ':'+ settings.SOLR_PORT+'/solr', timeout=timeout)
 
     def index_fingerprint(self, doc):
         """Index fingerprint 
