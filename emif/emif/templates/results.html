@@ -9,7 +9,12 @@
 
 {% endblock %}
 
+{% block styleextra %}
 
+.hoverDiv {background: #fff;}
+.hoverDiv:hover {background: #E8E8E8;}
+
+{% endblock %}
 
 {% block toolbar %}
 <div class="span6">
@@ -52,28 +57,48 @@
     </div>
   </div>
   {% for result in list_results.list_results %}
-  <div class="span12">
+  <div class="span12" >
     <div class="navbar" id="loading">
 
-      <div class="navbar-inner">
-        <div class"row-fluid">
+      <div class="navbar-inner hoverDiv">
+        <div class"row-fluid hoverDiv">
           <div class="pull-left span6" style="text-align:left">
-            {{result.name}}
+             <a href="fingerprint/{{ result.id }}/1"><span class="label label-success" style="font-size:15px">
+              {{ result.name }}
+              
+
+            </span>
+            </a>
             <div >
-              <span class="label label-inverse">{{result.date}}</span>
+             Institution Name: {{result.institution}}
+            </div>
+
+            <div >
+             Location: {{result.location}}
+            </div>
+            <div >
+             Number of patients: {{result.number_patients}}
+            </div>
+
+            <div >
+            Last change: {{result.date}}
+              
             </div>
           </div >
-          <div class="span5" >
+          <div class="span5" style="margin-top:60px">
             <div class="row " >
 
-         <div class="span1 pull-right" style="text-align:right; padding-top:5px; max-width:15px">
+         <div class="span1 pull-right" style="text-align:right; padding-top:5px; max-width:15px;">
 
-            <input class="checkbox" type="checkbox" name="">
+            <input class="checkbox" type="checkbox" name="" style="display:none; or visibility:hidden;">
           </div>
 
             <div class="span3 pull-right " style="max-width:165px">
               <a class="btn btn-small btn-success" href="advancedSearch/1">Contact</a>
+               <a class="btn btn-small btn-success" href="advancedSearch/1">Dump</a>
+               {% comment %}
               <a class="btn btn-small btn-success" href="advancedSearch/1">More like this</a>
+              {% endcomment %}
             </div>
            
           </div>
@@ -87,7 +112,7 @@
 
 
 
-    {% bootstrap_paginate page_obj range=10 url_view_name="views.results_diff" show_prev_next="false" show_first_last="true" %}
+{% bootstrap_paginate page_obj range=10 url_view_name="views.results_diff" show_prev_next="false" show_first_last="true" %}
 
 
 

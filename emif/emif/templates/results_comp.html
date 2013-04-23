@@ -1,0 +1,112 @@
+{% extends 'base.html' %}
+{% load url from future %}
+
+
+{% block content %}
+<div class="span12" style="text-align:center">
+  <div class="span4">
+    <table class="table table-bordered  table-hover">
+      <thead>
+        <tr>
+          <th>Tag</th>
+          <th>{{results.d1.name}}</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        {% for t in results.d1.fields %}
+        <tr>
+          <td>{{ t.tag }}</td>
+          <td>{{ t.value }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+
+    </table>
+
+    <div class="pull-right" >
+      <a class="btn btn-small btn-success" href="advancedSearch/1">Contact</a>
+      <a class="btn btn-small btn-success" href="advancedSearch/1">More like this</a>
+    </div>
+
+  </div>
+
+  <div class="span3">
+    <table class="table table-bordered  table-hover">
+      <thead>
+        <tr>
+
+          <th>{{results.d2.name}}</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        {% for t in results.d2.fields %}
+        <tr>
+
+          <td>{{ t.value }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    <div class="pull-right" >
+      <a class="btn btn-small btn-success" href="advancedSearch/1">Contact</a>
+      <a class="btn btn-small btn-success" href="advancedSearch/1">More like this</a>
+    </div>
+
+  </div>
+  <div class="span3">
+    <table class="table table-bordered  table-hover">
+      <thead>
+        <tr>
+
+          <th>{{results.d3.name}}</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        {% for t in results.d2.fields %}
+        <tr>
+
+          <td>{{ t.value }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    <div class="pull-right" >
+      <a class="btn btn-small btn-success" href="advancedSearch/1">Contact</a>
+      <a class="btn btn-small btn-success" href="advancedSearch/1">More like this</a>
+    </div>
+
+  </div>
+  <div class="span2"></div>
+</div>
+</div>
+{% endblock %}
+
+
+{% block scriptextra %}
+function hidecheckbox()
+{
+  $('.checkbox').toggle();
+}
+
+
+
+function highlight(text, text_to_highlight)
+{
+    inputText = document.getElementById("inputText")
+    var innerHTML = inputText.innerHTML
+    var index = innerHTML.indexOf(text);
+    if ( index >= 0 )
+    { 
+        innerHTML = innerHTML.substring(0,index) + "<span class='highlight'>" + innerHTML.substring(index,index+text.length) + "</span>" + innerHTML.substring(index + text.length);
+        inputText.innerHTML = innerHTML 
+    }
+
+}
+
+
+{% endblock %}
