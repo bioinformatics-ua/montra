@@ -9,6 +9,17 @@
 
 {% endblock %}
 
+{% block styleextra %}
+
+button {
+    border: 1px #AAA solid;
+    padding: 4px 10px;
+}
+.hide {
+    display: none;
+}
+
+{% endblock %}
 
 
 {% block toolbar %}
@@ -17,8 +28,6 @@
 {% endblock %}
 
 {% block content %}
-
-
 
 {% if list_databases %}
 <table class="table table-hover" id="table_databases" data-provides="rowlink">
@@ -35,19 +44,30 @@
         
         {% for t in list_databases %}
         <tr>
-          <td><a href="fingerprint/{{ t.id }}/1">{{ t.name }}</a></td>
+          <td>
+            <a href="fingerprint/{{ t.id }}/1">{{ t.name }}</a>
+
+            <div style="margin-left:20px">
+             Institution Name: {{t.institution}}
+            </div>
+
+            <div style="margin-left:20px">
+             Location: {{t.location}}
+            </div>
+            <div style="margin-left:20px">
+             Number of patients: {{t.number_patients}}
+            </div>
+        </td>
           <td>{{ t.date }}</td>
           <td>
 <!--<div style="color:red">
 <i class="icon-remove " ></i></div>-->
-            <a href="#"><img src="static/img/glyphicons_150_edit.png"/></a>
-            <a href="#"><img src="static/img/glyphicons_192_circle_remove.png"/></a></td>
+            <a ><img src="static/img/glyphicons_150_edit.png"/></a>
+            <a class="confirm-delete" data-id="{{ t.id }}" ><img src="static/img/glyphicons_192_circle_remove.png"/></a></td>
           
         </tr>
 
         {% endfor %}
-        
-        
 
     </tbody>
 </table>
@@ -67,10 +87,54 @@
   <a class="btn btn-large btn-success" href="advancedSearch/1">Add new database</a>
 {% endcomment %}
 </div>
+
+
+
+<div id="modal-from-dom" class="modal hide fade" style="display:none"  >
+    <div class="modal-header">
+        <a href="#" class="close">&times;</a>
+         <h3>Delete Fingerprint</h3>
+    </div>
+    <div class="modal-body">
+        <p>You are removing the database fingerprint. This procedure is irreversible.</p>
+        <p>Do you want to proceed?</p>
+        <p id="debug-url"></p>
+    </div>
+    <div class="modal-footer">
+        <a href="rm/ref" class="btn btn-danger">Yes</a>
+        <!-- <a href="delete.php?some=param&ref=" class="btn danger">Yes 2</a> -->
+        <a href="javascript:$('#modal-from-dom').modal('hide')" class="btn btn-secondary">No</a>
+    </div>
+</div>
+
 {% endblock %}
 
-
-
 {% block scriptextra %}
+{% comment %}
+<script>
+{% endcomment %}
 $('#li_workspace').addClass("active");
+
+$('#modal-from-dom').bind('show', function() {
+    var id = $(this).data('id'),
+        removeBtn = $(this).find('.btn-danger'),
+        href = removeBtn.attr('href');
+    console.log('id' + id);
+    removeBtn.attr('href', href.replace('ref', '' + id));
+})
+
+
+$('.confirm-delete').click(function(e) {
+    e.preventDefault();
+    
+    var id = $(this).data('id');
+    $('#modal-from-dom').data('id', id).modal('show');
+});
+
+
+
+{% comment %}
+</script>
+{% endcomment %}
+
 {% endblock %}
