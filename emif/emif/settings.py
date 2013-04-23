@@ -25,6 +25,7 @@ DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
 
+
 #BASE_URL = '/emif-dev'
 BASE_URL = '/'
 PROJECT_DIR_ROOT = '/projects/emif-dev/'
@@ -178,7 +179,7 @@ INSTALLED_APPS = (
     # Questionnaires
     'transmeta',
     'questionnaire',
-    'questionnaire.page',
+    'questionnaire.page',                                                                                                                   
 
     # User signup/signin/management
     'userena',
@@ -224,7 +225,7 @@ USERENA_WITHOUT_USERNAMES = True
 USERENA_DISABLE_PROFILE_LIST = True
 USERENA_USE_MESSAGES = False
 USERENA_REDIRECT_ON_SIGNOUT = BASE_URL
-USERENA_SIGNIN_REDIRECT_URL = BASE_URL + 'take/1/'
+USERENA_SIGNIN_REDIRECT_URL = BASE_URL + 'databases'
 
 LOGIN_REDIRECT_URL = USERENA_SIGNIN_REDIRECT_URL
 LOGIN_URL = BASE_URL + 'accounts/signin/'
