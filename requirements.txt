@@ -21,3 +21,4 @@ textile==2.1.5
 wsgiref==0.1.2
 djangorestframework
 django-bootstrap-breadcrumbs
+django-bootstrap-pagination
