@@ -50,7 +50,7 @@
                     <div class="nav-collapse collapse">
 
                         <ul class="nav">
-
+                            {% if request.user.is_authenticated %}    
                             <li id="li_workspace" class="dropdown">
                             <a href="#" class="dropdown-toggle" data-toggle="dropdown">Workspace <b class="caret"></b></a>
                             <ul class="dropdown-menu">
@@ -76,6 +76,7 @@
 
                             </ul>
                           </li>
+                          {% endif %}
 
                             <li id="li_search"><a href="search">Quick Search</a></li>
                            
