@@ -37,7 +37,7 @@ from searchengine.models import Slugs
 import searchengine.search_indexes
 
 
-from emif.utils import clean_value, convert_date
+from emif.utils import *
 
 import logging
 import re
@@ -96,15 +96,52 @@ def results_db(request, template_name='results.html'):
     return render(request, template_name, {'request': request, 
         'list_results': list_results})
 
-class Database:
-    id = ''
-    name = ''
-    date = ''
+
+def results_comp(request, id1, id2, id3, template_name='results_comp.html'):
+
+    class Results:
+        num_results=0
+        list_results= []
+        d1 = None
+        d2 = None 
+        d3 = None
+
+
+    class DatabaseFields:
+        id = ''
+        name = ''
+        date = ''
+        fields = None
+
+    list_databases = []
+    try:
+        list_databases.append(get_database_from_id(id1))
+        list_databases.append(get_database_from_id(id2))
+        list_databases.append(get_database_from_id(id3))
+
+        c = CoreEngine()
+        list_databases_final = []
+        list_results = Results()
+        for db in list_databases:
+            db_aux = get_database_from_id_with_tlv(db)        
+            list_databases_final.append(db_aux)
+
+        list_results.d1 = list_databases_final[0]
+        list_results.d2 = list_databases_final[1]
+        list_results.d3 = list_databases_final[2]
+
+        list_results.num_results=len(list_databases)
+    except:
+        raise
+        return render(request, template_name, {'request': request, 
+        'results': []})
+    return render(request, template_name, {'request': request, 
+        'results': list_results})
 
 
 def results_fulltext(request, page=1, template_name='results.html'):
 
-    rows = 10
+    rows = 5
 
     query = ""
     in_post = True
@@ -143,8 +180,11 @@ def results_fulltext(request, page=1, template_name='results.html'):
             print r['database_name_t']
             database_aux.id = r['id']
             database_aux.date = convert_date(r['created_t'])
-           
             database_aux.name = r['database_name_t']
+            database_aux.location = r['location_t']
+            database_aux.institution = r['institution_name_t']
+            database_aux.email_contact = r['contact_administrative_t']
+            database_aux.number_patients = r['number_active_patients_jan2012_t']
             list_databases.append(database_aux)
         except:
             pass
@@ -351,9 +391,9 @@ def get_databases_from_db(request):
         list_databases.append(database_aux)
     return list_databases
 
-def get_databases_from_solr(request):
+def get_databases_from_solr(request, query="*:*"):
     c = CoreEngine()
-    results = c.search_fingerprint("*:*")
+    results = c.search_fingerprint(query)
     print "Solr"
     print results
     list_databases = []
@@ -365,21 +405,58 @@ def get_databases_from_solr(request):
             print r['database_name_t']
             database_aux.id = r['id']
             database_aux.date = convert_date(r['created_t'])
-           
             database_aux.name = r['database_name_t']
+            database_aux.location = r['location_t']
+            database_aux.institution = r['institution_name_t']
+            database_aux.email_contact = r['contact_administrative_t']
+            database_aux.number_patients = r['number_active_patients_jan2012_t']
             list_databases.append(database_aux)
         except:
             pass
     return list_databases
+
+def delete_fingerprint(request, id):
+
+    user = request.user
+    su = Subject.objects.filter(user=user)
+
+    email = su[0].email
+
+    c = CoreEngine()
+    results = c.search_fingerprint('user_t:'+email)
+    for result in results:
+        if (id == result['id']):
+            c.delete(id)
+            break
+            
+    return databases(request)
+
+
+
+
+
+
+
 def databases(request, template_name='databases.html'):
     # Get the list of databases for a specific user
 
+    user = request.user
+    su = Subject.objects.filter(user=user)
+
     #list_databases = get_databases_from_db(request)
-    list_databases = get_databases_from_solr(request)
+    list_databases = get_databases_from_solr(request, "user_t:"+su[0].email)
 
     return render(request, template_name, {'request': request, 
         'list_databases': list_databases, 'breadcrumb': True})
 
+
+def all_databases(request, template_name='databases.html'):
+
+    #list_databases = get_databases_from_db(request)
+    list_databases = get_databases_from_solr(request, "*:*")
+
+    return render(request, template_name, {'request': request, 
+        'list_databases': list_databases, 'breadcrumb': True})
 
 def fingerprint(request, runcode, qs, template_name='database_info.html'):    
     
