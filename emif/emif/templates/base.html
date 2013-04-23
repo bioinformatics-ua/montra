@@ -55,12 +55,15 @@
                             <a href="#" class="dropdown-toggle" data-toggle="dropdown">Workspace <b class="caret"></b></a>
                             <ul class="dropdown-menu">
                               <li><a href="databases">List Databases</a></li>
+                              <li><a href="alldatabases">List all Databases</a></li>
+                              {% comment %}
                               <li><a href="databases">Edit Databases</a></li>
                               <li><a href="databases">Query History</a></li>
                               <li><a href="databases">Timeline</a></li>
                               
 
                               <li><a href="statistics">Statistics</a></li>
+                              {% endcomment %}
                               <li class="divider"></li>
 
                               <li><a href="databases">Subscribe interests</a></li>
@@ -158,11 +161,12 @@
 
 
         <!-- backbone -->
+        {% comment %}
         <script type="text/javascript" src="{{ STATIC_URL }}contrib/backbone/ICanHaz.min.js"></script>
         <script type="text/javascript" src="{{ STATIC_URL }}contrib/backbone/json2.js"></script>
         <script type="text/javascript" src="{{ STATIC_URL }}contrib/backbone/underscore-min.js"></script>
         <script type="text/javascript" src="{{ STATIC_URL }}contrib/backbone/backbone-min.js"></script>
-         
+         {% endcomment %}
         {% block scriptextraincludes %}
         {% endblock %}
         <script type="text/javascript">
