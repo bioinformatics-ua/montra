@@ -418,12 +418,12 @@ def get_databases_from_solr(request, query="*:*"):
 def delete_fingerprint(request, id):
 
     user = request.user
-    su = Subject.objects.filter(user=user)
+    #su = Subject.objects.filter(user=user)
 
-    email = su[0].email
+    #email = su[0].email
 
     c = CoreEngine()
-    results = c.search_fingerprint('user_t:'+email)
+    results = c.search_fingerprint('user_t:'+user.email)
     for result in results:
         if (id == result['id']):
             c.delete(id)
@@ -431,20 +431,12 @@ def delete_fingerprint(request, id):
             
     return databases(request)
 
-
-
-
-
-
-
 def databases(request, template_name='databases.html'):
     # Get the list of databases for a specific user
 
     user = request.user
-    su = Subject.objects.filter(user=user)
-
     #list_databases = get_databases_from_db(request)
-    list_databases = get_databases_from_solr(request, "user_t:"+su[0].email)
+    list_databases = get_databases_from_solr(request, "user_t:"+user.email)
 
     return render(request, template_name, {'request': request, 
         'list_databases': list_databases, 'breadcrumb': True})
