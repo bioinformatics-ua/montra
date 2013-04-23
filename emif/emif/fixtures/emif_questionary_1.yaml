@@ -42,33 +42,50 @@
 - pk: 1
   fields: {checks: 'required', extra_en: '', number: '1', questionset: 1,
  text_en: 'Please provide contact information. We ask three contacts (name, address, email, and phone number). First, the administrative contact; typically a secretariat. Second, the scientific content contact; this is the person(s) who are familiar with the data in the database and are have experience in conducting scientific studies with the data. Third, technical contact; this is the person who is familiar with the IT platform of the data source and will be our contact point if we will install software locally.',
-  type: open-textfield, slug: 'contact'}
+  type: comment, slug: 'contact'}
   model: questionnaire.question
 
-# Contact for Administrative
+
+
+# Institution Name
 - pk: 23
   fields: {checks: 'required', extra_en: '', number: '1a', questionset: 1,
- text_en: 'Administrative contact',
-  type: open-textfield, slug: 'contact_administrative'}
+ text_en: 'Institution Name',
+  type: open, slug: 'institution_name'}
+  model: questionnaire.question
+
+# Location 
+- pk: 24
+  fields: {checks: 'required', extra_en: '', number: '1b', questionset: 1,
+ text_en: 'Location',
+  type: open, slug: 'location'}
+  model: questionnaire.question
+
+
+
+# Contact for Administrative
+- pk: 25
+  fields: {checks: 'required', extra_en: '', number: '1c', questionset: 1,
+ text_en: 'Administrative email',
+  type: open, slug: 'contact_administrative'}
   model: questionnaire.question
 
 # Contact for Scientific contact
 
-- pk: 24
-  fields: {checks: 'required', extra_en: '', number: '1b', questionset: 1,
+- pk: 28
+  fields: {checks: 'required', extra_en: '', number: '1d', questionset: 1,
  text_en: 'Scientific contact',
-  type: open-textfield, slug: 'contact_scientific'}
+  type: open, slug: 'contact_scientific'}
   model: questionnaire.question
 
 
 # Contact for Technical contact
 
-- pk: 25
-  fields: {checks: 'required', extra_en: '', number: '1c', questionset: 1,
+- pk: 29
+  fields: {checks: 'required', extra_en: '', number: '1e', questionset: 1,
  text_en: 'Technical contact',
-  type: open-textfield, slug: 'contact_technical'}
+  type: open, slug: 'contact_technical'}
   model: questionnaire.question
-
 
 
 # Database name
@@ -291,270 +308,268 @@ Would you be able to create such a table for the population of in your database?
   value: "diagnosis specialist outpatient records"}
   model: questionnaire.choice
 
-# Stopped here. TODO
-
 - pk: 25
   fields: {question: 12, sortid: 4,
   text_en: "diagnosis from in-patient hospital records",
-  value: "4"}
+  value: "diagnosis in-patient hospital records"}
   model: questionnaire.choice
 
 - pk: 26
   fields: {question: 12, sortid: 5,
-  text_en: "diagnosis from in-patient hospital records",
-  value: "4"}
+  text_en: "diagnosis from out-patient hospital records",
+  value: "diagnosis from out-patient hospital records"}
   model: questionnaire.choice
 
 - pk: 27
   fields: {question: 12, sortid: 6,
   text_en: "diagnosis in ICPC",
-  value: "4"}
+  value: "ICPC"}
   model: questionnaire.choice
 
 - pk: 27
   fields: {question: 12, sortid: 7,
   text_en: "diagnosis in ICD",
-  value: "4"}
+  value: "ICD"}
   model: questionnaire.choice
 
 - pk: 28
   fields: {question: 12, sortid: 8,
   text_en: "diagnosis in READ",
-  value: "4"}
+  value: "READ"}
   model: questionnaire.choice
 
 - pk: 29
   fields: {question: 12, sortid: 9,
   text_en: "diagnosis in Snomed",
-  value: "4"}
+  value: "Snomed"}
   model: questionnaire.choice
 
 - pk: 30
   fields: {question: 12, sortid: 10,
   text_en: "diagnosis in other coding system",
-  value: "4"}
+  value: "other coding system"}
   model: questionnaire.choice
 
 - pk: 31
   fields: {question: 12, sortid: 11,
   text_en: "diagnosis in free text",
-  value: "4"}
+  value: "free text"}
   model: questionnaire.choice
 
 - pk: 13
   fields: {checks: 'requiredif=9,medication', extra_en: '', number: '9b', questionset: 4,
   text_en: 'Choose available prescription information',
-  type: choice-multiple}
+  type: choice-multiple, slug: 'prescription_information'}
   model: questionnaire.question
 
 - pk: 32
   fields: {question: 13, sortid: 1,
   text_en: "prescription as recorded in GP records",
-  value: "4"}
+  value: "prescription recorded GP records"}
   model: questionnaire.choice
 
 - pk: 33
   fields: {question: 13, sortid: 2,
   text_en: "prescriptions from pediatrician in general practice",
-  value: "4"}
+  value: "prescriptions pediatrician general practice"}
   model: questionnaire.choice
 
 - pk: 34
   fields: {question: 13, sortid: 3,
   text_en: "prescriptions as recorded pharmacies",
-  value: "4"}
+  value: "prescriptions recorded pharmacies"}
   model: questionnaire.choice
 
 - pk: 35
   fields: {question: 13, sortid: 4,
   text_en: "prescriptions from specialist outpatient records",
-  value: "4"}
+  value: "prescriptions specialist outpatient records"}
   model: questionnaire.choice
 
 - pk: 36
   fields: {question: 13, sortid: 5,
   text_en: "prescriptions from in-patient hospital records",
-  value: "4"}
+  value: "prescriptions from in-patient hospital records"}
   model: questionnaire.choice
 
 - pk: 37
   fields: {question: 13, sortid: 6,
   text_en: "prescriptions in ICPC",
-  value: "4"}
+  value: "prescriptions ICPC"}
   model: questionnaire.choice
 
 - pk: 38
   fields: {question: 13, sortid: 7,
   text_en: "prescriptions in ICD",
-  value: "4"}
+  value: "ICD"}
   model: questionnaire.choice
 
 - pk: 39
   fields: {question: 13, sortid: 8,
   text_en: "prescriptions in READ",
-  value: "4"}
+  value: "READ"}
   model: questionnaire.choice
 
 - pk: 40
   fields: {question: 13, sortid: 9,
   text_en: "prescriptions in Snomed",
-  value: "4"}
+  value: "Snomed"}
   model: questionnaire.choice
 
 - pk: 41
   fields: {question: 13, sortid: 10,
   text_en: "prescriptions in other coding system: (please fill in coding system)",
-  value: "4"}
+  value: "other coding system"}
   model: questionnaire.choice
 
 - pk: 42
   fields: {question: 13, sortid: 11,
   text_en: "prescriptions in free text",
-  value: "4"}
+  value: "free text"}
   model: questionnaire.choice
 
 - pk: 43
   fields: {question: 13, sortid: 12,
   text_en: "prescriptions from other source",
-  value: "4"}
+  value: "prescriptions from other source"}
   model: questionnaire.choice
 
 - pk: 14
   fields: {checks: 'requiredif=9,procedures', extra_en: '', number: '9c', questionset: 4,
   text_en: 'Choose available procedures information',
-  type: choice-multiple}
+  type: choice-multiple, slug: 'procedures_information'}
   model: questionnaire.question
 
 - pk: 44
   fields: {question: 14, sortid: 1,
   text_en: "Procedures from GP records",
-  value: "4"}
+  value: "procedures GP records"}
   model: questionnaire.choice
 
 - pk: 45
   fields: {question: 14, sortid: 1,
   text_en: "Procedures from pediatrician in general practice",
-  value: "4"}
+  value: "pediatrician in general practice"}
   model: questionnaire.choice
 
 - pk: 46
   fields: {question: 14, sortid: 1,
   text_en: "Procedures from specialist outpatient records ",
-  value: "4"}
+  value: "specialist outpatient records"}
   model: questionnaire.choice
 
 - pk: 47
   fields: {question: 14, sortid: 1,
   text_en: "Procedures from in-patient hospital records",
-  value: "4"}
+  value: "in-patient hospital records"}
   model: questionnaire.choice
 
 - pk: 48
   fields: {question: 14, sortid: 1,
   text_en: "Procedures coded in ICPC",
-  value: "4"}
+  value: "ICPC"}
   model: questionnaire.choice
 
 - pk: 49
   fields: {question: 14, sortid: 1,
   text_en: "Procedures coded in ICD",
-  value: "4"}
+  value: "ICD"}
   model: questionnaire.choice
 
 - pk: 50
   fields: {question: 14, sortid: 1,
   text_en: "Procedures coded in READ",
-  value: "4"}
+  value: "READ"}
   model: questionnaire.choice
 
 - pk: 51
   fields: {question: 14, sortid: 1,
   text_en: "Procedures coded in Snomed",
-  value: "4"}
+  value: "Snomed"}
   model: questionnaire.choice
 
 - pk: 52
   fields: {question: 14, sortid: 1,
   text_en: "Procedures other coding system: (please fill in coding system)",
-  value: "4"}
+  value: "any coding system"}
   model: questionnaire.choice
 
 - pk: 53
   fields: {question: 14, sortid: 1,
   text_en: "Procedures in free text",
-  value: "4"}
+  value: "free text"}
   model: questionnaire.choice
 
 - pk: 54
   fields: {question: 14, sortid: 1,
   text_en: "Procedures from other source: (please fill in source)",
-  value: "4"}
+  value: "other source"}
   model: questionnaire.choice
 
 - pk: 15
   fields: {checks: 'required', extra_en: '', number: '10', questionset: 4,
  text_en: 'Has the patient given informed consent for including his/her data in your data collection?',
-  type: choice-yesno}
+  type: choice-yesno, slug: 'patient_consent'}
   model: questionnaire.question
 
 - pk: 16
   fields: {checks: 'required', extra_en: '', number: '11', questionset: 4,
  text_en: 'Do you have an ethical/review committee?',
-  type: choice-yesno}
+  type: choice-yesno, slug: 'ethical_committee'}
   model: questionnaire.question
 
 - pk: 17
   fields: {checks: 'requiredif=11,yes', extra_en: '', number: '11a', questionset: 4,
  text_en: 'If yes, does the committee',
-  type: choice-multiple}
+  type: choice-multiple, slug: 'ethical_committee_comment'}
   model: questionnaire.question
 
 - pk: 55
   fields: {question: 17, sortid: 1,
   text_en: "judge each study prior to execution",
-  value: "4"}
+  value: "study_prior_execution"}
   model: questionnaire.choice
 
 - pk: 56
   fields: {question: 17, sortid: 1,
   text_en: "judge categories of studies as a whole (e.g., drug safety studies in general)",
-  value: "4"}
+  value: "judge categories of studies as a whole"}
   model: questionnaire.choice
 
 - pk: 57
   fields: {question: 17, sortid: 1,
   text_en: "judge conducted studies retrospectively",
-  value: "4"}
+  value: "judge conducted studies retrospectively"}
   model: questionnaire.choice
 
 - pk: 18
   fields: {checks: 'required', extra_en: '', number: '12', questionset: 4,
  text_en: 'Do you have a publically available document that details the procedure by which approval can be requested?',
-  type: choice-yesno}
+  type: choice-yesno, slug: 'publically_doc_procedure'}
   model: questionnaire.question
 
 - pk: 19
   fields: {checks: 'required', extra_en: '', number: '13', questionset: 4,
  text_en: 'Are you able to contact the care provider for additional information?',
-  type: choice-yesno}
+  type: choice-yesno, slug: 'contact_care_provider'}
   model: questionnaire.question
 
 - pk: 20
   fields: {checks: 'required', extra_en: '', number: '14', questionset: 4,
  text_en: 'Are you able to contact the patient for additional information?',
-  type: choice-yesno}
+  type: choice-yesno, slug: 'contact_patient'}
   model: questionnaire.question
 
 - pk: 21
   fields: {checks: 'required', extra_en: '', number: '15', questionset: 5,
  text_en: 'Can you assess the prevalence of diabetes mellitus in the population who enters your data base?',
-  type: open-textfield}
+  type: open-textfield, slug: 'assess_prevalence_prevalence'}
   model: questionnaire.question
 
 - pk: 22
   fields: {checks: 'required', extra_en: '', number: '16', questionset: 5,
  text_en: 'Could you provide a list of peer-reviewed papers based on your data base covering the last 3 years?',
-  type: open-textfield}
+  type: open-textfield, slug: 'literature_papers'}
   model: questionnaire.question
 
 
