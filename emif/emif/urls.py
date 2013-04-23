@@ -65,13 +65,17 @@ urlpatterns = patterns('',
     url(r'^statistics$', 'emif.views.statistics'),
 
     url(r'^resultsdiff/(?P<page>[-]{0,1}\d+)?$', 'emif.views.results_diff'),
+    url(r'^resultscomp/(?P<id1>[^/]+)/(?P<id2>[^/]+)/(?P<id3>[^/]+)', 'emif.views.results_comp'),
     url(r'^fingerprint/(?P<runcode>[^/]+)/(?P<qs>[-]{0,1}\d+)/$', 'emif.views.fingerprint'),
 
     # List Databases 
     url(r'^databases$', 'emif.views.databases'),
-
+    url(r'^alldatabases$', 'emif.views.all_databases'),
     # Documentation 
     url(r'^docs/api$', 'emif.views.docs_api'),
+
+
+    url(r'^rm/(?P<id>[^/]+)', 'emif.views.delete_fingerprint'),
 
     # API 
     url(r'^api/', include('api.urls')),
