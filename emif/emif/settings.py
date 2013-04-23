@@ -162,7 +162,7 @@ TEMPLATE_DIRS = (
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
     os.path.abspath(PROJECT_DIR_ROOT +MIDDLE_DIR + 'apps/seantis-questionnaire/questionnaire/templates'),
-    os.path.abspath(PROJECT_DIR_ROOT + MIDDLE_DIR + 'emif/templates'),
+    os.path.abspath(PROJECT_DIR_ROOT + MIDDLE_DIR + 'templates'),
 )
 
 INSTALLED_APPS = (
