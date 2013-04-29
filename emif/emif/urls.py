@@ -41,6 +41,7 @@ urlpatterns = patterns('',
 
     # Index page
     url(r'^$', 'emif.views.index'),
+    url(r'^about$', 'emif.views.about'),
 
     # Quick Search 
     url(r'^search$', 'emif.views.quick_search'),
