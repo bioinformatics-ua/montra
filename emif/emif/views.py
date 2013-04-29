@@ -611,7 +611,7 @@ def delete_fingerprint(request, id):
     #email = su[0].email
 
     c = CoreEngine()
-    results = c.search_fingerprint('user_t:'+user.email)
+    results = c.search_fingerprint('user_t:'+user.username)
     for result in results:
         if (id == result['id']):
             c.delete(id)
