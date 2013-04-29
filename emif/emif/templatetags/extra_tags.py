@@ -21,7 +21,27 @@ def fingerprints_list():
 
     return results
 
+
+
+def fingerprints_list():
+    
+    objs = Questionnaire.objects.all()
+    results = {}
+    for q in objs:
+        results[q.id] = q.name
+    print results
+
+    return results
+
+
 def show_fingerprints():
     
     return {'fingerprints':fingerprints_list()}
 register.inclusion_tag('menu_ttags.html')(show_fingerprints)
+
+
+def show_fingerprints_for_search():
+    
+    return {'fingerprints':fingerprints_list()}
+register.inclusion_tag('menu_ttags_for_search.html')(show_fingerprints_for_search)
+

@@ -19,7 +19,6 @@ def question_custom(request, question):
     return d
 
 
-
 @answer_proc('custom')
 def process_custom(question, answer):
     cd = question.getcheckdict()

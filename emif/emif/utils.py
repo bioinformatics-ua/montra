@@ -5,6 +5,8 @@ from datetime import datetime
 from searchengine.search_indexes import CoreEngine
 from searchengine.models import Slugs
 
+from questionnaire.models import Question, Questionnaire, QuestionSet
+
 def convert_text_to_slug(text):
     #TODO: optimize
     return text.replace(' ', '_').replace('?','').replace('.', '').replace(',','')
@@ -118,8 +120,48 @@ def get_database_from_id_with_tlv(db):
     db.fields = list_values
     return db
 
-
 WORKSPACE_PATH={'Workspace'}
+ 
+def convert_dict_to_query(params):
+    query = ""
+    i = 0 
+    size_params = len(params)
+    for key in params:
+        query += key+"_t:" + params[key]+"*"
+        i = i + 1 
+        if (size_params != i ):
+            query += " AND "
+
+    return query
+
+
+def convert_qvalues_to_query(qvalues, questionnaire_id):
+    questionsets = QuestionSet.objects.filter(questionnaire=questionnaire_id)
+    
+    questions = Question.objects.filter(questionset__in=questionsets)
+    
+    numbers = {}
+
+    for q in questions:
+        numbers[q.number] = q.slug
+    query_parameters = {}
+    query = ""  
+    for k in qvalues:
+        try:
+            print qvalues[k]
+            print numbers[k]
+            
+            if (qvalues[k]!=None and qvalues[k]!="" ):
+                query_parameters[numbers[k]] = qvalues[k]
+            query = query + " " + qvalues[k]
+        except:
+            pass
+    
+    return convert_dict_to_query(query_parameters)
+
+
+
+
 
 
 

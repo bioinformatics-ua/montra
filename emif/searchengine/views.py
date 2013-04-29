@@ -25,3 +25,32 @@
 
 
 
+from django.http import HttpResponse
+from django.http import HttpResponseRedirect
+from django.shortcuts import render_to_response
+from searchengine.models import ContactForm
+from django.template import RequestContext, Context
+from django import forms
+
+from django.core.mail import send_mail, BadHeaderError
+
+def contactview(request, email):
+		subject = request.POST.get('topic', '')
+		message = request.POST.get('message', '')
+		from_email = request.POST.get('email', '')
+
+		if subject and message and from_email:
+		        try:
+					send_mail(subject, message, "bioinformatics@ua.pt", [email])
+        		except BadHeaderError:
+            			return HttpResponse('Invalid header found.')
+        		return HttpResponseRedirect('/contact/thankyou/')
+		else:
+			return render_to_response('contact_form.html', {'form': ContactForm(), 'email_to': email}, RequestContext(request))
+	
+		return render_to_response('contact_form.html', {'form': ContactForm()},
+			RequestContext(request))
+
+
+def thankyou(request):
+		return render_to_response('contact_thankyou.html')

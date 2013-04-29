@@ -3,7 +3,10 @@
 {% load markup questionnaire i18n %}
 <div class="span8">
     <form name="qform" id="qform" action="{{ request.path }}" method="POST">
-    
+    {% for k, qlist in questions_list %}
+
+    <div id="qs_{{ k.pk }}" class="{% if k.pk == questionset.pk %} {% else %} hide {% endif %} questionset">
+
     <div class="questionset-title" style="font-size:6px">
     <h3>{{ k.text|removeh1 }}</h3>
     </div>
@@ -71,7 +74,8 @@
 
     
     </div>
-  
+    {% endfor %}
+    </form>
 </div>
 
 

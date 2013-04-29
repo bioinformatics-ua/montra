@@ -21,6 +21,11 @@
 from django.db import models
 
 from questionnaire.models import *
+from django import forms
+
+
+from django.core.mail import send_mail, BadHeaderError
+
 
 class Slugs(models.Model):
 	slug1 = models.CharField(max_length=128)
@@ -31,3 +36,8 @@ class Slugs(models.Model):
 class Nomenclature(models.Model):
 	name = models.CharField(max_length=256)
 
+class ContactForm(forms.Form):
+    name = forms.CharField()
+    email = forms.EmailField()
+    topic = forms.CharField()
+    message = forms.CharField(widget=forms.Textarea)

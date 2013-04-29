@@ -3,7 +3,7 @@
 
 {% load markup questionnaire i18n %}
 
-
+{% load django_bootstrap_breadcrumbs %}
 
 
 {% block breadcrumbs %}
@@ -19,7 +19,6 @@
 {% include "menu_toolbar.html" %}
 
 {% endblock %}
-
 
 
 {% block headextra %}
@@ -80,7 +79,7 @@
 </div>
 </div>
 
-{% include "fingerprint.html" %}
+{% include "fingerprint_edit.html" %}
 
 
 </div>

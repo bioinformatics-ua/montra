@@ -40,12 +40,21 @@ from django.dispatch import receiver
 import logging
 import ast
 
-
+import md5
+import random
 
 from django.conf import settings
 
-
+import datetime
 logger = logging.getLogger()
+
+def generate_hash():
+    hash = md5.new()
+    hash.update("".join(map(lambda i: chr(random.randint(0, 255)), range(16))))
+    hash.update(settings.SECRET_KEY)
+    key = hash.hexdigest()
+    return key
+
 
 class CoreEngine:
     """It is responsible for index the documents and search over them
@@ -128,6 +137,53 @@ def get_slug_from_choice(v, q):
     if (len(choice)>0):
         print(choice[0].text)
         print(choice[0].value)
+
+
+def index_answeres_from_qvalues(qvalues, questionnaire, subject):
+    print("index_answeres_from_qvalues")
+    c = CoreEngine()
+    d = {}
+    text = ""
+    
+
+    now = datetime.datetime.now()
+    for qs_aux, qlist in qvalues:
+        for question, qdict in qlist:
+            print(qdict)
+            try:
+                value = qdict['value']
+
+                slug = question.slug  
+                
+                slug_aux = ""
+                if len(slug)>2:
+                    slug = question.slug
+                else:
+                    slug = convert_text_to_slug(question.text)
+                slug_final = slug+"_t"
+
+                results = Slugs.objects.filter(description=question.text)
+                
+                if results==None or len(results)==0:
+                    slugs = Slugs()
+                    slugs.slug1 = slug_final
+                    slugs.description = question.text
+                    slugs.question = question
+                    slugs.save()
+
+                d[slug_final] = value
+                text += value + " " 
+            except:
+                pass
+    
+    d['id']=generate_hash()
+
+    d['type_t']=questionnaire.name.replace(" ", "").lower()
+    d['created_t']= now.strftime('%Y-%m-%d %H:%M:%S.%f')
+    d['user_t']= subject
+    d['text_t']= text
+    print(d)
+    c.index_fingerprint_as_json(d)
 
 
 def convert_answers_to_solr(runinfo):

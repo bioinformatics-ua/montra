@@ -46,18 +46,29 @@ urlpatterns = patterns('',
     url(r'^search$', 'emif.views.quick_search'),
 
     # Advanced Search 
-    url(r'^advancedSearch/(?P<questionnaire_id>[0-9]+)/$$', 'emif.views.advanced_search'),
-    url(r'^q2/(?P<runcode>[^/]+)/$', questionaries_with_sets, name='questionaries_with_sets'),
-    url(r'^q2/(?P<runcode>[^/]+)/(?P<qs>[-]{0,1}\d+)/$',
-            questionaries_with_sets, name='questionset_sets'),
+    url(r'^advancedSearch/(?P<questionnaire_id>[0-9]+)/(?P<question_set>[0-9]+)/$', 'emif.views.advanced_search'),
+    #url(r'^q2/(?P<runcode>[^/]+)/$', questionaries_with_sets, name='questionaries_with_sets'),
+    #url(r'^q2/(?P<runcode>[^/]+)/(?P<qs>[-]{0,1}\d+)/$',
+    #        questionaries_with_sets, name='questionset_sets'),
+
+    # Database Add 
+
+    url(r'^add/(?P<questionnaire_id>[0-9]+)/(?P<question_set>[0-9]+)/$', 'emif.views.database_add'),
+    url(r'^addPost/(?P<questionnaire_id>[0-9]+)/(?P<question_set>[0-9]+)$', 'emif.views.check_database_add_conditions'),
+    #url(r'^q2/(?P<runcode>[^/]+)/$', questionaries_with_sets, name='questionaries_with_sets'),
+    #url(r'^q2/(?P<runcode>[^/]+)/(?P<qs>[-]{0,1}\d+)/$',
+    #        questionaries_with_sets, name='questionset_sets'),
+
 
     # Database Edit
-    url(r'^dbEdit/(?P<questionnaire_id>[0-9]+)/$$', 'emif.views.database_edit'),
-    url(r'^q3/(?P<runcode>[^/]+)/$', questionaries_with_sets, name='database_edit'),
+    url(r'^dbEdit/(?P<fingerprint_id>[^/]+)/(?P<questionnaire_id>[0-9]+)$$', 'emif.views.database_edit'),
+    #url(r'^dbEdit/(?P<questionnaire_id>[0-9]+)/$$', 'emif.views.database_edit'),
+    url(r'^q3/(?P<runcode>[^/]+)/$', questionaries_with_sets, name='questionaries_with_sets'),
     url(r'^q3/(?P<runcode>[^/]+)/(?P<qs>[-]{0,1}\d+)/$',
-            questionaries_with_sets, name='database_edit_sets'),
+            questionaries_with_sets, name='questionset_sets'),
 
-
+    (r'^contact/thankyou/', 'searchengine.views.thankyou'),
+    (r'^contact/(?P<email>[^/]+)$', 'searchengine.views.contactview'),
     # Results
     #url(r'^results/(?P<query>[a-zA-Z0-9]+)/$', 'emif.views.results'),
     url(r'^results$', 'emif.views.results_fulltext'),

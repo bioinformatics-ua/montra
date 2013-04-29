@@ -2,19 +2,24 @@
 {% load extra_tags %}
 {% load markup questionnaire i18n %}
 <div class="span8">
-    <form name="qform" id="qform" action="{{ request.path }}" method="POST">
-    
+    <form name="qform" id="qform" action="addPost/{{questionset.questionnaire.pk}}/1" method="POST">
+    {% for k, qlist in questions_list %}
+
+    <div id="qs_{{ k.pk }}" class="{% if k.pk == questionset.pk %} {% else %} hide {% endif %} questionset">
+    {% if k.pk == questionset.pk %}     
+        <input type="hidden" name="active_qs" value="{{ k.pk }}">
+        <input type="hidden" name="active_qs_sortid" value="{{ k.sortid }}">
+    {% endif %}
     <div class="questionset-title" style="font-size:6px">
     <h3>{{ k.text|removeh1 }}</h3>
     </div>
 
-    
-    
         {% csrf_token %}
 
         <input type="hidden" name="questionset_id" value="{{ questionset.id }}">
     
         {% for question, qdict in qlist %}
+
         {% with errors|dictget:question.number as error %}
 
             <div class="question type_{{ qdict.qtype }} {% if error %} error prepend-top{% endif %}{{ qdict.qnum_class }}{{ qdict.qalpha_class }}" id="qc_{{ question.number }}" {{qdict.checkstring|safe}}>                
@@ -47,7 +52,6 @@
                 {% endif %}
 
 
-
             </div> <!-- /question container -->
             {% if question.footer %}
                 <div class="question-footer">
@@ -60,9 +64,12 @@
         {% endfor %}
     
             <div style="text-align: center;" class="well questionset-submit">
-                <input class="btn large primary" name="submit" onclick="next_questionset(qs_{{ k.pk }}); return false;" type="submit" value="{% trans "Continue" %}" >
-                  <input type="submit" class="btn btn-inverse" value="Search" >
-                
+                <input class="btn large primary" name="submit" type="submit" value="{% trans "Continue" %}" 
+                {% if k.sortid == 99 %} 
+                onclick="javascript:window.location.href='databases';return false;"
+                {% endif %}
+                >
+                  
             </div>
             
             {% if questionset.prev %}
@@ -71,7 +78,7 @@
 
     
     </div>
-  
+    {% endfor %}
+    </form>
 </div>
-
 
