@@ -34,6 +34,9 @@ from rest_framework.renderers import JSONRenderer
 from rest_framework.parsers import JSONParser
 import json
 import md5
+from django.views.decorators.csrf import csrf_exempt
+
+
 
 # Import Search Engine 
 
@@ -55,6 +58,7 @@ def api_root(request, format=None):
         'search': reverse('search', request=request),
         'insert': reverse('insert', request=request),
         'stats': reverse('stats', request=request),
+        'validate': reverse('validate', request=request),
         
     })
 
@@ -126,6 +130,38 @@ class InsertView(APIView):
         result = {'myValue': 'lol', 'myValue2': 'lol' }
         response = Response(result, status=status.HTTP_200_OK)
 
+        return response
+
+
+class ValidateView(APIView):
+    def get(self, request, *args, **kw):    
+    
+        database_name = request.GET['name']
+        c = CoreEngine()
+        results = c.search_fingerprint("database_name_t:"+database_name)
+        result = {'contains': len(results)!=0}
+        
+        response = Response(result, status=status.HTTP_200_OK)
+        return response
+
+
+    def post(self, request, *args, **kw):
+        try:
+            
+            print request.POST.items()
+            for i in request.POST.items():
+                print i[0]
+                json_test = json.loads(i[0])
+                print json_test
+
+            #database_name = request.POST['database_name']
+            # c = CoreEngine()
+            #results = c.search_fingerprint("database_name_t:"+database_name)
+            #result = {'contains': len(results)==0}
+            response = Response(result, status=status.HTTP_200_OK)
+        except:
+            print("fuck")
+            raise
         return response
 
 

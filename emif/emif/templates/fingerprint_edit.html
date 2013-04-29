@@ -64,7 +64,7 @@
         {% endfor %}
     
             <div style="text-align: center;" class="well questionset-submit">
-                <input class="btn large primary" name="submit" type="submit" value="{% trans "Continue" %}" 
+                <input class="btn large primary" name="submit" type="submit" value="Save" 
                 {% if k.sortid == 99 %} 
                 onclick="javascript:window.location.href='databases';return false;"
                 {% endif %}
@@ -81,4 +81,14 @@
     {% endfor %}
     </form>
 </div>
+
+<script>
+function validate(question_number)
+{
+
+    console.log($('#'+question_number).val());
+
+}
+</script>
+
 

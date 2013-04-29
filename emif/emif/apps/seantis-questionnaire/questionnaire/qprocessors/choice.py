@@ -13,6 +13,7 @@ def question_choice(request, question):
     val = None
     if key in request.POST:
         val = request.POST[key]
+
     else:
         if 'default' in cd:
             val = cd['default']
@@ -53,14 +54,23 @@ add_type('choice-freeform', 'Choice with a freeform option [radio]')
 @question_proc('choice-multiple', 'choice-multiple-freeform')
 def question_multiple(request, question):
     key = "question_%s" % question.number
+    print key
     choices = []
     counter = 0
     cd = question.getcheckdict()
+    val = None
+    try:
+        val = request.POST.get(key, None)
+    except:
+        pass
     defaults = cd.get('default','').split(',')
     for choice in question.choices():
         counter += 1
         key = "question_%s_multiple_%d" % (question.number, choice.sortid)
-        if key in request.POST or \
+        
+        print val
+        print choice.value
+        if key in request.POST or (val!=None and (choice.value in val)) or \
           (request.method == 'GET' and choice.value in defaults):
             choices.append( (choice, key, ' checked',) )
         else:

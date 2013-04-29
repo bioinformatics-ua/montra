@@ -6,15 +6,17 @@
 
 {% block breadcrumbs %}
     {{ block.super }}
-    {% breadcrumb "Databases" "/databases" %}
-    {% breadcrumb "List" "/databases" %}
+    {% breadcrumb "Databases" "databases" %}
+    {% breadcrumb "List" "databases" %}
     {% breadcrumb breadcrumb_name "" %}
 {% endblock %}
 
 
 
 {% block toolbar %}
+{% if request.user.is_authenticated %} 
 {% include "menu_toolbar.html" %}
+{% endif %}
 {% endblock %}
 
 

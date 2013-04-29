@@ -372,7 +372,7 @@ class RequestMonkeyPatch(object):
         return self.POST
 
 
-def database_edit(request, fingerprint_id, questionnaire_id, template_name="database_add.html"):
+def database_edit(request, fingerprint_id, questionnaire_id, template_name="database_edit.html"):
     #return render(request, template_name, {'request': request})
     #print questionnaire_id
     #logging.debug("Debugger")
@@ -431,6 +431,8 @@ def database_edit(request, fingerprint_id, questionnaire_id, template_name="data
         #    logging.warn("Unknown question when processing: %s" % answer[1])
         #    continue
         extra[question] = ans = extra.get(question, {})
+        if "[" in value:
+            value = value.lower().replace("]","").replace("[","") 
         request2.get_post()['question_%s' % question.number ] = value
         ans['ANSWER'] = value
         
@@ -518,7 +520,7 @@ def database_edit(request, fingerprint_id, questionnaire_id, template_name="data
             if qs_aux == None:
                 qs_aux = k
             qlist_general.append( (qs_aux, qlist))
-        if (question_set.sortid == 99):
+        if (question_set.sortid == 99 or request.POST):
             # Index on Solr
             index_answeres_from_qvalues(qlist_general, question_set.questionnaire, request.user.username)
 
@@ -618,7 +620,7 @@ def databases(request, template_name='databases.html'):
 
     user = request.user
     #list_databases = get_databases_from_db(request)
-    list_databases = get_databases_from_solr(request, "user_t:"+user.email)
+    list_databases = get_databases_from_solr(request, "user_t:"+user.username)
 
     return render(request, template_name, {'request': request, 
         'list_databases': list_databases, 'breadcrumb': True})
@@ -1186,7 +1188,7 @@ def show_fingerprint_page_errors(request, q_id, qs_id, errors={}, template_name=
             qs_aux = None
             for question in questions_list[k.id]:
                 qs_aux = question.questionset
-                #print "Question: " + str(question)
+                print "Question: " + str(question)
                 Type = question.get_type()
                 _qnum, _qalpha = split_numal(question.number)
 

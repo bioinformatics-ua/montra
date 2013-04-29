@@ -1,18 +1,26 @@
 {% extends "base.html" %}
 {% load extra_tags %}
-
 {% load markup questionnaire i18n %}
-
 {% load django_bootstrap_breadcrumbs %}
 
-
 {% block breadcrumbs %}
-    {{ block.super }}
-    {% breadcrumb "Databases" "/databases" %}
-    {% breadcrumb "List" "/databases" %}
+{{ block.super }}
+{% breadcrumb "Databases" "/databases" %}
+{% breadcrumb "Add" "/databases" %}
 
 {% endblock %}
 
+{% block styleextra %}
+
+button {
+    border: 1px #AAA solid;
+    padding: 4px 10px;
+}
+.hide {
+    display: none;
+}
+
+{% endblock %}
 
 
 {% block toolbar %}
@@ -21,69 +29,67 @@
 {% endblock %}
 
 
-{% block headextra %}
-    <script type="text/javascript" src="{{ STATIC_URL }}jquery.min.js"></script>
-    <script type="text/javascript" src="{{ STATIC_URL }}questionset.js"></script>
-    <link rel="stylesheet" href="{{ STATIC_URL }}progressbar.css"></script>
 
-    {% for x in jsinclude %}
-        <script type="text/javascript" src="{{ x }}"></script>
-    {% endfor %}
+{% block headextra %}
+<script type="text/javascript" src="{{ STATIC_URL }}jquery.min.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}questionset.js"></script>
+<link rel="stylesheet" href="{{ STATIC_URL }}progressbar.css"></script>
+{% for x in jsinclude %}
+<script type="text/javascript" src="{{ x }}"></script>
+{% endfor %}
     
     {% for x in cssinclude %}
-        <link rel="stylesheet" href="{{ x }}" type="text/css" />
-    {% endfor %}
+<link rel="stylesheet" href="{{ x }}" type="text/css" />
+{% endfor %}
 
     {% if async_progress %}
-        <script type="text/javascript">
-            var progress_url = "{{ async_url }}";
-        </script>
-        <script type="text/javascript" src="{{ STATIC_URL }}progress.js"></script>
-    {% endif %}
+<script type="text/javascript">var progress_url = "{{ async_url }}";</script>
+<script type="text/javascript" src="{{ STATIC_URL }}progress.js"></script>
+{% endif %}
 {% endblock %}
 
 {% block language %}
     {% for lang in LANGUAGES %}{% if not forloop.first %} |{% endif %}
-        <a href="{{request.path}}?lang={{ lang.0 }}">{{ lang.1 }}</a>
-    {% endfor %}
+<a href="{{request.path}}?lang={{ lang.0 }}">{{ lang.1 }}</a>
+{% endfor %}
 {% endblock %}
 
 {% block content %}
 
+<hr>
 <div class="row">
-    <div class="span3">
-<div class="well" style="max-width: 340px; padding: 8px 0;">
+<div class="span3">
+  <div class="well" style="max-width: 340px; padding: 8px 0;">
 
-            
-<ul class="nav nav-list nav-pills nav-stacked ">
-    <li class="nav-header">Step-by-Step</li>
-
-    
-{% for qs in questionset.questionnaire.questionsets %}
-  
-  <li{% if questionset.text == qs.text %} class="active" {% endif %}>
-  <a href="q2/{{runinfo.random}}/{{ qs.sortid }}">
-      <table><tr><td width="80%">
-          {{ qs.text|removeh1 }}</td>
-          <td width="10%">
-          <span style="float:right; vertical-align: middle " class="badge badge-warning">2</span>
-        </td>
-      </tr>
-      </table></a>
-
+    <ul class="nav nav-list nav-pills nav-stacked ">
+      <li class="nav-header">Step-by-Step</li>
+      {% for qs in questionset.questionnaire.questionsets %}
+      {% if qs.sortid != 99 %}
       
-  </li>
+      <li{% if questionset.text == qs.text %} class="active" {% endif %} id="li_qs_{{qs.id}}">
+        <!--<a href="q2/{{runinfo.random}}/{{ qs.sortid }}">
+        -->
+        <a href="add/{{qs.questionnaire.pk}}/{{ qs.pk }}" onclick="questionsets_handle(qs_{{ qs.pk }}); return false;">
+          <table>
+            <tr>
+              <td width="80%">{{ qs.text|removeh1 }}</td>
+              <td width="10%">
+                <!--<span style="float:right; vertical-align: middle " class="badge badge-warning">2</span>
+              -->
+            </td>
+          </tr>
+        </table>
+      </a>
+      {% endif %}
+    </li>
+    {% endfor %}
+  </ul>
 
-{% endfor %}
-</ul>
 </div>
 </div>
-
 {% include "fingerprint_edit.html" %}
-
-
 </div>
-    <script type="text/javascript">
+<script type="text/javascript">
         {% for trigger in triggers %}
             addtrigger("{{trigger}}");
         {% endfor %}
@@ -98,7 +104,64 @@
     </script>
 {% endblock %}
 
-
+<script type="text/javascript">
 {% block scriptextra %}
+
 $('#li_workspace').addClass("active");
+
+
+function next_questionset(id_questionset)
+{
+
+  var next = false;
+  $('.questionset').each(function(i, obj) {
+    console.log("obj.id: " + obj.id);
+    console.log("next" + next);
+    if (next==true)
+    {
+      questionsets_handle(obj);
+      next = false;
+
+  }
+    if (obj.id==id_questionset.id)
+    {
+      next = true; 
+    }
+      
+  }
+
+  );
+
+}
+
+function questionsets_handle(id_questionset)
+{
+
+  $('.questionset').each(function(i, obj) {
+    
+    if (obj.id==id_questionset.id)
+    {
+        
+       $('#'+obj.id).addClass("show");
+       $('#li_'+id_questionset.id).addClass("active");
+       $('#'+obj.id).removeClass("hide");
+    }
+  
+    else {
+      $('#li_'+obj.id).removeClass("active");
+      $('#'+obj.id).addClass("hide");
+      $('#'+obj.id).removeClass("show");
+    }
+ 
+      
+  }
+
+  );
+
+};
+
+
+
 {% endblock %}
+
+</script>

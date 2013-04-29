@@ -149,10 +149,31 @@ def index_answeres_from_qvalues(qvalues, questionnaire, subject):
     now = datetime.datetime.now()
     for qs_aux, qlist in qvalues:
         for question, qdict in qlist:
+            print("qdict")
             print(qdict)
             try:
-                value = qdict['value']
+                choices = None
+                value = None
+                choices_txt = None
+                if qdict.has_key('value'):
+                    value = qdict['value']
+                    print("Value: "+ value)
+                elif qdict.has_key('choices'):
+                    choices = qdict['choices']
+                    print("Choices:" + str(qdict['choices']))
+                    value = ""
+                    for choice, unk, checked  in choices:
+                        #print("Choice value: " + str(choice.value))
+                        #print("checked value: " + str(checked))
+                        #print("unk value: " + str(unk))
+                        if checked == " checked":
+                            value = value + "#" + choice.value
+                        
 
+                else:
+                    print("conitnue")
+
+                
                 slug = question.slug  
                 
                 slug_aux = ""
@@ -172,9 +193,10 @@ def index_answeres_from_qvalues(qvalues, questionnaire, subject):
                     slugs.save()
 
                 d[slug_final] = value
-                text += value + " " 
+                if value!=None:
+                    text += value + " " 
             except:
-                pass
+                raise
     
     d['id']=generate_hash()
 

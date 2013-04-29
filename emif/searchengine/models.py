@@ -28,8 +28,8 @@ from django.core.mail import send_mail, BadHeaderError
 
 
 class Slugs(models.Model):
-	slug1 = models.CharField(max_length=128)
-	description = models.CharField(max_length=256)
+	slug1 = models.CharField(max_length=256)
+	description = models.CharField(max_length=512)
 	question = models.ForeignKey(Question, help_text = u"The question that this is an answer to")
 
 

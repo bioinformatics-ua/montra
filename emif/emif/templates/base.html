@@ -78,9 +78,9 @@
                             </ul>
                           </li>
                           {% endif %}
-
+                          
                             <li id="li_search"><a href="search">Quick Search</a></li>
-                           
+                           {% comment %}
                            <li id="li_advanced_search" class="dropdown">
                             <a href="#" class="dropdown-toggle" data-toggle="dropdown">Advanced Search <b class="caret"></b></a>
                             <ul class="dropdown-menu">
@@ -89,6 +89,7 @@
 
                             </ul>
                           </li>
+                          {% endcomment %}
 
 
                         </ul>
@@ -120,9 +121,6 @@
 
 
         <div class="container">
-
-
-
 
             {% if request.user.is_authenticated and breadcrumb %}
                 
