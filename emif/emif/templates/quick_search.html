@@ -59,7 +59,7 @@ body {
                             <input class="input-xlarge" id="text_search" class="home_search" placeholder="Search here..."  type="text" name='query'>
                             <div class="btn-group" id="search_button">
                                 
-                                   <input type="submit" class="btn btn-inverse" value="Search" >
+                                   <input type="submit" name="searchbutton" class="btn btn-inverse" value="Search" onclick="return verify();">
 
                                    <!--
                                 <button class="btn btn-inverse dropdown-toggle" id="button_search_toggle" data-toggle="dropdown" tabindex="-1" rel="tooltip" title="Select search type">
@@ -90,4 +90,15 @@ body {
 
 {% block scriptextra %}
 $('#li_search').addClass("active");
+
+function verify()
+{
+
+  if ($("#text_search").val() == "")
+  {
+    return false;
+
+  }
+  return true;
+}
 {% endblock %}
