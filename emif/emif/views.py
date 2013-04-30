@@ -1313,11 +1313,11 @@ def show_fingerprint_page_read_only(request, q_id, qs_id, errors={}, template_na
     """
     try:
         
-        qs_list = QuestionSet.objects.filter(questionnaire=q_id)
+        qs_list = QuestionSet.objects.filter(questionnaire=q_id).order_by('sortid')
 
-        #print "Q_id: " + q_id
-        #print "Qs_id: " + qs_id
-        #print "QS List: " + str(qs_list)
+        print "Q_id: " + q_id
+        print "Qs_id: " + qs_id
+        print "QS List: " + str(qs_list)
         if (int(qs_id)==99):
             qs_id=len(qs_list)-1
         question_set = qs_list[int(qs_id)]
