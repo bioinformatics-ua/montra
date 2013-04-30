@@ -7,7 +7,11 @@
 {% block breadcrumbs %}
     {{ block.super }}
     {% breadcrumb "Databases" "databases" %}
+    {% if style == '1'%}
     {% breadcrumb "List" "databases" %}
+    {% else %}
+    {% breadcrumb "List" "alldatabases" %}
+    {% endif %}
     {% breadcrumb breadcrumb_name "" %}
 {% endblock %}
 

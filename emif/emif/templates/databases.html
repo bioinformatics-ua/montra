@@ -132,6 +132,18 @@ $('.confirm-delete').click(function(e) {
     $('#modal-from-dom').data('id', id).modal('show');
 });
 
+/*
+jQuery('#add_toolbar').bind("click")
+{
+    $('#group_toolbar').addClass("open");    
+}*/
+jQuery('#add_toolbar').click(function () {
+  //  console.log(jQuery(this).parent());
+//jQuery(this).parent().addClass("open");
+
+$('#group_toolbar').addClass("open");
+console.log($('#group_toolbar'))
+});
 
 
 {% comment %}

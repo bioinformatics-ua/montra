@@ -684,7 +684,7 @@ def fingerprint(request, runcode, qs, template_name='database_info.html'):
     
     return render(request, template_name,
      {'request': request, 'value_list': list_values, 
-     'breadcrumb': True, 'breadcrumb_name':name })
+     'breadcrumb': True, 'breadcrumb_name':name, 'style': qs })
 
 
 def get_questionsets_list(runinfo):
