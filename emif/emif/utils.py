@@ -58,6 +58,7 @@ class Database:
     location = ''
     email_contact = ''
     number_patients = ''
+    ttype = ''
 
 
 class Tag:

@@ -54,8 +54,8 @@ urlpatterns = patterns('',
 
     # Database Add 
 
-    url(r'^add/(?P<questionnaire_id>[0-9]+)/(?P<question_set>[0-9]+)/$', 'emif.views.database_add'),
-    url(r'^addPost/(?P<questionnaire_id>[0-9]+)/(?P<question_set>[0-9]+)$', 'emif.views.check_database_add_conditions'),
+    url(r'^add/(?P<questionnaire_id>[0-9]+)/(?P<sortid>[0-9]+)/$', 'emif.views.database_add'),
+    url(r'^addPost/(?P<questionnaire_id>[0-9]+)/(?P<sortid>[0-9]+)$', 'emif.views.check_database_add_conditions'),
     #url(r'^q2/(?P<runcode>[^/]+)/$', questionaries_with_sets, name='questionaries_with_sets'),
     #url(r'^q2/(?P<runcode>[^/]+)/(?P<qs>[-]{0,1}\d+)/$',
     #        questionaries_with_sets, name='questionset_sets'),

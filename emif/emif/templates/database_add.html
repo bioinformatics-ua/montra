@@ -66,10 +66,10 @@ button {
       {% for qs in questionset.questionnaire.questionsets %}
 
       
-      <li{% if questionset.text == qs.text %} class="active" {% endif %} id="li_qs_{{qs.id}}">
+      <li{% if questionset.text == qs.text %} class="active" {% endif %} id="li_qs_{{qs.sortid}}">
         <!--<a href="q2/{{runinfo.random}}/{{ qs.sortid }}">
         -->
-        <a href="add/{{qs.questionnaire.pk}}/{{ qs.pk }}" onclick="questionsets_handle(qs_{{ qs.pk }}); return false;">
+        <a href="add/{{qs.questionnaire.pk}}/{{ qs.sortid }}" onclick="questionsets_handle(qs_{{ qs.sortid }}); return false;">
           <table>
             <tr>
               <td width="80%">{{ qs.text|removeh1 }}</td>
@@ -145,6 +145,9 @@ function questionsets_handle(id_questionset)
        $('#'+obj.id).addClass("show");
        $('#li_'+id_questionset.id).addClass("active");
        $('#'+obj.id).removeClass("hide");
+       $('#active_qs').val(id_questionset.id);
+       $('#active_qs_sortid').val(id_questionset.id);
+       active_qs
     }
   
     else {
