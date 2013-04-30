@@ -1164,7 +1164,6 @@ def check_database_add_conditions(request, questionnaire_id, sortid,
             raise
 
     if len(errors) > 0 and active_qs_with_errors:
-
         return show_fingerprint_page_errors(request, questionnaire_id, question_set,
          errors=errors,template_name='database_add.html', next=False, sortid=sortid)
     print "show_fingerprint_page_errors"
