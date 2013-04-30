@@ -1,0 +1,134 @@
+{% extends 'base.html' %}
+{% load url from future %}
+{% load django_bootstrap_breadcrumbs %}
+
+{% block breadcrumbs %}
+    {{ block.super }}
+    {% breadcrumb "Databases" "databases" %}
+    {% breadcrumb "List" "databases" %}
+
+{% endblock %}
+
+{% block styleextra %}
+
+button {
+    border: 1px #AAA solid;
+    padding: 4px 10px;
+}
+.hide {
+    display: none;
+}
+
+{% endblock %}
+
+
+{% block toolbar %}
+{% include "menu_toolbar.html" %}
+
+{% endblock %}
+
+{% block content %}
+
+{% if list_databases %}
+<table class="table table-hover" id="table_databases" data-provides="rowlink">
+    <thead>
+        <tr>
+            
+            <th>Name</th>
+            <th>Date</th>
+
+        </tr>
+    </thead>
+    <tbody>
+        
+        {% for t in list_databases %}
+        <tr>
+          <td>
+            <a href="fingerprint/{{ t.id }}/1">{{ t.name }}</a>
+
+            <div style="margin-left:20px">
+             Institution Name: {{t.institution}}
+            </div>
+
+            <div style="margin-left:20px">
+             Location: {{t.location}}
+            </div>
+            <div style="margin-left:20px">
+             Number of patients: {{t.number_patients}}
+            </div>
+        </td>
+          <td>{{ t.date }} </td>
+          
+        </tr>
+
+        {% endfor %}
+
+    </tbody>
+</table>
+
+{% else %}
+<div class="row">  
+<div class="span4">  
+<div class="alert">  
+  <a class="close" data-dismiss="error">×</a>  
+  <strong>Info</strong> Please add a new database, like for instance a Cohort or Observation. You can find in the menu "Workspace -> Add -> Research Cohort or Observation Study"
+</div>  
+</div>  
+</div>  
+{% endif %}
+
+{% comment %}
+  <a class="btn btn-large btn-success" href="advancedSearch/1">Add new database</a>
+{% endcomment %}
+</div>
+
+
+
+<div id="modal-from-dom" class="modal hide fade" style="display:none"  >
+    <div class="modal-header">
+        <a href="#" class="close">&times;</a>
+         <h3>Delete Fingerprint</h3>
+    </div>
+    <div class="modal-body">
+        <p>You are removing the database fingerprint. This procedure is irreversible.</p>
+        <p>Do you want to proceed?</p>
+        <p id="debug-url"></p>
+    </div>
+    <div class="modal-footer">
+        <a href="rm/ref" class="btn btn-danger">Yes</a>
+        <!-- <a href="delete.php?some=param&ref=" class="btn danger">Yes 2</a> -->
+        <a href="javascript:$('#modal-from-dom').modal('hide')" class="btn btn-secondary">No</a>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scriptextra %}
+{% comment %}
+<script>
+{% endcomment %}
+$('#li_workspace').addClass("active");
+
+$('#modal-from-dom').bind('show', function() {
+    var id = $(this).data('id'),
+        removeBtn = $(this).find('.btn-danger'),
+        href = removeBtn.attr('href');
+    console.log('id' + id);
+    removeBtn.attr('href', href.replace('ref', '' + id));
+});
+
+
+$('.confirm-delete').click(function(e) {
+    e.preventDefault();
+    
+    var id = $(this).data('id');
+    $('#modal-from-dom').data('id', id).modal('show');
+});
+
+
+
+{% comment %}
+</script>
+{% endcomment %}
+
+{% endblock %}

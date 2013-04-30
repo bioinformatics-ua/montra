@@ -640,7 +640,7 @@ def databases(request, template_name='databases.html'):
         'list_databases': list_databases, 'breadcrumb': True})
 
 
-def all_databases(request, template_name='databases.html'):
+def all_databases(request, template_name='alldatabases.html'):
 
     #list_databases = get_databases_from_db(request)
     list_databases = get_databases_from_solr(request, "*:*")
