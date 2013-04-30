@@ -157,10 +157,10 @@ def index_answeres_from_qvalues(qvalues, questionnaire, subject):
                 choices_txt = None
                 if qdict.has_key('value'):
                     value = qdict['value']
-                    print("Value: "+ value)
+                    
                 elif qdict.has_key('choices'):
                     choices = qdict['choices']
-                    print("Choices:" + str(qdict['choices']))
+                    
                     value = ""
                     for choice, unk, checked  in choices:
                         #print("Choice value: " + str(choice.value))

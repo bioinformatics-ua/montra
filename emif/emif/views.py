@@ -526,8 +526,10 @@ def database_edit(request, fingerprint_id, questionnaire_id, template_name="data
             qlist_general.append( (qs_aux, qlist))
         if (question_set.sortid == 99 or request.POST):
             # Index on Solr
-            index_answeres_from_qvalues(qlist_general, question_set.questionnaire, request.user.username)
-
+            try:
+                index_answeres_from_qvalues(qlist_general, question_set.questionnaire, request.user.username)
+            except:
+                pass
         r = r2r(template_name, request,
             questionset=question_set,
             questionsets=question_set.questionnaire.questionsets,
