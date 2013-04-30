@@ -51,13 +51,22 @@
       <div class="navbar-inner">
 
         <h4>
+          {% if page_obj != None %}
           <span id="results_size"></span>
           total results for
           <span class="label label-inverse">{{list_results.num_results}}</span>
+          {% else %}
+          <span id="results_size"></span>
+          No results found 
+          {% endif %}
         </h4>
       </div>
     </div>
   </div>
+
+
+  {% if page_obj != None %}
+
   {% for result in list_results.list_results %}
   <div class="span12" >
     <div class="navbar" id="loading">
@@ -97,7 +106,7 @@
 
             <div class="span3 pull-right " style="max-width:165px">
               <a class="btn btn-small btn-success" href="contact/{{result.email_contact}}">Contact</a>
-               <a class="btn btn-small btn-success" href="fingerprint/{{result.id}}/1/">Dump</a>
+               <a class="btn btn-small btn-success" href="fingerprint/{{result.id}}/1/">Fingerprint</a>
                {% comment %}
               <a class="btn btn-small btn-success" href="advancedSearch/1">More like this</a>
               {% endcomment %}
@@ -112,10 +121,12 @@
   </div>
   {% endfor %}
 
+  {% endif %}
 
+{% if page_obj != None %}
 
 {% bootstrap_paginate page_obj range=10 url_view_name="views.results_diff" show_prev_next="false" show_first_last="true"%}
-
+{% endif %}
 
 
 
