@@ -30,6 +30,8 @@ from userena import views as userena_views
 from accounts.views import SignupFormExtra, signup, signin
 from views import *
 
+from django.conf import settings
+
 urlpatterns = patterns('',
     
 
@@ -109,7 +111,7 @@ urlpatterns = patterns('',
     url(r'^accounts/signup/$',
         signup,
         {'signup_form': SignupFormExtra,
-         'success_url': '/databases'},
+         'success_url': settings.BASE_URL + 'databases'},
         name='userena_signup'),
     url(r'^accounts/signin/$',
         signin,
