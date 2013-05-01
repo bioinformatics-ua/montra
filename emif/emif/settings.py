@@ -24,7 +24,7 @@ import os.path
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
-
+SITE_NAME = "EMIF Platform - Fingerprint Browser"
 
 #BASE_URL = '/emif-dev/'
 BASE_URL = '/'
@@ -38,6 +38,7 @@ else:
 
 ADMINS = (
      ('Luis A. Bastiao Silva', 'bastiao@ua.pt'),
+     ('José Luis Oliveira', 'jlo@ua.pt'),
 )
 
 SOLR_HOST = "localhost"
@@ -216,7 +217,10 @@ AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend',
 )
 
-EMAIL_BACKEND = 'django.core.mail.backends.dummy.EmailBackend'
+#EMAIL_BACKEND = 'django.core.mail.backends.dummy.EmailBackend'
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+# Email backend settings
+
 
 ANONYMOUS_USER_ID = -1
 
@@ -229,6 +233,8 @@ USERENA_DISABLE_PROFILE_LIST = True
 USERENA_USE_MESSAGES = False
 USERENA_REDIRECT_ON_SIGNOUT = BASE_URL
 USERENA_SIGNIN_REDIRECT_URL = BASE_URL + 'databases'
+
+
 
 LOGIN_REDIRECT_URL = USERENA_SIGNIN_REDIRECT_URL
 LOGIN_URL = BASE_URL + 'accounts/signin/'
