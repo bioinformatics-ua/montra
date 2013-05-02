@@ -7,6 +7,20 @@ from searchengine.models import Slugs
 
 from questionnaire.models import Question, Questionnaire, QuestionSet
 
+import md5
+import random
+
+from django.conf import settings
+
+
+def generate_hash():
+    hash = md5.new()
+    hash.update("".join(map(lambda i: chr(random.randint(0, 255)), range(16))))
+    hash.update(settings.SECRET_KEY)
+    key = hash.hexdigest()
+    return key
+
+
 def convert_text_to_slug(text):
     #TODO: optimize
     return text.replace(' ', '_').replace('?','').replace('.', '').replace(',','')

@@ -9,6 +9,7 @@
     {% if k.pk == questionset.pk %}     
         <input type="hidden" name="active_qs" value="{{ k.pk }}">
         <input type="hidden" name="active_qs_sortid" value="{{ k.sortid }}">
+        <input type="hidden" name="fingerprint_id" value="{{ fingerprint_id }}">
     {% endif %}
     <div class="questionset-title" style="font-size:6px">
     <h3>{{ k.text|removeh1 }}</h3>

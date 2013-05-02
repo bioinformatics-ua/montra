@@ -55,7 +55,6 @@ def generate_hash():
     key = hash.hexdigest()
     return key
 
-
 class CoreEngine:
     """It is responsible for index the documents and search over them
     It also connects to SOLR
@@ -139,18 +138,18 @@ def get_slug_from_choice(v, q):
         print(choice[0].value)
 
 
-def index_answeres_from_qvalues(qvalues, questionnaire, subject):
+def index_answeres_from_qvalues(qvalues, questionnaire, subject, fingerprint_id):
     print("index_answeres_from_qvalues")
     c = CoreEngine()
     d = {}
-    text = ""
     
+    text = ""
 
     now = datetime.datetime.now()
     for qs_aux, qlist in qvalues:
         for question, qdict in qlist:
-            print("qdict")
-            print(qdict)
+            #print("qdict")
+            #print(qdict)
             try:
                 choices = None
                 value = None
@@ -168,7 +167,6 @@ def index_answeres_from_qvalues(qvalues, questionnaire, subject):
                         #print("unk value: " + str(unk))
                         if checked == " checked":
                             value = value + "#" + choice.value
-                        
 
                 else:
                     print("conitnue")
@@ -197,8 +195,13 @@ def index_answeres_from_qvalues(qvalues, questionnaire, subject):
                     text += value + " " 
             except:
                 raise
-    
-    d['id']=generate_hash()
+    #print("Indexing...")
+    results = c.search_fingerprint("id:"+fingerprint_id)
+    if (len(results)>0):
+        c.delete(results.docs[0]['id'])
+
+
+    d['id']=fingerprint_id
 
     d['type_t']=questionnaire.name.replace(" ", "").lower()
     d['created_t']= now.strftime('%Y-%m-%d %H:%M:%S.%f')
@@ -269,9 +272,8 @@ def convert_answers_to_solr(runinfo):
                     print(get_slug_from_choice(v, a.question))
                     text_aux += v + " "
             
-        
-        else:           text_aux = a.answer
-
+        else:
+            text_aux = a.answer
 
         d[slug_final] = text_aux
         text += text_aux + " " 

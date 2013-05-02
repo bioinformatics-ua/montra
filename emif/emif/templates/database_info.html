@@ -6,10 +6,12 @@
 
 {% block breadcrumbs %}
     {{ block.super }}
-    {% breadcrumb "Databases" "databases" %}
+    
     {% if style == '1'%}
+    {% breadcrumb "Databases" "databases" %}
     {% breadcrumb "List" "databases" %}
     {% else %}
+    {% breadcrumb "Databases" "alldatabases" %}
     {% breadcrumb "List" "alldatabases" %}
     {% endif %}
     {% breadcrumb breadcrumb_name "" %}

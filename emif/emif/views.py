@@ -371,7 +371,6 @@ class RequestMonkeyPatch(object):
     def __init__(self):
         self.POST = {}  
 
-
     def get_post(self):
         return self.POST
 
@@ -383,6 +382,7 @@ def database_edit(request, fingerprint_id, questionnaire_id, template_name="data
     #return show_full_questionnaire(request, questionnaire_id, 
     #    reverse_name='questionaries_with_sets')
     #return show_full_questionnaire(request, questionnaire_id)
+    
     c = CoreEngine()
     results = c.search_fingerprint("id:"+fingerprint_id)
     items = None
@@ -398,6 +398,9 @@ def database_edit(request, fingerprint_id, questionnaire_id, template_name="data
         sortid = request.POST['active_qs_sortid'] 
     except:
         pass
+
+    if request.POST:
+        return check_database_add_conditions(request, questionnaire_id, sortid, template_name='database_edit.html')
     # to confirm that we have the correct answers
     
     expected = []
@@ -416,9 +419,8 @@ def database_edit(request, fingerprint_id, questionnaire_id, template_name="data
     # generate the answer_dict for each question, and place in extra
     request2 = RequestMonkeyPatch()
 
-
     for item in items:
-        print item
+        #wprint item
         key = item
         
         value = items[key]
@@ -527,9 +529,10 @@ def database_edit(request, fingerprint_id, questionnaire_id, template_name="data
         if (question_set.sortid == 99 or request.POST):
             # Index on Solr
             try:
-                index_answeres_from_qvalues(qlist_general, question_set.questionnaire, request.user.username)
+                index_answeres_from_qvalues(qlist_general, question_set.questionnaire, request.user.username, fingerprint_id)
             except:
-                pass
+                raise
+
         r = r2r(template_name, request,
             questionset=question_set,
             questionsets=question_set.questionnaire.questionsets,
@@ -597,20 +600,50 @@ def get_databases_from_solr(request, query="*:*"):
     for r in results:
         try:
             database_aux = Database()
-            print r['id']
-            print r['created_t']
-            print r['database_name_t']
+            #print r['id']
+            #print r['created_t']
+            #print r['database_name_t']
             database_aux.id = r['id']
-            database_aux.date = convert_date(r['created_t'])
-            database_aux.name = r['database_name_t']
-            database_aux.location = r['location_t']
-            database_aux.institution = r['institution_name_t']
-            database_aux.email_contact = r['contact_administrative_t']
-            database_aux.number_patients = r['number_active_patients_jan2012_t']
+            
+            if (not r.has_key('created_t')):
+                database_aux.date = '' 
+            else:
+                
+                try:
+                    database_aux.date = convert_date(r['created_t'])
+                except:
+                    database_aux.date = '' 
+                
+            
+            if (not r.has_key('database_name_t')):
+                database_aux.name = '(Unnamed)'
+            else:
+                database_aux.name = r['database_name_t']
+
+            if (not r.has_key('location_t')):
+                database_aux.location = ''
+            else:
+                database_aux.location = r['location_t']
+
+            if (not r.has_key('institution_name_t')):
+                database_aux.institution = ''
+            else:
+                database_aux.institution = r['institution_name_t']
+
+            if (not r.has_key('contact_administrative_t')):
+                database_aux.email_contact = ''
+            else:
+                database_aux.email_contact = r['contact_administrative_t']
+                        
+            if (not r.has_key('number_active_patients_jan2012_t')):
+                database_aux.number_patients = ''
+            else:
+                database_aux.number_patients = r['number_active_patients_jan2012_t']
+
             database_aux.ttype = questionnaires_ids[r['type_t']]
             list_databases.append(database_aux)
         except:
-            pass
+            raise
     return list_databases
 
 def delete_fingerprint(request, id):
@@ -1071,6 +1104,8 @@ def check_database_add_conditions(request, questionnaire_id, sortid,
             if qs.sortid==int(sortid):
                 question_set = qs.pk
                 break
+
+    fingerprint_id = request.POST['fingerprint_id']
     print "@QuestionSet" + str(question_set)
     print "@QuestionSet- sortid" + str(sortid)
     # to confirm that we have the correct answers
@@ -1167,7 +1202,7 @@ def check_database_add_conditions(request, questionnaire_id, sortid,
 
     if len(errors) > 0 and active_qs_with_errors:
         return show_fingerprint_page_errors(request, questionnaire_id, question_set,
-         errors=errors,template_name='database_add.html', next=False, sortid=sortid)
+         errors=errors,template_name='database_add.html', next=False, sortid=sortid, fingerprint_id=fingerprint_id)
     print "show_fingerprint_page_errors"
 
 
@@ -1183,11 +1218,11 @@ def check_database_add_conditions(request, questionnaire_id, sortid,
     print question_set
     print sortid
     return show_fingerprint_page_errors(request, questionnaire_id, question_set,
-         errors={},template_name='database_add.html', next=True, sortid=sortid)
+         errors={},template_name='database_add.html', next=True, sortid=sortid, fingerprint_id=fingerprint_id)
 
 
 def show_fingerprint_page_errors(request, q_id, qs_id, errors={}, template_name='database_add.html', 
-    next=False, sortid=0):
+    next=False, sortid=0,fingerprint_id=None):
     """
     Return the QuestionSet template
 
@@ -1273,9 +1308,13 @@ def show_fingerprint_page_errors(request, q_id, qs_id, errors={}, template_name=
                 qs_aux = k
             qlist_general.append( (qs_aux, qlist))
         print "Next:"
-        if (initial_sort == 99):
-            # Index on Solr
-            index_answeres_from_qvalues(qlist_general, question_set.questionnaire, request.user.username)
+        #if (initial_sort == 99):
+        #    # Index on Solr
+        #    index_answeres_from_qvalues(qlist_general, question_set.questionnaire, request.user.username)
+        print "Fingerprint"
+        if (fingerprint_id!=None):
+            print "Fingerprint" + fingerprint_id
+            index_answeres_from_qvalues(qlist_general, question_set.questionnaire, request.user.username, fingerprint_id)
 
         r = r2r(template_name, request,
             questionset=question_set,
@@ -1292,17 +1331,13 @@ def show_fingerprint_page_errors(request, q_id, qs_id, errors={}, template_name=
             async_url=None,
             qs_list = qs_list,
             questions_list=qlist_general,
+            fingerprint_id=fingerprint_id,
         )
         r['Cache-Control'] = 'no-cache'
         r['Expires'] = "Thu, 24 Jan 1980 00:00:00 GMT"
     except:
         raise
     return r
-
-
-
-
-
 
 
 
@@ -1416,6 +1451,7 @@ def show_fingerprint_page_read_only(request, q_id, qs_id, errors={}, template_na
         
 
         errors = {}
+        fingerprint_id = generate_hash()
         r = r2r(template_name, request,
             questionset=question_set,
             questionsets=question_set.questionnaire.questionsets,
@@ -1431,6 +1467,7 @@ def show_fingerprint_page_read_only(request, q_id, qs_id, errors={}, template_na
             async_url=None,
             qs_list = qs_list,
             questions_list=qlist_general,
+            fingerprint_id=fingerprint_id,
         )
         r['Cache-Control'] = 'no-cache'
         r['Expires'] = "Thu, 24 Jan 1980 00:00:00 GMT"
