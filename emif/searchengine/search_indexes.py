@@ -59,11 +59,14 @@ class CoreEngine:
     """It is responsible for index the documents and search over them
     It also connects to SOLR
     """
-
+    
     CONNECTION_TIMEOUT_DEFAULT = 10
     def __init__(self, timeout=CONNECTION_TIMEOUT_DEFAULT):
         # Setup a Solr instance. The timeout is optional.
         self.solr = pysolr.Solr('http://' +settings.SOLR_HOST+ ':'+ settings.SOLR_PORT+'/solr', timeout=timeout)
+
+
+
 
     def index_fingerprint(self, doc):
         """Index fingerprint 
