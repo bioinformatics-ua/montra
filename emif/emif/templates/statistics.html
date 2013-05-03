@@ -4,6 +4,23 @@
 {% block content %}
 
 
+
+    
+    
+{% for graph in graphs %}
+  
+  
+  {% comment %}
+    {{ graph }}
+  {% endcomment %}
+  {% for k in graph %}
+    {{k}}<br />
+    
+  {% endfor %}
+
+{% endfor %}
+
+
 {% endblock %}
 
 

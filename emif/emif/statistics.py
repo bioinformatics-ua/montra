@@ -14,25 +14,25 @@ class Statistic(object):
 
 	def get_percentage(self):
 		slug = self.question.slug 
-		results = self.search.search_fingerprint(slug + ":*")
+		print slug
+		if slug==None:
+			return "Empty"
+		results = self.search.search_fingerprint(slug + "_t:*")
 		values = dict()
 		for r in results:
 			for k in r:
 				try:
-					if (not values.has_key(r[k])):
+					if (values.has_key(r[k])):
 						values[r[k]] = values[r[k]]
 					else:
 						values[r[k]] = 1
 				except:
-					continue
+					raise
+		return values
 
+
+		
 	def tag_cloud(self):
 		pass
-
-
-
-
-
-
 
 

@@ -321,7 +321,20 @@ def results_diff(request, page=1, template_name='results_diff.html'):
 
 def statistics(request, template_name='statistics.html'):
 
-    return render(request, template_name, {'request': request})
+    from emif.statistics import Statistic
+
+    questions = Question.objects.all()
+    graphs = []
+    for q in questions:
+        try:
+            s = Statistic(q)
+            graph = s.get_percentage()
+            graphs.append(graph)
+
+        except:
+            raise
+
+    return render(request, template_name, {'request': request, 'graphs': graphs})
 
 
 def generate_statistics_from_multiple_choice(question_slug):
