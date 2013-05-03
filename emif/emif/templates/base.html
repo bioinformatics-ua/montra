@@ -70,10 +70,15 @@
                               {% endcomment %}
                               <li class="divider"></li>
 
-                              <li class="nav-header">Add new databases</li>
                               
                               
-                              {% show_fingerprints %}
+                              <li class="dropdown-submenu">
+                              <a href="#">Add new databases</a>
+                              <ul class="dropdown-menu">
+                                {% show_fingerprints %}
+                              </ul>
+                            </li>
+                              
 
                             </ul>
                           </li>
