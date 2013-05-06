@@ -11,7 +11,6 @@ class Statistic(object):
 		self.question = question 
 		self.search = CoreEngine()
 
-
 	def get_percentage(self):
 		slug = self.question.slug 
 		print slug
@@ -30,9 +29,6 @@ class Statistic(object):
 					raise
 		return values
 
-
-		
 	def tag_cloud(self):
 		pass
-
 
