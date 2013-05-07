@@ -17,20 +17,25 @@
     {% breadcrumb breadcrumb_name "" %}
 {% endblock %}
 
-
-
 {% block toolbar %}
 {% if request.user.is_authenticated %} 
 {% include "menu_toolbar.html" %}
 {% endif %}
 {% endblock %}
 
-
 {% block content %}
-
 
 {% if value_list %}
 
+<div class="row-fluid">
+<div class="">
+<ul class="nav nav-tabs">
+                <li class=""><a href="#A" data-toggle="tab">Metadata</a></li>
+                <li class="active"><a href="#B" data-toggle="tab">Literature</a></li>
+                <li class=""><a href="#C" data-toggle="tab">Section 3</a></li>
+</ul>
+</div>
+</div>
 <div class="span12">
 
 <table class="table table-bordered  table-hover">
