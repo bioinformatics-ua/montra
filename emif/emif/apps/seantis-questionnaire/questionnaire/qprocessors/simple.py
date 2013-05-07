@@ -84,6 +84,7 @@ def process_simple(question, ansdict):
     return dumps([])
 add_type('open', 'Open Answer, single line [input]')
 add_type('open-button', 'Open Answer, single line [input] with a button to validate')
+add_type('open-upload-image', 'Upload Image')
 add_type('open-textfield', 'Open Answer, multi-line [textarea]')
 add_type('choice-yesno', 'Yes/No Choice [radio]')
 add_type('choice-yesnocomment', 'Yes/No Choice with optional comment [radio, input]')
