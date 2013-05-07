@@ -5,8 +5,6 @@ from questionnaire.models import Question
 from searchengine.search_indexes import CoreEngine
 
 class Statistic(object):
-
-
 	def __init__(self, question):
 		self.question = question 
 		self.search = CoreEngine()
@@ -29,6 +27,7 @@ class Statistic(object):
 					raise
 		return values
 
+
 	def tag_cloud(self):
 
 		# http://www.jason-palmer.com/2011/05/creating-a-tag-cloud-with-solr-and-php/
@@ -36,3 +35,11 @@ class Statistic(object):
 		# solr.search([solrquery],facet = 'on' ,** {'facet.field' : ['fieldname']})
 		pass
 
+
+class Timeline(object):
+
+	def __init__(self):
+		pass
+
+
+	
