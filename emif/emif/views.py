@@ -720,7 +720,7 @@ def fingerprint(request, runcode, qs, template_name='database_info.html'):
 
             value = clean_value(str(result[k]))
             value = value[:75] + (value[75:] and '..')
-            t.value = value
+            t.value = value.replace("#", " ")
             if k== "database_name_t":
                 name = t.value
             list_values.append(t)
