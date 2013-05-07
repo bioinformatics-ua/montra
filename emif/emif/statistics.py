@@ -30,5 +30,9 @@ class Statistic(object):
 		return values
 
 	def tag_cloud(self):
+
+		# http://www.jason-palmer.com/2011/05/creating-a-tag-cloud-with-solr-and-php/
+		# solr = query = "(.................. )" 
+		# solr.search([solrquery],facet = 'on' ,** {'facet.field' : ['fieldname']})
 		pass
 
