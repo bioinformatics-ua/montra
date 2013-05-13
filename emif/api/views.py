@@ -36,7 +36,7 @@ import json
 import md5
 from django.views.decorators.csrf import csrf_exempt
 
-
+from rest_framework.permissions import AllowAny, IsAuthenticated
 
 # Import Search Engine 
 
@@ -51,7 +51,8 @@ class JSONResponse(HttpResponse):
         kwargs['content_type'] = 'application/json'
         super(JSONResponse, self).__init__(content, **kwargs)
 
-@api_view(('GET','POST'))
+@api_view(('GET','POST','OPTIONS'))
+
 def api_root(request, format=None):
     
     return Response({
@@ -101,6 +102,7 @@ class InsertView(APIView):
         response = Response(result, status=status.HTTP_200_OK)
 
         return response
+    permission_classes = (AllowAny,)
     def post(self, request, *args, **kw):
         # Process any get params that you may need
         # If you don't need to process get params,
@@ -108,15 +110,16 @@ class InsertView(APIView):
         # query = request.POST.get('myValue2', None)
         # print (query)
         # print(json.loads(request.POST.get('_content')).get('myValue'))
+        print request.POST
         # for param in request.POST:
         #     print(param)
         #     print(request.POST.get(param))
-        print "dasd"
-        print request.POST.items()
-        for i in request.POST.items():
-            print i[0]
-            json_test = json.loads(i[0])
-            print json_test
+        #print "dasd"
+        #print request.POST.items()
+        #for i in request.POST.items():
+        #    print i[0]
+        #    json_test = json.loads(i[0])
+        #    print json_test
         #data = JSONParser().parse(request)
 
         

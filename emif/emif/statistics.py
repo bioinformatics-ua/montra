@@ -4,6 +4,8 @@
 from questionnaire.models import Question
 from searchengine.search_indexes import CoreEngine
 
+
+
 class Statistic(object):
 	def __init__(self, question):
 		self.question = question 
@@ -42,4 +44,3 @@ class Timeline(object):
 		pass
 
 
-	

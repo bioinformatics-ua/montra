@@ -54,7 +54,7 @@ add_type('choice-freeform', 'Choice with a freeform option [radio]')
 @question_proc('choice-multiple', 'choice-multiple-freeform')
 def question_multiple(request, question):
     key = "question_%s" % question.number
-    print key
+    #print key
     choices = []
     counter = 0
     cd = question.getcheckdict()
@@ -68,8 +68,8 @@ def question_multiple(request, question):
         counter += 1
         key = "question_%s_multiple_%d" % (question.number, choice.sortid)
         
-        print val
-        print choice.value
+        #print val
+        #print choice.value
         if key in request.POST or (val!=None and (choice.value in val)) or \
           (request.method == 'GET' and choice.value in defaults):
             choices.append( (choice, key, ' checked',) )

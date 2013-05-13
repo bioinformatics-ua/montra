@@ -47,7 +47,7 @@ def question_yesno(request, question):
         'template' : 'questionnaire/choice-yesnocomment.html',
     }
 
-@question_proc('open', 'open-textfield', 'open-button')
+@question_proc('open', 'open-textfield', 'open-button', 'open-upload-image')
 def question_open(request, question):
     key = "question_%s" % question.number
     value = question.getcheckdict().get('default','')
@@ -58,9 +58,10 @@ def question_open(request, question):
         'value' : value,
     }
 
-@answer_proc('open', 'open-textfield', 'choice-yesno', 'choice-yesnocomment', 'choice-yesnodontknow',  'open-button')
+@answer_proc('open', 'open-textfield', 'choice-yesno', 'choice-yesnocomment', 'choice-yesnodontknow',  'open-button', 'open-upload-image')
 def process_simple(question, ansdict):
     checkdict = question.getcheckdict()
+    
     ans = ansdict['ANSWER'] or ''
     qtype = question.get_type()
     if qtype.startswith('choice-yesno'):

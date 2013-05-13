@@ -30,6 +30,12 @@
 {% block scriptextra%}
 
 
+$.post('api/insert', function(data) {
+  //$('.result').html(data);
+      console.log("Response: "+data);
+
+});
+
 var width = 960,
     height = 500,
     radius = Math.min(width, height) / 2;

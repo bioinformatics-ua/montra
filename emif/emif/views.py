@@ -41,7 +41,8 @@ import re
 import md5
 import random
 
-
+import os
+import os.path
 
 def list_questions():
     print "list_questions"
@@ -99,13 +100,13 @@ def results_db(request, template_name='results.html'):
 
 def results_comp(request, id1, id2, id3, template_name='results_comp.html'):
 
+
+
+    list_ids = [id1, id2, id3]
+    
     class Results:
         num_results=0
         list_results= []
-        d1 = None
-        d2 = None 
-        d3 = None
-
 
     class DatabaseFields:
         id = ''
@@ -126,9 +127,7 @@ def results_comp(request, id1, id2, id3, template_name='results_comp.html'):
             db_aux = get_database_from_id_with_tlv(db)        
             list_databases_final.append(db_aux)
 
-        list_results.d1 = list_databases_final[0]
-        list_results.d2 = list_databases_final[1]
-        list_results.d3 = list_databases_final[2]
+        list_results.list_results = list_databases_final
 
         list_results.num_results=len(list_databases)
     except:
@@ -173,15 +172,15 @@ def results_fulltext_aux(request, query, page=1, template_name='results.html'):
     #results = c.search_fingerprint("text_t:"+query,str(((int(page)-1)*rows)))
     results = c.search_fingerprint(query,str(0))
     #results = c.search_fingerprint("database_name_t:"+query)
-    print "Solr"
-    print results
+    #print "Solr"
+    #print results
     list_databases = []
     for r in results:
         try:
             database_aux = Database()
-            print r['id']
-            print r['created_t']
-            print r['database_name_t']
+            #print r['id']
+            #print r['created_t']
+            #print r['database_name_t']
             database_aux.id = r['id']
             database_aux.date = convert_date(r['created_t'])
             database_aux.name = r['database_name_t']
@@ -650,6 +649,12 @@ def get_databases_from_solr(request, query="*:*"):
             else:
                 database_aux.number_patients = r['number_active_patients_jan2012_t']
 
+            if (not r.has_key('upload-image_t')):
+                database_aux.logo = 'nopic.gif'
+            else:
+                database_aux.logo = r['upload-image_t']
+
+
             database_aux.ttype = questionnaires_ids[r['type_t']]
             list_databases.append(database_aux)
         except:
@@ -1082,8 +1087,8 @@ def next_questionset_order_by_sortid(questionset_id, questionnaire_id):
     next = False
     next_qs = None
     for qs in qsobjs:
-        print qs.pk
-        print questionset_id
+        #print qs.pk
+        #print questionset_id
         if next:
             next_qs = qs 
             next = False
@@ -1092,7 +1097,13 @@ def next_questionset_order_by_sortid(questionset_id, questionnaire_id):
             next = True
     return next_qs
 
+def handle_uploaded_file(f):
+    print "abspath"
 
+    with open(os.path.join(os.path.abspath(settings.PROJECT_DIR_ROOT + 'emif/static/upload_images/'), f.name), 
+        'wb+') as destination:
+        for chunk in f.chunks():
+            destination.write(chunk)
 
 def check_database_add_conditions(request, questionnaire_id, sortid, 
     template_name='database_add.html'):
@@ -1101,7 +1112,18 @@ def check_database_add_conditions(request, questionnaire_id, sortid,
     # --- Process POST with QuestionSet ---
     # -------------------------------------
     print "check_database_add_conditions"
-    
+    try:
+        if request.FILES:
+            print "file upload:"
+            for name, f in request.FILES.items():
+                print f
+                handle_uploaded_file(f)
+            #print request.FILES['file_uploaded']
+            #handle_uploaded_file(request.FILES['file_uploaded'])
+            #print request.POST
+            #print request.POST['file_uploaded']
+    except:
+        raise
     qsobjs = QuestionSet.objects.filter(questionnaire=questionnaire_id)
     questionnaire = qsobjs[0].questionnaire
     question_set = None
@@ -1116,8 +1138,8 @@ def check_database_add_conditions(request, questionnaire_id, sortid,
                 break
 
     fingerprint_id = request.POST['fingerprint_id']
-    print "@QuestionSet" + str(question_set)
-    print "@QuestionSet- sortid" + str(sortid)
+    #print "@QuestionSet" + str(question_set)
+    #print "@QuestionSet- sortid" + str(sortid)
     # to confirm that we have the correct answers
     
     expected = []
@@ -1171,7 +1193,7 @@ def check_database_add_conditions(request, questionnaire_id, sortid,
         
         return True
     active_qs_with_errors = False
-    print "Active QuestionSet: " + question_set
+    #print "Active QuestionSet: " + question_set
     for question, ans in extra.items():
         #if not question_satisfies_checks(question, runinfo):
         #    continue
@@ -1204,7 +1226,7 @@ def check_database_add_conditions(request, questionnaire_id, sortid,
             errors[question.number] = e
             
             if (str(question.questionset.id) == question_set):
-                print "active enable"
+                #print "active enable"
                 active_qs_with_errors = True
         except Exception:
             logging.exception("Unexpected Exception")
@@ -1213,8 +1235,7 @@ def check_database_add_conditions(request, questionnaire_id, sortid,
     if len(errors) > 0 and active_qs_with_errors:
         return show_fingerprint_page_errors(request, questionnaire_id, question_set,
          errors=errors,template_name='database_add.html', next=False, sortid=sortid, fingerprint_id=fingerprint_id)
-    print "show_fingerprint_page_errors"
-
+    #print "show_fingerprint_page_errors"
 
 
     #question_set = int(question_set) + 1
@@ -1225,8 +1246,8 @@ def check_database_add_conditions(request, questionnaire_id, sortid,
     else:
         sortid = next_qs.sortid
     question_set = str(next_qs.pk)
-    print question_set
-    print sortid
+    #print question_set
+    #print sortid
     return show_fingerprint_page_errors(request, questionnaire_id, question_set,
          errors={},template_name='database_add.html', next=True, sortid=sortid, fingerprint_id=fingerprint_id)
 
@@ -1241,10 +1262,10 @@ def show_fingerprint_page_errors(request, q_id, qs_id, errors={}, template_name=
     try:
         
         qs_list = QuestionSet.objects.filter(questionnaire=q_id)
-        print "Q_id: " + q_id
-        print "Qs_id: " + qs_id
-        print "SortID: " + str(sortid)
-        print "QS List: " + str(qs_list)
+        #print "Q_id: " + q_id
+        #print "Qs_id: " + qs_id
+        #print "SortID: " + str(sortid)
+        #print "QS List: " + str(qs_list)
         initial_sort = sortid
 
         if (int(sortid)==99):
@@ -1275,7 +1296,7 @@ def show_fingerprint_page_errors(request, q_id, qs_id, errors={}, template_name=
             qs_aux = None
             for question in questions_list[k.id]:
                 qs_aux = question.questionset
-                print "Question: " + str(question)
+                #print "Question: " + str(question)
                 Type = question.get_type()
                 _qnum, _qalpha = split_numal(question.number)
 
@@ -1317,14 +1338,15 @@ def show_fingerprint_page_errors(request, q_id, qs_id, errors={}, template_name=
             if qs_aux == None:
                 qs_aux = k
             qlist_general.append( (qs_aux, qlist))
-        print "Next:"
+        #print "Next:"
         #if (initial_sort == 99):
         #    # Index on Solr
         #    index_answeres_from_qvalues(qlist_general, question_set.questionnaire, request.user.username)
-        print "Fingerprint"
+        #print "Fingerprint"
         if (fingerprint_id!=None):
-            print "Fingerprint" + fingerprint_id
-            index_answeres_from_qvalues(qlist_general, question_set.questionnaire, request.user.username, fingerprint_id)
+            #print "Fingerprint" + fingerprint_id
+            index_answeres_from_qvalues(qlist_general, question_set.questionnaire, request.user.username, 
+                fingerprint_id)
 
         r = r2r(template_name, request,
             questionset=question_set,
@@ -1361,9 +1383,9 @@ def show_fingerprint_page_read_only(request, q_id, qs_id, errors={}, template_na
         
         qs_list = QuestionSet.objects.filter(questionnaire=q_id).order_by('sortid')
 
-        print "Q_id: " + q_id
-        print "Qs_id: " + qs_id
-        print "QS List: " + str(qs_list)
+        #print "Q_id: " + q_id
+        #print "Qs_id: " + qs_id
+        #print "QS List: " + str(qs_list)
         if (int(qs_id)==99):
             qs_id=len(qs_list)-1
         question_set = qs_list[int(qs_id)]
@@ -1403,9 +1425,9 @@ def show_fingerprint_page_read_only(request, q_id, qs_id, errors={}, template_na
                             qvalues[s[1]] += " " + v 
                         else:
                             qvalues[s[1]] = v 
-            print qvalues
+            #print qvalues
             query = convert_qvalues_to_query(qvalues,q_id)
-            print "Query: " + query
+            #print "Query: " + query
             return results_fulltext_aux(request, query)
 
         qlist_general = []
