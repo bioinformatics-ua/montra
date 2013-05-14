@@ -1,99 +1,49 @@
 {% extends 'base.html' %}
 {% load url from future %}
-
+{% load extra_tags %}
 
 {% block content %}
-<div class="span12" style="text-align:center">
-  <div class="span4">
-    <table class="table table-bordered  table-hover">
-      <thead>
-        <tr>
-          <th>Tag</th>
-          <th>{{results.d1.name}}</th>
-        </tr>
-      </thead>
+<div class="span12">
+  <div class="accordion" id="accordion2">
+    {% for name, qset in results %}
+    <div class="span3">
+      {% for k,v in qset.items %}
+      <div class="accordion-group">
+        <div class="accordion-heading">
+          <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapse{{k|removespaces}}{{name|removespaces}}">{{k|removeh1}}</a>
+        </div>
+        <div id="collapse{{k|removespaces}}{{name|removespaces}}" class="accordion-body collapse">
+          <div class="accordion-inner">
 
-      <tbody>
-        {% for t in results.d1.fields %}
-        <tr>
-          <td>{{ t.tag }}</td>
-          <td>{{ t.value }}</td>
-        </tr>
-        {% endfor %}
-      </tbody>
+            <table  class="table table-bordered  table-hover">
+              <thead></thead>
 
-    </table>
-
-    <div class="pull-right" >
-      <a class="btn btn-small btn-success" href="advancedSearch/1">Contact</a>
-      <a class="btn btn-small btn-success" href="advancedSearch/1">More like this</a>
+              <tbody>
+                {% for t in v.list_ordered_tags %}
+                <tr>
+                  <td>{{t.tag}}</td>
+                  <td>{{t.value}}</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
     </div>
-
+    {% endfor %}
   </div>
-
-  <div class="span3">
-    <table class="table table-bordered  table-hover">
-      <thead>
-        <tr>
-
-          <th>{{results.d2.name}}</th>
-        </tr>
-      </thead>
-
-      <tbody>
-        {% for t in results.d2.fields %}
-        <tr>
-
-          <td>{{ t.value }}</td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-
-    <div class="pull-right" >
-      <a class="btn btn-small btn-success" href="advancedSearch/1">Contact</a>
-      <a class="btn btn-small btn-success" href="advancedSearch/1">More like this</a>
-    </div>
-
-  </div>
-  <div class="span3">
-    <table class="table table-bordered  table-hover">
-      <thead>
-        <tr>
-
-          <th>{{results.d3.name}}</th>
-        </tr>
-      </thead>
-
-      <tbody>
-        {% for t in results.d2.fields %}
-        <tr>
-
-          <td>{{ t.value }}</td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-
-    <div class="pull-right" >
-      <a class="btn btn-small btn-success" href="advancedSearch/1">Contact</a>
-      <a class="btn btn-small btn-success" href="advancedSearch/1">More like this</a>
-    </div>
-
-  </div>
-  <div class="span2"></div>
 </div>
-</div>
+</div>  
+
 {% endblock %}
-
 
 {% block scriptextra %}
 function hidecheckbox()
 {
   $('.checkbox').toggle();
 }
-
-
 
 function highlight(text, text_to_highlight)
 {
@@ -102,7 +52,9 @@ function highlight(text, text_to_highlight)
     var index = innerHTML.indexOf(text);
     if ( index >= 0 )
     { 
-        innerHTML = innerHTML.substring(0,index) + "<span class='highlight'>" + innerHTML.substring(index,index+text.length) + "</span>" + innerHTML.substring(index + text.length);
+        innerHTML = innerHTML.substring(0,index) + "
+<span class='highlight'>" + innerHTML.substring(index,index+text.length) + "</span>
+" + innerHTML.substring(index + text.length);
         inputText.innerHTML = innerHTML 
     }
 

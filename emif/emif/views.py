@@ -98,12 +98,19 @@ def results_db(request, template_name='results.html'):
         'list_results': list_results})
 
 
-def results_comp(request, id1, id2, id3, template_name='results_comp.html'):
+def results_comp(request,  template_name='results_comp.html'):
+
+
+    list_fingerprint_to_compare = []
+    if request.POST:
+        for k,v in request.POST.items():
+            if k.startswith("chk_"):
+                arr = k.split("_")
+                
+                list_fingerprint_to_compare.append(arr[1])
 
 
 
-    list_ids = [id1, id2, id3]
-    
     class Results:
         num_results=0
         list_results= []
@@ -114,29 +121,16 @@ def results_comp(request, id1, id2, id3, template_name='results_comp.html'):
         date = ''
         fields = None
 
-    list_databases = []
-    try:
-        list_databases.append(get_database_from_id(id1))
-        list_databases.append(get_database_from_id(id2))
-        list_databases.append(get_database_from_id(id3))
-
-        c = CoreEngine()
-        list_databases_final = []
-        list_results = Results()
-        for db in list_databases:
-            db_aux = get_database_from_id_with_tlv(db)        
-            list_databases_final.append(db_aux)
-
-        list_results.list_results = list_databases_final
-
-        list_results.num_results=len(list_databases)
-    except:
-        raise
-        return render(request, template_name, {'request': request, 
-        'results': []})
-
+    list_qsets = []
+    for db_id in list_fingerprint_to_compare:
+        qsets, name = createqsets(db_id)
+        list_qsets.append((name, qsets))
+        for q in qsets:
+            print qsets[q].list_ordered_tags
+        
+    
     return render(request, template_name, {'request': request, 
-        'results': list_results})
+        'results': list_qsets})
 
 
 def results_fulltext(request, page=1, template_name='results.html'):
@@ -696,36 +690,15 @@ def all_databases(request, template_name='alldatabases.html'):
     return render(request, template_name, {'request': request, 
         'list_databases': list_databases, 'breadcrumb': True})
 
-def fingerprint(request, runcode, qs, template_name='database_info.html'):    
-    
+
+def createqsets(runcode, qsets=None):
     c = CoreEngine()
     results = c.search_fingerprint('id:'+runcode)
 
-    class Tag:
-        
-        def __init__(self):
-            self.tag = ''
-            self.value = ''    
-        def __str__(self):
-            return tag + ", " + value 
-
-    class QuestionGroup:
-        
-        
-        def __init__(self):
-            self.list_ordered_tags = []
-            self.name = ""
-
-        def __eq__(self, other):
-            return other.name == self.name
-
-        def __str__(self):
-            return self.name
-            #for tag in list_ordered_tags:
-            #    print tag
-
-    qsets = {}
-
+    
+    if qsets==None:
+        qsets = {}
+    name = ""
     list_values = []
     blacklist = ['created_t', 'type_t', '_version_']
     name = "Not defined"
@@ -766,9 +739,13 @@ def fingerprint(request, runcode, qs, template_name='database_info.html'):
                 question_group.list_ordered_tags.append(t)
                 #qsets[qs] = question_group
         break
+    return (qsets, name)
 
+def fingerprint(request, runcode, qs, template_name='database_info.html'):    
+    
+    qsets, name = createqsets(runcode)
     return render(request, template_name,
-     {'request': request, 'value_list': list_values, 'qsets':qsets,
+     {'request': request, 'qsets':qsets,
      'breadcrumb': True, 'breadcrumb_name':name, 'style': qs })
 
 

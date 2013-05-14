@@ -79,7 +79,7 @@ urlpatterns = patterns('',
     url(r'^statistics$', 'emif.views.statistics'),
 
     url(r'^resultsdiff/(?P<page>[-]{0,1}\d+)?$', 'emif.views.results_diff'),
-    url(r'^resultscomp/(?P<id1>[^/]+)/(?P<id2>[^/]+)/(?P<id3>[^/]+)', 'emif.views.results_comp'),
+    url(r'^resultscomp', 'emif.views.results_comp'),
     url(r'^fingerprint/(?P<runcode>[^/]+)/(?P<qs>[-]{0,1}\d+)/$', 'emif.views.fingerprint'),
 
     # List Databases 

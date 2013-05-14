@@ -77,10 +77,27 @@ class Database:
 
 
 class Tag:
-    tag = ''
-    value = ''
+        
+        def __init__(self):
+            self.tag = ''
+            self.value = ''    
+        def __str__(self):
+            return self.tag + ", " + self.value 
 
+class QuestionGroup:
+    
+    
+    def __init__(self):
+        self.list_ordered_tags = []
+        self.name = ""
 
+    def __eq__(self, other):
+        return other.name == self.name
+
+    def __str__(self):
+        return self.name
+        #for tag in list_ordered_tags:
+        #    print tag
 def get_database_from_id(id):
     c = CoreEngine()
     results = c.search_fingerprint("id:"+id)
