@@ -698,27 +698,60 @@ def all_databases(request, template_name='alldatabases.html'):
 
 def fingerprint(request, runcode, qs, template_name='database_info.html'):    
     
-
     c = CoreEngine()
-
     results = c.search_fingerprint('id:'+runcode)
+
     class Tag:
-        tag = ''
-        value = ''
+        
+        def __init__(self):
+            self.tag = ''
+            self.value = ''    
+        def __str__(self):
+            return tag + ", " + value 
+
+    class QuestionGroup:
+        
+        
+        def __init__(self):
+            self.list_ordered_tags = []
+            self.name = ""
+
+        def __eq__(self, other):
+            return other.name == self.name
+
+        def __str__(self):
+            return self.name
+            #for tag in list_ordered_tags:
+            #    print tag
+
+    qsets = {}
 
     list_values = []
     blacklist = ['created_t', 'type_t', '_version_']
     name = "Not defined"
     for result in results:
+
         for k in result:
             if k in blacklist:
                 continue
             t = Tag()
-            results = Slugs.objects.filter(slug1=k)
-            if len(results)>0:
-                text = results[0].description 
+            aux_results = Slugs.objects.filter(slug1=k)
+            qs = None
+            question_group = None
+            if len(aux_results)>0:
+                text = aux_results[0].description 
+                qs = aux_results[0].question.questionset.text
+                if qsets.has_key(qs):
+                    # Add the Tag to the QuestionGroup
+                    question_group = qsets[qs] 
+                    
+                else:
+                    question_group = QuestionGroup()
+                    qsets[qs] = question_group
+                    # Add a new QuestionGroup
             else:
                 text = k
+            #print qs
             info = text[:75] + (text[75:] and '..')
 
             t.tag = info
@@ -729,9 +762,13 @@ def fingerprint(request, runcode, qs, template_name='database_info.html'):
             if k== "database_name_t":
                 name = t.value
             list_values.append(t)
-    
+            if question_group!=None:
+                question_group.list_ordered_tags.append(t)
+                #qsets[qs] = question_group
+        break
+
     return render(request, template_name,
-     {'request': request, 'value_list': list_values, 
+     {'request': request, 'value_list': list_values, 'qsets':qsets,
      'breadcrumb': True, 'breadcrumb_name':name, 'style': qs })
 
 

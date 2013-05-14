@@ -29,7 +29,7 @@ def convert_text_to_slug(text):
 def clean_value(v):
     if isinstance(v, str):
         logging.debug("Value: " + v)
-        print "Value: " + v
+        #print "Value: " + v
 
         v = re.sub(r"\[|\]", "", v)
         logging.debug("Value after clean: " + v)

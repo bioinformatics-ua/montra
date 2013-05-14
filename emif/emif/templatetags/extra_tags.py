@@ -8,7 +8,18 @@ register = template.Library()
 @register.filter(name='removeh1')
 @stringfilter
 def removeh1(value):
+    
     return value.replace('h1. ','')
+
+@register.filter(name='removespaces')
+@stringfilter
+def removespaces(value):
+    value = value.replace('h1. ','')
+    value = value.replace(',','')
+    result = value.replace(' ','')
+
+    
+    return result
 
 
 def fingerprints_list():
@@ -20,8 +31,6 @@ def fingerprints_list():
     print results
 
     return results
-
-
 
 def fingerprints_list():
     

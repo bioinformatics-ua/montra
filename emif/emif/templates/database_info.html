@@ -1,7 +1,9 @@
 
 {% extends 'base.html' %}
 {% load url from future %}
+{% load extra_tags %}
 {% load django_bootstrap_breadcrumbs %}
+
 
 {% block styleextra %}
  
@@ -40,174 +42,97 @@ body {
 {% if value_list %}
 <br />
 
-
 <div class="span12">
-<div class="row-fluid">
-<div class="">
-<ul class="nav nav-tabs">
-                <li id="li_metadata" class="active" class=""><a href="#A" onclick="navigation_handler('metadata');"data-toggle="tab">Metadata</a></li>
-                <li id="li_literature" ><a href="#B" onclick="navigation_handler('literature');" data-toggle="tab">Literature</a></li>
-                
-</ul>
-</div>
-</div>
-<div id="metadata">
+  <div class="row-fluid">
+    <div class="">
+      <ul class="nav nav-tabs">
+        <li id="li_metadata" class="active" class="">
+          <a href="#A" onclick="navigation_handler('metadata');"data-toggle="tab">Metadata</a>
+        </li>
+        <li id="li_literature" >
+          <a href="#B" onclick="navigation_handler('literature');" data-toggle="tab">Literature</a>
+        </li>
 
-<table  class="table table-bordered  table-hover">
-              <thead>
-                <tr>
-                  <th>Tag</th>
-                  <th>Value</th>
-                  
-                </tr>
-              </thead>
+      </ul>
+    </div>
+  </div>
+  <div id="metadata">
 
-              <tbody>
-              {% for t in value_list %}
-                <tr>
-                  <td>{{ t.tag }}</td>
-                  <td>{{ t.value }}</td>
-                  
-                </tr>
-                {% endfor %}
-
-              </tbody>
-            </table>
-</div>
-</div>
-
-{% else %}
-<div class="row">  
-<div class="span4">  
-<div class="alert">  
-  <a class="close" data-dismiss="error">×</a>  
-  <strong>Warning!</strong> You don't have results. 
-</div>  
-</div>  
-</div>  
-
-{% endif %}
-</div>  
-
-<div id"literature" class="row-fluid span12" style="">
 
 <div class="accordion" id="accordion2">
+  {% for k,qs in qsets.items %}
   <div class="accordion-group">
     <div class="accordion-heading">
-      <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapseOne">
-        Collapsible Group Item #1
+      <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapse{{k|removespaces}}">
+        {{k|removeh1}}
       </a>
     </div>
-    <div id="collapseOne" class="accordion-body collapse in">
+    <div id="collapse{{k|removespaces}}" class="accordion-body collapse">
       <div class="accordion-inner">
-        Anim pariatur cliche...
 
-    <div id="becas-widget-text" class="widget-container"></div>
+        <table  class="table table-bordered  table-hover">
+        <thead>
+        <tr>
+        <th>Tag</th>
+        <th>Value</th>
 
+        </tr>
+        </thead>
+
+        <tbody>
+
+        {% for t in qs.list_ordered_tags %}
+                    <tr>
+                    <td>{{ t.tag }}</td> 
+                   <td> {{ t.value }}</td>
+                  </tr>
+                  {% endfor %}
+                  </tbody>
+        </table>
       </div>
     </div>
   </div>
-  <div class="accordion-group">
-    <div class="accordion-heading">
-      <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapseTwo">
-        Collapsible Group Item #2
-      </a>
-    </div>
-    <div id="collapseTwo" class="accordion-body collapse">
-      <div class="accordion-inner">
-        Anim pariatur cliche...
+  {% endfor %}
+</div>
+{% comment %}
 
-    <!-- Container to hold one widget -->
-    <br />
+<table  class="table table-bordered  table-hover">
+<thead>
+<tr>
+<th>Tag</th>
+<th>Value</th>
 
-    <h3>Abstract annotation</h3>
-    <!-- Container to hold another widget -->
-    <div id="becas-widget-pmid" class="widget-container"></div>
-      </div>
-    </div>
-  </div>
+</tr>
+</thead>
+
+<tbody>
+{% for t in value_list %}
+<tr>
+<td>{{ t.tag }}</td>
+<td>{{ t.value }}</td>
+
+</tr>
+{% endfor %}
+</tbody>
+</table>
+{% endcomment %}
 </div>
 </div>
+{% else %}
+<div class="row">
+<div class="span4">
+<div class="alert">
+<a class="close" data-dismiss="error">×</a> <strong>Warning!</strong>
+You don't have results.
+</div>
+</div>
+</div>
+{% endif %}
+</div>
 
-
- 
-
-   
-
-    <!-- Include the widget embedding script -->
-    <script src="//bioinformatics.ua.pt/becas/embed-widget.js"></script>
-    <!-- Use the widgets -->
-    <script>
-        // Initialize widget
-        var becasWidget = new becas.Widget({
-            container: 'becas-widget-text'
-        });
-        // Request text annotation
-        becasWidget.annotateText({
-            // required parameter
-            text: 'In Duchenne muscular dystrophy (DMD), the infiltration of skeletal muscle by immune cells aggravates disease, yet the precise mechanisms behind these inflammatory responses remain poorly understood. Chemotactic cytokines, or chemokines, are considered essential recruiters of inflammatory cells to the tissues.\nWe assayed chemokine and chemokine receptor expression in DMD muscle biopsies (n = 9, average age 7 years) using immunohistochemistry, immunofluorescence, and in situ hybridization.\nCXCL1, CXCL2, CXCL3, CXCL8, and CXCL11, absent from normal muscle fibers, were induced in DMD myofibers. CXCL11, CXCL12, and the ligand-receptor couple CCL2-CCR2 were upregulated on the blood vessel endothelium of DMD patients. CD68(+) macrophages expressed high levels of CXCL8, CCL2, and CCL5.\nOur data suggest a possible beneficial role for CXCR1/2/4 ligands in managing muscle fiber damage control and tissue regeneration. Upregulation of endothelial chemokine receptors and CXCL8, CCL2, and CCL5 expression by cytotoxic macrophages may regulate myofiber necrosis.',
-            // optional parameters
-            groups: {
-                "SPEC": true,
-                "ANAT": true,
-                "DISO": true,
-                "PATH": true,
-                "CHED": true,
-                "ENZY": true,
-                "MRNA": true,
-                "PRGE": true,
-                "COMP": true,
-                "FUNC": true,
-                "PROC": true
-            },
-            success: function () {
-                // Everything went fine, widget is rendered.
-            },
-            error: function (err) {
-                // An error prevented annotation, an error message has rendered.
-            }
-        });
-
-        // Initialize another widget
-        var becasWidget2 = new becas.Widget({
-            container: 'becas-widget-pmid'
-        });
-        // Request abstract annotation by PMID
-        becasWidget2.annotatePublication({
-            // required parameter
-            pmid: 23225384,
-            // optional parameters
-            groups: {
-                "SPEC": true,
-                "ANAT": true,
-                "DISO": true,
-                "PATH": true,
-                "CHED": true,
-                "ENZY": true,
-                "MRNA": true,
-                "PRGE": true,
-                "COMP": true,
-                "FUNC": true,
-                "PROC": true
-            },
-            success: function () {
-                // Everything went fine, widget is rendered.
-            },
-            error: function (err) {
-                // An error prevented annotation, an error message has rendered.
-            }
-        });
-    </script>
-    <!-- Display a message to users with Javascript deactivated -->
-    <noscript>
-        <div style="position:absolute;top:0;left:0;width:500px;height:250px;border:2px solid #A00;padding:6px;background-color:#fff;color:#600;text-align:center">
-            <h1>This page requires Javascript to function properly.</h1>
-            <h2>Please follow this instructions on how to <a href="http://www.enable-javascript.com/" target="_blank">enable JavaScript in your web browser</a>.</h2>
-        </div>
-    </noscript>
-
+</div>
+</noscript>
 {% endblock %}
-
 <script type="text/javascript">
 {% block scriptextra %}
 
@@ -237,5 +162,3 @@ function navigation_handler(id)
 {% endblock %}
 
 </script>
-
-
