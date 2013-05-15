@@ -177,16 +177,41 @@ def results_fulltext_aux(request, query, page=1, template_name='results.html'):
             #print r['id']
             #print r['created_t']
             #print r['database_name_t']
+
+            if (not r.has_key('database_name_t')):
+                database_aux.name = '(Unnamed)'
+            else:
+                database_aux.name = r['database_name_t']
+
+            if (not r.has_key('location_t')):
+                database_aux.location = ''
+            else:
+                database_aux.location = r['location_t']
+
+            if (not r.has_key('institution_name_t')):
+                database_aux.institution = ''
+            else:
+                database_aux.institution = r['institution_name_t']
+
+            if (not r.has_key('contact_administrative_t')):
+                database_aux.email_contact = ''
+            else:
+                database_aux.email_contact = r['contact_administrative_t']
+                        
+            if (not r.has_key('number_active_patients_jan2012_t')):
+                database_aux.number_patients = ''
+            else:
+                database_aux.number_patients = r['number_active_patients_jan2012_t']
             database_aux.id = r['id']
             database_aux.date = convert_date(r['created_t'])
-            database_aux.name = r['database_name_t']
-            database_aux.location = r['location_t']
-            database_aux.institution = r['institution_name_t']
-            database_aux.email_contact = r['contact_administrative_t']
-            database_aux.number_patients = r['number_active_patients_jan2012_t']
+            #database_aux.name = r['database_name_t']
+            #database_aux.location = r['location_t']
+            #database_aux.institution = r['institution_name_t']
+            #database_aux.email_contact = r['contact_administrative_t']
+            #database_aux.number_patients = r['number_active_patients_jan2012_t']
             list_databases.append(database_aux)
         except:
-            pass
+            raise
 
     pp = Paginator(list_databases, rows) 
     list_results = Results()
@@ -731,7 +756,7 @@ def createqsets(runcode, qsets=None):
 
             t.tag = info
 
-            value = clean_value(str(result[k]))
+            value = clean_value(str(result[k].encode('utf-8')))
             value = value[:75] + (value[75:] and '..')
             t.value = value.replace("#", " ")
             if k== "database_name_t":
