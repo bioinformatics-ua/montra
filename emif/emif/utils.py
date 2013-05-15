@@ -80,7 +80,8 @@ class Tag:
         
         def __init__(self):
             self.tag = ''
-            self.value = ''    
+            self.value = ''
+            self.extra = ''    
         def __str__(self):
             return self.tag + ", " + self.value 
 

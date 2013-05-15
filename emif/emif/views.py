@@ -125,9 +125,11 @@ def results_comp(request,  template_name='results_comp.html'):
     for db_id in list_fingerprint_to_compare:
         qsets, name = createqsets(db_id)
         list_qsets.append((name, qsets))
-        for q in qsets:
-            print qsets[q].list_ordered_tags
-        
+    
+    for db_id in list_fingerprint_to_compare:
+        qsets, name = createqsets(db_id)
+        list_qsets.append((name, qsets))
+            
     
     return render(request, template_name, {'request': request, 
         'results': list_qsets})
