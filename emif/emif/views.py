@@ -35,6 +35,7 @@ from searchengine.models import Slugs
 import searchengine.search_indexes
 from searchengine.search_indexes import index_answeres_from_qvalues
 from emif.utils import *
+from emif.models import *
 
 import logging
 import re
@@ -223,6 +224,27 @@ def results_fulltext_aux(request, query, page=1, template_name='results.html'):
         'list_results': list_results, 'page_obj': pp.page(page)})
 
 
+def store_query(user_request, query_executed):
+    print "Store Query"
+    # Verify if the query already exists in that user 
+    results_tmp = QueryLog.objects.filter(query=query_executed, user=user_request)
+    query = None
+    print results_tmp
+    if (results_tmp.exists()):
+        print "exists"
+        # If the user exists, then update the Query 
+        query = results_tmp[0]
+    else:
+        # Create a query 
+        query = QueryLog()
+
+        query.user = user_request
+        query.query = query_executed
+    if query != None:
+        query.user = user_request
+        query.query = query_executed
+        query.save()
+
 def results_diff(request, page=1, template_name='results_diff.html'):
 
     query = ""
@@ -240,14 +262,16 @@ def results_diff(request, page=1, template_name='results_diff.html'):
     if query == "":
         return render(request, "results.html", {'request': request, 
             'list_results': [], 'page_obj': None})
-
+    store_query(request.user, query)
     try:
-
+        # Store query by the user
+        
         search_full = request.POST['search_full']
 
         if search_full == "search_full":
             return results_fulltext(request, page)
     except: 
+        
         return results_fulltext(request, page)
 
     
@@ -585,8 +609,6 @@ def database_edit(request, fingerprint_id, questionnaire_id, template_name="data
     except:
         raise
     return r
-
-
 
 
 # Documentation 

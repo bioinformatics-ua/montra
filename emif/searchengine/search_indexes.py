@@ -19,7 +19,7 @@
 
 """A module for Python index
 
-.. moduleauthor:: Luís A. Bastião Silva<bastiao@ua.pt>
+.. moduleauthor:: Luís A. Bastião Silva <bastiao@ua.pt>
 """
 
 from __future__ import print_function
@@ -139,6 +139,7 @@ def get_slug_from_choice(v, q):
     if (len(choice)>0):
         print(choice[0].text)
         print(choice[0].value)
+
 
 
 def index_answeres_from_qvalues(qvalues, questionnaire, subject, fingerprint_id):
