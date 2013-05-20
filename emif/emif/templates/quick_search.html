@@ -2,47 +2,16 @@
 {% load url from future %}
 
 {% block styleextra %}
-body {
-  
-}
 
-/* Custom container */
-.container-narrow {
-  margin: 0 auto;
-  max-width: 700px;
-}
-.container-narrow > hr {
-  margin: 30px 0;
-}
 
-/* Main marketing message and sign up button */
-.jumbotron {
-  margin: 60px 0;
-  text-align: center;
-}
-.jumbotron h1 {
-  font-size: 72px;
-  line-height: 1;
-}
-.jumbotron .btn {
-  font-size: 21px;
-  padding: 14px 24px;
-}
-
-/* Supporting marketing content */
-.marketing {
-  margin: 60px 0;
-}
-.marketing p + h4 {
-  margin-top: 28px;
-}
 {% endblock %}
 
 {% block content %}
-<div class="container-narrow">
+<div class="container" style="text-align:center">
+  <div class="">
   <div class="jumbotron">
 
-    <div class="span6" style="text-align:center; padding-top: 40px">
+    <div class="span12" style="text-align:center; padding-top: 40px">
       <img src="static/img/emif_logo.png" alt="EMIF Logo" style="width: 180px; height: 163px;" />
       <h2>Quick Search </h2>    
     </div>
@@ -51,7 +20,7 @@ body {
   </div>
 <hr>
   
-<div class="span6" style="text-align:center">
+<div class="span12" style="text-align:center">
     
 
                     <form class="form" id="home_search" action="resultsdiff/1" method="POST">{% csrf_token %}
@@ -85,6 +54,7 @@ body {
 </div>
   
   </div>
+</div>
 </div>
 {% endblock %}
 
