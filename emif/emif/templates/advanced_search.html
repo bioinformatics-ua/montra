@@ -16,7 +16,7 @@
 <link rel="stylesheet" href="{{ x }}" type="text/css" />
 {% endfor %}
 
-    {% if async_progress %}
+{% if async_progress %}
 <script type="text/javascript">var progress_url = "{{ async_url }}";</script>
 <script type="text/javascript" src="{{ STATIC_URL }}progress.js"></script>
 {% endif %}
@@ -37,7 +37,6 @@
     <img src="static/img/emif_logo.png" alt="EMIF Logo" style="width: 80px; height: 81px;" />
     <h2>Advanced Search</h2>
   </div>
-
 
   </div>
 </div>
