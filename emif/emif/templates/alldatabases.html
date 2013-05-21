@@ -33,7 +33,7 @@ button {
 <table class="table table-hover" id="table_databases" data-provides="rowlink">
     <thead>
         <tr>
-            
+            <th></th>
             <th>Name</th>
             <th>Date</th>
 
@@ -43,6 +43,8 @@ button {
         
         {% for t in list_databases %}
         <tr>
+            <td><img src="static/upload_images/{{t.logo}}" width="50px" height="50px"/></td>
+          <td>
           <td>
             <a href="fingerprint/{{ t.id }}/2">{{ t.name }}</a>
 
