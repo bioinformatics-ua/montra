@@ -225,11 +225,21 @@ def results_fulltext_aux(request, query, page=1, template_name='results.html'):
 
 
 def store_query(user_request, query_executed):
-    print "Store Query"
+    print user_request.user.is_authenticated()
+    print "Store Query2"
     # Verify if the query already exists in that user 
-    results_tmp = QueryLog.objects.filter(query=query_executed, user=user_request)
+    user_aux = None
+    if user_request.user.is_authenticated():
+
+        user_aux = user_request.user
+
+        results_tmp = QueryLog.objects.filter(query=query_executed, user=user_aux)
+
+    else:
+        results_tmp = QueryLog.objects.filter(query=query_executed, user__isnull=True)        
     query = None
     print results_tmp
+    print "lol"
     if (results_tmp.exists()):
         print "exists"
         # If the user exists, then update the Query 
@@ -237,13 +247,20 @@ def store_query(user_request, query_executed):
     else:
         # Create a query 
         query = QueryLog()
-
-        query.user = user_request
+        if user_request.user.is_authenticated():
+            query.user = user_request.user
+        else:
+            query.user = None
         query.query = query_executed
+        print "dmn"
     if query != None:
-        query.user = user_request
+        if user_request.user.is_authenticated():
+            query.user = user_request.user
+        else:
+            query.user = None
         query.query = query_executed
         query.save()
+    print "executed"
 
 def results_diff(request, page=1, template_name='results_diff.html'):
 
@@ -262,7 +279,7 @@ def results_diff(request, page=1, template_name='results_diff.html'):
     if query == "":
         return render(request, "results.html", {'request': request, 
             'list_results': [], 'page_obj': None})
-    store_query(request.user, query)
+    store_query(request, query)
     try:
         # Store query by the user
         
@@ -752,7 +769,7 @@ def createqsets(runcode, qsets=None):
     blacklist = ['created_t', 'type_t', '_version_']
     name = "Not defined"
     for result in results:
-
+        print "results"
         for k in result:
             if k in blacklist:
                 continue
