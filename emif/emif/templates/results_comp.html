@@ -50,8 +50,8 @@ th, td {
               <tbody>
                 {% for t in v.list_ordered_tags %}
                 <tr>
-                  <td>{{t.tag}}</td>
-                  <td>{{t.value}}</td>
+                  <td data-original-title="{{ t.tag }}" title="">{{ t.tag }}</td> 
+                   <td data-original-title="{{ t.value }}" title=""> {{ t.value }}</td>
                 </tr>
                 {% endfor %}
               </tbody>
