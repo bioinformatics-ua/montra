@@ -15,6 +15,27 @@ body {
 .widget-container {
     max-width: 800px;
 }
+
+      table {
+        table-layout: fixed;
+      }
+      th, td {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        -o-text-overflow: ellipsis;
+        -ms-text-overflow: ellipsis;
+      }
+
+.tooltip.in {
+  opacity: 0.8;
+  filter: alpha(opacity=80);
+}
+.tooltip.in {
+  opacity: 1;
+  filter: alpha(opacity=100);
+}
+
     
 {% endblock %}
 
@@ -72,7 +93,7 @@ body {
     <div id="collapse{{k|removespaces}}" class="accordion-body collapse">
       <div class="accordion-inner">
 
-        <table  class="table table-bordered  table-hover">
+        <table  id="t2" class="table table-bordered  table-hover">
         <thead>
         
         </thead>
@@ -81,8 +102,8 @@ body {
 
         {% for t in qs.list_ordered_tags %}
                     <tr>
-                    <td>{{ t.tag }}</td> 
-                   <td> {{ t.value }}</td>
+                    <td data-original-title="{{ t.tag }}" title="">{{ t.tag }}</td> 
+                   <td data-original-title="{{ t.value }}" title=""> {{ t.value }}</td>
                   </tr>
                   {% endfor %}
                   </tbody>
@@ -94,7 +115,7 @@ body {
 </div>
 {% comment %}
 
-<table  class="table table-bordered  table-hover">
+<table  class="table ">
 <thead>
 <tr>
 <th>Tag</th>
@@ -276,6 +297,43 @@ function navigation_handler(id)
    
   }
 };
+$('.popover').popover({
+    container: 'body'
+});
+$('.accordion-body.collapse').hover(
+function () {
+$(this).css('overflow','visible');
+}, 
+function () {
+$(this).css('overflow','hidden');
+}
+);
+
+$.fn.textWidth = function() {
+  var node, original, width;
+  original = $(this).html();
+  node = $("<span style='position:absolute;width:auto;left:-9999px'>" + original + "</span>");
+  //node.css('font-family', $(this).css('font-family')).css('font-size', $(this).//css('font-size'));
+  $('body').append(node);
+  width = node.width();
+  node.remove();
+  return width;
+};
+
+$(function() {
+  $('td').each(function() {
+
+    var content;
+    content = $(this).text().replace(/\s+/gi, ' ');
+
+    
+    if ($(this).textWidth() > $(this).width()) {
+    
+      return $(this).tooltip({container:"body"});
+    }
+  });
+});
+
 
 
 {% endblock %}

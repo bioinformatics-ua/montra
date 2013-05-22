@@ -790,12 +790,13 @@ def createqsets(runcode, qsets=None):
             else:
                 text = k
             #print qs
-            info = text[:75] + (text[75:] and '..')
-
+            #info = text[:75] + (text[75:] and '..')
+            info = text
             t.tag = info
 
             value = clean_value(str(result[k].encode('utf-8')))
-            value = value[:75] + (value[75:] and '..')
+            #value = value[:75] + (value[75:] and '..')
+
             t.value = value.replace("#", " ")
             if k== "database_name_t":
                 name = t.value
