@@ -6,7 +6,10 @@
 <div class="span12">
   <div class="accordion" id="accordion2">
     {% for name, qset in results %}
+
     <div class="span3">
+      <span class="label label-inverse">{{name}}</span>
+
       {% for k,v in qset.items %}
       <div class="accordion-group">
         <div class="accordion-heading">

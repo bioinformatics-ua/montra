@@ -105,13 +105,15 @@ def results_comp(request,  template_name='results_comp.html'):
     list_fingerprint_to_compare = []
     if request.POST:
         for k,v in request.POST.items():
-            if k.startswith("chk_"):
+            
+            if k.startswith("chk_") and v == "on":
+
                 arr = k.split("_")
                 
                 list_fingerprint_to_compare.append(arr[1])
 
 
-
+    print list_fingerprint_to_compare
     class Results:
         num_results=0
         list_results= []
@@ -127,11 +129,8 @@ def results_comp(request,  template_name='results_comp.html'):
         qsets, name = createqsets(db_id)
         list_qsets.append((name, qsets))
     
-    for db_id in list_fingerprint_to_compare:
-        qsets, name = createqsets(db_id)
-        list_qsets.append((name, qsets))
-            
     
+    print list_qsets
     return render(request, template_name, {'request': request, 
         'results': list_qsets})
 
