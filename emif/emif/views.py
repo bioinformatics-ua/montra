@@ -128,11 +128,13 @@ def results_comp(request,  template_name='results_comp.html'):
     for db_id in list_fingerprint_to_compare:
         qsets, name = createqsets(db_id)
         list_qsets.append((name, qsets))
-    
-    
+    first_name = None 
+    if len(list_qsets)>0:
+        (first_name, discard) = list_qsets[0]
+
     print list_qsets
     return render(request, template_name, {'request': request, 
-        'results': list_qsets})
+        'results': list_qsets,'database_to_compare':first_name })
 
 
 def results_fulltext(request, page=1, template_name='results.html'):

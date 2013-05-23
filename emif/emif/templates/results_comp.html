@@ -230,12 +230,17 @@ comparetable = function(table1, table2){
 
 {% for name, qset in results %}
 
-
+{% if not forloop.first %}
 {% for k,v in qset.items %}
-{{name|removespaces}}_{{k|removespaces}}
-comparetable('das_{{k|removespaces}}','{{name|removespaces}}_{{k|removespaces}}')
-{% endfor %}
 
+
+comparetable('{{database_to_compare|removespaces}}_{{k|removespaces}}','{{name|removespaces}}_{{k|removespaces}}')
+
+comparetable('{{name|removespaces}}_{{k|removespaces}}',  '{{database_to_compare|removespaces}}_{{k|removespaces}}')
+
+
+{% endfor %}
+{% endif %}
 
 
 {% endfor %}
