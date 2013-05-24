@@ -1592,6 +1592,30 @@ def show_fingerprint_page_read_only(request, q_id, qs_id, errors={}, template_na
 
 
 
+def feedback(request):
+        subject = request.POST.get('topic', '')
+        message = request.POST.get('message', '')
+        from_email = request.POST.get('email', '')
+        emails_to_feedback = ['bastiao@ua.pt']
+
+        if subject and message and from_email:
+                try:
+                    send_mail(subject, message, "bioinformatics@ua.pt", [emails_to_feedback])
+                except BadHeaderError:
+                        return HttpResponse('Invalid header found.')
+                return HttpResponseRedirect('/contact/thankyou/')
+        else:
+            return render_to_response('feedback.html', {'form': ContactForm(), 'email_to': emails_to_feedback}, RequestContext(request))
+    
+        return render_to_response('feedback.html', {'form': ContactForm()},
+            RequestContext(request))
+
+
+def feedback_thankyou(request):
+        return render_to_response('feedback_thankyou.html')
+
+
+
 def show_fingerprint_page(request, runinfo, errors={}, template_name='database_edit.html'):
     """
     Return the QuestionSet template

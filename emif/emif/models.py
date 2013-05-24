@@ -5,6 +5,9 @@ from django.db import models
 
 from django.db.models.fields import * 
 #from questionnaire.models import Subject
+#
+from django import forms
+
 
 class QueryLog(models.Model):
 	id = AutoField(primary_key=True)
@@ -20,3 +23,9 @@ class Log(models.Model):
 	latest_date = models.DateField()
 
 
+
+class ContactForm(forms.Form):
+    name = forms.CharField()
+    email = forms.EmailField()
+    topic = forms.CharField()
+    message = forms.CharField(widget=forms.Textarea)

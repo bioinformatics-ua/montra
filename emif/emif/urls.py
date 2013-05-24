@@ -70,6 +70,11 @@ urlpatterns = patterns('',
     url(r'^q3/(?P<runcode>[^/]+)/(?P<qs>[-]{0,1}\d+)/$',
             questionaries_with_sets, name='questionset_sets'),
 
+
+    (r'^feedback/thankyou/', 'emif.views.feedback_thankyou'),
+    (r'^feedback$', 'emif.views.feedback'),
+
+
     (r'^contact/thankyou/', 'searchengine.views.thankyou'),
     (r'^contact/(?P<email>[^/]+)$', 'searchengine.views.contactview'),
     # Results
