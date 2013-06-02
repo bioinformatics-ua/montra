@@ -41,16 +41,16 @@ th, td {
 <div class="span12">
   <div class="accordion" id="accordion2">
     {% for name, qset in results %}
-
+                                                                            
     <div class="span3">
       <span class="label label-inverse">{{name}}</span>
 
       {% for k,v in qset.items %}
       <div class="accordion-group">
         <div class="accordion-heading">
-          <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapse{{k|removespaces}}{{name|removespaces}}">{{k|removeh1}}</a>
+          <a id="a_collapse{{k|removespaces}}_{{name|removespaces}}" class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapse{{k|removespaces}}_{{name|removespaces}}">{{k|removeh1}}</a>
         </div>
-        <div id="collapse{{k|removespaces}}{{name|removespaces}}" class="accordion-body collapse">
+        <div id="collapse{{k|removespaces}}_{{name|removespaces}}" class="accordion-body collapse">
           <div class="accordion-inner">
 
             <table id="{{name|removespaces}}_{{k|removespaces}}" class="table table-bordered  table-hover table-striped">
@@ -80,8 +80,48 @@ th, td {
 {% block scriptextra %}
 function hidecheckbox()
 {
+  console.log("togle");
   $('.checkbox').toggle();
 }
+
+
+myFunc = function(name)
+{
+  console.log(this);
+  console.log(name);
+  var current = this.id;
+  current = current.replace("a_", "");
+  current = current.split("_")[0];
+  //console.log(this.parent);
+  
+   $('div[id]').filter(function () {
+    return /^collapse.*$/.test(this.id);
+}).each(function (name2) {
+    //console.log(name2);
+});
+
+
+
+
+$("div[id^='collapse']").filter(function(){
+    var regexp = /^collapse(.*)$/;
+    return (this.id.match(regexp));
+}).each(function(){
+    //this.innerHTML = this.id;
+    console.log(this.id);
+    console.log(current);
+    if (!this.id.indexOf(current))
+    { 
+      $('#'+this.id).collapse('toggle'); 
+    };
+});
+
+
+
+};
+$('body').on('click', '.accordion-toggle', myFunc);
+
+
 
 /*
 
@@ -112,6 +152,8 @@ $.fn.textWidth = function() {
   node.remove();
   return width;
 };
+
+
 
 
 $(function() {
