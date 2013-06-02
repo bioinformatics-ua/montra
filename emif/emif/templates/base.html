@@ -96,14 +96,13 @@
                             </ul>
                           </li>
                           
-                    <form class="navbar-search pull-right">
+                    <form class="navbar-search pull-right" method="POST" action="resultsdiff/1">{% csrf_token %}
                         <div class="">
-                        <input title="Enter the terms you wish to search for." class="search-query span3 form-text" placeholder="Search" type="text" id="edit-search-block-form--3" name="search_block_form" value="" size="25" maxlength="256">
+                        <input title="Enter the terms you wish to search for." class="search-query span3 form-text" placeholder="Search" type="text" id="edit-search-block-form--3" name="query" value="" size="25" maxlength="256">
                     </div>
                 </form> 
 
                         </ul>
-
                         
                             <ul class="nav pull-right">
                             <li><a href="feedback">Feedback</a></li>
