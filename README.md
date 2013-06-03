@@ -6,7 +6,7 @@ EMIF Platform - Fingerprint Browser
 
 #### Local settings
 
-    cat emif/emif/local_settings.py
+    $ cat emif/emif/local_settings.py
     EMAIL_HOST = 'address.mail.com'
     EMAIL_HOST_PASSWORD = 'passwd'
     EMAIL_HOST_USER = 'login'
