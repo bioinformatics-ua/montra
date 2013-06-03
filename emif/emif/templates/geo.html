@@ -1,0 +1,201 @@
+{% block scriptextraincludes %}
+<script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false"></script>
+{% endblock %}
+
+
+{% comment %}
+<script type="text/javascript" >
+{% endcomment %}
+
+{% block scriptextra %}
+
+var map;
+function initialize(list_cities) {
+	var latlng = new google.maps.LatLng(38, -90);
+	var myOptions = {
+		zoom: 3,
+		center: latlng,
+		mapTypeId: google.maps.MapTypeId.ROADMAP
+	};
+	map = new google.maps.Map(document.getElementById("map_canvas"),myOptions);
+	
+	geocoder = new google.maps.Geocoder();
+	
+	geocoder.geocode( { 'address': '12 Gover St'}, function(results, status) {
+		if (status == google.maps.GeocoderStatus.OK) {
+			var marker = new google.maps.Marker({
+				map: map, 
+				position: results[0].geometry.location,
+				title: "Order 1 for $10,400.00"
+			});
+		} else {
+			alert("Geocode was not successful for the following reason: " + status);
+		}
+	});
+	
+	geocoder.geocode( { 'address': '123 4th St'}, function(results, status) {
+		if (status == google.maps.GeocoderStatus.OK) {
+			var marker = new google.maps.Marker({
+				map: map, 
+				position: results[0].geometry.location,
+				title: "Order 2 for $26,988.00"
+			});
+		} else {
+			alert("Geocode was not successful for the following reason: " + status);
+		}
+	});
+	
+	geocoder.geocode( { 'address': '11267 Green St'}, function(results, status) {
+		if (status == google.maps.GeocoderStatus.OK) {
+			var marker = new google.maps.Marker({
+				map: map, 
+				position: results[0].geometry.location,
+				title: "Order 3 for $10,192.00"
+			});
+		} else {
+			alert("Geocode was not successful for the following reason: " + status);
+		}
+	});
+	
+	geocoder.geocode( { 'address': '78 45th Ave'}, function(results, status) {
+		if (status == google.maps.GeocoderStatus.OK) {
+			var marker = new google.maps.Marker({
+				map: map, 
+				position: results[0].geometry.location,
+				title: "Order 4 for $8,112.00"
+			});
+		} else {
+			alert("Geocode was not successful for the following reason: " + status);
+		}
+	});
+	
+	geocoder.geocode( { 'address': '988 Brownlee Way'}, function(results, status) {
+		if (status == google.maps.GeocoderStatus.OK) {
+			var marker = new google.maps.Marker({
+				map: map, 
+				position: results[0].geometry.location,
+				title: "Order 5 for $5,824.00"
+			});
+		} else {
+			alert("Geocode was not successful for the following reason: " + status);
+		}
+	});
+	
+	geocoder.geocode( { 'address': '689 Dell Ave'}, function(results, status) {
+		if (status == google.maps.GeocoderStatus.OK) {
+			var marker = new google.maps.Marker({
+				map: map, 
+				position: results[0].geometry.location,
+				title: "Order 6 for $78,000.00"
+			});
+		} else {
+			alert("Geocode was not successful for the following reason: " + status);
+		}
+	});
+	
+	geocoder.geocode( { 'address': '234 Phoenix Way'}, function(results, status) {
+		if (status == google.maps.GeocoderStatus.OK) {
+			var marker = new google.maps.Marker({
+				map: map, 
+				position: results[0].geometry.location,
+				title: "Order 7 for $22,880.00"
+			});
+		} else {
+			alert("Geocode was not successful for the following reason: " + status);
+		}
+	});
+	
+	geocoder.geocode( { 'address': '944 Eaton Way'}, function(results, status) {
+		if (status == google.maps.GeocoderStatus.OK) {
+			var marker = new google.maps.Marker({
+				map: map, 
+				position: results[0].geometry.location,
+				title: "Order 8 for $31,200.00"
+			});
+		} else {
+			alert("Geocode was not successful for the following reason: " + status);
+		}
+	});
+	
+	geocoder.geocode( { 'address': '6 23rd'}, function(results, status) {
+		if (status == google.maps.GeocoderStatus.OK) {
+			var marker = new google.maps.Marker({
+				map: map, 
+				position: results[0].geometry.location,
+				title: "Order 9 for $12,272.00"
+			});
+		} else {
+			alert("Geocode was not successful for the following reason: " + status);
+		}
+	});
+	
+	geocoder.geocode( { 'address': 'Scottsdale Circle'}, function(results, status) {
+		if (status == google.maps.GeocoderStatus.OK) {
+			var marker = new google.maps.Marker({
+				map: map, 
+				position: results[0].geometry.location,
+				title: "Order 10 for $31,200.00"
+			});
+		} else {
+			alert("Geocode was not successful for the following reason: " + status);
+		}
+	});
+	
+	$(list_cities).each(function(city_tmp)
+	{
+
+		geocoder.geocode( { 'address': city_tmp}, function(results, status) {
+				if (status == google.maps.GeocoderStatus.OK) {
+					var marker = new google.maps.Marker({
+						map: map, 
+						position: results[0].geometry.location,
+						title: city_tmp
+					});
+				} else {
+					alert("Geocode was not successful for the following reason: " + status);
+				}
+		});
+	
+
+	}
+
+}
+
+var list_cities_aux = []
+{% for city in list_cities %}
+
+list_cities_aux.append({{city}})
+
+{% enfor %}
+
+
+load_map = function(list_cities)
+{
+	initialize(list_cities);
+}
+
+$(document).ready(load_map.bind(window,list_cities_aux));
+
+
+{% endblock %}
+
+
+{% comment %}
+</script>
+{% endcomment %}
+
+
+
+{% block styleextra %}
+  #map_canvas { width: 450px; height: 450px; }
+{% endblock %}
+
+
+</head>
+
+<body onload="initialize()">
+
+<div id="map_canvas"></div>
+
+</body>
+</html>
