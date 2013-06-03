@@ -381,6 +381,12 @@ def results_diff(request, page=1, template_name='results_diff.html'):
         'results': list_results})
 
 
+
+def geo(request, template_name='geo.html'):
+
+    return render(request, template_name, {'request': request, 'list_cities': ['Aveiro, Portugal', 'Berlin, Germany']})
+
+
 def statistics(request, template_name='statistics.html'):
 
     from emif.statistics import Statistic
