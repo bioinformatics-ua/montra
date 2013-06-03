@@ -32,7 +32,7 @@ function initialize(list_cities) {
 						title: list_cities[city_tmp]
 					});
 				} else {
-					alert("Geocode was not successful for the following reason: " + status);
+					//alert("Geocode was not successful for the //following reason: " + status);
 				}
 		});
 	
@@ -63,7 +63,6 @@ $(document).ready(load_map.bind(window,list_cities_aux));
 
 {% endblock %}
 
-
 {% comment %}
 <script type="text/javascript" >
 {% endcomment %}
@@ -81,7 +80,7 @@ $(document).ready(load_map.bind(window,list_cities_aux));
 
 
 {% block styleextra %}
-  #map_canvas { width: 800px; height: 450px; }
+  #map_canvas { width: 100%; height: 600px; }
 {% endblock %}
 
 
