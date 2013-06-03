@@ -93,6 +93,8 @@ class QuestionSet(models.Model):
 
     "Which questions to display on a question page"
     questionnaire = models.ForeignKey(Questionnaire)
+    # TODO
+    # questionnaire = models.ManyToManyField(Questionnaire)
     sortid = models.IntegerField() # used to decide which order to display in
     heading = models.CharField(max_length=64)
     checks = models.CharField(max_length=128, blank=True,

@@ -19,7 +19,7 @@ class ChoiceInline(admin.TabularInline):
     extra = 5
 
 class QuestionSetAdmin(admin.ModelAdmin):
-    ordering = ['questionnaire', 'sortid', ]
+    #ordering = ['questionnaire', 'sortid', ]
     list_filter = ['questionnaire', ]
     list_display = ['questionnaire', 'heading', 'sortid', ]
     list_editable = ['sortid', ]

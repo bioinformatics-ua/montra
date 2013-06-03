@@ -29,7 +29,7 @@ def convert_text_to_slug(text):
 def clean_value(v):
     if isinstance(v, str):
         logging.debug("Value: " + v)
-        print "Value: " + v
+        #print "Value: " + v
 
         v = re.sub(r"\[|\]", "", v)
         logging.debug("Value after clean: " + v)
@@ -73,13 +73,32 @@ class Database:
     email_contact = ''
     number_patients = ''
     ttype = ''
+    logo = ''
 
 
 class Tag:
-    tag = ''
-    value = ''
+        
+        def __init__(self):
+            self.tag = ''
+            self.value = ''
+            self.extra = ''    
+        def __str__(self):
+            return self.tag + ", " + self.value 
 
+class QuestionGroup:
+    
+    
+    def __init__(self):
+        self.list_ordered_tags = []
+        self.name = ""
 
+    def __eq__(self, other):
+        return other.name == self.name
+
+    def __str__(self):
+        return self.name
+        #for tag in list_ordered_tags:
+        #    print tag
 def get_database_from_id(id):
     c = CoreEngine()
     results = c.search_fingerprint("id:"+id)
@@ -163,8 +182,8 @@ def convert_qvalues_to_query(qvalues, questionnaire_id):
     query = ""  
     for k in qvalues:
         try:
-            print qvalues[k]
-            print numbers[k]
+            #print qvalues[k]
+            #print numbers[k]
             
             if (qvalues[k]!=None and qvalues[k]!="" ):
                 query_parameters[numbers[k]] = qvalues[k]

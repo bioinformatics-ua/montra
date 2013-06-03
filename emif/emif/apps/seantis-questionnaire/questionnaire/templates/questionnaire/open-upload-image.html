@@ -1,0 +1,53 @@
+{% load i18n %}
+<div class="clearfix row">
+
+  <div class="row span2" style="padding-top:20px; padding-left:20px;">
+
+    <div class="fileupload fileupload-new" data-provides="fileupload" >
+      <div class="fileupload-new thumbnail" style="width: 200px; height: 150px;">
+        <img src="http://www.placehold.it/200x150/EFEFEF/AAAAAA&text=no+image" />
+      </div>
+      <div class="fileupload-preview fileupload-exists thumbnail" style="max-width: 200px; max-height: 150px; line-height: 20px;"></div>
+      <div>
+        <span class="btn btn-file">
+          <span class="fileupload-new">Select image</span>
+          <span class="fileupload-exists">Change</span>
+          <input type="file" id="question_{{ question.number }}_image" name="question_{{ question.number }}_image" />
+        </span>
+        <a href="#" class="btn fileupload-exists" data-dismiss="fileupload">Remove</a>
+      </div>
+    </div>
+
+  </div>
+
+<div class="input span5">
+  <div class="pull-left" >
+    <input type="hidden" class="" size="50" id="question_{{ question.number }}" name="question_{{ question.number }}" value="{{ qdict.value }}">
+    {% if question.extra %}
+    <span class="help-block">{{ question.extra }}</span>
+    {% endif %}
+  </div>
+
+</div>
+
+</div>
+{% block headextra %}
+<link rel="stylesheet" href="static/css/bootstrap-fileupload.css">
+{% endblock %}
+
+{% block scriptextraincludes %}
+<script type="text/javascript" src="static/js/vendor/bootstrap-fileupload.js"></script>
+<script type="text/javascript">
+$('#question_{{ question.number }}_image').change(function() {
+    var filename = $(this).val();
+    var lastIndex = filename.lastIndexOf("\\");
+    if (lastIndex >= 0) {
+        filename = filename.substring(lastIndex + 1);
+    }
+    $('#question_{{ question.number }}').val(filename);
+});
+</script>
+{% endblock %}
+
+
+

@@ -1,99 +1,134 @@
 {% extends 'base.html' %}
 {% load url from future %}
+{% load extra_tags %}
+
+{% block scriptextraincludes %}
+<script src="static/js/vendor/tablediff.js"></script>
+
+{% endblock %}
+
+
+{% block styleextra %}
+    
+
+
+   table {
+  table-layout: fixed;
+}
+th, td {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  -o-text-overflow: ellipsis;
+  -ms-text-overflow: ellipsis;
+}
+
+.tooltip.in {
+  opacity: 0.8;
+  filter: alpha(opacity=80);
+}
+.tooltip.in {
+  opacity: 1;
+  filter: alpha(opacity=100);
+}
+
+
+{% endblock %}
 
 
 {% block content %}
-<div class="span12" style="text-align:center">
-  <div class="span4">
-    <table class="table table-bordered  table-hover">
-      <thead>
-        <tr>
-          <th>Tag</th>
-          <th>{{results.d1.name}}</th>
-        </tr>
-      </thead>
+<div class="span12">
+  <div class="accordion" id="accordion2">
+    {% for name, qset in results %}
+                                                                            
+    <div class="span5">
+      <span class="label label-inverse">{{name}}</span>
 
-      <tbody>
-        {% for t in results.d1.fields %}
-        <tr>
-          <td>{{ t.tag }}</td>
-          <td>{{ t.value }}</td>
-        </tr>
-        {% endfor %}
-      </tbody>
+      {% for k,v in qset.items %}
+      <div class="accordion-group">
+        <div class="accordion-heading">
+          <a id="a_collapse{{k|removespaces}}_{{name|removespaces}}" class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapse{{k|removespaces}}_{{name|removespaces}}">{{k|removeh1}}</a>
+        </div>
+        <div id="collapse{{k|removespaces}}_{{name|removespaces}}" class="accordion-body collapse">
+          <div class="accordion-inner">
 
-    </table>
+            <table id="{{name|removespaces}}_{{k|removespaces}}" class="table table-bordered  table-hover table-striped">
+              <thead></thead>
 
-    <div class="pull-right" >
-      <a class="btn btn-small btn-success" href="advancedSearch/1">Contact</a>
-      <a class="btn btn-small btn-success" href="advancedSearch/1">More like this</a>
+              <tbody>
+                {% for t in v.list_ordered_tags %}
+                <tr>
+                  <td data-original-title="{{ t.tag }}" title="">{{ t.tag }}</td> 
+                   <td data-original-title="{{ t.value }}" title=""> {{ t.value }}</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
     </div>
-
+    {% endfor %}
   </div>
-
-  <div class="span3">
-    <table class="table table-bordered  table-hover">
-      <thead>
-        <tr>
-
-          <th>{{results.d2.name}}</th>
-        </tr>
-      </thead>
-
-      <tbody>
-        {% for t in results.d2.fields %}
-        <tr>
-
-          <td>{{ t.value }}</td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-
-    <div class="pull-right" >
-      <a class="btn btn-small btn-success" href="advancedSearch/1">Contact</a>
-      <a class="btn btn-small btn-success" href="advancedSearch/1">More like this</a>
-    </div>
-
-  </div>
-  <div class="span3">
-    <table class="table table-bordered  table-hover">
-      <thead>
-        <tr>
-
-          <th>{{results.d3.name}}</th>
-        </tr>
-      </thead>
-
-      <tbody>
-        {% for t in results.d2.fields %}
-        <tr>
-
-          <td>{{ t.value }}</td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-
-    <div class="pull-right" >
-      <a class="btn btn-small btn-success" href="advancedSearch/1">Contact</a>
-      <a class="btn btn-small btn-success" href="advancedSearch/1">More like this</a>
-    </div>
-
-  </div>
-  <div class="span2"></div>
 </div>
-</div>
+</div>  
+
 {% endblock %}
+
+{% comment %}
+<script type="text/javascript" >
+{% endcomment %}
+
 
 
 {% block scriptextra %}
 function hidecheckbox()
 {
+  console.log("togle");
   $('.checkbox').toggle();
 }
 
 
+myFunc = function(name)
+{
+  console.log(this);
+  console.log(name);
+  var current = this.id;
+  current = current.replace("a_", "");
+  current = current.split("_")[0];
+  //console.log(this.parent);
+  
+   $('div[id]').filter(function () {
+    return /^collapse.*$/.test(this.id);
+}).each(function (name2) {
+    //console.log(name2);
+});
+
+
+
+
+$("div[id^='collapse']").filter(function(){
+    var regexp = /^collapse(.*)$/;
+    return (this.id.match(regexp));
+}).each(function(){
+    //this.innerHTML = this.id;
+    console.log(this.id);
+    console.log(current);
+    if (!this.id.indexOf(current))
+    { 
+      $('#'+this.id).collapse('toggle'); 
+    };
+});
+
+
+
+};
+$('body').on('click', '.accordion-toggle', myFunc);
+
+
+
+/*
 
 function highlight(text, text_to_highlight)
 {
@@ -102,11 +137,72 @@ function highlight(text, text_to_highlight)
     var index = innerHTML.indexOf(text);
     if ( index >= 0 )
     { 
-        innerHTML = innerHTML.substring(0,index) + "<span class='highlight'>" + innerHTML.substring(index,index+text.length) + "</span>" + innerHTML.substring(index + text.length);
+        innerHTML = innerHTML.substring(0,index) + "
+<span class='highlight'>" + innerHTML.substring(index,index+text.length) + "</span>
+" + innerHTML.substring(index + text.length);
         inputText.innerHTML = innerHTML 
     }
 
 }
+
+*/
+
+$.fn.textWidth = function() {
+  var node, original, width;
+  original = $(this).html();
+  node = $("<span style='position:absolute;width:auto;left:-9999px'>" + original + "</span>");
+  //node.css('font-family', $(this).css('font-family')).css('font-size', $(this).//css('font-size'));
+  $('body').append(node);
+  width = node.width();
+  node.remove();
+  return width;
+};
+
+
+
+$(function() {
+  $('td').each(function() {
+
+    var content;
+    content = $(this).text().replace(/\s+/gi, ' ');
+
+    
+    if ($(this).textWidth() > $(this).width()) {
+    
+      return $(this).tooltip({container:"body"});
+    }
+  });
+});
+
+
+{% for name, qset in results %}
+
+{% if not forloop.first %}
+{% for k,v in qset.items %}
+
+
+comparetable('{{database_to_compare|removespaces}}_{{k|removespaces}}','{{name|removespaces}}_{{k|removespaces}}')
+
+comparetable('{{name|removespaces}}_{{k|removespaces}}',  '{{database_to_compare|removespaces}}_{{k|removespaces}}')
+
+
+{% endfor %}
+{% endif %}
+
+
+{% endfor %}
+
+{% comment %}
+</script>
+{% endcomment %}
+
+
+
+
+
+
+
+
 
 
 {% endblock %}

@@ -4,8 +4,8 @@
 
 {% block breadcrumbs %}
     {{ block.super }}
-    {% breadcrumb "Databases" "databases" %}
-    {% breadcrumb "List" "databases" %}
+    
+    {% breadcrumb "My Databases" "databases" %}
 
 {% endblock %}
 
@@ -21,7 +21,6 @@ button {
 
 {% endblock %}
 
-
 {% block toolbar %}
 {% include "menu_toolbar.html" %}
 
@@ -33,7 +32,7 @@ button {
 <table class="table table-hover" id="table_databases" data-provides="rowlink">
     <thead>
         <tr>
-            
+            <th></th>
             <th>Name</th>
             <th>Date</th>
             <th>Modify</th>
@@ -44,9 +43,10 @@ button {
         
         {% for t in list_databases %}
         <tr>
+            <td><img src="static/upload_images/{{t.logo}}" width="50px" height="50px"/></td>
           <td>
             <a href="fingerprint/{{ t.id }}/1">{{ t.name }}</a>
-
+            
             <div style="margin-left:20px">
              Institution Name: {{t.institution}}
             </div>

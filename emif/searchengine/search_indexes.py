@@ -19,7 +19,7 @@
 
 """A module for Python index
 
-.. moduleauthor:: Luís A. Bastião Silva<bastiao@ua.pt>
+.. moduleauthor:: Luís A. Bastião Silva <bastiao@ua.pt>
 """
 
 from __future__ import print_function
@@ -59,11 +59,14 @@ class CoreEngine:
     """It is responsible for index the documents and search over them
     It also connects to SOLR
     """
-
+    
     CONNECTION_TIMEOUT_DEFAULT = 10
     def __init__(self, timeout=CONNECTION_TIMEOUT_DEFAULT):
         # Setup a Solr instance. The timeout is optional.
         self.solr = pysolr.Solr('http://' +settings.SOLR_HOST+ ':'+ settings.SOLR_PORT+'/solr', timeout=timeout)
+
+
+
 
     def index_fingerprint(self, doc):
         """Index fingerprint 
@@ -138,8 +141,9 @@ def get_slug_from_choice(v, q):
         print(choice[0].value)
 
 
+
 def index_answeres_from_qvalues(qvalues, questionnaire, subject, fingerprint_id):
-    print("index_answeres_from_qvalues")
+    #print("index_answeres_from_qvalues")
     c = CoreEngine()
     d = {}
     
@@ -169,7 +173,7 @@ def index_answeres_from_qvalues(qvalues, questionnaire, subject, fingerprint_id)
                             value = value + "#" + choice.value
 
                 else:
-                    print("conitnue")
+                    print("continue")
 
                 
                 slug = question.slug  
@@ -207,7 +211,7 @@ def index_answeres_from_qvalues(qvalues, questionnaire, subject, fingerprint_id)
     d['created_t']= now.strftime('%Y-%m-%d %H:%M:%S.%f')
     d['user_t']= subject
     d['text_t']= text
-    print(d)
+    #print(d)
     c.index_fingerprint_as_json(d)
 
 

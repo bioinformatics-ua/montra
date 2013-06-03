@@ -1,0 +1,33 @@
+{% load i18n %}
+<div class="clearfix span8">
+
+  <div class="input span5">
+    <div class="pull-left" >
+      <input type="text" class=" " size="50" id="{{ question.number }}" name="question_{{ question.number }}" value="{{ qdict.value }}">
+      {% if question.extra %}
+      <span class="help-block">{{ question.extra }}</span>
+      {% endif %}
+    </div>
+
+    
+  </div>
+  {% if question.slug == "database_name" %}
+        <div class="input span2">         
+      <div class="" style="vertical-align:center;padding-top:12px">
+<div class="fileupload fileupload-new" data-provides="fileupload">
+  <div class="fileupload-preview thumbnail" style="width: 200px; height: 150px;"></div>
+  <div>
+    <span class="btn btn-file"><span class="fileupload-new">Select image</span><span class="fileupload-exists">Change</span><input type="file" name="fileuploaded"/></span>
+    <a href="#" class="btn fileupload-exists" data-dismiss="fileupload">Remove</a>
+  </div>
+</div>
+</div>
+      </div>
+      </div>
+      {% endif %}
+
+</div>
+
+
+
+

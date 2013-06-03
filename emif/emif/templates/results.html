@@ -17,29 +17,31 @@
 {% endblock %}
 
 {% block toolbar %}
-{% comment %}
+
+<form id="result_form" action="resultscomp" method="POST">
+{% csrf_token %}
 <div class="span6">
   <div class="btn-group pull-right">
 
     <div class="btn-group">
-      <a class="btn btn" href="" onclick="hidecheckbox(); return false;"> <i class="icon-edit icon" ></i>
+      <a class="btn" href="" onclick="hidecheckbox(); return false;"> <i class="icon-edit icon" ></i>
         Edit results
       </a>
 
     </div>
-    <a class="btn btn" href="" onclick="return false;"> <i class="icon-plus icon"></i>
+    <a class="btn" href="" onclick="$('#result_form').submit(); return false; "> <i class="icon-plus icon"></i>
       Compare
     </a>
   </div>
 </div>
-{% endcomment %}
+
 {% endblock %}
 
 {% load bootstrap_pagination %}
 
-
-
 {% block content %}
+
+
 <div class"row">
   <div class="span12" style="text-align:center">
     <img src="static/img/emif_logo.png" alt="EMIF Logo" style="width: 80px; height: 81px;" />
@@ -76,7 +78,6 @@
           <div class="pull-left span6" style="text-align:left">
              <a href="fingerprint/{{ result.id }}/1"><span class="label label-success" style="font-size:15px">
               {{ result.name }}
-              
 
             </span>
             </a>
@@ -101,7 +102,7 @@
 
          <div class="span1 pull-right" style="text-align:right; padding-top:5px; max-width:15px;">
 
-            <input class="checkbox" type="checkbox" name="" style="display:none; or visibility:hidden;">
+            <input class="checkbox" type="checkbox" name="chk_{{ result.id }}" style="display:none; or visibility:hidden;">
           </div>
 
             <div class="span3 pull-right " style="max-width:165px">
@@ -123,10 +124,13 @@
 
   {% endif %}
 
+
+</form>
 {% if page_obj != None %}
 
 {% bootstrap_paginate page_obj range=10 url_view_name="views.results_diff" show_prev_next="false" show_first_last="true"%}
 {% endif %}
+
 
 
 

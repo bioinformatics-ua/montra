@@ -2,7 +2,7 @@
 {% load extra_tags %}
 {% load markup questionnaire i18n %}
 <div class="span8">
-    <form name="qform" id="qform" action="addPost/{{questionset.questionnaire.pk}}/1" method="POST">
+    <form name="qform" id="qform" action="addPost/{{questionset.questionnaire.pk}}/1" method="POST" enctype="multipart/form-data">
     {% for k, qlist in questions_list %}
 
     <div id="qs_{{ k.pk }}" class="{% if k.pk == questionset.pk %} {% else %} hide {% endif %} questionset">
@@ -102,7 +102,9 @@ function validate(question_number)
     
 
 
-}
+};
+
+
 </script>
 
 

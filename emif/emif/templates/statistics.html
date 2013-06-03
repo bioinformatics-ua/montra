@@ -3,6 +3,20 @@
 
 {% block content %}
 
+    
+{% for graph in graphs %}
+  
+  
+  {% comment %}
+    {{ graph }}
+  {% endcomment %}
+  {% for k in graph %}
+    {{k}}<br />
+    
+  {% endfor %}
+
+{% endfor %}
+
 
 {% endblock %}
 
@@ -13,10 +27,14 @@
 
 {% endblock %}
 
-
-
 {% block scriptextra%}
 
+
+$.post('api/insert', function(data) {
+  //$('.result').html(data);
+      console.log("Response: "+data);
+
+});
 
 var width = 960,
     height = 500,

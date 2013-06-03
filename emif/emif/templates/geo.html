@@ -1,0 +1,91 @@
+{% extends 'base.html' %}
+{% load url from future %}
+{% load extra_tags %}
+
+
+{% block scriptextraincludes %}
+<script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false"></script>
+<script type="text/javascript">
+
+
+var map;
+function initialize(list_cities) {
+	var latlng = new google.maps.LatLng(40, -8);
+	var myOptions = {
+		zoom: 3,
+		center: latlng,
+		mapTypeId: google.maps.MapTypeId.ROADMAP
+	};
+	map = new google.maps.Map(document.getElementById("map_canvas"),myOptions);
+	
+	geocoder = new google.maps.Geocoder();
+	
+	$(list_cities).each(function(city_tmp)
+	{
+		console.log(list_cities[city_tmp]);
+		geocoder.geocode( { 'address': list_cities[city_tmp]}, function(results, status) {
+
+				if (status == google.maps.GeocoderStatus.OK) {
+					var marker = new google.maps.Marker({
+						map: map, 
+						position: results[0].geometry.location,
+						title: list_cities[city_tmp]
+					});
+				} else {
+					alert("Geocode was not successful for the following reason: " + status);
+				}
+		});
+	
+
+	});
+
+}
+
+var list_cities_aux = []
+{% for city in list_cities %}
+
+list_cities_aux.push('{{city}}')
+
+{% endfor %}
+
+
+load_map = function(list_cities)
+{
+	initialize(list_cities);
+}
+
+$(document).ready(load_map.bind(window,list_cities_aux));
+
+
+
+
+</script>
+
+{% endblock %}
+
+
+{% comment %}
+<script type="text/javascript" >
+{% endcomment %}
+
+{% block scriptextra %}
+
+
+{% endblock %}
+
+
+{% comment %}
+</script>
+{% endcomment %}
+
+
+
+{% block styleextra %}
+  #map_canvas { width: 800px; height: 450px; }
+{% endblock %}
+
+
+{% block content %}
+<div id="map_canvas"></div>
+{% endblock %}
+

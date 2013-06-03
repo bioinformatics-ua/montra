@@ -1,8 +1,43 @@
 
 {% extends 'base.html' %}
 {% load url from future %}
+{% load extra_tags %}
 {% load django_bootstrap_breadcrumbs %}
 
+
+{% block styleextra %}
+ 
+body {
+    font-family: "Helvetica Neue", Helvetica, sans-serif;
+    background-color: #fff;
+    color: #333;
+}
+.widget-container {
+    max-width: 800px;
+}
+
+      table {
+        table-layout: fixed;
+      }
+      th, td {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        -o-text-overflow: ellipsis;
+        -ms-text-overflow: ellipsis;
+      }
+
+.tooltip.in {
+  opacity: 0.8;
+  filter: alpha(opacity=80);
+}
+.tooltip.in {
+  opacity: 1;
+  filter: alpha(opacity=100);
+}
+
+    
+{% endblock %}
 
 {% block breadcrumbs %}
     {{ block.super }}
@@ -17,55 +52,299 @@
     {% breadcrumb breadcrumb_name "" %}
 {% endblock %}
 
-
-
 {% block toolbar %}
 {% if request.user.is_authenticated %} 
 {% include "menu_toolbar.html" %}
 {% endif %}
 {% endblock %}
 
-
 {% block content %}
 
-
-{% if value_list %}
+{% if qsets %}
+<br />
 
 <div class="span12">
+  <div class="row-fluid">
+    <div class="">
+      <ul class="nav nav-tabs">
+        <li id="li_metadata" class="active" class="">
+          <a href="#A" onclick="navigation_handler('metadata');"data-toggle="tab">Metadata</a>
+        </li>
+        
+        <li id="li_literature" >
+          <a href="#B" onclick="navigation_handler('literature');" data-toggle="tab">Literature</a>
+        </li>        
+        
 
-<table class="table table-bordered  table-hover">
-              <thead>
-                <tr>
-                  <th>Tag</th>
-                  <th>Value</th>
-                  
-                </tr>
-              </thead>
+      </ul>
+    </div>
+  </div>
+  <div id="metadata">
 
-              <tbody>
-              {% for t in value_list %}
-                <tr>
-                  <td>{{ t.tag }}</td>
-                  <td>{{ t.value }}</td>
-                  
-                </tr>
-                {% endfor %}
 
-              </tbody>
-            </table>
+<div class="accordion" id="accordion2">
+  {% for k,qs in qsets.items %}
+  <div class="accordion-group">
+    <div class="accordion-heading">
+      <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapse{{k|removespaces}}">
+        {{k|removeh1}}
+      </a>
+    </div>
+    <div id="collapse{{k|removespaces}}" class="accordion-body collapse">
+      <div class="accordion-inner">
+
+        <table  id="t2" class="table table-bordered  table-hover">
+        <thead>
+        
+        </thead>
+
+        <tbody>
+
+        {% for t in qs.list_ordered_tags %}
+                    <tr>
+                    <td data-original-title="{{ t.tag }}" title="">{{ t.tag }}</td> 
+                   <td data-original-title="{{ t.value }}" title=""> {{ t.value }}</td>
+                  </tr>
+                  {% endfor %}
+                  </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% comment %}
+
+<table  class="table ">
+<thead>
+<tr>
+<th>Tag</th>
+<th>Value</th>
+
+</tr>
+</thead>
+
+<tbody>
+{% for t in value_list %}
+<tr>
+<td>{{ t.tag }}</td>
+<td>{{ t.value }}</td>
+
+</tr>
+{% endfor %}
+</tbody>
+</table>
+{% endcomment %}
 </div>
 </div>
-
-
 {% else %}
-<div class="row">  
-<div class="span4">  
-<div class="alert">  
-  <a class="close" data-dismiss="error">×</a>  
-  <strong>Warning!</strong> You don't have results. 
-</div>  
-</div>  
-</div>  
+<div class="row">
+<div class="span4">
+<div class="alert">
+<a class="close" data-dismiss="error">×</a> <strong>Warning!</strong>
+You don't have results.
+</div>
+</div>
+</div>
 {% endif %}
+</div>
+
+</div>
+
+
+<div id="literature" class="row-fluid span12 hide" >
+
+<div class="accordion" id="accordion2">
+  <div class="accordion-group">
+    <div class="accordion-heading">
+      <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapseOne">
+        Upregulation of chemokines and their receptors in Duchenne muscular dystrophy: potential for attenuation of myofiber necrosis.
+      </a>
+    </div>
+    <div id="collapseOne" class="accordion-body collapse in">
+      <div class="accordion-inner">
+        
+
+    <div id="becas-widget-text" class="widget-container"></div>
+
+      </div>
+    </div>
+  </div>
+  <div class="accordion-group">
+    <div class="accordion-heading">
+      <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapseTwo">
+        Upregulation of chemokines and their receptors in Duchenne muscular dystrophy: potential for attenuation of myofiber necrosis.
+      </a>
+    </div>
+    <div id="collapseTwo" class="accordion-body collapse">
+      <div class="accordion-inner">
+
+
+    <!-- Container to hold another widget -->
+    <div id="becas-widget-pmid" class="widget-container"></div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+
+ 
+
+   
+
+    <!-- Include the widget embedding script -->
+    <script src="//bioinformatics.ua.pt/becas/embed-widget.js"></script>
+    <!-- Use the widgets -->
+    <script>
+        // Initialize widget
+        var becasWidget = new becas.Widget({
+            container: 'becas-widget-text'
+        });
+        // Request text annotation
+        becasWidget.annotateText({
+            // required parameter
+            text: 'In Duchenne muscular dystrophy (DMD), the infiltration of skeletal muscle by immune cells aggravates disease, yet the precise mechanisms behind these inflammatory responses remain poorly understood. Chemotactic cytokines, or chemokines, are considered essential recruiters of inflammatory cells to the tissues.\nWe assayed chemokine and chemokine receptor expression in DMD muscle biopsies (n = 9, average age 7 years) using immunohistochemistry, immunofluorescence, and in situ hybridization.\nCXCL1, CXCL2, CXCL3, CXCL8, and CXCL11, absent from normal muscle fibers, were induced in DMD myofibers. CXCL11, CXCL12, and the ligand-receptor couple CCL2-CCR2 were upregulated on the blood vessel endothelium of DMD patients. CD68(+) macrophages expressed high levels of CXCL8, CCL2, and CCL5.\nOur data suggest a possible beneficial role for CXCR1/2/4 ligands in managing muscle fiber damage control and tissue regeneration. Upregulation of endothelial chemokine receptors and CXCL8, CCL2, and CCL5 expression by cytotoxic macrophages may regulate myofiber necrosis.',
+            // optional parameters
+            groups: {
+                "SPEC": true,
+                "ANAT": true,
+                "DISO": true,
+                "PATH": true,
+                "CHED": true,
+                "ENZY": true,
+                "MRNA": true,
+                "PRGE": true,
+                "COMP": true,
+                "FUNC": true,
+                "PROC": true
+            },
+            success: function () {
+                // Everything went fine, widget is rendered.
+            },
+            error: function (err) {
+                // An error prevented annotation, an error message has rendered.
+            }
+        });
+      
+        // Initialize another widget
+        var becasWidget2 = new becas.Widget({
+            container: 'becas-widget-pmid'
+        });
+        // Request abstract annotation by PMID
+        becasWidget2.annotatePublication({
+            // required parameter
+            pmid: 23225384,
+            // optional parameters
+            groups: {
+                "SPEC": true,
+                "ANAT": true,
+                "DISO": true,
+                "PATH": true,
+                "CHED": true,
+                "ENZY": true,
+                "MRNA": true,
+                "PRGE": true,
+                "COMP": true,
+                "FUNC": true,
+                "PROC": true
+            },
+            success: function () {
+                // Everything went fine, widget is rendered.
+            },
+            error: function (err) {
+                // An error prevented annotation, an error message has rendered.
+            }
+        });
+    </script>
+    <!-- Display a message to users with Javascript deactivated -->
+    <noscript>
+        <div style="position:absolute;top:0;left:0;width:500px;height:250px;border:2px solid #A00;padding:6px;background-color:#fff;color:#600;text-align:center">
+            <h1>This page requires Javascript to function properly.</h1>
+            <h2>Please follow this instructions on how to <a href="http://www.enable-javascript.com/" target="_blank">enable JavaScript in your web browser</a>.</h2>
+        </div>
+    </noscript>
+
+
+
 
 {% endblock %}
+<script type="text/javascript">
+{% block scriptextra %}
+
+function navigation_handler(id)
+{
+
+  if (id=="literature")
+  {
+
+       $('#'+id).removeClass("hide");
+       $('#'+id).addClass("show");
+       
+       $('#li_'+id).addClass("active");
+       $('#metadata').addClass("hide");
+       $('#li_metadata').removeClass("active");
+       $('#metadata').removeClass("show");
+  }
+  else if (id=="metadata")
+  {
+       $('#'+id).addClass("show");
+       $('#'+id).removeClass("hide");
+       $('#li_'+id).addClass("active");
+       $('#literature').addClass("hide");
+       $('#li_literature').removeClass("active");
+       $('#literature').removeClass("show");
+   
+  }
+};
+$('.popover').popover({
+    container: 'body'
+});
+$('.accordion-body.collapse').hover(
+function () {
+$(this).css('overflow','visible');
+}, 
+function () {
+$(this).css('overflow','hidden');
+}
+);
+
+$.fn.textWidth = function() {
+  var node, original, width;
+  original = $(this).html();
+  node = $("<span style='position:absolute;width:auto;left:-9999px'>" + original + "</span>");
+  //node.css('font-family', $(this).css('font-family')).css('font-size', $(this).//css('font-size'));
+  $('body').append(node);
+  width = node.width();
+  node.remove();
+  return width;
+};
+
+$(function() {
+  $('td').each(function() {
+
+    var content;
+    content = $(this).text().replace(/\s+/gi, ' ');
+
+    
+    if ($(this).textWidth() > $(this).width()) {
+    
+      return $(this).tooltip({container:"body"});
+    }
+  });
+});
+
+/* TODO: Toggle + Expand all
+$('.').on('click', function(e) {
+    e.preventDefault();
+    var $this = $(this);
+    var $collapse = $this.closest('.collapse-group').find('.collapse');
+    $collapse.collapse('toggle');
+});
+*/
+
+
+
+{% endblock %}
+
+</script>

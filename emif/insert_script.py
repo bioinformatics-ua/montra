@@ -5,7 +5,7 @@ import md5
 import random
 
 
-from settings import SOLRSOLR_HOST, SOLR_PORT
+#from settings import SOLRSOLR_HOST, SOLR_PORT
 
 
 
@@ -53,21 +53,26 @@ data = {
         'literature_papers_t': "Luis A. Bastiao Silva, Carlos Costa, Jose Luis Olveira. A Secure PACS Cloud Archive in CARS 2011, Berlin, Germany ",
         'population_description_t':'Fat, Headcache'}
 
-import pysolr
-import random
 
-solr = pysolr.Solr('http://' + SOLRSOLR_HOST + ':' + SOLR_PORT+ '/solr', timeout=10)
-for i in range(10):
-        index_db = random.randint(1, len(databasenames))
-        index_institutionnames = random.randint(1, len(institutionnames))
-        index_locations = random.randint(1, len(location))
+import requests
 
-	data['database_name_t'] = institutionnames[index_institutionnames-1] + " " + location[index_locations-1] + " " +databasenames[index_db-1]
-        data['location_t'] = location[index_locations]
-	data['id'] = generate_hash()
-	solr.add([data])
+requests.post("http://127.0.0.1:8000/api/insert", data)
+
+#import pysolr
+#import random
+
+#solr = pysolr.Solr('http://' + SOLRSOLR_HOST + ':' + SOLR_PORT+ '/solr', timeout=10)
+#for i in range(10):
+#        index_db = random.randint(1, len(databasenames))
+#        index_institutionnames = random.randint(1, len(institutionnames))
+#        index_locations = random.randint(1, len(location))
+
+#	data['database_name_t'] = institutionnames[index_institutionnames-1] + " " + location[index_locations-1] + " " +databasenames[index_db-1]
+#        data['location_t'] = location[index_locations]
+#	data['id'] = generate_hash()
+#	solr.add([data])
 	
-	solr.optimize()
+#	solr.optimize()
 
 
 #curl -v -H "Accept: application/json" -H "Content-type: application/json" -X POST -d ' {"user":{"first_name":"firstname","last_name":"lastname","email":"email@email.com","password":"app123","password_confirmation":"app123"}}' http://127.0.0.1:8000/api/insert
