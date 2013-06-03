@@ -368,8 +368,6 @@ def results_diff(request, page=1, template_name='results_diff.html'):
         db.fields = list_values
         list_databases_final.append(db)
 
-
-
     list_results.d1 = list_databases_final[0]
     list_results.d2 = list_databases_final[1]
     list_results.d3 = list_databases_final[2]
@@ -384,7 +382,12 @@ def results_diff(request, page=1, template_name='results_diff.html'):
 
 def geo(request, template_name='geo.html'):
 
-    return render(request, template_name, {'request': request, 'list_cities': ['Aveiro, Portugal', 'Berlin, Germany']})
+    list_databases = get_databases_from_solr(request, "*:*")
+    list_locations = []
+    for database in list_databases:
+        list_locations.append(database.location)
+    return render(request, template_name, {'request': request, 
+        'list_cities': list_locations})
 
 
 def statistics(request, template_name='statistics.html'):
@@ -725,7 +728,8 @@ def get_databases_from_solr(request, query="*:*"):
             database_aux.ttype = questionnaires_ids[r['type_t']]
             list_databases.append(database_aux)
         except:
-            raise
+            pass
+            #raise
     return list_databases
 
 def delete_fingerprint(request, id):
