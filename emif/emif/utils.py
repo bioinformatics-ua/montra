@@ -81,7 +81,11 @@ class Tag:
         def __init__(self):
             self.tag = ''
             self.value = ''
-            self.extra = ''    
+            self.extra = ''   
+
+        def __cmp__(self, other):
+            return other.tag == self.tag
+
         def __str__(self):
             return self.tag + ", " + self.value 
 

@@ -772,15 +772,37 @@ def createqsets(runcode, qsets=None):
     c = CoreEngine()
     results = c.search_fingerprint('id:'+runcode)
 
-    
     if qsets==None:
         qsets = {}
     name = ""
     list_values = []
     blacklist = ['created_t', 'type_t', '_version_']
     name = "Not defined"
+
     for result in results:
+
+        print result['type_t']
+        # Get the slug of fingerprint type 
+        q_aux = Questionnaire.objects.filter(slug=result['type_t'])
+        print q_aux
+        
+        list_qsets = QuestionSet.objects.filter(questionnaire=q_aux[0]).order_by('sortid')
+        
+        for qset in list_qsets:
+            if (qset.sortid!=0 and qset.sortid!=99):
+                question_group = QuestionGroup()
+                list_questions = Question.objects.filter(questionset=qset).order_by('number')
+                for question in list_questions:
+                    t = Tag()
+                    t.tag = question.text
+                    t.value = ""
+                    question_group.list_ordered_tags.append(t)
+
+
+                qsets[qset.text] = question_group
+        print list_qsets
         print "results"
+
         for k in result:
             if k in blacklist:
                 continue
@@ -791,10 +813,10 @@ def createqsets(runcode, qsets=None):
             if len(aux_results)>0:
                 text = aux_results[0].description 
                 qs = aux_results[0].question.questionset.text
+
                 if qsets.has_key(qs):
                     # Add the Tag to the QuestionGroup
                     question_group = qsets[qs] 
-                    
                 else:
                     question_group = QuestionGroup()
                     qsets[qs] = question_group
@@ -803,9 +825,11 @@ def createqsets(runcode, qsets=None):
                 text = k
             #print qs
             #info = text[:75] + (text[75:] and '..')
+            
             info = text
             t.tag = info
-
+            if question_group!= None and question_group.list_ordered_tags!= None and question_group.list_ordered_tags.index(t)!=0:
+                t = question_group.list_ordered_tags[question_group.list_ordered_tags.index(t)]
             value = clean_value(str(result[k].encode('utf-8')))
             #value = value[:75] + (value[75:] and '..')
 
@@ -817,7 +841,9 @@ def createqsets(runcode, qsets=None):
                 question_group.list_ordered_tags.append(t)
                 #qsets[qs] = question_group
         break
+    print "List of qsets " + str(qsets)
     return (qsets, name)
+
 
 def fingerprint(request, runcode, qs, template_name='database_info.html'):    
     
