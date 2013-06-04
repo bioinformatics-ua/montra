@@ -83,6 +83,10 @@ class Tag:
             self.value = ''
             self.extra = ''   
 
+        def __eq__(self, other):
+            return other.tag == self.tag
+
+
         def __cmp__(self, other):
             return other.tag == self.tag
 
