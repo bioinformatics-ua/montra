@@ -842,7 +842,10 @@ def createqsets(runcode, qsets=None):
                 name = t.value
             list_values.append(t)
             if question_group!=None:
-                question_group.list_ordered_tags.remove(t)
+                try:
+                    question_group.list_ordered_tags.remove(t)
+                except:
+                    pass
                 question_group.list_ordered_tags.append(t)
                 #qsets[qs] = question_group
         break
