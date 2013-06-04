@@ -828,8 +828,12 @@ def createqsets(runcode, qsets=None):
             
             info = text
             t.tag = info
-            if question_group!= None and question_group.list_ordered_tags!= None and question_group.list_ordered_tags.index(t)!=0:
-                t = question_group.list_ordered_tags[question_group.list_ordered_tags.index(t)]
+            if question_group!= None and question_group.list_ordered_tags!= None:
+                try:
+                    t = question_group.list_ordered_tags[question_group.list_ordered_tags.index(t)]
+                except:
+                    pass
+                    
             value = clean_value(str(result[k].encode('utf-8')))
             #value = value[:75] + (value[75:] and '..')
 
