@@ -220,9 +220,9 @@ def results_fulltext_aux(request, query, page=1, template_name='results.html'):
     list_results.num_results=results.hits
     list_results.list_results=pp.page(page)
     list_results.paginator = pp
-
+    query_old = request.session.get('query', "")
     return render(request, template_name, {'request': request, 
-        'list_results': list_results, 'page_obj': pp.page(page)})
+        'list_results': list_results, 'page_obj': pp.page(page), 'search_old':query_old})
 
 
 def store_query(user_request, query_executed):
@@ -376,7 +376,7 @@ def results_diff(request, page=1, template_name='results_diff.html'):
     list_results.num_results=len(list_databases)
 
     return render(request, template_name, {'request': request, 
-        'results': list_results})
+        'results': list_results, 'search_old':query})
 
 
 
