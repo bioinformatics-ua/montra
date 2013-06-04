@@ -833,7 +833,7 @@ def createqsets(runcode, qsets=None):
                     t = question_group.list_ordered_tags[question_group.list_ordered_tags.index(t)]
                 except:
                     pass
-                    
+
             value = clean_value(str(result[k].encode('utf-8')))
             #value = value[:75] + (value[75:] and '..')
 
@@ -842,10 +842,19 @@ def createqsets(runcode, qsets=None):
                 name = t.value
             list_values.append(t)
             if question_group!=None:
+                question_group.list_ordered_tags.remove(t)
                 question_group.list_ordered_tags.append(t)
                 #qsets[qs] = question_group
         break
     print "List of qsets " + str(qsets)
+    #for qg in qsets:
+    #    print qg
+    #    for tt in qsets[qg].list_ordered_tags:
+    #        try:
+    #            print tt
+    #        except:
+    #            pass
+    #    #print qsets[qg].list_ordered_tags
     return (qsets, name)
 
 
