@@ -80,7 +80,6 @@
                                 {% show_fingerprints %}
                               </ul>
                             </li>
-                              
 
                             </ul>
                           </li>
@@ -124,7 +123,9 @@
                         </form>
                         {% else %}
                         <p class="navbar-text pull-right">
-                          <em>{{ request.user.get_full_name }}</em> [ <a href="{% url 'userena_signout' %}" class="navbar-link">Sign out</a> ]
+                          
+
+                          {% comment %}<em>{{ request.user.get_full_name }}{% comment %}</em> [ <a href="{% url 'userena_signout' %}" class="navbar-link">Sign out</a> ]
                         </p>
                         {% endif %}
                         {% endblock %}
