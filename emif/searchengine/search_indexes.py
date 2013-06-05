@@ -198,7 +198,7 @@ def index_answeres_from_qvalues(qvalues, questionnaire, subject, fingerprint_id)
                 if value!=None:
                     text += value + " " 
             except:
-                raise
+                pass
     #print("Indexing...")
     results = c.search_fingerprint("id:"+fingerprint_id)
     if (len(results)>0):
