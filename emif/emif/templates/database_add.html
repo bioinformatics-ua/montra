@@ -65,7 +65,6 @@ button {
       <li class="nav-header">Step-by-Step</li>
       {% for qs in questionset.questionnaire.questionsets %}
 
-      
       <li{% if questionset.text == qs.text %} class="active" {% endif %} id="li_qs_{{qs.sortid}}">
         <!--<a href="q2/{{runinfo.random}}/{{ qs.sortid }}">
         -->
@@ -149,7 +148,6 @@ function questionsets_handle(id_questionset)
        $('#active_qs_sortid').val(id_questionset.id);
        
     }
-  
     else {
       $('#li_'+obj.id).removeClass("active");
       $('#'+obj.id).addClass("hide");
