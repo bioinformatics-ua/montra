@@ -24,14 +24,15 @@
   <div class="btn-group pull-right">
 
     <div class="btn-group">
-      <a class="btn" href="" onclick="hidecheckbox(); return false;"> <i class="icon-edit icon" ></i>
-        Edit results
-      </a>
-
     </div>
-    <a class="btn" href="" onclick="$('#result_form').submit(); return false; "> <i class="icon-plus icon"></i>
+    <a class="btn" href="" onclick="$('#result_form').submit(); return false; "> <i class=" icon"></i>
       Compare
     </a>
+
+    <a class="btn" href="geo" onclick=""> <i class=" icon"></i>
+      Geolocation
+    </a>
+
   </div>
 </div>
 
@@ -102,7 +103,7 @@
 
          <div class="span1 pull-right" style="text-align:right; padding-top:5px; max-width:15px;">
 
-            <input class="checkbox" type="checkbox" name="chk_{{ result.id }}" style="display:none; or visibility:hidden;">
+            <input class="checkbox" type="checkbox" name="chk_{{ result.id }}">
           </div>
 
             <div class="span3 pull-right " style="max-width:165px">
