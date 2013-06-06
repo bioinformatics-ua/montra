@@ -24,7 +24,7 @@ import os.path
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
-SITE_NAME = "EMIF Platform - Fingerprint Browser"
+SITE_NAME = "EMIF Catalogue"
 
 #BASE_URL = '/emif-dev/'
 BASE_URL = '/'
