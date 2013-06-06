@@ -25,7 +25,7 @@
 
     <div class="btn-group">
     </div>
-    <a class="btn" href="" onclick="$('#result_form').submit(); return false; "> <i class=" icon"></i>
+    <a class="btn"  href="" onclick="$('#result_form').submit(); return false; " rel="tooltip" data-container="body" data-placement="bottom" data-original-title="You only can select two databases for a comparison"> <i  class=" icon"></i>
       Compare
     </a>
 
@@ -180,6 +180,18 @@ $('.checkbox').click(function()
     }
 
 });
+$('[rel=tooltip]').tooltip() 
+$('.popover').popover({
+    container: 'body'
+});
+$('.accordion-body.collapse').hover(
+function () {
+$(this).css('overflow','visible');
+}, 
+function () {
+$(this).css('overflow','hidden');
+}
+);
 
 
 {% endblock %}
