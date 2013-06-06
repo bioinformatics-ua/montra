@@ -381,8 +381,11 @@ def results_diff(request, page=1, template_name='results_diff.html'):
 
 
 def geo(request, template_name='geo.html'):
-
-    list_databases = get_databases_from_solr(request, "*:*")
+    query = request.session['query']
+    if query == None:
+        query = "*:*"
+    print "query@" + query 
+    list_databases = get_databases_from_solr(request, query)
     list_locations = []
     for database in list_databases:
         list_locations.append(database.location)
