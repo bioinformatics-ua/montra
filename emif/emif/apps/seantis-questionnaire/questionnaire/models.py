@@ -72,6 +72,7 @@ class Questionnaire(models.Model):
     name = models.CharField(max_length=128)
     redirect_url = models.CharField(max_length=128, help_text="URL to redirect to when Questionnaire is complete. Macros: $SUBJECTID, $RUNID, $LANG", default="/static/complete.html")
     slug = models.CharField(max_length=128)
+    disable = models.CharField(max_length=128)
 
     def __unicode__(self):
         return self.name

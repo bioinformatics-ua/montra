@@ -18,12 +18,10 @@ def removespaces(value):
     value = value.replace(',','')
     result = value.replace(' ','')
 
-    
     return result
 
-
 def fingerprints_list():
-    
+
     objs = Questionnaire.objects.all()
     results = {}
     for q in objs:
@@ -34,7 +32,7 @@ def fingerprints_list():
 
 def fingerprints_list():
     
-    objs = Questionnaire.objects.all()
+    objs = Questionnaire.objects.filter(disable=False)
     results = {}
     for q in objs:
         results[q.id] = q.name

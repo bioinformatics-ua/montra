@@ -27,6 +27,7 @@ class Migration(SchemaMigration):
             ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
             ('name', self.gf('django.db.models.fields.CharField')(max_length=128)),
             ('slug', self.gf('django.db.models.fields.CharField')(max_length=128)),
+            ('disable', self.gf('django.db.models.fields.NullBooleanField')()),
             ('redirect_url', self.gf('django.db.models.fields.CharField')(default='/static/complete.html', max_length=128)),
         ))
         db.send_create_signal('questionnaire', ['Questionnaire'])
@@ -167,6 +168,7 @@ class Migration(SchemaMigration):
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'name': ('django.db.models.fields.CharField', [], {'max_length': '128'}),
             'slug': ('django.db.models.fields.CharField', [], {'max_length': '128'}),
+            'disable': ('django.db.models.fields.NullBooleanField', [], {'default': 'False'}),
             'redirect_url': ('django.db.models.fields.CharField', [], {'default': "'/static/complete.html'", 'max_length': '128'})
         },
         'questionnaire.questionset': {

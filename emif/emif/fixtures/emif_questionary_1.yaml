@@ -1,6 +1,6 @@
 # Questionnaire 
 - pk: 1
-  fields: {name: "Observational data sources", redirect_url: /}
+  fields: {name: "Observational data sources", disable: False, redirect_url: /}
   model: questionnaire.questionnaire
 
 # Question Sets 
@@ -578,7 +578,7 @@ Would you be able to create such a table for the population of in your database?
 
 
 - pk: 2
-  fields: {name: "Research Cohorts", redirect_url: /}
+  fields: {name: "Research Cohorts", disable: True, redirect_url: /}
   model: questionnaire.questionnaire
 
 

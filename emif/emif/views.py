@@ -1666,8 +1666,6 @@ def feedback(request):
 def feedback_thankyou(request):
         return render_to_response('feedback_thankyou.html')
 
-
-
 def show_fingerprint_page(request, runinfo, errors={}, template_name='database_edit.html'):
     """
     Return the QuestionSet template
