@@ -43,15 +43,24 @@ body {
 <div class="container-narrow">
   <div class="jumbotron">
     <h1>Welcome to the EMIF Catalogue!</h1>
-    <p class="lead">This is a prototype of EMIF Catalogue v0.1, which is currently under development.</p>
+    <br />
+    <p style="text-align: justify" class="">
+The EMIF Catalogue is an on-going work of the IMI-funded research project EMIF (European Medical Information Framework). 
+This system is continuously under development and we welcome your ideas and suggestions for improving this catalogue.
+<br />
+We make no warranty and cannot be held responsible for any information retrieved and displayed in this catalogue.</p>
     
     {% if not request.user.is_authenticated %}
     <a class="btn btn-medium btn-success" href="accounts/signup/">Sign up for EMIF Fingerprint Browser</a>
     {% endif %}
 <div style="padding-top:20px">
+{% comment %}
 <p>
+  
     <iframe width="560" height="315" src="http://www.youtube.com/embed/T7jWD-JjM8Q" frameborder="0" allowfullscreen></iframe>
+
 </p>
+{% endcomment %}
 </div>
   </div>
 
