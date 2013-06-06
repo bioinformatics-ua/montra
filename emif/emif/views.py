@@ -385,7 +385,7 @@ def geo(request, template_name='geo.html'):
     if query == None:
         query = "*:*"
     print "query@" + query 
-    list_databases = get_databases_from_solr(request, query)
+    list_databases = get_databases_from_solr(request, 'text_t:'+query)
     list_locations = []
     for database in list_databases:
         list_locations.append(database.location)
