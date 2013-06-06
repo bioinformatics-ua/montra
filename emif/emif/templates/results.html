@@ -17,117 +17,96 @@
 {% endblock %}
 
 {% block toolbar %}
-
 <form id="result_form" action="resultscomp" method="POST">
-{% csrf_token %}
-<div class="span6">
-  <div class="btn-group pull-right">
+  {% csrf_token %}
+  <div class="span6">
+    <div class="btn-group pull-right">
 
-    <div class="btn-group">
+      <div class="btn-group"></div>
+      <a id="comparabtn" class="btn "  href="" onclick="$('#result_form').submit(); return false; " rel="tooltip" data-container="body" data-placement="bottom" data-original-title="You only can select two databases for a comparison" disabled> <i  class=" icon"></i>
+        Compare
+      </a>
+
+      <a class="btn" href="geo" onclick="return false;" > <i class=" icon"></i>
+        Geolocation
+      </a>
+
     </div>
-    <a class="btn"  href="" onclick="$('#result_form').submit(); return false; " rel="tooltip" data-container="body" data-placement="bottom" data-original-title="You only can select two databases for a comparison"> <i  class=" icon"></i>
-      Compare
-    </a>
-
-    <a class="btn" href="geo" onclick=""> <i class=" icon"></i>
-      Geolocation
-    </a>
-
   </div>
-</div>
-
-{% endblock %}
+  {% endblock %}
 
 {% load bootstrap_pagination %}
 
 {% block content %}
-
-
-<div class"row">
-  <div class="span12" style="text-align:center">
-    <img src="static/img/emif_logo.png" alt="EMIF Logo" style="width: 80px; height: 81px;" />
-    <h2>Quick Search</h2>
-  </div>
-
-  <div class="span12" style="text-align:center">
-    <div class="navbar" id="loading">
-      <div class="navbar-inner">
-
-        <h4>
-          {% if page_obj != None %}
-          <span id="results_size"></span>
-          total results for
-          <span class="label label-inverse">{{list_results.num_results}}</span>
-          {% else %}
-          <span id="results_size"></span>
-          No results found 
-          {% endif %}
-        </h4>
-      </div>
+  <div class"row">
+    <div class="span12" style="text-align:center">
+      <img src="static/img/emif_logo.png" alt="EMIF Logo" style="width: 80px; height: 81px;" />
+      <h2>Quick Search</h2>
     </div>
-  </div>
 
+    <div class="span12" style="text-align:center">
+      <div class="navbar" id="loading">
+        <div class="navbar-inner">
 
-  {% if page_obj != None %}
-
-  {% for result in list_results.list_results %}
-  <div class="span12" >
-    <div class="navbar" id="loading">
-
-      <div class="navbar-inner hoverDiv">
-        <div class"row-fluid hoverDiv">
-          <div class="pull-left span6" style="text-align:left">
-             <a href="fingerprint/{{ result.id }}/1"><span class="label label-success" style="font-size:15px">
-              {{ result.name }}
-
-            </span>
-            </a>
-            <div >
-             Institution Name: {{result.institution}}
-            </div>
-
-            <div >
-             Location: {{result.location}}
-            </div>
-            <div >
-             Number of patients: {{result.number_patients}}
-            </div>
-
-            <div >
-            Last change: {{result.date}}
-              
-            </div>
-          </div >
-          <div class="span5" style="margin-top:60px">
-            <div class="row " >
-
-         <div class="span1 pull-right" style="text-align:right; padding-top:5px; max-width:15px;">
-
-            <input class="checkbox" type="checkbox" name="chk_{{ result.id }}">
-          </div>
-
-            <div class="span3 pull-right " style="max-width:165px">
-              <a class="btn btn-small btn-success" href="contact/{{result.email_contact}}">Contact</a>
-               <a class="btn btn-small btn-success" href="fingerprint/{{result.id}}/1/">Fingerprint</a>
-               {% comment %}
-              <a class="btn btn-small btn-success" href="advancedSearch/1">More like this</a>
-              {% endcomment %}
-            </div>
-           
-          </div>
-          </div>
+          <h4>
+            {% if page_obj != None %}
+            <span id="results_size"></span>
+            total results for
+            <span class="label label-inverse">{{list_results.num_results}}</span>
+            {% else %}
+            <span id="results_size"></span>
+            No results found 
+          {% endif %}
+          </h4>
         </div>
       </div>
-
     </div>
-  </div>
-  {% endfor %}
+    {% if page_obj != None %}
+
+  {% for result in list_results.list_results %}
+    <div class="span12" >
+      <div class="navbar" id="loading">
+
+        <div class="navbar-inner hoverDiv">
+          <div class"row-fluid hoverDiv">
+            <div class="pull-left span6" style="text-align:left">
+              <a href="fingerprint/{{ result.id }}/1">
+                <span class="label label-success" style="font-size:15px">{{ result.name }}</span>
+              </a>
+              <div >Institution Name: {{result.institution}}</div>
+
+              <div >Location: {{result.location}}</div>
+              <div >Number of patients: {{result.number_patients}}</div>
+
+              <div >Last change: {{result.date}}</div>
+            </div >
+            <div class="span5" style="margin-top:60px">
+              <div class="row " >
+
+                <div class="span1 pull-right" style="text-align:right; padding-top:5px; max-width:15px;">
+
+                  <input class="checkbox" type="checkbox" name="chk_{{ result.id }}"></div>
+
+                <div class="span3 pull-right " style="max-width:165px">
+                  <a class="btn btn-small btn-success" href="contact/{{result.email_contact}}">Contact</a>
+                  <a class="btn btn-small btn-success" href="fingerprint/{{result.id}}/1/">Fingerprint</a>
+                  {% comment %}
+                  <a class="btn btn-small btn-success" href="advancedSearch/1">More like this</a>
+                  {% endcomment %}
+                </div>
+
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+    {% endfor %}
 
   {% endif %}
-
-
-</form>
-{% if page_obj != None %}
+  </form>
+  {% if page_obj != None %}
 
 {% bootstrap_paginate page_obj range=10 url_view_name="views.results_diff" show_prev_next="false" show_first_last="true"%}
 {% endif %}
@@ -135,7 +114,7 @@
 {% endblock %}
 
 {% comment %}
-<script type="text/javascript" >
+  <script type="text/javascript" >
 {% endcomment %}
 
 {% block scriptextra %}
@@ -144,8 +123,16 @@ function hidecheckbox()
 {
   $('.checkbox').toggle();
 }
+/*
+$("#comparabtn").bind('click',function(e)
+        { 
+          //e.preventDefault(); 
+          //e.stopPropagation();
+          return false;
+        });
 
-
+$("#comparabtn").unbind();
+*/
 $('.checkbox').click(function()
 {
     if($(this).is(':checked')){
@@ -156,24 +143,32 @@ $('.checkbox').click(function()
     }
     if (counter==2)
     {
-
+      $("#comparabtn").removeAttr('disabled');
+      
       $('.checkbox').each(function(cbox)
       {
         console.log(this);
           
         if(!$(this).is(':checked')){
-            $(this).toggle();
+            $(this).prop('disabled', true);
         };
       });
       
     }
     else
     {
-
+      $("#comparabtn").attr('disabled', true);
+      $("#comparabtn").bind('click',function(e)
+        { 
+          e.preventDefault(); 
+          return false;
+        });
+      console.log($("#comparabtn"))
       $('.checkbox').each(function(cbox)
       {
         
-        $(this).show();
+        $(this).prop('disabled', false);
+
         
       });
 
@@ -198,4 +193,4 @@ $(this).css('overflow','hidden');
 
 {% comment %}
 </script>
-{% endcomment %}
+  {% endcomment %}
