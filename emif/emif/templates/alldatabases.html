@@ -9,6 +9,17 @@
 
 {% endblock %}
 
+
+{% block headextra %}
+<link rel="stylesheet" href="static/css/theme.blue.css">
+{% endblock %}
+
+
+{% block scriptextraincludes %}
+
+<script src="static/js/vendor/jquery.tablesorter.min.js"></script>
+{% endblock %}
+
 {% block styleextra %}
 
 button {
@@ -30,7 +41,7 @@ button {
 {% block content %}
 
 {% if list_databases %}
-<table class="table table-hover" id="table_databases" data-provides="rowlink">
+<table class="table table-hover tablesorter" id="table_databases" data-provides="rowlink">
     <thead>
         <tr>
             <th></th>
@@ -109,6 +120,20 @@ button {
 {% comment %}
 <script>
 {% endcomment %}
+
+$(function() {
+
+  // call the tablesorter plugin
+  $("table").tablesorter({
+    theme : 'blue',
+
+    // sort on the first column and third column in ascending order
+    sortList: [[0,0],[2,0]]
+  });
+
+});
+
+
 $('#li_workspace').addClass("active");
 
 $('#modal-from-dom').bind('show', function() {
