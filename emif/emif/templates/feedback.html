@@ -6,9 +6,14 @@
 
 {% block content%}
 
+<div class="row">
+  <div class="span6 center">
        <div id="contact_wrap" class="rows">
-        Give feedback.
-        <div id="contact" class="clearfix" style="margin-left:30%">
+        
+Your feedback is highly appreciated. We want to hear your feedback and incorporate your ideas into improving and expanding what is on this catalogue.
+Looking forward to your input.
+
+        <div id="contact" class="clearfix" style="">
             <div id="c_form">
                 <br /><br />
                 <form name="theform" action="contact/{{email_to}}" method="post" id="theform">
@@ -26,7 +31,9 @@
 
                     </div><!-- end message -->
                     <div id="submit">
-                        <input type="submit" name="submit" value="Send" />
+                        
+
+                        <button class="btn btn-primary" name="submit" type="submit">Send</button>
                     </div><!-- end submit -->
                     <input class="hidden" type="hidden" name="topic" value="Home : Contact Form Submission" id="subject" />
                 </form>
@@ -35,7 +42,8 @@
         </div><!-- end contact -->
 
     </div><!-- end contact_wrap -->
-
+</div>
+</div>
 
 {% endblock %}
 
