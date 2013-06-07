@@ -858,7 +858,7 @@ def createqsets(runcode, qsets=None):
                 try:
                     question_group.list_ordered_tags[question_group.list_ordered_tags.index(t)] = t
                 except:
-                    raise
+                    pass
                 #qsets[qs] = question_group
         break
     print "List of qsets " + str(qsets)
