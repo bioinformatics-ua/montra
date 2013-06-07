@@ -32,9 +32,44 @@ th, td {
   filter: alpha(opacity=100);
 }
 
-
 {% endblock %}
 
+
+{% block toolbar %}
+<form id="result_form" action="resultscomp" method="POST">
+  {% csrf_token %}
+  <div class="span6">
+    <div class="btn-group pull-right">
+
+      <div class="btn-group"></div>
+      
+      <a id="collapseall" class="btn" href="" >
+        Collapse all
+      </a>
+
+      
+
+      <div class="btn-group">
+        <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
+    Show/Hide
+    <span class="caret"></span>
+  </a>
+    
+
+
+  <ul class="dropdown-menu">
+    <!-- dropdown menu links -->
+    <li><a href="#">Match</a></li>
+    <li><a href="#">Unmatch</a></li>
+    <li><a href="#">Proximity</a></li>
+    <li><a href="#">Empty rows</a></li>
+  </ul>
+</div>
+
+      
+    </div>
+  </div>
+  {% endblock %}
 
 {% block content %}
 <div class="span12">
@@ -82,13 +117,61 @@ style="margin-left: 0px;"
 
 {% endblock %}
 
+
+
 {% comment %}
 <script type="text/javascript" >
 {% endcomment %}
-
-
-
 {% block scriptextra %}
+
+
+$("#collapseall").bind('click',function(e)
+        { 
+          e.preventDefault(); 
+          e.stopPropagation();
+          
+          if ($(this).text().indexOf('Collapse')!==-1)
+          {
+            $(this).text('Expand all');
+            change_name_collapse(false);
+          }
+          else
+          {
+              $(this).text('Collapse all');
+              change_name_collapse(true);
+
+          }
+            
+          return false;
+        });
+
+function change_name_collapse(value)
+{
+
+  
+    {% for name, qset in results %}
+      {% for k,v in qset.items %}
+
+
+    $("div[id^='collapse']").filter(function(){
+    var regexp = /^collapse(.*)$/;
+    return (this.id.match(regexp));
+    }).each(function(){
+    //this.innerHTML = this.id;
+    console.log(this.id);
+    var current = "'" + {{name|removespaces}}_{{k|removespaces}} + "'";
+    if (this.id.indexOf(current))
+    { 
+      $('#'+this.id).collapse('toggle'); 
+    };
+    });
+
+      //show_hide_empty_rows(['{{name|removespaces}}_{{k|removespaces}}'], value);
+      {% endfor %}
+      {% endfor %}
+      return false;
+};
+
 function hidecheckbox()
 {
   console.log("togle");
@@ -201,14 +284,6 @@ comparetable('{{name|removespaces}}_{{k|removespaces}}',  '{{database_to_compare
 {% comment %}
 </script>
 {% endcomment %}
-
-
-
-
-
-
-
-
 
 
 {% endblock %}

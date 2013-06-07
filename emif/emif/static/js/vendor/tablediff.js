@@ -23,7 +23,7 @@
  * @param  {[type]} table     [description]
  * @param  {[type]} cell_name [description]
  * @param  {[type]} value     [description]
- * @return {[type]}           [description]
+ * @return {[type]}           1 = 
  */
 compare_cell = function(table, cell_name, value)
 {	
@@ -47,12 +47,19 @@ compare_cell = function(table, cell_name, value)
 		  				{
 		  					//console.log("FOUND: " + value.data);
 		  					//console.log($(this.childNodes[3].childNodes[0])[0].textContent);
+		  					//console.log($(this.childNodes[3].childNodes[0])[0].textContent.indexOf(value.data));
 		  					//if (value.data.indexOf($(this.childNodes[3].childNodes[0]).context) !== -1))
-							if ($(this.childNodes[3].childNodes[0])[0].textContent.indexOf(value.data) !== -1)
+							if ($(this.childNodes[3].childNodes[0])[0].textContent.indexOf(value.data) !== -1 && $(this.childNodes[3].childNodes[0])[0].textContent === value.data)
 		  					{
 		  						//console.log("True: " + value.data);
 		  						result_final = 1;
 		  						return false;
+		  					}
+		  					else if ($(this.childNodes[3].childNodes[0])[0].textContent.indexOf(value.data) >= 0 && $(this.childNodes[3].childNodes[0])[0].textContent !== value.data)
+		  					{
+
+		  						result_final = 2;
+		  						return result_final;
 		  					}
 		  					$(this.childNodes[1]).addClass("success");
 		  					$(this.childNodes[1]).add("found");
@@ -92,7 +99,7 @@ comparetable = function(table1, table2){
 	  $('#'+ table1).each(function() {
 	  	//console.log($(this.childNodes[3].childNodes));
 	  	$(this.childNodes[3].childNodes).each(function()
-	  	{
+	  	{	
 	  		//console.log($(this.childNodes));
 			$(this).each(function()
 		  	{	
@@ -105,6 +112,8 @@ comparetable = function(table1, table2){
 		  				//console.log('Result: ' + result );
 		  				if (result==1)
 		  					$(this).addClass("success");
+		  				else if (result==2)
+		  					$(this).addClass("warning");
 		  				else
 		  					$(this).addClass("error");
 		  				//console.log($(this));	
@@ -166,7 +175,7 @@ cleantablediff = function(list_tables)
 {
 	$(list_tables).each(function(table_tmp)
 	{
-		console.log(list_tables[table_tmp]);
+		//console.log(list_tables[table_tmp]);
 		$('#'+ list_tables[table_tmp]).each(function() 
 		{
 	  	//console.log($(this.childNodes[3].childNodes));
@@ -182,10 +191,85 @@ cleantablediff = function(list_tables)
 	  					$(this).removeClass("error");
 		  			}
 		  	});		
-	  		
 	  	});
 
 	});
 	});
 
 };
+
+function show_hide_match(list_tables, show)
+{
+
+	$(list_tables).each(function(table_tmp)
+	{
+
+		if (show)
+		{
+			$('#' + list_tables[table_tmp] + ' .success').show();	
+		}
+		else
+		{
+			$('#' + list_tables[table_tmp] + ' .success').hide();	
+		}
+		
+	});
+};
+
+function show_hide_unmatch(list_tables, show)
+{
+	$(list_tables).each(function(table_tmp)
+	{
+		if (show)
+		{
+			$('#' + list_tables[table_tmp] + ' .error').show();	
+		}
+		else
+		{
+			$('#' + list_tables[table_tmp] + ' .error').hide();	
+		}
+	});
+};
+
+function show_hide_proximity(list_tables, show)
+{
+	$(list_tables).each(function(table_tmp)
+	{
+		if (show)
+		{
+			$('#' + list_tables[table_tmp] + ' .warning').show();	
+		}
+		else
+		{
+			$('#' + list_tables[table_tmp] + ' .warning').hide();	
+		}
+	});
+};
+
+function show_hide_empty_rows(list_tables, show)
+{
+	$(list_tables).each(function(table_tmp)
+	{
+		console.log(list_tables[table_tmp]);
+		$("#" + list_tables[table_tmp]+" tr").each(function() {        
+		    var cell = $.trim($($(this).find('td')[1]).text());
+		    console.log(cell);
+		    if (cell.length == 0){
+		        //console.log('empty');
+		        //$(this).addClass('nodisplay');
+		        if (show)
+		        {
+		        	$(this).closest('tr').show();
+		        }
+		        else
+		        {
+		        	$(this).closest('tr').hide();	
+		        }
+		        
+		    }                   
+		});
+	});
+};
+
+
+
