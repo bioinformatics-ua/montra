@@ -9,6 +9,18 @@
 
 {% endblock %}
 
+
+{% block headextra %}
+<link rel="stylesheet" href="static/css/theme.blue.css">
+{% endblock %}
+
+
+{% block scriptextraincludes %}
+
+<script src="static/js/vendor/jquery.tablesorter.min.js"></script>
+{% endblock %}
+
+
 {% block styleextra %}
 
 .hoverDiv {background: #fff;}
@@ -62,8 +74,41 @@
       </div>
     </div>
     {% if page_obj != None %}
+<table class="table table-hover tablesorter" id="table_databases" data-provides="rowlink">
+    <thead>
+        <tr>
+            <th></th>
+            <th>Name</th>
+            <th>Date</th>
 
-  {% for result in list_results.list_results %}
+        </tr>
+    </thead>
+    <tbody>
+
+
+  {% for t in list_results.list_results %}
+
+   <tr>
+            <td><img src="static/upload_images/{{t.logo}}" width="50px" height="50px"/></td>
+          
+          <td>
+            <a href="fingerprint/{{ t.id }}/2">{{ t.name }}</a>
+
+            <div style="margin-left:20px">
+             Institution Name: {{t.institution}}
+            </div>
+
+            <div style="margin-left:20px">
+             Location: {{t.location}}
+            </div>
+            <div style="margin-left:20px">
+             Number of patients: {{t.number_patients}}
+            </div>
+        </td>
+          <td>{{ t.date }} </td>
+          
+        </tr>
+  {% comment %}
     <div class="span12" >
       <div class="navbar" id="loading">
 
@@ -89,10 +134,11 @@
 
                 <div class="span3 pull-right " style="max-width:165px">
                   <a class="btn btn-small btn-success" href="contact/{{result.email_contact}}">Contact</a>
+                  
                   <a class="btn btn-small btn-success" href="fingerprint/{{result.id}}/1/">Fingerprint</a>
-                  {% comment %}
+                  
                   <a class="btn btn-small btn-success" href="advancedSearch/1">More like this</a>
-                  {% endcomment %}
+                  
                 </div>
 
               </div>
@@ -102,8 +148,11 @@
 
       </div>
     </div>
+    {% endcomment %}
     {% endfor %}
 
+    </tbody>
+</table>
   {% endif %}
   </form>
   {% if page_obj != None %}
@@ -118,6 +167,21 @@
 {% endcomment %}
 
 {% block scriptextra %}
+
+
+$(function() {
+
+  // call the tablesorter plugin
+  $("table").tablesorter({
+    theme : 'blue',
+
+    // sort on the first column and third column in ascending order
+    sortList: [[0,0],[2,0]]
+  });
+
+});
+
+
 var counter = 0;
 function hidecheckbox()
 {

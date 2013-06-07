@@ -39,8 +39,8 @@ compare_cell = function(table, cell_name, value)
 		  	{	
 		  			if (this.tagName=="TR")
 		  			{
-		  				$('#t11').addClass("warning");
-		  				$(this.childNodes[1]).addClass("success");
+		  				//$('#t11').addClass("warning");
+		  				//$(this.childNodes[1]).addClass("success");
 		  				try
 		  				{
 		  				if ($(this.childNodes[1].childNodes[0]).context.data==cell_name.data)
@@ -52,17 +52,17 @@ compare_cell = function(table, cell_name, value)
 							if ($(this.childNodes[3].childNodes[0])[0].textContent.indexOf(value.data) !== -1 && $(this.childNodes[3].childNodes[0])[0].textContent === value.data)
 		  					{
 		  						//console.log("True: " + value.data);
-		  						$(this.childNodes[1]).addClass("success");
+		  						//$(this.childNodes[1]).addClass("success");
 		  						result_final = 1;
 		  						return false;
 		  					}
 		  					else if (($(this.childNodes[3].childNodes[0])[0].textContent.indexOf(value.data) >= 0 || value.data.indexOf($(this.childNodes[3].childNodes[0])[0].textContent) >= 0 ) && $(this.childNodes[3].childNodes[0])[0].textContent !== value.data)
 		  					{
-		  						$(this.childNodes[1]).addClass("warning");
+		  						//$(this.childNodes[1]).addClass("warning");
 		  						result_final = 2;
 		  						return result_final;
 		  					}
-		  					$(this.childNodes[1]).addClass("error");
+		  					//$(this.childNodes[1]).addClass("error");
 		  					$(this.childNodes[1]).add("found");
 		  					//console.log($(this.childNodes[1]));
 		  				}
