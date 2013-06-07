@@ -102,6 +102,7 @@ def results_db(request, template_name='results.html'):
 def results_comp(request,  template_name='results_comp.html'):
 
     list_fingerprint_to_compare = []
+    print request.POST
     if request.POST:
         for k,v in request.POST.items():
             print k
@@ -854,7 +855,10 @@ def createqsets(runcode, qsets=None):
                 #except:
                 #    pass
                 #question_group.list_ordered_tags.append(t)
-                question_group.list_ordered_tags[question_group.list_ordered_tags.index(t)] = t
+                try:
+                    question_group.list_ordered_tags[question_group.list_ordered_tags.index(t)] = t
+                except:
+                    raise
                 #qsets[qs] = question_group
         break
     print "List of qsets " + str(qsets)

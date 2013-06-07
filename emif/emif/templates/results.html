@@ -29,8 +29,7 @@
 {% endblock %}
 
 {% block toolbar %}
-<form id="result_form" action="resultscomp" method="POST">
-  {% csrf_token %}
+
   <div class="span6">
     <div class="btn-group pull-right">
 
@@ -74,12 +73,15 @@
       </div>
     </div>
     {% if page_obj != None %}
+    <form id="result_form" action="resultscomp" method="POST">
+  {% csrf_token %}
 <table class="table table-hover tablesorter" id="table_databases" data-provides="rowlink">
     <thead>
         <tr>
             <th></th>
             <th>Name</th>
             <th>Date</th>
+            <th>Select</th>
 
         </tr>
     </thead>
@@ -92,7 +94,7 @@
             <td><img src="static/upload_images/{{t.logo}}" width="50px" height="50px"/></td>
           
           <td>
-            <a href="fingerprint/{{ t.id }}/2">{{ t.name }}</a>
+            <a href="fingerprint/{{ t.id }}/1">{{ t.name }}</a>
 
             <div style="margin-left:20px">
              Institution Name: {{t.institution}}
@@ -105,9 +107,15 @@
              Number of patients: {{t.number_patients}}
             </div>
         </td>
-          <td>{{ t.date }} </td>
+          <td>{{ t.date }}</td>
+          
+        
+          <td> <input class="checkbox" type="checkbox" name="chk_{{ t.id }}"></td>
+
           
         </tr>
+
+
   {% comment %}
     <div class="span12" >
       <div class="navbar" id="loading">
@@ -153,8 +161,9 @@
 
     </tbody>
 </table>
-  {% endif %}
   </form>
+  {% endif %}
+  
   {% if page_obj != None %}
 
 {% bootstrap_paginate page_obj range=10 url_view_name="views.results_diff" show_prev_next="false" show_first_last="true"%}
