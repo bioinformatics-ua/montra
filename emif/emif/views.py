@@ -208,6 +208,10 @@ def results_fulltext_aux(request, query, page=1, template_name='results.html'):
                 database_aux.number_patients = ''
             else:
                 database_aux.number_patients = r['number_active_patients_jan2012_t']
+            if (not r.has_key('upload-image_t')):
+                database_aux.logo = 'nopic.gif'
+            else:
+                database_aux.logo = r['upload-image_t']
             database_aux.id = r['id']
             database_aux.date = convert_date(r['created_t'])
             #database_aux.name = r['database_name_t']
