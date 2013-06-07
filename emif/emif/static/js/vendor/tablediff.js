@@ -56,7 +56,7 @@ compare_cell = function(table, cell_name, value)
 		  						result_final = 1;
 		  						return false;
 		  					}
-		  					else if ($(this.childNodes[3].childNodes[0])[0].textContent.indexOf(value.data) >= 0 && $(this.childNodes[3].childNodes[0])[0].textContent !== value.data)
+		  					else if (($(this.childNodes[3].childNodes[0])[0].textContent.indexOf(value.data) >= 0 || value.data.indexOf($(this.childNodes[3].childNodes[0])[0].textContent) >= 0 ) && $(this.childNodes[3].childNodes[0])[0].textContent !== value.data)
 		  					{
 		  						$(this.childNodes[1]).addClass("warning");
 		  						result_final = 2;
@@ -113,7 +113,7 @@ comparetable = function(table1, table2){
 		  				//console.log($(this.childNodes[3].childNodes[0]).context);
 		  				
 		  				var result = compare_cell(table2, $(this.childNodes[1].childNodes[0]).context,$(this.childNodes[3].childNodes[0]).context);
-		  				//console.log('Result: ' + result );
+		  				console.log('Result: ' + result );
 		  				if (result==1)
 		  				{
 
@@ -210,11 +210,11 @@ comparetable_two = function(table1, table2){
 		  	{	
 		  			if (this.tagName=="TR")
 		  			{
-		  				//console.log($(this.childNodes[1].childNodes[0]).context);
-		  				//console.log($(this.childNodes[3].childNodes[0]).context);
+		  				console.log($(this.childNodes[1].childNodes[0]).context);
+		  				console.log($(this.childNodes[3]));
 		  				
 		  				var result = compare_cell(table2, $(this.childNodes[1].childNodes[0]).context,$(this.childNodes[3].childNodes[0]).context);
-		  				//console.log('Result: ' + result );
+		  				console.log('Result: ' + result );
 		  				if (result==1)
 		  				{
 

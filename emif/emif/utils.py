@@ -108,7 +108,7 @@ class Tag:
 
 
         def __cmp__(self, other):
-            return other.tag == self.tag
+            return cmp(other.tag, self.tag)
 
         def __str__(self):
             return self.tag + ", " + self.value 

@@ -100,7 +100,7 @@ style="margin-left: 0px;"
                 {% for t in v.list_ordered_tags %}
                 <tr>
                   <td data-original-title="{{ t.tag }}" title="">{{ t.tag }}</td> 
-                   <td data-original-title="{{ t.value }}" title=""> {{ t.value }}</td>
+                   <td data-original-title="{{ t.value }}" title="">{{ t.value }}</td>
                 </tr>
                 {% endfor %}
               </tbody>
@@ -321,7 +321,8 @@ $.fn.textWidth = function() {
 
 
 $(function() {
-  $('td').each(function() {
+  $('td').each(function() 
+  {
 
     var content;
     content = $(this).text().replace(/\s+/gi, ' ');
@@ -339,10 +340,10 @@ $(function() {
 
 {% if not forloop.first %}
 {% for k,v in qset.items %}
-
+/*
 tablediffall_two('{{database_to_compare|removespaces}}_{{k|removespaces}}',['{{name|removespaces}}_{{k|removespaces}}'] )
-
-/*tablediffall('{{name|removespaces}}_{{k|removespaces}}', ['{{database_to_compare|removespaces}}_{{k|removespaces}}'])*/
+*/
+tablediffall_two('{{database_to_compare|removespaces}}_{{k|removespaces}}', ['{{name|removespaces}}_{{k|removespaces}}'])
 
 {% endfor %}
 {% endif %}
