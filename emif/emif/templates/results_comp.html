@@ -340,11 +340,9 @@ $(function() {
 {% if not forloop.first %}
 {% for k,v in qset.items %}
 
+tablediffall_two('{{database_to_compare|removespaces}}_{{k|removespaces}}',['{{name|removespaces}}_{{k|removespaces}}'] )
 
-comparetable('{{database_to_compare|removespaces}}_{{k|removespaces}}','{{name|removespaces}}_{{k|removespaces}}')
-
-comparetable('{{name|removespaces}}_{{k|removespaces}}',  '{{database_to_compare|removespaces}}_{{k|removespaces}}')
-
+/*tablediffall('{{name|removespaces}}_{{k|removespaces}}', ['{{database_to_compare|removespaces}}_{{k|removespaces}}'])*/
 
 {% endfor %}
 {% endif %}

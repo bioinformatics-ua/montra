@@ -52,16 +52,17 @@ compare_cell = function(table, cell_name, value)
 							if ($(this.childNodes[3].childNodes[0])[0].textContent.indexOf(value.data) !== -1 && $(this.childNodes[3].childNodes[0])[0].textContent === value.data)
 		  					{
 		  						//console.log("True: " + value.data);
+		  						$(this.childNodes[1]).addClass("success");
 		  						result_final = 1;
 		  						return false;
 		  					}
 		  					else if ($(this.childNodes[3].childNodes[0])[0].textContent.indexOf(value.data) >= 0 && $(this.childNodes[3].childNodes[0])[0].textContent !== value.data)
 		  					{
-
+		  						$(this.childNodes[1]).addClass("warning");
 		  						result_final = 2;
 		  						return result_final;
 		  					}
-		  					$(this.childNodes[1]).addClass("success");
+		  					$(this.childNodes[1]).addClass("error");
 		  					$(this.childNodes[1]).add("found");
 		  					//console.log($(this.childNodes[1]));
 		  				}
@@ -84,6 +85,9 @@ compare_cell = function(table, cell_name, value)
 	  });
 	  return result_final;
 }
+
+
+
 
 
 /**
@@ -111,13 +115,23 @@ comparetable = function(table1, table2){
 		  				var result = compare_cell(table2, $(this.childNodes[1].childNodes[0]).context,$(this.childNodes[3].childNodes[0]).context);
 		  				//console.log('Result: ' + result );
 		  				if (result==1)
+		  				{
+
+		  					console.log($('#' + table2));
+
+		  					//$('#' + table2).childNodes[1].childNodes[0]).addClass("success")
+		  					//$($('#' + table2).childNodes[1].childNodes[0]).addClass("success");
 		  					$(this).addClass("success");
-		  				else if (result==2)
+		  				}
+		  				else if (result==2){
+		  					//$($('#' + table2).childNodes[1].childNodes[0]).addClass("warning");
 		  					$(this).addClass("warning");
-		  				else
+		  				}
+		  				else{
+		  					//$($('#' + table2).childNodes[1].childNodes[0]).addClass("error");
 		  					$(this).addClass("error");
-		  				//console.log($(this));	
-		  			}
+		  				}
+		  	}
 		  	}	  
 		  	);		
 	  		
@@ -150,6 +164,112 @@ comparetable = function(table1, table2){
 };
 
 
+
+
+paint_table2 = function(table2, tag, nameClass)
+{
+	$('#'+ table2).each(function() {
+		$(this.childNodes[3].childNodes).each(function()
+	  	{	
+
+	  		$(this).each(function()
+		  	{
+		  		if (this.tagName=="TR")
+		  		{
+		  			console.log($(this.childNodes[1].childNodes[0]).context.data );
+		  			console.log(tag);
+		  			//if ($(this.childNodes[1].childNodes[0]).context.nodeValue.indexOf(tag)!==-1)
+		  			try
+		  			{
+		  			if (tag.indexOf($(this.childNodes[1].childNodes[0]).context.data)!==-1)
+		  			{
+		  					console.log("maasa");
+
+		  				$(this).addClass(nameClass);
+		  			}
+		  			}
+		  			catch (err)
+		  			{}
+		  		}
+		  	});
+	  	});
+	});
+
+};
+
+comparetable_two = function(table1, table2){
+	// Compare two tables: highlight the differences
+	$(function() {
+
+	  $('#'+ table1).each(function() {
+	  	//console.log($(this.childNodes[3].childNodes));
+	  	$(this.childNodes[3].childNodes).each(function()
+	  	{	
+	  		//console.log($(this.childNodes));
+			$(this).each(function()
+		  	{	
+		  			if (this.tagName=="TR")
+		  			{
+		  				//console.log($(this.childNodes[1].childNodes[0]).context);
+		  				//console.log($(this.childNodes[3].childNodes[0]).context);
+		  				
+		  				var result = compare_cell(table2, $(this.childNodes[1].childNodes[0]).context,$(this.childNodes[3].childNodes[0]).context);
+		  				//console.log('Result: ' + result );
+		  				if (result==1)
+		  				{
+
+		  					console.log($('#' + table2));
+		  					console.log($('#' + table1));
+		  					paint_table2(table2,$(this.childNodes[1].childNodes[0]).context.data, "success" );
+
+		  					//$('#' + table2).childNodes[1].childNodes[0]).addClass("success")
+		  					//$($('#' + table2).childNodes[1].childNodes[0]).addClass("success");
+		  					$(this).addClass("success");
+		  				}
+		  				else if (result==2){
+		  					//$($('#' + table2).childNodes[1].childNodes[0]).addClass("warning");
+		  					$(this).addClass("warning");
+		  					
+		  					paint_table2(table2,$(this.childNodes[1].childNodes[0]).context.data, "warning" );
+		  				}
+		  				else{
+		  					//$($('#' + table2).childNodes[1].childNodes[0]).addClass("error");
+		  					$(this).addClass("error");
+		  					
+		  					paint_table2(table2,$(this.childNodes[1].childNodes[0]).context.data, "error" );
+		  				}
+		  	}
+		  	}	  
+		  	);		
+	  		
+	  	}
+
+	);
+
+  	$('td').each(function()
+  	{
+  		
+  	}
+
+  		);
+    var content;
+    content = $(this).text().replace(/\s+/gi, ' ');
+    //console.log(content)
+
+
+  });
+  $('#'+ table2).each(function() {
+
+    var content;
+    content = $(this).text().replace(/\s+/gi, ' ');
+    //console.log(content)
+
+  });
+	  
+	});
+
+};
+
 /**
  * [ description]
  * @param  {[type]} table_base  [description]
@@ -162,8 +282,20 @@ tablediffall = function(table_base, list_tables)
 	{
 		comparetable(list_tables[table_tmp],table_base);		
 	});	
+
+};
+
+tablediffall_two = function(table_base, list_tables)
+{
+	$(list_tables).each(function(table_tmp)
+	{
+		comparetable_two(table_base, list_tables[table_tmp]);		
+	});	
 	
 };
+
+
+
 
 
 /**
