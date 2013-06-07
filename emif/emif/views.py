@@ -173,6 +173,9 @@ def results_fulltext_aux(request, query, page=1, template_name='results.html'):
     #print "Solr"
     #print results
     list_databases = []
+    if len(results)==0:
+        return render(request, "results.html", {'request': request, 
+            'list_results': [], 'page_obj': None})
     for r in results:
         try:
             database_aux = Database()
@@ -335,6 +338,7 @@ def results_diff(request, page=1, template_name='results_diff.html'):
     c = CoreEngine()
     list_databases_final = []
     list_results = Results()
+    
     for db in list_databases:
 
         results = c.search_fingerprint('id:'+db.id)

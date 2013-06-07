@@ -168,7 +168,7 @@
 
 {% block scriptextra %}
 
-
+{% if page_obj != None %}
 $(function() {
 
   // call the tablesorter plugin
@@ -180,6 +180,7 @@ $(function() {
   });
 
 });
+{% endif %}
 
 
 var counter = 0;
