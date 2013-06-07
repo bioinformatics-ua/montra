@@ -59,10 +59,10 @@ th, td {
 
   <ul class="dropdown-menu">
     <!-- dropdown menu links -->
-    <li><a href="#">Match</a></li>
-    <li><a href="#">Unmatch</a></li>
-    <li><a href="#">Proximity</a></li>
-    <li><a href="#">Empty rows</a></li>
+    <li><a id="match" href="#">Match</a></li>
+    <li><a id="unmatch" href="#">Unmatch</a></li>
+    <li><a id="proximity" href="#">Proximity</a></li>
+    <li><a id="emptyrows" href="#">Empty rows</a></li>
   </ul>
 </div>
 
@@ -139,11 +139,82 @@ $("#collapseall").bind('click',function(e)
           {
               $(this).text('Collapse all');
               change_name_collapse(true);
-
           }
             
           return false;
         });
+
+var match=false;
+$("#match").bind('click',function(e)
+{ 
+
+          e.preventDefault(); 
+          e.stopPropagation();
+          {% for name, qset in results %}
+            {% for k,v in qset.items %}
+
+            show_hide_match(['{{name|removespaces}}_{{k|removespaces}}'], match);
+          {% endfor %}
+          {% endfor %}
+          match = !match ;
+          return false;
+});
+
+
+var unmatch=false;
+$("#unmatch").bind('click',function(e)
+{ 
+
+          e.preventDefault(); 
+          e.stopPropagation();
+          {% for name, qset in results %}
+            {% for k,v in qset.items %}
+
+            show_hide_unmatch(['{{name|removespaces}}_{{k|removespaces}}'], unmatch);
+          {% endfor %}
+          {% endfor %}
+          unmatch = !unmatch ;
+          return false;
+});
+
+var emptyrows=false;
+$("#emptyrows").bind('click',function(e)
+{ 
+
+          e.preventDefault(); 
+          e.stopPropagation();
+          {% for name, qset in results %}
+            {% for k,v in qset.items %}
+
+            show_hide_empty_rows(['{{name|removespaces}}_{{k|removespaces}}'], emptyrows);
+          {% endfor %}
+          {% endfor %}
+          emptyrows = !emptyrows ;
+          return false;
+});
+
+
+
+var proximity=false;
+$("#proximity").bind('click',function(e)
+{ 
+
+          e.preventDefault(); 
+          e.stopPropagation();
+          {% for name, qset in results %}
+            {% for k,v in qset.items %}
+
+            show_hide_proximity(['{{name|removespaces}}_{{k|removespaces}}'], proximity);
+          {% endfor %}
+          {% endfor %}
+          proximity = !proximity ;
+          return false;
+});
+
+
+
+
+
 
 function change_name_collapse(value)
 {
