@@ -230,7 +230,7 @@ function change_name_collapse(value)
     }).each(function(){
     //this.innerHTML = this.id;
     console.log(this.id);
-    var current = "'" + {{name|removespaces}}_{{k|removespaces}} + "'";
+    var current = "{{name|removespaces}}_{{k|removespaces}}";
     if (this.id.indexOf(current))
     { 
       $('#'+this.id).collapse('toggle'); 
