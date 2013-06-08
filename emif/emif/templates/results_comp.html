@@ -59,14 +59,14 @@ th, td {
 
   <ul class="dropdown-menu">
     <!-- dropdown menu links -->
-    <li><a id="match" href="#">Match</a></li>
-    <li><a id="unmatch" href="#">Unmatch</a></li>
-    <li><a id="proximity" href="#">Proximity</a></li>
-    <li><a id="emptyrows" href="#">Empty rows</a></li>
+    <li><a id="match" href="#"><i id="imatch" class="icon-ok icon-white active"></i> Match</a></li>
+    <li><a id="unmatch" href="#"><i id="iunmatch" class="icon-ok icon-white active"></i>  Unmatch</a></li>
+    <li><a id="proximity" href="#"><i id="iproximity" class="icon-ok icon-white active"></i>  Proximity</a></li>
+    <li><a id="emptyrows" href="#"><i id="iemptyrows" class="icon-ok icon-white disabled"></i>  Empty rows</a></li>
   </ul>
+
 </div>
 
-      
     </div>
   </div>
   {% endblock %}
@@ -157,6 +157,15 @@ $("#match").bind('click',function(e)
           {% endfor %}
           {% endfor %}
           match = !match ;
+          if (match)
+          {
+            $('#imatch').removeClass('icon-ok') 
+
+          }
+          else
+          {
+            $('#imatch').addClass('icon-ok')
+          }
           return false;
 });
 
@@ -174,6 +183,15 @@ $("#unmatch").bind('click',function(e)
           {% endfor %}
           {% endfor %}
           unmatch = !unmatch ;
+          if (unmatch)
+          {
+            $('#iunmatch').removeClass('icon-ok') 
+            
+          }
+          else
+          {
+            $('#iunmatch').addClass('icon-ok')
+          }
           return false;
 });
 
@@ -190,6 +208,15 @@ $("#emptyrows").bind('click',function(e)
           {% endfor %}
           {% endfor %}
           emptyrows = !emptyrows ;
+          if (emptyrows)
+          {
+            $('#iemptyrows').removeClass('icon-ok') 
+            
+          }
+          else
+          {
+            $('#iemptyrows').addClass('icon-ok')
+          }
           return false;
 });
 
@@ -208,6 +235,15 @@ $("#proximity").bind('click',function(e)
           {% endfor %}
           {% endfor %}
           proximity = !proximity ;
+          if (proximity)
+          {
+            $('#iproximity').removeClass('icon-ok') 
+            
+          }
+          else
+          {
+            $('#iproximity').addClass('icon-ok')
+          }
           return false;
 });
 
