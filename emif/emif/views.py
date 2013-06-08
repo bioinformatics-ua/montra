@@ -1670,7 +1670,7 @@ def feedback(request):
 
         if subject and message and from_email:
                 try:
-                    send_mail(subject, message, from_email, [emails_to_feedback])
+                    send_mail(subject, message, "bioinformatics@ua.pt", [emails_to_feedback, from_email])
                 except BadHeaderError:
                         return HttpResponse('Invalid header found.')
                 return HttpResponseRedirect('/contact/thankyou/')
