@@ -1666,11 +1666,11 @@ def feedback(request):
         subject = request.POST.get('topic', '')
         message = request.POST.get('message', '')
         from_email = request.POST.get('email', '')
-        emails_to_feedback = ['bastiao@ua.pt']
+        emails_to_feedback = 'bastiao@ua.pt'
 
         if subject and message and from_email:
                 try:
-                    send_mail(subject, message, "bioinformatics@ua.pt", [emails_to_feedback])
+                    send_mail(subject, message, from_email, [emails_to_feedback])
                 except BadHeaderError:
                         return HttpResponse('Invalid header found.')
                 return HttpResponseRedirect('/contact/thankyou/')

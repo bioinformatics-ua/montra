@@ -37,7 +37,7 @@ def contactview(request, email):
 
 		if subject and message and from_email:
 		        try:
-					send_mail(subject, message, "bioinformatics@ua.pt", [email])
+					send_mail(subject, message, from_email, ['bastiao@ua.pt'])
         		except BadHeaderError:
             			return HttpResponse('Invalid header found.')
         		return HttpResponseRedirect('/contact/thankyou/')
