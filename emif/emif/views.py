@@ -37,6 +37,8 @@ from searchengine.search_indexes import index_answeres_from_qvalues
 from emif.utils import *
 from emif.models import *
 
+from django.core.mail import send_mail, BadHeaderError
+
 import logging
 import re
 import md5
