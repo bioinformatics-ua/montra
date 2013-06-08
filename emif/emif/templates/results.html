@@ -34,7 +34,7 @@
     <div class="btn-group pull-right">
 
       <div class="btn-group"></div>
-      <a id="comparabtn" class="btn "  href="" onclick="$('#result_form').submit(); return false; " rel="tooltip" data-container="body" data-placement="bottom" data-original-title="You only can select two databases for a comparison" disabled> <i  class=" icon"></i>
+      <a id="comparabtn" class="btn "  href=""  rel="tooltip" data-container="body" data-placement="bottom" data-original-title="You only can select two databases for a comparison" disabled> <i  class=" icon"></i>
         Compare
       </a>
 
@@ -197,18 +197,20 @@ function hidecheckbox()
 {
   $('.checkbox').toggle();
 }
-/*
+
 $("#comparabtn").bind('click',function(e)
         { 
-          //e.preventDefault(); 
-          //e.stopPropagation();
+          
+          e.preventDefault(); 
+          e.stopPropagation();
           return false;
         });
 
-$("#comparabtn").unbind();
-*/
+//$("#comparabtn").unbind();
+
 $('.checkbox').click(function()
 {
+    console.log(counter);
     if($(this).is(':checked')){
         counter++;
     } else 
@@ -222,7 +224,14 @@ $('.checkbox').click(function()
       $('.checkbox').each(function(cbox)
       {
         console.log(this);
+        $("#comparabtn").bind('click',function(e)
+        { 
           
+          $('#result_form').submit();
+
+          return false;
+        });
+
         if(!$(this).is(':checked')){
             $(this).prop('disabled', true);
         };
@@ -232,12 +241,18 @@ $('.checkbox').click(function()
     else
     {
       $("#comparabtn").attr('disabled', true);
+      
+      console.log($("#comparabtn"))
+      $("#comparabtn").unbind();
       $("#comparabtn").bind('click',function(e)
         { 
+          
           e.preventDefault(); 
+          e.stopPropagation();
           return false;
         });
-      console.log($("#comparabtn"))
+
+    
       $('.checkbox').each(function(cbox)
       {
         
