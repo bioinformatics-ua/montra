@@ -40,7 +40,7 @@ def contactview(request, email):
 					send_mail(subject, message, "bioinformatics@ua.pt", [from_email, 'bastiao@ua.pt'])
         		except BadHeaderError:
             			return HttpResponse('Invalid header found.')
-        		return HttpResponseRedirect('/contact/thankyou/')
+        		return HttpResponseRedirect('http://bioinformatics.ua.pt/emif/contact/thankyou/')
 		else:
 			return render_to_response('contact_form.html', {'form': ContactForm(), 'email_to': email}, RequestContext(request))
 	

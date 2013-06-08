@@ -1673,7 +1673,7 @@ def feedback(request):
                     send_mail(subject, message, "bioinformatics@ua.pt", [emails_to_feedback, from_email])
                 except BadHeaderError:
                         return HttpResponse('Invalid header found.')
-                return HttpResponseRedirect('/contact/thankyou/')
+                return HttpResponseRedirect('http://bioinformatics.ua.pt/emif/feedback/thankyou/')
         else:
             return render_to_response('feedback.html', {'form': ContactForm(), 'email_to': emails_to_feedback}, RequestContext(request))
     
