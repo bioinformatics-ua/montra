@@ -76,7 +76,7 @@ urlpatterns = patterns('',
 
 
     (r'^contact/thankyou/', 'searchengine.views.thankyou'),
-    (r'^contact/(?P<email>[^/]+)$', 'searchengine.views.contactview'),
+    (r'^contact$', 'searchengine.views.contactview'),
     # Results
     #url(r'^results/(?P<query>[a-zA-Z0-9]+)/$', 'emif.views.results'),
     url(r'^results$', 'emif.views.results_fulltext'),
