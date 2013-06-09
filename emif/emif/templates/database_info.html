@@ -53,9 +53,9 @@ body {
 {% endblock %}
 
 {% block toolbar %}
-{% if request.user.is_authenticated %} 
+
 {% include "menu_toolbar.html" %}
-{% endif %}
+
 {% endblock %}
 
 {% block content %}
@@ -270,6 +270,53 @@ You don't have results.
 {% endblock %}
 <script type="text/javascript">
 {% block scriptextra %}
+
+
+$("#collapseall").bind('click',function(e)
+        { 
+          e.preventDefault(); 
+          e.stopPropagation();
+          
+          if ($(this).text().indexOf('Collapse')!==-1)
+          {
+            $(this).text('Expand all');
+            change_name_collapse(false);
+          }
+          else
+          {
+              $(this).text('Collapse all');
+              change_name_collapse(true);
+          }
+            
+          return false;
+        });
+
+
+function change_name_collapse(value)
+{
+  
+      {% for k,qs in qsets.items %}
+
+
+    $("div[id^='collapse']").filter(function(){
+    var regexp = /^collapse(.*)$/;
+    return (this.id.match(regexp));
+    }).each(function(){
+    //this.innerHTML = this.id;
+    console.log(this.id);
+    var current = "{{k|removespaces}}";
+    if (this.id.indexOf(current))
+    { 
+      $('#'+this.id).collapse('toggle'); 
+    };
+    });
+
+      //show_hide_empty_rows(['{{name|removespaces}}_{{k|removespaces}}'], value);
+      {% endfor %}
+      
+      return false;
+};
+
 
 function navigation_handler(id)
 {

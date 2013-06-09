@@ -1,7 +1,10 @@
 {% load extra_tags %}
+
 <div class="span6">
 	<div class="btn-group pull-right">
+		{% if request.user.is_authenticated %} 
 		<div class="btn-group" id="group_toolbar">
+
 			<a class="btn btn" href="" id="add_toolbar" onclick="return false;"> <i class="icon-plus icon"></i>
 				Add
 			</a>
@@ -14,6 +17,10 @@
 
 			</ul>
 		</div>
+		{% endif %}
+		 <a id="collapseall" class="btn" href="" >
+        Expand all
+      </a>
 
 		<button type="button" class="btn btn" onclick="window.print();" title="Print">
 			<i class="icon-print"></i>
