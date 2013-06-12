@@ -1,5 +1,4 @@
 Django==1.4.5
-PIL==1.1.7
 PyYAML==3.10
 South==0.7.6
 autopep8==0.8.6
@@ -22,3 +21,4 @@ wsgiref==0.1.2
 djangorestframework
 django-bootstrap-breadcrumbs
 django-bootstrap-pagination
+pysolr==3.0.6
