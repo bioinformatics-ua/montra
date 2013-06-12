@@ -5,7 +5,7 @@
 
 emif/emif/emif.db
 
-emif/questionnaire
+#emif/questionnaire
 
 emif/emif/questions.to.print.py
 
