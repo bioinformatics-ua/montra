@@ -18,6 +18,8 @@
 {% block scriptextraincludes %}
 
 <script src="static/js/vendor/jquery.tablesorter.min.js"></script>
+<script src="static/js/vendor/jquery.tablesorter.widgets.js"></script>
+
 {% endblock %}
 
 
@@ -79,10 +81,10 @@
 <table class="table table-hover tablesorter" id="table_databases" data-provides="rowlink">
     <thead>
         <tr>
-            <th></th>
+            <th class="sorter-false filter-false"></th>
             <th>Name</th>
             <th>Date</th>
-            <th>Select</th>
+            <th class="sorter-false filter-false">Select</th>
 
         </tr>
     </thead>
@@ -186,7 +188,13 @@ $(function() {
     theme : 'blue',
 
     // sort on the first column and third column in ascending order
-    sortList: [[0,0],[2,0]]
+    sortList: [[0,0],[2,0]],
+
+    // hidden filter input/selects will resize the columns, so try to minimize the change
+    widthFixed : true,
+
+    // initialize zebra striping and filter widgets
+    widgets: ["zebra", "filter"]
   });
 
 });
