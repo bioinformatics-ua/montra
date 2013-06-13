@@ -25,6 +25,7 @@ from django.db import transaction
 from django.core.urlresolvers import *
 
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from emif.utils import QuestionGroup
 
 from questionnaire.models import *
 from questionnaire.parsers import *
@@ -791,17 +792,17 @@ def createqsets(runcode, qsets=None):
     name = ""
     list_values = []
     blacklist = ['created_t', 'type_t', '_version_']
-    name = "Not defined"
+    name = "Not defined."
 
     for result in results:
 
         print result['type_t']
-        # Get the slug of fingerprint type 
+        # Get the slug of fingerprint type
         q_aux = Questionnaire.objects.filter(slug=result['type_t'])
         print q_aux
-        
+
         list_qsets = QuestionSet.objects.filter(questionnaire=q_aux[0]).order_by('sortid')
-        
+
         for qset in list_qsets:
             if (qset.sortid!=0 and qset.sortid!=99):
                 question_group = QuestionGroup()
@@ -825,12 +826,12 @@ def createqsets(runcode, qsets=None):
             qs = None
             question_group = None
             if len(aux_results)>0:
-                text = aux_results[0].description 
+                text = aux_results[0].description
                 qs = aux_results[0].question.questionset.text
 
                 if qsets.has_key(qs):
                     # Add the Tag to the QuestionGroup
-                    question_group = qsets[qs] 
+                    question_group = qsets[qs]
                 else:
                     question_group = QuestionGroup()
                     qsets[qs] = question_group
@@ -839,7 +840,7 @@ def createqsets(runcode, qsets=None):
                 text = k
             #print qs
             #info = text[:75] + (text[75:] and '..')
-            
+
             info = text
             t.tag = info
             if question_group!= None and question_group.list_ordered_tags!= None:
@@ -867,6 +868,8 @@ def createqsets(runcode, qsets=None):
                     pass
                 #qsets[qs] = question_group
         break
+
+
     print "List of qsets " + str(qsets)
     #for qg in qsets:
     #    print qg
@@ -1675,10 +1678,11 @@ def feedback(request):
                         return HttpResponse('Invalid header found.')
                 return HttpResponseRedirect('http://bioinformatics.ua.pt/emif/feedback/thankyou/')
         else:
-            return render_to_response('feedback.html', {'form': ContactForm(), 'email_to': emails_to_feedback}, RequestContext(request))
+            return render_to_response('feedback.html', {'form': ContactForm(), 'email_to': emails_to_feedback,
+                                                        'request': request}, RequestContext(request))
     
-        return render_to_response('feedback.html', {'form': ContactForm()},
-            RequestContext(request))
+        # return render_to_response('feedback.html', {'form': ContactForm()},
+        #     RequestContext(request))
 
 
 def feedback_thankyou(request):

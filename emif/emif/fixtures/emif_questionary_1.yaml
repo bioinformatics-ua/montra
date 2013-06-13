@@ -1,6 +1,6 @@
 # Questionnaire 
 - pk: 1
-  fields: {name: "Observational data sources", disable: False, redirect_url: /}
+  fields: {name: "Observational data sources", disable: False, redirect_url: /, slug='observationaldatasources'}
   model: questionnaire.questionnaire
 
 # Question Sets 
