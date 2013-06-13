@@ -21,3 +21,4 @@ djangorestframework
 django-bootstrap-breadcrumbs
 django-bootstrap-pagination
 pysolr==3.0.6
+github3.py==0.7.0
