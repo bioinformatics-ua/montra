@@ -206,6 +206,7 @@ INSTALLED_APPS = (
 
     'django_bootstrap_breadcrumbs',
     'bootstrap-pagination',
+    'django_jenkins',
 
 )
 
@@ -294,6 +295,17 @@ LANGUAGES = (
 #   Completely omits the progressbar. Good if you don't want one or if the
 #   questionnaire is so huge that even the ajax request takes too long.
 QUESTIONNAIRE_PROGRESS = 'async'
+
+
+JENKINS_TASKS = (
+    'django_jenkins.tasks.run_pylint',
+    'django_jenkins.tasks.with_coverage',
+    'django_jenkins.tasks.django_tests',
+)
+
+JENKINS_TEST_RUNNER='django_jenkins.nose_runner.CINoseTestSuiteRunner'
+
+
 
 try: from local_settings import *
 except: pass
