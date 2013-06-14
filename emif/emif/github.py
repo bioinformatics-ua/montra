@@ -22,6 +22,14 @@
 
 from github3 import login
 
-gh = login(user, pw)
+
+class Issue(object):
+	def __init__(self, user, pw):
+		
+		self.gh = login(user, pw)
+
+	def create(self, title, body ):
+		r = self.gh.repository("bioinformatics-ua", "emif-fb")
+		i = r.create_issue(title, body)
 
 
