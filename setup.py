@@ -12,7 +12,6 @@ setup(
     name='emif-fb',
     version='0.1-dev',
     description='EMIF FB',
-    long_description=open('README.md', 'r').read(),
     packages=[
         'emif',
     ],
