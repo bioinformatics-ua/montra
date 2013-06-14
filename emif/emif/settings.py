@@ -303,7 +303,7 @@ JENKINS_TASKS = (
     'django_jenkins.tasks.django_tests',
 )
 
-JENKINS_TEST_RUNNER='django_jenkins.nose_runner.CINoseTestSuiteRunner'
+#JENKINS_TEST_RUNNER='django_jenkins.nose_runner.CINoseTestSuiteRunner'
 
 
 
