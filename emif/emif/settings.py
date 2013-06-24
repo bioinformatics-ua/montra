@@ -151,6 +151,7 @@ MIDDLEWARE_CLASSES = (
     'questionnaire.request_cache.RequestCacheMiddleware',
     # Uncomment the next line for simple clickjacking protection:
     # 'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'emif.middleware.LoginRequiredMiddleware',
 )
 
 ROOT_URLCONF = 'emif.urls'
@@ -305,7 +306,12 @@ JENKINS_TASKS = (
 
 #JENKINS_TEST_RUNNER='django_jenkins.nose_runner.CINoseTestSuiteRunner'
 
-
+#Exception pages that don't need sign in
+LOGIN_EXEMPT_URLS = (
+ r'^$',
+ r'^about',
+ r'^feedback',
+)
 
 try: from local_settings import *
 except: pass
