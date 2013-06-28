@@ -98,11 +98,7 @@ def signup(request, **kwargs):
 
 def signin(request, **kwargs):
 
-    print "Tempo2: " + str(request.session.get_expiry_age())
     if request.user.is_authenticated():
-
-        print "Tempo3: " + str(request.session.get_expiry_age())
-
         return redirect(settings.BASE_URL)
 
     return userena.views.signin(request, **kwargs)

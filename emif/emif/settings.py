@@ -209,6 +209,7 @@ INSTALLED_APPS = (
     'bootstrap-pagination',
     'django_jenkins',
 
+
 )
 
 # Userena settings
@@ -306,12 +307,17 @@ JENKINS_TASKS = (
 
 #JENKINS_TEST_RUNNER='django_jenkins.nose_runner.CINoseTestSuiteRunner'
 
-#Exception pages that don't need sign in
+#Pages that do not require login
 LOGIN_EXEMPT_URLS = (
  r'^$',
  r'^about',
  r'^feedback',
+ r'^accounts/signup',
 )
+
+#Set session idle timeout (seconds)
+SESSION_IDLE_TIMEOUT = 7200
+SESSION_SAVE_EVERY_REQUEST = True
 
 try: from local_settings import *
 except: pass
