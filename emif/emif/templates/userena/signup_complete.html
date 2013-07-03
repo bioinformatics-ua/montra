@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% load crispy_forms_tags %}
+{% load url from future %}
+
+{% block title %}{% trans "Signup almost done!" %}{% endblock %}
+
+
+
+{% block content %}
+<div class="row">
+  <div class="span6 center">
+    <legend>{% trans "Sign up almost done!" %}</legend>
+{% if userena_activation_required %}
+    {% if userena_moderated_registration %}
+        <p>{% blocktrans %}An administrator has to approve your registration.{% endblocktrans %}</p>
+
+        <p>{% blocktrans %}When your account is activated, you will receive an email.{% endblocktrans %}</p>
+    {% else  %}
+        <p>{% blocktrans %}You have been sent an e-mail with an activation link to the supplied email.{% endblocktrans %}</p>
+{% endif %}
+    {% endif %}
+
+    <p>{% trans "Thank you for signing up with us!" %}</p>
+    <div class="span6 center">
+     <img src="static/img/emif_logo.png" alt="EMIF Logo" style="width: 180px; height: 163px;">
+    </div>
+    <div class="form-actions center">
+        <a class="btn btn-medium btn-success" href="/">Home</a>
+
+    </div>
+{% endblock %}
+  </div>
+
+</div>

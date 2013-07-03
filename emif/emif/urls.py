@@ -24,6 +24,8 @@ from django.conf.urls import patterns, include, url
 from django.contrib.auth import views as auth_views
 
 from django.contrib import admin
+from django.views.generic.simple import direct_to_template
+
 admin.autodiscover()
 
 from userena import views as userena_views
@@ -33,7 +35,7 @@ from views import *
 from django.conf import settings
 
 urlpatterns = patterns('',
-    
+
 
     # Uncomment the admin/doc line below to enable admin documentation:
     url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
@@ -45,16 +47,16 @@ urlpatterns = patterns('',
     url(r'^$', 'emif.views.index'),
     url(r'^about$', 'emif.views.about'),
 
-    # Quick Search 
+    # Quick Search
     url(r'^search$', 'emif.views.quick_search'),
 
-    # Advanced Search 
+    # Advanced Search
     url(r'^advancedSearch/(?P<questionnaire_id>[0-9]+)/(?P<question_set>[0-9]+)/$', 'emif.views.advanced_search'),
     #url(r'^q2/(?P<runcode>[^/]+)/$', questionaries_with_sets, name='questionaries_with_sets'),
     #url(r'^q2/(?P<runcode>[^/]+)/(?P<qs>[-]{0,1}\d+)/$',
     #        questionaries_with_sets, name='questionset_sets'),
 
-    # Database Add 
+    # Database Add
 
     url(r'^add/(?P<questionnaire_id>[0-9]+)/(?P<sortid>[0-9]+)/$', 'emif.views.database_add'),
     url(r'^addPost/(?P<questionnaire_id>[0-9]+)/(?P<sortid>[0-9]+)$', 'emif.views.check_database_add_conditions'),
@@ -90,16 +92,16 @@ urlpatterns = patterns('',
     url(r'^resultscomp', 'emif.views.results_comp'),
     url(r'^fingerprint/(?P<runcode>[^/]+)/(?P<qs>[-]{0,1}\d+)/$', 'emif.views.fingerprint'),
 
-    # List Databases 
+    # List Databases
     url(r'^databases$', 'emif.views.databases'),
     url(r'^alldatabases$', 'emif.views.all_databases'),
-    # Documentation 
+    # Documentation
     url(r'^docs/api$', 'emif.views.docs_api'),
 
 
     url(r'^rm/(?P<id>[^/]+)', 'emif.views.delete_fingerprint'),
 
-    # API 
+    # API
     url(r'^api/', include('api.urls')),
 
     # Questionnaire URLs
@@ -121,6 +123,14 @@ urlpatterns = patterns('',
         {'signup_form': SignupFormExtra,
          'success_url': settings.BASE_URL + 'databases'},
         name='userena_signup'),
+
+    url(r'^accounts/signup/complete/$',
+        direct_to_template,
+        {'template': 'userena/signup_complete.html',
+         'extra_context': {'userena_activation_required': settings.USERENA_ACTIVATION_REQUIRED,
+                           'userena_moderated_registration': settings.USERENA_MODERATE_REGISTRATION}},
+        name='userena_signup_complete'),
+
     url(r'^accounts/signin/$',
         signin,
         name='userena_signin'),

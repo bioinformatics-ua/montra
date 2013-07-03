@@ -23,3 +23,4 @@ django-bootstrap-pagination
 pysolr==3.0.6
 github3.py==0.7.0
 django-jenkins
+-e git://github.com/bioinformatics-ua/django-userena.git@f0041bcc77a9d2f8111b6bbfdfcf4cf1cd5dab3e

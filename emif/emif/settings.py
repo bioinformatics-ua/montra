@@ -39,6 +39,7 @@ else:
 ADMINS = (
      ('Luis A. Bastiao Silva', 'bastiao@ua.pt'),
      ('José Luis Oliveira', 'jlo@ua.pt'),
+     ('Rui Mendes', 'ruidamendes@ua.pt'),
 )
 
 SOLR_HOST = "localhost"
@@ -220,22 +221,30 @@ AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend',
 )
 
-#EMAIL_BACKEND = 'django.core.mail.backends.dummy.EmailBackend'
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 # Email backend settings
+# EMAIL_BACKEND = 'django.core.mail.backends.dummy.EmailBackend'
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+# EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+# EMAIL_HOST = 'localhost'
+# EMAIL_PORT = 1025
 
 
 ANONYMOUS_USER_ID = -1
 
 AUTH_PROFILE_MODULE = 'accounts.EmifProfile'
 
-USERENA_ACTIVATION_REQUIRED = False
-USERENA_SIGNIN_AFTER_SIGNUP = True
+
+#Userena settings
+USERENA_ACTIVATION_REQUIRED = True
+USERENA_SIGNIN_AFTER_SIGNUP = False
 USERENA_WITHOUT_USERNAMES = True
 USERENA_DISABLE_PROFILE_LIST = True
-USERENA_USE_MESSAGES = False
+USERENA_USE_MESSAGES = True
 USERENA_REDIRECT_ON_SIGNOUT = BASE_URL
 USERENA_SIGNIN_REDIRECT_URL = BASE_URL + 'databases'
+USERENA_MODERATE_REGISTRATION = True                    #True - need admin approval (activation)
+USERENA_ACTIVATION_REJECTED = 'ACTIVATION_REJECTED'
+USERENA_PENDING_MODERATION = 'PENDING_MODERATION'
 
 
 
@@ -313,6 +322,8 @@ LOGIN_EXEMPT_URLS = (
  r'^about',
  r'^feedback',
  r'^accounts/signup',
+ r'^accounts/activate/(?P<activation_key>\w+)/$',
+ r'^accounts/signup/complete',
 )
 
 #Set session idle timeout (seconds)
