@@ -131,6 +131,11 @@ urlpatterns = patterns('',
                            'userena_moderated_registration': settings.USERENA_MODERATE_REGISTRATION}},
         name='userena_signup_complete'),
 
+    url(r'^accounts/signup/activate/complete/$',
+        direct_to_template,
+        {'template': 'userena/activation_complete.html'},
+        name='userena_activated'),
+
     url(r'^accounts/signin/$',
         signin,
         name='userena_signin'),

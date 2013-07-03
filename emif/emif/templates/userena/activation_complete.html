@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% load crispy_forms_tags %}
+{% load url from future %}
+
+{% block title %}{% trans "Activation complete!" %}{% endblock %}
+
+{% block content %}
+<div class="row">
+  <div class="span6 center">
+    <legend>{% trans "Activation complete!" %}</legend>
+<p>{% trans "Activation done an email sent." %}</p>
+
+<p>{% blocktrans %}User can now use the supplied credentials to signin.{% endblocktrans %}</p>
+
+    <div class="form-actions center">
+        <a class="btn btn-medium btn-success" href="/">Home</a>
+
+    </div>
+{% endblock %}
+  </div>
+
+</div>

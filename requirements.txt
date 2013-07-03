@@ -8,7 +8,6 @@ django-countries==1.5
 django-crispy-forms==1.2.3
 django-guardian==1.0.4
 django-transmeta==0.6.9
-django-userena==1.2.0
 docutils==0.10
 easy-thumbnails==1.2
 pep8==1.4.1
@@ -23,4 +22,4 @@ django-bootstrap-pagination
 pysolr==3.0.6
 github3.py==0.7.0
 django-jenkins
--e git://github.com/bioinformatics-ua/django-userena.git@f0041bcc77a9d2f8111b6bbfdfcf4cf1cd5dab3e
+-e git://github.com/bioinformatics-ua/django-userena.git@f0041bcc77a9d2f8111b6bbfdfcf4cf1cd5dab3e#egg=userena
