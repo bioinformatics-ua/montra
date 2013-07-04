@@ -117,8 +117,8 @@
                         {% if not request.user.is_authenticated %}
                         <form class="navbar-form pull-right" method="post" action="{% url 'userena_signin' %}">
                             {% csrf_token %}
-                            <input name="identification" class="span1" type="text" placeholder="Email">
-                            <input name="password" class="span1" type="password" placeholder="Password">
+                            <input name="identification" class="signin-header-form-email" type="text" placeholder="Email">
+                            <input name="password" class="signin-header-form-pass" type="password" placeholder="Password">
                             <button type="submit" class="btn">Sign in</button>
                         </form>
                         {% else %}
