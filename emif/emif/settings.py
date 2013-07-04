@@ -37,9 +37,9 @@ else:
     MIDDLE_DIR = "emif/emif/"
 
 ADMINS = (
-     ('Luis A. Bastiao Silva', 'bastiao@ua.pt'),
-     ('José Luis Oliveira', 'jlo@ua.pt'),
-     ('Rui Mendes', 'ruidamendes@ua.pt'),
+         ('Luis A. Bastiao Silva', 'bastiao@ua.pt'),
+         ('José Luis Oliveira', 'jlo@ua.pt'),
+         ('Rui Mendes', 'ruidamendes@ua.pt'),
 )
 
 SOLR_HOST = "localhost"
@@ -325,6 +325,7 @@ LOGIN_EXEMPT_URLS = (
  r'^accounts/signin',
  r'^accounts/activate/(?P<activation_key>\w+)/$',
  r'^accounts/signup/complete',
+ r'^accounts/password/reset/',
 )
 
 #Set session idle timeout (seconds)
