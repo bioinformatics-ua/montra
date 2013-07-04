@@ -141,3 +141,11 @@ input.sending {
 .question-text ul {
     margin: 5px 0 5px 50px;
 }
+
+input.signin-header-form-email {
+    width: 190px !important;
+}
+
+input.signin-header-form-pass {
+    width: 70px !important;
+}
