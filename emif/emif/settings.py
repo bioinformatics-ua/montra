@@ -322,6 +322,7 @@ LOGIN_EXEMPT_URLS = (
  r'^about',
  r'^feedback',
  r'^accounts/signup',
+ r'^accounts/signin',
  r'^accounts/activate/(?P<activation_key>\w+)/$',
  r'^accounts/signup/complete',
 )
