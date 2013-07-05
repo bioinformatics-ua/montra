@@ -100,8 +100,8 @@
 
                                         {% for t in qs.list_ordered_tags %}
                                             <tr>
-                                                <td data-original-title="{{ t.tag|safe }}" title="">{{ t.tag|safe }}</td>
-                                                <td data-original-title="{{ t.value|safe }}" title=""> {{ t.value|safe }}</td>
+                                                <td title="{{ t.tag }}">{{ t.tag }}</td>
+                                                <td title="{{ t.value }}"> {{ t.value }}</td>
                                             </tr>
                                         {% endfor %}
                                         </tbody>
