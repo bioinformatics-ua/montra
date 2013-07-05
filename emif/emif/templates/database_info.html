@@ -30,10 +30,10 @@
     opacity: 0.8;
     filter: alpha(opacity=80);
     }
-    .tooltip.in {
-    opacity: 1;
-    filter: alpha(opacity=100);
-    }
+{#    .tooltip.in {#}
+{#    opacity: 1;#}
+{#    filter: alpha(opacity=100);#}
+{#    }#}
 
 
 {% endblock %}
@@ -100,8 +100,8 @@
 
                                         {% for t in qs.list_ordered_tags %}
                                             <tr>
-                                                <td data-original-title="{{ t.tag }}" title="">{{ t.tag }}</td>
-                                                <td data-original-title="{{ t.value }}" title=""> {{ t.value }}</td>
+                                                <td data-original-title="{{ t.tag|safe }}" title="">{{ t.tag|safe }}</td>
+                                                <td data-original-title="{{ t.value|safe }}" title=""> {{ t.value|safe }}</td>
                                             </tr>
                                         {% endfor %}
                                         </tbody>
