@@ -26,14 +26,18 @@
     -ms-text-overflow: ellipsis;
     }
 
+
     .tooltip.in {
     opacity: 0.8;
     filter: alpha(opacity=80);
     }
+
 {#    .tooltip.in {#}
 {#    opacity: 1;#}
 {#    filter: alpha(opacity=100);#}
 {#    }#}
+
+
 
 
 {% endblock %}
@@ -100,8 +104,8 @@
 
                                         {% for t in qs.list_ordered_tags %}
                                             <tr>
-                                                <td title="{{ t.tag }}">{{ t.tag }}</td>
-                                                <td title="{{ t.value }}"> {{ t.value }}</td>
+                                                <td title="{{ t.tag|safe }}">{{ t.tag|safe }}</td>
+                                                <td title="{{ t.value|safe }}"> {{ t.value|safe }}</td>
                                             </tr>
                                         {% endfor %}
                                         </tbody>
@@ -371,7 +375,7 @@
 
                 if ($(this).textWidth() > $(this).width()) {
 
-                    return $(this).tooltip({container: "body"});
+                    return $(this).tooltip({container: "body", html: true});
                 }
             });
         });
