@@ -1,0 +1,14 @@
+{% load i18n %}{% autoescape off %}{% load url from future %}
+{% blocktrans with site.name as site %}A new user has been registered at {{ site }}.{% endblocktrans %}
+
+{% blocktrans with user.username as username %}Username: {{ username }} {% endblocktrans %}
+
+{% trans "To activate his account you should click on the link below:" %}
+
+{{ protocol }}://{{ site.domain }}{% url 'userena_activate' activation_key %}
+
+{% blocktrans with user.email as email %}An email has been sent to {{ email }}! {% endblocktrans %}
+
+{% trans "Sincerely" %},
+{{ site.name }}
+{% endautoescape %}
