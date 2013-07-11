@@ -405,36 +405,23 @@ def geo(request, template_name='geo.html'):
 
 
 def statistics(request, questionnaire_id, question_set, template_name='statistics.html'):
-    from emif.statistics import Statistic
 
     # print "QUESTIONNAIRE_ID: " + str(questionnaire_id)
     # print "QUESTION_SET: " + str(questionnaire_id)
 
-    questions = Question.objects.all()
     qs_list = QuestionSet.objects.filter(questionnaire=questionnaire_id).order_by('sortid')
 
-    if (int(question_set) == 99):
-        qs_id = len(qs_list) - 1
+    if int(question_set) == 99:
+        question_set = len(qs_list) - 1
     question_set = qs_list[int(question_set)]
-    graphs = []
-    for q in questions:
-        # print q
-        try:
-            type = q.type
-            s = Statistic(q)
-            graph = s.get_percentage()
-            graphs_aux = dict()
-            # print graph
-            graphs_aux['name'] = s.question.slug
-            graphs_aux['score'] = graph
-            graphs.append(graphs_aux)
-        except:
-            raise
-    result = json.dumps(graphs)
-    # pprint(result)
-    print "GRAPH2: " + str(graphs.__len__())
-    return render(request, template_name, {'request': request, 'graphs': graphs, 'questionset': question_set,
-                                           'breadcrumb': True})
+    # questions = Question.objects.filter(questionset=question_set)
+
+    questions = question_set.questions()
+    print "Questions: " + str(questions)
+    # print "QuestionSet: " + str(question_set)
+
+    return render(request, template_name, {'request': request, 'questionset': question_set,
+                                           'breadcrumb': True, 'questions_list':questions})
 
 
 def generate_statistics_from_multiple_choice(question_slug):
