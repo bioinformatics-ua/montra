@@ -72,3 +72,8 @@ def show_fingerprints_for_search():
     return {'fingerprints':fingerprints_list()}
 register.inclusion_tag('menu_ttags_for_search.html')(show_fingerprints_for_search)
 
+
+def show_fingerprints_for_statistics():
+
+    return {'fingerprints':fingerprints_list()}
+register.inclusion_tag('menu_ttags_for_statistics.html')(show_fingerprints_for_statistics)

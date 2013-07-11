@@ -1,130 +1,133 @@
 {% extends 'base.html' %}
 {% load url from future %}
+{% load django_bootstrap_breadcrumbs %}
+
+{% block breadcrumbs %}
+    {{ block.super }}
+    {% breadcrumb "Statistics" "statistics" %}
+{% endblock %}
+
+{% load extra_tags %}
+
+{% load markup questionnaire i18n %}
 
 {% block content %}
+    <div class="container">
+{#        <div class="jumbotron">#}
+{##}
+{#            <div class="span12" style="text-align:center">#}
+{#                <img src="static/img/emif_logo.png" alt="EMIF Logo" style="width: 80px; height: 81px;"/>#}
+{##}
+{#                <h2>Statistics</h2>#}
+{#            </div>#}
+{##}
+{#        </div>#}
+    </div>
+    <hr>
+    <div class="row">
+        <div class="span3">
+            <div class="well" style="max-width: 340px; padding: 8px 0;">
 
-    
-{% for graph in graphs %}
-  
-  
-  {% comment %}
-    {{ graph }}
-  {% endcomment %}
-  {% for k in graph %}
-    {{k}}<br />
-    
-  {% endfor %}
+                <ul class="nav nav-list nav-pills nav-stacked ">
+                    <li class="nav-header">Step-by-Step</li>
+                    {% for qs in questionset.questionnaire.questionsets %}
 
-{% endfor %}
+                        {% if qs.sortid != 0 and qs.sortid != 99 %}
+                            <li{% if questionset.text == qs.text %} class="active" {% endif %} id="li_qs_{{ qs.id }}">
+                            <!--<a href="q2/{{runinfo.random}}/{{ qs.sortid }}">-->
+                            <a href="statistics/{{ qs.questionnaire.pk }}/{{ qs.pk }}"
+                               onclick="questionsets_handle(qs_{{ qs.pk }}); return false;">
+                                <table>
+                                    <tr>
+                                        <td width="80%">{{ qs.text|removeh1 }}</td>
+                                        <td width="10%">
+                                            <!--<span style="float:right; vertical-align: middle " class="badge badge-warning">2</span>
+                                          -->
+                                        </td>
+                                    </tr>
+                                </table>
+                            </a>
+                        {% endif %}
+                    </li>
+                    {% endfor %}
+                </ul>
 
+            </div>
+        </div>
+{#        <div class="span3">#}
+{#            {% for i in graphs %}#}
+{#                ---------------------------------<br/>#}
+{#                {% comment %}#}
+{#                {{ graph }}#}
+{#                {% endcomment %}#}
+{#                {% for graph in i.items %}#}
+{#                    {{ graph }}  <br/>#}
+{#                            {% for key,value in graph.items %}{{ key }} = {{ value }}<br />{% endfor %}#}
+{#                {% endfor %}#}
+{#            {% endfor %}#}
+{#        </div>#}
+        <div class="span3">
+            <div id="chart"></div>
+        </div>
+    </div>
 
 {% endblock %}
 
 
 
 {% block scriptextraincludes %}
-<script src="http://d3js.org/d3.v3.min.js"></script>
+    <script src="http://d3js.org/d3.v3.min.js"></script>7
+    <script src="static/js/charts_d3.js"></script>
 
 {% endblock %}
 
-{% block scriptextra%}
+{% block scriptextra %}
+    var values = getQuestionValues(1, 1, 'location', 'choice-yesno');
+
+    draw_piechart(values);
+
+    values = getQuestionValues(1, 2, 'range_databases', 'choice-yesno');
+
+    draw_piechart(values);
 
 
-$.post('api/insert', function(data) {
-  //$('.result').html(data);
-      console.log("Response: "+data);
+    $('#li_advanced_search').addClass("active");
 
-});
+    function next_questionset(id_questionset){
+        var next = false;
+        $('.questionset').each(function(i, obj) {
+            console.log("obj.id: " + obj.id);
+            console.log("next" + next);
+            if (next==true){
+                questionsets_handle(obj);
+                next = false;
+            }
+            if (obj.id==id_questionset.id){
+                next = true;
+            }
+        });
+    }
 
-var width = 960,
-    height = 500,
-    radius = Math.min(width, height) / 2;
-
-var color = d3.scale.ordinal()
-    .range(["#98abc5", "#8a89a6", "#7b6888", "#6b486b", "#a05d56", "#d0743c", "#ff8c00"]);
-
-var arc = d3.svg.arc()
-    .outerRadius(radius - 10)
-    .innerRadius(0);
-
-var pie = d3.layout.pie()
-    .sort(null)
-    .value(function(d) { return d.population; });
-
-var svg = d3.select("body").append("svg")
-    .attr("width", width)
-    .attr("height", height)
-  .append("g")
-    .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
-
-d3.json("http://127.0.0.1:8000/api/stats", function(error, data) {
-
-
-      var w = 620;
-      var h = 480;
-
-      var radius = Math.min(w, h) / 2; //change 2 to 1.4. It's hilarious.
-
-      //TODO: Generate colors randomly, but have them be apart.
-
-      var color = d3.scale.ordinal().range(["#7b4173", "#9ecae1", "#ff7f0e", "#bcbd22", "#8c564b", "#d62728"])
-
-      var arc = d3.svg.arc() //each datapoint will create one later.
-      .outerRadius(radius - 20)
-          .innerRadius(0);
-      //well, if you set this to not 0 it becomes a donut chart!
-
-
-      var pie = d3.layout.pie()
-          .sort(function (d) {
-          return d.score;
-      })
-          .value(function (d) {
-          return d.score;
-      });
-
-
-      var svg = d3.select("body").append("svg")
-          .attr("width", w)
-          .attr("height", h)
-          .attr("class", "chart")
-          .append("g") //someone to transform. Groups data.
-      .attr("transform", "translate(" + w / 2 + "," + h / 2 + ")");
-      //transform to the center.
-
-
-      //create the slices
-      var slices = svg.selectAll(".arc")
-          .data(pie(data.charts))
-          .enter().append("g")
-          .attr("class", "slice");
-
-      //and fill them
-      slices.append("path")
-          .attr("d", arc)
-          .style("fill", function (d, i) {
-          return color(i);
-      });
-
-      //add text, even
-      slices.append("text")
-          .attr("transform", function (d) {
-          return "translate(" + arc.centroid(d) + ")";
-      })
-          .attr("class", "data-title")
-          .text(function (d) {
-          return d.data.name;
-      });
-
-
-
-
-});
-
+    function questionsets_handle(id_questionset){
+        console.log("Clicked QuestionSet: " + id_questionset.id);
+        $('.questionset').each(function(i, obj) {
+            console.log("obj.id: " + obj.id);
+            if (obj.id==id_questionset.id){
+                console.log("show " + obj.id);
+                $('#'+obj.id).addClass("show");
+                $('#li_'+id_questionset.id).addClass("active");
+            }
+            else {
+                console.log("hide " + obj.id);
+                $('#li_'+obj.id).removeClass("active");
+                $('#'+obj.id).addClass("hide");
+                $('#'+obj.id).removeClass("show");
+            }
+        });
+    };
 
 
 
 
 {% endblock %}
-
 

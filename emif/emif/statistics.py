@@ -23,42 +23,42 @@ from questionnaire.models import Question
 from searchengine.search_indexes import CoreEngine
 
 
-
 class Statistic(object):
-	def __init__(self, question):
-		self.question = question 
-		self.search = CoreEngine()
+    def __init__(self, question):
+        self.question = question
+        self.search = CoreEngine()
 
-	def get_percentage(self):
-		slug = self.question.slug 
-		print slug
-		if slug==None:
-			return "Empty"
-		results = self.search.search_fingerprint(slug + "_t:*")
-		values = dict()
-		for r in results:
-			for k in r:
-				try:
-					if (values.has_key(r[k])):
-						values[r[k]] = values[r[k]]
-					else:
-						values[r[k]] = 1
-				except:
-					raise
-		return values
+    def get_percentage(self):
+        slug = self.question.slug
+        # print slug
+        if slug is None:
+            return "Empty"
+        results = self.search.search_fingerprint(slug + "_t:*", 0, 100, slug + "_t")
+        values = []
+        for r in results:
+            # print r
+            values_aux = dict()
+            for k in r:
+                # print r[k]
+                try:
+                    if r[k] in values_aux.keys():
+                        values_aux[r[k]] += 1
+                    else:
+                        values_aux[r[k]] = 1
+                except:
+                    raise
+            values.append(values_aux)
+        return values
 
-
-	def tag_cloud(self):
-
-		# http://www.jason-palmer.com/2011/05/creating-a-tag-cloud-with-solr-and-php/
-		# solr = query = "(.................. )" 
-		# solr.search([solrquery],facet = 'on' ,** {'facet.field' : ['fieldname']})
-		pass
+    def tag_cloud(self):
+        # http://www.jason-palmer.com/2011/05/creating-a-tag-cloud-with-solr-and-php/
+        # solr = query = "(.................. )"
+        # solr.search([solrquery],facet = 'on' ,** {'facet.field' : ['fieldname']})
+        pass
 
 
 class Timeline(object):
-
-	def __init__(self):
-		pass
+    def __init__(self):
+        pass
 
 

@@ -108,14 +108,15 @@ class CoreEngine:
         """
         self.solr.delete(id=id_doc)
 
-    def search_fingerprint(self, query, start=0, rows=100):
+    def search_fingerprint(self, query, start=0, rows=100, fl=''):
         """search the fingerprint
         """
         # Later, searching is easy. In the simple case, just a plain Lucene-style
         # query is fine.
         results = self.solr.search(query,**{
                 'rows': rows,
-                'start': start
+                'start': start,
+                'fl': fl
             })
 
         return results
