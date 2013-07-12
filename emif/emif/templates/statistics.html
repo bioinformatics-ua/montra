@@ -13,15 +13,15 @@
 
 {% block content %}
     <div class="container">
-        {#        <div class="jumbotron">#}
-        {##}
-        {#            <div class="span12" style="text-align:center">#}
-        {#                <img src="static/img/emif_logo.png" alt="EMIF Logo" style="width: 80px; height: 81px;"/>#}
-        {##}
-        {#                <h2>Statistics</h2>#}
-        {#            </div>#}
-        {##}
-        {#        </div>#}
+        <!--{#        <div class="jumbotron">#}-->
+        <!--{##}-->
+        <!--{#            <div class="span12" style="text-align:center">#}-->
+        <!--{#                <img src="static/img/emif_logo.png" alt="EMIF Logo" style="width: 80px; height: 81px;"/>#}-->
+        <!--{##}-->
+        <!--{#                <h2>Statistics</h2>#}-->
+        <!--{#            </div>#}-->
+        <!--{##}-->
+        <!--{#        </div>#}-->
     </div>
     <hr>
     <div class="row">
@@ -61,13 +61,11 @@
 
             {% for qt in questions_list %}
                 <div class="question-text"><span>{{ qt.number }}. {{ qt.text }}</span></div>
+                <div  id="chart_{{ qt.number }}"></div>
             {% endfor %}
-            <div id="chart"></div>
         </div>
     </div>
 {% endblock %}
-
-
 
 {% block scriptextraincludes %}
     <script src="http://d3js.org/d3.v3.min.js"></script>7
@@ -77,51 +75,55 @@
 
 {% block scriptextra %}
 
-    $('#li_workspace').addClass("active");
+        $('#li_workspace').addClass("active");
 
-    var values = getQuestionValues(1, 1, 'location', 'piechart');
+        {% for qt in questions_list %}
+            $("#chart_{{ qt.number }}").ready(function() {
+                console.log({{ questionnaire_id }}, {{ questionset.id }}, '{{ qt.slug }}', 'piechart', 'chart_{{ qt.number }}');
+                draw_chart({{ questionnaire_id }}, {{ questionset.id }}, '{{ qt.slug }}', 'piechart', 'chart_{{ qt.number }}');
+            });
+        {% endfor %}
 
-    draw_piechart(values);
+    function draw_chart(q_id, qs_id, slug, type, div_id) {
+        var values = getQuestionValues(q_id, qs_id, slug, type);
+        draw_piechart(values, div_id);
+    }
 
-    values = getQuestionValues(1, 2, 'range_databases', 'piechart');
-
-    draw_piechart(values);
+    <!--values = getQuestionValues(1, 2, 'range_databases', 'piechart');-->
+<!---->
+    <!--draw_piechart(values, 'chart_1a');-->
 
     function next_questionset(id_questionset){
-    var next = false;
-    $('.questionset').each(function(i, obj) {
-    console.log("obj.id: " + obj.id);
-    console.log("next" + next);
-    if (next==true){
-    questionsets_handle(obj);
-    next = false;
-    }
-    if (obj.id==id_questionset.id){
-    next = true;
-    }
-    });
+        var next = false;
+        $('.questionset').each(function(i, obj) {
+            console.log("obj.id: " + obj.id);
+            console.log("next" + next);
+            if (next==true){
+                questionsets_handle(obj);
+                next = false;
+            }
+            if (obj.id==id_questionset.id){
+                next = true;
+            }
+        });
     }
 
     function questionsets_handle(id_questionset){
-    console.log("Clicked QuestionSet: " + id_questionset.id);
-    $('.questionset').each(function(i, obj) {
-    console.log("obj.id: " + obj.id);
-    if (obj.id==id_questionset.id){
-    console.log("show " + obj.id);
-    $('#'+obj.id).addClass("show");
-    $('#li_'+id_questionset.id).addClass("active");
-    }
-    else {
-    console.log("hide " + obj.id);
-    $('#li_'+obj.id).removeClass("active");
-    $('#'+obj.id).addClass("hide");
-    $('#'+obj.id).removeClass("show");
-    }
-    });
+        console.log("Clicked QuestionSet: " + id_questionset.id);
+        $('.questionset').each(function(i, obj) {
+            console.log("obj.id: " + obj.id);
+            if (obj.id==id_questionset.id){
+                console.log("show " + obj.id);
+                $('#'+obj.id).addClass("show");
+                $('#li_'+id_questionset.id).addClass("active");
+            }
+            else {
+                console.log("hide " + obj.id);
+                $('#li_'+obj.id).removeClass("active");
+                $('#'+obj.id).addClass("hide");
+                $('#'+obj.id).removeClass("show");
+            }
+        });
     };
 
-
-
-
 {% endblock %}
-

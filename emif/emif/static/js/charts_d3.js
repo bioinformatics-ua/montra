@@ -28,7 +28,7 @@ function getQuestionValues(questionnaire_id, questionset_id, slug, type) {
 }
 
 
-function draw_piechart(jsonData) {
+function draw_piechart(jsonData,div_id) {
 ;
     var data = JSON.parse(jsonData);
 
@@ -56,8 +56,7 @@ function draw_piechart(jsonData) {
                 return d.score;
             });
 
-
-        var svg = d3.select("#chart").append("svg")
+        var svg = d3.select('#' + div_id).append("svg")
             .attr("width", w)
             .attr("height", h)
             .attr("class", "chart")

@@ -421,7 +421,8 @@ def statistics(request, questionnaire_id, question_set, template_name='statistic
     # print "QuestionSet: " + str(question_set)
 
     return render(request, template_name, {'request': request, 'questionset': question_set,
-                                           'breadcrumb': True, 'questions_list':questions})
+                                           'breadcrumb': True, 'questions_list': questions,
+                                           'questionnaire_id': questionnaire_id})
 
 
 def generate_statistics_from_multiple_choice(question_slug):
