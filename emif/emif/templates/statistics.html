@@ -34,9 +34,8 @@
 
                         {% if qs.sortid != 0 and qs.sortid != 99 %}
                             <li{% if questionset.text == qs.text %} class="active" {% endif %} id="li_qs_{{ qs.id }}">
-                            <!--<a href="q2/{{runinfo.random}}/{{ qs.sortid }}">-->
                             <a href="statistics/{{ qs.questionnaire.pk }}/{{ qs.pk }}"
-                               onclick="questionsets_handle(qs_{{ qs.pk }}); return false;">
+                               onclick="questionsets_handle('qs_{{ qs.pk }}');">
                                 <table>
                                     <tr>
                                         <td width="80%">{{ qs.text|removeh1 }}</td>
@@ -75,24 +74,35 @@
 
 {% block scriptextra %}
 
-        $('#li_workspace').addClass("active");
+    $('#li_workspace').addClass("active");
 
-        {% for qt in questions_list %}
-            $("#chart_{{ qt.number }}").ready(function() {
-                console.log({{ questionnaire_id }}, {{ questionset.id }}, '{{ qt.slug }}', 'piechart', 'chart_{{ qt.number }}');
-                draw_chart({{ questionnaire_id }}, {{ questionset.id }}, '{{ qt.slug }}', 'piechart', 'chart_{{ qt.number }}');
-            });
-        {% endfor %}
 
+    <!-- Define Chart Type -->
+
+    <!---->
+
+    <!-- Call draw_chart() function -->
+    {% for qt in questions_list %}
+        $("#chart_{{ qt.number }}").ready(function() {
+            console.log({{ questionnaire_id }}, {{ questionset.id }}, '{{ qt.slug }}', 'piechart', 'chart_{{ qt.number }}');
+            draw_chart({{ questionnaire_id }}, {{ questionset.id }}, '{{ qt.slug }}', 'piechart', 'chart_{{ qt.number }}');
+        });
+    {% endfor %}
+    <!---->
+
+     <!-- Function draw_chart() -->
     function draw_chart(q_id, qs_id, slug, type, div_id) {
         var values = getQuestionValues(q_id, qs_id, slug, type);
-        draw_piechart(values, div_id);
+        <!-- Falta verificar se não existem respostas para a pergunta -->
+        <!-- Caso não exista, não desenha o gráfico, caso contrário, chama a função draw_chart() -->
+        if (values != '')
+            draw_piechart(values, div_id);
+
+
     }
 
-    <!--values = getQuestionValues(1, 2, 'range_databases', 'piechart');-->
-<!---->
-    <!--draw_piechart(values, 'chart_1a');-->
 
+<!-------------------------- APAGAR / REMODELAR ----------------------------------------->
     function next_questionset(id_questionset){
         var next = false;
         $('.questionset').each(function(i, obj) {
@@ -125,5 +135,6 @@
             }
         });
     };
+<!------------------------------------------------------------------->
 
 {% endblock %}

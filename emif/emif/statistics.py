@@ -32,23 +32,25 @@ class Statistic(object):
         slug = self.question.slug
         # print slug
         if slug is None:
-            return "Empty"
+            return None
         results = self.search.search_fingerprint(slug + "_t:*", 0, 100, slug + "_t")
         values = []
-        for r in results:
-            # print r
-            values_aux = dict()
-            for k in r:
-                # print r[k]
-                try:
-                    if r[k] in values_aux.keys():
-                        values_aux[r[k]] += 1
-                    else:
-                        values_aux[r[k]] = 1
-                except:
-                    raise
-            values.append(values_aux)
-        return values
+        if results:
+            for r in results:
+                values_aux = dict()
+                for k in r:
+                    print str(k) + " --> " + str(r[k])
+                    try:
+                        if r[k] in values_aux.keys():
+                            values_aux[r[k]] += 1
+                        else:
+                            values_aux[r[k]] = 1
+                    except:
+                        raise
+                values.append(values_aux)
+            return values
+        else:
+            return "Empty"
 
     def tag_cloud(self):
         # http://www.jason-palmer.com/2011/05/creating-a-tag-cloud-with-solr-and-php/

@@ -168,7 +168,7 @@ class ValidateView(APIView):
             # c = CoreEngine()
             #results = c.search_fingerprint("database_name_t:"+database_name)
             #result = {'contains': len(results)==0}
-            result = {'test':'teste2'}
+            result = {'test': 'teste2'}
             response = Response(result, status=status.HTTP_200_OK)
         except:
             print("fuck")
@@ -177,35 +177,45 @@ class ValidateView(APIView):
 
 
 class StatsView(APIView):
+    """
+    Class that returns json values of answers to create stats (charts)
+    """
 
     def get(self, request, *args, **kw):
+        """
+        Method to return values on format json
+        :param request:
+        :param args:
+        :param kw:
+        """
+
         try:
 
             results = dict()
             for i in request.POST.items():
                 print i
 
+            # GET Values
             questionnaire_id = request.GET['q_id']
             question_set = request.GET['qs_id']
             slug = request.GET['slug']
             type = request.GET['type']
 
-            questions = Question.objects.filter(questionset_id=question_set).order_by('number')
-            qs_list = QuestionSet.objects.filter(questionnaire=questionnaire_id).order_by('sortid')
+            question = Question.objects.filter(questionset_id=question_set, slug=slug).order_by('number')
 
-            print "QUESTIONS: " + str(questions.__len__())
-
-            if (int(question_set) == 99):
-                qs_id = len(qs_list) - 1
-            question_set = qs_list[int(question_set)]
+            print "QUESTIONS: " + str(question.__len__())
 
             #Chart PIECHART
             if type == 'piechart':
-                results = self.piechart(questions, slug)
+                results = self.piechart(question, slug)
 
-            #Dump json file
-            result = json.dumps(results)
-            # print(result)
+            print(results)
+            if results:
+                #Dump json file
+                result = json.dumps(results)
+            else:
+                result = []
+                # print(result)
 
             response = Response(result, status=status.HTTP_200_OK)
         except:
@@ -213,22 +223,35 @@ class StatsView(APIView):
             raise
         return response
 
-    def piechart(self, questions, slug):
+    def piechart(self, question, slug):
+        """
+        Method that returns values to use in piechart
+        :param question:
+        :param slug:
+        """
+
         from emif.statistics import Statistic
+
         results = dict()
         graphs = []
-        for q in questions:
+        for q in question:
             try:
                 s = Statistic(q)
                 if s.question.slug == slug:
                     graph = s.get_percentage()
-                    print graph
-                    for g in graph:
-                        graphs_aux = dict()
-                        for i in g:
-                            graphs_aux['name'] = i
-                            graphs_aux['score'] = g[i]
-                            graphs.append(graphs_aux)
+                    if not graph:
+                        # results["values"] = "No"
+                        #Return NULL if graph is empty
+                        return results
+                    else:
+                        # results["values"] = "Yes"
+                        print graph
+                        for g in graph:
+                            graphs_aux = dict()
+                            for i in g:
+                                graphs_aux['name'] = i
+                                graphs_aux['score'] = g[i]
+                                graphs.append(graphs_aux)
             except:
                 raise
 
@@ -236,4 +259,5 @@ class StatsView(APIView):
         results["attr1"] = "name"
         results["attr2"] = "score"
         results['charts'] = graphs
+
         return results
