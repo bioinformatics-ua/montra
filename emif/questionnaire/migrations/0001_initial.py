@@ -84,6 +84,7 @@ class Migration(SchemaMigration):
             ('checks', self.gf('django.db.models.fields.CharField')(max_length=128, null=True, blank=True)),
             ('footer_en', self.gf('django.db.models.fields.TextField')(blank=True)),
             ('slug', self.gf('django.db.models.fields.CharField')(max_length=128)),
+            ('stats', self.gf('django.db.models.fields.BooleanField')(default=False)),
         ))
         db.send_create_signal('questionnaire', ['Question'])
 
@@ -161,7 +162,8 @@ class Migration(SchemaMigration):
             'questionset': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['questionnaire.QuestionSet']"}),
             'text_en': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
             'slug': ('django.db.models.fields.CharField', [], {'max_length': '128'}),
-            'type': ('django.db.models.fields.CharField', [], {'max_length': '32'})
+            'type': ('django.db.models.fields.CharField', [], {'max_length': '32'}),
+            'stats': ('django.db.models.fields.BooleanField', [], {'default': 'False'})
         },
         'questionnaire.questionnaire': {
             'Meta': {'object_name': 'Questionnaire'},

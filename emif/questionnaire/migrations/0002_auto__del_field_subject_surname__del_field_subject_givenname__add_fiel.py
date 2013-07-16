@@ -29,6 +29,10 @@ class Migration(SchemaMigration):
                       self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User'], null=True, blank=True),
                       keep_default=False)
 
+        #Adding field 'stats'
+        db.add_column('questionnaire_question', 'stats',
+                      self.gf('django.db.models.fields.BooleanField')(default=False))
+
 
     def backwards(self, orm):
         # Adding field 'Subject.surname'
@@ -49,6 +53,9 @@ class Migration(SchemaMigration):
 
         # Deleting field 'Subject.user'
         db.delete_column('questionnaire_subject', 'user_id')
+
+        # Deleting field 'Question.stats'
+        db.delete_column('questionnaire_question', 'stats')
 
 
     models = {
@@ -114,7 +121,8 @@ class Migration(SchemaMigration):
             'questionset': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['questionnaire.QuestionSet']"}),
             'text_en': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
             'slug': ('django.db.models.fields.CharField', [], {'max_length': '128'}),
-            'type': ('django.db.models.fields.CharField', [], {'max_length': '32'})
+            'type': ('django.db.models.fields.CharField', [], {'max_length': '32'}),
+            'stats': ('django.db.models.fields.BooleanField', [], {'default': 'False'})
         },
         'questionnaire.questionnaire': {
             'Meta': {'object_name': 'Questionnaire'},
