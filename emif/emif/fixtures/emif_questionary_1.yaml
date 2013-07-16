@@ -36,13 +36,13 @@
 - pk: 0
   fields: {checks: '', extra_en: '', number: '0', questionset: 0,
  text_en: 'The purpose of this questionnaire is to get some initial information on the databases available for the EMIF Platform. In the first months of the project, we will start a process of “fingerprinting”. The first version of a deliverable (the so-called initial fingerprinting) is already due in march. The process of fingerprinting will be led by Miriam Sturkenboom. To have some information available on the databases in the platform and to identify the points of contact, we ask you to fill in this questionnaire. It will form the bases of a short presentation during the kick-off meeting in Barcelona. Please click "Continue" to procceed.',
-  type: comment, slug: 'purpose'}
+  type: comment, slug: 'purpose', stats: False}
   model: questionnaire.question
 
 - pk: 1
   fields: {checks: 'required', extra_en: '', number: '1', questionset: 1,
  text_en: 'Please provide contact information. We ask three contacts (name, address, email, and phone number). First, the administrative contact; typically a secretariat. Second, the scientific content contact; this is the person(s) who are familiar with the data in the database and are have experience in conducting scientific studies with the data. Third, technical contact; this is the person who is familiar with the IT platform of the data source and will be our contact point if we will install software locally.',
-  type: comment, slug: 'contact'}
+  type: comment, slug: 'contact', stats: False}
   model: questionnaire.question
 
 
@@ -51,14 +51,16 @@
 - pk: 23
   fields: {checks: 'required', extra_en: '', number: '1a', questionset: 1,
  text_en: 'Institution Name',
-  type: open, slug: 'institution_name'}
+  type: open, slug: 'institution_name', stats: False}
   model: questionnaire.question
 
 # Location 
 - pk: 24
   fields: {checks: 'required', extra_en: '', number: '1b', questionset: 1,
  text_en: 'Location',
-  type: open, slug: 'location'}
+  type: open,
+  slug: 'location',
+  stats: True}
   model: questionnaire.question
 
 
@@ -67,7 +69,7 @@
 - pk: 25
   fields: {checks: 'required', extra_en: '', number: '1c', questionset: 1,
  text_en: 'Administrative email',
-  type: open, slug: 'contact_administrative'}
+  type: open, slug: 'contact_administrative', stats: False}
   model: questionnaire.question
 
 # Contact for Scientific contact
@@ -75,7 +77,8 @@
 - pk: 28
   fields: {checks: 'required', extra_en: '', number: '1d', questionset: 1,
  text_en: 'Scientific contact',
-  type: open, slug: 'contact_scientific'}
+  type: open, slug: 'contact_scientific',
+  stats: False}
   model: questionnaire.question
 
 
@@ -84,7 +87,9 @@
 - pk: 29
   fields: {checks: 'required', extra_en: '', number: '1e', questionset: 1,
  text_en: 'Technical contact',
-  type: open, slug: 'contact_technical'}
+  type: open,
+  slug: 'contact_technical',
+  stats: False}
   model: questionnaire.question
 
 
@@ -93,7 +98,9 @@
 - pk: 26
   fields: {checks: 'type=open-button', extra_en: '', number: '2', questionset: 2,
  text_en: 'Database Name',
-  type: custom, slug: 'database_name'}
+  type: custom,
+  slug: 'database_name',
+  stats: False}
   model: questionnaire.question
 
 
@@ -101,7 +108,9 @@
 - pk: 2
   fields: {checks: 'required', extra_en: '', number: '2a', questionset: 2,
  text_en: 'In the platform, we have a wide range of databases. Could you indicate what of the below would characterize your database? More answers are possible.',
-  type: choice-multiple-freeform, slug: 'range_databases'}
+  type: choice-multiple-freeform,
+  slug: 'range_databases',
+  stats: True}
   model: questionnaire.question
 
 - pk: 1
@@ -162,13 +171,17 @@
 - pk: 3
   fields: {checks: 'requiredif=2a,5', extra_en: '', number: '2b', questionset: 2,
   text_en: 'If disease specific registry, please specify disease or event.',
-  type: open-textfield, slug: 'disease_registry'}
+  type: open-textfield,
+  slug: 'disease_registry',
+  stats: True}
   model: questionnaire.question
 
 - pk: 4
   fields: {checks: 'required', extra_en: '', number: '3', questionset: 3,
   text_en: 'How would you briefly (in say five of six lines of text) describe the population of your database?',
-  type: open-textfield, slug: 'population_description'}
+  type: open-textfield,
+  slug: 'population_description',
+  stats: True}
   model: questionnaire.question
 
 
@@ -181,19 +194,25 @@
   <li>End Date (the date the person exits your data base).</li>
 </ul>
 Would you be able to create such a table for the population of in your database?',
-  type: choice-yesnocomment, slug: 'matching_table'}
+  type: choice-yesnocomment,
+  slug: 'matching_table',
+  stats: True}
   model: questionnaire.question
 
 - pk: 6
   fields: {checks: 'requiredif=4,no', extra_en: '', number: '4a', questionset: 3,
  text_en: 'Why not be able to create such a table for the population of in your database?',
-  type: open-textfield,slug: 'table_population'}
+  type: open-textfield,
+  slug: 'table_population',
+  stats: False}
   model: questionnaire.question
 
 - pk: 7
   fields: {checks: 'required', extra_en: '', number: '5', questionset: 3,
  text_en: 'What are the possible causes for a person to enter/exit your database? ',
-  type: choice-multiple-freeform, slug: 'causes_person_database'}
+  type: choice-multiple-freeform,
+  slug: 'causes_person_database',
+  stats: True}
   model: questionnaire.question
 
 - fields: {question: 7, sortid: 1,
@@ -245,25 +264,33 @@ Would you be able to create such a table for the population of in your database?
 - pk: 8
   fields: {checks: 'required', extra_en: '', number: '6', questionset: 3,
  text_en: 'What is the total (cumulative) number of subjects in your data source?',
-  type: open, slug: 'total_number_subjects'}
+  type: open,
+  slug: 'total_number_subjects',
+  stats: True}
   model: questionnaire.question
 
 - pk: 9
   fields: {checks: 'required', extra_en: '', number: '7', questionset: 3,
  text_en: 'What was the number of active patients in January 2012?',
-  type: open, slug: 'number_active_patients_jan2012'}
+  type: open,
+  slug: 'number_active_patients_jan2012',
+  stats: True}
   model: questionnaire.question
 
 - pk: 10
   fields: {checks: 'required', extra_en: '', number: '8', questionset: 4,
  text_en: 'Can you estimate the average time of follow up (that is, the time when you are actively collecting data) for a subject in your database?',
-  type: open, slug: 'average_time_follow_up'}
+  type: open,
+  slug: 'average_time_follow_up',
+  stats: True}
   model: questionnaire.question
 
 - pk: 11
   fields: {checks: 'required', extra_en: '', number: '9', questionset: 4,
  text_en: 'During the follow-up period (that is, after a subject enters you data base), what information do you have?',
-  type: choice-multiple, slug: 'information_follow_up'}
+  type: choice-multiple,
+  slug: 'information_follow_up',
+  stats: True}
   model: questionnaire.question
 
 - pk: 19
@@ -287,7 +314,9 @@ Would you be able to create such a table for the population of in your database?
 - pk: 12
   fields: {checks: 'requiredif=9,diagnosis', extra_en: '', number: '9a', questionset: 4,
  text_en: 'Choose available diagnosis information',
-  type: choice-multiple, slug: 'diagnosis_information'}
+  type: choice-multiple,
+  slug: 'diagnosis_information',
+  stats: True}
   model: questionnaire.question
 
 - pk: 22
@@ -359,7 +388,9 @@ Would you be able to create such a table for the population of in your database?
 - pk: 13
   fields: {checks: 'requiredif=9,medication', extra_en: '', number: '9b', questionset: 4,
   text_en: 'Choose available prescription information',
-  type: choice-multiple, slug: 'prescription_information'}
+  type: choice-multiple,
+  slug: 'prescription_information',
+  stats: True}
   model: questionnaire.question
 
 - pk: 32
@@ -437,7 +468,9 @@ Would you be able to create such a table for the population of in your database?
 - pk: 14
   fields: {checks: 'requiredif=9,procedures', extra_en: '', number: '9c', questionset: 4,
   text_en: 'Choose available procedures information',
-  type: choice-multiple, slug: 'procedures_information'}
+  type: choice-multiple,
+  slug: 'procedures_information',
+  stats: True}
   model: questionnaire.question
 
 - pk: 44
@@ -509,19 +542,25 @@ Would you be able to create such a table for the population of in your database?
 - pk: 15
   fields: {checks: 'required', extra_en: '', number: '10', questionset: 4,
  text_en: 'Has the patient given informed consent for including his/her data in your data collection?',
-  type: choice-yesno, slug: 'patient_consent'}
+  type: choice-yesno,
+  slug: 'patient_consent',
+  stats: True}
   model: questionnaire.question
 
 - pk: 16
   fields: {checks: 'required', extra_en: '', number: '11', questionset: 4,
  text_en: 'Do you have an ethical/review committee?',
-  type: choice-yesno, slug: 'ethical_committee'}
+  type: choice-yesno,
+  slug: 'ethical_committee',
+  stats: True}
   model: questionnaire.question
 
 - pk: 17
   fields: {checks: 'requiredif=11,yes', extra_en: '', number: '11a', questionset: 4,
  text_en: 'If yes, does the committee',
-  type: choice-multiple, slug: 'ethical_committee_comment'}
+  type: choice-multiple,
+  slug: 'ethical_committee_comment',
+  stats: True}
   model: questionnaire.question
 
 - pk: 55
@@ -545,31 +584,41 @@ Would you be able to create such a table for the population of in your database?
 - pk: 18
   fields: {checks: 'required', extra_en: '', number: '12', questionset: 4,
  text_en: 'Do you have a publically available document that details the procedure by which approval can be requested?',
-  type: choice-yesno, slug: 'publically_doc_procedure'}
+  type: choice-yesno,
+  slug: 'publically_doc_procedure',
+  stats: True}
   model: questionnaire.question
 
 - pk: 19
   fields: {checks: 'required', extra_en: '', number: '13', questionset: 4,
  text_en: 'Are you able to contact the care provider for additional information?',
-  type: choice-yesno, slug: 'contact_care_provider'}
+  type: choice-yesno,
+  slug: 'contact_care_provider',
+  stats: True}
   model: questionnaire.question
 
 - pk: 20
   fields: {checks: 'required', extra_en: '', number: '14', questionset: 4,
  text_en: 'Are you able to contact the patient for additional information?',
-  type: choice-yesno, slug: 'contact_patient'}
+  type: choice-yesno,
+  slug: 'contact_patient',
+  stats: True}
   model: questionnaire.question
 
 - pk: 21
   fields: {checks: 'required', extra_en: '', number: '15', questionset: 5,
  text_en: 'Can you assess the prevalence of diabetes mellitus in the population who enters your data base?',
-  type: open-textfield, slug: 'assess_prevalence_prevalence'}
+  type: open-textfield,
+  slug: 'assess_prevalence_prevalence',
+  stats: True}
   model: questionnaire.question
 
 - pk: 22
   fields: {checks: 'required', extra_en: '', number: '16', questionset: 5,
  text_en: 'Could you provide a list of peer-reviewed papers based on your data base covering the last 3 years?',
-  type: open-textfield, slug: 'literature_papers'}
+  type: open-textfield,
+  slug: 'literature_papers',
+  stats: True}
   model: questionnaire.question
 
 
@@ -616,13 +665,17 @@ Would you be able to create such a table for the population of in your database?
 - pk: 50
   fields: {checks: '', extra_en: '', number: '0', questionset: 7,
  text_en: 'The purpose of this questionnaire is to get some initial information on the databases available for the EMIF Platform. In the first months of the project, we will start a process of “fingerprinting”. The first version of a deliverable (the so-called initial fingerprinting) is already due in march. The process of fingerprinting will be led by Miriam Sturkenboom. To have some information available on the databases in the platform and to identify the points of contact, we ask you to fill in this questionnaire. It will form the bases of a short presentation during the kick-off meeting in Barcelona. Please click "Continue" to procceed.',
-  type: comment, slug: 'purpose'}
+  type: comment,
+  slug: 'purpose',
+  stats: False}
   model: questionnaire.question
 
 - pk: 51
   fields: {checks: 'required', extra_en: '', number: '1', questionset: 8,
  text_en: 'Please provide contact information. We ask three contacts (name, address, email, and phone number). First, the administrative contact; typically a secretariat. Second, the scientific content contact; this is the person(s) who are familiar with the data in the database and are have experience in conducting scientific studies with the data. Third, technical contact; this is the person who is familiar with the IT platform of the data source and will be our contact point if we will install software locally.',
-  type: comment, slug: 'contact'}
+  type: comment,
+  slug: 'contact',
+  stats: False}
   model: questionnaire.question
 
 
@@ -630,14 +683,18 @@ Would you be able to create such a table for the population of in your database?
 - pk: 52
   fields: {checks: 'required', extra_en: '', number: '1a', questionset: 8,
  text_en: 'Institution Name',
-  type: open, slug: 'institution_name'}
+  type: open,
+  slug: 'institution_name',
+  stats: False}
   model: questionnaire.question
 
 # Location 
 - pk: 53
   fields: {checks: 'required', extra_en: '', number: '1b', questionset: 8,
  text_en: 'Location',
-  type: open, slug: 'location'}
+  type: open,
+  slug: 'location',
+  stats: True}
   model: questionnaire.question
 
 
@@ -646,7 +703,9 @@ Would you be able to create such a table for the population of in your database?
 - pk: 54
   fields: {checks: 'required', extra_en: '', number: '1c', questionset: 8,
  text_en: 'Administrative email',
-  type: open, slug: 'contact_administrative'}
+  type: open,
+  slug: 'contact_administrative',
+  stats: False}
   model: questionnaire.question
 
 # Contact for Scientific contact
@@ -654,7 +713,9 @@ Would you be able to create such a table for the population of in your database?
 - pk: 55
   fields: {checks: 'required', extra_en: '', number: '1d', questionset: 8,
  text_en: 'Scientific contact',
-  type: open, slug: 'contact_scientific'}
+  type: open,
+  slug: 'contact_scientific',
+  stats: False}
   model: questionnaire.question
 
 
@@ -663,7 +724,9 @@ Would you be able to create such a table for the population of in your database?
 - pk: 56
   fields: {checks: 'required', extra_en: '', number: '1e', questionset: 8,
  text_en: 'Technical contact',
-  type: open, slug: 'contact_technical'}
+  type: open,
+  slug: 'contact_technical',
+  stats: False}
   model: questionnaire.question
 
 
@@ -673,14 +736,18 @@ Would you be able to create such a table for the population of in your database?
 - pk: 57
   fields: {checks: 'type=open-button', extra_en: '', number: '2', questionset: 9,
  text_en: 'Database Name',
-  type: custom, slug: 'database_name'}
+  type: custom,
+  slug: 'database_name',
+  stats: False}
   model: questionnaire.question
 
 
 - pk: 58
   fields: {checks: 'required', extra_en: '', number: '2a', questionset: 9,
  text_en: 'In the platform, we have a wide range of databases. Could you indicate what of the below would characterize your database? More answers are possible.',
-  type: choice-multiple-freeform, slug: 'range_databases'}
+  type: choice-multiple-freeform,
+  slug: 'range_databases',
+  stats: True}
   model: questionnaire.question
 
 - pk: 101
