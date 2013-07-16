@@ -59,8 +59,12 @@
             </div>
 
             {% for qt in questions_list %}
-                <div class="question-text"><span>{{ qt.number }}. {{ qt.text }}</span></div>
-                <div  id="chart_{{ qt.number }}"></div>
+                {% if qt.stats == 1 or qt.type == 'comment' %}
+                <div class="question-text"><span>{{ qt.number }}. {{ qt.text|safe }}</span></div>
+                    {% if qt.stats == 1 %}
+                        <div  id="chart_{{ qt.number }}"></div>
+                    {% endif %}
+                {% endif %}
             {% endfor %}
         </div>
     </div>

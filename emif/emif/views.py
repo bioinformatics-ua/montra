@@ -414,9 +414,9 @@ def statistics(request, questionnaire_id, question_set, template_name='statistic
     if int(question_set) == 99:
         question_set = len(qs_list) - 1
     question_set = qs_list[int(question_set)]
-    # questions = Question.objects.filter(questionset=question_set)
+    questions = Question.objects.filter(questionset=question_set)
 
-    questions = question_set.questions()
+    # questions = question_set.questions()
     print "Questions: " + str(questions)
     # print "QuestionSet: " + str(question_set)
 
