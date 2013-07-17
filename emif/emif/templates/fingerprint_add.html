@@ -54,6 +54,7 @@
 
 
             </div> <!-- /question container -->
+
             {% if question.footer %}
                 <div class="question-footer">
                     {{ question.footer|textile }}
@@ -62,12 +63,19 @@
             {% endif %}
         {% endwith %}
 
+
         {% endfor %}
-    
+
+        {% if k.sortid != 99 and k.sortid != 0%}
+            <span>* Required</span>
+        {% endif  %}
+
             <div style="text-align: center;" class="well questionset-submit">
-                <input class="btn large primary" name="submit" type="submit" value="{% trans "Continue" %}"
+                <input class="btn large primary" name="submit" type="submit"
                 {% if k.sortid == 99 %} 
-                onclick="javascript:window.location.href='databases';return false;"
+                onclick="javascript:window.location.href='databases';return false;" value="{% trans "Show databases" %}"
+                {% else %}
+                 value="{% trans "Continue" %}"
                 {% endif %}
                 >
                   
@@ -81,6 +89,7 @@
     </div>
     {% endfor %}
     </form>
+
 </div>
 
 
