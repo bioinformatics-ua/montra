@@ -66,32 +66,51 @@
 
 
 # Contact for Administrative
-- pk: 25
+- pk: 30
   fields: {checks: 'required', extra_en: '', number: '1c', questionset: 1,
- text_en: 'Administrative email',
+ text_en: 'Administrative contact (name)',
+  type: open, slug: 'name_administrative', stats: False}
+  model: questionnaire.question
+
+- pk: 25
+  fields: {checks: 'required', extra_en: '', number: '1d', questionset: 1,
+ text_en: 'Administrative contact (email)',
   type: open, slug: 'contact_administrative', stats: False}
   model: questionnaire.question
 
 # Contact for Scientific contact
 
 - pk: 28
-  fields: {checks: 'required', extra_en: '', number: '1d', questionset: 1,
- text_en: 'Scientific contact',
+  fields: {checks: 'required', extra_en: '', number: '1f', questionset: 1,
+ text_en: 'Scientific contact (email)',
   type: open, slug: 'contact_scientific',
   stats: False}
   model: questionnaire.question
 
+- pk: 31
+  fields: {checks: 'required', extra_en: '', number: '1e', questionset: 1,
+ text_en: 'Scientific contact (name)',
+  type: open, slug: 'name_scientific',
+  stats: False}
+  model: questionnaire.question
 
 # Contact for Technical contact
 
 - pk: 29
-  fields: {checks: 'required', extra_en: '', number: '1e', questionset: 1,
- text_en: 'Technical contact',
+  fields: {checks: 'required', extra_en: '', number: '1h', questionset: 1,
+ text_en: 'Technical contact (email)',
   type: open,
   slug: 'contact_technical',
   stats: False}
   model: questionnaire.question
 
+- pk: 32
+  fields: {checks: 'required', extra_en: '', number: '1g', questionset: 1,
+ text_en: 'Technical contact (name)',
+  type: open,
+  slug: 'name_technical',
+  stats: False}
+  model: questionnaire.question
 
 # Database name
 
