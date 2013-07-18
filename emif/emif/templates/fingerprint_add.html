@@ -5,8 +5,8 @@
     <form name="qform" id="qform" action="addPost/{{questionset.questionnaire.pk}}/1" method="POST" enctype="multipart/form-data">
     {% for k, qlist in questions_list %}
 
-    <div id="qs_{{ k.pk }}" class="{% if k.pk == questionset.pk %} {% else %} hide {% endif %} questionset">
-    {% if k.pk == questionset.pk %}     
+    <div id="qs_{{ k.sortid }}" class="{% if k.sortid == questionset.sortid %} {% else %} hide {% endif %} questionset">
+    {% if k.sortid == questionset.sortid %}
         <input type="hidden" name="active_qs" value="{{ k.pk }}">
         <input type="hidden" name="active_qs_sortid" value="{{ k.sortid }}">
         <input type="hidden" name="fingerprint_id" value="{{ fingerprint_id }}">
