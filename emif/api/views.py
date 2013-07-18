@@ -192,24 +192,25 @@ class StatsView(APIView):
         try:
 
             results = dict()
-            for i in request.POST.items():
-                print i
+            for i in request.GET.items():
+                print "GET -> " + str(i)
 
             # GET Values
-            questionnaire_id = request.GET['q_id']
-            question_set = request.GET['qs_id']
+            questionnaire_id = int(request.GET['q_id'])
+            question_set = int(request.GET['qs_id'])
             slug = request.GET['slug']
             type = request.GET['type']
 
-            question = Question.objects.filter(questionset_id=question_set, slug=slug).order_by('number')
-
+            question = Question.objects.filter(questionset_id=question_set, slug=slug, stats='1',
+                                               questionset__questionnaire=questionnaire_id).order_by('number')
+            print question
             print "QUESTIONS: " + str(question.__len__())
 
             #Chart PIECHART
             if type == 'piechart':
-                results = self.piechart(question, slug)
+                results = self.piechartResults(question)
 
-            print(results)
+
             if results:
                 #Dump json file
                 result = json.dumps(results)
@@ -223,11 +224,10 @@ class StatsView(APIView):
             raise
         return response
 
-    def piechart(self, question, slug):
+    def piechartResults(self, question):
         """
         Method that returns values to use in piechart
         :param question:
-        :param slug:
         """
 
         from emif.statistics import Statistic
@@ -237,21 +237,23 @@ class StatsView(APIView):
         for q in question:
             try:
                 s = Statistic(q)
-                if s.question.slug == slug:
-                    graph = s.get_percentage()
-                    if not graph:
-                        # results["values"] = "No"
-                        #Return NULL if graph is empty
-                        return results
-                    else:
-                        # results["values"] = "Yes"
-                        print graph
-                        for g in graph:
+
+                graph = s.get_percentage()
+                # print graph
+                if not graph:
+                    # results["values"] = "No"
+                    #Return NULL if graph is empty
+                    return results
+                else:
+                    # results["values"] = "Yes"
+                    for g in graph:
+                        # print g
+                        for i in g:
                             graphs_aux = dict()
-                            for i in g:
-                                graphs_aux['name'] = i
-                                graphs_aux['score'] = g[i]
-                                graphs.append(graphs_aux)
+                            # print i, g[i]
+                            graphs_aux['name'] = i
+                            graphs_aux['score'] = g[i]
+                            graphs.append(graphs_aux)
             except:
                 raise
 

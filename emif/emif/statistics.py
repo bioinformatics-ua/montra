@@ -31,26 +31,26 @@ class Statistic(object):
     def get_percentage(self):
         slug = self.question.slug
         # print slug
+        type_id = self.question.questionset.questionnaire.slug
+
         if slug is None:
             return None
-        results = self.search.search_fingerprint(slug + "_t:*", 0, 100, slug + "_t")
+        results = self.search.search_fingerprint(slug + "_t:* AND type_t:" + type_id, 0, 100, slug + "_t")
         values = []
+        # print "RESULTS: " + str(results.__len__())
         if results:
+            values_aux = dict()
             for r in results:
-                values_aux = dict()
-                for k in r:
-                    print str(k) + " --> " + str(r[k])
-                    try:
-                        if r[k] in values_aux.keys():
-                            values_aux[r[k]] += 1
-                        else:
-                            values_aux[r[k]] = 1
-                    except:
-                        raise
-                values.append(values_aux)
-            return values
-        else:
-            return "Empty"
+                try:
+                    if r.values()[0] in values_aux.keys():
+                        values_aux[r.values()[0]] += 1
+                    else:
+                        values_aux[r.values()[0]] = 1
+                except:
+                    raise
+            values.append(values_aux)
+
+        return values
 
     def tag_cloud(self):
         # http://www.jason-palmer.com/2011/05/creating-a-tag-cloud-with-solr-and-php/

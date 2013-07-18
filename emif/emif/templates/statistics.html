@@ -33,9 +33,9 @@
                     {% for qs in questionset.questionnaire.questionsets %}
 
                         {% if qs.sortid != 0 and qs.sortid != 99 %}
-                            <li{% if questionset.text == qs.text %} class="active" {% endif %} id="li_qs_{{ qs.id }}">
-                            <a href="statistics/{{ qs.questionnaire.pk }}/{{ qs.pk }}"
-                               onclick="questionsets_handle('qs_{{ qs.pk }}');">
+                            <li{% if questionset.text == qs.text %} class="active" {% endif %} id="li_qs_{{ qs.sortid }}">
+                            <a href="statistics/{{ qs.questionnaire.pk }}/{{ qs.sortid }}"
+                               onclick="questionsets_handle('qs_{{ qs.sortid }}');">
                                 <table>
                                     <tr>
                                         <td width="80%">{{ qs.text|removeh1 }}</td>
@@ -87,10 +87,12 @@
 
     <!-- Call draw_chart() function -->
     {% for qt in questions_list %}
+        {% if qt.stats == 1  %}
         $("#chart_{{ qt.number }}").ready(function() {
-            console.log({{ questionnaire_id }}, {{ questionset.id }}, '{{ qt.slug }}', 'piechart', 'chart_{{ qt.number }}');
+            <!--console.log({{ questionnaire_id }}, {{ questionset.id }}, '{{ qt.slug }}', 'piechart', 'chart_{{ qt.number }}');-->
             draw_chart({{ questionnaire_id }}, {{ questionset.id }}, '{{ qt.slug }}', 'piechart', 'chart_{{ qt.number }}');
         });
+        {% endif %}
     {% endfor %}
     <!---->
 
@@ -101,7 +103,6 @@
         <!-- Caso não exista, não desenha o gráfico, caso contrário, chama a função draw_chart() -->
         if (values != '')
             draw_piechart(values, div_id);
-
 
     }
 

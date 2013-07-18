@@ -20,7 +20,7 @@ function getQuestionValues(questionnaire_id, questionset_id, slug, type) {
         },
         success: function (data) {
             //        alert("success");
-            console.log("Response: " + data);
+//            console.log("Response: " + data);
             result = data;
         }
     });
