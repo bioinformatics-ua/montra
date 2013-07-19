@@ -192,22 +192,27 @@ class StatsView(APIView):
         try:
 
             results = dict()
-            for i in request.GET.items():
-                print "GET -> " + str(i)
+            # for i in request.GET.items():
+            #     print "GET -> " + str(i)
 
             # GET Values
             questionnaire_id = int(request.GET['q_id'])
             question_set = int(request.GET['qs_id'])
             slug = request.GET['slug']
-            type = request.GET['type']
+
 
             question = Question.objects.filter(questionset_id=question_set, slug=slug, stats='1',
                                                questionset__questionnaire=questionnaire_id).order_by('number')
-            print question
-            print "QUESTIONS: " + str(question.__len__())
+
+            type = question[0].type
+
+            # Define type of chart
+            chart_type = 'piechart'
+
+            # print "QUESTIONS: " + str(question.__len__())
 
             #Chart PIECHART
-            if type == 'piechart':
+            if chart_type == 'piechart':
                 results = self.piechartResults(question)
 
 

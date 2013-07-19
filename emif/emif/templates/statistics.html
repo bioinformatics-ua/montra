@@ -71,7 +71,9 @@
 {% endblock %}
 
 {% block scriptextraincludes %}
-    <script src="http://d3js.org/d3.v3.min.js"></script>7
+    <script src="static/js/d3/d3.v3.min.js"></script>
+    <script src="static/js/d3/d3.layout.cloud.js"></script>
+    <script src="static/js/d3/tooltip.js"></script>
     <script src="static/js/charts_d3.js"></script>
 
 {% endblock %}
@@ -90,15 +92,16 @@
         {% if qt.stats == 1  %}
         $("#chart_{{ qt.number }}").ready(function() {
             <!--console.log({{ questionnaire_id }}, {{ questionset.id }}, '{{ qt.slug }}', 'piechart', 'chart_{{ qt.number }}');-->
-            draw_chart({{ questionnaire_id }}, {{ questionset.id }}, '{{ qt.slug }}', 'piechart', 'chart_{{ qt.number }}');
+            draw_chart({{ questionnaire_id }}, {{ questionset.id }}, '{{ qt.slug }}', 'chart_{{ qt.number }}');
+            draw_tagcloud('chart_{{ qt.number }}')
         });
         {% endif %}
     {% endfor %}
     <!---->
 
      <!-- Function draw_chart() -->
-    function draw_chart(q_id, qs_id, slug, type, div_id) {
-        var values = getQuestionValues(q_id, qs_id, slug, type);
+    function draw_chart(q_id, qs_id, slug, div_id) {
+        var values = getQuestionValues(q_id, qs_id, slug);
         <!-- Falta verificar se não existem respostas para a pergunta -->
         <!-- Caso não exista, não desenha o gráfico, caso contrário, chama a função draw_chart() -->
         if (values != '')

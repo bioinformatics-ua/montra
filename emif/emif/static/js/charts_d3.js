@@ -5,7 +5,7 @@
 //});
 
 
-function getQuestionValues(questionnaire_id, questionset_id, slug, type) {
+function getQuestionValues(questionnaire_id, questionset_id, slug) {
     var result = "";
     $.ajax({
         type: "GET",
@@ -15,8 +15,7 @@ function getQuestionValues(questionnaire_id, questionset_id, slug, type) {
             csrfmiddlewaretoken: $('input[name="csrfmiddlewaretoken"]').prop('value'),
             q_id: questionnaire_id,
             qs_id: questionset_id,
-            slug: slug,
-            type: type
+            slug: slug
         },
         success: function (data) {
             //        alert("success");
@@ -29,7 +28,7 @@ function getQuestionValues(questionnaire_id, questionset_id, slug, type) {
 
 
 function draw_piechart(jsonData,div_id) {
-;
+
     var data = JSON.parse(jsonData);
 
 //    d3.json("http://localhost:8000/api/stats", function (error, data) {
@@ -89,4 +88,67 @@ function draw_piechart(jsonData,div_id) {
             });
 
 //    });
+}
+
+function draw_tagcloud(div_id) {
+    var jWord = ["abc","def","ghi", "jkl"];
+    var jCount = ["20", "50", "30", "80"];
+    var words = [
+  {text: "abc", size: 20},
+  {text: "def", size: 50},
+  {text: "ghi", size: 30},
+  {text: "dasdas", size: 50},
+  {text: "gdasdfhi", size: 80},
+  {text: "ghgfdgfdi", size: 30},
+  {text: "gdfgdhi", size: 30},{text: "ghi", size: 30},
+  {text: "rrttre", size: 50},
+  {text: "rte", size: 90},
+  {text: "ghgfdytrytrgfdi", size: 30},
+  {text: "ewerwerw", size: 30},
+  {text: "jkl", size: 80}
+];
+
+    var fill = d3.scale.category20();
+    var max = d3.max(words, function(d) { return d.size; })
+    var tooltip = d3.select("body")
+
+
+    d3.layout.cloud().size([900, 300])
+      .words(words.map(function(d) {
+          return {text: d.text, size: d.size};
+        }))
+      .padding(5)
+      .rotate(function(d) { return ~~(Math.random()* (d.size - max/2)) ; })
+      .font("Impact")
+      .fontSize(function(d) { return d.size; })
+      .on("end", draw)
+      .start();
+
+    function draw(words) {
+    d3.select('#' + div_id).append("svg")
+        .attr("width", 900)
+        .attr("height", 300)
+      .append("g")
+        .attr("transform", "translate(400,150)")
+      .selectAll("text")
+        .data(words)
+      .enter().append("text")
+        .style("font-size", function(d) { return d.size + "px"; })
+        .style("font-family", "Impact")
+        .style("fill", function(d, i) { return fill(i); })
+        .attr("text-anchor", "middle")
+        .attr("transform", function(d) {
+          return "translate(" + [d.x, d.y] + ")rotate(" + d.rotate + ")";
+        })
+        .text(function(d) { return d.text; })
+        .on("click", function(d) { alert(d.text) })
+        .call(d3.helper.tooltip()
+//            .attr({class: function(d, i) { return d + ' ' +  i + ' A'; }})
+//            .style({color: 'blue'})
+            .text(function(d){ return d.size; })
+        )
+//            .on('mouseover', function(d, i){ d3.select(this).style({fill: 'skyblue'}); })
+//            .on('mouseout', function(d, i){ d3.select(this).style({fill: 'aliceblue'}); });
+
+    }
 }
