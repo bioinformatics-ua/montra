@@ -41,13 +41,17 @@ class Statistic(object):
         if results:
             values_aux = dict()
             for r in results:
-                try:
-                    if r.values()[0] in values_aux.keys():
-                        values_aux[r.values()[0]] += 1
-                    else:
-                        values_aux[r.values()[0]] = 1
-                except:
-                    raise
+
+                for s in r.values()[0].split("#"):
+                    
+                    if s:
+                        try:
+                            if s in values_aux.keys():
+                                values_aux[s] += 1
+                            else:
+                                values_aux[s] = 1
+                        except:
+                            raise
             values.append(values_aux)
 
         return values

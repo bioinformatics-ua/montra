@@ -97,16 +97,15 @@
 
     <!-- Call draw_chart() function -->
     {% for qt in questions_list %}
+        <!--$("#chart_{{ qt.number }}").ready(function() {-->
+        $(function() {
         {% if qt.stats == 1  %}
-        $("#chart_{{ qt.number }}").ready(function() {
-
+        <!--console.log('{{ qt.number }}');-->
             <!--console.log({{ questionnaire_id }}, {{ questionset.id }}, '{{ qt.slug }}', 'piechart', 'chart_{{ qt.number }}');-->
             draw_chart({{ questionnaire_id }}, {{ questionset.id }}, '{{ qt.slug }}', 'chart_{{ qt.number }}', '{{ qt.type }}', '{{ qt.number }}');
 
-
-
-        });
         {% endif %}
+        });
     {% endfor %}
     <!---->
 
@@ -115,8 +114,7 @@
         var char_type;
         var values = getQuestionValues(q_id, qs_id, slug);
          <!--console.log(values);-->
-        <!-- Falta verificar se não existem respostas para a pergunta -->
-        <!-- Caso não exista, não desenha o gráfico, caso contrário, chama a função draw_chart() -->
+
         if (values != '') {
         <!--drawPie(pieName, dataSet, selectString, colors, margin, outerRadius, innerRadius, sortArcs)-->
             switch(type){
@@ -157,12 +155,10 @@
                 default:
                 drawHorizontalBarChart(div_id, values, "#"+div_id, "colorScale10");
             }
+        <!-- Se não existem respostas para a pergunta, a div da pergunta é ocultada -->
         } else {
-            <!--alert('#question-text-'+number);-->
             $('#question-text-'+number).hide();
         }
-
-
     }
 
 

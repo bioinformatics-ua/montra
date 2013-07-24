@@ -18,8 +18,6 @@ function getQuestionValues(questionnaire_id, questionset_id, slug) {
             slug: slug
         },
         success: function (data) {
-            //        alert("success");
-//            console.log("Response: " + data);
             result = data;
         }
     });
@@ -31,9 +29,6 @@ function getQuestionValues(questionnaire_id, questionset_id, slug) {
 function draw_piechart(jsonData, div_id) {
 
     var data = JSON.parse(jsonData);
-
-//    d3.json("http://localhost:8000/api/stats", function (error, data) {
-//    d3.json(myjson, function (error, data) {
 
     var w = 620;
     var h = 480;
@@ -523,7 +518,18 @@ function drawPie(pieName, dataSet, selectString, colors, margin, outerRadius, in
         .style("fill", "Black")
         .style("font", "normal 1.1em Arial")
         .on('mouseover', synchronizedMouseOver)
-        .on("mouseout", synchronizedMouseOut);
+        .on("mouseout", synchronizedMouseOut)
+    .call(d3.helper.tooltip()
+                .style({position: 'absolute', 'z-index': 10000, border: '2px solid black',
+                    padding: '3px 5px;', margin: 'auto', 'background-color': 'rgba(0, 0, 0, 0.8)',
+                    color: 'white', 'font-size': '12px', 'font-family': 'arial', 'border-top-left-radius': '5px',
+                    'border-top-right-radius': '5px', 'border-bottom-right-radius': '5px',
+                    'border-bottom-left-radius': '5px', 'vertical-align': 'middle', 'text-align': 'center',
+                    'min-width': '50px', 'overflow': 'auto'})
+                .text(function (d) {
+                    return d.name + "<br />" + d.score;
+                })
+            );
 
 };
 
@@ -672,10 +678,22 @@ function drawHorizontalBarChart(chartID, dataSet, selectString, colors) {
           .attr("x", x)
           .attr("y", function(d, i) { return y(i); })
           //.attr("y", function(d) { return y(d) + y.rangeBand() / 2; })
-          .attr("dx", function(d) { return x(d.score) - 5; })
+//          .attr("dx", function(d) { return x(d.score) - 5; })
+          .attr("dx", function() {return barsWidthTotal - 5; })
           .attr("dy", barHeight-5) // vertical-align: middle
           .attr("text-anchor", "end") // text-align: right
           .text(function(d) { return d.score;})
+          .call(d3.helper.tooltip()
+                .style({position: 'absolute', 'z-index': 10000, border: '2px solid black',
+                    padding: '3px 5px;', margin: 'auto', 'background-color': 'rgba(0, 0, 0, 0.8)',
+                    color: 'white', 'font-size': '12px', 'font-family': 'arial', 'border-top-left-radius': '5px',
+                    'border-top-right-radius': '5px', 'border-bottom-right-radius': '5px',
+                    'border-bottom-left-radius': '5px', 'vertical-align': 'middle', 'text-align': 'center',
+                    'min-width': '50px', 'overflow': 'auto'})
+                .text(function (d) {
+                    return d.name + "<br />" + d.score;
+                })
+            )
           .attr("fill", "White");
 
       // Plot the bullet circles...
@@ -709,6 +727,17 @@ function drawHorizontalBarChart(chartID, dataSet, selectString, colors) {
               .attr("index_value", function(d, i) { return "index-" + i; })
               .attr("class", function(d, i) { return "bars-" + chartID + "-legendText-index-" + i; })
               .on('mouseover', synchronizedMouseOver)
-              .on("mouseout", synchronizedMouseOut);
+              .on("mouseout", synchronizedMouseOut)
+      .call(d3.helper.tooltip()
+                .style({position: 'absolute', 'z-index': 10000, border: '2px solid black',
+                    padding: '3px 5px;', margin: 'auto', 'background-color': 'rgba(0, 0, 0, 0.8)',
+                    color: 'white', 'font-size': '12px', 'font-family': 'arial', 'border-top-left-radius': '5px',
+                    'border-top-right-radius': '5px', 'border-bottom-right-radius': '5px',
+                    'border-bottom-left-radius': '5px', 'vertical-align': 'middle', 'text-align': 'center',
+                    'min-width': '50px', 'overflow': 'auto'})
+                .text(function (d) {
+                    return d.name + "<br />" + d.score;
+                })
+            );
 
       };
