@@ -552,7 +552,7 @@ def database_edit(request, fingerprint_id, questionnaire_id, template_name="data
     errors = {}
 
     try:
-        q_id = 1
+        q_id = questionnaire_id
         qs_id = 1
         qs_list = QuestionSet.objects.filter(questionnaire=q_id)
         #print "Q_id: " + q_id
