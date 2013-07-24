@@ -392,11 +392,16 @@ def results_diff(request, page=1, template_name='results_diff.html'):
 
 
 def geo(request, template_name='geo.html'):
-    query = request.session['query']
+    query = None
+    try:
+        query = request.session['query']
+        query = 'text_t:' + query
+    except:
+        pass
     if query == None:
         query = "*:*"
     print "query@" + query
-    list_databases = get_databases_from_solr(request, 'text_t:' + query)
+    list_databases = get_databases_from_solr(request, query)
     list_locations = []
     for database in list_databases:
         list_locations.append(database.location)
@@ -404,7 +409,14 @@ def geo(request, template_name='geo.html'):
                                            'list_cities': list_locations})
 
 
+<<<<<<< HEAD
 def statistics(request, questionnaire_id, question_set, template_name='statistics.html'):
+=======
+
+
+def statistics(request, template_name='statistics.html'):
+    from emif.statistics import Statistic
+>>>>>>> 427e412cd4ec589ed09cbb8ba4eb577de00a6e03
 
     # print "QUESTIONNAIRE_ID: " + str(questionnaire_id)
     # print "QUESTION_SET: " + str(question_set)
@@ -547,7 +559,7 @@ def database_edit(request, fingerprint_id, questionnaire_id, template_name="data
     errors = {}
 
     try:
-        q_id = 1
+        q_id = questionnaire_id
         qs_id = 1
         qs_list = QuestionSet.objects.filter(questionnaire=q_id)
         #print "Q_id: " + q_id
