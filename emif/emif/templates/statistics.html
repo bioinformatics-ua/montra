@@ -62,7 +62,7 @@
 
             {% for qt in questions_list %}
                 {% if qt.stats == 1 or qt.type == 'comment' %}
-                <div class="question-text"><span>{{ qt.number }}. {{ qt.text|safe }}</span></div>
+                <div id="question-text-{{ qt.number }}" class="question-text"><span>{{ qt.number }}. {{ qt.text|safe }}</span></div>
                     {% if qt.stats == 1 %}
                         <div  id="chart_{{ qt.number }}"></div>
                         <!--<svg id="chart_{{ qt.number }}" class="mypiechart"></svg>-->
@@ -101,7 +101,7 @@
         $("#chart_{{ qt.number }}").ready(function() {
 
             <!--console.log({{ questionnaire_id }}, {{ questionset.id }}, '{{ qt.slug }}', 'piechart', 'chart_{{ qt.number }}');-->
-            draw_chart({{ questionnaire_id }}, {{ questionset.id }}, '{{ qt.slug }}', 'chart_{{ qt.number }}', '{{ qt.type }}');
+            draw_chart({{ questionnaire_id }}, {{ questionset.id }}, '{{ qt.slug }}', 'chart_{{ qt.number }}', '{{ qt.type }}', '{{ qt.number }}');
 
 
 
@@ -111,7 +111,7 @@
     <!---->
 
      <!-- Function draw_chart() -->
-    function draw_chart(q_id, qs_id, slug, div_id, type) {
+    function draw_chart(q_id, qs_id, slug, div_id, type, number) {
         var char_type;
         var values = getQuestionValues(q_id, qs_id, slug);
          <!--console.log(values);-->
@@ -133,7 +133,7 @@
                     chart_type = 'pie';
                     break;
                 case 'choice-multiple':
-                    chart_type = 'pie';
+                    chart_type = 'drawHorizontalBarChart';
                     break;
                 case 'choice-yesno':
                     chart_type = 'pie';
@@ -158,8 +158,8 @@
                 drawHorizontalBarChart(div_id, values, "#"+div_id, "colorScale10");
             }
         } else {
-            alert("#"+div_id);
-            $("#"+div_id).hide();
+            <!--alert('#question-text-'+number);-->
+            $('#question-text-'+number).hide();
         }
 
 

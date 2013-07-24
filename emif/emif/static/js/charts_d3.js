@@ -547,7 +547,7 @@ function drawHorizontalBarChart(chartID, dataSet, selectString, colors) {
         var barHeight = 20;
         var barsHeightTotal = barHeight * data.charts.length;
         //var canvasHeight = 200;
-        var canvasHeight = data.charts.length * barHeight + 10; // +10 puts a little space at bottom.
+        var canvasHeight = data.charts.length * barHeight + 50; // +10 puts a little space at bottom.
         var legendOffset = barHeight/2;
         var legendBulletOffset = 30;
         var legendTextOffset = 20;
@@ -633,8 +633,8 @@ function drawHorizontalBarChart(chartID, dataSet, selectString, colors) {
             // NOTE: the "15 represents an offset to allow for space to place magnitude
             // at end of bars.  May have to address this better, possibly by placing the
             // magnitude within the bars.
-            //.attr("x", function(d) { return barsWidthTotal - x(d.magnitude) + 15; }) // Left to right
-            .attr("x", 0) // Right to left
+            .attr("x", function(d) { return barsWidthTotal - x(d.score) + 10; }) // Left to right
+//            .attr("x", 0) // Right to left
             .attr("y", function(d, i) { return y(i); })
             .attr("height", barHeight)
             .on('mouseover', synchronizedMouseOver)
@@ -654,9 +654,9 @@ function drawHorizontalBarChart(chartID, dataSet, selectString, colors) {
             .style("stroke", "White" )
             .transition()
 
-	      .ease("bounce")
-              .duration(1500)
-              .delay(function(d, i) { return i * 100; })
+//	      .ease("bounce")
+//              .duration(1500)
+//              .delay(function(d, i) { return i * 100; })
             .attr("width", function(d) { return x(d.score); })
             .style("fill", function(d, i) { colorVal = colorScale(i); return colorVal; } )
             .attr("index_value", function(d, i) { return "index-" + i; })
