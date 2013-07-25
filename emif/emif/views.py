@@ -1417,7 +1417,7 @@ def show_fingerprint_page_errors(request, q_id, qs_id, errors={}, template_name=
     """
     try:
 
-        qs_list = QuestionSet.objects.filter(questionnaire=q_id)
+        qs_list = QuestionSet.objects.filter(questionnaire=q_id).order_by('sortid')
         #print "Q_id: " + q_id
         #print "Qs_id: " + qs_id
         #print "SortID: " + str(sortid)
