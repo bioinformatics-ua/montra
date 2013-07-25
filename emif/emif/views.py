@@ -1401,8 +1401,8 @@ def check_database_add_conditions(request, questionnaire_id, sortid,
     else:
         sortid = next_qs.sortid
     question_set = str(next_qs.pk)
-    #print question_set
-    #print sortid
+    print question_set
+    print sortid
     return show_fingerprint_page_errors(request, questionnaire_id, question_set,
                                         errors={}, template_name='database_add.html', next=True, sortid=sortid,
                                         fingerprint_id=fingerprint_id)
