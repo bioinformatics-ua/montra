@@ -198,6 +198,7 @@ INSTALLED_APPS = (
 
     # Django Rest Framework 
     'rest_framework',
+    'rest_framework.authtoken',
 
     # Bootstrap layouts and forms
     'crispy_forms',
@@ -326,6 +327,8 @@ LOGIN_EXEMPT_URLS = (
  r'^accounts/activate/(?P<activation_key>\w+)/$',
  r'^accounts/signup/complete',
  r'^accounts/password/reset/',
+ r'^api/insert',
+ r'^api-token-auth-create/',
 )
 
 #Set session idle timeout (seconds)
@@ -334,3 +337,10 @@ SESSION_SAVE_EVERY_REQUEST = True
 
 try: from local_settings import *
 except: pass
+
+REST_FRAMEWORK = {
+   'DEFAULT_AUTHENTICATION_CLASSES': (
+       'rest_framework.authentication.TokenAuthentication',
+   ),
+
+}

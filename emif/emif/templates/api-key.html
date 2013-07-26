@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+{% load url from future %}
+{% load django_bootstrap_breadcrumbs %}
+
+<!--{% block breadcrumbs %}-->
+    <!--{{ block.super }}-->
+    
+    <!--{% breadcrumb "My Databases" "databases" %}-->
+
+<!--{% endblock %}-->
+<a href="/api-token-auth-create">API Token</a>
+
+{% block content %}
+
+        <p><strong>User:</strong> {{ user}}</p>
+        <p><strong>Token:</strong> {{ token}}</p>
+        <p><strong>Fingerptints:</strong> </p>
+        {% if list_databases %}
+
+        {% for t in list_databases %}
+        <ul>
+            <li>Name: {{ t.name }}</li>
+            <li>ID: {{ t.id }}</li>
+            <li>Institution: {{ t.institution }}</li>
+            <li>Location: {{ t.location }}</li>
+            <li>Date: {{ t.date }}</li>
+        </ul>
+        {% endfor %}
+
+        {% else %}
+        <p><strong>Info: </strong> Currently, there are no databases in your account. You can add new ones through the option "Workspace -> Add new databases"</p>
+        {% endif %}
+
+{% endblock %}

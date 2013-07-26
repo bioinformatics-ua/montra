@@ -41,6 +41,8 @@ from emif.models import *
 
 from django.core.mail import send_mail, BadHeaderError
 
+from rest_framework.authtoken.models import Token
+
 import logging
 import re
 import md5
@@ -1807,6 +1809,27 @@ def show_fingerprint_page(request, runinfo, errors={}, template_name='database_e
     r['Cache-Control'] = 'no-cache'
     r['Expires'] = "Thu, 24 Jan 1980 00:00:00 GMT"
     return r
+
+
+def create_auth_token(request):
+    """
+    Method to create token to authenticate when calls REST API
+    """
+
+    user = request.user
+    if not Token.objects.filter(user=user).exists():
+        token = Token.objects.create(user=request.user)
+    else:
+        token = Token.objects.get(user=user)
+
+    # print token
+
+    list_databases = get_databases_from_solr(request, "user_t:" + user.username)
+    # for database in list_databases:
+    #     print database.id
+
+    return render_to_response('api-key.html', {'list_databases': list_databases, 'token': token, 'user': user,
+                              'request': request}, RequestContext(request))
 
 
 
