@@ -104,8 +104,9 @@ class AdvancedSearchView(APIView):
 class InsertView(APIView):
     def get(self, request, *args, **kw):
         result = {'myV22222alue': 'lol', 'myValue2': 'lol'}
-        response = Response(result, status=status.HTTP_200_OK)
 
+        response = Response(result, status=status.HTTP_200_OK)
+        response['Access-Control-Allow-Origin'] = "*"
         return response
 
     permission_classes = (AllowAny,)
@@ -118,9 +119,8 @@ class InsertView(APIView):
         # print (query)
         # print(json.loads(request.POST.get('_content')).get('myValue'))
         print request.POST
-        # for param in request.POST:
-        #     print(param)
-        #     print(request.POST.get(param))
+        for param in request.POST:
+            print str(param) + " -> " + str(request.POST.get(param))
         #print "dasd"
         #print request.POST.items()
         #for i in request.POST.items():
@@ -128,7 +128,6 @@ class InsertView(APIView):
         #    json_test = json.loads(i[0])
         #    print json_test
         #data = JSONParser().parse(request)
-
 
         #c = CoreEngine()
         #print request.content_type
@@ -139,6 +138,7 @@ class InsertView(APIView):
 
         result = {'myValue': 'lol', 'myValue2': 'lol'}
         response = Response(result, status=status.HTTP_200_OK)
+        response['Access-Control-Allow-Origin'] = "*"
 
         return response
 
