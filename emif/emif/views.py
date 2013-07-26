@@ -794,7 +794,7 @@ def all_databases(request, template_name='alldatabases.html'):
     list_databases = get_databases_from_solr(request, "*:*")
 
     return render(request, template_name, {'request': request,
-                                           'list_databases': list_databases, 'breadcrumb': True, 'collapseall': False})
+                                           'list_databases': list_databases, 'breadcrumb': True, 'collapseall': False, 'geo': True})
 
 
 def createqsets(runcode, qsets=None):
@@ -1407,8 +1407,8 @@ def check_database_add_conditions(request, questionnaire_id, sortid,
     else:
         sortid = next_qs.sortid
     question_set = str(next_qs.pk)
-    #print question_set
-    #print sortid
+    print question_set
+    print sortid
     return show_fingerprint_page_errors(request, questionnaire_id, question_set,
                                         errors={}, template_name='database_add.html', next=True, sortid=sortid,
                                         fingerprint_id=fingerprint_id)
@@ -1423,7 +1423,7 @@ def show_fingerprint_page_errors(request, q_id, qs_id, errors={}, template_name=
     """
     try:
 
-        qs_list = QuestionSet.objects.filter(questionnaire=q_id)
+        qs_list = QuestionSet.objects.filter(questionnaire=q_id).order_by('sortid')
         #print "Q_id: " + q_id
         #print "Qs_id: " + qs_id
         #print "SortID: " + str(sortid)
