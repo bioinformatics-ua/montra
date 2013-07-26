@@ -411,14 +411,11 @@ def geo(request, template_name='geo.html'):
                                            'list_cities': list_locations})
 
 
-<<<<<<< HEAD
+
 def statistics(request, questionnaire_id, question_set, template_name='statistics.html'):
-=======
 
-
-def statistics(request, template_name='statistics.html'):
     from emif.statistics import Statistic
->>>>>>> 427e412cd4ec589ed09cbb8ba4eb577de00a6e03
+
 
     # print "QUESTIONNAIRE_ID: " + str(questionnaire_id)
     # print "QUESTION_SET: " + str(question_set)
