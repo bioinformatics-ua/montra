@@ -788,7 +788,7 @@ def all_databases(request, template_name='alldatabases.html'):
     list_databases = get_databases_from_solr(request, "*:*")
 
     return render(request, template_name, {'request': request,
-                                           'list_databases': list_databases, 'breadcrumb': True, 'collapseall': False})
+                                           'list_databases': list_databases, 'breadcrumb': True, 'collapseall': False, 'geo': True})
 
 
 def createqsets(runcode, qsets=None):
