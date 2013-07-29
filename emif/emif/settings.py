@@ -105,7 +105,7 @@ MEDIA_URL = ''
 # Example: "/home/media/media.lawrence.com/static/"
 
 if DEBUG:
-    STATIC_ROOT = ''    
+    STATIC_ROOT = ''
 else:
     STATIC_ROOT = PROJECT_DIR_ROOT + 'emif/emif/collected-static'
 
@@ -185,7 +185,7 @@ INSTALLED_APPS = (
     # Questionnaires
     'transmeta',
     'questionnaire',
-    'questionnaire.page',                                                                                                                   
+    'questionnaire.page',
 
     # User signup/signin/management
     'userena',
@@ -319,28 +319,30 @@ JENKINS_TASKS = (
 
 #Pages that do not require login
 LOGIN_EXEMPT_URLS = (
- r'^$',
- r'^about',
- r'^feedback',
- r'^accounts/signup',
- r'^accounts/signin',
- r'^accounts/activate/(?P<activation_key>\w+)/$',
- r'^accounts/signup/complete',
- r'^accounts/password/reset/',
- r'^api/insert',
- r'^api-token-auth-create/',
+    r'^$',
+    r'^about',
+    r'^feedback',
+    r'^accounts/signup',
+    r'^accounts/signin',
+    r'^accounts/activate/(?P<activation_key>\w+)/$',
+    r'^accounts/signup/complete',
+    r'^accounts/password/reset/',
+    r'^api/insert',
+    r'^api-token-auth-create/',
 )
 
 #Set session idle timeout (seconds)
 SESSION_IDLE_TIMEOUT = 7200
 SESSION_SAVE_EVERY_REQUEST = True
 
-try: from local_settings import *
-except: pass
+try:
+    from local_settings import *
+except:
+    pass
 
 REST_FRAMEWORK = {
-   'DEFAULT_AUTHENTICATION_CLASSES': (
-       'rest_framework.authentication.TokenAuthentication',
-   ),
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework.authentication.TokenAuthentication',
+    ),
 
 }

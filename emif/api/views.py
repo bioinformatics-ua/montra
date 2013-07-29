@@ -24,9 +24,9 @@ from django.contrib.auth.models import User
 from questionnaire.models import *
 from questionnaire.parsers import *
 from questionnaire.views import *
-from rest_framework import generics
 from rest_framework import permissions
 from rest_framework import renderers
+from rest_framework.authentication import TokenAuthentication
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.reverse import reverse
@@ -102,43 +102,58 @@ class AdvancedSearchView(APIView):
 
 
 class InsertView(APIView):
+    authentication_classes = (TokenAuthentication,)
+    # permission_classes = (permissions.AllowAny,)
+    # permission_classes = (permissions.IsAuthenticated,)
+
     def get(self, request, *args, **kw):
-        result = {'myV22222alue': 'lol', 'myValue2': 'lol'}
+
+        # If authenticated
+        if request.auth:
+            user = request.user
+            result = {'status': 'authenticated', 'method': 'GET', 'user': str(user)}
 
         response = Response(result, status=status.HTTP_200_OK)
-        response['Access-Control-Allow-Origin'] = "*"
+
+        # response['Access-Control-Allow-Origin'] = "*"
+        # response['Access-Control-Allow-Headers'] = "Authorization"
+
         return response
 
-    permission_classes = (AllowAny,)
-
     def post(self, request, *args, **kw):
+
+        # If authenticated
+        if request.auth:
+            user = request.user
+            result = {'status': 'authenticated', 'method': 'POST', 'user': str(user)}
+
         # Process any get params that you may need
         # If you don't need to process get params,
         # you can skip this part
         # query = request.POST.get('myValue2', None)
         # print (query)
         # print(json.loads(request.POST.get('_content')).get('myValue'))
-        print request.POST
-        for param in request.POST:
-            print str(param) + " -> " + str(request.POST.get(param))
-        #print "dasd"
-        #print request.POST.items()
-        #for i in request.POST.items():
-        #    print i[0]
-        #    json_test = json.loads(i[0])
-        #    print json_test
-        #data = JSONParser().parse(request)
+        # print request.META.get('Authorization')
+        #
 
-        #c = CoreEngine()
-        #print request.content_type
-        #print request
-        #print(json.loads(request.POST.get('_content')))
-
-        #c.index_fingerprint_as_json(json.loads(request.POST.get('_content')))
-
-        result = {'myValue': 'lol', 'myValue2': 'lol'}
+        # #print request.POST.items()
+        # #for i in request.POST.items():
+        # #    print i[0]
+        # #    json_test = json.loads(i[0])
+        # #    print json_test
+        # #data = JSONParser().parse(request)
+        #
+        # #c = CoreEngine()
+        # #print request.content_type
+        # #print request
+        # #print(json.loads(request.POST.get('_content')))
+        #
+        # #c.index_fingerprint_as_json(json.loads(request.POST.get('_content')))
+        #
+        # result = {'myValue': 'lol', 'myValue2': 'lol'}
         response = Response(result, status=status.HTTP_200_OK)
-        response['Access-Control-Allow-Origin'] = "*"
+        # response['Access-Control-Allow-Origin'] = "*"
+        # response['Access-Control-Allow-Headers'] = "Authorization"
 
         return response
 

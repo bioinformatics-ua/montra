@@ -786,7 +786,8 @@ def databases(request, template_name='databases.html'):
     list_databases = get_databases_from_solr(request, "user_t:" + user.username)
 
     return render(request, template_name, {'request': request,
-                                           'list_databases': list_databases, 'breadcrumb': True, 'collapseall': False})
+                                           'list_databases': list_databases, 'breadcrumb': True, 'collapseall': False,
+                                           'api_token': True})
 
 
 def all_databases(request, template_name='alldatabases.html'):

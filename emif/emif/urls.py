@@ -216,6 +216,6 @@ urlpatterns = patterns('',
         userena_views.ProfileListView.as_view(),
         name='userena_profile_list'),
 
-    # url(r'^api-token-auth/', 'rest_framework.authtoken.views.obtain_auth_token'),
-    url(r'^api-token-auth-create/', 'emif.views.create_auth_token'),
+    # url(r'^api-upload-info/', 'rest_framework.authtoken.views.obtain_auth_token'),
+    url(r'^api-upload-info/', 'emif.views.create_auth_token'),
 )
