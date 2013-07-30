@@ -69,6 +69,8 @@ def api_root(request, format=None):
 
 
 class SearchView(APIView):
+    authentication_classes = (TokenAuthentication,)
+
     def get(self, request, *args, **kw):
         # Process any get params that you may need
         # If you don't need to process get params,
@@ -151,7 +153,7 @@ class MetaDataView(APIView):
         # #c.index_fingerprint_as_json(json.loads(request.POST.get('_content')))
         #
         # result = {'myValue': 'lol', 'myValue2': 'lol'}
-        response = Response(result, status=status.HTTP_200_OK)
+        response = Response(result, status=status.HTTP_201_CREATED)
         # response['Access-Control-Allow-Origin'] = "*"
         # response['Access-Control-Allow-Headers'] = "Authorization"
 

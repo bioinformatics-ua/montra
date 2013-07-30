@@ -328,6 +328,7 @@ LOGIN_EXEMPT_URLS = (
     r'^accounts/signup/complete',
     r'^accounts/password/reset/',
     r'^api/metadata',
+    r'^api/search',
     r'^api-token-auth-create/',
 )
 
