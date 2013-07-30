@@ -21,12 +21,12 @@
 from django.conf.urls import patterns, url
 from rest_framework.urlpatterns import format_suffix_patterns
 
-from api.views import SearchView, InsertView, StatsView, ValidateView
+from api.views import SearchView, MetaDataView, StatsView, ValidateView
 
 urlpatterns = patterns('api.views',
     url(r'^root/$', 'api_root'),
     url(r'^search$', SearchView.as_view(), name='search'),
-    url(r'^insert$', InsertView.as_view(), name='insert'),
+    url(r'^metadata', MetaDataView.as_view(), name='metadata'),
     url(r'^stats$', StatsView.as_view(), name='stats'),
     url(r'^validate$', ValidateView.as_view(), name='validate'),
 

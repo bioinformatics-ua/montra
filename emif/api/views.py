@@ -61,7 +61,7 @@ class JSONResponse(HttpResponse):
 def api_root(request, format=None):
     return Response({
         'search': reverse('search', request=request),
-        'insert': reverse('insert', request=request),
+        'metadata': reverse('metadata', request=request),
         'stats': reverse('stats', request=request),
         'validate': reverse('validate', request=request),
 
@@ -101,7 +101,7 @@ class AdvancedSearchView(APIView):
         return response
 
 
-class InsertView(APIView):
+class MetaDataView(APIView):
     authentication_classes = (TokenAuthentication,)
     # permission_classes = (permissions.AllowAny,)
     # permission_classes = (permissions.IsAuthenticated,)
@@ -168,7 +168,6 @@ class ValidateView(APIView):
 
         response = Response(result, status=status.HTTP_200_OK)
         return response
-
 
     def post(self, request, *args, **kw):
         try:
