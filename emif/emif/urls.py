@@ -218,4 +218,5 @@ urlpatterns = patterns('',
 
     # url(r'^api-upload-info/', 'rest_framework.authtoken.views.obtain_auth_token'),
     url(r'^api-info/', 'emif.views.create_auth_token'),
+    url(r'^docs/api', 'emif.views.docs_api'),
 )

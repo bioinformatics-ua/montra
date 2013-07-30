@@ -666,11 +666,6 @@ def database_edit(request, fingerprint_id, questionnaire_id, template_name="data
     return r
 
 
-# Documentation 
-def docs_api(request, template_name='docs/api.html'):
-    return render(request, template_name, {'request': request})
-
-
 class Database:
     id = ''
     name = ''
@@ -1809,7 +1804,7 @@ def show_fingerprint_page(request, runinfo, errors={}, template_name='database_e
     return r
 
 
-def create_auth_token(request):
+def create_auth_token(request, templateName='api-key.html'):
     """
     Method to create token to authenticate when calls REST API
     """
@@ -1826,9 +1821,12 @@ def create_auth_token(request):
     # for database in list_databases:
     #     print database.id
 
-    return render_to_response('api-key.html', {'list_databases': list_databases, 'token': token, 'user': user,
-                              'request': request}, RequestContext(request))
+    return render_to_response(templateName, {'list_databases': list_databases, 'token': token, 'user': user,
+                              'request': request, 'breadcrumb': True}, RequestContext(request))
 
 
+# Documentation
+def docs_api(request, template_name='docs/api.html'):
+    return render(request, template_name, {'request': request})
 
 
