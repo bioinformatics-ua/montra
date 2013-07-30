@@ -2,33 +2,121 @@
 {% load url from future %}
 {% load django_bootstrap_breadcrumbs %}
 
-<!--{% block breadcrumbs %}-->
-    <!--{{ block.super }}-->
-    
-    <!--{% breadcrumb "My Databases" "databases" %}-->
+{% block breadcrumbs %}
+{{ block.super }}
 
-<!--{% endblock %}-->
-
-
-{% block content %}
-
-        <p><strong>User:</strong> {{ user}}</p>
-        <p><strong>Token:</strong> {{ token}}</p>
-        <p><strong>Fingerptints:</strong> </p>
-        {% if list_databases %}
-
-        {% for t in list_databases %}
-        <ul>
-            <li>Name: {{ t.name }}</li>
-            <li>ID: {{ t.id }}</li>
-            <li>Institution: {{ t.institution }}</li>
-            <li>Location: {{ t.location }}</li>
-            <li>Date: {{ t.date }}</li>
-        </ul>
-        {% endfor %}
-
-        {% else %}
-        <p><strong>Info: </strong> Currently, there are no databases in your account. You can add new ones through the option "Workspace -> Add new databases"</p>
-        {% endif %}
+{% breadcrumb "My Databases" "databases" %}
 
 {% endblock %}
+
+{% block headextra %}
+    <link rel="stylesheet" href="static/css/theme.blue.css">
+{% endblock %}
+
+
+{% block scriptextraincludes %}
+    <script src="static/js/vendor/jquery.tablesorter.min.js"></script>
+    <script src="static/js/vendor/jquery.tablesorter.widgets.js"></script>
+{% endblock %}
+
+{% block content %}
+<div class="container"></div>
+
+    <div class="row-fluid">
+        <div class="span6">
+            <h3>API Info Details</h3>
+        </div>
+        <div class="span6 pull-right" style="text-align:right">
+            <a class="btn right" href="docs/api"> <i class=" icon"></i>
+                API Doc
+            </a>
+        </div>
+    </div>
+    <hr>
+    <p><strong>User:</strong> {{ user}}</p>
+
+    <p><strong>Token:</strong> {{ token}}</p>
+    <hr>
+    <p><strong>Fingerptints</strong></p>
+
+    {% if list_databases %}
+    <table class="table table-hover tablesorter" id="table_databases" data-provides="rowlink">
+        <thead>
+        <tr>
+            <th class="sorter-false filter-false"></th>
+            <th>Name</th>
+            <th>Date</th>
+
+        </tr>
+        </thead>
+        <tbody>
+
+        {% for t in list_databases %}
+        <tr>
+            <td><img src="static/upload_images/{{t.logo}}" width="50px" height="50px"/></td>
+            <td>
+                <a href="fingerprint/{{ t.id }}/1">{{ t.name }}</a>
+
+                <div style="margin-left:20px">
+                    Institution Name: {{t.institution}}
+                </div>
+
+                <div style="margin-left:20px">
+                    Location: {{t.location}}
+                </div>
+                <div style="margin-left:20px">
+                    ID: {{t.id}}
+                </div>
+            </td>
+            <td>{{ t.date }}</td>
+
+
+        </tr>
+
+        {% endfor %}
+
+        </tbody>
+    </table>
+    {% else %}
+    <p><strong>Info: </strong> Currently, there are no databases in your account. You can add new ones through the
+        option "Workspace -> Add new databases"</p>
+    {% endif %}
+
+
+    {% endblock %}
+
+    {% block scriptextra %}
+    {% comment %}
+    <script>
+        {% endcomment %}
+
+        $('#li_workspace').addClass("active");
+
+        $(function () {
+
+            // call the tablesorter plugin
+            $("table").tablesorter({
+                theme: 'blue',
+
+                // sort on the first column and third column in ascending order
+                sortList: [
+                    [0, 0],
+                    [2, 0]
+                ],
+
+                // hidden filter input/selects will resize the columns, so try to minimize the change
+                widthFixed: true,
+
+                // initialize zebra striping and filter widgets
+                widgets: ["zebra", "filter"]
+
+
+            });
+
+        });
+
+        {% comment %}
+    </script>
+    {% endcomment %}
+
+    {% endblock %}

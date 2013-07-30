@@ -217,5 +217,5 @@ urlpatterns = patterns('',
         name='userena_profile_list'),
 
     # url(r'^api-upload-info/', 'rest_framework.authtoken.views.obtain_auth_token'),
-    url(r'^api-upload-info/', 'emif.views.create_auth_token'),
+    url(r'^api-info/', 'emif.views.create_auth_token'),
 )
