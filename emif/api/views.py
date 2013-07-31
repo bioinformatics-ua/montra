@@ -27,7 +27,7 @@ from questionnaire.views import *
 from rest_framework import permissions
 from rest_framework import renderers
 from rest_framework.authentication import TokenAuthentication
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, parser_classes
 from rest_framework.response import Response
 from rest_framework.reverse import reverse
 from rest_framework import serializers
@@ -35,7 +35,8 @@ from rest_framework.views import APIView
 from rest_framework import status
 from rest_framework.renderers import JSONRenderer
 from rest_framework.parsers import JSONParser
-import json
+from django.utils import simplejson
+# import json
 import md5
 from django.views.decorators.csrf import csrf_exempt
 
@@ -57,7 +58,7 @@ class JSONResponse(HttpResponse):
         super(JSONResponse, self).__init__(content, **kwargs)
 
 
-@api_view(('GET', 'POST', 'OPTIONS'))
+@api_view(('GET', 'POST', 'PUT', 'OPTIONS', 'HEAD'))
 def api_root(request, format=None):
     return Response({
         'search': reverse('search', request=request),
@@ -69,22 +70,23 @@ def api_root(request, format=None):
 
 
 class SearchView(APIView):
+    """
+    Class to search and return fingerprint details, like Name, ID and structure
+    """
     authentication_classes = (TokenAuthentication,)
 
     def get(self, request, *args, **kw):
-        # Process any get params that you may need
-        # If you don't need to process get params,
-        # you can skip this part
-        #query = request.GET.get('query', None)
 
-        for param in request.GET:
-            print(param)
-            print(request.GET.get(param))
-        response = None
-        #if query!=None:
+        # If authenticated
+        if request.auth:
+            user = request.user
+            result = {'status': 'authenticated', 'method': 'GET', 'user': str(user)}
+         #if query!=None:
 
         result = {'myValue': 'lol', 'myValue2': 'lol', }
         response = Response(result, status=status.HTTP_200_OK)
+        # response['Access-Control-Allow-Origin'] = "*"
+        # response['Access-Control-Allow-Headers'] = "Authorization"
         #else:
         #    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         return response
@@ -104,56 +106,88 @@ class AdvancedSearchView(APIView):
 
 
 class MetaDataView(APIView):
+    """
+    Class to insert or update data values of one fingerprint
+
+    Method POST: to insert a new field and value
+    Method PUT: to update a value that already exists
+
+    Note: both methods check if field value already exists and, if exists, it is updated,
+    otherwise the field is created and the value added
+    """
     authentication_classes = (TokenAuthentication,)
     # permission_classes = (permissions.AllowAny,)
     # permission_classes = (permissions.IsAuthenticated,)
-
-    def get(self, request, *args, **kw):
-
-        # If authenticated
-        if request.auth:
-            user = request.user
-            result = {'status': 'authenticated', 'method': 'GET', 'user': str(user)}
-
-        response = Response(result, status=status.HTTP_200_OK)
-
-        # response['Access-Control-Allow-Origin'] = "*"
-        # response['Access-Control-Allow-Headers'] = "Authorization"
-
-        return response
+    parser_classes((JSONParser,))
 
     def post(self, request, *args, **kw):
+
 
         # If authenticated
         if request.auth:
             user = request.user
             result = {'status': 'authenticated', 'method': 'POST', 'user': str(user)}
 
-        # Process any get params that you may need
-        # If you don't need to process get params,
-        # you can skip this part
-        # query = request.POST.get('myValue2', None)
-        # print (query)
-        # print(json.loads(request.POST.get('_content')).get('myValue'))
-        # print request.META.get('Authorization')
-        #
+            # objs = json.loads(request.POST)
+            # Iterate through the stuff in the list
+            # for o in objs:
+            #     print o
 
-        # #print request.POST.items()
-        # #for i in request.POST.items():
-        # #    print i[0]
-        # #    json_test = json.loads(i[0])
-        # #    print json_test
-        # #data = JSONParser().parse(request)
-        #
-        # #c = CoreEngine()
-        # #print request.content_type
-        # #print request
-        # #print(json.loads(request.POST.get('_content')))
-        #
-        # #c.index_fingerprint_as_json(json.loads(request.POST.get('_content')))
-        #
+            # print request.content_type
+            print request.DATA['fingerprintID']
+
+            # for i in request.DATA:
+            #     print i
+            #     json_data = simplejson.loads(i)
+            #     print json_data
+
+            # json_data = simplejson.loads(request.body)
+            # print json_data
+            # try:
+            #   data = json_data['data']
+            # except KeyError:
+            #     print "ERROR"
+
+            # for t in request.POST:
+            #     print t
+            # print request.POST.items()
+            # jsonstr = request.POST["foo"]
+            # print jsonstr
+
+                # data = JSONParser().parse(i[0])
+                # print data
+                # json_test = json.loads(str(i[0]))
+                # print json_test
+            # data = JSONParser().parse(request)
+            # print data
+            #
+            # #c = CoreEngine()
+            # print request.content_type
+
+            #
+            # #c.index_fingerprint_as_json(json.loads(request.POST.get('_content')))
+        else:
+            result = {'status': 'NOT authenticated', 'method': 'POST'}
         # result = {'myValue': 'lol', 'myValue2': 'lol'}
-        response = Response(result, status=status.HTTP_201_CREATED)
+        response = Response(result, status=status.HTTP_200_OK)
+        # response['Access-Control-Allow-Origin'] = "192.168.1.2"
+        response['Access-Control-Allow-Origin'] = "http://localhost"
+        response['Access-Control-Allow-Headers'] = "authorization"
+
+        return response
+
+    def put(self, request, *args, **kw):
+
+        # If authenticated
+        if request.auth:
+            user = request.user
+            result = {'status': 'authenticated', 'method': 'PUT', 'user': str(user)}
+        else:
+            result = {'status': 'NOT authenticated', 'method': 'PUT'}
+        # If modified
+        response = Response(result, status=status.HTTP_200_OK)
+        # If created
+        # response = Response(result, status=status.HTTP_201_CREATED)
         # response['Access-Control-Allow-Origin'] = "*"
         # response['Access-Control-Allow-Headers'] = "Authorization"
 
@@ -233,7 +267,7 @@ class StatsView(APIView):
 
     def getResults(self, question):
         """
-        Method that returns values to use in piechart
+        Method that returns values to use in charts
         :param question:
         """
 
