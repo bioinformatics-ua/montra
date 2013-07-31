@@ -55,12 +55,12 @@ margin-top: 28px;
     <hr>
 
     <ul id="myTab" class="nav nav-pills">
-        <li class="active"><a href="#basics" data-toggle="tab">Basics</a></li>
-        <li><a href="#services" data-toggle="tab">Services API</a></li>
+        <li class="active"><a href="#intro" data-toggle="tab">Intro</a></li>
+        <li><a href="#services" data-toggle="tab">How to use</a></li>
         <li><a href="#license" data-toggle="tab">License</a></li>
     </ul>
-    <div class="well tab-content text-left">
-        <div class="tab-pane fade in active" id="basics">
+    <div class="tab-content text-left">
+        <div class="well tab-pane fade in active" id="intro">
             <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse dignissim neque euismod est
                 tincidunt, sed sollicitudin quam pellentesque. Aliquam ut lorem non nulla bibendum ornare. Proin
                 lobortis a justo at ultrices. Sed lacus felis, ultrices id auctor eu, pharetra placerat dolor. Praesent
@@ -71,12 +71,86 @@ margin-top: 28px;
                 et sem. Mauris vitae euismod dui. Vivamus suscipit lobortis purus ut euismod.</p>
         </div>
         <div class="tab-pane fade" id="services">
-            <p>Pellentesque consectetur neque a magna adipiscing tempus. Nulla facilisi. Pellentesque vitae placerat
-                erat. Sed congue dignissim ipsum a feugiat. Fusce elementum eros ac ante dignissim, sed laoreet diam
-                porta. Aliquam nisi orci, tempus at adipiscing et, porttitor euismod dolor. Vivamus a orci non dui
-                vestibulum ultricies quis sed ipsum. Fusce gravida gravida lectus vitae fringilla. Curabitur id diam
-                aliquet velit fringilla laoreet et quis justo. Ut iaculis eget velit at posuere. Suspendisse iaculis
-                purus a varius iaculis.</p>
+            <div class="well">
+                <h4>Get Token and Fingerprint IDs</h4>
+                <hr>
+                <p>First, you need access to the information of the API Key (Token) and the fingerprint IDs associated with
+                    your account.</p>
+
+                <p>To get that information, you should go to Workspace / My Databases and click on API Info button.</p>
+
+                <p>It will be displayed all information that you need to use API Services.</p>
+                <table>
+                    <tr>
+                        <td><img data-toggle="modal" href="#myModal" width="300px" class="img-rounded"
+                                 src="static/img/api-info.png" title="API Info Example"/></td>
+                    </tr>
+                    <tr>
+                        <td class="text-center"><i>
+                            <small>Click on image to enlarge</small>
+                        </i></td>
+                    </tr>
+                </table>
+                <div class="modal fade" id="myModal" style="width: 720px;">
+                    <div class="modal-header">
+                        <a class="close" data-dismiss="modal">&times;</a>
+                        <h4>API Info Details Example Image</h4>
+                    </div>
+                    <img src="static/img/api-info.png" class="img-rounded" style="width: 700px;" title="API Info Example"/>
+                </div>
+            </div>
+            <div class="well">
+                <h4>Insert/edit values to a fingerprint</h4>
+                <hr>
+                <p>The parameteres to insert values in one fingerprint are:</p>
+                <ul>
+                    <li><b>Url: </b>http://bioinformatics.pt/emif/api/metadata</li>
+                    <li><b>Method: </b>POST or PUT</li>
+                    <li><b>HTTP Header: </b>"Authentication: Token <i>&lt;your token&gt;</i>"</li>
+                    <li><b>JSON structure: </b>
+                        <div style="width: 25%;">
+<pre>{
+ "fingerprintID":"<i>&lt;your ID&gt;</i>",
+ "values":
+    {
+        "field1":"value1",
+        "field2":"value2",
+        "field3":"value4",
+        ...
+    }
+}</pre></div></li>
+                </ul>
+                <p><b>Note: </b>If the field does not exist, it will be created, otherwise the value will be replaced.</p>
+                <h5>Example</h5>
+            <code>
+                <small>curl -X POST -H "Content-Type: application/json" -H "Authorization: Token <i>&lt;your
+                    token&gt;</i>"
+                    -d "{\"fingerprintID\":"<i>&lt;your ID&gt;</i>",\"field1\":\"value1\"}"
+                    http://bioinformatics.pt/emif/api/metadata
+                </small>
+            </code>
+            </div>
+            <div class="well">
+            <h4>Get values of one fingerprint or all</h4>
+            <hr>
+            <p>The parameteres to get values are:</p>
+            <ul>
+                <li><b>Url: </b>http://bioinformatics.pt/emif/api/search</li>
+                <li><b>Method: </b>GET</li>
+                <li><b>HTTP Header: </b>"Authentication: Token <i>&lt;your token&gt;</i>"</li>
+                <li><b>Data structure: </b>
+                    <div style="width: 45%;">
+<pre>data: {
+     "fingerprintID":"<i>&lt;your fingerprint ID&gt; </i>"
+}</pre></div> or
+          <div style="width: 45%;">
+<pre>data: {
+     "fingerprintID":"all"
+}</pre></div></li>
+            </ul>
+            <p><b>Note: </b>The output will be the structure of fingerprint(s) (fields and values).</p>
+            </div>
+
         </div>
         <div class="tab-pane fade" id="license">
             <p>Proin bibendum neque eleifend nisl tempus laoreet. Nullam sit amet porttitor massa, eu bibendum est.
