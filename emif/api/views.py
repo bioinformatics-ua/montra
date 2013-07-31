@@ -122,19 +122,25 @@ class MetaDataView(APIView):
 
     def post(self, request, *args, **kw):
 
-
         # If authenticated
         if request.auth:
             user = request.user
             result = {'status': 'authenticated', 'method': 'POST', 'user': str(user)}
 
-            # objs = json.loads(request.POST)
-            # Iterate through the stuff in the list
-            # for o in objs:
-            #     print o
-
             # print request.content_type
-            print request.DATA['fingerprintID']
+            data = request.DATA
+            if 'fingerprintID' in data.keys():
+                print "FingerprintID: " + str(data['fingerprintID'])
+                if 'values' in data.keys():
+                    print "Tem valores"
+                    for f in data['values']:
+                        print str(f) + " -> " + str(data['values'][f])
+                else:
+                    print "Não tem valores"
+            else:
+                print "Não tem nenhuma chave fingerprint"
+
+
 
             # for i in request.DATA:
             #     print i
