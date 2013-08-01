@@ -127,71 +127,21 @@ class MetaDataView(APIView):
     parser_classes((JSONParser,))
 
     def post(self, request, *args, **kw):
-        result = {}
 
         # If authenticated
         if request.auth:
-
             user = request.user
+            data = request.DATA
+            result = validate_and_save(user, data)
             result['status'] = 'authenticated'
             result['method'] = 'POST'
             result['user'] = str(user)
 
-            data = request.DATA
-
-            # Verify if json structure is valid
-            if 'fingerprintID' in data.keys():
-                fingerprintID = data['fingerprintID']
-
-                # Verify if fingerprint belongs to user
-                if validate_fingerprint(user, fingerprintID):
-                    if 'values' in data.keys():
-                        for f in data['values']:
-                            # Check if field already exists
-                            if FingerprintAPI.objects.filter(fingerprintID=fingerprintID, field=f):
-                                try:
-                                    fp = FingerprintAPI.objects.get(fingerprintID=fingerprintID, field=f)
-                                    if str(fp.value) != str(data['values'][f]):
-                                        # Update value
-                                        fp.value = data['values'][f]
-                                        fp.save()
-                                        result[f] = "Updated successfully"
-                                    else:
-                                        result[f] = "Same old value"
-                                except:
-                                    # print "Erro a atualizar o registo"
-                                    result[f] = "Error to update field"
-                            # If field does not exist
-                            else:
-                                try:
-                                    fingerprint = FingerprintAPI(fingerprintID=fingerprintID, field=f,
-                                                                 value=data['values'][f], user=user)
-                                    # Create new field-value
-                                    fingerprint.save()
-                                    result[f] = "Saved successfully"
-                                except:
-                                    # print "Erro a criar o novo registo"
-                                    result[f] = "Error to create the new field"
-
-                    # No values key in JSON structure
-                    else:
-                        # print "Não tem valores"
-                        result['error'] = "No values detected"
-                else:
-                    result['error'] = "Error find FingerprintID"
-            else:
-                # print "Não tem nenhuma chave fingerprint"
-                result['error'] = "No fingerprintID detected"
-
         # NOT authenticated
         else:
             result = {'status': 'NOT authenticated', 'method': 'POST'}
-        # result = {'myValue': 'lol', 'myValue2': 'lol'}
-        response = Response(result, status=status.HTTP_200_OK)
-        # response['Access-Control-Allow-Origin'] = "192.168.1.2"
-        # response['Access-Control-Allow-Origin'] = "http://localhost"
-        # response['Access-Control-Allow-Headers'] = "authorization"
 
+        response = Response(result, status=status.HTTP_200_OK)
         return response
 
     def put(self, request, *args, **kw):
@@ -199,15 +149,16 @@ class MetaDataView(APIView):
         # If authenticated
         if request.auth:
             user = request.user
-            result = {'status': 'authenticated', 'method': 'PUT', 'user': str(user)}
+            data = request.DATA
+            result = validate_and_save(user, data)
+            result['status'] = 'authenticated'
+            result['method'] = 'PUT'
+            result['user'] = str(user)
+
+        # NOT authenticated
         else:
             result = {'status': 'NOT authenticated', 'method': 'PUT'}
-        # If modified
         response = Response(result, status=status.HTTP_200_OK)
-        # If created
-        # response = Response(result, status=status.HTTP_201_CREATED)
-        # response['Access-Control-Allow-Origin'] = "*"
-        # response['Access-Control-Allow-Headers'] = "Authorization"
 
         return response
 
@@ -324,6 +275,11 @@ class StatsView(APIView):
 
 
 def validate_fingerprint(user, fingerprintID):
+    """
+    Verify if fingerprint belongs to given user
+    :param user:
+    :param fingerprintID:
+    """
 
     result = False
     c = CoreEngine()
@@ -333,4 +289,59 @@ def validate_fingerprint(user, fingerprintID):
         if fingerprintID == r['id']:
             result = True
             break
+    return result
+
+
+def validate_and_save(user, data):
+    """
+    Verify if json structure is correct and create/update values of fingerprint
+
+    :param user:
+    :param data:
+    """
+    result = {}
+    # Verify if json structure is valid
+    if 'fingerprintID' in data.keys():
+        fingerprintID = data['fingerprintID']
+
+        # Verify if fingerprint belongs to user
+        if validate_fingerprint(user, fingerprintID):
+            if 'values' in data.keys():
+                for f in data['values']:
+                    # Check if field already exists
+                    if FingerprintAPI.objects.filter(fingerprintID=fingerprintID, field=f):
+                        try:
+                            fp = FingerprintAPI.objects.get(fingerprintID=fingerprintID, field=f)
+                            if str(fp.value) != str(data['values'][f]):
+                                # Update value
+                                fp.value = data['values'][f]
+                                fp.save()
+                                result[f] = "Updated successfully"
+                            else:
+                                result[f] = "Same old value"
+                        except:
+                            # print "Erro a atualizar o registo"
+                            result[f] = "Error to update field"
+                    # If field does not exist
+                    else:
+                        try:
+                            fingerprint = FingerprintAPI(fingerprintID=fingerprintID, field=f,
+                                                         value=data['values'][f], user=user)
+                            # Create new field-value
+                            fingerprint.save()
+                            result[f] = "Created successfully"
+                        except:
+                            # print "Erro a criar o novo registo"
+                            result[f] = "Error to create new field"
+
+            # No values key in JSON structure
+            else:
+                # print "Não tem valores"
+                result['error'] = "No values detected"
+        else:
+            result['error'] = "Error find FingerprintID"
+    else:
+        # print "Não tem nenhuma chave fingerprint"
+        result['error'] = "No fingerprintID detected"
+
     return result
