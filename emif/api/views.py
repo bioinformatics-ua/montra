@@ -45,6 +45,7 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 # Import Search Engine 
 
 from searchengine.search_indexes import CoreEngine
+from api.models import *
 
 
 class JSONResponse(HttpResponse):
@@ -81,9 +82,12 @@ class SearchView(APIView):
         if request.auth:
             user = request.user
             result = {'status': 'authenticated', 'method': 'GET', 'user': str(user)}
-         #if query!=None:
 
-        result = {'myValue': 'lol', 'myValue2': 'lol', }
+            print request.DATA
+         #if query!=None:
+        else:
+            result = {'status': 'NOT authenticated', 'method': 'GET'}
+
         response = Response(result, status=status.HTTP_200_OK)
         # response['Access-Control-Allow-Origin'] = "*"
         # response['Access-Control-Allow-Headers'] = "Authorization"
@@ -108,77 +112,85 @@ class AdvancedSearchView(APIView):
 class MetaDataView(APIView):
     """
     Class to insert or update data values of one fingerprint
-
     Method POST: to insert a new field and value
     Method PUT: to update a value that already exists
-
     Note: both methods check if field value already exists and, if exists, it is updated,
     otherwise the field is created and the value added
     """
+
+    # Example request
+    # curl -H "Content-Type: application/json" -X POST -d "{\"uid\":12,\"token\":\"asdert\"}" http://192.168.1.3:8000/api/metadata -H "Authorization: Token c6e25981c67ae45f98bdb380b0a9d8164e7ec4d1" -v
+
     authentication_classes = (TokenAuthentication,)
     # permission_classes = (permissions.AllowAny,)
     # permission_classes = (permissions.IsAuthenticated,)
     parser_classes((JSONParser,))
 
     def post(self, request, *args, **kw):
+        result = {}
 
         # If authenticated
         if request.auth:
+
             user = request.user
-            result = {'status': 'authenticated', 'method': 'POST', 'user': str(user)}
+            result['status'] = 'authenticated'
+            result['method'] = 'POST'
+            result['user'] = str(user)
 
-            # print request.content_type
             data = request.DATA
+
+            # Verify if json structure is valid
             if 'fingerprintID' in data.keys():
-                print "FingerprintID: " + str(data['fingerprintID'])
-                if 'values' in data.keys():
-                    print "Tem valores"
-                    for f in data['values']:
-                        print str(f) + " -> " + str(data['values'][f])
+                fingerprintID = data['fingerprintID']
+
+                # Verify if fingerprint belongs to user
+                if validate_fingerprint(user, fingerprintID):
+                    if 'values' in data.keys():
+                        for f in data['values']:
+                            # Check if field already exists
+                            if FingerprintAPI.objects.filter(fingerprintID=fingerprintID, field=f):
+                                try:
+                                    fp = FingerprintAPI.objects.get(fingerprintID=fingerprintID, field=f)
+                                    if str(fp.value) != str(data['values'][f]):
+                                        # Update value
+                                        fp.value = data['values'][f]
+                                        fp.save()
+                                        result[f] = "Updated successfully"
+                                    else:
+                                        result[f] = "Same old value"
+                                except:
+                                    # print "Erro a atualizar o registo"
+                                    result[f] = "Error to update field"
+                            # If field does not exist
+                            else:
+                                try:
+                                    fingerprint = FingerprintAPI(fingerprintID=fingerprintID, field=f,
+                                                                 value=data['values'][f], user=user)
+                                    # Create new field-value
+                                    fingerprint.save()
+                                    result[f] = "Saved successfully"
+                                except:
+                                    # print "Erro a criar o novo registo"
+                                    result[f] = "Error to create the new field"
+
+                    # No values key in JSON structure
+                    else:
+                        # print "Não tem valores"
+                        result['error'] = "No values detected"
                 else:
-                    print "Não tem valores"
+                    result['error'] = "Error find FingerprintID"
             else:
-                print "Não tem nenhuma chave fingerprint"
+                # print "Não tem nenhuma chave fingerprint"
+                result['error'] = "No fingerprintID detected"
 
-
-
-            # for i in request.DATA:
-            #     print i
-            #     json_data = simplejson.loads(i)
-            #     print json_data
-
-            # json_data = simplejson.loads(request.body)
-            # print json_data
-            # try:
-            #   data = json_data['data']
-            # except KeyError:
-            #     print "ERROR"
-
-            # for t in request.POST:
-            #     print t
-            # print request.POST.items()
-            # jsonstr = request.POST["foo"]
-            # print jsonstr
-
-                # data = JSONParser().parse(i[0])
-                # print data
-                # json_test = json.loads(str(i[0]))
-                # print json_test
-            # data = JSONParser().parse(request)
-            # print data
-            #
-            # #c = CoreEngine()
-            # print request.content_type
-
-            #
-            # #c.index_fingerprint_as_json(json.loads(request.POST.get('_content')))
+        # NOT authenticated
         else:
             result = {'status': 'NOT authenticated', 'method': 'POST'}
         # result = {'myValue': 'lol', 'myValue2': 'lol'}
         response = Response(result, status=status.HTTP_200_OK)
         # response['Access-Control-Allow-Origin'] = "192.168.1.2"
-        response['Access-Control-Allow-Origin'] = "http://localhost"
-        response['Access-Control-Allow-Headers'] = "authorization"
+        # response['Access-Control-Allow-Origin'] = "http://localhost"
+        # response['Access-Control-Allow-Headers'] = "authorization"
 
         return response
 
@@ -309,3 +321,16 @@ class StatsView(APIView):
         results['charts'] = graphs
 
         return results
+
+
+def validate_fingerprint(user, fingerprintID):
+
+    result = False
+    c = CoreEngine()
+    results = c.search_fingerprint('user_t:' + user.username)
+
+    for r in results:
+        if fingerprintID == r['id']:
+            result = True
+            break
+    return result
