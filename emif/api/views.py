@@ -81,8 +81,11 @@ class SearchView(APIView):
         # If authenticated
         if request.auth:
             user = request.user
-            result = {'status': 'authenticated', 'method': 'GET', 'user': str(user)}
-
+            data = request.DATA
+            result = validate_and_get(user, data)
+            result['status'] = 'authenticated'
+            result['method'] = 'GET'
+            result['user'] = str(user)
             print request.DATA
          #if query!=None:
         else:
@@ -338,6 +341,31 @@ def validate_and_save(user, data):
             else:
                 # print "Não tem valores"
                 result['error'] = "No values detected"
+        else:
+            result['error'] = "Error find FingerprintID"
+    else:
+        # print "Não tem nenhuma chave fingerprint"
+        result['error'] = "No fingerprintID detected"
+
+    return result
+
+
+def validate_and_get(user, data):
+
+    result = {}
+    # Verify if json structure is valid
+    if 'fingerprintID' in data.keys():
+        fingerprintID = data['fingerprintID']
+
+        # Verify if fingerprint belongs to user
+        if validate_fingerprint(user, fingerprintID):
+            result['fingerprintID'] = fingerprintID
+            results = FingerprintAPI.objects.filter(fingerprintID=fingerprintID)
+            result['values'] = {}
+            for r in results:
+                # print str(r.field) + " -> " + str(r.value)
+                result['values'][r.field] = r.value
+
         else:
             result['error'] = "Error find FingerprintID"
     else:
