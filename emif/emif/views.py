@@ -1669,15 +1669,21 @@ def feedback(request):
     name = request.POST.get('name', '')
     message = request.POST.get('message', '')
     from_email = request.POST.get('email', '')
-    
+
     emails_to_feedback = []
     for k, v in settings.ADMINS:
         emails_to_feedback.append(v)
 
     if subject and message and from_email and name:
         try:
-            message = "Name: " + name + "\nFrom: " + from_email + "\n\nMessage:\n" + message
-            send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, emails_to_feedback)
+            message_admin = "Name: " + name + "\nFrom: " + from_email + "\n\nMessage:\n" + message
+            
+            # Send email to admins
+            send_mail(subject, message_admin, settings.DEFAULT_FROM_EMAIL, emails_to_feedback)
+
+            # Send email to user with the copy of feedback message
+            send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [from_email])
+
         except BadHeaderError:
             return HttpResponse('Invalid header found.')
         return feedback_thankyou(request)
