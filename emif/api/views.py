@@ -321,7 +321,7 @@ def validate_and_save(user, data):
                                 fp.save()
                                 result[f] = "Updated successfully"
                             else:
-                                result[f] = "Same old value"
+                                result[f] = "Not updated"
                         except:
                             # print "Erro a atualizar o registo"
                             result[f] = "Error to update field"
