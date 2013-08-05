@@ -55,22 +55,15 @@ margin-top: 28px;
     <hr>
 
     <ul id="myTab" class="nav nav-pills">
-        <li class="active"><a href="#intro" data-toggle="tab">Intro</a></li>
-        <li><a href="#services" data-toggle="tab">How to use</a></li>
+        <li><a href="#intro" data-toggle="tab">Intro</a></li>
+        <li class="active"><a href="#services" data-toggle="tab">How to use</a></li>
         <li><a href="#license" data-toggle="tab">License</a></li>
     </ul>
     <div class="tab-content text-left">
-        <div class="well tab-pane fade in active" id="intro">
-            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse dignissim neque euismod est
-                tincidunt, sed sollicitudin quam pellentesque. Aliquam ut lorem non nulla bibendum ornare. Proin
-                lobortis a justo at ultrices. Sed lacus felis, ultrices id auctor eu, pharetra placerat dolor. Praesent
-                vitae consectetur massa, quis gravida tellus. Mauris non venenatis neque. Duis vel augue pharetra,
-                blandit mi a, varius dolor. Donec non tincidunt purus. Aenean suscipit erat in tortor ullamcorper
-                dignissim. Morbi ac ultrices odio, sed porttitor tortor. Nam sed rhoncus ipsum, et semper sapien. Duis
-                vehicula urna quis quam ultricies mattis. Vestibulum fringilla mauris sit amet dolor posuere iaculis sed
-                et sem. Mauris vitae euismod dui. Vivamus suscipit lobortis purus ut euismod.</p>
+        <div class="well tab-pane fade" id="intro">
+            <p><i>In construction...</i></p>
         </div>
-        <div class="tab-pane fade" id="services">
+        <div class="tab-pane fade in active" id="services">
             <div class="well">
                 <h4>Get Token and Fingerprint IDs</h4>
                 <hr>
@@ -125,13 +118,14 @@ margin-top: 28px;
             <code>
                 <small>curl -X POST -H "Content-Type: application/json" -H "Authorization: Token <i>&lt;your
                     token&gt;</i>"
-                    -d "{\"fingerprintID\":"<i>&lt;your ID&gt;</i>",\"field1\":\"value1\"}"
+                    -d "{\"fingerprintID\":\"<i>&lt;your ID&gt;</i>\",\"field1\":\"value1\"}"
                     http://bioinformatics.pt/emif/api/metadata
                 </small>
             </code>
             </div>
             <div class="well">
-            <h4>Get values of one fingerprint or all</h4>
+            <!--<h4>Get values of one fingerprint or all</h4>-->
+            <h4>Get values of one fingerprint</h4>
             <hr>
             <p>The parameteres to get values are:</p>
             <ul>
@@ -142,23 +136,27 @@ margin-top: 28px;
                     <div style="width: 45%;">
 <pre>data: {
      "fingerprintID":"<i>&lt;your fingerprint ID&gt; </i>"
-}</pre></div> or
-          <div style="width: 45%;">
-<pre>data: {
-     "fingerprintID":"all"
-}</pre></div></li>
+}</pre></div>
+                    <!--or-->
+          <!--<div style="width: 45%;">-->
+<!--<pre>data: {-->
+     <!--"fingerprintID":"all"-->
+<!--}</pre></div>-->
+                </li>
             </ul>
-            <p><b>Note: </b>The output will be the structure of fingerprint(s) (fields and values).</p>
+            <p><b>Note: </b>The output will be the structure of fingerprint (fields and values).</p>
+            <h5>Example</h5>
+            <code>
+                <small>curl -X GET -H "Content-Type: application/json" -H "Authorization: Token <i>&lt;your
+                    token&gt;</i>" -d "{\"fingerprintID\":\"<i>&lt;your ID&gt;</i>\"}"
+                    http://bioinformatics.pt/emif/api/search
+                </small>
+            </code>
             </div>
 
         </div>
-        <div class="tab-pane fade" id="license">
-            <p>Proin bibendum neque eleifend nisl tempus laoreet. Nullam sit amet porttitor massa, eu bibendum est.
-                Nullam porta metus vitae tincidunt ullamcorper. Aenean posuere libero velit, et tincidunt dolor ultrices
-                id. Duis pellentesque, massa id posuere tempus, sapien felis rutrum nulla, in vehicula nisl dui at
-                lectus. Suspendisse lorem orci, lacinia vel mauris sit amet, pulvinar pharetra arcu. Pellentesque semper
-                egestas purus nec auctor. Sed blandit dolor eget lorem laoreet, eget eleifend risus consequat. Nam vitae
-                nunc pharetra, fringilla tortor in, tincidunt nisl. Aliquam erat volutpat.</p>
+        <div class="well tab-pane fade" id="license">
+            <p><i>In construction...</i></p>
         </div>
 
     </div>
