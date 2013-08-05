@@ -1666,13 +1666,18 @@ def show_fingerprint_page_read_only(request, q_id, qs_id, errors={}, template_na
 
 def feedback(request):
     subject = request.POST.get('topic', '')
+    name = request.POST.get('name', '')
     message = request.POST.get('message', '')
     from_email = request.POST.get('email', '')
-    emails_to_feedback = 'bastiao@ua.pt'
+    
+    emails_to_feedback = []
+    for k, v in settings.ADMINS:
+        emails_to_feedback.append(v)
 
-    if subject and message and from_email:
+    if subject and message and from_email and name:
         try:
-            send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [emails_to_feedback, from_email])
+            message = "Name: " + name + "\nFrom: " + from_email + "\n\nMessage:\n" + message
+            send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, emails_to_feedback)
         except BadHeaderError:
             return HttpResponse('Invalid header found.')
         return feedback_thankyou(request)
