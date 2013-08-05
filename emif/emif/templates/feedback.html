@@ -2,14 +2,12 @@
 {% load url from future %}
 
 
-
-
 {% block content%}
 
 <div class="row">
   <div class="span6 center">
        <div id="contact_wrap" class="rows">
-        
+       <h2>Feedback</h2>
 Your feedback is highly appreciated. We want to hear your feedback and incorporate your ideas into improving and expanding what is on this catalogue.
 Looking forward to your input.
 
@@ -19,20 +17,22 @@ Looking forward to your input.
                 <form name="theform" action="feedback" method="post" id="theform">
                   {% csrf_token %}
                     <div id="name_email">
-
+                        {{ form.name.errors }}
                         <label id="id_name">Name:</label>
-                        <input type="text" name="name" value="" id="name" />
+                        {{ form.name }}
+                        <!--<input type="text" name="name" value="" id="name" />-->
+                        {{ form.email.errors }}
                         <label id="id_email">Email:</label>
-                        <input type="text" name="email" value="" id="Email" />
+                        {{ form.email }}
+                        <!--<input type="text" name="email" value="" id="Email" />-->
                     </div><!-- end name_email -->
                     <div id="message">
+                        {{ form.message.errors }}
                         <label id="id_message">Message:</label>
-                        <textarea  class="span6" name="message" cols="30" rows="10" ></textarea>
-
+                        <!--<textarea  class="span6" name="message" cols="30" rows="10" ></textarea>-->
+                        {{ form.message }}
                     </div><!-- end message -->
                     <div id="submit">
-                        
-
                         <button class="btn btn-primary" name="submit" type="submit">Send</button>
                     </div><!-- end submit -->
                     <input class="hidden" type="hidden" name="topic" value="EMIF Catalogue: Feedback" id="subject" />

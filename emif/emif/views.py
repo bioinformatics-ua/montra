@@ -1665,30 +1665,36 @@ def show_fingerprint_page_read_only(request, q_id, qs_id, errors={}, template_na
 
 
 def feedback(request):
-    subject = request.POST.get('topic', '')
-    name = request.POST.get('name', '')
-    message = request.POST.get('message', '')
-    from_email = request.POST.get('email', '')
 
-    emails_to_feedback = []
-    for k, v in settings.ADMINS:
-        emails_to_feedback.append(v)
+    if request.method == 'POST':  # If the form has been submitted...
+        form = ContactForm(request.POST)
+        if form.is_valid():  # All validation rules pass
 
-    if subject and message and from_email and name:
-        try:
-            message_admin = "Name: " + str(name) + "\nEmail: " + from_email + "\n\nMessage:\n" + str(message)
-            message = "Dear " + name + ",\n\nThank you for giving us your feedback.\n\nMessage sent:\n" + str(message) + "\n\nSincerely,\nEMIF Catalogue"
-            # Send email to admins
-            send_mail(subject, message_admin, settings.DEFAULT_FROM_EMAIL, emails_to_feedback)
-            # Send email to user with the copy of feedback message
-            send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [from_email])
+            subject = request.POST.get('topic', '')
+            name = request.POST.get('name', '')
+            message = request.POST.get('message', '')
+            from_email = request.POST.get('email', '')
 
-        except BadHeaderError:
-            return HttpResponse('Invalid header found.')
-        return feedback_thankyou(request)
+            emails_to_feedback = []
+            for k, v in settings.ADMINS:
+                emails_to_feedback.append(v)
+
+            try:
+                message_admin = "Name: " + str(name) + "\nEmail: " + from_email + "\n\nMessage:\n" + str(message)
+                message = "Dear " + name + ",\n\nThank you for giving us your feedback.\n\nMessage sent:\n" + str(message) + "\n\nSincerely,\nEMIF Catalogue"
+                # Send email to admins
+                send_mail(subject, message_admin, settings.DEFAULT_FROM_EMAIL, emails_to_feedback)
+                # Send email to user with the copy of feedback message
+                send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [from_email])
+
+            except BadHeaderError:
+                return HttpResponse('Invalid header found.')
+
+            return feedback_thankyou(request)
+
     else:
-        return render_to_response('feedback.html', {'form': ContactForm(), 'email_to': emails_to_feedback,
-                                                    'request': request}, RequestContext(request))
+        form = ContactForm()  # An unbound form
+    return render(request, 'feedback.html', {'form': form})
 
         # return render_to_response('feedback.html', {'form': ContactForm()},
         #     RequestContext(request))
