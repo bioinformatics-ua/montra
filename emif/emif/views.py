@@ -1676,11 +1676,10 @@ def feedback(request):
 
     if subject and message and from_email and name:
         try:
-            message_admin = "Name: " + name + "\nFrom: " + from_email + "\n\nMessage:\n" + message
-            
+            message_admin = "Name: " + str(name) + "\nEmail: " + from_email + "\n\nMessage:\n" + str(message)
+            message = "Dear " + name + ",\n\nThank you for giving us your feedback.\n\nMessage sent:\n" + str(message) + "\n\nSincerely,\nEMIF Catalogue"
             # Send email to admins
             send_mail(subject, message_admin, settings.DEFAULT_FROM_EMAIL, emails_to_feedback)
-
             # Send email to user with the copy of feedback message
             send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [from_email])
 
