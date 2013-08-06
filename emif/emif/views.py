@@ -1664,7 +1664,7 @@ def show_fingerprint_page_read_only(request, q_id, qs_id, errors={}, template_na
     return r
 
 
-def feedback(request):
+def feedback(request, template_name='feedback.html'):
 
     if request.method == 'POST':  # If the form has been submitted...
         form = ContactForm(request.POST)
@@ -1694,14 +1694,14 @@ def feedback(request):
 
     else:
         form = ContactForm()  # An unbound form
-    return render(request, 'feedback.html', {'form': form})
+    return render(request, template_name, {'form': form, 'request': request})
 
         # return render_to_response('feedback.html', {'form': ContactForm()},
         #     RequestContext(request))
 
 
-def feedback_thankyou(request):
-    return render_to_response('feedback_thankyou.html')
+def feedback_thankyou(request, template_name='feedback_thankyou.html'):
+    return render(request, template_name, {'request': request})
 
 
 def show_fingerprint_page(request, runinfo, errors={}, template_name='database_edit.html'):
