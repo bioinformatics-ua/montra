@@ -659,6 +659,7 @@ def database_edit(request, fingerprint_id, questionnaire_id, template_name="data
                 async_url=None,
                 qs_list=qs_list,
                 questions_list=qlist_general,
+                breadcrumb=True
         )
         r['Cache-Control'] = 'no-cache'
         r['Expires'] = "Thu, 24 Jan 1980 00:00:00 GMT"
@@ -1522,6 +1523,7 @@ def show_fingerprint_page_errors(request, q_id, qs_id, errors={}, template_name=
                 qs_list=qs_list,
                 questions_list=qlist_general,
                 fingerprint_id=fingerprint_id,
+                breadcrumb=True
         )
         r['Cache-Control'] = 'no-cache'
         r['Expires'] = "Thu, 24 Jan 1980 00:00:00 GMT"
@@ -1816,7 +1818,8 @@ def show_fingerprint_page(request, runinfo, errors={}, template_name='database_e
             jsinclude=jsinclude,
             cssinclude=cssinclude,
             async_progress=async_progress,
-            async_url=reverse('progress', args=[runinfo.random])
+            async_url=reverse('progress', args=[runinfo.random]),
+            breadcrumb=True
     )
     r['Cache-Control'] = 'no-cache'
     r['Expires'] = "Thu, 24 Jan 1980 00:00:00 GMT"
