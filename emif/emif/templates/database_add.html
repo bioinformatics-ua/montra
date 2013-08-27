@@ -5,8 +5,8 @@
 
 {% block breadcrumbs %}
 {{ block.super }}
-{% breadcrumb "Databases" "/databases" %}
-{% breadcrumb "Add" "/databases" %}
+{% breadcrumb "Databases" "databases" %}
+{% breadcrumb "Add" "" %}
 
 {% endblock %}
 
@@ -56,7 +56,9 @@ button {
 
 {% block content %}
 
-<hr>
+
+<div style="margin-bottom: 60px;"></div>
+        <hr>
 <div class="row">
 <div class="span3">
   <div class="well" style="max-width: 340px; padding: 8px 0;">
