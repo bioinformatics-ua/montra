@@ -67,7 +67,7 @@ def index(request, template_name='index.html'):
 
 
 def about(request, template_name='about.html'):
-    return render(request, template_name, {'request': request})
+    return render(request, template_name, {'request': request, 'breadcrumb': True})
 
 
 def quick_search(request, template_name='quick_search.html'):

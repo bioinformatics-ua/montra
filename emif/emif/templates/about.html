@@ -1,10 +1,19 @@
 {% extends 'base.html' %}
 {% load url from future %}
+{% load django_bootstrap_breadcrumbs %}
 
+{% block breadcrumbs %}
+
+        {% breadcrumb "Home" "home" %}
+        {% breadcrumb "About" "" %}
+
+{% endblock %}
 
 
 
 {% block content%}
+<div style="margin-bottom: 70px;"></div>
+
 
 <div id="contact_wrap">
 
@@ -23,7 +32,7 @@ University of Aveiro, Dept. Electronics, Telecommunications and Informatics (DET
 
 <hr>
 
-<h2>Available features:<h2>
+<h2>Available features:</h2>
 
 <h3>Regular user</h3>
 <ul>
@@ -61,6 +70,7 @@ University of Aveiro, Dept. Electronics, Telecommunications and Informatics (DET
 	<iframe width="560" height="315" src="http://www.youtube.com/embed/T7jWD-JjM8Q" frameborder="0" allowfullscreen></iframe>
 
 </p>
+
 
 {% endblock %}
 
