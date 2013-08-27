@@ -468,9 +468,10 @@ def advanced_search(request, questionnaire_id, question_set):
 
 
 def database_add(request, questionnaire_id, sortid):
+
     response = show_fingerprint_page_read_only(request, questionnaire_id, sortid,
                                                template_name='database_add.html')
-    response['breadcrumb'] = True
+
     return response
 
 
@@ -1655,9 +1656,11 @@ def show_fingerprint_page_read_only(request, q_id, qs_id, errors={}, template_na
                 qs_list=qs_list,
                 questions_list=qlist_general,
                 fingerprint_id=fingerprint_id,
+                breadcrumb=True,
         )
         r['Cache-Control'] = 'no-cache'
         r['Expires'] = "Thu, 24 Jan 1980 00:00:00 GMT"
+
     except:
 
         raise

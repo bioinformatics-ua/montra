@@ -95,7 +95,7 @@ urlpatterns = patterns('',
     url(r'^fingerprint/(?P<runcode>[^/]+)/(?P<qs>[-]{0,1}\d+)/$', 'emif.views.fingerprint'),
 
     # List Databases
-    url(r'^databases$', 'emif.views.databases'),
+    url(r'^databases$', 'emif.views.databases', name="databases"),
     url(r'^alldatabases$', 'emif.views.all_databases'),
     # Documentation
     url(r'^docs/api$', 'emif.views.docs_api'),
