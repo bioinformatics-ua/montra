@@ -32,10 +32,12 @@
       </a>
       {% endif %}
 
-        {% if  api_token %}
-      <a class="btn" href="api-info"> <i class=" icon"></i>
-          API Info
-      </a>
+      {% if request.user.is_superuser %}
+            {% if  api_token %}
+                <a class="btn" href="api-info"> <i class=" icon"></i>
+                  API Info
+                </a>
+            {% endif %}
       {% endif %}
 
 
