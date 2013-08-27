@@ -408,7 +408,7 @@ def geo(request, template_name='geo.html'):
     for database in list_databases:
         list_locations.append(database.location)
     return render(request, template_name, {'request': request,
-                                           'list_cities': list_locations})
+                                           'list_cities': list_locations, 'breadcrumb': True})
 
 
 
