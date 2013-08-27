@@ -1,11 +1,20 @@
 {% extends 'base.html' %}
 {% load url from future %}
+{% load django_bootstrap_breadcrumbs %}
+
+{% block breadcrumbs %}
+{{ block.super }}
+
+{% breadcrumb "My Databases" "databases" %}
+{% breadcrumb "API Doc" "api-doc" %}
+
+{% endblock %}
 
 {% block styleextra %}
-body {
-padding-top: 20px;
-padding-bottom: 40px;
-}
+<!--body {-->
+<!--padding-top: 20px;-->
+<!--padding-bottom: 40px;-->
+<!--}-->
 
 /* Custom container */
 .container-narrow {
@@ -18,7 +27,7 @@ margin: 30px 0;
 
 /* Main marketing message and sign up button */
 .jumbotron {
-margin: 60px 0;
+margin: 60px 0 0 0;
 text-align: left;
 }
 .jumbotron h1 {
@@ -46,7 +55,7 @@ margin-top: 28px;
         <div class="span6">
             <h3>API Documentation</h3>
         </div>
-        <div class="span6 pull-right" style="text-align:right">
+        <div class="span6" style="text-align:right">
             <a class="btn right" href="api-info"> <i class=" icon"></i>
                 API Info
             </a>

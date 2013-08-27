@@ -1849,6 +1849,6 @@ def create_auth_token(request, templateName='api-key.html'):
 
 # Documentation
 def docs_api(request, template_name='docs/api.html'):
-    return render(request, template_name, {'request': request})
+    return render(request, template_name, {'request': request, 'breadcrumb': True})
 
 
