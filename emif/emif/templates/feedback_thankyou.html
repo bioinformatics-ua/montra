@@ -1,11 +1,19 @@
 {% extends 'base.html' %}
 {% load url from future %}
+{% load django_bootstrap_breadcrumbs %}
 
+{% block breadcrumbs %}
+
+        {% breadcrumb "Home" "home" %}
+        {% breadcrumb "Feedback" "feedback" %}
+        {% breadcrumb "Thank You" "" %}
+
+{% endblock %}
 
 
 
 {% block content%}
-
+<div style="margin-bottom: 20px;"></div>
        <div id="contact_wrap">
 
         <div id="contact" class="clearfix" style="margin-left:40%">

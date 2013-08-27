@@ -1694,14 +1694,14 @@ def feedback(request, template_name='feedback.html'):
 
     else:
         form = ContactForm()  # An unbound form
-    return render(request, template_name, {'form': form, 'request': request})
+    return render(request, template_name, {'form': form, 'request': request, 'breadcrumb': True})
 
         # return render_to_response('feedback.html', {'form': ContactForm()},
         #     RequestContext(request))
 
 
 def feedback_thankyou(request, template_name='feedback_thankyou.html'):
-    return render(request, template_name, {'request': request})
+    return render(request, template_name, {'request': request, 'breadcrumb': True})
 
 
 def show_fingerprint_page(request, runinfo, errors={}, template_name='database_edit.html'):

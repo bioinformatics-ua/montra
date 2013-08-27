@@ -44,7 +44,7 @@ urlpatterns = patterns('',
     url(r'^admin/', include(admin.site.urls)),
 
     # Index page
-    url(r'^$', 'emif.views.index'),
+    url(r'^$', 'emif.views.index', name="home"),
     url(r'^about$', 'emif.views.about'),
 
     # Quick Search
@@ -73,8 +73,8 @@ urlpatterns = patterns('',
             questionaries_with_sets, name='questionset_sets'),
 
 
-    (r'^feedback/thankyou/', 'emif.views.feedback_thankyou'),
-    (r'^feedback$', 'emif.views.feedback'),
+    url(r'^feedback/thankyou/', 'emif.views.feedback_thankyou'),
+    url(r'^feedback$', 'emif.views.feedback', name="feedback"),
 
 
     (r'^contact/thankyou/', 'searchengine.views.thankyou'),
