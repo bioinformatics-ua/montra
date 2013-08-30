@@ -70,7 +70,7 @@ margin-top: 28px;
     </ul>
     <div class="tab-content text-left">
         <div class="well tab-pane fade" id="intro">
-            <p><i>In construction...</i></p>
+            <p><i>Under construction...</i></p>
         </div>
         <div class="tab-pane fade in active" id="services">
             <div class="well">
@@ -106,7 +106,7 @@ margin-top: 28px;
                 <hr>
                 <p>The parameteres to insert values in one fingerprint are:</p>
                 <ul>
-                    <li><b>Url: </b>http://bioinformatics.pt/emif/api/metadata</li>
+                    <li><b>Url: </b>http://bioinformatics.ua.pt/emif/api/metadata</li>
                     <li><b>Method: </b>POST or PUT</li>
                     <li><b>HTTP Header: </b>"Authentication: Token <i>&lt;your token&gt;</i>"</li>
                     <li><b>JSON structure: </b>
@@ -125,10 +125,9 @@ margin-top: 28px;
                 <p><b>Note: </b>If the field does not exist, it will be created, otherwise the value will be replaced.</p>
                 <h5>Example</h5>
             <code>
-                <small>curl -X POST -H "Content-Type: application/json" -H "Authorization: Token <i>&lt;your
-                    token&gt;</i>"
-                    -d "{\"fingerprintID\":\"<i>&lt;your ID&gt;</i>\",\"field1\":\"value1\"}"
-                    http://bioinformatics.pt/emif/api/metadata
+                <small>curl -X POST -H "Content-Type: application/json" "Authorization: Token <i>&lt;your
+                    token&gt;</i>" -d "{\"fingerprintID\":\"<i>&lt;your ID&gt;</i>\",\"field1\":\"value1\"}"
+                    http://bioinformatics.ua.pt/emif/api/metadata
                 </small>
             </code>
             </div>
@@ -138,7 +137,7 @@ margin-top: 28px;
             <hr>
             <p>The parameteres to get values are:</p>
             <ul>
-                <li><b>Url: </b>http://bioinformatics.pt/emif/api/search</li>
+                <li><b>Url: </b>http://bioinformatics.ua.pt/emif/api/search</li>
                 <li><b>Method: </b>GET</li>
                 <li><b>HTTP Header: </b>"Authentication: Token <i>&lt;your token&gt;</i>"</li>
                 <li><b>Data structure: </b>
@@ -158,14 +157,14 @@ margin-top: 28px;
             <code>
                 <small>curl -X GET -H "Content-Type: application/json" -H "Authorization: Token <i>&lt;your
                     token&gt;</i>" -d "{\"fingerprintID\":\"<i>&lt;your ID&gt;</i>\"}"
-                    http://bioinformatics.pt/emif/api/search
+                    http://bioinformatics.ua.pt/emif/api/search
                 </small>
             </code>
             </div>
 
         </div>
         <div class="well tab-pane fade" id="license">
-            <p><i>In construction...</i></p>
+            <p><i>Under construction...</i></p>
         </div>
 
     </div>
