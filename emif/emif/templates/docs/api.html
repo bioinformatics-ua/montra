@@ -125,8 +125,8 @@ margin-top: 28px;
                 <p><b>Note: </b>If the field does not exist, it will be created, otherwise the value will be replaced.</p>
                 <h5>Example</h5>
             <code>
-                <small>curl -X POST -H "Content-Type: application/json" "Authorization: Token <i>&lt;your
-                    token&gt;</i>" -d "{\"fingerprintID\":\"<i>&lt;your ID&gt;</i>\",\"field1\":\"value1\"}"
+                <small>curl -X POST -H "Content-Type: application/json" -H "Authorization: Token <i>&lt;your
+                    token&gt;</i>" -d "{\"fingerprintID\":\"<i>&lt;your ID&gt;</i>\",\"values\":{\"field1\":\"value1\"}}"
                     http://bioinformatics.ua.pt/emif/api/metadata
                 </small>
             </code>
