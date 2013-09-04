@@ -6,31 +6,31 @@
 
 {% block styleextra %}
 
-    body {
-    font-family: "Helvetica Neue", Helvetica, sans-serif;
-    background-color: #fff;
-    color: #333;
-    }
-    .widget-container {
-    max-width: 800px;
-    }
+body {
+font-family: "Helvetica Neue", Helvetica, sans-serif;
+background-color: #fff;
+color: #333;
+}
+.widget-container {
+max-width: 800px;
+}
 
-    table {
-    table-layout: fixed;
-    }
-    th, td {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    -o-text-overflow: ellipsis;
-    -ms-text-overflow: ellipsis;
-    }
+table {
+table-layout: fixed;
+}
+th, td {
+white-space: nowrap;
+overflow: hidden;
+text-overflow: ellipsis;
+-o-text-overflow: ellipsis;
+-ms-text-overflow: ellipsis;
+}
 
 
-    .tooltip.in {
-    opacity: 0.8;
-    filter: alpha(opacity=80);
-    }
+.tooltip.in {
+opacity: 0.8;
+filter: alpha(opacity=80);
+}
 
 {#    .tooltip.in {#}
 {#    opacity: 1;#}
@@ -38,357 +38,533 @@
 {#    }#}
 
 
-
-
 {% endblock %}
 
 {% block breadcrumbs %}
-    {{ block.super }}
+{{ block.super }}
 
-    {% if style == '1' %}
-        {% breadcrumb "Databases" "databases" %}
-        {% breadcrumb "List" "databases" %}
-    {% else %}
-        {% breadcrumb "Databases" "alldatabases" %}
-        {% breadcrumb "List" "alldatabases" %}
-    {% endif %}
-    {% breadcrumb breadcrumb_name "" %}
+{% if style == '1' %}
+{% breadcrumb "Databases" "databases" %}
+{% breadcrumb "List" "databases" %}
+{% else %}
+{% breadcrumb "Databases" "alldatabases" %}
+{% breadcrumb "List" "alldatabases" %}
+{% endif %}
+{% breadcrumb breadcrumb_name "" %}
 {% endblock %}
 
 {% block toolbar %}
 
-    {% include "menu_toolbar.html" with collapse=collapseall %}
+{% include "menu_toolbar.html" with collapse=collapseall %}
 
 {% endblock %}
 
 {% block content %}
 
-    {% if qsets %}
-        <br/>
+{% if qsets %}
 
-        <div class="span12">
-            <div class="row-fluid">
-                <div class="">
-                    <ul class="nav nav-tabs">
-                        <li id="li_metadata" class="active" class="">
-                            <a href="#A" onclick="navigation_handler('metadata');" data-toggle="tab">Fingerprint</a>
-                        </li>
+        <!--<div style="margin-top: 40px;"></div>-->
 
-                        <li id="li_literature">
-                            <a href="#B" onclick="navigation_handler('literature');" data-toggle="tab">Literature</a>
-                        </li>
+        <!--<h2>Example tabs</h2>-->
+          <!--<p>Add quick, dynamic tab functionality to transition through panes of local content, even via dropdown menus.</p>-->
 
-                    </ul>
-                </div>
-            </div>
-            <div id="metadata">
+          <!--<div class="bs-docs-example">-->
+            <!--<ul id="myTab" class="nav nav-tabs">-->
+              <!--<li class="active"><a href="#home" data-toggle="tab">Home</a></li>-->
 
-                <div class="accordion" id="accordion2">
+              <!--<li><a href="#profile" data-toggle="tab">Profile</a></li>-->
+
+            <!--</ul>-->
+            <!--<div id="myTabContent" class="tab-content">-->
+              <!--<div class="tab-pane fade in active" id="home">-->
+
+                  <!--<div class="pull-right" style="margin-bottom: 10px;"><a id="collapseall_metadata" class="btn" href="" >-->
+            <!--Expand all-->
+         <!--</a></div>-->
+                <!--<div class="accordion span11" id="accordion1">-->
+                      <!--<div class="accordion-group">-->
+                        <!--<div class="accordion-heading">-->
+                          <!--<a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion1" href="#collapseOne">-->
+                            <!--Collapsible Group Item #1-->
+                          <!--</a>-->
+                        <!--</div>-->
+                        <!--<div id="collapseOne" class="accordion-body collapse in">-->
+                          <!--<div class="accordion-inner">-->
+                            <!--Anim pariatur cliche...-->
+                          <!--</div>-->
+                        <!--</div>-->
+                      <!--</div>-->
+                      <!--<div class="accordion-group">-->
+                        <!--<div class="accordion-heading">-->
+                          <!--<a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion1" href="#collapseTwo">-->
+                            <!--Collapsible Group Item #2-->
+                          <!--</a>-->
+                        <!--</div>-->
+                        <!--<div id="collapseTwo" class="accordion-body collapse">-->
+                          <!--<div class="accordion-inner">-->
+                            <!--Anim pariatur cliche...-->
+                          <!--</div>-->
+                        <!--</div>-->
+                      <!--</div>-->
+                    <!--</div>-->
+              <!--</div>-->
+              <!--<div class="tab-pane fade" id="profile">-->
+                  <!--<div class="pull-right" style="margin-bottom: 10px;"><a id="collapseall_literature" class="btn" href="" >-->
+            <!--Expand all </a></div>-->
+
+                  <!--<div class="accordion span11" id="accordion2">-->
+                      <!--<div class="accordion-group">-->
+                            <!--<div class="accordion-heading">-->
+                              <!--<a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapseThree">-->
+                                <!--Collapsible Group Item #3-->
+                              <!--</a>-->
+                            <!--</div>-->
+                            <!--<div id="collapseThree" class="accordion-body collapse in">-->
+                              <!--<div class="accordion-inner">-->
+                                <!--Anim pariatur cliche...-->
+                              <!--</div>-->
+                            <!--</div>-->
+                          <!--</div>-->
+                          <!--<div class="accordion-group">-->
+                            <!--<div class="accordion-heading">-->
+                              <!--<a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapseFour">-->
+                                <!--Collapsible Group Item #4-->
+                              <!--</a>-->
+                            <!--</div>-->
+                            <!--<div id="collapseFour" class="accordion-body collapse">-->
+                              <!--<div class="accordion-inner">-->
+                                <!--Anim pariatur cliche...-->
+                              <!--</div>-->
+                            <!--</div>-->
+                          <!--</div>-->
+                        <!--</div>-->
+                    <!--</div>-->
+              <!--</div>-->
+
+          <!--</div>-->
+
+
+
+<div class="span12">
+<div class="row-fluid">
+    <div class="tabbable">
+        <ul class="nav nav-tabs">
+            <li class="active"><a href="#metadata" data-toggle="tab">Fingerprint</a></li>
+            <li><a href="#literature" data-toggle="tab">Literature</a></li>
+        </ul>
+        <div class="tab-content">
+            <div class="tab-pane active" id="metadata">
+            <div ><a id="collapseall_metadata"  class="btn pull-right" href="">Expand all </a></div>
+                <div class="accordion pull-left "  id="accordion1" style="margin-top: 10px;">
                     {% for k,qs in qsets.items %}
-                        <div class="accordion-group">
-                            <div class="accordion-heading">
-                                <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2"
-                                   href="#collapse{{ k|removespaces }}">
-                                    {{ k|removeh1 }}
-                                </a>
-                            </div>
-                            <div id="collapse{{ k|removespaces }}" class="accordion-body collapse">
-                                <div class="accordion-inner">
-
-                                    <table id="t2" class="table table-bordered  table-hover">
-                                        <thead>
-
-                                        </thead>
-
-                                        <tbody>
-
-                                        {% for t in qs.list_ordered_tags %}
-                                            <tr>
-                                                <td title="{{ t.tag|safe }}">{{ t.tag|safe }}</td>
-                                                <td title="{{ t.value|safe }}"> {{ t.value|safe }}</td>
-                                            </tr>
-                                        {% endfor %}
-                                        </tbody>
-                                    </table>
-                                </div>
+                    <div class="accordion-group">
+                        <div class="accordion-heading">
+                            <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion1"
+                               href="#collapse{{ k|removespaces }}">{{ k|removeh1 }}
+                            </a>
+                        </div>
+                        <div id="collapse{{ k|removespaces }}" class="accordion-body collapse">
+                            <div class="accordion-inner">
+                                <table id="t2" class="table table-bordered  table-hover">
+                                    <thead></thead>
+                                    <tbody>
+                                    {% for t in qs.list_ordered_tags %}
+                                    <tr>
+                                        <td title="{{ t.tag|safe }}">{{ t.tag|safe }}</td>
+                                        <td title="{{ t.value|safe }}"> {{ t.value|safe }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                    </tbody>
+                                </table>
                             </div>
                         </div>
+                    </div>
                     {% endfor %}
                 </div>
                 {% comment %}
 
-        <table  class="table ">
-        <thead>
-        <tr>
-        <th>Tag</th>
-        <th>Value</th>
-
-        </tr>
-        </thead>
-
-        <tbody>
-        {% for t in value_list %}
-        <tr>
-        <td>{{ t.tag }}</td>
-        <td>{{ t.value }}</td>
-
-        </tr>
-        {% endfor %}
-        </tbody>
-        </table>
-        {% endcomment %}
+                <table class="table ">
+                    <thead>
+                    <tr>
+                        <th>Tag</th>
+                        <th>Value</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for t in value_list %}
+                    <tr>
+                        <td>{{ t.tag }}</td>
+                        <td>{{ t.value }}</td>
+                    </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+                {% endcomment %}
             </div>
-        </div>
-    {% else %}
-        <div class="row">
-            <div class="span4">
-                <div class="alert">
-                    <a class="close" data-dismiss="error">×</a> <strong>Warning!</strong>
-                    You don't have results.
-                </div>
-            </div>
-        </div>
-    {% endif %}
 
-
-
-    <div id="literature" class="row-fluid span12 hide">
-
-        <div class="accordion" id="accordion2">
-            <div class="accordion-group">
-                <div class="accordion-heading">
-                    <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#c_ollapseOne">
-                        Upregulation of chemokines and their receptors in Duchenne muscular dystrophy: potential for
-                        attenuation of myofiber necrosis.
-                    </a>
-                </div>
-                <div id="c_ollapseOne" class="accordion-body collapse in">
-                    <div class="accordion-inner">
-
-
-                        <div id="becas-widget-text" class="widget-container"></div>
-
+            <div class="tab-pane" id="literature">
+                <div ><a id="collapseall_literature"  class="btn pull-right" href="">Expand all </a></div>
+                <div class="accordion pull-left "  id="accordion2" style="margin-top: 10px;">
+                    <div class="accordion-group">
+                        <div class="accordion-heading">
+                            <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2"
+                               href="#collapseOne">
+                                Upregulation of chemokines and their receptors in Duchenne muscular dystrophy: potential
+                                for
+                                attenuation of myofiber necrosis.
+                            </a>
+                        </div>
+                        <div id="collapseOne" class="accordion-body collapse in">
+                            <div class="accordion-inner">
+                                <div id="becas-widget-text" class="widget-container"></div>
+                            </div>
+                        </div>
                     </div>
-                </div>
-            </div>
-            <div class="accordion-group">
-                <div class="accordion-heading">
-                    <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#c_ollapseTwo">
-                        Upregulation of chemokines and their receptors in Duchenne muscular dystrophy: potential for
-                        attenuation of myofiber necrosis.
-                    </a>
-                </div>
-                <div id="c_ollapseTwo" class="accordion-body collapse">
-                    <div class="accordion-inner">
-
-
-                        <!-- Container to hold another widget -->
-                        <div id="becas-widget-pmid" class="widget-container"></div>
+                    <div class="accordion-group">
+                        <div class="accordion-heading">
+                            <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2"
+                               href="#collapseTwo">
+                                Upregulation of chemokines and their receptors in Duchenne muscular dystrophy: potential
+                                for
+                                attenuation of myofiber necrosis.
+                            </a>
+                        </div>
+                        <div id="collapseTwo" class="accordion-body collapse">
+                            <div class="accordion-inner">
+                                <!-- Container to hold another widget -->
+                                <div id="becas-widget-pmid" class="widget-container"></div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-    </div>
-
-    </div>
-
-
-
-
-
-    <!-- Include the widget embedding script -->
-    <script src="//bioinformatics.ua.pt/becas/embed-widget.js"></script>
-    <!-- Use the widgets -->
-    <script>
-        // Initialize widget
-        var becasWidget = new becas.Widget({
-            container: 'becas-widget-text'
-        });
-        // Request text annotation
-        becasWidget.annotateText({
-            // required parameter
-            text: 'In Duchenne muscular dystrophy (DMD), the infiltration of skeletal muscle by immune cells aggravates disease, yet the precise mechanisms behind these inflammatory responses remain poorly understood. Chemotactic cytokines, or chemokines, are considered essential recruiters of inflammatory cells to the tissues.\nWe assayed chemokine and chemokine receptor expression in DMD muscle biopsies (n = 9, average age 7 years) using immunohistochemistry, immunofluorescence, and in situ hybridization.\nCXCL1, CXCL2, CXCL3, CXCL8, and CXCL11, absent from normal muscle fibers, were induced in DMD myofibers. CXCL11, CXCL12, and the ligand-receptor couple CCL2-CCR2 were upregulated on the blood vessel endothelium of DMD patients. CD68(+) macrophages expressed high levels of CXCL8, CCL2, and CCL5.\nOur data suggest a possible beneficial role for CXCR1/2/4 ligands in managing muscle fiber damage control and tissue regeneration. Upregulation of endothelial chemokine receptors and CXCL8, CCL2, and CCL5 expression by cytotoxic macrophages may regulate myofiber necrosis.',
-            // optional parameters
-            groups: {
-                "SPEC": true,
-                "ANAT": true,
-                "DISO": true,
-                "PATH": true,
-                "CHED": true,
-                "ENZY": true,
-                "MRNA": true,
-                "PRGE": true,
-                "COMP": true,
-                "FUNC": true,
-                "PROC": true
-            },
-            success: function () {
-                // Everything went fine, widget is rendered.
-            },
-            error: function (err) {
-                // An error prevented annotation, an error message has rendered.
-            }
-        });
-
-        // Initialize another widget
-        var becasWidget2 = new becas.Widget({
-            container: 'becas-widget-pmid'
-        });
-        // Request abstract annotation by PMID
-        becasWidget2.annotatePublication({
-            // required parameter
-            pmid: 23225384,
-            // optional parameters
-            groups: {
-                "SPEC": true,
-                "ANAT": true,
-                "DISO": true,
-                "PATH": true,
-                "CHED": true,
-                "ENZY": true,
-                "MRNA": true,
-                "PRGE": true,
-                "COMP": true,
-                "FUNC": true,
-                "PROC": true
-            },
-            success: function () {
-                // Everything went fine, widget is rendered.
-            },
-            error: function (err) {
-                // An error prevented annotation, an error message has rendered.
-            }
-        });
-    </script>
-    <!-- Display a message to users with Javascript deactivated -->
-    <noscript>
-        <div style="position:absolute;top:0;left:0;width:500px;height:250px;border:2px solid #A00;padding:6px;background-color:#fff;color:#600;text-align:center">
-            <h1>This page requires Javascript to function properly.</h1>
-
-            <h2>Please follow this instructions on how to <a href="http://www.enable-javascript.com/" target="_blank">enable
-                JavaScript in your web browser</a>.</h2>
+</div>
+{% else %}
+<div class="row">
+    <div class="span4">
+        <div class="alert">
+            <a class="close" data-dismiss="error">×</a> <strong>Warning!</strong>
+            You don't have results.
         </div>
-    </noscript>
+    </div>
+</div>
+{% endif %}
+</div>
+
+</div>
 
 
+<!-- Include the widget embedding script -->
+<script src="//bioinformatics.ua.pt/becas/embed-widget.js"></script>
+<!--&lt;!&ndash; Use the widgets &ndash;&gt;-->
+<script>
+    // Initialize widget
+    var becasWidget = new becas.Widget({
+        container: 'becas-widget-text'
+    });
+    // Request text annotation
+    becasWidget.annotateText({
+        // required parameter
+        text: 'In Duchenne muscular dystrophy (DMD), the infiltration of skeletal muscle by immune cells aggravates disease, yet the precise mechanisms behind these inflammatory responses remain poorly understood. Chemotactic cytokines, or chemokines, are considered essential recruiters of inflammatory cells to the tissues.\nWe assayed chemokine and chemokine receptor expression in DMD muscle biopsies (n = 9, average age 7 years) using immunohistochemistry, immunofluorescence, and in situ hybridization.\nCXCL1, CXCL2, CXCL3, CXCL8, and CXCL11, absent from normal muscle fibers, were induced in DMD myofibers. CXCL11, CXCL12, and the ligand-receptor couple CCL2-CCR2 were upregulated on the blood vessel endothelium of DMD patients. CD68(+) macrophages expressed high levels of CXCL8, CCL2, and CCL5.\nOur data suggest a possible beneficial role for CXCR1/2/4 ligands in managing muscle fiber damage control and tissue regeneration. Upregulation of endothelial chemokine receptors and CXCL8, CCL2, and CCL5 expression by cytotoxic macrophages may regulate myofiber necrosis.',
+        // optional parameters
+        groups: {
+            "SPEC": true,
+            "ANAT": true,
+            "DISO": true,
+            "PATH": true,
+            "CHED": true,
+            "ENZY": true,
+            "MRNA": true,
+            "PRGE": true,
+            "COMP": true,
+            "FUNC": true,
+            "PROC": true
+        },
+        success: function () {
+            // Everything went fine, widget is rendered.
+        },
+        error: function (err) {
+            // An error prevented annotation, an error message has rendered.
+        }
+    });
+
+    // Initialize another widget
+    var becasWidget2 = new becas.Widget({
+        container: 'becas-widget-pmid'
+    });
+    // Request abstract annotation by PMID
+    becasWidget2.annotatePublication({
+        // required parameter
+        pmid: 23225384,
+        // optional parameters
+        groups: {
+            "SPEC": true,
+            "ANAT": true,
+            "DISO": true,
+            "PATH": true,
+            "CHED": true,
+            "ENZY": true,
+            "MRNA": true,
+            "PRGE": true,
+            "COMP": true,
+            "FUNC": true,
+            "PROC": true
+        },
+        success: function () {
+            // Everything went fine, widget is rendered.
+        },
+        error: function (err) {
+            // An error prevented annotation, an error message has rendered.
+        }
+    });
+</script>
+<!-- Display a message to users with Javascript deactivated -->
+<noscript>
+    <div style="position:absolute;top:0;left:0;width:500px;height:250px;border:2px solid #A00;padding:6px;background-color:#fff;color:#600;text-align:center">
+        <h1>This page requires Javascript to function properly.</h1>
+
+        <h2>Please follow this instructions on how to <a href="http://www.enable-javascript.com/" target="_blank">enable
+            JavaScript in your web browser</a>.</h2>
+    </div>
+</noscript>
 
 
 {% endblock %}
+
+
 <script type="text/javascript">
+
     {% block scriptextra %}
 
+        $('#li_workspace').addClass("active");
 
-        $("#collapseall").bind('click', function (e) {
-            e.preventDefault();
-            e.stopPropagation();
-
-            if ($(this).text().indexOf('Collapse') !== -1) {
-                $(this).text('Expand all');
-                change_name_collapse(false);
-            }
-            else {
-                $(this).text('Collapse all');
-                change_name_collapse(true);
-            }
-
-            return false;
-        });
+//        $(".nav-tabs").bind('click', function (e) {
+//            $('.collapse').collapse();
+//            console.log(e.target());
+//        });
 
 
-        function change_name_collapse(value) {
+   $("#collapseall_metadata").bind('click', function (e) {
+        e.preventDefault();
+        e.stopPropagation();
 
-            {% for k,qs in qsets.items %}
+       var div_id = 'accordion1';
+       collapseAll($("#collapseall_metadata"), div_id);
 
+       });
+    $("#collapseall_literature").bind('click', function (e) {
+       e.preventDefault();
+       e.stopPropagation();
+       var div_id = 'accordion2';
+       collapseAll($("#collapseall_literature"), div_id);
 
-                $("div[id^='collapse']").filter(function () {
-                    var regexp = /^collapse(.*)$/;
-                    return (this.id.match(regexp));
-                }).each(function () {
-                            //this.innerHTML = this.id;
-                            console.log(this.id);
-                            var current = "{{k|removespaces}}";
-                            if (this.id.indexOf(current)) {
-                                $('#' + this.id).collapse('toggle');
-                            }
-                            ;
-                        });
+       });
 
-                //show_hide_empty_rows(['{{name|removespaces}}_{{k|removespaces}}'], value);
-            {% endfor %}
+    function collapseAll(element, div_id){
+        if (element.text().indexOf('Collapse') !== -1) {
+           console.log('Collapse all');
+           element.text('Expand all');
+           if (!element.hasClass('disabled')){
+            element.parents().find('#'+div_id +' .collapse').each(function(index){
 
-            return false;
-        };
-
-
-        function navigation_handler(id) {
-
-            if (id == "literature") {
-
-                $('#' + id).removeClass("hide");
-                $('#' + id).addClass("show");
-
-                $('#li_' + id).addClass("active");
-                $('#metadata').addClass("hide");
-                $('#li_metadata').removeClass("active");
-                $('#metadata').removeClass("show");
-            }
-            else if (id == "metadata") {
-                $('#' + id).addClass("show");
-                $('#' + id).removeClass("hide");
-                $('#li_' + id).addClass("active");
-                $('#literature').addClass("hide");
-                $('#li_literature').removeClass("active");
-                $('#literature').removeClass("show");
-
-            }
-        };
-        $('.popover').popover({
-            container: 'body'
-        });
-        $('.accordion-body.collapse').hover(
-                function () {
-                    $(this).css('overflow', 'visible');
-                },
-                function () {
-                    $(this).css('overflow', 'hidden');
-                }
-        );
-
-        $.fn.textWidth = function () {
-            var node, original, width;
-            original = $(this).html();
-            node = $("<span style='position:absolute;width:auto;left:-9999px'>" + original + "</span>");
-            //node.css('font-family', $(this).css('font-family')).css('font-size', $(this).//css('font-size'));
-            $('body').append(node);
-            width = node.width();
-            node.remove();
-            return width;
-        };
-
-        $(function () {
-            $('td').each(function () {
-
-                var content;
-                content = $(this).text().replace(/\s+/gi, ' ');
-
-
-                if ($(this).textWidth() > $(this).width()) {
-
-                    return $(this).tooltip({container: "body", html: true});
+//                 $(this).removeAttr('style')
+                if ( $(this).hasClass('in')) {
+                    //alert('hide - '+$(this).attr('id')+" : "+index)
+                console.log($(this).attr("id"));
+                     $(this).collapse('hide');
                 }
             });
-        });
+           }
+       } else {
+           console.log('Expand all');
+            element.text('Collapse all');
+           if (!element.hasClass('disabled')){
+            element.parents().find('#'+div_id +' .collapse').each(function(index){
+                //alert('test1 - '+$(this).attr('id')+" : "+index)
 
-        /* TODO: Toggle + Expand all
-         $('.').on('click', function(e) {
-         e.preventDefault();
-         var $this = $(this);
-         var $collapse = $this.closest('.collapse-group').find('.collapse');
-         $collapse.collapse('toggle');
-         });
-         */
+//                $(this).removeAttr('style')
 
+                if (!$(this).hasClass('in')) {
+//                    alert('show - '+$(this).attr('id')+" : "+index)
+                console.log($(this).attr("id"));
+                    $(this).collapse('show');
+                }
+            });
+           }
+       }
+    }
+//    $("#collapseall").bind('click', function (e) {
+//       e.preventDefault();
+//       e.stopPropagation();
+//
+//       var div_id = 'accordion1';
+//
+//       if ($(this).text().indexOf('Collapse') !== -1) {
+//           console.log('Collapse all');
+//           $(this).text('Expand all');
+//           if (!$(this).hasClass('disabled')){
+//            $(this).parents().find('#'+div_id +' .collapse').each(function(index){
+//                $(this).collapse();
+//                $(this).removeAttr('style')
+//                if ($(this).hasClass('in')) {
+//                    //alert('hide - '+$(this).attr('id')+" : "+index)
+//                    $(this).collapse('hide');
+//                }
+//            })
+//           //$(this).parents().find('#accordion2 *.accordion-body').collapse('hide');
+//
+//           }
+//       } else {
+//           console.log('Expand all');
+//            $(this).text('Collapse all');
+//           if (!$(this).hasClass('disabled')){
+//            $(this).parents().find('#'+div_id +' .collapse').each(function(index){
+//                //alert('test1 - '+$(this).attr('id')+" : "+index)
+//                $(this).collapse();
+//                    $(this).removeAttr('style')
+//
+//                if (!$(this).hasClass('in')) {
+//                    //alert('show - '+$(this).attr('id')+" : "+index)
+//                    $(this).collapse('show');
+//                }
+//            })
+//           //$(this).parents().find('#accordion2 *.accordion-body').collapse('show');
+//
+//           }
+//       }
+//
+//   });
+
+
+//        $("#collapseall").bind('click', function (e) {
+//            e.preventDefault();
+//            e.stopPropagation();
+//
+//            if ($(this).text().indexOf('Collapse') !== -1) {
+//                // Collapse all
+//                console.log('1 - ' + $(this).text().indexOf('Collapse'));
+//                $(this).text('Expand all');
+//                change_name_collapse('collapse');
+//            }
+//            else {
+//                console.log('2 - ' + $(this).text().indexOf('Collapse'));
+//                // Expand all
+//                $(this).text('Collapse all');
+//                change_name_collapse('expand');
+//            }
+//
+//            return false;
+//        });
+//
+//
+//        function change_name_collapse(value) {
+//
+//            {% for k, qs in qsets.items %}
+//
+//
+//                $("div[id^='collapse']").filter(function () {
+//                    var regexp = /^collapse(.*)$/;
+//                    return (this.id.match(regexp));
+//                }).each(function () {
+//                            //this.innerHTML = this.id;
+//    //                            console.log(this.id);
+//
+//                            if (value === 'collapse') {
+//                                console.log(value);
+//    //                                $('#' + this.id).addClass('collapse in ');
+//                                if ($('#' + this.id).hasClass('in')) {
+//                                    $('#' + this.id).collapse('hide');
+//                                }
+//                            }
+//                            else if (value === 'expand') {
+//                                console.log(value);
+//    //                                $('#' + this.id).removeClass('collapse in ');
+//                                if (!$('#' + this.id).hasClass('in')) {
+//                                    $('#' + this.id).collapse('show');
+//                                }
+//
+//                            }
+//    //                            if (this.id.indexOf(current)) {
+//    //                                $('#' + this.id).collapse('toggle');
+//    //                            };
+//                        });
+//
+//                //show_hide_empty_rows(['{{name|removespaces}}_{{k|removespaces}}'], value);
+//                {% endfor %}
+//
+//                return false;
+//            } ;
+    //
+    //
+    //        function navigation_handler(id) {
+    //            console.log("navigation");
+    //            if (id == "literature") {
+    //
+    //                $('#' + id).removeClass("hide");
+    //                $('#' + id).addClass("show");
+    //
+    //                $('#li_' + id).addClass("active");
+    //                $('#metadata').addClass("hide");
+    //                $('#li_metadata').removeClass("active");
+    //                $('#metadata').removeClass("show");
+    //            }
+    //            else if (id == "metadata") {
+    //                $('#' + id).addClass("show");
+    //                $('#' + id).removeClass("hide");
+    //                $('#li_' + id).addClass("active");
+    //                $('#literature').addClass("hide");
+    //                $('#li_literature').removeClass("active");
+    //                $('#literature').removeClass("show");
+    //
+    //            }
+    //        };
+            $('.popover').popover({
+                container: 'body'
+            });
+    //            $('.accordion-body.collapse').hover(
+    //                    function () {
+    //                        $(this).css('overflow', 'visible');
+    //                    },
+    //                    function () {
+    //                        $(this).css('overflow', 'hidden');
+    //                    }
+    //            );
+
+            $.fn.textWidth = function () {
+                var node, original, width;
+                original = $(this).html();
+                node = $("<span style='position:absolute;width:auto;left:-9999px'>" + original + "</span>");
+                //node.css('font-family', $(this).css('font-family')).css('font-size', $(this).//css('font-size'));
+                $('body').append(node);
+                width = node.width();
+                node.remove();
+                return width;
+            };
+
+            $(function () {
+                $('td').each(function () {
+
+                    var content;
+                    content = $(this).text().replace(/\s+/gi, ' ');
+
+
+                    if ($(this).textWidth() > $(this).width()) {
+
+                        return $(this).tooltip({container: "body", html: true});
+                    }
+                });
+            });
+
+            /* TODO: Toggle + Expand all
+             $('.').on('click', function(e) {
+             e.preventDefault();
+             var $this = $(this);
+             var $collapse = $this.closest('.collapse-group').find('.collapse');
+             $collapse.collapse('toggle');
+             });
+             */
 
 
     {% endblock %}

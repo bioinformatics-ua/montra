@@ -896,7 +896,7 @@ def fingerprint(request, runcode, qs, template_name='database_info.html'):
     qsets, name = createqsets(runcode)
     return render(request, template_name,
                   {'request': request, 'qsets': qsets,
-                   'breadcrumb': True, 'breadcrumb_name': name, 'style': qs, 'collapseall': True})
+                   'breadcrumb': True, 'breadcrumb_name': name, 'style': qs, 'collapseall': False})
 
 
 def get_questionsets_list(runinfo):
