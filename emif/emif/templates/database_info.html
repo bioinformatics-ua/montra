@@ -368,13 +368,8 @@ filter: alpha(opacity=80);
            element.text('Expand all');
            if (!element.hasClass('disabled')){
             element.parents().find('#'+div_id +' .collapse').each(function(index){
-
-//                 $(this).removeAttr('style')
-                if ( $(this).hasClass('in')) {
-                    //alert('hide - '+$(this).attr('id')+" : "+index)
-                console.log($(this).attr("id"));
-                     $(this).collapse('hide');
-                }
+                $(this).addClass('in');
+                $(this).collapse('hide');
             });
            }
        } else {
@@ -382,15 +377,8 @@ filter: alpha(opacity=80);
             element.text('Collapse all');
            if (!element.hasClass('disabled')){
             element.parents().find('#'+div_id +' .collapse').each(function(index){
-                //alert('test1 - '+$(this).attr('id')+" : "+index)
-
-//                $(this).removeAttr('style')
-
-                if (!$(this).hasClass('in')) {
-//                    alert('show - '+$(this).attr('id')+" : "+index)
-                console.log($(this).attr("id"));
-                    $(this).collapse('show');
-                }
+                $(this).removeClass('in');
+                $(this).collapse('show');
             });
            }
        }
