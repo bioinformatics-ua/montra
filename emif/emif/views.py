@@ -140,7 +140,7 @@ def results_comp(request, template_name='results_comp.html'):
         (first_name, discard) = list_qsets[0]
 
     print "list_qsets: " + str(list_qsets)
-    return render(request, template_name, {'request': request,
+    return render(request, template_name, {'request': request, 'breadcrumb': True,
                                            'results': list_qsets, 'database_to_compare': first_name})
 
 
