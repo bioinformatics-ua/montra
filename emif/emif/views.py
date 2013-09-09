@@ -496,6 +496,7 @@ def database_edit(request, fingerprint_id, questionnaire_id, template_name="data
         items = r
         break
     fingerprint_id = r['id']
+    fingerprint_name = r['database_name_t']
     qsobjs = QuestionSet.objects.filter(questionnaire=questionnaire_id)
     questionnaire = qsobjs[0].questionnaire
     sortid = None
@@ -654,7 +655,9 @@ def database_edit(request, fingerprint_id, questionnaire_id, template_name="data
                 async_url=None,
                 qs_list=qs_list,
                 questions_list=qlist_general,
-                breadcrumb=True
+                breadcrumb=True,
+                name=fingerprint_name,
+                id=fingerprint_id,
         )
         r['Cache-Control'] = 'no-cache'
         r['Expires'] = "Thu, 24 Jan 1980 00:00:00 GMT"

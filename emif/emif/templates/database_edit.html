@@ -4,10 +4,16 @@
 {% load django_bootstrap_breadcrumbs %}
 
 {% block breadcrumbs %}
-{{ block.super }}
-{% breadcrumb "Databases" "databases" %}
-{% breadcrumb "Edit" "" %}
-
+    {{ block.super }}
+    {% breadcrumb "Databases" "databases" %}
+    {% with url_id="dbEdit/" %}
+        {% with url_id=url_id|add:id  %}
+            {% with url_id=url_id|add:"/1" %}
+                {% breadcrumb "Edit" url_id %}
+            {% endwith %}
+        {% endwith %}
+    {% endwith %}
+    {% breadcrumb name "" %}
 {% endblock %}
 
 {% block styleextra %}
@@ -36,7 +42,7 @@ button {
 {% for x in jsinclude %}
 <script type="text/javascript" src="{{ x }}"></script>
 {% endfor %}
-    
+
     {% for x in cssinclude %}
 <link rel="stylesheet" href="{{ x }}" type="text/css" />
 {% endfor %}
@@ -66,7 +72,7 @@ button {
       <li class="nav-header">Step-by-Step</li>
       {% for qs in questionset.questionnaire.questionsets %}
       {% if qs.sortid != 99 %}
-      
+
       <li{% if questionset.text == qs.text %} class="active" {% endif %} id="li_qs_{{qs.id}}">
         <!--<a href="q2/{{runinfo.random}}/{{ qs.sortid }}">
         -->
@@ -94,11 +100,11 @@ button {
         {% for trigger in triggers %}
             addtrigger("{{trigger}}");
         {% endfor %}
-        
+
         {% for k,v in qvalues.items %}
             qvalues['{{ k|escapejs }}'] = '{{ v|escapejs }}';
         {% endfor %}
-        
+
         for(key in qvalues) {
             valchanged(key, qvalues[key]);
         }
@@ -126,9 +132,9 @@ function next_questionset(id_questionset)
   }
     if (obj.id==id_questionset.id)
     {
-      next = true; 
+      next = true;
     }
-      
+
   }
 
   );
@@ -139,22 +145,22 @@ function questionsets_handle(id_questionset)
 {
 
   $('.questionset').each(function(i, obj) {
-    
+
     if (obj.id==id_questionset.id)
     {
-        
+
        $('#'+obj.id).addClass("show");
        $('#li_'+id_questionset.id).addClass("active");
        $('#'+obj.id).removeClass("hide");
     }
-  
+
     else {
       $('#li_'+obj.id).removeClass("active");
       $('#'+obj.id).addClass("hide");
       $('#'+obj.id).removeClass("show");
     }
- 
-      
+
+
   }
 
   );
