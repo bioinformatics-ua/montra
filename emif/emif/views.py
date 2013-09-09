@@ -496,7 +496,10 @@ def database_edit(request, fingerprint_id, questionnaire_id, template_name="data
         items = r
         break
     fingerprint_id = r['id']
-    fingerprint_name = r['database_name_t']
+    try:
+        fingerprint_name = r['database_name_t']
+    except:
+        fingerprint_name = 'unnamed'
     qsobjs = QuestionSet.objects.filter(questionnaire=questionnaire_id)
     questionnaire = qsobjs[0].questionnaire
     sortid = None
