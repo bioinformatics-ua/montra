@@ -4,9 +4,12 @@
 
 {% block breadcrumbs %}
     {{ block.super }}
-    {% breadcrumb "Databases" "/databases" %}
-    {% breadcrumb "List" "/databases" %}
-
+    {% breadcrumb "Search" "/resultsdiff/1" %}
+    {% if search_old == None %}
+        {% breadcrumb "None" "" %}
+    {% else %}
+        {% breadcrumb search_old "" %}
+    {% endif %}
 {% endblock %}
 
 
@@ -37,13 +40,9 @@
 
       <div class="btn-group"></div>
       <a id="comparabtn" class="btn "  href=""  rel="tooltip" data-container="body" data-placement="bottom" data-original-title="You only can select two databases for a comparison" disabled> <i  class=" icon"></i>
-        Compare
-      </a>
-      
+        Compare</a>
 
-      <a class="btn" href="geo" onclick="" > <i class=" icon"></i>
-        Geolocation
-      </a>
+      <a class="btn" href="geo" onclick="" > <i class=" icon"></i>Geolocation</a>
 
     </div>
   </div>
@@ -52,7 +51,8 @@
 {% load bootstrap_pagination %}
 
 {% block content %}
-  <div class"row">
+
+  <div class="row">
     <div class="span12" style="text-align:center">
       <img src="static/img/emif_logo.png" alt="EMIF Logo" style="width: 80px; height: 81px;" />
       <h2>Quick Search</h2>
@@ -63,12 +63,11 @@
         <div class="navbar-inner">
 
           <h4>
+              <span id="results_size"></span>
             {% if page_obj != None %}
-            <span id="results_size"></span>
-            total results for
-            <span class="label label-inverse">{{list_results.num_results}}</span>
+            total results for {{search_old}}
+            <span class="label label-inverse"> {{list_results.num_results}}</span>
             {% else %}
-            <span id="results_size"></span>
             No results found 
           {% endif %}
           </h4>
@@ -124,7 +123,7 @@
       <div class="navbar" id="loading">
 
         <div class="navbar-inner hoverDiv">
-          <div class"row-fluid hoverDiv">
+          <div class="row-fluid hoverDiv">
             <div class="pull-left span6" style="text-align:left">
               <a href="fingerprint/{{ result.id }}/1">
                 <span class="label label-success" style="font-size:15px">{{ result.name }}</span>
@@ -165,8 +164,10 @@
     </tbody>
 </table>
   </form>
+    {% else %}
+    <div style="margin-top: 60px;"></div>
   {% endif %}
-  
+
   {% if page_obj != None %}
 
 {% bootstrap_paginate page_obj range=10 url_view_name="views.results_diff" show_prev_next="false" show_first_last="true"%}

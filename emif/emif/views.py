@@ -163,7 +163,7 @@ def results_fulltext(request, page=1, template_name='results.html'):
 def results_fulltext_aux(request, query, page=1, template_name='results.html'):
     rows = 5
     if query == "":
-        return render(request, "results.html", {'request': request,
+        return render(request, "results.html", {'request': request, 'breadcrumb': True,
                                                 'list_results': [], 'page_obj': None})
 
     class Results:
@@ -180,8 +180,9 @@ def results_fulltext_aux(request, query, page=1, template_name='results.html'):
     #print results
     list_databases = []
     if len(results) == 0:
-        return render(request, "results.html", {'request': request,
-                                                'list_results': [], 'page_obj': None})
+        query_old = request.session.get('query', "")
+        return render(request, "results.html", {'request': request, 'breadcrumb': True,
+                                                'list_results': [], 'page_obj': None, 'search_old': query_old})
     for r in results:
         try:
             database_aux = Database()
@@ -236,7 +237,7 @@ def results_fulltext_aux(request, query, page=1, template_name='results.html'):
     query_old = request.session.get('query', "")
     return render(request, template_name, {'request': request,
                                            'list_results': list_results, 'page_obj': pp.page(page),
-                                           'search_old': query_old})
+                                           'search_old': query_old, 'breadcrumb': True})
 
 
 def store_query(user_request, query_executed):
@@ -287,23 +288,19 @@ def results_diff(request, page=1, template_name='results_diff.html'):
     except:
         in_post = False
         #raise
-
     if not in_post:
         query = request.session.get('query', "")
 
     if query == "":
         return render(request, "results.html", {'request': request,
-                                                'list_results': [], 'page_obj': None})
+                                                'list_results': [], 'page_obj': None, 'breadcrumb': True})
     store_query(request, query)
     try:
         # Store query by the user
-
         search_full = request.POST['search_full']
-
         if search_full == "search_full":
             return results_fulltext(request, page)
     except:
-
         return results_fulltext(request, page)
 
 
@@ -386,11 +383,9 @@ def results_diff(request, page=1, template_name='results_diff.html'):
     list_results.d1 = list_databases_final[0]
     list_results.d2 = list_databases_final[1]
     list_results.d3 = list_databases_final[2]
-
     list_results.num_results = len(list_databases)
-
-    return render(request, template_name, {'request': request,
-                                           'results': list_results, 'search_old': query})
+    return render(request, template_name, {'request': request, 'query': query,
+                                           'results': list_results, 'search_old': query, 'breadcrumb': True})
 
 
 def geo(request, template_name='geo.html'):
