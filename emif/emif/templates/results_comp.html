@@ -74,20 +74,17 @@ th, td {
 
     </div>
   </div>
+  </form>
   {% endblock %}
 
 {% block content %}
+
 <div class="span12">
   <div class="accordion" id="accordion2">
     {% for name, qset in results %}
                       
     
-    <div class="span6" 
-{% if forloop.first%}
-style="margin-left: 0px;"
-    
-    {% endif %}                                                
-    >
+    <div class="span6" {% if forloop.first%}style="margin-left: 0px;"{% endif %}>
       <span class="label label-inverse">{{name}}</span>
 
       {% for k,v in qset.items %}
@@ -273,8 +270,16 @@ function change_name_collapse(value)
     console.log(this.id);
     var current = "{{name|removespaces}}_{{k|removespaces}}";
     if (this.id.indexOf(current))
-    { 
-      $('#'+this.id).collapse('toggle'); 
+    {
+        if(value) { //expand
+//            console.log("expand");
+            $('#'+this.id).collapse('show');
+        }
+        else {  //collapse
+//            console.log("collapse");
+            $('#'+this.id).collapse('hide');
+        }
+
     };
     });
 
