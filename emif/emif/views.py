@@ -1872,6 +1872,6 @@ def export_all_answers(request):
             qsets, name = createqsets(id)
             for k, qs in qsets.iteritems():
                 for q in qs.list_ordered_tags:
-                    writer.writerow([id, name, k.replace('h1. ', ''), str(q.tag), str(q.value).replace("\n", ". ")])
+                    writer.writerow([id, name, k.replace('h1. ', ''), str(q.tag), str(q.value).replace("\n", ". ").replace(";", ",")])
 
     return response
