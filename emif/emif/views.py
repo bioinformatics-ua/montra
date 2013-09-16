@@ -17,6 +17,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
+import csv
 from pprint import pprint
 
 from django.shortcuts import render
@@ -792,7 +793,7 @@ def all_databases(request, template_name='alldatabases.html'):
     #list_databases = get_databases_from_db(request)
     list_databases = get_databases_from_solr(request, "*:*")
 
-    return render(request, template_name, {'request': request,
+    return render(request, template_name, {'request': request, 'export_all_answers': True,
                                            'list_databases': list_databases, 'breadcrumb': True, 'collapseall': False, 'geo': True})
 
 
@@ -822,7 +823,7 @@ def createqsets(runcode, qsets=None):
                 list_questions = Question.objects.filter(questionset=qset).order_by('number')
                 for question in list_questions:
                     t = Tag()
-                    t.tag = question.text
+                    t.tag = question.text.encode('utf-8')
                     t.value = ""
                     question_group.list_ordered_tags.append(t)
 
@@ -1853,3 +1854,24 @@ def docs_api(request, template_name='docs/api.html'):
     return render(request, template_name, {'request': request, 'breadcrumb': True})
 
 
+def export_all_answers(request):
+    """
+    Method to export all databases answers to a csv file
+    """
+    # Create the HttpResponse object with the appropriate CSV header.
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="EMIF_Catalogue_DBs_%s.csv"' % datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
+
+    list_databases = get_databases_from_solr(request, "*:*")
+
+    if list_databases:
+        writer = csv.writer(response)
+        writer.writerow(['DB_ID', 'DB_name', 'Questionset', 'Question', 'Answer'])
+        for t in list_databases:
+            id = t.id
+            qsets, name = createqsets(id)
+            for k, qs in qsets.iteritems():
+                for q in qs.list_ordered_tags:
+                    writer.writerow([id, name, k.replace('h1. ', ''), str(q.tag), str(q.value).replace("\n", ". ")])
+
+    return response

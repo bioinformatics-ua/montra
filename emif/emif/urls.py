@@ -97,6 +97,7 @@ urlpatterns = patterns('',
     # List Databases
     url(r'^databases$', 'emif.views.databases', name="databases"),
     url(r'^alldatabases$', 'emif.views.all_databases'),
+    url(r'^export_all_answers', 'emif.views.export_all_answers'),
     # Documentation
     url(r'^docs/api$', 'emif.views.docs_api'),
 
