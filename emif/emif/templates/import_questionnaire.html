@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+{% load url from future %}
+{% load django_bootstrap_breadcrumbs %}
+
+{% block breadcrumbs %}
+
+        {% breadcrumb "Home" "home" %}
+        {% breadcrumb "Import Questionnaire" "" %}
+
+{% endblock %}
+
+{% block content%}
+
+<div class="span12">
+  <div class="span6 center">
+       <div id="contact_wrap" class="rows">
+       <h2>Import questionnaire</h2>
+           <ul>
+           {% for row in content %}
+               {% for cell in row %}
+                <li>{{ cell }}</li>
+                {% endfor %}
+               <br />
+           {% endfor %}
+            </ul>
+
+</div>
+</div>
+
+{% endblock %}
+
+ {% block scriptextra %}
+    {% comment %}
+    <script>
+        {% endcomment %}
+
+        $('#li_workspace').addClass("active");
+
+        {% comment %}
+    </script>
+    {% endcomment %}
+
+    {% endblock %}
+
+

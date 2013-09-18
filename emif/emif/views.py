@@ -1875,3 +1875,28 @@ def export_all_answers(request):
                     writer.writerow([id, name, k.replace('h1. ', ''), str(q.tag), str(q.value).replace("\n", ". ").replace(";", ",")])
 
     return response
+
+
+def import_questionnaire(request, template_name='import_questionnaire.html'):
+
+    from openpyxl import load_workbook
+    wb = load_workbook(filename = r'C:/questionnaire_example1.xlsx')
+    # print wb.get_sheet_names()
+    ws = wb.get_active_sheet()
+    content = []
+    for row in ws.rows:
+        content.append([c.value for c in row])
+
+    # for row in ws.iter_rows(): # it brings a new method: iter_rows()
+    #
+    #     row_content = []
+    #     for cell in row:
+    #         row_content.append(cell.internal_value)
+    #         print cell.row
+    #     #     # content.append(cell.internal_value)
+    #     content.append(cell.row)
+    #     content[cell.row].append(row_content)
+    print content
+
+    return render_to_response(template_name, {'import_questionnaire': True, 'content': content,
+                              'request': request, 'breadcrumb': True}, RequestContext(request))
