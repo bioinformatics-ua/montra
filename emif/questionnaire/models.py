@@ -273,6 +273,7 @@ class Question(models.Model):
         'eg. <tt>requiredif="Q1,A or Q2,B"</tt>')
     footer = models.TextField(u"Footer", help_text="Footer rendered below the question interpreted as textile", blank=True)
     slug = models.CharField(max_length=128)
+    help_text = models.CharField(max_length=255, blank=True)
     stats = models.BooleanField(default=False)
 
     def questionnaire(self):
