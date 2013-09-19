@@ -1886,6 +1886,8 @@ def import_questionnaire(request, template_name='import_questionnaire.html'):
     """
 
     from openpyxl import load_workbook
+    from django.template.defaultfilters import slugify
+
     wb = load_workbook(filename = r'C:/questionnaire_example1.xlsx')
     ws = wb.get_active_sheet()
     content = []
@@ -1893,7 +1895,7 @@ def import_questionnaire(request, template_name='import_questionnaire.html'):
 
     # get questionnaire type in cell A1
     name = ws.cell('A1').value
-    slug = ws.cell('A1').value
+    slug = slugify(ws.cell('A1').value)
     disable = False
 
     questionnaire = Questionnaire(name=name, disable=disable, slug=slug, redirect_url='/')
@@ -1904,52 +1906,69 @@ def import_questionnaire(request, template_name='import_questionnaire.html'):
         # print questionnaire.name
         question_set = re.compile('(QS\d)')
         for row in ws.rows[2:]:
+            # print row[0].number
             if len(row) > 0:
                 heading = row[0]
                 number = row[1]
-
                 text = row[2]
-
                 # If is question_set
                 if question_set.match(heading.value):
                     text_question_set = row[1]
                     sortid = str(heading.value)
                     text_en = 'h1. %s' % text_question_set.value
                     questionset = QuestionSet(questionnaire=questionnaire, checks='required', sortid=sortid[2:], text_en=text_en, heading=text_question_set.value)
-                    log += '\nQuestionSet criado %s ' % questionset
+                    log += '\n%s - QuestionSet criado %s ' % (heading.row, questionset)
                     try:
                         questionset.save()
-                        log += '\nQuestionSet gravado %s ' % questionset
+                        log += '\n%s - QuestionSet gravado %s ' % (heading.row, questionset)
                     except:
-                        log += "\nErro a gravar o questionset %s" % str(question_set)
+                        log += "\n%s - Erro a gravar o questionset %s" % (heading.row, question_set)
                 elif heading.value == "Description":
                     try:
-                        question = Question(questionset=questionset, text_en=text.value, number=number.value, type='comment', help_text='', slug=heading.value, stats=False)
-                        log += '\nQuestion criada %s ' % question
+                        question = Question(questionset=questionset, text_en=text.value, number=number.value, type='comment', help_text='', slug=slugify(heading.value), stats=False)
+                        log += '\n%s - Question criada %s ' % (heading.row, question)
                         question.save()
-                        log += '\nQuestion guardada %s ' % question
+                        log += '\n%s - Question guardada %s ' % (heading.row, question)
                     except:
-                        log += "\nErro a gravar a question %s" % str(question)
+                        log += "\n%s - Erro a gravar a question %s" % (heading.row, question)
                 else:
                     try:
                         type = row[3]
-                        if row[4]:
-                            help_text = row[4]
-                        else:
-                            help_text = ''
-                        question = Question(questionset=questionset, text_en=text.value, number=number.value, type=type.value, help_text=help_text.value, slug=heading.value, stats=True)
-                        log += '\nQuestion criada %s ' % question
-                        question.save()
-                        log += '\nQuestion guardada %s ' % question
-                        print question.type
+                        if type.value != 'System generated value':
+                            if row[5]:
+                                help_text = row[5]
+                            else:
+                                help_text = ''
+                            question = Question(questionset=questionset, text_en=text.value, number=number.value, type=type.value, help_text=help_text.value, slug=slugify(heading.value), stats=True)
+                            log += '\n%s - Question criada %s ' % (heading.row, question)
+                            question.save()
+                            log += '\n%s - Question guardada %s ' % (heading.row, question)
+                            if type.value in ['choice', 'choice-freeform', 'choice-multiple', 'choice-multiple-freeform']:
+                                # Parse of values list
+                                values_list = row[4]
+                                list = values_list.value.split('\n')
+                                i = 1
+                                for choice in list:
+                                    try:
+                                        choice = Choice(question=question, sortid=i, text_en=choice, value=choice)
+                                        log += '\n%s - Choice criada %s ' % (heading.row, choice)
+                                        # print choice
+                                        choice.save()
+                                        log += '\n%s - Choice guardada %s ' % (heading.row, choice)
+                                        i += 1
+                                    except:
+                                        log += "\n%s - Erro a gravar a Choice %s" % (heading.row, choice)
+
                     except:
-                        log += "\nErro a gravar a question %s" % str(question)
+                        log += "\n%s - Erro a gravar a question %s" % (heading.row, question)
 
             content.append([c.value for c in row])
     except:
-        log += '\nErro a gravar questionario %s ' % questionnaire
+        log += '\nErro a gravar os questionsets e questoes do questionario %s ' % questionnaire
 
-    print log
+    with open("log_%s.txt" % datetime.datetime.now().strftime("%Y%m%d-%H%M%S"), "w") as f:
+        f.write(log)
+    # print log
 
 
     # for row in ws.iter_rows(): # it brings a new method: iter_rows()
