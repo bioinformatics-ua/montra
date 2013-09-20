@@ -61,11 +61,11 @@ def question_open(request, question):
 @answer_proc('open', 'open-textfield', 'choice-yesno', 'choice-yesnocomment', 'choice-yesnodontknow',  'open-button', 'open-upload-image')
 def process_simple(question, ansdict):
     checkdict = question.getcheckdict()
-    
+    required = question.getcheckdict().get('required', 0)
     ans = ansdict['ANSWER'] or ''
     qtype = question.get_type()
     if qtype.startswith('choice-yesno'):
-        if ans not in ('yes','no','dontknow'):
+        if ans not in ('yes','no','dontknow') and required:
             raise AnswerException(_(u'You must select an option'))
         if qtype == 'choice-yesnocomment' \
         and len(ansdict.get('comment','').strip()) == 0:

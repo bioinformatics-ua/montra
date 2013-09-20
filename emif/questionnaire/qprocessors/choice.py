@@ -34,8 +34,10 @@ def question_choice(request, question):
 
 @answer_proc('choice', 'choice-freeform')
 def process_choice(question, answer):
+    required = question.getcheckdict().get('required', 0)
+
     opt = answer['ANSWER'] or ''
-    if not opt:
+    if not opt and required:
         raise AnswerException(_(u'You must select an option'))
     if opt == '_entry_' and question.type == 'choice-freeform':
         opt = answer.get('comment','')
@@ -44,7 +46,7 @@ def process_choice(question, answer):
         return dumps([[opt]])
     else:
         valid = [c.value for c in question.choices()]
-        if opt not in valid:
+        if opt not in valid and required:
             raise AnswerException(_(u'Invalid option!'))
     return dumps([opt])
 add_type('choice', 'Choice [radio]')
