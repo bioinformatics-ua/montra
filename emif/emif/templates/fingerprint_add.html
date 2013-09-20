@@ -105,6 +105,9 @@ function validate(question_number)
       {
         $('#warning_'+question_number).addClass("show");
         $('#warning_'+question_number).removeClass("hide");
+      } else {
+          $('#warning_'+question_number).addClass("hide");
+        $('#warning_'+question_number).removeClass("show");
       }
       
     });
