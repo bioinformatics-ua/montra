@@ -43,14 +43,15 @@
                     {% include qdict.template %}
                 {% else %}
                     <div class="question-text {% if qdict.required %}required{% endif %} {% if error %}text-error{% endif %}">
-                        <span class="qnumber">{{ question.display_number }}.
-                        {{ question.text|safe }}
+                        <span class="qnumber">{{ question.display_number }}.</span>
+                        <span class="qtext">{{ question.text|safe }}
                         {% if question.help_text %}
                         <div class="question-help-text" style="display: none;">
                             <span>{{ question.help_text|safe }}</span>
                         </div>
-                            </span>
+
                     {% endif %}
+                            </span>
                     </div>
 
                     <div class="answer">
@@ -104,6 +105,7 @@
 <!-- Fix later -->
 <script src="static/js/vendor/bootstrap-tooltip.js"></script>
 <script src="static/js/vendor/bootstrap-popover.js"></script>
+<script src="static/js/fingerprint.js"></script>
 
 <script type="text/javascript">
 
@@ -129,35 +131,10 @@ function validate(question_number)
 
 
 };
-var getPlacement = function($el) {
-    var offset = $el.offset(),
-        top = offset.top,
-        left = offset.left,
-        height = $(document).outerHeight(),
-        width = $(document).outerWidth(),
-        vert = 0.5 * height - top,
-        vertPlacement = vert > 0 ? 'bottom' : 'top',
-        horiz = 0.5 * width - left,
-        horizPlacement = horiz > 0 ? 'right' : 'left',
-        placement = Math.abs(horiz) > Math.abs(vert) ?  horizPlacement : vertPlacement;
-    return placement
-};
 
-$('.qnumber').each(function() {
-    var $this = $(this);
-    $this.popover({
-
-      trigger: 'hover',
-        placement: getPlacement($this),
-      html: true,
-      content: $this.find('.question-help-text').html()
-//      content: 'body'
-    });
-});
-
+    help_text_popover();
 
     {% endblock %}
-
 </script>
 
 
