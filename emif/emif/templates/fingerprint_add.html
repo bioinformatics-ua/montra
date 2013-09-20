@@ -1,6 +1,8 @@
 
 {% load extra_tags %}
 {% load markup questionnaire i18n %}
+
+
 <div class="span8">
     <form name="qform" id="qform" action="addPost/{{questionset.questionnaire.pk}}/1" method="POST" enctype="multipart/form-data">
     {% for k, qlist in questions_list %}
@@ -41,9 +43,16 @@
                     {% include qdict.template %}
                 {% else %}
                     <div class="question-text {% if qdict.required %}required{% endif %} {% if error %}text-error{% endif %}">
-                        <span class="qnumber">{{ question.display_number }}.</span> 
+                        <span class="qnumber">{{ question.display_number }}.
                         {{ question.text|safe }}
+                        {% if question.help_text %}
+                        <div class="question-help-text" style="display: none;">
+                            <span>{{ question.help_text|safe }}</span>
+                        </div>
+                            </span>
+                    {% endif %}
                     </div>
+
                     <div class="answer">
                         {% if error %}
                             <div class="alert-message block-message text-error input">{{ error }}</div>
@@ -90,10 +99,16 @@
     {% endfor %}
     </form>
 
+
+
+
+
 </div>
 
+<script src="static/js/vendor/bootstrap.min.js"></script>
+<script type="text/javascript">
 
-<script>
+    {% block scriptextra %}
 function validate(question_number)
 {
     console.log($('#'+question_number).val());
@@ -115,7 +130,34 @@ function validate(question_number)
 
 
 };
+var getPlacement = function($el) {
+    var offset = $el.offset(),
+        top = offset.top,
+        left = offset.left,
+        height = $(document).outerHeight(),
+        width = $(document).outerWidth(),
+        vert = 0.5 * height - top,
+        vertPlacement = vert > 0 ? 'bottom' : 'top',
+        horiz = 0.5 * width - left,
+        horizPlacement = horiz > 0 ? 'right' : 'left',
+        placement = Math.abs(horiz) > Math.abs(vert) ?  horizPlacement : vertPlacement;
+    return placement
+};
 
+$('.qnumber').each(function() {
+    var $this = $(this);
+    $this.popover({
+
+      trigger: 'hover',
+        placement: getPlacement($this),
+      html: true,
+      content: $this.find('.question-help-text').html()
+//      content: 'body'
+    });
+});
+
+
+    {% endblock %}
 
 </script>
 
