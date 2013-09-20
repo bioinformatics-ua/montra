@@ -91,11 +91,12 @@
                                 {% show_fingerprints %}
                               </ul>
                             </li>
-                                <li class="divider"></li>
+                                {% comment %}<li class="divider"></li>
                                 <li>{% if request.user.is_superuser %}
                                     <a href="import-questionnaire">Import Questionnaire</a>
                                 {% endif %}
-                                </li>
+
+                                </li>{% endcomment %}
 
                             </ul>
                           </li>
