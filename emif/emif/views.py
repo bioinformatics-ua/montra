@@ -1887,8 +1887,8 @@ def import_questionnaire(request, template_name='import_questionnaire.html'):
 
     from openpyxl import load_workbook
     from django.template.defaultfilters import slugify
-
-    wb = load_workbook(filename = r'C:/Observational_Data_Sources_Template_v3.xlsx')
+    #wb = load_workbook(filename = r'C:/Observational_Data_Sources_Template_v3.xlsx')
+    wb = load_workbook(filename = r'/Volumes/EXT1/Dropbox/MAPi-Dropbox/EMIF/Observational_Data_Sources_Template_v4.xlsx')
     ws = wb.get_active_sheet()
     content = []
     log = ''
