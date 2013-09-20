@@ -37,6 +37,7 @@ from searchengine.search_indexes import CoreEngine
 from searchengine.models import Slugs
 import searchengine.search_indexes
 from searchengine.search_indexes import index_answeres_from_qvalues
+from searchengine.search_indexes import convert_text_to_slug
 from emif.utils import *
 from emif.models import *
 
@@ -1925,7 +1926,7 @@ def import_questionnaire(request, template_name='import_questionnaire.html'):
                         log += "\n%s - Erro a gravar o questionset %s" % (heading.row, question_set)
                 elif heading.value == "Description":
                     try:
-                        question = Question(questionset=questionset, text_en=text.value, number=number.value, type='comment', help_text='', slug=slugify(heading.value), stats=False)
+                        question = Question(questionset=questionset, text_en=text.value, number=number.value, type='comment', help_text='', slug=convert_text_to_slug(text.value.value), stats=False)
                         log += '\n%s - Question criada %s ' % (heading.row, question)
                         question.save()
                         log += '\n%s - Question guardada %s ' % (heading.row, question)
