@@ -1888,7 +1888,7 @@ def import_questionnaire(request, template_name='import_questionnaire.html'):
     from openpyxl import load_workbook
     from django.template.defaultfilters import slugify
 
-    wb = load_workbook(filename = r'C:/questionnaire_example1.xlsx')
+    wb = load_workbook(filename = r'C:/Observational_Data_Sources_Template_v3.xlsx')
     ws = wb.get_active_sheet()
     content = []
     log = ''
@@ -1939,7 +1939,11 @@ def import_questionnaire(request, template_name='import_questionnaire.html'):
                                 help_text = row[5]
                             else:
                                 help_text = ''
-                            question = Question(questionset=questionset, text_en=text.value, number=number.value, type=type.value, help_text=help_text.value, slug=slugify(heading.value), stats=True)
+                            if row[6]:
+                                checks = row[6]
+                            else:
+                                checks = ''
+                            question = Question(questionset=questionset, text_en=text.value, number=number.value, type=type.value, help_text=help_text.value, slug=slugify(heading.value), stats=True, checks=checks.value)
                             log += '\n%s - Question criada %s ' % (heading.row, question)
                             question.save()
                             log += '\n%s - Question guardada %s ' % (heading.row, question)
@@ -1962,7 +1966,7 @@ def import_questionnaire(request, template_name='import_questionnaire.html'):
                     except:
                         log += "\n%s - Erro a gravar a question %s" % (heading.row, question)
 
-            content.append([c.value for c in row])
+            # content.append([c.value for c in row])
     except:
         log += '\nErro a gravar os questionsets e questoes do questionario %s ' % questionnaire
 
@@ -1970,17 +1974,6 @@ def import_questionnaire(request, template_name='import_questionnaire.html'):
         f.write(log)
     # print log
 
-
-    # for row in ws.iter_rows(): # it brings a new method: iter_rows()
-    #
-    #     row_content = []
-    #     for cell in row:
-    #         row_content.append(cell.internal_value)
-    #         print cell.row
-    #     #     # content.append(cell.internal_value)
-    #     content.append(cell.row)
-    #     content[cell.row].append(row_content)
-    # print content
 
     return render_to_response(template_name, {'import_questionnaire': True, 'content': content,
                               'request': request, 'breadcrumb': True}, RequestContext(request))
