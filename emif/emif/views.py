@@ -1928,11 +1928,13 @@ def import_questionnaire(request, template_name='import_questionnaire.html'):
                         log += "\n%s - Erro a gravar o questionset %s" % (heading.row, question_set)
                 elif heading.value == "Description":
                     try:
-                        question = Question(questionset=questionset, text_en=text.value, number=number.value, type='comment', help_text='', slug=convert_text_to_slug(text.value.value), stats=False)
+                        slug_q = convert_text_to_slug(text.value[:50])
+                        question = Question(questionset=questionset, text_en=text.value, number=number.value, type='comment', help_text='', slug=slug_q, stats=False)
                         log += '\n%s - Question criada %s ' % (heading.row, question)
                         question.save()
                         log += '\n%s - Question guardada %s ' % (heading.row, question)
                     except:
+                        pass
                         log += "\n%s - Erro a gravar a question %s" % (heading.row, question)
                 else:
                     try:
@@ -1946,7 +1948,8 @@ def import_questionnaire(request, template_name='import_questionnaire.html'):
                                 checks = row[6]
                             else:
                                 checks = ''
-                            question = Question(questionset=questionset, text_en=text.value, number=number.value, type=type.value, help_text=help_text.value, slug=convert_text_to_slug(text.value), stats=True, checks=checks.value)
+                            slug_q = convert_text_to_slug(text.value[:50])
+                            question = Question(questionset=questionset, text_en=text.value, number=number.value, type=type.value, help_text=help_text.value, slug=slug_q, stats=True, checks=checks.value)
                             log += '\n%s - Question criada %s ' % (heading.row, question)
                             question.save()
                             log += '\n%s - Question guardada %s ' % (heading.row, question)
