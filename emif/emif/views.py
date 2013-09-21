@@ -1917,7 +1917,9 @@ def import_questionnaire(request, template_name='import_questionnaire.html'):
                     text_question_set = row[1]
                     sortid = str(heading.value)
                     text_en = 'h1. %s' % text_question_set.value
-                    questionset = QuestionSet(questionnaire=questionnaire, checks='required', sortid=sortid[2:], text_en=text_en, heading=text_question_set.value)
+                    slug_qs = slug  + "_" + convert_text_to_slug(text_question_set.value)
+
+                    questionset = QuestionSet(questionnaire=questionnaire, checks='required', sortid=sortid[2:], text_en=text_en, heading=slug_qs)
                     log += '\n%s - QuestionSet criado %s ' % (heading.row, questionset)
                     try:
                         questionset.save()
@@ -1944,7 +1946,7 @@ def import_questionnaire(request, template_name='import_questionnaire.html'):
                                 checks = row[6]
                             else:
                                 checks = ''
-                            question = Question(questionset=questionset, text_en=text.value, number=number.value, type=type.value, help_text=help_text.value, slug=slugify(heading.value), stats=True, checks=checks.value)
+                            question = Question(questionset=questionset, text_en=text.value, number=number.value, type=type.value, help_text=help_text.value, slug=convert_text_to_slug(text.value), stats=True, checks=checks.value)
                             log += '\n%s - Question criada %s ' % (heading.row, question)
                             question.save()
                             log += '\n%s - Question guardada %s ' % (heading.row, question)
@@ -1969,6 +1971,7 @@ def import_questionnaire(request, template_name='import_questionnaire.html'):
 
             # content.append([c.value for c in row])
     except:
+        raise
         log += '\nErro a gravar os questionsets e questoes do questionario %s ' % questionnaire
 
     with open("log_%s.txt" % datetime.datetime.now().strftime("%Y%m%d-%H%M%S"), "w") as f:
