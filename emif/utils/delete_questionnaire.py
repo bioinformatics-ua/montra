@@ -23,10 +23,8 @@ from questionnaire.models import *
 from django.shortcuts import render_to_response, get_object_or_404
 import sys
 
- 
-
 # Uncomment this and add your list of ids to remove (of Questionnaire model)
-#to_delete = [9, 8, 6, 5, 4, 3, 2]
+to_delete = [1]
 
 for rem in to_delete:
 	qu = get_object_or_404(Questionnaire, id=rem)
