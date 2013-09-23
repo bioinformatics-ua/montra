@@ -1321,6 +1321,8 @@ def check_database_add_conditions(request, questionnaire_id, sortid,
     # generate the answer_dict for each question, and place in extra
     for item in items:
         key, value = item[0], item[1]
+        print key
+        print value
         if key.startswith('question_'):
             answer = key.split("_", 2)
             question = get_question(answer[1], questionnaire)
@@ -1333,6 +1335,7 @@ def check_database_add_conditions(request, questionnaire_id, sortid,
             elif (len(answer) == 3):
                 ans[answer[2]] = value
             else:
+                print "Poorly formed form element name: %r" % answer
                 logging.warn("Poorly formed form element name: %r" % answer)
                 continue
             extra[question] = ans
@@ -1889,7 +1892,7 @@ def import_questionnaire(request, template_name='import_questionnaire.html'):
     from openpyxl import load_workbook
     from django.template.defaultfilters import slugify
     #wb = load_workbook(filename = r'C:/Observational_Data_Sources_Template_v3.xlsx')
-    wb = load_workbook(filename = r'/Volumes/EXT1/Dropbox/MAPi-Dropbox/EMIF/Observational_Data_Sources_Template_v4.xlsx')
+    wb = load_workbook(filename = r'/Volumes/EXT1/Dropbox/MAPi-Dropbox/EMIF/Observational_Data_Sources_Template_v5.xlsx')
     ws = wb.get_active_sheet()
     content = []
     log = ''
@@ -1949,7 +1952,10 @@ def import_questionnaire(request, template_name='import_questionnaire.html'):
                             else:
                                 checks = ''
                             slug_q = convert_text_to_slug(text.value[:50])
-                            question = Question(questionset=questionset, text_en=text.value, number=number.value, type=type.value, help_text=help_text.value, slug=slug_q, stats=True, checks=checks.value)
+                            help_text = help_text.value
+                            if help_text==None:
+                                help_text = ""
+                            question = Question(questionset=questionset, text_en=text.value, number=number.value, type=type.value, help_text=help_text, slug=slug_q, stats=True, checks=checks.value)
                             log += '\n%s - Question criada %s ' % (heading.row, question)
                             question.save()
                             log += '\n%s - Question guardada %s ' % (heading.row, question)
