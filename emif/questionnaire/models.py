@@ -246,7 +246,7 @@ class Question(models.Model):
     __metaclass__ = TransMeta
 
     questionset = models.ForeignKey(QuestionSet)
-    number = models.CharField(max_length=8, help_text=
+    number = models.CharField(max_length=255, help_text=
         "eg. <tt>1</tt>, <tt>2a</tt>, <tt>2b</tt>, <tt>3c</tt><br /> "
         "Number is also used for ordering questions.")
     text = models.TextField(blank=True)
