@@ -97,7 +97,7 @@ class QuestionSet(models.Model):
     # TODO
     # questionnaire = models.ManyToManyField(Questionnaire)
     sortid = models.IntegerField() # used to decide which order to display in
-    heading = models.CharField(max_length=64)
+    heading = models.CharField(max_length=255)
     checks = models.CharField(max_length=128, blank=True,
         help_text = """Current options are 'femaleonly' or 'maleonly' and shownif="QuestionNumber,Answer" which takes the same format as <tt>requiredif</tt> for questions.""")
     text = models.TextField(help_text="This is interpreted as Textile: <a href='http://hobix.com/textile/quick.html'>http://hobix.com/textile/quick.html</a>")
@@ -273,7 +273,7 @@ class Question(models.Model):
         'eg. <tt>requiredif="Q1,A or Q2,B"</tt>')
     footer = models.TextField(u"Footer", help_text="Footer rendered below the question interpreted as textile", blank=True)
     slug = models.CharField(max_length=128)
-    help_text = models.CharField(max_length=255, blank=True)
+    help_text = models.CharField(max_length=2255, blank=True)
     stats = models.BooleanField(default=False)
 
     def questionnaire(self):
