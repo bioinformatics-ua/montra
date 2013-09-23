@@ -40,15 +40,15 @@ def removespaces(value):
 
     return result
 
-def fingerprints_list():
+# def fingerprints_list():
 
-    objs = Questionnaire.objects.all()
-    results = {}
-    for q in objs:
-        results[q.id] = q.name
-    print results
+#     objs = Questionnaire.objects.all()
+#     results = {}
+#     for q in objs:
+#         results[q.id] = q.name
+#     print results
 
-    return results
+#     return results
 
 def fingerprints_list():
     
