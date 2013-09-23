@@ -156,7 +156,7 @@ filter: alpha(opacity=80);
             <div class="tab-pane active" id="metadata">
             <div ><a id="collapseall_metadata"  class="btn pull-right" href="">Expand all </a></div>
                 <div class="accordion pull-left "  id="accordion1" style="margin-top: 10px;">
-                    {% for k,qs in qsets.items %}
+                    {% for k,qs in qsets.ordered_items %}
                     <div class="accordion-group">
                         <div class="accordion-heading">
                             <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion1"

@@ -820,6 +820,9 @@ def createqsets(runcode, qsets=None):
         for qset in list_qsets:
             if (qset.sortid != 0 and qset.sortid != 99):
                 question_group = QuestionGroup()
+                question_group.sortid = qset.sortid
+                print qset.text
+                qsets[qset.text] = question_group
                 qset.sortid
                 list_questions = Question.objects.filter(questionset=qset).order_by('number')
                 for question in list_questions:
@@ -884,6 +887,8 @@ def createqsets(runcode, qsets=None):
         break
 
     print "List of qsets " + str(qsets)
+    #qsets = qsets.order()
+    #print qsets.order()
     #for qg in qsets:
     #    print qg
     #    for tt in qsets[qg].list_ordered_tags:
