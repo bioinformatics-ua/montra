@@ -704,8 +704,7 @@ def get_databases_from_solr(request, query="*:*"):
     questionnaires_ids = {}
     qqs = Questionnaire.objects.all()
     for q in qqs:
-        lower_name = q.name.replace(" ", "").lower()
-        questionnaires_ids[lower_name] = q.pk
+        questionnaires_ids[q.slug] = q.pk
 
     for r in results:
         try:
@@ -811,16 +810,17 @@ def createqsets(runcode, qsets=None):
 
     for result in results:
 
-        print result['type_t']
+        #print result['type_t']
         # Get the slug of fingerprint type
         q_aux = Questionnaire.objects.filter(slug=result['type_t'])
-        print q_aux
+        #print q_aux
 
         list_qsets = QuestionSet.objects.filter(questionnaire=q_aux[0]).order_by('sortid')
 
         for qset in list_qsets:
             if (qset.sortid != 0 and qset.sortid != 99):
                 question_group = QuestionGroup()
+                qset.sortid
                 list_questions = Question.objects.filter(questionset=qset).order_by('number')
                 for question in list_questions:
                     t = Tag()
@@ -829,8 +829,8 @@ def createqsets(runcode, qsets=None):
                     question_group.list_ordered_tags.append(t)
 
                 qsets[qset.text] = question_group
-        print list_qsets
-        print "results"
+        #print list_qsets
+        #print "results"
 
         for k in result:
             if k in blacklist:
@@ -1321,8 +1321,8 @@ def check_database_add_conditions(request, questionnaire_id, sortid,
     # generate the answer_dict for each question, and place in extra
     for item in items:
         key, value = item[0], item[1]
-        print key
-        print value
+        #print key
+        #print value
         if key.startswith('question_'):
             answer = key.split("_", 2)
             question = get_question(answer[1], questionnaire)
@@ -1920,7 +1920,7 @@ def import_questionnaire(request, template_name='import_questionnaire.html'):
                     text_question_set = row[1]
                     sortid = str(heading.value)
                     text_en = 'h1. %s' % text_question_set.value
-                    slug_qs = slug  + "_" + convert_text_to_slug(text_question_set.value)
+                    slug_qs = slug  + "_" + convert_text_to_slug(str(text_question_set.value))
 
                     questionset = QuestionSet(questionnaire=questionnaire, checks='required', sortid=sortid[2:], text_en=text_en, heading=slug_qs)
                     log += '\n%s - QuestionSet criado %s ' % (heading.row, questionset)
@@ -1931,7 +1931,7 @@ def import_questionnaire(request, template_name='import_questionnaire.html'):
                         log += "\n%s - Erro a gravar o questionset %s" % (heading.row, question_set)
                 elif heading.value == "Description":
                     try:
-                        slug_q = convert_text_to_slug(text.value[:50])
+                        slug_q = convert_text_to_slug(str(text.value[:50]))
                         question = Question(questionset=questionset, text_en=text.value, number=number.value, type='comment', help_text='', slug=slug_q, stats=False)
                         log += '\n%s - Question criada %s ' % (heading.row, question)
                         question.save()
@@ -1951,7 +1951,7 @@ def import_questionnaire(request, template_name='import_questionnaire.html'):
                                 checks = row[6]
                             else:
                                 checks = ''
-                            slug_q = convert_text_to_slug(text.value[:50])
+                            slug_q = convert_text_to_slug(str(text.value[:50]))
                             help_text = help_text.value
                             if help_text==None:
                                 help_text = ""
