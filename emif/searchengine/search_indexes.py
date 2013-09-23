@@ -164,15 +164,33 @@ def index_answeres_from_qvalues(qvalues, questionnaire, subject, fingerprint_id)
                     
                 elif qdict.has_key('choices'):
                     choices = qdict['choices']
-                    
-                    value = ""
-                    for choice, unk, checked  in choices:
-                        #print("Choice value: " + str(choice.value))
-                        #print("checked value: " + str(checked))
-                        #print("unk value: " + str(unk))
-                        if checked == " checked":
-                            value = value + "#" + choice.value
+                    qv = ""
+                    try:
+                        print(qv)
+                        qv = qdict['qvalue']
 
+                    except:
+                        pass
+
+                    value = qv + "#"
+                    print(choices)
+                    do_again = False
+                    try:
+                        for choice, unk, checked  in choices:
+                            #print("Choice value: " + str(choice.value))
+                            #print("checked value: " + str(checked))
+                            #print("unk value: " + str(unk))
+                            if checked == " checked":
+                                value = value + "#" + choice.value
+                    except:
+                        do_again = True
+                    if do_again:
+                        for checked, choice  in choices:
+                            print("checked" + str(checked))
+                            if checked:
+                                value = value + "#" + choice.value
+
+                    print("choice value " + value)
                 else:
                     print("continue")
 
@@ -198,8 +216,9 @@ def index_answeres_from_qvalues(qvalues, questionnaire, subject, fingerprint_id)
                 d[slug_final] = value
                 if value!=None:
                     text += value + " " 
-            except:
+            except :
                 pass
+                
     #print("Indexing...")
     results = c.search_fingerprint("id:"+fingerprint_id)
     if (len(results)>0):
