@@ -115,13 +115,20 @@ class Tag:
 
 class QuestionGroup:
     
-    
     def __init__(self):
         self.list_ordered_tags = []
         self.name = ""
+        self.sortid = ""
 
     def __eq__(self, other):
         return other.name == self.name
+
+    def __lt__ (self, other):
+        
+        return self.sortid < other.sortid
+
+    def __gt__ (self, other):
+        return other.__lt__(self)
 
     def __str__(self):
         return self.name
