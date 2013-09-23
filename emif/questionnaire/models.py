@@ -349,8 +349,8 @@ class Choice(models.Model):
 
     question = models.ForeignKey(Question)
     sortid = models.IntegerField()
-    value = models.CharField(u"Short Value", max_length=64)
-    text = models.CharField(u"Choice Text", max_length=200)
+    value = models.CharField(u"Short Value", max_length=1000)
+    text = models.CharField(u"Choice Text", max_length=2000)
 
     def __unicode__(self):
         return u'(%s) %d. %s' % (self.question.number, self.sortid, self.text)
