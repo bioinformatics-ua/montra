@@ -27,7 +27,7 @@ from django.db import transaction
 from django.core.urlresolvers import *
 
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-from emif.utils import QuestionGroup
+from emif.utils import QuestionGroup, ordered_dict
 
 from questionnaire.models import *
 from questionnaire.parsers import *
@@ -802,7 +802,7 @@ def createqsets(runcode, qsets=None):
     results = c.search_fingerprint('id:' + runcode)
 
     if qsets == None:
-        qsets = {}
+        qsets = ordered_dict()
     name = ""
     list_values = []
     blacklist = ['created_t', 'type_t', '_version_']
@@ -961,6 +961,8 @@ def show_full_questionnaire_ro(request, qs_id, runinfo, errors={},
     # generate the answer_dict for each question, and place in extra
     for item in items:
         key, value = item[0], item[1]
+        print key
+        print value
         if key.startswith('question_'):
             answer = key.split("_", 2)
             question = get_question(answer[1], questionnaire)
@@ -968,6 +970,7 @@ def show_full_questionnaire_ro(request, qs_id, runinfo, errors={},
                 logging.warn("Unknown question when processing: %s" % answer[1])
                 continue
             extra[question] = ans = extra.get(question, {})
+            print answer
             if (len(answer) == 2):
                 ans['ANSWER'] = value
             elif (len(answer) == 3):
