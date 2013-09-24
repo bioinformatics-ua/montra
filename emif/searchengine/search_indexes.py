@@ -149,8 +149,14 @@ def index_answeres_from_qvalues(qvalues, questionnaire, subject, fingerprint_id)
     d = {}
     
     text = ""
+    slugs_objs = Slugs.objects.all()
+    slugs = []
+    for s in slugs_objs:
+        slugs.append(s.description)
 
+    slugs_objs = None
     now = datetime.datetime.now()
+
     for qs_aux, qlist in qvalues:
         for question, qdict in qlist:
             #print("qdict")
@@ -204,9 +210,10 @@ def index_answeres_from_qvalues(qvalues, questionnaire, subject, fingerprint_id)
                     slug = convert_text_to_slug(question.text)
                 slug_final = slug+"_t"
 
-                results = Slugs.objects.filter(description=question.text)
+                #results = Slugs.objects.filter(description=question.text)
                 
-                if results==None or len(results)==0:
+                #if slugs_dict==None or len(results)==0:
+                if question.text not in slugs:
                     slugs = Slugs()
                     slugs.slug1 = slug_final
                     slugs.description = question.text
