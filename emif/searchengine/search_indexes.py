@@ -198,6 +198,10 @@ def index_answeres_from_qvalues(qvalues, questionnaire, subject, fingerprint_id)
 
                     # print("choice value " + value)
 
+                    '''
+                    TO-DO
+                    Verify if symbols || (separator) is compatible with solr
+                    '''
                     #Save in case of extra field is filled
                     if qdict.has_key('extras'):
                         extras = qdict['extras']
@@ -205,7 +209,7 @@ def index_answeres_from_qvalues(qvalues, questionnaire, subject, fingerprint_id)
                         for q, val in extras:
                             # print("VAL: " + str(q) + " - " + str(val))
                             if val:
-                                value = value + "=" + val
+                                value = value + "||" + val
 
                 else:
                     print("continue")
