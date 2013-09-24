@@ -160,7 +160,7 @@ def index_answeres_from_qvalues(qvalues, questionnaire, subject, fingerprint_id)
     for qs_aux, qlist in qvalues:
         for question, qdict in qlist:
             #print("qdict")
-            #print(qdict)
+            # print("################## QDICT:" + str(qdict))
             try:
                 choices = None
                 value = None
@@ -172,31 +172,41 @@ def index_answeres_from_qvalues(qvalues, questionnaire, subject, fingerprint_id)
                     choices = qdict['choices']
                     qv = ""
                     try:
-                        print(qv)
+                        # print(qv)
                         qv = qdict['qvalue']
 
                     except:
                         pass
 
-                    value = qv + "#"
-                    print(choices)
+                    value = qv
+                    # print(choices)
                     do_again = False
                     try:
                         for choice, unk, checked  in choices:
-                            #print("Choice value: " + str(choice.value))
-                            #print("checked value: " + str(checked))
-                            #print("unk value: " + str(unk))
+                            # print("Choice value: " + str(choice.value))
+                            # print("checked value: " + str(checked))
+                            # print("unk value: " + str(unk))
                             if checked == " checked":
                                 value = value + "#" + choice.value
                     except:
                         do_again = True
                     if do_again:
                         for checked, choice  in choices:
-                            print("checked" + str(checked))
+                            # print("checked" + str(checked))
                             if checked:
                                 value = value + "#" + choice.value
 
-                    print("choice value " + value)
+                    # print("choice value " + value)
+
+                    #Save in case of extra field is filled
+                    if qdict.has_key('extras'):
+                        extras = qdict['extras']
+                        # print("EXTRAS: " + str(extras))
+                        for q, val in extras:
+                            # print("VAL: " + str(q) + " - " + str(val))
+                            if val:
+                                value = value + "=" + val
+
                 else:
                     print("continue")
 

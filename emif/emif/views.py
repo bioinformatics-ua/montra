@@ -530,12 +530,13 @@ def database_edit(request, fingerprint_id, questionnaire_id, template_name="data
 
     # generate the answer_dict for each question, and place in extra
     request2 = RequestMonkeyPatch()
-
+    # print "REQUEST2: " + str(request2)
     for item in items:
-        #wprint item
+        # print "ITEM: " + str(item),
         key = item
 
         value = items[key]
+        # print " VALUE: " + str(value)
         results = Slugs.objects.filter(slug1=key)
 
         if results == None or len(results) == 0:
@@ -1329,8 +1330,8 @@ def check_database_add_conditions(request, questionnaire_id, sortid,
     # generate the answer_dict for each question, and place in extra
     for item in items:
         key, value = item[0], item[1]
-        #print key
-        #print value
+        # print "KEY: %s" % str(key)
+        # print "VALUE: %s" % str(value)
         if key.startswith('question_'):
             answer = key.split("_", 2)
             question = get_question(answer[1], questionnaire)
@@ -1405,6 +1406,7 @@ def check_database_add_conditions(request, questionnaire_id, sortid,
             raise
 
     if len(errors) > 0 and active_qs_with_errors:
+        print "ERRORS"
         return show_fingerprint_page_errors(request, questionnaire_id, question_set,
                                             errors=errors, template_name='database_add.html', next=False, sortid=sortid,
                                             fingerprint_id=fingerprint_id)
@@ -1419,8 +1421,8 @@ def check_database_add_conditions(request, questionnaire_id, sortid,
     else:
         sortid = next_qs.sortid
     question_set = str(next_qs.pk)
-    print question_set
-    print sortid
+    # print question_set
+    # print sortid
     return show_fingerprint_page_errors(request, questionnaire_id, question_set,
                                         errors={}, template_name='database_add.html', next=True, sortid=sortid,
                                         fingerprint_id=fingerprint_id)
@@ -1517,7 +1519,8 @@ def show_fingerprint_page_errors(request, q_id, qs_id, errors={}, template_name=
         #    index_answeres_from_qvalues(qlist_general, question_set.questionnaire, request.user.username)
         #print "Fingerprint"
         if (fingerprint_id != None):
-            #print "Fingerprint" + fingerprint_id
+            # print "Fingerprint: " + fingerprint_id
+            # print "QLIST_general: " + str(qlist_general)
             index_answeres_from_qvalues(qlist_general, question_set.questionnaire, request.user.username,
                                         fingerprint_id)
 
