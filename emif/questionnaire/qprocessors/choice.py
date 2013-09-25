@@ -81,12 +81,25 @@ def question_multiple(request, question):
     if not extracount and question.type == 'choice-multiple-freeform':
         extracount = 1
     extras = []
+    if question.number=="16": 
+        print "Request POST "  + str(request.POST)
     for x in range(1, extracount+1):
+
         key = "question_%s_more%d" % (question.number, x)
-        if key in request.POST:
-            extras.append( (key, request.POST[key],) )
+        key_aux = "question_%s" % (question.number)
+
+        if key_aux in request.POST :
+            
+            extras_value = request.POST[key_aux].split("||")
+            if (len(extras_value)>1):
+                extras.append( (key, extras_value[1]) )
+            else:
+                extras.append( (key, '') )
+        elif key in request.POST:
+            extras.append( (key, request.POST[key]) )
         else:
             extras.append( (key, '',) )
+
     return {
         "choices": choices,
         "extras": extras,
@@ -111,6 +124,8 @@ def process_multiple(question, answer):
         requiredcount = question.choices().count()
 
     for k, v in answer.items():
+        #print "K: " + str(k)
+        #print "V "
         if k.startswith('multiple'):
             multiple.append(v)
         if k.startswith('more') and len(v.strip()) > 0:
@@ -123,6 +138,7 @@ def process_multiple(question, answer):
     multiple.sort()
     if multiple_freeform:
         multiple.append(multiple_freeform)
+    #print "Multiple" + str(multiple)
     return dumps(multiple)
 add_type('choice-multiple', 'Multiple-Choice, Multiple-Answers [checkbox]')
 add_type('choice-multiple-freeform', 'Multiple-Choice, Multiple-Answers, plus freeform [checkbox, input]')
