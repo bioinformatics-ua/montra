@@ -66,7 +66,7 @@
                               <li><a href="databases">Query History</a></li>
                               <li><a href="databases">Timeline</a></li>
                               {% endcomment %}
-			      
+			      {% comment %}
 
 			       {% if request.user.is_superuser %}
 
@@ -77,6 +77,7 @@
                                 {% show_fingerprints_for_statistics %}
                               </ul>
           		      {% endif %}
+                    {% endcomment %}
 
                               {% comment %}
                               <li class="divider"></li>
