@@ -21,8 +21,8 @@ def question_choice(request, question):
     if val != None and "#" in val:
         val = val.split("#")[0]
     for choice in question.choices():
-        print "choice.value: " + str(choice.value )
-        print "val" + str(val)
+        #print "choice.value: " + str(choice.value )
+        #print "val" + str(val)
         choices.append( ( choice.value == val, choice, ) )
 
     if question.type == 'choice-freeform':
