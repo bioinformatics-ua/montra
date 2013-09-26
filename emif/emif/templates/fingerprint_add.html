@@ -113,7 +113,7 @@
 function validate(question_number)
 {
     //console.log($('#'+question_number).val());
-
+    question_number = question_number + ""
     $.getJSON('api/validate?name='+$('#'+question_number.replace(".","\\.")).val(), function(data) {
       var items = [];
       console.log(data['contains'])
