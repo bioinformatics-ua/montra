@@ -16,8 +16,8 @@ EMIF Platform - Fingerprint Browser
 
 #### Author
 
- Luís A. Bastião Silva <bastiao@ua.pt>
- Rui Mendes <Ruidamendes@ua.pt>
+ * Luís A. Bastião Silva <bastiao@ua.pt>
+ * Rui Mendes <Ruidamendes@ua.pt>
 
 
 #### Installation steps
