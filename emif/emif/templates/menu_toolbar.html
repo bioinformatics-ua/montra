@@ -38,6 +38,18 @@
       </a>
       {% endif %}
 
+      {% if export_my_answers and request.user.is_superuser %}
+      <a class="btn" href="export_my_answers" onclick="" > <i class="icon-file"></i>
+        Export
+      </a>
+      {% endif %}
+
+      {% if export_bd_answers and request.user.is_superuser %}
+      <a class="btn" href="export_bd_answers/{{ fingerprint_id }}" onclick="" > <i class="icon-file"></i>
+        Export
+      </a>
+      {% endif %}
+
       {% if request.user.is_superuser %}
             {% if  api_token %}
                 <a class="btn" href="api-info"> <i class=" icon"></i>

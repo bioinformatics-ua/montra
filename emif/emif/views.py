@@ -785,7 +785,7 @@ def databases(request, template_name='databases.html'):
     #list_databases = get_databases_from_db(request)
     list_databases = get_databases_from_solr(request, "user_t:" + user.username)
 
-    return render(request, template_name, {'request': request,
+    return render(request, template_name, {'request': request, 'export_my_answers': True,
                                            'list_databases': list_databases, 'breadcrumb': True, 'collapseall': False,
                                            'api_token': True})
 
@@ -904,7 +904,7 @@ def createqsets(runcode, qsets=None):
 def fingerprint(request, runcode, qs, template_name='database_info.html'):
     qsets, name = createqsets(runcode)
     return render(request, template_name,
-                  {'request': request, 'qsets': qsets,
+                  {'request': request, 'qsets': qsets, 'export_bd_answers': True, 'fingerprint_id': runcode,
                    'breadcrumb': True, 'breadcrumb_name': name, 'style': qs, 'collapseall': False})
 
 
@@ -1703,7 +1703,7 @@ def feedback(request, template_name='feedback.html'):
 
             try:
                 message_admin = "Name: " + str(name) + "\nEmail: " + from_email + "\n\nMessage:\n" + str(message)
-                message = "Dear " + name + ",\n\nThank you for giving us your feedback.\n\nMessage sent:\n" + str(message) + "\n\nSincerely,\nEMIF Catalogue"
+                message = "Dear " + name + ",\n\nThank you for giving us your feedback.\n\nYour message will be analyzed by EMIF Catalogue team.\n\nMessage sent:\n" + str(message) + "\n\nSincerely,\nEMIF Catalogue"
                 # Send email to admins
                 send_mail(subject, message_admin, settings.DEFAULT_FROM_EMAIL, emails_to_feedback)
                 # Send email to user with the copy of feedback message
@@ -1869,15 +1869,13 @@ def docs_api(request, template_name='docs/api.html'):
     return render(request, template_name, {'request': request, 'breadcrumb': True})
 
 
-def export_all_answers(request):
+def save_answers_to_csv(list_databases, filename):
     """
-    Method to export all databases answers to a csv file
+    Method to export answers of a given database to a csv file
     """
     # Create the HttpResponse object with the appropriate CSV header.
     response = HttpResponse(content_type='text/csv')
-    response['Content-Disposition'] = 'attachment; filename="EMIF_Catalogue_DBs_%s.csv"' % datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
-
-    list_databases = get_databases_from_solr(request, "*:*")
+    response['Content-Disposition'] = 'attachment; filename="EMIF_Catalogue_%s_%s.csv"' % (filename, datetime.datetime.now().strftime("%Y%m%d-%H%M%S"))
 
     if list_databases:
         writer = csv.writer(response)
@@ -1891,6 +1889,35 @@ def export_all_answers(request):
             writer.writerow([id, name, "System", "Date", t.date])
 
     return response
+
+
+def export_all_answers(request):
+    """
+    Method to export all databases answers to a csv file
+    """
+
+    list_databases = get_databases_from_solr(request, "*:*")
+    return save_answers_to_csv(list_databases, "DBs")
+
+
+def export_my_answers(request):
+    """
+    Method to export my databases answers to a csv file
+    """
+
+    user = request.user
+    list_databases = get_databases_from_solr(request, "user_t:" + user.username)
+
+    return save_answers_to_csv(list_databases, "MyDBs")
+
+
+def export_bd_answers(request, runcode):
+    """
+    Method to export answers of a specific database to a csv file
+    """
+
+    list_databases = get_databases_from_solr(request, "id:" + runcode)
+    return save_answers_to_csv(list_databases, 'MyDB')
 
 
 def import_questionnaire(request, template_name='import_questionnaire.html'):
