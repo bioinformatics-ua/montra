@@ -1,7 +1,9 @@
 {% load i18n %}{% autoescape off %}{% load url from future %}
 {% blocktrans with site.name as site %}A new user has been registered at {{ site }}.{% endblocktrans %}
 
-{% blocktrans with user.username as username %}{% blocktrans with user.first_name as fname %}{% blocktrans with user.last_name as lname %} Name: {{ fname }} {{ lname }} Username: {{ username }} {% endblocktrans %}
+{% blocktrans with user.username as username %} Username: {{ username }} {% endblocktrans %}
+
+Name: {% blocktrans with user.first_name as fname %} {{ fname }} {% endblocktrans %} {% blocktrans with user.last_name as lname %} {{ lname }} {% endblocktrans %}
 
 {% trans "To activate his account you should click on the link below:" %}
 
