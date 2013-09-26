@@ -121,9 +121,15 @@ function validate(question_number)
       {
         $('#warning_'+question_number).addClass("show");
         $('#warning_'+question_number).removeClass("hide");
+        $('#success_'+question_number).addClass("hide");
+        $('#success_'+question_number).removeClass("show");
+
+
       } else {
           $('#warning_'+question_number).addClass("hide");
         $('#warning_'+question_number).removeClass("show");
+        $('#success_'+question_number).addClass("show");
+        $('#success_'+question_number).removeClass("hide");
       }
       
     });
