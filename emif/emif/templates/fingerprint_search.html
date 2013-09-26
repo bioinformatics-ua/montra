@@ -23,7 +23,7 @@
             <div class="question type_{{ qdict.qtype }} {% if error %} error prepend-top{% endif %}{{ qdict.qnum_class }}{{ qdict.qalpha_class }}" id="qc_{{ question.number }}" {{qdict.checkstring|safe}}>                
                 {% if request.user.is_staff %}
                     <span class="pull-right">
-                        <a href="/admin/questionnaire/question/{{ question.id }}/">
+                        <a href="admin/questionnaire/question/{{ question.id }}/">
                             ({% trans "edit" %} {{ question.number }})
                         </a>
                     </span>
