@@ -1703,7 +1703,7 @@ def feedback(request, template_name='feedback.html'):
 
             try:
                 message_admin = "Name: " + str(name) + "\nEmail: " + from_email + "\n\nMessage:\n" + str(message)
-                message = "Dear " + name + ",\n\nThank you for giving us your feedback.\n\nMessage sent:\n" + str(message) + "\n\nSincerely,\nEMIF Catalogue"
+                message = "Dear " + name + ",\n\nThank you for giving us your feedback.\n\nYour message will be analyzed by EMIF Catalogue team.\n\nMessage sent:\n" + str(message) + "\n\nSincerely,\nEMIF Catalogue"
                 # Send email to admins
                 send_mail(subject, message_admin, settings.DEFAULT_FROM_EMAIL, emails_to_feedback)
                 # Send email to user with the copy of feedback message
