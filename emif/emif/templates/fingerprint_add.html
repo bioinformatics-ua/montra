@@ -114,7 +114,7 @@ function validate(question_number)
 {
     //console.log($('#'+question_number).val());
 
-    $.getJSON('api/validate?name='+$('#'+question_number.replace(".","\\.").val()), function(data) {
+    $.getJSON('api/validate?name='+$('#'+question_number.replace(".","\\.")).val(), function(data) {
       var items = [];
       console.log(data['contains'])
       if (data['contains'] == true)
