@@ -61,11 +61,14 @@ def truncate(value):
 
 def fingerprints_list():
     
-    objs = Questionnaire.objects.filter(disable=False)
+    try:
+        objs = Questionnaire.objects.filter(disable=False)
+    except:
+        pass
     results = {}
     for q in objs:
         results[q.id] = q.name
-    print results
+    
 
     return results
 

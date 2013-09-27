@@ -86,7 +86,7 @@ button {
             <tr class="">
                 <td>{{ ans.0 }}</td>
                 {% for a in ans.1 %}
-                    <td> {{ a }}</td>
+                    <td title="{{a}}"> {{ a|truncate  }}</td>
                 {% endfor %}
                 </tr>
             {% endfor %}
