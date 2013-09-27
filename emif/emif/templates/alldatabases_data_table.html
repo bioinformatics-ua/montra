@@ -17,10 +17,26 @@
 
 
 {% block scriptextraincludes %}
-
 <script src="static/js/vendor/jquery.tablesorter.min.js"></script>
 <script src="static/js/vendor/jquery.tablesorter.widgets.js"></script>
-<script src="static/js/vendor/jquery.dataTables.min.js"></script>
+
+        
+        <script type="text/javascript" language="javascript" src="static/js/jquery.dataTables.js"></script>
+        <script type="text/javascript" charset="utf-8">
+            $(document).ready(function() {
+                $('#table_databases').dataTable( {
+                        "sScrollY": 200,
+                    "sScrollX": "200%",
+                    "sScrollXInner": "210%",
+                    "bScrollCollapse": true
+                } );
+
+
+
+
+             
+        </script>
+
 
 {% endblock %}
 
@@ -47,7 +63,14 @@ button {
 {% if list_databases %}
 <div style="margin-bottom: 70px;"></div>
 
-<table cellpadding="0" cellspacing="0" border="1" class="display" id="table_databases">
+
+
+
+
+
+
+<div class="dataTables_scrollBody" style="overflow: auto; width: 100%; height: 540px;">
+<table cellpadding="0" cellspacing="0" border="1" class="display dataTable table table-hover tablesorter "  data-provides="rowlink" id="table_databases" style="margin-left: 0px; ;">
 	<thead>
 		<tr>
 			<th>{{ titles.0 }}</th>
@@ -59,7 +82,7 @@ button {
     <tbody>
 
             {% for ans in answers %}
-            <tr>
+            <tr class="">
                 <td>{{ ans.0 }}</td>
                 {% for a in ans.1 %}
                     <td> {{ a }}</td>
@@ -69,7 +92,7 @@ button {
 
     </tbody>
 </table>
-
+</div>
 {% else %}
 <div class="row">
 <div class="span4">
@@ -96,17 +119,28 @@ button {
 {% endcomment %}
 
 
+$(function() {
+
+  // call the tablesorter plugin
+  $("table").tablesorter({
+    theme : 'blue',
+
+    // sort on the first column and third column in ascending order
+    sortList: [[0,0],[2,0]],
+
+    // hidden filter input/selects will resize the columns, so try to minimize the change
+    widthFixed : true,
+
+    // initialize zebra striping and filter widgets
+    widgets: ["zebra", "filter"]
+
+  });
+
+});
+
 
 $('#li_workspace').addClass("active");
 
-
-$(document).ready(function() {
-	$('#table_databases').dataTable( {
-     "sScrollY": 200,
-        "sScrollX": "100%",
-        "sScrollXInner": "110%"
-	} );
-} );
 
 {% comment %}
 </script>
