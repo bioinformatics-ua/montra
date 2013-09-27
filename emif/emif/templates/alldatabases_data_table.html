@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load url from future %}
+{% load extra_tags %}
 {% load django_bootstrap_breadcrumbs %}
 
 {% block breadcrumbs %}
@@ -73,9 +74,9 @@ button {
 <table cellpadding="0" cellspacing="0" border="1" class="display dataTable table table-hover tablesorter "  data-provides="rowlink" id="table_databases" style="margin-left: 0px; ;">
 	<thead>
 		<tr>
-			<th>{{ titles.0 }}</th>
+			<th >{{ titles.0 }}</th>
             {% for t in titles.1 %}
-               <th title="{{ t.tag }}">{{t.number}} </th>
+               <th  title="{{ t.tag }}">{{t.tag|truncate}} </th>
             {% endfor %}
 		</tr>
 	</thead>

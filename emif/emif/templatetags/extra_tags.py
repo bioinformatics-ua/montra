@@ -40,6 +40,15 @@ def removespaces(value):
 
     return result
 
+
+@register.filter(name='truncate')
+@stringfilter
+def truncate(value):
+    result = value[:30]
+
+    return result
+
+
 # def fingerprints_list():
 
 #     objs = Questionnaire.objects.all()
