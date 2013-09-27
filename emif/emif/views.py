@@ -1884,7 +1884,9 @@ def save_answers_to_csv(list_databases, filename):
         for t in list_databases:
             id = t.id
             qsets, name = createqsets(id)
-            for k, qs in qsets.iteritems():
+
+            for group in qsets.ordered_items():
+                (k, qs) = group
                 if (qs!=None and qs.list_ordered_tags!= None):
                     list_aux = sorted(qs.list_ordered_tags)
                     #import pdb
