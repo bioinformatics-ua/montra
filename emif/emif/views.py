@@ -801,15 +801,16 @@ def all_databases(request, template_name='alldatabases.html'):
 def all_databases_data_table(request, template_name='alldatabases_data_table.html'):
     answers = []
     list_databases = get_databases_from_solr(request, "*:*")
+    titles = []
     if list_databases:
         for t in list_databases:
             id = t.id
             qsets, name = createqsets(id)
             q_list = []
-            for k, qs in qsets.iteritems():
-
+            for group in qsets.ordered_items():
+                (k, qs) = group
                 for q in qs.list_ordered_tags:
-                    q_list.append(q.tag[:10])
+                    q_list.append(q)
             titles = ('Name', (q_list))
             a_list = []
             for k, qs in qsets.iteritems():
