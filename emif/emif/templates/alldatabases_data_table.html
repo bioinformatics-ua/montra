@@ -75,7 +75,7 @@ button {
 		<tr>
 			<th>{{ titles.0 }}</th>
             {% for t in titles.1 %}
-               <th> {{ t }}</th>
+               <th title="{{ t.tag }}">{{t.number}} </th>
             {% endfor %}
 		</tr>
 	</thead>
