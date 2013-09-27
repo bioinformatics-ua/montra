@@ -124,6 +124,7 @@ class Tag:
             self.tag = ''
             self.value = ''
             self.extra = ''   
+            self.number = ''
 
         def __eq__(self, other):
             return other.tag == self.tag
@@ -131,6 +132,12 @@ class Tag:
 
         def __cmp__(self, other):
             return cmp(other.tag, self.tag)
+
+        def __lt__ (self, other):
+            return self.number < other.number
+
+        def __gt__ (self, other):
+            return other.__lt__(self)
 
         def __str__(self):
             return self.tag + ", " + self.value 

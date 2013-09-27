@@ -859,6 +859,7 @@ def createqsets(runcode, qsets=None):
                     t = Tag()
                     t.tag = question.text.encode('utf-8')
                     t.value = ""
+                    t.number = question.number
                     question_group.list_ordered_tags.append(t)
 
                 qsets[qset.text] = question_group
@@ -1908,14 +1909,20 @@ def save_answers_to_csv(list_databases, filename):
 
     if list_databases:
         writer = csv.writer(response)
-        writer.writerow(['DB_ID', 'DB_name', 'Questionset', 'Question', 'Answer'])
+        writer.writerow(['DB_ID', 'DB_name', 'Questionset', 'Question', 'QuestioNumber', 'Answer'])
         for t in list_databases:
             id = t.id
             qsets, name = createqsets(id)
-            for k, qs in qsets.iteritems():
-                for q in qs.list_ordered_tags:
-                    writer.writerow([id, name, k.replace('h1. ', ''), str(q.tag), str(q.value).replace("\n", ". ").replace(";", ",")])
-            writer.writerow([id, name, "System", "Date", t.date])
+
+            for group in qsets.ordered_items():
+                (k, qs) = group
+                if (qs!=None and qs.list_ordered_tags!= None):
+                    list_aux = sorted(qs.list_ordered_tags)
+                    #import pdb
+                    #pdb.set_trace()
+                    for q in list_aux:
+                        writer.writerow([id, name, k.replace('h1. ', ''), str(q.tag), str(q.number), str(q.value).replace("\n", ". ").replace(";", ",")])
+            writer.writerow([id, name, "System", "Date", "99.0", t.date])
 
     return response
 
