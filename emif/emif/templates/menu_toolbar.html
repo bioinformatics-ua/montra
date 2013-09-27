@@ -32,6 +32,12 @@
       </a>
       {% endif %}
 
+      {% if data_table %}
+      <a class="btn" href="alldatabases/data-table" onclick="" > <i class="icon icon-th"></i>
+        Data table
+      </a>
+      {% endif %}
+
       {% if export_all_answers and request.user.is_superuser %}
       <a class="btn" href="export_all_answers" onclick="" > <i class="icon-file"></i>
         Export

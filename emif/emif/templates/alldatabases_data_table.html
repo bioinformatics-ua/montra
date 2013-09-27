@@ -1,0 +1,563 @@
+{% extends 'base.html' %}
+{% load url from future %}
+{% load django_bootstrap_breadcrumbs %}
+
+{% block breadcrumbs %}
+    {{ block.super }}
+    {% breadcrumb "All databases" "alldatabases" %}
+    {% breadcrumb "Excel table" "alldatabases/excel-table" %}
+
+
+{% endblock %}
+
+
+{% block headextra %}
+<link rel="stylesheet" href="static/css/theme.blue.css">
+{% endblock %}
+
+
+{% block scriptextraincludes %}
+
+<script src="static/js/vendor/jquery.tablesorter.min.js"></script>
+<script src="static/js/vendor/jquery.tablesorter.widgets.js"></script>
+<script src="static/js/vendor/jquery.dataTables.min.js"></script>
+
+{% endblock %}
+
+{% block styleextra %}
+
+button {
+    border: 1px #AAA solid;
+    padding: 4px 10px;
+}
+.hide {
+    display: none;
+}
+
+{% endblock %}
+
+
+{% block toolbar %}
+{% include "menu_toolbar.html" %}
+
+{% endblock %}
+
+{% block content %}
+
+{% if list_databases %}
+<div style="margin-bottom: 70px;"></div>
+
+        <tbody>
+    {% for field, value in list_databases %}
+        <tr>
+            <td class="field-name">{{ field }}</td><td>{{ value }}</td>
+        </tr>
+    {% endfor %}
+    </tbody>
+<table class="table table-hover" id="table_databases" class="display" data-provides="rowlink">
+    <thead>
+        <tr>
+            <th class="sorter-false filter-false"></th>
+            <th>Name</th>
+            <th>Date</th>
+
+        </tr>
+    </thead>
+    <tbody>
+
+        {% for t in list_databases %}
+        <tr>
+            <td><img src="static/upload_images/{{t.logo}}" width="50px" height="50px"/></td>
+
+          <td>
+            <a href="fingerprint/{{ t.id }}/2">{{ t.name }}</a>
+
+            <div style="margin-left:20px">
+             Institution Name: {{t.institution}}
+            </div>
+
+            <div style="margin-left:20px">
+             Location: {{t.location}}
+            </div>
+            <div style="margin-left:20px">
+             Number of patients: {{t.number_patients}}
+            </div>
+        </td>
+          <td>{{ t.date }} </td>
+
+        </tr>
+
+        {% endfor %}
+
+    </tbody>
+</table>
+<div id="demo">
+<table cellpadding="0" cellspacing="0" border="0" class="display" id="example">
+	<thead>
+		<tr>
+			<th>Rendering engine</th>
+			<th>Browser</th>
+			<th>Platform(s)</th>
+			<th>Engine version</th>
+			<th>CSS grade</th>
+		</tr>
+	</thead>
+	<tfoot>
+		<tr>
+			<th>Rendering engine</th>
+			<th>Browser</th>
+			<th>Platform(s)</th>
+			<th>Engine version</th>
+			<th>CSS grade</th>
+		</tr>
+	</tfoot>
+	<tbody>
+		<tr class="odd gradeX">
+			<td>Trident</td>
+			<td>Internet
+				 Explorer 4.0</td>
+			<td>Win 95+</td>
+			<td class="center">4</td>
+			<td class="center">X</td>
+		</tr>
+		<tr class="odd gradeC">
+			<td>Trident</td>
+			<td>Internet
+				 Explorer 5.0</td>
+			<td>Win 95+</td>
+			<td class="center">5</td>
+			<td class="center">C</td>
+		</tr>
+		<tr class="odd gradeA">
+			<td>Trident</td>
+			<td>Internet
+				 Explorer 5.5</td>
+			<td>Win 95+</td>
+			<td class="center">5.5</td>
+			<td class="center">A</td>
+		</tr>
+		<tr class="odd gradeA">
+			<td>Trident</td>
+			<td>Internet
+				 Explorer 6</td>
+			<td>Win 98+</td>
+			<td class="center">6</td>
+			<td class="center">A</td>
+		</tr>
+		<tr class="odd gradeA">
+			<td>Trident</td>
+			<td>Internet Explorer 7</td>
+			<td>Win XP SP2+</td>
+			<td class="center">7</td>
+			<td class="center">A</td>
+		</tr>
+		<tr class="odd gradeA">
+			<td>Trident</td>
+			<td>AOL browser (AOL desktop)</td>
+			<td>Win XP</td>
+			<td class="center">6</td>
+			<td class="center">A</td>
+		</tr>
+		<tr class="gradeA">
+			<td>Gecko</td>
+			<td>Firefox 1.0</td>
+			<td>Win 98+ / OSX.2+</td>
+			<td class="center">1.7</td>
+			<td class="center">A</td>
+		</tr>
+		<tr class="gradeA">
+			<td>Gecko</td>
+			<td>Firefox 1.5</td>
+			<td>Win 98+ / OSX.2+</td>
+			<td class="center">1.8</td>
+			<td class="center">A</td>
+		</tr>
+		<tr class="gradeA">
+			<td>Gecko</td>
+			<td>Firefox 2.0</td>
+			<td>Win 98+ / OSX.2+</td>
+			<td class="center">1.8</td>
+			<td class="center">A</td>
+		</tr>
+		<tr class="gradeA">
+			<td>Gecko</td>
+			<td>Firefox 3.0</td>
+			<td>Win 2k+ / OSX.3+</td>
+			<td class="center">1.9</td>
+			<td class="center">A</td>
+		</tr>
+		<tr class="gradeA">
+			<td>Gecko</td>
+			<td>Camino 1.0</td>
+			<td>OSX.2+</td>
+			<td class="center">1.8</td>
+			<td class="center">A</td>
+		</tr>
+		<tr class="gradeA">
+			<td>Gecko</td>
+			<td>Camino 1.5</td>
+			<td>OSX.3+</td>
+			<td class="center">1.8</td>
+			<td class="center">A</td>
+		</tr>
+		<tr class="gradeA">
+			<td>Gecko</td>
+			<td>Netscape 7.2</td>
+			<td>Win 95+ / Mac OS 8.6-9.2</td>
+			<td class="center">1.7</td>
+			<td class="center">A</td>
+		</tr>
+		<tr class="gradeA">
+			<td>Gecko</td>
+			<td>Netscape Browser 8</td>
+			<td>Win 98SE+</td>
+			<td class="center">1.7</td>
+			<td class="center">A</td>
+		</tr>
+		<tr class="gradeA">
+			<td>Gecko</td>
+			<td>Netscape Navigator 9</td>
+			<td>Win 98+ / OSX.2+</td>
+			<td class="center">1.8</td>
+			<td class="center">A</td>
+		</tr>
+		<tr class="gradeA">
+			<td>Gecko</td>
+			<td>Mozilla 1.0</td>
+			<td>Win 95+ / OSX.1+</td>
+			<td class="center">1</td>
+			<td class="center">A</td>
+		</tr>
+		<tr class="gradeA">
+			<td>Gecko</td>
+			<td>Mozilla 1.1</td>
+			<td>Win 95+ / OSX.1+</td>
+			<td class="center">1.1</td>
+			<td class="center">A</td>
+		</tr>
+		<tr class="gradeA">
+			<td>Gecko</td>
+			<td>Mozilla 1.2</td>
+			<td>Win 95+ / OSX.1+</td>
+			<td class="center">1.2</td>
+			<td class="center">A</td>
+		</tr>
+		<tr class="gradeA">
+			<td>Gecko</td>
+			<td>Mozilla 1.3</td>
+			<td>Win 95+ / OSX.1+</td>
+			<td class="center">1.3</td>
+			<td class="center">A</td>
+		</tr>
+		<tr class="gradeA">
+			<td>Gecko</td>
+			<td>Mozilla 1.4</td>
+			<td>Win 95+ / OSX.1+</td>
+			<td class="center">1.4</td>
+			<td class="center">A</td>
+		</tr>
+		<tr class="gradeA">
+			<td>Gecko</td>
+			<td>Mozilla 1.5</td>
+			<td>Win 95+ / OSX.1+</td>
+			<td class="center">1.5</td>
+			<td class="center">A</td>
+		</tr>
+		<tr class="gradeA">
+			<td>Gecko</td>
+			<td>Mozilla 1.6</td>
+			<td>Win 95+ / OSX.1+</td>
+			<td class="center">1.6</td>
+			<td class="center">A</td>
+		</tr>
+		<tr class="gradeA">
+			<td>Gecko</td>
+			<td>Mozilla 1.7</td>
+			<td>Win 98+ / OSX.1+</td>
+			<td class="center">1.7</td>
+			<td class="center">A</td>
+		</tr>
+		<tr class="gradeA">
+			<td>Gecko</td>
+			<td>Mozilla 1.8</td>
+			<td>Win 98+ / OSX.1+</td>
+			<td class="center">1.8</td>
+			<td class="center">A</td>
+		</tr>
+		<tr class="gradeA">
+			<td>Gecko</td>
+			<td>Seamonkey 1.1</td>
+			<td>Win 98+ / OSX.2+</td>
+			<td class="center">1.8</td>
+			<td class="center">A</td>
+		</tr>
+		<tr class="gradeA">
+			<td>Gecko</td>
+			<td>Epiphany 2.20</td>
+			<td>Gnome</td>
+			<td class="center">1.8</td>
+			<td class="center">A</td>
+		</tr>
+		<tr class="gradeA">
+			<td>Webkit</td>
+			<td>Safari 1.2</td>
+			<td>OSX.3</td>
+			<td class="center">125.5</td>
+			<td class="center">A</td>
+		</tr>
+		<tr class="gradeA">
+			<td>Webkit</td>
+			<td>Safari 1.3</td>
+			<td>OSX.3</td>
+			<td class="center">312.8</td>
+			<td class="center">A</td>
+		</tr>
+		<tr class="gradeA">
+			<td>Webkit</td>
+			<td>Safari 2.0</td>
+			<td>OSX.4+</td>
+			<td class="center">419.3</td>
+			<td class="center">A</td>
+		</tr>
+		<tr class="gradeA">
+			<td>Webkit</td>
+			<td>Safari 3.0</td>
+			<td>OSX.4+</td>
+			<td class="center">522.1</td>
+			<td class="center">A</td>
+		</tr>
+		<tr class="gradeA">
+			<td>Webkit</td>
+			<td>OmniWeb 5.5</td>
+			<td>OSX.4+</td>
+			<td class="center">420</td>
+			<td class="center">A</td>
+		</tr>
+		<tr class="gradeA">
+			<td>Webkit</td>
+			<td>iPod Touch / iPhone</td>
+			<td>iPod</td>
+			<td class="center">420.1</td>
+			<td class="center">A</td>
+		</tr>
+		<tr class="gradeA">
+			<td>Webkit</td>
+			<td>S60</td>
+			<td>S60</td>
+			<td class="center">413</td>
+			<td class="center">A</td>
+		</tr>
+		<tr class="gradeA">
+			<td>Presto</td>
+			<td>Opera 7.0</td>
+			<td>Win 95+ / OSX.1+</td>
+			<td class="center">-</td>
+			<td class="center">A</td>
+		</tr>
+		<tr class="gradeA">
+			<td>Presto</td>
+			<td>Opera 7.5</td>
+			<td>Win 95+ / OSX.2+</td>
+			<td class="center">-</td>
+			<td class="center">A</td>
+		</tr>
+		<tr class="gradeA">
+			<td>Presto</td>
+			<td>Opera 8.0</td>
+			<td>Win 95+ / OSX.2+</td>
+			<td class="center">-</td>
+			<td class="center">A</td>
+		</tr>
+		<tr class="gradeA">
+			<td>Presto</td>
+			<td>Opera 8.5</td>
+			<td>Win 95+ / OSX.2+</td>
+			<td class="center">-</td>
+			<td class="center">A</td>
+		</tr>
+		<tr class="gradeA">
+			<td>Presto</td>
+			<td>Opera 9.0</td>
+			<td>Win 95+ / OSX.3+</td>
+			<td class="center">-</td>
+			<td class="center">A</td>
+		</tr>
+		<tr class="gradeA">
+			<td>Presto</td>
+			<td>Opera 9.2</td>
+			<td>Win 88+ / OSX.3+</td>
+			<td class="center">-</td>
+			<td class="center">A</td>
+		</tr>
+		<tr class="gradeA">
+			<td>Presto</td>
+			<td>Opera 9.5</td>
+			<td>Win 88+ / OSX.3+</td>
+			<td class="center">-</td>
+			<td class="center">A</td>
+		</tr>
+		<tr class="gradeA">
+			<td>Presto</td>
+			<td>Opera for Wii</td>
+			<td>Wii</td>
+			<td class="center">-</td>
+			<td class="center">A</td>
+		</tr>
+		<tr class="gradeA">
+			<td>Presto</td>
+			<td>Nokia N800</td>
+			<td>N800</td>
+			<td class="center">-</td>
+			<td class="center">A</td>
+		</tr>
+		<tr class="gradeA">
+			<td>Presto</td>
+			<td>Nintendo DS browser</td>
+			<td>Nintendo DS</td>
+			<td class="center">8.5</td>
+			<td class="center">C/A<sup>1</sup></td>
+		</tr>
+		<tr class="gradeC">
+			<td>KHTML</td>
+			<td>Konqureror 3.1</td>
+			<td>KDE 3.1</td>
+			<td class="center">3.1</td>
+			<td class="center">C</td>
+		</tr>
+		<tr class="gradeA">
+			<td>KHTML</td>
+			<td>Konqureror 3.3</td>
+			<td>KDE 3.3</td>
+			<td class="center">3.3</td>
+			<td class="center">A</td>
+		</tr>
+		<tr class="gradeA">
+			<td>KHTML</td>
+			<td>Konqureror 3.5</td>
+			<td>KDE 3.5</td>
+			<td class="center">3.5</td>
+			<td class="center">A</td>
+		</tr>
+		<tr class="gradeX">
+			<td>Tasman</td>
+			<td>Internet Explorer 4.5</td>
+			<td>Mac OS 8-9</td>
+			<td class="center">-</td>
+			<td class="center">X</td>
+		</tr>
+		<tr class="gradeC">
+			<td>Tasman</td>
+			<td>Internet Explorer 5.1</td>
+			<td>Mac OS 7.6-9</td>
+			<td class="center">1</td>
+			<td class="center">C</td>
+		</tr>
+		<tr class="gradeC">
+			<td>Tasman</td>
+			<td>Internet Explorer 5.2</td>
+			<td>Mac OS 8-X</td>
+			<td class="center">1</td>
+			<td class="center">C</td>
+		</tr>
+		<tr class="gradeA">
+			<td>Misc</td>
+			<td>NetFront 3.1</td>
+			<td>Embedded devices</td>
+			<td class="center">-</td>
+			<td class="center">C</td>
+		</tr>
+		<tr class="gradeA">
+			<td>Misc</td>
+			<td>NetFront 3.4</td>
+			<td>Embedded devices</td>
+			<td class="center">-</td>
+			<td class="center">A</td>
+		</tr>
+		<tr class="gradeX">
+			<td>Misc</td>
+			<td>Dillo 0.8</td>
+			<td>Embedded devices</td>
+			<td class="center">-</td>
+			<td class="center">X</td>
+		</tr>
+		<tr class="gradeX">
+			<td>Misc</td>
+			<td>Links</td>
+			<td>Text only</td>
+			<td class="center">-</td>
+			<td class="center">X</td>
+		</tr>
+		<tr class="gradeX">
+			<td>Misc</td>
+			<td>Lynx</td>
+			<td>Text only</td>
+			<td class="center">-</td>
+			<td class="center">X</td>
+		</tr>
+		<tr class="gradeC">
+			<td>Misc</td>
+			<td>IE Mobile</td>
+			<td>Windows Mobile 6</td>
+			<td class="center">-</td>
+			<td class="center">C</td>
+		</tr>
+		<tr class="gradeC">
+			<td>Misc</td>
+			<td>PSP browser</td>
+			<td>PSP</td>
+			<td class="center">-</td>
+			<td class="center">C</td>
+		</tr>
+		<tr class="gradeU">
+			<td>Other browsers</td>
+			<td>All others</td>
+			<td>-</td>
+			<td class="center">-</td>
+			<td class="center">U</td>
+		</tr>
+	</tbody>
+</table>
+
+{% else %}
+<div class="row">  
+<div class="span4">  
+<div class="alert">  
+  <a class="close" data-dismiss="error">×</a>  
+  <strong>Info</strong> Please add a new database, like for instance a Cohort or Observation. You can find this option in the menu "Workspace -> Add -> Research Cohort or Observation Study"
+</div>  
+</div>  
+</div>  
+{% endif %}
+
+{% comment %}
+  <a class="btn btn-large btn-success" href="advancedSearch/1">Add new database</a>
+{% endcomment %}
+</div>
+
+
+
+{% endblock %}
+
+{% block scriptextra %}
+{% comment %}
+<script>
+{% endcomment %}
+
+
+
+$('#li_workspace').addClass("active");
+
+
+$(document).ready(function() {
+	$('#table_databases').dataTable( {
+        "sScrollY": 200,
+         "sScrollX": "120%",
+        "sScrollXInner": "150%"
+	} );
+} );
+
+{% comment %}
+</script>
+{% endcomment %}
+
+{% endblock %}

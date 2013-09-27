@@ -794,8 +794,37 @@ def all_databases(request, template_name='alldatabases.html'):
     #list_databases = get_databases_from_db(request)
     list_databases = get_databases_from_solr(request, "*:*")
 
-    return render(request, template_name, {'request': request, 'export_all_answers': True,
+    return render(request, template_name, {'request': request, 'export_all_answers': True, 'data_table': True,
                                            'list_databases': list_databases, 'breadcrumb': True, 'collapseall': False, 'geo': True})
+
+
+def all_databases_data_table(request, template_name='alldatabases_data_table.html'):
+    answers = []
+    list_databases = get_databases_from_solr(request, "*:*")
+    if list_databases:
+        for t in list_databases:
+            id = t.id
+            qsets, name = createqsets(id)
+            q_list = []
+            for k, qs in qsets.iteritems():
+
+                for q in qs.list_ordered_tags:
+                    q_list.append(q.tag[:10])
+            titles = ('Name', (q_list))
+            a_list = []
+            for k, qs in qsets.iteritems():
+
+                for q in qs.list_ordered_tags:
+                    a_list.append(q.value)
+            answers.append((name, (a_list)))
+                # print answers
+
+    # print titles
+    # print answers
+
+    return render(request, template_name, {'request': request, 'export_all_answers': True, 'titles': titles,
+                                           'answers': answers, 'breadcrumb': True, 'collapseall': False, 'geo': True,
+                                           'list_databases': list_databases})
 
 
 def createqsets(runcode, qsets=None):
