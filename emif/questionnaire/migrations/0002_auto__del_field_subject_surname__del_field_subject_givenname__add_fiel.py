@@ -29,9 +29,7 @@ class Migration(SchemaMigration):
                       self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User'], null=True, blank=True),
                       keep_default=False)
 
-        #Adding field 'stats'
-        db.add_column('questionnaire_question', 'stats',
-                      self.gf('django.db.models.fields.BooleanField')(default=False))
+
 
 
     def backwards(self, orm):
@@ -54,8 +52,7 @@ class Migration(SchemaMigration):
         # Deleting field 'Subject.user'
         db.delete_column('questionnaire_subject', 'user_id')
 
-        # Deleting field 'Question.stats'
-        db.delete_column('questionnaire_question', 'stats')
+
 
 
     models = {
