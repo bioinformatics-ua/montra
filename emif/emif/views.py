@@ -2075,7 +2075,7 @@ def import_questionnaire(request, template_name='import_questionnaire.html'):
 
     from openpyxl import load_workbook
     from django.template.defaultfilters import slugify
-    wb = load_workbook(filename = r'C:/questionnaire_ad.xlsx')
+    wb = load_workbook(filename = r'/Volumes/EXT1/Dropbox/MAPi-Dropbox/EMIF/Code/emif/emif/questionnaire_ad_v2.xlsx')
     # wb = load_workbook(filename = r'/Volumes/EXT1/Dropbox/MAPi-Dropbox/EMIF/Observational_Data_Sources_Template_v5.xlsx')
     ws = wb.get_active_sheet()
     log = ''
@@ -2086,11 +2086,12 @@ def import_questionnaire(request, template_name='import_questionnaire.html'):
     disable = False
 
     def format_number(number):
+        print number
         number_arr = number.split(".")
-        print number_arr
+        
         result = number_arr[0] + "."
         for i in range(1,len(number_arr)):
-            print i
+            
             val = int(number_arr[i])
             if val<10:
                 val = "0" + str(val)
@@ -2099,6 +2100,7 @@ def import_questionnaire(request, template_name='import_questionnaire.html'):
                 result += str(val) + "."
             else:
                 result += str(val)
+        print "result " + result
         return result
 
 
@@ -2145,6 +2147,7 @@ def import_questionnaire(request, template_name='import_questionnaire.html'):
                         text_en = str(tabulation.value) + '. ' + str(text.value)
 
                         try:
+
                             questionNumber = qNumber.getNumber(tabulation.value)
                             questionNumber = format_number(str(questionNumber))
                         except:
@@ -2176,6 +2179,7 @@ def import_questionnaire(request, template_name='import_questionnaire.html'):
 
                             try:
                                 questionNumber = qNumber.getNumber(tabulation.value)
+                                questionNumber = format_number(str(questionNumber))
                             except:
                                 log += "\n%s - Error to create question number %s" % (heading.row, text_en)
                                 raise
