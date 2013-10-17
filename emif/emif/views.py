@@ -2064,7 +2064,8 @@ class QuestionNumber:
                 self.resetH4()
 
         return self._nQuestion
-        
+
+
 def import_questionnaire(request, template_name='import_questionnaire.html'):
     """
     To-Do
@@ -2083,6 +2084,23 @@ def import_questionnaire(request, template_name='import_questionnaire.html'):
     name = ws.cell('A1').value
     slug = slugify(ws.cell('A1').value)
     disable = False
+
+    def format_number(number):
+        number_arr = number.split(".")
+        print number_arr
+        result = number_arr[0] + "."
+        for i in range(1,len(number_arr)):
+            print i
+            val = int(number_arr[i])
+            if val<10:
+                val = "0" + str(val)
+            number_arr[i] = str(val)
+            if (i!=len(number_arr)-1):
+                result += str(val) + "."
+            else:
+                result += str(val)
+        return result
+
 
     questionnaire = Questionnaire(name=name, disable=disable, slug=slug, redirect_url='/')
     log += '\nQuestionnaire created %s ' % questionnaire
@@ -2128,6 +2146,7 @@ def import_questionnaire(request, template_name='import_questionnaire.html'):
 
                         try:
                             questionNumber = qNumber.getNumber(tabulation.value)
+                            questionNumber = format_number(str(questionNumber))
                         except:
                             log += "\n%s - Error to create question number %s" % (heading.row, text_en)
                             raise
