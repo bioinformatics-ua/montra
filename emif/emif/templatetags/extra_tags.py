@@ -31,6 +31,21 @@ def removeh1(value):
     
     return value.replace('h1. ','')
 
+
+@register.filter(name='removehs')
+@stringfilter
+def removehs(value):
+    value = value.replace('h1. ','')
+    value = value.replace('h2. ','')
+    value = value.replace('h3. ','')
+    value = value.replace('h4. ','')
+    value = value.replace('h5. ','')
+    value = value.replace('h6. ','')
+    value = value.replace('h7. ','')
+
+    return value
+
+
 @register.filter(name='removespaces')
 @stringfilter
 def removespaces(value):

@@ -29,7 +29,7 @@
                 {% if request.user.is_staff %}
                     <span class="pull-right">
                         <a href="admin/questionnaire/question/{{ question.id }}/">
-                            ({% trans "edit" %} {{ question.number }})
+                            ({% trans "edit" %} {{ question.number|removeh1  }})
                         </a>
                     </span>
                 {% endif %}
