@@ -39,7 +39,7 @@
                 {% else %}
                     <div class="question-text {% if qdict.required %}required{% endif %} {% if error %}text-error{% endif %}">
                         <span class="qnumber">{{ question.display_number }}.</span> 
-                        {{ question.text|safe }}
+                        {{ question.text|safe|removehs }}
                     </div>
                     <div class="answer">
                         {% if error %}
