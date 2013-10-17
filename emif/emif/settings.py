@@ -37,9 +37,9 @@ else:
     MIDDLE_DIR = "emif/emif/"
 
 ADMINS = (
-         ('Luis A. Bastiao Silva', 'bastiao@ua.pt'),
-         ('José Luis Oliveira', 'jlo@ua.pt'),
-         ('Rui Mendes', 'ruidamendes@ua.pt'),
+    ('Luis A. Bastiao Silva', 'bastiao@ua.pt'),
+    ('José Luis Oliveira', 'jlo@ua.pt'),
+    ('Rui Mendes', 'ruidamendes@ua.pt'),
 )
 
 SOLR_HOST = "localhost"
@@ -50,17 +50,34 @@ MANAGERS = ADMINS
 DATABASE_PATH_SQLITE3 = "emif.db"
 
 if not DEBUG:
-    DATABASE_PATH_SQLITE3 = PROJECT_DIR_ROOT + "emif/" +  DATABASE_PATH_SQLITE3
+    DATABASE_PATH_SQLITE3 = PROJECT_DIR_ROOT + "emif/" + DATABASE_PATH_SQLITE3
+
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
+#         'NAME': DATABASE_PATH_SQLITE3,                      # Or path to database file if using sqlite3.
+#         'USER': '',                      # Not used with sqlite3.
+#         'PASSWORD': '',                  # Not used with sqlite3.
+#         'HOST': '',                      # Set to empty string for localhost. Not used with sqlite3.
+#         'PORT': '',                      # Set to empty string for default. Not used with sqlite3.
+#     }
+# }
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': DATABASE_PATH_SQLITE3,                      # Or path to database file if using sqlite3.
-        'USER': '',                      # Not used with sqlite3.
-        'PASSWORD': '',                  # Not used with sqlite3.
-        'HOST': '',                      # Set to empty string for localhost. Not used with sqlite3.
-        'PORT': '',                      # Set to empty string for default. Not used with sqlite3.
-    }
+        #        'ENGINE': 'django.db.backends.mysql', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
+        'ENGINE': 'django.db.backends.postgresql_psycopg2', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
+        'NAME': 'emif_dev', # Or path to database file if using sqlite3.
+        'USER': 'postgres', # Not used with sqlite3.
+        'PASSWORD': 'ieeta123IEETA', # Not used with sqlite3.
+        'HOST': 'localhost', # Set to empty string for localhost. Not used with sqlite3.
+        'PORT': '', # Set to empty string for default. Not used with sqlite3.
+        'AUTOCOMMIT': True,
+        'autocommit': True,
+        'OPTIONS': {
+            'autocommit': True,
+        },
+    },
 }
 
 # Hosts/domain names that are valid for this site; required if DEBUG is False
@@ -121,7 +138,7 @@ STATICFILES_DIRS = (
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
     os.path.abspath(PROJECT_DIR_ROOT + MIDDLE_DIR + 'emif/static'),
-    os.path.abspath(PROJECT_DIR_ROOT +MIDDLE_DIR +'apps/seantis-questionnaire/questionnaire/static/')
+    os.path.abspath(PROJECT_DIR_ROOT + MIDDLE_DIR + 'apps/seantis-questionnaire/questionnaire/static/')
 )
 
 # List of finder classes that know how to find static files in
@@ -129,7 +146,7 @@ STATICFILES_DIRS = (
 STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
-#    'django.contrib.staticfiles.finders.DefaultStorageFinder',
+    #    'django.contrib.staticfiles.finders.DefaultStorageFinder',
 )
 
 # Make this unique, and don't share it with anybody.
@@ -139,7 +156,7 @@ SECRET_KEY = 'j*zdirg7yy9@q1k=c*q!*kovfsd#$FDFfsdfkae#id04pyta=yz@w34m6rvwfe'
 TEMPLATE_LOADERS = (
     'django.template.loaders.filesystem.Loader',
     'django.template.loaders.app_directories.Loader',
-#     'django.template.loaders.eggs.Loader',
+    #     'django.template.loaders.eggs.Loader',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -164,7 +181,7 @@ TEMPLATE_DIRS = (
     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
-    os.path.abspath(PROJECT_DIR_ROOT +MIDDLE_DIR + 'apps/seantis-questionnaire/questionnaire/templates'),
+    os.path.abspath(PROJECT_DIR_ROOT + MIDDLE_DIR + 'apps/seantis-questionnaire/questionnaire/templates'),
     os.path.abspath(PROJECT_DIR_ROOT + MIDDLE_DIR + 'emif/templates'),
 )
 
@@ -331,6 +348,7 @@ LOGIN_EXEMPT_URLS = (
     r'^api/metadata',
     r'^api/search',
     r'^api-token-auth-create/',
+    r'^import-questionnaire',
 )
 
 #Set session idle timeout (seconds)
