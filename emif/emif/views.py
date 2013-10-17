@@ -1951,26 +1951,132 @@ def export_my_answers(request):
 def export_bd_answers(request, runcode):
     """
     Method to export answers of a specific database to a csv file
+    :param request:
+    :param runcode:
     """
 
     list_databases = get_databases_from_solr(request, "id:" + runcode)
     return save_answers_to_csv(list_databases, 'MyDB')
 
 
+class QuestionNumber:
+    """
+    State machine to create number of questions dynamically
+    """
+    def __init__(self):
+        """
+        n1, n2, n3, n4: level count
+        t0, t1, t2, t3, t4: level text
+        state: level state
+        nQuestion: result
+        :rtype : object
+        """
+        self._n1 = self._n2 = self._n3 = self._n4 = 1
+        self._t0 = self._t1 = self._t2 = self._t3 = self._t4 = ''
+        self._state = 'h1'
+        self._nQuestion = ''
+            
+    def saveQuestionNumber(self):
+        self._nQuestion = ''
+        if self._t0:
+            self._nQuestion += self._t0
+        if self._t1 != '':
+            self._nQuestion += '.' + self._t1
+        if self._t2:
+            self._nQuestion += '.' + self._t2
+        if self._t3:
+            self._nQuestion += '.' + self._t3
+        if self._t4:
+            self._nQuestion += '.' + self._t4
+
+    def resetH0(self, hValue=1):
+        self._t0 = str(hValue)
+        self._n1 = self._n2 = self._n3 = self._n4 = 1
+        self._t1 = self._t2 = self._t3 = self._t4 = ''
+        self._state = 'h1'
+
+    def resetH1(self):
+        self._t1 = str(self._n1)
+        self._n2 = self._n3 = self._n4 = 1
+        self._t2 = self._t3 = self._t4 = ''
+        self._n1 += 1
+        self._state = 'h1'
+        self.saveQuestionNumber()
+
+    def resetH2(self):
+        self._t2 = str(self._n2)
+        self._n2 += 1
+        self._n3 = self._n4 = 1
+        self._t3 = self._t4 = ''
+        self._state = 'h2'
+        self.saveQuestionNumber()
+
+    def resetH3(self):
+        self._t3 = str(self._n3)
+        self._n3 += 1
+        self._n4 = 1
+        self._t4 = ''
+        self._state = 'h3'
+        self.saveQuestionNumber()
+
+    def resetH4(self):
+        self._t4 = str(self._n4)
+        self._n4 += 1
+        self._state = 'h4'
+        self.saveQuestionNumber()
+
+    def getNumber(self, headingValue, hValue=1):
+        """
+        Function to get number of question, subquestion, etc.
+        """
+        # headingValue = 'h0' : QuestionSet
+        if headingValue == 'h0':
+            self.resetH0(hValue)
+        elif self._state == 'h1':
+            if headingValue == 'h1':
+                self.resetH1()
+            elif headingValue == 'h2':
+                self.resetH2()
+        elif self._state == 'h2':
+            if headingValue == 'h1':
+                self.resetH1()
+            elif headingValue == 'h2':
+                self.resetH2()
+            elif headingValue == 'h3':
+                self.resetH3()
+        elif self._state == 'h3':
+            if headingValue == 'h1':
+                self.resetH1()
+            elif headingValue == 'h2':
+                self.resetH2()
+            elif headingValue == 'h3':
+                self.resetH3()
+            elif headingValue == 'h4':
+                self.resetH4()
+        elif self._state == 'h4':
+            if headingValue == 'h1':
+                self.resetH1()
+            elif headingValue == 'h2':
+                self.resetH2()
+            elif headingValue == 'h3':
+                self.resetH3()
+            elif headingValue == 'h4':
+                self.resetH4()
+
+        return self._nQuestion
+        
 def import_questionnaire(request, template_name='import_questionnaire.html'):
     """
     To-Do
-    - implement slug solution (slug must be unique for the questionnaire)
-    - save choices when question type is ...
     - validation of template structure and content fields
     """
+    qNumber = QuestionNumber()
 
     from openpyxl import load_workbook
     from django.template.defaultfilters import slugify
-    #wb = load_workbook(filename = r'C:/Observational_Data_Sources_Template_v3.xlsx')
-    wb = load_workbook(filename = r'/Volumes/EXT1/Dropbox/MAPi-Dropbox/EMIF/Observational_Data_Sources_Template_v5.xlsx')
+    wb = load_workbook(filename = r'C:/questionnaire_ad.xlsx')
+    # wb = load_workbook(filename = r'/Volumes/EXT1/Dropbox/MAPi-Dropbox/EMIF/Observational_Data_Sources_Template_v5.xlsx')
     ws = wb.get_active_sheet()
-    content = []
     log = ''
 
     # get questionnaire type in cell A1
@@ -1979,42 +2085,60 @@ def import_questionnaire(request, template_name='import_questionnaire.html'):
     disable = False
 
     questionnaire = Questionnaire(name=name, disable=disable, slug=slug, redirect_url='/')
-    log += '\nQuestionario criado %s ' % questionnaire
+    log += '\nQuestionnaire created %s ' % questionnaire
     try:
         questionnaire.save()
-        log += '\nQuestionario gravado %s ' % questionnaire
+        log += '\nQuestionnaire saved %s ' % questionnaire
         # print questionnaire.name
         question_set = re.compile('(QS\d)')
+
         for row in ws.rows[2:]:
-            # print row[0].number
+
+            # print row[0].row,
             if len(row) > 0:
                 heading = row[0]
-                number = row[1]
+                tabulation = row[1]
                 text = row[2]
                 # If is question_set
-                if question_set.match(heading.value):
+                if question_set.match(str(heading.value)):
                     text_question_set = row[1]
                     sortid = str(heading.value)
-                    text_en = 'h1. %s' % text_question_set.value
-                    slug_qs = slug  + "_" + convert_text_to_slug(str(text_question_set.value))
+                    questionNumber = sortid[2:]
 
+                    try:
+                        qNumber.getNumber('h0', questionNumber)
+                    except:
+                        raise
+
+                    text_en = 'h1. %s' % text_question_set.value
+                    slug_qs = slug + "_" + convert_text_to_slug(str(text_question_set.value))
                     questionset = QuestionSet(questionnaire=questionnaire, checks='required', sortid=sortid[2:], text_en=text_en, heading=slug_qs)
-                    log += '\n%s - QuestionSet criado %s ' % (heading.row, questionset)
+                    log += '\n%s - QuestionSet created %s - %s ' % (heading.row, sortid[2:], text_en)
                     try:
                         questionset.save()
-                        log += '\n%s - QuestionSet gravado %s ' % (heading.row, questionset)
+                        log += '\n%s - QuestionSet saved %s - %s ' % (heading.row, sortid[2:], text_en)
                     except:
-                        log += "\n%s - Erro a gravar o questionset %s" % (heading.row, question_set)
-                elif heading.value == "Description":
+
+                        log += "\n%s - Error to save questionset %s - %s" % (heading.row, sortid[2:], text_en)
+                        raise
+                elif str(heading.value).lower() == "description":
                     try:
                         slug_q = convert_text_to_slug(str(text.value[:50]))
-                        question = Question(questionset=questionset, text_en=text.value, number=number.value, type='comment', help_text='', slug=slug_q, stats=False)
-                        log += '\n%s - Question criada %s ' % (heading.row, question)
+                        text_en = str(tabulation.value) + '. ' + str(text.value)
+
+                        try:
+                            questionNumber = qNumber.getNumber(tabulation.value)
+                        except:
+                            log += "\n%s - Error to create question number %s" % (heading.row, text_en)
+                            raise
+
+                        question = Question(questionset=questionset, text_en=text_en, number=str(questionNumber), type='comment', help_text='', slug=slug_q, stats=False)
+                        log += '\n%s - Description created %s ' % (heading.row, question)
                         question.save()
-                        log += '\n%s - Question guardada %s ' % (heading.row, question)
+                        log += '\n%s - Description saved %s ' % (heading.row, question)
                     except:
-                        pass
-                        log += "\n%s - Erro a gravar a question %s" % (heading.row, question)
+                        log += "\n%s - Error to save question %s" % (heading.row, text_en)
+                        raise
                 else:
                     try:
                         type = row[3]
@@ -2027,43 +2151,52 @@ def import_questionnaire(request, template_name='import_questionnaire.html'):
                                 checks = row[6]
                             else:
                                 checks = ''
-                            slug_q = convert_text_to_slug(str(text.value[:50]))
+                            slug_q = convert_text_to_slug(str(text.value))
                             help_text = help_text.value
-                            if help_text==None:
+                            text_en = str(tabulation.value) + '. ' + str(text.value)
+
+                            try:
+                                questionNumber = qNumber.getNumber(tabulation.value)
+                            except:
+                                log += "\n%s - Error to create question number %s" % (heading.row, text_en)
+                                raise
+
+                            if help_text is None:
                                 help_text = ""
-                            question = Question(questionset=questionset, text_en=text.value, number=number.value, type=type.value, help_text=help_text, slug=slug_q, stats=True, checks=checks.value)
-                            log += '\n%s - Question criada %s ' % (heading.row, question)
+                            question = Question(questionset=questionset, text_en=text_en, number=str(questionNumber), type=type.value, help_text=help_text, slug=slug_q, stats=True, checks=checks.value)
+                            log += '\n%s - Question created %s ' % (heading.row, question)
                             question.save()
-                            log += '\n%s - Question guardada %s ' % (heading.row, question)
+                            log += '\n%s - Question saved %s ' % (heading.row, question)
                             if type.value in ['choice', 'choice-freeform', 'choice-multiple', 'choice-multiple-freeform']:
                                 # Parse of values list
                                 values_list = row[4]
                                 list = values_list.value.split('\n')
                                 i = 1
-                                for choice in list:
+                                for ch in list:
                                     try:
-                                        choice = Choice(question=question, sortid=i, text_en=choice, value=choice)
-                                        log += '\n%s - Choice criada %s ' % (heading.row, choice)
-                                        # print choice
+                                        choice = Choice(question=question, sortid=i, text_en=ch, value=ch)
+                                        log += '\n%s - Choice created %s ' % (heading.row, ch)
                                         choice.save()
-                                        log += '\n%s - Choice guardada %s ' % (heading.row, choice)
+                                        log += '\n%s - Choice saved %s ' % (heading.row, ch)
                                         i += 1
                                     except:
-                                        log += "\n%s - Erro a gravar a Choice %s" % (heading.row, choice)
+                                        log += "\n%s - Error to save Choice %s" % (heading.row, ch)
+                                        raise
 
                     except:
-                        log += "\n%s - Erro a gravar a question %s" % (heading.row, question)
+                        log += "\n%s - Error to save question %s" % (heading.row, text_en)
+                        raise
 
-            # content.append([c.value for c in row])
     except:
+        log += '\nError to save questionsets and questions of the questionnaire %s ' % questionnaire
         raise
-        log += '\nErro a gravar os questionsets e questoes do questionario %s ' % questionnaire
 
     with open("log_%s.txt" % datetime.datetime.now().strftime("%Y%m%d-%H%M%S"), "w") as f:
         f.write(log)
     # print log
 
-
-    return render_to_response(template_name, {'import_questionnaire': True, 'content': content,
+    return render_to_response(template_name, {'import_questionnaire': True,
                               'request': request, 'breadcrumb': True}, RequestContext(request))
+
+
 
