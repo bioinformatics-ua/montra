@@ -102,6 +102,7 @@ urlpatterns = patterns('',
     url(r'^export_my_answers', 'emif.views.export_my_answers'),
     url(r'^export_bd_answers/(?P<runcode>[^/]+)/$', 'emif.views.export_bd_answers'),
     url(r'^import-questionnaire', 'emif.views.import_questionnaire'),
+    url(r'^delete-questionnaire/(?P<qId>[0-9]+)/$', 'utils.delete_questionnaire.delete'),
     # Documentation
     url(r'^docs/api$', 'emif.views.docs_api'),
 

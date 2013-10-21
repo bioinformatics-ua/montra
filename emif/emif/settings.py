@@ -349,6 +349,7 @@ LOGIN_EXEMPT_URLS = (
     r'^api/search',
     r'^api-token-auth-create/',
     r'^import-questionnaire',
+    r'^delete-questionnaire',
 )
 
 #Set session idle timeout (seconds)

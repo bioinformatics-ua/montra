@@ -17,35 +17,43 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
-
+from django.http import HttpResponse, HttpResponseRedirect
 
 from questionnaire.models import *
 from django.shortcuts import render_to_response, get_object_or_404
 import sys
 
 # Uncomment this and add your list of ids to remove (of Questionnaire model)
-to_delete = [1]
-
-for rem in to_delete:
-	qu = get_object_or_404(Questionnaire, id=rem)
 
 
+def delete(request, qId):
+    to_delete = [qId]
+    print "Questionnaire ID: " + str(qId)
+    try:
+        for rem in to_delete:
+            qu = get_object_or_404(Questionnaire, id=rem)
 
-	qsets = qu.questionsets()
+            qsets = qu.questionsets()
 
-	for qs in qsets:
-		print "iterate questions"
-		expected = qs.questions()
-		
-		for q in expected:
-			print "iterate choices"
-			print q.choices
-			try:
-				for c in q.choices:
-					c.delete()
-			except:
-				pass
-			q.delete()
-		qs.delete()
+            for qs in qsets:
+                print "iterate questions"
+                expected = qs.questions()
 
-	qu.delete()
+                for q in expected:
+                    print "iterate choices"
+                    print q.choices
+                    try:
+                        for c in q.choices:
+                            c.delete()
+                    except:
+                        pass
+                    q.delete()
+                qs.delete()
+
+            qu.delete()
+        print str('Questionnaire %s deleted!' % str(qId))
+        # return HttpResponseRedirect("/databases")
+        return HttpResponse(content=str('Questionnaire %s deleted!' % str(qId)))
+    except:
+        raise
+
