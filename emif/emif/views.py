@@ -2066,6 +2066,11 @@ class QuestionNumber:
         return self._nQuestion
 
 
+def writeLog(log):
+    with open("log_%s.txt" % datetime.datetime.now().strftime("%Y%m%d-%H%M%S"), "w") as f:
+        f.write(log)
+        f.close()
+
 def import_questionnaire(request, template_name='import_questionnaire.html'):
     """
     To-Do
@@ -2075,18 +2080,19 @@ def import_questionnaire(request, template_name='import_questionnaire.html'):
 
     from openpyxl import load_workbook
     from django.template.defaultfilters import slugify
-    wb = load_workbook(filename = r'/Volumes/EXT1/Dropbox/MAPi-Dropbox/EMIF/Code/emif/emif/questionnaire_ad_v2.xlsx')
+    # wb = load_workbook(filename = r'/Volumes/EXT1/Dropbox/MAPi-Dropbox/EMIF/Code/emif/emif/questionnaire_ad_v2.xlsx')
     # wb = load_workbook(filename = r'/Volumes/EXT1/Dropbox/MAPi-Dropbox/EMIF/Observational_Data_Sources_Template_v5.xlsx')
+    wb = load_workbook(filename = r'C:/Questionnaire_template_v3.xlsx')
     ws = wb.get_active_sheet()
     log = ''
 
-    # get questionnaire type in cell A1
-    name = ws.cell('A1').value
-    slug = slugify(ws.cell('A1').value)
+    # Cell B1: Name of questionnaire
+    name = ws.cell('B1').value
+    slugQ = slugify(ws.cell('B1').value)
     disable = False
 
     def format_number(number):
-        print number
+        # print number
         number_arr = number.split(".")
         
         result = number_arr[0] + "."
@@ -2100,126 +2106,160 @@ def import_questionnaire(request, template_name='import_questionnaire.html'):
                 result += str(val) + "."
             else:
                 result += str(val)
-        print "result " + result
+        # print "result " + result
         return result
 
-
-    questionnaire = Questionnaire(name=name, disable=disable, slug=slug, redirect_url='/')
+    questionnaire = Questionnaire(name=name, disable=disable, slug=slugQ, redirect_url='/')
     log += '\nQuestionnaire created %s ' % questionnaire
     try:
         questionnaire.save()
         log += '\nQuestionnaire saved %s ' % questionnaire
-        # print questionnaire.name
-        question_set = re.compile('(QS\d)')
+
+        #############################
+        # TIPS:
+        # Type of Row: QuestionSet, Category, Question
+        # Columns: Type, Text/Question, Level/Number, Data type, Value list, Help text/Description, Tooltip, Slug, Stats
+        #############################
 
         for row in ws.rows[2:]:
-
-            # print row[0].row,
             if len(row) > 0:
-                heading = row[0]
-                tabulation = row[1]
-                text = row[2]
-                # If is question_set
-                if question_set.match(str(heading.value)):
-                    text_question_set = row[1]
-                    sortid = str(heading.value)
-                    questionNumber = sortid[2:]
+                type_Column = row[0]
+                text_question_Column = row[1]
+                level_number_column = row[2]
 
+                # Type = QUESTIONSET
+                # Columns required:  Type, Text/Question
+                # Columns optional:  Help text/Description, Tooltip
+                if str(type_Column.value) == "QuestionSet":
+                    sortid = str(level_number_column.value)
                     try:
-                        qNumber.getNumber('h0', questionNumber)
+                        qNumber.getNumber('h0', sortid)
                     except:
+                        writeLog(log)
                         raise
+                    text_en = 'h1. %s' % text_question_Column.value
+                    slug_qs = str(slugQ) + "_" + convert_text_to_slug(str(text_question_Column.value))
+                    if row[5]:
+                        helpText = row[5].value
+                    else:
+                        helpText = ""
+                    tooltip = False
+                    if row[6]:
+                        if str(row[6].value).lower() == 'yes':
+                            tooltip = True
 
-                    text_en = 'h1. %s' % text_question_set.value
-                    slug_qs = slug + "_" + convert_text_to_slug(str(text_question_set.value))
-                    questionset = QuestionSet(questionnaire=questionnaire, checks='required', sortid=sortid[2:], text_en=text_en, heading=slug_qs)
-                    log += '\n%s - QuestionSet created %s - %s ' % (heading.row, sortid[2:], text_en)
+                    questionset = QuestionSet(questionnaire=questionnaire, checks='required', sortid=sortid, text_en=text_en, heading=slug_qs, help_text=helpText, tooltip=tooltip)
+                    log += '\n%s - QuestionSet created %s - %s ' % (type_Column.row, sortid, text_en)
                     try:
                         questionset.save()
-                        log += '\n%s - QuestionSet saved %s - %s ' % (heading.row, sortid[2:], text_en)
+                        log += '\n%s - QuestionSet saved %s - %s ' % (type_Column.row, sortid, text_en)
                     except:
 
-                        log += "\n%s - Error to save questionset %s - %s" % (heading.row, sortid[2:], text_en)
+                        log += "\n%s - Error to save questionset %s - %s" % (type_Column.row, sortid, text_en)
+                        writeLog(log)
                         raise
-                elif str(heading.value).lower() == "description":
+
+                # Type = CATEGORY
+                # Columns required:  Type, Text/Question, Level/Number, Category
+                # Columns optional:  Help text/Description, Slug, Tooltip
+                elif str(type_Column.value) == "Category":
                     try:
-                        slug_q = convert_text_to_slug(str(text.value[:50]))
-                        text_en = str(tabulation.value) + '. ' + str(text.value)
-
+                        text_en = str(level_number_column.value) + '. ' + str(text_question_Column.value)
+                        if row[7]:
+                            slug = row[7].value
+                        else:
+                            slug = str(text_question_Column.value[:50])
+                        slug_q = convert_text_to_slug(str(slug))
+                        if row[5]:
+                            helpText = row[5].value
+                        else:
+                            helpText = ""
+                        print "HELP_TEXT1: " + str(helpText)
+                        tooltip = False
+                        if row[6]:
+                            if str(row[6].value).lower() == 'yes':
+                                tooltip = True
                         try:
-
-                            questionNumber = qNumber.getNumber(tabulation.value)
+                            questionNumber = qNumber.getNumber(level_number_column.value)
                             questionNumber = format_number(str(questionNumber))
                         except:
-                            log += "\n%s - Error to create question number %s" % (heading.row, text_en)
+                            log += "\n%s - Error to create Category number %s" % (type_Column.row, text_en)
+                            writeLog(log)
+                            raise
+                        question = Question(questionset=questionset, text_en=text_en, number=str(questionNumber), type='comment', help_text=helpText, slug=slug_q, stats=False, category=True, tooltip=tooltip)
+                        log += '\n%s - Category created %s ' % (type_Column.row, question)
+                        question.save()
+                        log += '\n%s - Category saved %s ' % (type_Column.row, question)
+                    except:
+                        log += "\n%s - Error to save Category %s" % (type_Column.row, text_en)
+                        writeLog(log)
+                        raise
+
+                # Type = QUESTION
+                # Columns required:  Type, Text/Question, Level/Number, Data Type, Category, Stats
+                # Columns optional:  Value List, Help text/Description, Tooltip
+                else:
+                    text_en = str(level_number_column.value) + '. ' + str(text_question_Column.value)
+                    try:
+                        dataType_column = row[3]
+                        if row[7]:
+                            slug = row[7].value
+                        else:
+                            slug = convert_text_to_slug(str(text_question_Column.value))
+                        slug_q = convert_text_to_slug(str(slug))
+                        if row[5]:
+                            helpText = row[5].value
+                        else:
+                            helpText = ''
+                        print "HELP_TEXT2: " + str(helpText)
+                        tooltip = False
+                        if row[6]:
+                            if str(row[6].value).lower() == 'yes':
+                                tooltip = True
+                        try:
+                            questionNumber = qNumber.getNumber(level_number_column.value)
+                            questionNumber = format_number(str(questionNumber))
+                        except:
+                            log += "\n%s - Error to create question number %s" % (type_Column.row, text_en)
+                            writeLog(log)
                             raise
 
-                        question = Question(questionset=questionset, text_en=text_en, number=str(questionNumber), type='comment', help_text='', slug=slug_q, stats=False)
-                        log += '\n%s - Description created %s ' % (heading.row, question)
+                        question = Question(questionset=questionset, text_en=text_en, number=str(questionNumber), type=dataType_column.value, help_text=helpText, slug=slug_q, stats=True, category=False, tooltip=tooltip)
+                        log += '\n%s - Question created %s ' % (type_Column.row, question)
                         question.save()
-                        log += '\n%s - Description saved %s ' % (heading.row, question)
-                    except:
-                        log += "\n%s - Error to save question %s" % (heading.row, text_en)
-                        raise
-                else:
-                    try:
-                        type = row[3]
-                        if type.value != 'System generated value':
-                            if row[5]:
-                                help_text = row[5]
-                            else:
-                                help_text = ''
-                            if row[6]:
-                                checks = row[6]
-                            else:
-                                checks = ''
-                            slug_q = convert_text_to_slug(str(text.value))
-                            help_text = help_text.value
-                            text_en = str(tabulation.value) + '. ' + str(text.value)
-
-                            try:
-                                questionNumber = qNumber.getNumber(tabulation.value)
-                                questionNumber = format_number(str(questionNumber))
-                            except:
-                                log += "\n%s - Error to create question number %s" % (heading.row, text_en)
-                                raise
-
-                            if help_text is None:
-                                help_text = ""
-                            question = Question(questionset=questionset, text_en=text_en, number=str(questionNumber), type=type.value, help_text=help_text, slug=slug_q, stats=True, checks=checks.value)
-                            log += '\n%s - Question created %s ' % (heading.row, question)
-                            question.save()
-                            log += '\n%s - Question saved %s ' % (heading.row, question)
-                            if type.value in ['choice', 'choice-freeform', 'choice-multiple', 'choice-multiple-freeform']:
-                                # Parse of values list
-                                values_list = row[4]
-                                list = values_list.value.split('\n')
-                                i = 1
-                                for ch in list:
-                                    try:
-                                        choice = Choice(question=question, sortid=i, text_en=ch, value=ch)
-                                        log += '\n%s - Choice created %s ' % (heading.row, ch)
-                                        choice.save()
-                                        log += '\n%s - Choice saved %s ' % (heading.row, ch)
-                                        i += 1
-                                    except:
-                                        log += "\n%s - Error to save Choice %s" % (heading.row, ch)
-                                        raise
+                        log += '\n%s - Question saved %s ' % (type_Column.row, question)
+                        if dataType_column.value in ['choice', 'choice-freeform', 'choice-multiple', 'choice-multiple-freeform']:
+                            # Parse of values list
+                            values_list = row[4]
+                            list = values_list.value.split('|')
+                            i = 1
+                            for ch in list:
+                                try:
+                                    choice = Choice(question=question, sortid=i, text_en=ch, value=ch)
+                                    log += '\n%s - Choice created %s ' % (type_Column.row, choice)
+                                    choice.save()
+                                    log += '\n%s - Choice saved %s ' % (type_Column.row, choice)
+                                    i += 1
+                                except:
+                                    log += "\n%s - Error to save Choice %s" % (type_Column.row, choice)
+                                    writeLog(log)
+                                    raise
 
                     except:
-                        log += "\n%s - Error to save question %s" % (heading.row, text_en)
+                        log += "\n%s - Error to save question %s" % (type_Column.row, text_en)
+                        writeLog(log)
                         raise
 
     except:
         log += '\nError to save questionsets and questions of the questionnaire %s ' % questionnaire
+        writeLog(log)
         raise
 
-    with open("log_%s.txt" % datetime.datetime.now().strftime("%Y%m%d-%H%M%S"), "w") as f:
-        f.write(log)
+    log += '\nQuestionnaire %s, questionsets, questions and choices created with success!! ' % questionnaire
+    writeLog(log)
     # print log
 
     return render_to_response(template_name, {'import_questionnaire': True,
                               'request': request, 'breadcrumb': True}, RequestContext(request))
-
 
 

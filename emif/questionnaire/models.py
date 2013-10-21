@@ -101,7 +101,8 @@ class QuestionSet(models.Model):
     checks = models.CharField(max_length=128, blank=True,
         help_text = """Current options are 'femaleonly' or 'maleonly' and shownif="QuestionNumber,Answer" which takes the same format as <tt>requiredif</tt> for questions.""")
     text = models.TextField(help_text="This is interpreted as Textile: <a href='http://hobix.com/textile/quick.html'>http://hobix.com/textile/quick.html</a>")
-    
+    help_text = models.CharField(max_length=2255, blank=True, null=True)
+    tooltip = models.BooleanField(default=False, help_text="If help text appears in a tooltip")
 
     def questions(self):
         if not hasattr(self, "__qcache"):
@@ -273,8 +274,10 @@ class Question(models.Model):
         'eg. <tt>requiredif="Q1,A or Q2,B"</tt>')
     footer = models.TextField(u"Footer", help_text="Footer rendered below the question interpreted as textile", blank=True)
     slug = models.CharField(max_length=128)
-    help_text = models.CharField(max_length=2255, blank=True)
+    help_text = models.CharField(max_length=2255, blank=True, null=True)
     stats = models.BooleanField(default=False)
+    category = models.BooleanField(default=False)
+    tooltip = models.BooleanField(default=False, help_text="If help text appears in a tooltip")
 
     def questionnaire(self):
         return self.questionset.questionnaire
