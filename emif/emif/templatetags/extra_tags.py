@@ -45,6 +45,12 @@ def removehs(value):
 
     return value
 
+@register.filter(name='geths')
+@stringfilter
+def geths(value):
+    value = value[0:2]
+    return value
+
 
 @register.filter(name='removespaces')
 @stringfilter

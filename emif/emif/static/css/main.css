@@ -29,8 +29,8 @@
 }
 
 .question-text {
-    font-size: 1.3em;
-    line-height: 1.3em;
+    font-size: 1.2em;
+    line-height: 1.1em;
 }
 
 div.input {
@@ -164,4 +164,42 @@ div .tooltip {
   border-radius: 8px;
   /*pointer-events: none;        */
 
+}
+
+.qnumber_h1 {
+    font-size: 14px;
+    /*margin-left: 0px;*/
+
+
+}
+
+.qnumber_h2 {
+    font-size: 14px;
+    /*margin-left: 20px;*/
+}
+
+.qnumber_h3 {
+    font-size: 14px;
+    /*margin-left: 40px;*/
+}
+
+.qnumber_h4 {
+    font-size: 13px;
+    /*margin-left: 60px;*/
+}
+
+.qtext_h1 {
+    margin-left: 0px;
+}
+
+.qtext_h2 {
+    margin-left: 20px;
+}
+
+.qtext_h3 {
+    margin-left: 40px;
+}
+
+.qtext_h4 {
+    margin-left: 60px;
 }
