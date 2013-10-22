@@ -277,6 +277,17 @@ class StatsView(APIView):
         return results
 
 
+
+
+class PublicationsView(APIView):
+    """
+    Class that returns the information of a publication 
+    """
+
+    def get(self, request, *args, **kw):
+        pass
+
+
 def validate_fingerprint(user, fingerprintID):
     """
     Verify if fingerprint belongs to given user
