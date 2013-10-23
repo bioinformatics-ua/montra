@@ -2088,7 +2088,7 @@ def import_questionnaire(request, template_name='import_questionnaire.html'):
 
     # Cell B1: Name of questionnaire
     name = ws.cell('B1').value
-    slugQ = slugify(ws.cell('B1').value)
+    slugQ = convert_text_to_slug(ws.cell('B1').value)
     disable = False
 
     def format_number(number):
