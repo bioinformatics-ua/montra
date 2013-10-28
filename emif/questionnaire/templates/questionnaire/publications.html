@@ -37,9 +37,11 @@
         <input class="" type="text" id="question_{{ question.number }}_publink" />
     </div>
     <div class="control-group span12">
-    <button id="addpub" type="button" class="btn btn-primary"><i class="icon-large icon-plus-sign"></i>Add</button>
-    <button id="removepub" type="button" class="btn btn-primary"><i class="icon-large icon-minus-sign"></i>Remove</button>
+    <button id="addpub" type="button" class="btn btn-primary"><i class="icon-large icon-plus-sign"></i>Add Publication</button>
+    
     </div>
+
+    <input type="hidden" name="question_{{ question.number }}" value="">
     <table id="question_{{ question.number }}_table" class="table table-hover">
         <thead>
             <tr>
@@ -79,6 +81,7 @@ function PublicationWidget ()
         $('#question_{{ question.number }}_pubpages').val(""); 
         $('#question_{{ question.number }}_pubauthors').val(""); 
         $('#question_{{ question.number }}_publink').val(""); 
+    
     }
 
     this.updateInformationFromPubMed = function()
@@ -143,14 +146,12 @@ function PublicationWidget ()
         $('#question_{{ question.number }}_table > tbody:last').append('<tr><td><a class="deleteLink" href="#" ><img src="static/img/glyphicons_192_circle_remove.png"/></a></td><td>'+_pubmedid+'</td><td>'+_pubtitle+'</td><td>'+_pubjournal+'</td><td>'+_pubyear+'</td><td>'+_pubvolume+'</td><td>'+_pubpages+'</td><td>'+_pubauthors+'</td><td>'+_publink+'</td></tr>');
 
         $(".deleteLink").click(function(e) {
-                
-
                 e.preventDefault();
                 $(this).closest('tr').remove()
-
+                console.log(pw.stringfy());
                 return false;
-
         });
+        pw.stringfy();
     };
 
     this.removeSelectedPublication = function() 
@@ -160,11 +161,19 @@ function PublicationWidget ()
 
     this.saveInformation = function()
     {
-
+        _value = pw.stringfy();
+        $("question_{{ question.number }}").val(JSON.stringify(_value));
     };
 
     this.loadInformation = function()
     {
+        var _aux = $("question_{{ question.number }}").val();
+
+        $('#question_{{ question.number }}_table > tbody:last').append('<tr><td><a class="deleteLink" href="#" ><img src="static/img/glyphicons_192_circle_remove.png"/></a></td><td>'+_pubmedid+'</td><td>'+_pubtitle+'</td><td>'+_pubjournal+'</td><td>'+_pubyear+'</td><td>'+_pubvolume+'</td><td>'+_pubpages+'</td><td>'+_pubauthors+'</td><td>'+_publink+'</td></tr>');
+
+
+
+
 
     };
 
@@ -190,11 +199,56 @@ function PublicationWidget ()
 
     };
 
-
     this.stringfy = function()
     {
-
+        var result = [];
+        $('#question_{{ question.number }}_table > tbody  > tr').each(function()
+         {
+            
+            var _aux = $(this).html();
+            _aux = _aux.replace('<td>', '');
+            _aux2 = _aux.split("</td>");
+            _pub = {}
+            for (var i = 1 ; i<_aux2.length; i++)
+            {
+                _aux2[i] = _aux2[i].replace('<td>', '');
+                if (i==1)
+                {
+                    _pub['pmid'] = _aux2[i];
+                }
+                else if (i==2)
+                {
+                    _pub['title'] = _aux2[i];    
+                }
+                else if (i==3)
+                {
+                    _pub['journal'] = _aux2[i];    
+                }
+                else if (i==4)
+                {
+                    _pub['year'] = _aux2[i];    
+                }
+                else if (i==5)
+                {
+                    _pub['pages'] = _aux2[i];    
+                }
+                else if (i==6)
+                {
+                    _pub['volume'] = _aux2[i];    
+                }
+                else if (i==7)
+                {
+                    _pub['authors'] = _aux2[i];    
+                }
+                else if (i==8)
+                {
+                    _pub['link'] = _aux2[i];    
+                }
+            }
+            result.push(_pub); 
+        });
         
+        return result;
     }
 
 }
