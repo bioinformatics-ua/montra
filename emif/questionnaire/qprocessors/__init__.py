@@ -7,3 +7,4 @@ import choice       # multiple choice, do checks
 import range        # range of numbers
 import timeperiod   # time periods
 import custom       # backwards compatibility support
+import publications
