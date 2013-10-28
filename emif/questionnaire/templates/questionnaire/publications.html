@@ -36,10 +36,10 @@
         <label class="control-label span2">Link (URL):</label>
         <input class="" type="text" id="question_{{ question.number }}_publink" />
     </div>
-    
+    <div class="control-group span12">
     <button id="addpub" type="button" class="btn btn-primary"><i class="icon-large icon-plus-sign"></i>Add</button>
     <button id="removepub" type="button" class="btn btn-primary"><i class="icon-large icon-minus-sign"></i>Remove</button>
-
+    </div>
     <table id="question_{{ question.number }}_table" class="table table-hover">
         <thead>
             <tr>
@@ -110,7 +110,6 @@ function PublicationWidget ()
             
             pw.updateInformationFromPubMed();
         });
-        
 
         $( "#removepub" ).bind( "click", function() {
             pw.removeSelectedPublication();
@@ -126,13 +125,7 @@ function PublicationWidget ()
             pw.updateInformationFromPubMed();
         });
 
-           $(".deleteLink").click(function(e) {
-                console.log("click");
-                e.preventDefault();
-                
-                return false;
-
-        });
+           
 
     };
 
@@ -147,7 +140,17 @@ function PublicationWidget ()
         var _pubauthors = $('#question_{{ question.number }}_pubauthors').val();  
         var _publink = $('#question_{{ question.number }}_publink').val();  
 
-        $('#question_{{ question.number }}_table > tbody:last').append('<tr><td><a class="deleteLink" href="#" >delete</a></td><td>'+_pubmedid+'</td><td>'+_pubtitle+'</td><td>'+_pubjournal+'</td><td>'+_pubyear+'</td><td>'+_pubvolume+'</td><td>'+_pubpages+'</td><td>'+_pubauthors+'</td><td>'+_publink+'</td></tr>');
+        $('#question_{{ question.number }}_table > tbody:last').append('<tr><td><a class="deleteLink" href="#" ><img src="static/img/glyphicons_192_circle_remove.png"/></a></td><td>'+_pubmedid+'</td><td>'+_pubtitle+'</td><td>'+_pubjournal+'</td><td>'+_pubyear+'</td><td>'+_pubvolume+'</td><td>'+_pubpages+'</td><td>'+_pubauthors+'</td><td>'+_publink+'</td></tr>');
+
+        $(".deleteLink").click(function(e) {
+                
+
+                e.preventDefault();
+                $(this).closest('tr').remove()
+
+                return false;
+
+        });
     };
 
     this.removeSelectedPublication = function() 
@@ -186,6 +189,14 @@ function PublicationWidget ()
         return result;
 
     };
+
+
+    this.stringfy = function()
+    {
+
+        
+    }
+
 }
 
 pw = new PublicationWidget();
