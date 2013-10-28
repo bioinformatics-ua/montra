@@ -1445,13 +1445,18 @@ def check_database_add_conditions(request, questionnaire_id, sortid,
 
 
     #question_set = int(question_set) + 1
-    next_qs = next_questionset_order_by_sortid(question_set, questionnaire_id)
-    if next_qs == None:
-        # Redirect + handle that!!!
-        pass
-    else:
-        sortid = next_qs.sortid
-    question_set = str(next_qs.pk)
+
+    # Commented to stay in the current questionset after save the questionnaire
+    ##########################
+    # next_qs = next_questionset_order_by_sortid(question_set, questionnaire_id)
+    # if next_qs == None:
+    #     # Redirect + handle that!!!
+    #     pass
+    # else:
+    #     sortid = next_qs.sortid
+    # question_set = str(next_qs.pk)
+    ##########################
+
     # print question_set
     # print sortid
     return show_fingerprint_page_errors(request, questionnaire_id, question_set,

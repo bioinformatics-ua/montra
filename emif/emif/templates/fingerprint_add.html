@@ -5,13 +5,14 @@
 
 <div class="span8">
     <form name="qform" id="qform" action="addPost/{{questionset.questionnaire.pk}}/1" method="POST" enctype="multipart/form-data">
+        <input type="hidden" name="active_qs" id="active_qs" value="0">
+        <input type="hidden" name="active_qs_sortid" id="active_qs_sortid" value="0">
+        <input type="hidden" name="fingerprint_id" value="{{ fingerprint_id }}">
     {% for k, qlist in questions_list %}
 
     <div id="qs_{{ k.sortid }}" class="{% if k.sortid == questionset.sortid %} {% else %} hide {% endif %} questionset">
     {% if k.sortid == questionset.sortid %}
-        <input type="hidden" name="active_qs" value="{{ k.pk }}">
-        <input type="hidden" name="active_qs_sortid" value="{{ k.sortid }}">
-        <input type="hidden" name="fingerprint_id" value="{{ fingerprint_id }}">
+
     {% endif %}
     <div class="questionset-title" style="font-size:6px">
     <h3>{{ k.text|removeh1 }}</h3>
@@ -76,26 +77,43 @@
 
         {% endfor %}
 
-        {% if k.sortid != 99 and k.sortid != 0%}
-            <span>* Required</span>
-        {% endif  %}
+        <!--{% if k.sortid != 99 and k.sortid != 0%}-->
+            <!--<span>* Required</span>-->
+        <!--{% endif  %}-->
 
-            <div style="text-align: center;" class="well questionset-submit">
-                <input class="btn large primary" name="submit" type="submit"
-                {% if k.sortid == 99 %} 
-                onclick="javascript:window.location.href='databases';return false;" value="{% trans "Show databases" %}"
-                {% else %}
-                 value="{% trans "Continue" %}"
+        <div class="well questionset-submit">
+            <!-- Previous | Next buttons -->
+            <div class="span5 text-center">
+            <!-- If Questionset is not the first (Introduction) or the final (Thank you) -->
+
+                {% if k.prev %}
+                    <a href="add/{{ questionset.questionnaire.pk }}/{{ k.prev.sortid }}" class="btn large primary" onclick="questionsets_handle(qs_{{ k.prev.sortid }});  return false;">{% trans "Previous" %}</a>
                 {% endif %}
-                >
-                  
-            </div>
-            
-            {% if questionset.prev %}
-                <a class="back-link pull-left" href="javascript:history.back();">{% trans "return to previous page" %}</a>
-            {% endif %}
+                {% if k.prev and k.next %}
 
-    
+                {% endif %}
+                {% if k.next %}
+                    <a href="add/{{ questionset.questionnaire.pk }}/{{ k.next.sortid }}" class="btn large primary" onclick="questionsets_handle(qs_{{ k.next.sortid }});  return false;">{% trans "Next" %}</a>
+                {% endif %}
+
+
+
+
+                <!-- First Questionset - Introduction -->
+
+            </div>
+            <div class="span2 text-right">
+                {% if k.sortid != 0 %}
+                    <input class="btn large btn-primary" name="submit" type="submit" value="{% trans 'Save' %}" />
+                {% endif %}
+                {% if k.sortid == 0 %}
+                {% endif %}
+                    <!-- Last Questionset - Thank You -->
+                {% if k.sortid == 99 %}
+                    <!--<input class="btn large btn-primary" name="submit" type="submit" value="{% trans 'Save' %}" />-->
+                {% endif %}
+            </div>
+        </div>
     </div>
     {% endfor %}
     </form>
@@ -110,6 +128,7 @@
 <script type="text/javascript">
 
     {% block scriptextra %}
+
 function validate(question_number)
 {
     //console.log($('#'+question_number).val());

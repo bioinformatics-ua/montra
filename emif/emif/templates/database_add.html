@@ -138,16 +138,21 @@ function next_questionset(id_questionset)
 function questionsets_handle(id_questionset)
 {
 
+    var idString = id_questionset.id
+    var id = idString.split('_');
+
+    $('#active_qs').val(id_questionset.id);
+    $('#active_qs_sortid').val(id[1]);
+
   $('.questionset').each(function(i, obj) {
-    
+
     if (obj.id==id_questionset.id)
     {
         
        $('#'+obj.id).addClass("show");
        $('#li_'+id_questionset.id).addClass("active");
        $('#'+obj.id).removeClass("hide");
-       $('#active_qs').val(id_questionset.id);
-       $('#active_qs_sortid').val(id_questionset.id);
+
        
     }
     else {
@@ -159,7 +164,7 @@ function questionsets_handle(id_questionset)
   }
 
   );
-
+    document.body.scrollTop = document.documentElement.scrollTop = 0;
 };
 
 
