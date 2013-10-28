@@ -126,7 +126,7 @@ def process_doi(doi):
         print "Skipping " + doi_object.pubmed_url + "..."
         return ''
 
-def main(args):
+def main2(args):
     try:
         # program's main code here
         # You can also enter a PubMed id using the syntax pmid:xxxxxxxx
@@ -153,5 +153,24 @@ def main(args):
     else:
         return 0  # exit errorlessly
 
-if __name__ == '__main__':
-    sys.exit(main(sys.argv))
+def main(args):
+    doi_object = PubMedObject("pmid:"+str(22875554))
+    try:
+        #print "Downloading " + doi_object.pubmed_url + "..."
+        doi_object.download()
+        doi_object.fill_data()
+        print doi_object.authors
+        print doi_object.journal
+        print doi_object.title
+        print doi_object.pages
+        print doi_object.pub_year
+        print doi_object.volume
+
+        #return doi_object.get_formatted()
+    except urllib2.HTTPError:
+        print "Skipping " + doi_object.pubmed_url + "..."
+        return ''
+
+
+#if __name__ == '__main__':
+#    sys.exit(main(sys.argv))
