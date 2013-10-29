@@ -498,6 +498,8 @@ def database_edit(request, fingerprint_id, questionnaire_id, template_name="data
         items = r
         break
     fingerprint_id = r['id']
+
+    users_db = r['user_t']
     try:
         fingerprint_name = r['database_name_t']
     except:
@@ -512,7 +514,7 @@ def database_edit(request, fingerprint_id, questionnaire_id, template_name="data
         pass
 
     if request.POST:
-        return check_database_add_conditions(request, questionnaire_id, sortid, template_name='database_edit.html')
+        return check_database_add_conditions(request, questionnaire_id, sortid, template_name='database_edit.html', users_db=users_db)
         # to confirm that we have the correct answers
 
     expected = []
@@ -1309,7 +1311,7 @@ def handle_uploaded_file(f):
 
 
 def check_database_add_conditions(request, questionnaire_id, sortid,
-                                  template_name='database_add.html'):
+                                  template_name='database_add.html', users_db=None):
     # -------------------------------------
     # --- Process POST with QuestionSet ---
     # -------------------------------------
@@ -1456,11 +1458,11 @@ def check_database_add_conditions(request, questionnaire_id, sortid,
     # print sortid
     return show_fingerprint_page_errors(request, questionnaire_id, question_set,
                                         errors={}, template_name='database_add.html', next=True, sortid=sortid,
-                                        fingerprint_id=fingerprint_id)
+                                        fingerprint_id=fingerprint_id, users_db=users_db)
 
 
 def show_fingerprint_page_errors(request, q_id, qs_id, errors={}, template_name='database_add.html',
-                                 next=False, sortid=0, fingerprint_id=None):
+                                 next=False, sortid=0, fingerprint_id=None, users_db=None):
     """
     Return the QuestionSet template
 
@@ -1552,7 +1554,9 @@ def show_fingerprint_page_errors(request, q_id, qs_id, errors={}, template_name=
         if (fingerprint_id != None):
             # print "Fingerprint: " + fingerprint_id
             # print "QLIST_general: " + str(qlist_general)
-            index_answeres_from_qvalues(qlist_general, question_set.questionnaire, request.user.username,
+            if users_db==None:
+                users_db = request.user.username
+            index_answeres_from_qvalues(qlist_general, question_set.questionnaire, users_db,
                                         fingerprint_id)
 
         r = r2r(template_name, request,
