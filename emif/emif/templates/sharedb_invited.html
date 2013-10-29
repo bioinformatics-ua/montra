@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% load url from future %}
+{% load django_bootstrap_breadcrumbs %}
+
+{% block breadcrumbs %}
+
+        {% breadcrumb "Home" "home" %}
+        {% breadcrumb "Databases" "databases" %}
+        {% breadcrumb "Share Database" "" %}
+
+{% endblock %}
+
+
+
+{% block content%}
+<div style="margin-bottom: 20px;"></div>
+       <div id="contact_wrap">
+
+        <div id="contact" class="clearfix" style="margin-left:20%">
+            <div id="c_form">
+                <br /><br />
+               <h3>Access permited to a new database</h3>
+
+
+<p>You accepted the invitation to management a new database. <a href="databases">You can access them in "Databases".</a></p>
+<p>If you need further assistance, please do not hesitate to contact EMIF Catalogue team.</p>
+<p>
+ <a href="feedback">Feedback are welcome.</a></p>
+
+
+            </div><!-- end c_form -->
+        </div><!-- end contact -->
+
+    </div><!-- end contact_wrap -->
+
+
+{% endblock %}
+
+
