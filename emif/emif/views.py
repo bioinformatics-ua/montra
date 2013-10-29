@@ -1895,6 +1895,130 @@ def create_auth_token(request, templateName='api-key.html'):
                               'request': request, 'breadcrumb': True}, RequestContext(request))
 
 
+def sharedb(request, db_id, template_name="sharedb.html"):
+    if not request.method == 'POST':
+        return HttpResponse('Invalid header found. The request need to be POST')
+
+    # Verify if it is a valid email
+    email = request.POST.get('email', '')
+    if (email == None or email==''):
+        return HttpResponse('Invalid email address.')
+
+    # Verify if it is a valid user name
+    username_to_share = User.objects.get(email__exact=email)
+
+    if (username_to_share==None):
+        return HttpResponse('Invalid username.')
+
+
+    # Verify if it is a valid database 
+    if (db_id == None or db_id==''):
+        return HttpResponse('Invalid email address.')  
+    c = CoreEngine()
+    results = c.search_fingerprint('id:' + db_id)
+    if (len(results)!=1):
+        return HttpResponse('Invalid database identifier.')  
+
+    subject = "EMIF Catalogue: A new database has been shared with you."
+    name = username_to_share.get_full_name()
+    message = request.POST.get('message', '')
+    from_email = request.POST.get('email', '')
+    # import pdb
+    # pdb.set_trace()
+    __objs = SharePending.objects.filter(db_id=db_id, pending=True, user=username_to_share)
+    if (len(__objs)>0):
+        return HttpResponse('Already contains databases')  
+
+    share_pending = SharePending()
+    share_pending.user = username_to_share
+    share_pending.db_id = db_id
+    share_pending.activation_code = generate_hash()
+    share_pending.pending = True
+    share_pending.user_invite = request.user 
+    share_pending.save()
+
+    link_activation = settings.BASE_URL + "share/activation/"+share_pending.activation_code
+
+    emails_to_feedback = []
+    for k, v in settings.ADMINS:
+        emails_to_feedback.append(v)
+
+    try:
+        
+        message = """Dear %s,\n\n
+            \n\n
+            %s has shared a new database with you. 
+            Now you're able to edit and management the database. \n\n
+            To activate the database to your account, please open this link:
+            %s 
+            \n\nSincerely,\nEMIF Catalogue
+        """ % (name,request.user.get_full_name(), link_activation)
+        # Send email to admins
+        #send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, emails_to_feedback)
+        # Send email to user with the copy of feedback message
+        send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [from_email])
+
+    except BadHeaderError:
+        return HttpResponse('Invalid header found.')
+
+
+
+    return render(request, template_name, {'request': request, 'breadcrumb': True})
+
+def sharedb_activation(request, activation_code, template_name="sharedb_invited.html"):
+
+    if (request.user==None):
+        return HttpResponse('You need to be authenticated.')
+    __objs = SharePending.objects.filter(activation_code=activation_code, pending=True, user=request.user)
+    if (len(__objs)==0):
+        return HttpResponse('It is already activated or does the item has been expired.')
+
+    if (len(__objs)>1):
+        return HttpResponse('An error has occured. Contact the EMIF Catalogue Team.')
+    
+    sp = __objs[0]
+    c = CoreEngine()
+    results = c.search_fingerprint('id:' + sp.db_id)
+    for r in results:
+        _aux = r
+        break
+    
+    _aux['user_t'] =  _aux['user_t'] + " \\ " + sp.user.username
+    print _aux['user_t']
+
+    c.update(r)
+    sp.pending = False
+    sp.save()
+
+
+    try:
+        subject = "EMIF Catalogue: Accepted database shared"
+        message = """Dear %s,\n\n
+            \n\n
+            %s has been actived. You can access the new database in "Workspace" -> My Databases".
+            \n\nSincerely,\nEMIF Catalogue
+        """ % (request.user.get_full_name(), _aux['database_name_t'] )
+
+
+        message_to_inviter = """Dear %s,\n\n
+            \n\n
+            %s has accepted to work with you in database %s. 
+            
+            \n\nSincerely,\nEMIF Catalogue
+        """ % (sp.user_invite.get_full_name(), request.user.get_full_name(), _aux['database_name_t'])
+
+        # Send email to admins
+        send_mail(subject, message_to_inviter, settings.DEFAULT_FROM_EMAIL, [sp.user_invite.email])
+        # Send email to user with the copy of feedback message
+        send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [sp.user.email])
+
+    except BadHeaderError:
+        return HttpResponse('Invalid header found.')
+
+
+    return render(request, template_name, {'request': request, 'breadcrumb': True})
+
+
 # Documentation
 def docs_api(request, template_name='docs/api.html'):
     return render(request, template_name, {'request': request, 'breadcrumb': True})
