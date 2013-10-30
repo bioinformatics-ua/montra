@@ -29,6 +29,7 @@ from django.core.mail import send_mail, BadHeaderError
 
 class Slugs(models.Model):
 	slug1 = models.CharField(max_length=1256)
+	# TODO: delete 
 	description = models.TextField()
 	question = models.ForeignKey(Question, help_text = u"The question that this is an answer to")
 
