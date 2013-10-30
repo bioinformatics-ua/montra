@@ -2204,6 +2204,26 @@ def writeLog(log):
         f.write(log)
         f.close()
 
+def get_slug(slug):
+    slugs_objs = Slugs.objects.filter(slug1=slug)
+    slug_aux = None
+    if (len(slugs_objs)>0):
+        slug_aux=slugs_objs[0]
+    else:
+        return slug
+    slug_name_final = ""
+    slug_arr = slug_aux.slug1.split("_")
+    if len(slug_arr)>0:
+        if (slug_arr[len(slug_arr)-1].isdigit()):
+            slug_number = int(slug_arr[len(slug_arr)-1]) + 1 
+            slug_name_final = "".join(slug_arr)
+        else:
+            slug_name_final = slug_aux.slug1 + "_0"
+    else:
+        slug_name_final = slug_aux.slug1 + "_0"
+
+
+
 def import_questionnaire(request, template_name='import_questionnaire.html'):
     """
     To-Do
@@ -2303,6 +2323,9 @@ def import_questionnaire(request, template_name='import_questionnaire.html'):
                             slug = row[7].value
                         else:
                             slug = convert_text_to_slug(str(row[1].value)[:50])
+
+                        slug = get_slug(slug)
+                            
                         if row[5].value:
                             helpText = row[5].value
                         else:
@@ -2339,7 +2362,8 @@ def import_questionnaire(request, template_name='import_questionnaire.html'):
                             slug = row[7].value
                         else:
                             slug = convert_text_to_slug(str(row[1].value)[:50])
-                        print convert_text_to_slug(str(row[1].value)[:50])
+                        slug = get_slug(slug)
+                        
                         if row[5].value:
                             helpText = row[5].value
                         else:
