@@ -1,25 +1,19 @@
 
 {% load extra_tags %}
 {% load markup questionnaire i18n %}
+
+
 <div class="span8">
-    <form name="qform" id="qform" action="dbEdit/{{fingerprint_id}}/{{questionset.questionnaire.pk}}" method="POST" enctype="multipart/form-data">
+    <form name="qform" id="qform" action="dbEdit/{{fingerprint_id}}/{{questionset.questionnaire.pk}}/1" method="POST" enctype="multipart/form-data">
         <input type="hidden" name="active_qs" id="active_qs" value="0">
         <input type="hidden" name="active_qs_sortid" id="active_qs_sortid" value="0">
         <input type="hidden" name="fingerprint_id" value="{{ fingerprint_id }}">
+        <input type="hidden" name="users_db" value="{{ users_db }}">
+
     {% for k, qlist in questions_list %}
 
-<<<<<<< HEAD
     <div id="qs_{{ k.sortid }}" class="{% if k.sortid == questionset.sortid %} {% else %} hide {% endif %} questionset">
     {% if k.sortid == questionset.sortid %}
-=======
-    <div id="qs_{{ k.pk }}" class="{% if k.pk == questionset.pk %} {% else %} hide {% endif %} questionset">
-    {% if k.pk == questionset.pk %}     
-        <input type="hidden" name="active_qs" value="{{ k.pk }}">
-        <input type="hidden" name="active_qs_sortid" value="{{ k.sortid }}">
-        <input type="hidden" name="fingerprint_id" value="{{ fingerprint_id }}"
-        >
-        <input type="hidden" name="users_db" value="{{ users_db }}">
->>>>>>> 1a392384f2cfb91e406ac6bdbf0658b2ab4f5393
 
     {% endif %}
     <div class="questionset-title" style="font-size:6px">
@@ -73,6 +67,7 @@
 
 
             </div> <!-- /question container -->
+
             {% if question.footer %}
                 <div class="question-footer">
                     {{ question.footer|textile }}
@@ -81,46 +76,90 @@
             {% endif %}
         {% endwith %}
 
-        {% endfor %}
-    
-            <div style="text-align: center;" class="well questionset-submit">
-                <input class="btn large primary" name="submit" type="submit" value="Save" 
-                {% if k.sortid == 99 %} 
-                onclick="javascript:window.location.href='databases';return false;"
-                {% endif %}
-                >
-                  
-            </div>
-            
-            {% if questionset.prev %}
-                <a class="back-link pull-left" href="javascript:history.back();">{% trans "return to previous page" %}</a>
-            {% endif %}
 
-    
+        {% endfor %}
+
+
+        <div class="well questionset-submit">
+            <!-- Previous | Next buttons -->
+            <div class="span5 text-center">
+            <!-- If Questionset is not the first (Introduction) or the final (Thank you) -->
+
+                {% if k.prev %}
+                    <a href="add/{{ questionset.questionnaire.pk }}/{{ k.prev.sortid }}" class="btn large primary" onclick="questionsets_handle(qs_{{ k.prev.sortid }});  return false;">{% trans "Previous" %}</a>
+                {% endif %}
+                {% if k.prev and k.next %}
+
+                {% endif %}
+                {% if k.next %}
+                    <a href="add/{{ questionset.questionnaire.pk }}/{{ k.next.sortid }}" class="btn large primary" onclick="questionsets_handle(qs_{{ k.next.sortid }});  return false;">{% trans "Next" %}</a>
+                {% endif %}
+
+
+
+
+                <!-- First Questionset - Introduction -->
+
+            </div>
+            <div class="span2 text-right">
+                {% if k.sortid != 0 %}
+                    <input class="btn large btn-primary" name="submit" type="submit" value="{% trans 'Save' %}" />
+                {% endif %}
+                {% if k.sortid == 0 %}
+                {% endif %}
+                    <!-- Last Questionset - Thank You -->
+                {% if k.sortid == 99 %}
+                    <!--<input class="btn large btn-primary" name="submit" type="submit" value="{% trans 'Save' %}" />-->
+                {% endif %}
+            </div>
+        </div>
     </div>
     {% endfor %}
-
     </form>
+
 </div>
 
-        <script src="static/js/vendor/bootstrap-tooltip.js"></script>
+<!-- Fix later -->
+<script src="static/js/vendor/bootstrap-tooltip.js"></script>
 <script src="static/js/vendor/bootstrap-popover.js"></script>
-        <script src="static/js/fingerprint.js"></script>
+<script src="static/js/fingerprint.js"></script>
 
-<script>
+<script type="text/javascript">
+
     {% block scriptextra %}
+
 function validate(question_number)
 {
+    //console.log($('#'+question_number).val());
+    question_number = question_number + "";
+    question_number = question_number.replace(".","\\.");
+    $.getJSON('api/validate?name='+$('#'+question_number).val(), function(data) {
+      var items = [];
+      console.log(data['contains'])
+      if (data['contains'] == true)
+      {
+        $('#warning_'+question_number).addClass("show");
+        $('#warning_'+question_number).removeClass("hide");
+        $('#success_'+question_number).addClass("hide");
+        $('#success_'+question_number).removeClass("show");
 
-    console.log($('#'+question_number).val());
 
-}
+      } else {
+        $('#warning_'+question_number).addClass("hide");
+        $('#warning_'+question_number).removeClass("show");
+        $('#success_'+question_number).addClass("show");
+        $('#success_'+question_number).removeClass("hide");
+      }
+
+    });
+
+
+
+};
 
     help_text_popover();
 
     {% endblock %}
 </script>
-
-
 
 
