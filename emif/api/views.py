@@ -49,7 +49,7 @@ from api.models import *
 
 
 # Import pubmed object
-from utils.pubmed import PubMedObject
+from emif.utils.pubmed import PubMedObject
 
 class JSONResponse(HttpResponse):
     """
