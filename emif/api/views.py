@@ -48,6 +48,9 @@ from searchengine.search_indexes import CoreEngine
 from api.models import *
 
 
+# Import pubmed object
+from utils.pubmed import PubMedObject
+
 class JSONResponse(HttpResponse):
     """
     An HttpResponse that renders it's content into JSON.
@@ -66,6 +69,7 @@ def api_root(request, format=None):
         'metadata': reverse('metadata', request=request),
         'stats': reverse('stats', request=request),
         'validate': reverse('validate', request=request),
+        'pubmed': reverse('pubmed', request=request),
 
     })
 
@@ -275,6 +279,37 @@ class StatsView(APIView):
         results['charts'] = graphs
 
         return results
+
+
+
+
+class PublicationsView(APIView):
+    """
+    Class that returns the information of a publication 
+    """
+
+    def get(self, request, *args, **kw):
+        pmid = int(request.GET['pmid'])
+        results = dict()
+        doi_object = PubMedObject("pmid:"+str(pmid))
+        try:
+            #print "Downloading " + doi_object.pubmed_url + "..."
+            doi_object.download()
+            doi_object.fill_data()
+            results['authors'] =  doi_object.authors
+            results['title'] =  doi_object.title
+            results['pages'] =  doi_object.pages
+            results['pub_year'] =  doi_object.pub_year
+            results['journal'] =  doi_object.journal
+            results['pubmed_url'] =  doi_object.pubmed_url
+            results['volume'] =  doi_object.volume
+            
+            
+        except urllib2.HTTPError:
+            print "Skipping " + doi_object.pubmed_url + "..."
+
+            
+        return Response(results, status=status.HTTP_200_OK)    
 
 
 def validate_fingerprint(user, fingerprintID):

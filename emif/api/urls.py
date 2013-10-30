@@ -21,7 +21,11 @@
 from django.conf.urls import patterns, url
 from rest_framework.urlpatterns import format_suffix_patterns
 
-from api.views import SearchView, MetaDataView, StatsView, ValidateView
+from api.views import SearchView
+from api.views import MetaDataView
+from api.views import StatsView
+from api.views import ValidateView
+from api.views import PublicationsView
 
 urlpatterns = patterns('api.views',
     url(r'^root/$', 'api_root'),
@@ -29,6 +33,7 @@ urlpatterns = patterns('api.views',
     url(r'^metadata', MetaDataView.as_view(), name='metadata'),
     url(r'^stats$', StatsView.as_view(), name='stats'),
     url(r'^validate$', ValidateView.as_view(), name='validate'),
+    url(r'^pubmed$', PublicationsView.as_view(), name='validate'),
 
 )
 
