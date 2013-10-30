@@ -2222,15 +2222,13 @@ def get_slug(slug):
     else:
         slug_name_final = slug_aux.slug1 + "_0"
 
-
-
 def import_questionnaire(request, template_name='import_questionnaire.html'):
     """
     To-Do
     - validation of template structure and content fields
     """
     qNumber = QuestionNumber()
-
+    slugs = []
     from openpyxl import load_workbook
     from django.template.defaultfilters import slugify
     # wb = load_workbook(filename = r'/Volumes/EXT1/Dropbox/MAPi-Dropbox/EMIF/Code/emif/emif/questionnaire_ad_v2.xlsx')
@@ -2331,10 +2329,10 @@ def import_questionnaire(request, template_name='import_questionnaire.html'):
                         else:
                             helpText = ""
                         # print "HELP_TEXT1: " + str(helpText)
-                        tooltip = False
+                        _tooltip = False
                         if row[6]:
                             if str(row[6].value).lower() == 'yes':
-                                tooltip = True
+                                _tooltip = True
                         try:
                             questionNumber = qNumber.getNumber(level_number_column.value)
                             questionNumber = format_number(str(questionNumber))
@@ -2342,9 +2340,10 @@ def import_questionnaire(request, template_name='import_questionnaire.html'):
                             log += "\n%s - Error to create Category number %s" % (type_Column.row, text_en)
                             writeLog(log)
                             raise
-                        question = Question(questionset=questionset, text_en=text_en, number=str(questionNumber), type='comment', help_text=helpText, slug=slug, stats=False, category=True, tooltip=tooltip)
+                        question = Question(questionset=questionset, text_en=text_en, number=str(questionNumber), type='comment', help_text=helpText, slug=slug, stats=False, category=True, tooltip=_tooltip)
                         log += '\n%s - Category created %s ' % (type_Column.row, question)
                         question.save()
+                        slugs.append((question.slug, question, question.text_en))
                         log += '\n%s - Category saved %s ' % (type_Column.row, question)
                     except:
                         log += "\n%s - Error to save Category %s" % (type_Column.row, text_en)
@@ -2369,10 +2368,10 @@ def import_questionnaire(request, template_name='import_questionnaire.html'):
                         else:
                             helpText = ''
                         # print "HELP_TEXT2: " + str(helpText)
-                        tooltip = False
+                        _tooltip = False
                         if row[6].value:
                             if str(row[6].value).lower() == 'yes':
-                                tooltip = True
+                                _tooltip = True
                         try:
                             questionNumber = qNumber.getNumber(level_number_column.value)
                             questionNumber = format_number(str(questionNumber))
@@ -2381,9 +2380,10 @@ def import_questionnaire(request, template_name='import_questionnaire.html'):
                             writeLog(log)
                             raise
 
-                        question = Question(questionset=questionset, text_en=text_en, number=str(questionNumber), type=dataType_column.value, help_text=helpText, slug=slug, stats=True, category=False, tooltip=tooltip)
+                        question = Question(questionset=questionset, text_en=text_en, number=str(questionNumber), type=dataType_column.value, help_text=helpText, slug=slug, stats=True, category=False, tooltip=_tooltip)
                         log += '\n%s - Question created %s ' % (type_Column.row, question)
                         question.save()
+                        slugs.append((question.slug, question, question.text_en))
                         log += '\n%s - Question saved %s ' % (type_Column.row, question)
                         if dataType_column.value in ['choice', 'choice-freeform', 'choice-multiple', 'choice-multiple-freeform']:
                             # Parse of values list
@@ -2416,6 +2416,15 @@ def import_questionnaire(request, template_name='import_questionnaire.html'):
     log += '\nQuestionnaire %s, questionsets, questions and choices created with success!! ' % questionnaire
     writeLog(log)
     # print log
+
+    for a in slugs:
+        (_slug, _desc, question) = a
+        # Write Slug 
+        slugsAux = Slugs()
+        slugsAux.slug1 = _slug
+        slugsAux.description = _desc
+        slugsAux.question = question
+        slugsAux.save()
 
     return render_to_response(template_name, {'import_questionnaire': True,
                               'request': request, 'breadcrumb': True}, RequestContext(request))
