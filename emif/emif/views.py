@@ -2215,7 +2215,8 @@ def import_questionnaire(request, template_name='import_questionnaire.html'):
     from django.template.defaultfilters import slugify
     # wb = load_workbook(filename = r'/Volumes/EXT1/Dropbox/MAPi-Dropbox/EMIF/Code/emif/emif/questionnaire_ad_v2.xlsx')
     # wb = load_workbook(filename = r'/Volumes/EXT1/Dropbox/MAPi-Dropbox/EMIF/Observational_Data_Sources_Template_v5.xlsx')
-    wb = load_workbook(filename = r'C:/Questionnaire_template_v3.xlsx')
+    # wb = load_workbook(filename = r'C:/Questionnaire_template_v3.xlsx')
+    wb = load_workbook(filename =r'/Volumes/EXT1/trash/Questionnaire_template_v3.1.xlsx')
     ws = wb.get_active_sheet()
     log = ''
 
@@ -2364,19 +2365,20 @@ def import_questionnaire(request, template_name='import_questionnaire.html'):
                         if dataType_column.value in ['choice', 'choice-freeform', 'choice-multiple', 'choice-multiple-freeform']:
                             # Parse of values list
                             values_list = row[4]
-                            list = values_list.value.split('|')
-                            i = 1
-                            for ch in list:
-                                try:
-                                    choice = Choice(question=question, sortid=i, text_en=ch, value=ch)
-                                    log += '\n%s - Choice created %s ' % (type_Column.row, choice)
-                                    choice.save()
-                                    log += '\n%s - Choice saved %s ' % (type_Column.row, choice)
-                                    i += 1
-                                except:
-                                    log += "\n%s - Error to save Choice %s" % (type_Column.row, choice)
-                                    writeLog(log)
-                                    raise
+                            if (values_list!=None and values_list.value!=None):
+                                list_aux = values_list.value.split('|')
+                                i = 1
+                                for ch in list_aux:
+                                    try:
+                                        choice = Choice(question=question, sortid=i, text_en=ch, value=ch)
+                                        log += '\n%s - Choice created %s ' % (type_Column.row, choice)
+                                        choice.save()
+                                        log += '\n%s - Choice saved %s ' % (type_Column.row, choice)
+                                        i += 1
+                                    except:
+                                        log += "\n%s - Error to save Choice %s" % (type_Column.row, choice)
+                                        writeLog(log)
+                                        raise
 
                     except:
                         log += "\n%s - Error to save question %s" % (type_Column.row, text_en)
