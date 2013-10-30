@@ -45,6 +45,16 @@ def removehs(value):
 
     return value
 
+
+
+@register.filter(name='removedots')
+@stringfilter
+def removedots(value):
+    value = value.replace('.','')
+    
+    return value
+
+
 @register.filter(name='geths')
 @stringfilter
 def geths(value):
