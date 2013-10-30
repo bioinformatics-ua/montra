@@ -2299,16 +2299,15 @@ def import_questionnaire(request, template_name='import_questionnaire.html'):
                 elif str(type_Column.value) == "Category":
                     try:
                         text_en = str(level_number_column.value) + '. ' + str(text_question_Column.value)
-                        if row[7]:
+                        if row[7].value:
                             slug = row[7].value
                         else:
-                            slug = str(text_question_Column.value[:50])
-                        slug_q = convert_text_to_slug(str(slug))
-                        if row[5]:
+                            slug = convert_text_to_slug(str(row[1].value)[:50])
+                        if row[5].value:
                             helpText = row[5].value
                         else:
                             helpText = ""
-                        print "HELP_TEXT1: " + str(helpText)
+                        # print "HELP_TEXT1: " + str(helpText)
                         tooltip = False
                         if row[6]:
                             if str(row[6].value).lower() == 'yes':
@@ -2320,7 +2319,7 @@ def import_questionnaire(request, template_name='import_questionnaire.html'):
                             log += "\n%s - Error to create Category number %s" % (type_Column.row, text_en)
                             writeLog(log)
                             raise
-                        question = Question(questionset=questionset, text_en=text_en, number=str(questionNumber), type='comment', help_text=helpText, slug=slug_q, stats=False, category=True, tooltip=tooltip)
+                        question = Question(questionset=questionset, text_en=text_en, number=str(questionNumber), type='comment', help_text=helpText, slug=slug, stats=False, category=True, tooltip=tooltip)
                         log += '\n%s - Category created %s ' % (type_Column.row, question)
                         question.save()
                         log += '\n%s - Category saved %s ' % (type_Column.row, question)
@@ -2336,18 +2335,18 @@ def import_questionnaire(request, template_name='import_questionnaire.html'):
                     text_en = str(level_number_column.value) + '. ' + str(text_question_Column.value)
                     try:
                         dataType_column = row[3]
-                        if row[7]:
+                        if row[7].value:
                             slug = row[7].value
                         else:
-                            slug = convert_text_to_slug(str(text_question_Column.value))
-                        slug_q = convert_text_to_slug(str(slug))
-                        if row[5]:
+                            slug = convert_text_to_slug(str(row[1].value)[:50])
+                        print convert_text_to_slug(str(row[1].value)[:50])
+                        if row[5].value:
                             helpText = row[5].value
                         else:
                             helpText = ''
-                        print "HELP_TEXT2: " + str(helpText)
+                        # print "HELP_TEXT2: " + str(helpText)
                         tooltip = False
-                        if row[6]:
+                        if row[6].value:
                             if str(row[6].value).lower() == 'yes':
                                 tooltip = True
                         try:
@@ -2358,7 +2357,7 @@ def import_questionnaire(request, template_name='import_questionnaire.html'):
                             writeLog(log)
                             raise
 
-                        question = Question(questionset=questionset, text_en=text_en, number=str(questionNumber), type=dataType_column.value, help_text=helpText, slug=slug_q, stats=True, category=False, tooltip=tooltip)
+                        question = Question(questionset=questionset, text_en=text_en, number=str(questionNumber), type=dataType_column.value, help_text=helpText, slug=slug, stats=True, category=False, tooltip=tooltip)
                         log += '\n%s - Question created %s ' % (type_Column.row, question)
                         question.save()
                         log += '\n%s - Question saved %s ' % (type_Column.row, question)
