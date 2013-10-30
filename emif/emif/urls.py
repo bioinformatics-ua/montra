@@ -109,6 +109,9 @@ urlpatterns = patterns('',
 
     url(r'^rm/(?P<id>[^/]+)', 'emif.views.delete_fingerprint'),
 
+    url(r'^share/activation/(?P<activation_code>[^/]+)', 'emif.views.sharedb_activation'),
+    url(r'^share/(?P<db_id>[^/]+)', 'emif.views.sharedb'),
+
     # API
     url(r'^api/', include('api.urls')),
 

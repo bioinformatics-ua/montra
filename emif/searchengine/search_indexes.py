@@ -94,11 +94,7 @@ class CoreEngine:
         """
         # Search  and identify the document id
 
-        # Delete 
-        self.solr.delete(id='doc_1')
-
-        # Index the new document
-        self.index(doc)
+        self.solr.add([doc])
 
 
     def delete(self, id_doc):

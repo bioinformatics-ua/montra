@@ -5,10 +5,20 @@
         <ul class="inputs-list unstyled">
         {% for choice, key, checked in qdict.choices %}
             <li>
+<<<<<<< HEAD
                 <label>
                     <input onClick="valchanged('{{ question.number }}_{{ choice.value }}', this.checked);" type="checkbox" id="{{ key }}" name="{{ key }}" value="{{ choice.value }}" {{ checked }}>
                     <span>{{ choice.text }}</span>
                 </label>
+=======
+                
+                <label>
+                    <input onClick="valchanged('{{ question.number }}_{{ choice.value }}', this.checked);" type="checkbox" id="{{ key }}" name="{{ key }}" value="{{ choice.value }}" {{ checked }}>
+                    <span>{{ choice.text }}</span> 
+                </label>
+                <input type="text" id="{{ question.number }}_{{ choice.value }}_opt" >
+                
+>>>>>>> 1a392384f2cfb91e406ac6bdbf0658b2ab4f5393
             </li>
             
         {% endfor %}

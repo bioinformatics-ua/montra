@@ -8,8 +8,18 @@
         <input type="hidden" name="fingerprint_id" value="{{ fingerprint_id }}">
     {% for k, qlist in questions_list %}
 
+<<<<<<< HEAD
     <div id="qs_{{ k.sortid }}" class="{% if k.sortid == questionset.sortid %} {% else %} hide {% endif %} questionset">
     {% if k.sortid == questionset.sortid %}
+=======
+    <div id="qs_{{ k.pk }}" class="{% if k.pk == questionset.pk %} {% else %} hide {% endif %} questionset">
+    {% if k.pk == questionset.pk %}     
+        <input type="hidden" name="active_qs" value="{{ k.pk }}">
+        <input type="hidden" name="active_qs_sortid" value="{{ k.sortid }}">
+        <input type="hidden" name="fingerprint_id" value="{{ fingerprint_id }}"
+        >
+        <input type="hidden" name="users_db" value="{{ users_db }}">
+>>>>>>> 1a392384f2cfb91e406ac6bdbf0658b2ab4f5393
 
     {% endif %}
     <div class="questionset-title" style="font-size:6px">
@@ -89,6 +99,7 @@
     
     </div>
     {% endfor %}
+
     </form>
 </div>
 

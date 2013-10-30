@@ -36,10 +36,19 @@
         <label class="control-label span2">Link (URL):</label>
         <input class="" type="text" id="question_{{ question.number }}_publink" />
     </div>
+<<<<<<< HEAD
     
     <button id="addpub" type="button" class="btn btn-primary"><i class="icon-large icon-plus-sign"></i>Add</button>
     <button id="removepub" type="button" class="btn btn-primary"><i class="icon-large icon-minus-sign"></i>Remove</button>
 
+=======
+    <div class="control-group span12">
+    <button id="addpub" type="button" class="btn btn-primary"><i class="icon-large icon-plus-sign"></i>Add Publication</button>
+    
+    </div>
+
+    <input type="hidden"  id="question_{{ question.number }}" name="question_{{ question.number }}" value="">
+>>>>>>> 1a392384f2cfb91e406ac6bdbf0658b2ab4f5393
     <table id="question_{{ question.number }}_table" class="table table-hover">
         <thead>
             <tr>
@@ -79,6 +88,10 @@ function PublicationWidget ()
         $('#question_{{ question.number }}_pubpages').val(""); 
         $('#question_{{ question.number }}_pubauthors').val(""); 
         $('#question_{{ question.number }}_publink').val(""); 
+<<<<<<< HEAD
+=======
+    
+>>>>>>> 1a392384f2cfb91e406ac6bdbf0658b2ab4f5393
     }
 
     this.updateInformationFromPubMed = function()
@@ -87,7 +100,11 @@ function PublicationWidget ()
         
         if (_pubmedid==null)
             return;
+<<<<<<< HEAD
         information = pw.getPubmedInformation(_pubmedid);
+=======
+        information = pw{{ question.number }}.getPubmedInformation(_pubmedid);
+>>>>>>> 1a392384f2cfb91e406ac6bdbf0658b2ab4f5393
         if (information==null)
             return;
         $('#question_{{ question.number }}_pubtitle').val(information['title']); 
@@ -104,6 +121,7 @@ function PublicationWidget ()
 
         $("#addpub" ).bind( "click", function() {
             
+<<<<<<< HEAD
             pw.addPublication();
         });
         $("#loadpubbtn" ).bind( "click", function() {
@@ -114,15 +132,31 @@ function PublicationWidget ()
 
         $( "#removepub" ).bind( "click", function() {
             pw.removeSelectedPublication();
+=======
+            pw{{ question.number }}.addPublication();
+        });
+        $("#loadpubbtn" ).bind( "click", function() {
+            
+            pw{{ question.number }}.updateInformationFromPubMed();
+        });
+
+        $( "#removepub" ).bind( "click", function() {
+            pw{{ question.number }}.removeSelectedPublication();
+>>>>>>> 1a392384f2cfb91e406ac6bdbf0658b2ab4f5393
         });
         
         $( "#question_{{ question.number }}_pubmedid").bind( "keypress", function() {
             
+<<<<<<< HEAD
             pw.updateInformationFromPubMed();
+=======
+            pw{{ question.number }}.updateInformationFromPubMed();
+>>>>>>> 1a392384f2cfb91e406ac6bdbf0658b2ab4f5393
         });
 
         $( "#question_{{ question.number }}_pubmedid").bind( "paste", function() {
             
+<<<<<<< HEAD
             pw.updateInformationFromPubMed();
         });
 
@@ -133,6 +167,12 @@ function PublicationWidget ()
                 return false;
 
         });
+=======
+            pw{{ question.number }}.updateInformationFromPubMed();
+        });
+
+           
+>>>>>>> 1a392384f2cfb91e406ac6bdbf0658b2ab4f5393
 
     };
 
@@ -147,7 +187,19 @@ function PublicationWidget ()
         var _pubauthors = $('#question_{{ question.number }}_pubauthors').val();  
         var _publink = $('#question_{{ question.number }}_publink').val();  
 
+<<<<<<< HEAD
         $('#question_{{ question.number }}_table > tbody:last').append('<tr><td><a class="deleteLink" href="#" >delete</a></td><td>'+_pubmedid+'</td><td>'+_pubtitle+'</td><td>'+_pubjournal+'</td><td>'+_pubyear+'</td><td>'+_pubvolume+'</td><td>'+_pubpages+'</td><td>'+_pubauthors+'</td><td>'+_publink+'</td></tr>');
+=======
+        $('#question_{{ question.number }}_table > tbody:last').append('<tr><td><a class="deleteLink" href="#" ><img src="static/img/glyphicons_192_circle_remove.png"/></a></td><td>'+_pubmedid+'</td><td>'+_pubtitle+'</td><td>'+_pubjournal+'</td><td>'+_pubyear+'</td><td>'+_pubvolume+'</td><td>'+_pubpages+'</td><td>'+_pubauthors+'</td><td>'+_publink+'</td></tr>');
+
+        $(".deleteLink").click(function(e) {
+                e.preventDefault();
+                $(this).closest('tr').remove()
+                console.log(pw{{ question.number }}.stringfy());
+                return false;
+        });
+        pw{{ question.number }}.saveInformation();
+>>>>>>> 1a392384f2cfb91e406ac6bdbf0658b2ab4f5393
     };
 
     this.removeSelectedPublication = function() 
@@ -157,12 +209,43 @@ function PublicationWidget ()
 
     this.saveInformation = function()
     {
+<<<<<<< HEAD
 
+=======
+        var _value = pw{{ question.number }}.stringfy();
+        $("#question_{{ question.number }}").val(JSON.stringify(_value));
+>>>>>>> 1a392384f2cfb91e406ac6bdbf0658b2ab4f5393
     };
 
     this.loadInformation = function()
     {
+<<<<<<< HEAD
 
+=======
+        var _aux = $("question_{{ question.number }}").val();
+        var _objs = JSON.parse(_aux);
+
+        for (var i = 0 ; i<_objs.length; i++)
+        {
+
+
+            var _pubmedid = _objs['pmid']; 
+            var _pubtitle = _objs['title'];
+            var _pubjournal = _objs['journal'];
+            var _pubyear = _objs['year'];
+            var _pubvolume = _objs['volume'];
+            var _pubpages = _objs['pages'];
+            var _pubauthors = _objs['authors'];
+
+            var _publink = _objs['link'];
+
+            $('#question_{{ question.number }}_table > tbody:last').append('<tr><td><a class="deleteLink" href="#" ><img src="static/img/glyphicons_192_circle_remove.png"/></a></td><td>'+_pubmedid+'</td><td>'+_pubtitle+'</td><td>'+_pubjournal+'</td><td>'+_pubyear+'</td><td>'+_pubvolume+'</td><td>'+_pubpages+'</td><td>'+_pubauthors+'</td><td>'+_publink+'</td></tr>'); 
+
+
+        }
+
+        
+>>>>>>> 1a392384f2cfb91e406ac6bdbf0658b2ab4f5393
     };
 
     this.getPubmedInformation = function(pubmedid) 
@@ -186,9 +269,69 @@ function PublicationWidget ()
         return result;
 
     };
+<<<<<<< HEAD
 }
 
 pw = new PublicationWidget();
 pw.bindElements();
+=======
+
+    this.stringfy = function()
+    {
+        var result = [];
+        $('#question_{{ question.number }}_table > tbody  > tr').each(function()
+         {
+            
+            var _aux = $(this).html();
+            _aux = _aux.replace('<td>', '');
+            _aux2 = _aux.split("</td>");
+            _pub = {}
+            for (var i = 1 ; i<_aux2.length; i++)
+            {
+                _aux2[i] = _aux2[i].replace('<td>', '');
+                if (i==1)
+                {
+                    _pub['pmid'] = _aux2[i];
+                }
+                else if (i==2)
+                {
+                    _pub['title'] = _aux2[i];    
+                }
+                else if (i==3)
+                {
+                    _pub['journal'] = _aux2[i];    
+                }
+                else if (i==4)
+                {
+                    _pub['year'] = _aux2[i];    
+                }
+                else if (i==5)
+                {
+                    _pub['pages'] = _aux2[i];    
+                }
+                else if (i==6)
+                {
+                    _pub['volume'] = _aux2[i];
+                }
+                else if (i==7)
+                {
+                    _pub['authors'] = _aux2[i];    
+                }
+                else if (i==8)
+                {
+                    _pub['link'] = _aux2[i];    
+                }
+            }
+            result.push(_pub); 
+        });
+        
+        return result;
+    }
+
+}
+
+pw{{ question.number }} = new PublicationWidget();
+pw{{ question.number }}.bindElements();
+>>>>>>> 1a392384f2cfb91e406ac6bdbf0658b2ab4f5393
 
 </script>
