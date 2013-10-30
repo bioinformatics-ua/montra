@@ -5,10 +5,13 @@
         <ul class="inputs-list unstyled">
         {% for choice, key, checked in qdict.choices %}
             <li>
+                
                 <label>
                     <input onClick="valchanged('{{ question.number }}_{{ choice.value }}', this.checked);" type="checkbox" id="{{ key }}" name="{{ key }}" value="{{ choice.value }}" {{ checked }}>
-                    <span>{{ choice.text }}</span>
+                    <span>{{ choice.text }}</span> 
                 </label>
+                <input type="text" id="{{ question.number }}_{{ choice.value }}_opt" >
+                
             </li>
             
         {% endfor %}
