@@ -168,10 +168,10 @@ def index_answeres_from_qvalues(qvalues, questionnaire, subject, fingerprint_id)
                     choices = qdict['choices']
                     qv = ""
                     try:
-                        # print(qv)
                         qv = qdict['qvalue']
 
                     except:
+                        # raise
                         pass
 
                     value = qv
@@ -210,33 +210,32 @@ def index_answeres_from_qvalues(qvalues, questionnaire, subject, fingerprint_id)
                 else:
                     print("continue")
 
-                
-                slug = question.slug  
-                
+                # print(value)
+                slug = question.slug
                 slug_aux = ""
                 if len(slug)>2:
                     slug = question.slug
                 else:
                     slug = convert_text_to_slug(question.text)
                 slug_final = slug+"_t"
-
                 #results = Slugs.objects.filter(description=question.text)
                 
                 #if slugs_dict==None or len(results)==0:
                 if question.text not in slugs:
-                    slugs = Slugs()
-                    slugs.slug1 = slug_final
-                    slugs.description = question.text
-                    slugs.question = question
-                    slugs.save()
+                    slugsAux = Slugs()
+                    slugsAux.slug1 = slug_final
+                    slugsAux.description = question.text
+                    slugsAux.question = question
+                    slugsAux.save()
 
                 d[slug_final] = value
                 if value!=None:
                     text += value + " " 
-            except :
+            except:
+                # raise
                 pass
                 
-    #print("Indexing...")
+    # print("Indexing...")
     results = c.search_fingerprint("id:"+fingerprint_id)
     if (len(results)>0):
         c.delete(results.docs[0]['id'])
@@ -248,7 +247,7 @@ def index_answeres_from_qvalues(qvalues, questionnaire, subject, fingerprint_id)
     d['created_t']= now.strftime('%Y-%m-%d %H:%M:%S.%f')
     d['user_t']= subject
     d['text_t']= text
-    #print(d)
+    # print(d)
     c.index_fingerprint_as_json(d)
 
 

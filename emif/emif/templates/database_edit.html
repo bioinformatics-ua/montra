@@ -61,8 +61,8 @@ button {
 
 {% block content %}
 
-<div style="margin-bottom: 60px;"></div>
 
+<div style="margin-bottom: 60px;"></div>
 <hr>
 <div class="row">
 <div class="span3">
@@ -71,15 +71,14 @@ button {
     <ul class="nav nav-list nav-pills nav-stacked ">
       <li class="nav-header">Step-by-Step</li>
       {% for qs in questionset.questionnaire.questionsets %}
-      {% if qs.sortid != 99 %}
 
-      <li{% if questionset.text == qs.text %} class="active" {% endif %} id="li_qs_{{qs.id}}">
+      <li{% if questionset.text == qs.text %} class="active" {% endif %} id="li_qs_{{qs.sortid}}">
         <!--<a href="q2/{{runinfo.random}}/{{ qs.sortid }}">
         -->
-        <a href="add/{{qs.questionnaire.pk}}/{{ qs.pk }}" onclick="questionsets_handle(qs_{{ qs.pk }}); return false;">
+        <a href="add/{{qs.questionnaire.pk}}/{{ qs.sortid }}" onclick="questionsets_handle(qs_{{ qs.sortid }}); return false;">
           <table>
             <tr>
-              <td width="80%">{% if qs.sortid != 0 and qs.sortid != 99 %}{{ qs.sortid }}. {{ qs.text|removeh1 }}</td>
+              <td width="80%">{% if qs.sortid != 0 and qs.sortid != 99 %}{{ qs.sortid }}. {% endif %}{{ qs.text|removeh1 }}</td>
               <td width="10%">
                 <!--<span style="float:right; vertical-align: middle " class="badge badge-warning">2</span>
               -->
@@ -87,7 +86,7 @@ button {
           </tr>
         </table>
       </a>
-      {% endif %}
+
     </li>
     {% endfor %}
   </ul>
@@ -144,6 +143,12 @@ function next_questionset(id_questionset)
 function questionsets_handle(id_questionset)
 {
 
+    var idString = id_questionset.id
+    var id = idString.split('_');
+
+    $('#active_qs').val(id_questionset.id);
+    $('#active_qs_sortid').val(id[1]);
+
   $('.questionset').each(function(i, obj) {
 
     if (obj.id==id_questionset.id)
@@ -152,19 +157,19 @@ function questionsets_handle(id_questionset)
        $('#'+obj.id).addClass("show");
        $('#li_'+id_questionset.id).addClass("active");
        $('#'+obj.id).removeClass("hide");
-    }
 
+
+    }
     else {
       $('#li_'+obj.id).removeClass("active");
       $('#'+obj.id).addClass("hide");
       $('#'+obj.id).removeClass("show");
     }
 
-
   }
 
   );
-
+    document.body.scrollTop = document.documentElement.scrollTop = 0;
 };
 
 
