@@ -3,6 +3,10 @@ from questionnaire import *
 from questionnaire import Processors, QuestionProcessors
 from django.utils.translation import ugettext as _
 
+from questionnaire import *
+from django.utils.translation import ugettext as _
+from django.utils.simplejson import dumps
+
 @question_proc('publication')
 def question_pub(request, question):
     cd = question.getcheckdict()
@@ -19,7 +23,7 @@ def question_pub(request, question):
 
 
 @answer_proc('publication')
-def process_pub(question, answer):
+def process_pub(question, ansdict):
     checkdict = question.getcheckdict()
     required = question.getcheckdict().get('required', 0)
     ans = ansdict['ANSWER'] or ''
