@@ -212,21 +212,21 @@ def index_answeres_from_qvalues(qvalues, questionnaire, subject, fingerprint_id)
 
                 # print(value)
                 slug = question.slug
-                slug_aux = ""
-                if len(slug)>2:
-                    slug = question.slug
-                else:
-                    slug = convert_text_to_slug(question.text)
+                # slug_aux = ""
+                # if len(slug)>2:
+                #     slug = question.slug
+                # else:
+                #     slug = convert_text_to_slug(question.text)
                 slug_final = slug+"_t"
                 #results = Slugs.objects.filter(description=question.text)
                 
                 #if slugs_dict==None or len(results)==0:
-                if question.text not in slugs:
-                    slugsAux = Slugs()
-                    slugsAux.slug1 = slug_final
-                    slugsAux.description = question.text
-                    slugsAux.question = question
-                    slugsAux.save()
+                # if question.text not in slugs:
+                #     slugsAux = Slugs()
+                #     slugsAux.slug1 = slug_final
+                #     slugsAux.description = question.text
+                #     slugsAux.question = question
+                #     slugsAux.save()
 
                 d[slug_final] = value
                 if value!=None:
@@ -268,10 +268,10 @@ def convert_answers_to_solr(runinfo):
         slug = a.question.slug  
         
         slug_aux = ""
-        if len(slug)>2:
-            slug = a.question.slug
-        else:
-            slug = convert_text_to_slug(a.question.text)
+        #if len(slug)>2:
+        slug = a.question.slug
+        #else:
+        #    slug = convert_text_to_slug(a.question.text)
         slug_final = slug+"_t"
 
         results = Slugs.objects.filter(description=a.question.text)
