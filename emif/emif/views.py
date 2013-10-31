@@ -364,7 +364,7 @@ def results_diff(request, page=1, template_name='results_diff.html'):
                 if k in blacklist:
                     continue
                 t = Tag()
-                results = Slugs.objects.filter(slug1=k)
+                results = Slugs.objects.filter(slug1=k[:-2])
                 if len(results) > 0:
                     text = results[0].description
                 else:
@@ -542,7 +542,7 @@ def database_edit(request, fingerprint_id, questionnaire_id, template_name="data
         if item == '_version_':
             continue
         print " VALUE: " + str(value)
-        results = Slugs.objects.filter()
+        results = Slugs.objects.filter(slug1=str(item)[:-2])
         print len(results)
         if results == None or len(results) == 0:
             continue
@@ -875,7 +875,8 @@ def createqsets(runcode, qsets=None):
             if k in blacklist:
                 continue
             t = Tag()
-            aux_results = Slugs.objects.filter(slug1=k)
+            
+            aux_results = Slugs.objects.filter(slug1=k[:-2])
             qs = None
             question_group = None
             if len(aux_results) > 0:
@@ -904,7 +905,8 @@ def createqsets(runcode, qsets=None):
 
             value = clean_value(str(result[k].encode('utf-8')))
             #value = value[:75] + (value[75:] and '..')
-
+            
+        
             t.value = value.replace("#", " ")
             if k == "database_name_t":
                 name = t.value
@@ -2248,8 +2250,8 @@ def import_questionnaire(request, template_name='import_questionnaire.html'):
     from django.template.defaultfilters import slugify
     # wb = load_workbook(filename = r'/Volumes/EXT1/Dropbox/MAPi-Dropbox/EMIF/Code/emif/emif/questionnaire_ad_v2.xlsx')
     # wb = load_workbook(filename = r'/Volumes/EXT1/Dropbox/MAPi-Dropbox/EMIF/Observational_Data_Sources_Template_v5.xlsx')
-    wb = load_workbook(filename = r'C:/Questionnaire_template_v3.2.xlsx')
-    # wb = load_workbook(filename =r'/Volumes/EXT1/trash/Questionnaire_template_v3.2.xlsx')
+    # wb = load_workbook(filename = r'C:/Questionnaire_template_v3.2.xlsx')
+    wb = load_workbook(filename =r'/Volumes/EXT1/trash/Questionnaire_template_v3.2.xlsx')
     ws = wb.get_active_sheet()
     log = ''
 
