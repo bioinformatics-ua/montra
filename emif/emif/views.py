@@ -534,6 +534,7 @@ def database_edit(request, fingerprint_id, questionnaire_id, template_name="data
     # generate the answer_dict for each question, and place in extra
     request2 = RequestMonkeyPatch()
     # print "REQUEST2: " + str(request2)
+    
     for item in items:
         print "ITEM: " + str(item),
         key = item
@@ -545,6 +546,7 @@ def database_edit(request, fingerprint_id, questionnaire_id, template_name="data
         results = Slugs.objects.filter(slug1=str(item)[:-2])
         print len(results)
         if results == None or len(results) == 0:
+            
             continue
         question = results[0].question
 
@@ -602,6 +604,8 @@ def database_edit(request, fingerprint_id, questionnaire_id, template_name="data
                 #print "Question: " + str(question)
                 Type = question.get_type()
                 _qnum, _qalpha = split_numal(question.number)
+                #print question.number
+
 
                 qdict = {
                     'template': 'questionnaire/%s.html' % (Type),
@@ -638,6 +642,9 @@ def database_edit(request, fingerprint_id, questionnaire_id, template_name="data
                         #    qvalues[question.number] = qdict['qvalue']
 
                 qlist.append((question, qdict))
+                #if question.number=="2.01":
+                #    print question
+                #    print qdict
             if qs_aux == None:
                 qs_aux = k
             qlist_general.append((qs_aux, qlist))

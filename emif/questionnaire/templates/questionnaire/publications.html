@@ -42,7 +42,7 @@
     
     </div>
 
-    <input type="hidden"  id="question_{{ question.number }}" name="question_{{ question.number }}" value="">
+    <input type="hidden"  id="question_{{ question.number }}" name="question_{{ question.number }}" value="{{qdict.value}}">
     <table id="question_{{ question.number|removedots }}_table" class="table table-hover">
         <thead>
             <tr>
@@ -167,27 +167,31 @@ function PublicationWidget ()
     this.saveInformation = function()
     {
         var _value = pw{{ question.number|removedots }}.stringfy();
-        $("#question_{{ question.number }}").val(JSON.stringify(_value));
+        //$("#question_{{ question.number }}").val(JSON.stringify(_value));
+        document.getElementById("question_{{ question.number }}").value = JSON.stringify(_value);
     };
 
     this.loadInformation = function()
     {
-        var _aux = $("question_{{ question.number }}").val();
-        var _objs = JSON.parse(_aux);
+        //var _aux = $("question_{{ question.number }}").val();
+        var _aux = document.getElementById("question_{{ question.number }}").value ;
+        if (_aux===undefined)
+            return;
+        var _objs = JSON.parse("["+_aux+"]")
 
         for (var i = 0 ; i<_objs.length; i++)
         {
 
 
-            var _pubmedid = _objs['pmid']; 
-            var _pubtitle = _objs['title'];
-            var _pubjournal = _objs['journal'];
-            var _pubyear = _objs['year'];
-            var _pubvolume = _objs['volume'];
-            var _pubpages = _objs['pages'];
-            var _pubauthors = _objs['authors'];
+            var _pubmedid = _objs[i]['pmid'];    
+            var _pubtitle = _objs[i]['title'];
+            var _pubjournal = _objs[i]['journal'];
+            var _pubyear = _objs[i]['year'];
+            var _pubvolume = _objs[i]['volume'];
+            var _pubpages = _objs[i]['pages'];
+            var _pubauthors = _objs[i]['authors'];
 
-            var _publink = _objs['link'];
+            var _publink = _objs[i]['link'];
 
             $('#question_{{ question.number|removedots }}_table > tbody:last').append('<tr><td><a class="deleteLink" href="#" ><img src="static/img/glyphicons_192_circle_remove.png"/></a></td><td>'+_pubmedid+'</td><td>'+_pubtitle+'</td><td>'+_pubjournal+'</td><td>'+_pubyear+'</td><td>'+_pubvolume+'</td><td>'+_pubpages+'</td><td>'+_pubauthors+'</td><td>'+_publink+'</td></tr>'); 
 
@@ -275,5 +279,6 @@ function PublicationWidget ()
 
 pw{{ question.number|removedots }} = new PublicationWidget();
 pw{{ question.number|removedots }}.bindElements();
+pw{{ question.number|removedots }}.loadInformation();
 
 </script>

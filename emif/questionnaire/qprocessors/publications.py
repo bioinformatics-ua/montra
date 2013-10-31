@@ -10,11 +10,12 @@ from django.utils.simplejson import dumps
 @question_proc('publication')
 def question_pub(request, question):
     cd = question.getcheckdict()
-    print cd
+    
     key = "question_%s" % question.number
     value = question.getcheckdict().get('default','')
     if key in request.POST:
         value = request.POST[key]
+        print "REQUEST" + value
     return {
         'required' : question.getcheckdict().get('required', False),
         'value' : value,
