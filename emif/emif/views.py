@@ -2343,7 +2343,7 @@ def import_questionnaire(request, template_name='import_questionnaire.html'):
                         question = Question(questionset=questionset, text_en=text_en, number=str(questionNumber), type='comment', help_text=helpText, slug=slug, stats=False, category=True, tooltip=_tooltip)
                         log += '\n%s - Category created %s ' % (type_Column.row, question)
                         question.save()
-                        slugs.append((question.slug, question, question.text_en))
+                        slugs.append((question.slug,  question.text_en, question))
                         log += '\n%s - Category saved %s ' % (type_Column.row, question)
                     except:
                         log += "\n%s - Error to save Category %s" % (type_Column.row, text_en)
@@ -2383,7 +2383,7 @@ def import_questionnaire(request, template_name='import_questionnaire.html'):
                         question = Question(questionset=questionset, text_en=text_en, number=str(questionNumber), type=dataType_column.value, help_text=helpText, slug=slug, stats=True, category=False, tooltip=_tooltip)
                         log += '\n%s - Question created %s ' % (type_Column.row, question)
                         question.save()
-                        slugs.append((question.slug, question, question.text_en))
+                        slugs.append((question.slug,  question.text_en, question))
                         log += '\n%s - Question saved %s ' % (type_Column.row, question)
                         if dataType_column.value in ['choice', 'choice-freeform', 'choice-multiple', 'choice-multiple-freeform']:
                             # Parse of values list
@@ -2413,9 +2413,6 @@ def import_questionnaire(request, template_name='import_questionnaire.html'):
         writeLog(log)
         raise
 
-    log += '\nQuestionnaire %s, questionsets, questions and choices created with success!! ' % questionnaire
-    writeLog(log)
-    # print log
 
     for a in slugs:
         (_slug, _desc, question) = a
@@ -2425,6 +2422,11 @@ def import_questionnaire(request, template_name='import_questionnaire.html'):
         slugsAux.description = _desc
         slugsAux.question = question
         slugsAux.save()
+
+    log += '\nQuestionnaire %s, questionsets, questions and choices created with success!! ' % questionnaire
+    writeLog(log)
+    # print log
+
 
     return render_to_response(template_name, {'import_questionnaire': True,
                               'request': request, 'breadcrumb': True}, RequestContext(request))
