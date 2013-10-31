@@ -124,7 +124,10 @@ class CoreEngine:
 
 def convert_text_to_slug(text):
     #TODO: optimize
-    return text.replace(' ', '_').replace('?','').replace('.', '').replace(',','')
+    text_aux = text.replace(' ', '_').replace('?','').replace('.', '').replace(',','')
+    if text_aux[:-1] == '_':
+        text_aux = text_aux[:-1]
+    return text_aux
 
 def clean_answer(answer):
     #TODO: optimize

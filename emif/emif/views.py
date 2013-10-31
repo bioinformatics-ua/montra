@@ -492,6 +492,7 @@ def database_edit(request, fingerprint_id, questionnaire_id, template_name="data
     #return show_full_questionnaire(request, questionnaire_id)
 
     c = CoreEngine()
+
     results = c.search_fingerprint("id:" + fingerprint_id)
     items = None
     for r in results:
@@ -534,13 +535,15 @@ def database_edit(request, fingerprint_id, questionnaire_id, template_name="data
     request2 = RequestMonkeyPatch()
     # print "REQUEST2: " + str(request2)
     for item in items:
-        # print "ITEM: " + str(item),
+        print "ITEM: " + str(item),
         key = item
 
         value = items[key]
-        # print " VALUE: " + str(value)
-        results = Slugs.objects.filter(slug1=key)
-
+        if item == '_version_':
+            continue
+        print " VALUE: " + str(value)
+        results = Slugs.objects.filter()
+        print len(results)
         if results == None or len(results) == 0:
             continue
         question = results[0].question
@@ -559,9 +562,8 @@ def database_edit(request, fingerprint_id, questionnaire_id, template_name="data
 
         extra[question] = ans
 
-    print extra
+    # print extra
     errors = {}
-
     try:
         q_id = questionnaire_id
         qs_id = 1
@@ -2215,12 +2217,25 @@ def get_slug(slug):
     slug_arr = slug_aux.slug1.split("_")
     if len(slug_arr)>0:
         if (slug_arr[len(slug_arr)-1].isdigit()):
-            slug_number = int(slug_arr[len(slug_arr)-1]) + 1 
-            slug_name_final = "".join(slug_arr)
+            slug_number = int(slug_arr[len(slug_arr)-1]) + 1
+            slug_arr[len(slug_arr)-1] = str(slug_number)
+            slug_name_final = "_".join(slug_arr)
+
         else:
             slug_name_final = slug_aux.slug1 + "_0"
     else:
         slug_name_final = slug_aux.slug1 + "_0"
+
+    return slug_name_final
+
+
+def save_slug(slugName, desc, question):
+    slugsAux = Slugs()
+    slugsAux.slug1 = slugName
+    slugsAux.description = desc
+    slugsAux.question = question
+    slugsAux.save()
+
 
 def import_questionnaire(request, template_name='import_questionnaire.html'):
     """
@@ -2233,8 +2248,8 @@ def import_questionnaire(request, template_name='import_questionnaire.html'):
     from django.template.defaultfilters import slugify
     # wb = load_workbook(filename = r'/Volumes/EXT1/Dropbox/MAPi-Dropbox/EMIF/Code/emif/emif/questionnaire_ad_v2.xlsx')
     # wb = load_workbook(filename = r'/Volumes/EXT1/Dropbox/MAPi-Dropbox/EMIF/Observational_Data_Sources_Template_v5.xlsx')
-    # wb = load_workbook(filename = r'C:/Questionnaire_template_v3.xlsx')
-    wb = load_workbook(filename =r'/Volumes/EXT1/trash/Questionnaire_template_v3.2.xlsx')
+    wb = load_workbook(filename = r'C:/Questionnaire_template_v3.2.xlsx')
+    # wb = load_workbook(filename =r'/Volumes/EXT1/trash/Questionnaire_template_v3.2.xlsx')
     ws = wb.get_active_sheet()
     log = ''
 
@@ -2323,7 +2338,7 @@ def import_questionnaire(request, template_name='import_questionnaire.html'):
                             slug = convert_text_to_slug(str(row[1].value)[:50])
 
                         slug = get_slug(slug)
-                            
+
                         if row[5].value:
                             helpText = row[5].value
                         else:
@@ -2343,7 +2358,8 @@ def import_questionnaire(request, template_name='import_questionnaire.html'):
                         question = Question(questionset=questionset, text_en=text_en, number=str(questionNumber), type='comment', help_text=helpText, slug=slug, stats=False, category=True, tooltip=_tooltip)
                         log += '\n%s - Category created %s ' % (type_Column.row, question)
                         question.save()
-                        slugs.append((question.slug,  question.text_en, question))
+                        save_slug(question.slug,  question.text_en, question)
+                        # slugs.append((question.slug,  question.text_en, question))
                         log += '\n%s - Category saved %s ' % (type_Column.row, question)
                     except:
                         log += "\n%s - Error to save Category %s" % (type_Column.row, text_en)
@@ -2383,7 +2399,8 @@ def import_questionnaire(request, template_name='import_questionnaire.html'):
                         question = Question(questionset=questionset, text_en=text_en, number=str(questionNumber), type=dataType_column.value, help_text=helpText, slug=slug, stats=True, category=False, tooltip=_tooltip)
                         log += '\n%s - Question created %s ' % (type_Column.row, question)
                         question.save()
-                        slugs.append((question.slug,  question.text_en, question))
+                        save_slug(question.slug,  question.text_en, question)
+                        # slugs.append((question.slug,  question.text_en, question))
                         log += '\n%s - Question saved %s ' % (type_Column.row, question)
                         if dataType_column.value in ['choice', 'choice-freeform', 'choice-multiple', 'choice-multiple-freeform']:
                             # Parse of values list
@@ -2414,14 +2431,14 @@ def import_questionnaire(request, template_name='import_questionnaire.html'):
         raise
 
 
-    for a in slugs:
-        (_slug, _desc, question) = a
-        # Write Slug 
-        slugsAux = Slugs()
-        slugsAux.slug1 = _slug
-        slugsAux.description = _desc
-        slugsAux.question = question
-        slugsAux.save()
+    # for a in slugs:
+    #     (_slug, _desc, question) = a
+    #     # Write Slug
+    #     slugsAux = Slugs()
+    #     slugsAux.slug1 = _slug
+    #     slugsAux.description = _desc
+    #     slugsAux.question = question
+    #     slugsAux.save()
 
     log += '\nQuestionnaire %s, questionsets, questions and choices created with success!! ' % questionnaire
     writeLog(log)
