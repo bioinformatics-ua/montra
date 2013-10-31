@@ -39,7 +39,7 @@ class PubMedObject:
             self.external_url = 'http://dx.doi.org/' + self.doi
 
         #initialize name of local file
-        self.local_file = getproperfilename(urllib.quote_plus(self.doi)) + '.html'
+        self.local_file = "/tmp" + getproperfilename(urllib.quote_plus(self.doi)) + '.html'
 
         #delete the local file if it already exists
         if os.path.isfile(self.local_file):
