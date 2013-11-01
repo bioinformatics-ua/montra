@@ -364,7 +364,7 @@ def results_diff(request, page=1, template_name='results_diff.html'):
                 if k in blacklist:
                     continue
                 t = Tag()
-                results = Slugs.objects.filter(slug1=k)
+                results = Slugs.objects.filter(slug1=k[:-2])
                 if len(results) > 0:
                     text = results[0].description
                 else:
@@ -534,6 +534,7 @@ def database_edit(request, fingerprint_id, questionnaire_id, template_name="data
     # generate the answer_dict for each question, and place in extra
     request2 = RequestMonkeyPatch()
     # print "REQUEST2: " + str(request2)
+    
     for item in items:
         print "ITEM: " + str(item),
         key = item
@@ -542,9 +543,10 @@ def database_edit(request, fingerprint_id, questionnaire_id, template_name="data
         if item == '_version_':
             continue
         print " VALUE: " + str(value)
-        results = Slugs.objects.filter()
+        results = Slugs.objects.filter(slug1=str(item)[:-2])
         print len(results)
         if results == None or len(results) == 0:
+            
             continue
         question = results[0].question
 
@@ -602,6 +604,8 @@ def database_edit(request, fingerprint_id, questionnaire_id, template_name="data
                 #print "Question: " + str(question)
                 Type = question.get_type()
                 _qnum, _qalpha = split_numal(question.number)
+                #print question.number
+
 
                 qdict = {
                     'template': 'questionnaire/%s.html' % (Type),
@@ -638,6 +642,9 @@ def database_edit(request, fingerprint_id, questionnaire_id, template_name="data
                         #    qvalues[question.number] = qdict['qvalue']
 
                 qlist.append((question, qdict))
+                #if question.number=="2.01":
+                #    print question
+                #    print qdict
             if qs_aux == None:
                 qs_aux = k
             qlist_general.append((qs_aux, qlist))
@@ -875,7 +882,8 @@ def createqsets(runcode, qsets=None):
             if k in blacklist:
                 continue
             t = Tag()
-            aux_results = Slugs.objects.filter(slug1=k)
+            
+            aux_results = Slugs.objects.filter(slug1=k[:-2])
             qs = None
             question_group = None
             if len(aux_results) > 0:
@@ -904,7 +912,8 @@ def createqsets(runcode, qsets=None):
 
             value = clean_value(str(result[k].encode('utf-8')))
             #value = value[:75] + (value[75:] and '..')
-
+            
+        
             t.value = value.replace("#", " ")
             if k == "database_name_t":
                 name = t.value
@@ -2248,8 +2257,8 @@ def import_questionnaire(request, template_name='import_questionnaire.html'):
     from django.template.defaultfilters import slugify
     # wb = load_workbook(filename = r'/Volumes/EXT1/Dropbox/MAPi-Dropbox/EMIF/Code/emif/emif/questionnaire_ad_v2.xlsx')
     # wb = load_workbook(filename = r'/Volumes/EXT1/Dropbox/MAPi-Dropbox/EMIF/Observational_Data_Sources_Template_v5.xlsx')
-    wb = load_workbook(filename = r'C:/Questionnaire_template_v3.2.xlsx')
-    # wb = load_workbook(filename =r'/Volumes/EXT1/trash/Questionnaire_template_v3.2.xlsx')
+    # wb = load_workbook(filename = r'C:/Questionnaire_template_v3.2.xlsx')
+    wb = load_workbook(filename =r'/Volumes/EXT1/trash/Questionnaire_template_v3.2.xlsx')
     ws = wb.get_active_sheet()
     log = ''
 
