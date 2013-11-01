@@ -2,114 +2,124 @@
 {% load extra_tags %}
 {% load markup questionnaire i18n %}
 
-
 <div class="span8">
     <form name="qform" id="qform" action="addPost/{{questionset.questionnaire.pk}}/1" method="POST" enctype="multipart/form-data">
         <input type="hidden" name="active_qs" id="active_qs" value="0">
         <input type="hidden" name="active_qs_sortid" id="active_qs_sortid" value="0">
         <input type="hidden" name="fingerprint_id" value="{{ fingerprint_id }}">
 
-
+    {% setglobal iteratorQ 0 %}
     {% for k, qlist in questions_list %}
-    {% set h1 = False %} <!-- Reset variable h1 to accordion -->
-    {% set close = False %}
+
+        {% setglobal h1_already 0 %}
+        {% setglobal h1_last 0 %}
+
 
     <div id="qs_{{ k.sortid }}" class="{% if k.sortid == questionset.sortid %} {% else %} hide {% endif %} questionset">
+        <div><a id="collapseall_qs_{{ k.sortid }}"  class="btn pull-right" href="">Expand all </a></div>
     <div class="questionset-title" style="font-size:6px">
     <h3>{{ k.text|removeh1 }}</h3>
+
     </div>
+
 
         {% csrf_token %}
 
         <input type="hidden" name="questionset_id" value="{{ questionset.id }}">
 
+        <div class="accordion" id="accordion_{{ k.sortid }}">
 
-        <div class="accordion" id="accordion2">
         {% for question, qdict in qlist %}
 
-        {% with errors|dictget:question.number as error %}
+            {% incrementglobal iteratorQ %}
 
-            <!-- If has already appear another h1 before -->
-            {% if question.text|geths == 'h1' and h1 = True%}
-                </div>
-            </div>
-            {% endif %}
+            {% with errors|dictget:question.number as error %}
 
-            {% if question.text|geths == 'h1' %}
-                {% set h1 = "True" %} <!-- Set variable h1 to accordion -->
+                {% if question.text|geths == 'h1' %}
 
-                <div class="accordion-group">
-                    <div class="accordion-heading">
-                        <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#div_qc_{{ question.number }}">
+                    <!-- If has already appear another h1 before close accordion-group -->
+                    {% if h1_already.value == '1' %}
 
-            {% endif %}
-            {% if h1 == True %}
-                <div id="div_qc_{{ question.number }}" class="accordion-body collapse in">
-                    <div class="accordion-inner">
-
-            {% endif %}
-                    <div class="question type_{{ qdict.qtype }} {% if error %} error prepend-top{% endif %}{{ qdict.qnum_class }}{{ qdict.qalpha_class }}" id="qc_{{ question.number }}" {{qdict.checkstring|safe}} >
-                        {% if request.user.is_staff %}
-                            <span class="pull-right">
-                                <a href="admin/questionnaire/question/{{ question.id }}/">
-                                    ({% trans "edit" %} {{ question.number }})
-                                </a>
-                            </span>
-                        {% endif %}
-
-                        {% if qdict.custom %}
-                            {% if error %}
-                                <div class="error">
-                                    {{ error }}
-                                </div>
-                            {% endif %}
-                            {% include qdict.template %}
-                        {% else %}
-                            <div class="question-text {% if qdict.required %}required{% endif %} {% if error %}text-error{% endif %} qtext_{{question.text|geths}}">
-                                <span class="qnumber_{{question.text|geths}}">{{ question.display_number }}.</span>
-                                <span class="qtext">{{ question.text|safe|removehs }}
-                                {% if question.help_text %}
-                                <div class="question-help-text" style="display: none;">
-                                    <span>{{ question.help_text|safe }}</span>
-                                </div>
-
-                            {% endif %}
-                                    </span>
-                            </div>
-
-                            <div class="answer qtext_{{question.text|geths}}">
-                                {% if error %}
-                                    <div class="alert-message block-message text-error input">{{ error }}</div>
-                                {% endif %}
-                                {% include qdict.template %}
-                            </div>
-                        {% endif %}
-
-
-                    </div> <!-- /question container -->
-
-                    {% if question.text|geths == 'h1' %}
-                        </a>
-                    </div>
-
-                    {% else %}
-                        {% if h1 == True %}
-                            </div>
+                        </div>
+                        </div>
                         </div>
 
-                        {% endif %}
                     {% endif %}
 
-            {% if question.footer %}
-                <div class="question-footer">
-                    {{ question.footer|textile }}
-                    <div class="clearfix"></div>
-                </div>
-            {% endif %}
+                    <!-- Set variable h1 to accordion -->
+                    {% setglobal h1_already 1 %}
+                    {% setglobal h1_last 1 %}
 
-        {% endwith %}
+                    <div class="accordion-group">
+                        <div class="accordion-heading">
+                            <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion_{{ k.sortid }}" href="#div_{{ iteratorQ.value }}">
+                {% endif %}
+                        <div class="question type_{{ qdict.qtype }} {% if error %} error prepend-top{% endif %}{{ qdict.qnum_class }}{{ qdict.qalpha_class }}" id="qc_{{ question.number }}" {{qdict.checkstring|safe}} >
+                            <!--{% if request.user.is_staff %}-->
+                                <!--<div><span class="pull-right">-->
+                                    <!--<a href="admin/questionnaire/question/{{ question.id }}/">-->
+                                        <!--({% trans "edit" %} {{ question.number }})-->
+                                    <!--</a>-->
+                                <!--</span>-->
+                                    <!--</div>-->
+                            <!--{% endif %}-->
+
+                            {% if qdict.custom %}
+                                {% if error %}
+                                    <div class="error">
+                                        {{ error }}
+                                    </div>
+                                {% endif %}
+                                {% include qdict.template %}
+                            {% else %}
+                                <div class="question-text {% if qdict.required %}required{% endif %} {% if error %}text-error{% endif %} qtext_{{question.text|geths}}">
+                                    <span class="qnumber_{{question.text|geths}}">{{ question.display_number }}.</span>
+                                    <span class="qtext">{{ question.text|safe|removehs }}
+                                    {% if question.help_text %}
+                                    <div class="question-help-text" style="display: none;">
+                                        <span>{{ question.help_text|safe }}</span>
+                                    </div>
+
+                                {% endif %}
+                                        </span>
+                                </div>
+                                {% if question.text|geths == 'h1' %}
+                                        </a>
+                                    </div>
+
+                                    <div id="div_{{ iteratorQ.value }}" class="accordion-body collapse">
+                                        <div class="accordion-inner">
+                                 {% endif %}
+                                <div class="answer qtext_{{question.text|geths}}">
+                                    {% if error %}
+                                        <div class="alert-message block-message text-error input">{{ error }}</div>
+                                    {% endif %}
+                                    {% include qdict.template %}
+                                </div>
+                            {% endif %}
+
+
+                        </div> <!-- /question container -->
+
+                        {% if question.footer %}
+                            <div class="question-footer">
+                                {{ question.footer|textile }}
+                                <div class="clearfix"></div>
+                            </div>
+                        {% endif %}
+
+
+
+            {% endwith %}
 
         {% endfor %}
+
+        {% if h1_last.value == '1' %}
+                </div>
+                </div>
+            </div>
+
+        {% endif %}
 
         </div>  <!-- div accordion2 -->
 
@@ -196,6 +206,40 @@ function validate(question_number)
 };
 
     help_text_popover();
+
+    $("#collapseall").bind('click', function (e) {
+        console.log('Collapse all');
+       alert("coiso");
+        return false;
+//        e.preventDefault();
+//        e.stopPropagation();
+//
+//       var div_id = 'accordion1';
+//       collapseAll($("#collapseall_metadata"), div_id);
+
+       });
+
+    function collapseAll(element, div_id){
+        if (element.text().indexOf('Collapse') !== -1) {
+           console.log('Collapse all');
+           element.text('Expand all');
+           if (!element.hasClass('disabled')){
+            element.parents().find('#'+div_id +' .collapse').each(function(index){
+                $(this).addClass('in');
+                $(this).collapse('hide');
+            });
+           }
+       } else {
+           console.log('Expand all');
+            element.text('Collapse all');
+           if (!element.hasClass('disabled')){
+            element.parents().find('#'+div_id +' .collapse').each(function(index){
+                $(this).removeClass('in');
+                $(this).collapse('show');
+            });
+           }
+       }
+    };
 
     {% endblock %}
 </script>
