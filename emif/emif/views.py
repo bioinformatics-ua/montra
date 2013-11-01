@@ -485,7 +485,7 @@ class RequestMonkeyPatch(object):
 
 
 def extract_answers(request2, questionnaire_id, question_set, qs_list):
-    
+    question_set2 = question_set
     request = request2
     # Extract files if they exits 
     try:
@@ -493,8 +493,8 @@ def extract_answers(request2, questionnaire_id, question_set, qs_list):
             for name, f in request.FILES.items():
                 handle_uploaded_file(f)
     except:
-        raise
-
+        pass
+        #raise
 
     qsobjs = QuestionSet.objects.filter(questionnaire=questionnaire_id)
     questionnaire = qsobjs[0].questionnaire
@@ -505,19 +505,12 @@ def extract_answers(request2, questionnaire_id, question_set, qs_list):
         try:
             question_set = request.POST['active_qs']
             sortid = request.POST['active_qs_sortid']
+            fingerprint_id = request.POST['fingerprint_id']
         except:
             for qs in qsobjs:
                 if qs.sortid == int(sortid):
                     question_set = qs.pk
                     break
-
-        #import pdb
-        #import ipdb
-        #ipdb.set_trace()
-
-
-        fingerprint_id = request.POST['fingerprint_id']
-
 
     expected = []
     for qset in qsobjs:
@@ -536,8 +529,8 @@ def extract_answers(request2, questionnaire_id, question_set, qs_list):
     # generate the answer_dict for each question, and place in extra
     for item in items:
         key, value = item[0], item[1]
-        # print "KEY: %s" % str(key)
-        # print "VALUE: %s" % str(value)
+        print  "KEY= " + str(key)
+        print  "VALUE= " + str(value)
         if key.startswith('question_'):
             answer = key.split("_", 2)
             question = get_question(answer[1], questionnaire)
@@ -574,33 +567,17 @@ def extract_answers(request2, questionnaire_id, question_set, qs_list):
     active_qs_with_errors = False
     #print "Active QuestionSet: " + question_set
     for question, ans in extra.items():
-        #if not question_satisfies_checks(question, runinfo):
-        #    continue
-        #    
-        #print ans 
-
+        
         if u"Trigger953" not in ans:
             logging.warn("User attempted to insert extra question (or it's a bug)")
             continue
         try:
             cd = question.getcheckdict()
-            #print cd 
-            # requiredif is the new way
+            
             depon = cd.get('requiredif', None) or cd.get('dependent', None)
-            #print depon
-            #if depon:
-            #depparser = BooleanParser(dep_check, runinfo, extra)
-            #if not depparser.parse(depon):
-            # if check is not the same as answer, then we don't care
-            # about this question plus we should delete it from the DB
-            #delete_answer(question, runinfo.subject, runinfo.runid)
-            #if cd.get('store', False):
-            #    runinfo.set_cookie(question.number, None)
-            #    continue
-            #add_answer(runinfo, question, ans)
+            
             verify_answer(question, ans)
-            #if cd.get('store', False):
-            #    runinfo.set_cookie(question.number, ans['ANSWER'])
+            
         except AnswerException, e:
             errors[question.number] = e
 
@@ -612,9 +589,7 @@ def extract_answers(request2, questionnaire_id, question_set, qs_list):
             raise
 
     try:
-        
-
-        questions = question_set.questions()
+        questions = question_set2.questions()
 
         questions_list = {}
         for qset_aux in qs_list:
@@ -698,9 +673,12 @@ def database_edit(request, fingerprint_id, questionnaire_id, template_name="data
     # Render page first time.
 
     request2 = RequestMonkeyPatch()
+
+    request2.method = request.method
     for item in items:
         key = item
         value = items[key]
+        
         if item == '_version_':
             continue
 
@@ -715,27 +693,29 @@ def database_edit(request, fingerprint_id, questionnaire_id, template_name="data
         if "[" in value:
             value = value.lower().replace("]", "").replace("[", "")
         request2.get_post()['question_%s' % question.number] = value
+        
         ans['ANSWER'] = value
-
+        
         extra[question] = ans
 
     errors = {}
 
     q_id = questionnaire_id
     qs_id = 1
-    
 
     qs_list = QuestionSet.objects.filter(questionnaire=questionnaire_id)
 
     print qs_list
 
     question_set = qs_list[int(qs_id)]
-    (qlist_general, qlist, jstriggers, qvalues, jsinclude, cssinclude) = extract_answers(request, questionnaire_id, question_set, qs_list)
-    import pdb
-    pdb.set_trace()
+    if request.POST:
+        (qlist_general, qlist, jstriggers, qvalues, jsinclude, cssinclude) = extract_answers(request, questionnaire_id, question_set, qs_list)
+    else:
+        (qlist_general, qlist, jstriggers, qvalues, jsinclude, cssinclude) = extract_answers(request2, questionnaire_id, question_set, qs_list)
 
     if (question_set.sortid == 99 or request.POST):
         # Index on Solr
+        print "Indexing Solr"
         try:
             index_answeres_from_qvalues(qlist_general, question_set.questionnaire, request.user.username,
                                         fingerprint_id)
@@ -959,8 +939,7 @@ def createqsets(runcode, qsets=None):
                     question_group.list_ordered_tags.append(t)
 
                 qsets[qset.text] = question_group
-        #print list_qsets
-        #print "results"
+        
 
         for k in result:
             if k in blacklist:
