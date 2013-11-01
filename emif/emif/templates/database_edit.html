@@ -71,7 +71,7 @@ button {
     <ul class="nav nav-list nav-pills nav-stacked ">
       <li class="nav-header">Step-by-Step</li>
       {% for qs in questionset.questionnaire.questionsets %}
-
+      {% if qs.sortid != 99 %}
       <li{% if questionset.text == qs.text %} class="active" {% endif %} id="li_qs_{{qs.sortid}}">
         <!--<a href="q2/{{runinfo.random}}/{{ qs.sortid }}">
         -->
@@ -88,6 +88,7 @@ button {
       </a>
 
     </li>
+    {% endif %}
     {% endfor %}
   </ul>
 

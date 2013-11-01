@@ -529,8 +529,7 @@ def extract_answers(request2, questionnaire_id, question_set, qs_list):
     # generate the answer_dict for each question, and place in extra
     for item in items:
         key, value = item[0], item[1]
-        print  "KEY= " + str(key)
-        print  "VALUE= " + str(value)
+        
         if key.startswith('question_'):
             answer = key.split("_", 2)
             question = get_question(answer[1], questionnaire)
@@ -715,7 +714,7 @@ def database_edit(request, fingerprint_id, questionnaire_id, template_name="data
 
     if (question_set.sortid == 99 or request.POST):
         # Index on Solr
-        print "Indexing Solr"
+        
         try:
             index_answeres_from_qvalues(qlist_general, question_set.questionnaire, request.user.username,
                                         fingerprint_id)
