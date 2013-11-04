@@ -181,12 +181,15 @@ def index_answeres_from_qvalues(qvalues, questionnaire, subject, fingerprint_id)
                     # print(choices)
                     do_again = False
                     try:
-                        for choice, unk, checked  in choices:
+                        for choice, unk, checked, _aux  in choices:
                             # print("Choice value: " + str(choice.value))
                             # print("checked value: " + str(checked))
                             # print("unk value: " + str(unk))
                             if checked == " checked":
-                                value = value + "#" + choice.value
+                                if _aux != "":
+                                    value = value + "#" + choice.value + "{" + _aux +"}"
+                                else:
+                                    value = value + "#" + choice.value
                     except:
                         do_again = True
                     if do_again:
@@ -211,7 +214,9 @@ def index_answeres_from_qvalues(qvalues, questionnaire, subject, fingerprint_id)
                                 value = value + "||" + val
 
                 else:
-                    print("continue")
+                    #print("continue")
+                    pass
+
 
                 # print(value)
                 slug = question.slug
