@@ -58,8 +58,20 @@
 
                     <div class="accordion-group">
                         <div class="accordion-heading">
+                            {% if request.user.is_staff %}
+                                <span class="pull-right"> <a href="admin/questionnaire/question/{{ question.id }}/">
+                                    <i class="icon-edit"></i>
+                                </a></span>
+                             {% endif %}
                             <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion_{{ k.sortid }}" href="#div_{{ iteratorQ.value }}">
                 {% endif %}
+                        {% if question.text|geths != 'h1' %}
+                             {% if request.user.is_staff %}
+                                    <span class="pull-right"> <a href="admin/questionnaire/question/{{ question.id }}/">
+                                        <i class="icon-edit"></i>
+                                    </a></span>
+                             {% endif %}
+                        {% endif %}
                         <div class="question type_{{ qdict.qtype }} {% if error %} error prepend-top{% endif %}{{ qdict.qnum_class }}{{ qdict.qalpha_class }}" id="qc_{{ question.number }}" {{qdict.checkstring|safe}} >
                             <!--{% if request.user.is_staff %}-->
                                 <!--<div><span class="pull-right">-->
