@@ -26,6 +26,20 @@ button {
     display: none;
 }
 
+.accordion-inner {
+    padding: 9px 15px;
+    border-top: 0px solid #e5e5e5;
+}
+.accordion-heading .accordion-toggle {
+display: block;
+padding: 5px 15px;
+}
+
+.accordion-heading a {
+color: #333;
+text-decoration: none;
+}
+
 {% endblock %}
 
 
@@ -172,6 +186,8 @@ function questionsets_handle(id_questionset)
   );
     document.body.scrollTop = document.documentElement.scrollTop = 0;
 };
+
+//questionsets_handle(qs_0);
 
 
 
