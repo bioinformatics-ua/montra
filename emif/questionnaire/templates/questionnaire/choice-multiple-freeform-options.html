@@ -1,16 +1,18 @@
 {% load i18n %}
 
 <div class="clearfix">
-    <div class="input">
+    <div class="input control-group">
         <ul class="inputs-list unstyled">
-        {% for choice, key, checked in qdict.choices %}
+        {% for choice, key, checked, aux in qdict.choices %}
             <li>
                 
-                <label>
+                <label class="control-label">
                     <input onClick="valchanged('{{ question.number }}_{{ choice.value }}', this.checked);" type="checkbox" id="{{ key }}" name="{{ key }}" value="{{ choice.value }}" {{ checked }}>
                     <span>{{ choice.text }}</span> 
                 </label>
-                <input type="text" id="{{ question.number }}_{{ choice.value }}_opt" >
+                <div class="controls">
+                <input type="text" id="question_{{ question.number }}_{{ choice.sortid }}_opt" name="question_{{ question.number }}_{{ choice.sortid }}_opt" value="{{ aux }}" >
+                </div>
                 
             </li>
             
