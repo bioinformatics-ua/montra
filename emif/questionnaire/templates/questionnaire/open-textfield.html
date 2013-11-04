@@ -1,7 +1,7 @@
 {% load i18n %}
 <div class="clearfix">
     <div class="input">
-        <textarea class="span8" name="question_{{ question.number }}" cols="60" rows="5">{{qdict.value}}</textarea>
+        <textarea class="span6" name="question_{{ question.number }}" cols="50" rows="5">{{qdict.value}}</textarea>
         {% if question.extra %}
             <span class="help-block">{{ question.extra }}</span>
         {% endif %}
