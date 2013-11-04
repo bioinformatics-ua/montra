@@ -17,7 +17,7 @@
         {% setglobal h1_last 0 %}
 
 
-    <div id="qs_{{ k.sortid }}" class="{% if k.sortid == questionset.sortid %} {% else %} hide {% endif %} questionset">
+    <div id="qs_{{ k.sortid }}" class="{% if k.sortid == 0 %} {% else %} hide {% endif %} questionset">
 
     {% if k.sortid != 0 and k.sortid != 99 %}
         <div><a id="collapseall_qs_{{ k.sortid }}"  class="btn pull-right" href="">Expand all </a></div>
