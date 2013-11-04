@@ -216,6 +216,14 @@ function PublicationWidget ()
             },
             success: function (data) {
                 result = data;
+                information = data;
+                $('#question_{{ question.number|removedots }}_pubtitle').val(information['title']); 
+                $('#question_{{ question.number|removedots }}_pubjournal').val(information['journal']);
+                $('#question_{{ question.number|removedots }}_pubyear').val(information['pub_year']);
+                $('#question_{{ question.number|removedots }}_pubvolume').val(information['volume']);  
+                $('#question_{{ question.number|removedots }}_pubpages').val(information['pages']);  
+                $('#question_{{ question.number|removedots }}_pubauthors').val(information['authors']);  
+                $('#question_{{ question.number|removedots }}_publink').val(information['pubmed_url']);
             }
 
         });
