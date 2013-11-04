@@ -222,11 +222,6 @@ def results_fulltext_aux(request, query, page=1, template_name='results.html'):
                 database_aux.logo = r['upload-image_t']
             database_aux.id = r['id']
             database_aux.date = convert_date(r['created_t'])
-            #database_aux.name = r['database_name_t']
-            #database_aux.location = r['location_t']
-            #database_aux.institution = r['institution_name_t']
-            #database_aux.email_contact = r['contact_administrative_t']
-            #database_aux.number_patients = r['number_active_patients_jan2012_t']
             list_databases.append(database_aux)
         except:
             raise
@@ -278,7 +273,6 @@ def store_query(user_request, query_executed):
             query.user = None
         query.query = query_executed
         query.save()
-    print "executed"
 
 
 def results_diff(request, page=1, template_name='results_diff.html'):
