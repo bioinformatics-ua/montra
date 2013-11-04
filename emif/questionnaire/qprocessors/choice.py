@@ -2,9 +2,6 @@ from questionnaire import *
 from django.utils.translation import ugettext as _, ungettext
 from django.utils.simplejson import dumps
 
-import re
-
-
 @question_proc('choice', 'choice-freeform')
 def question_choice(request, question):
     choices = []
@@ -78,6 +75,8 @@ def question_multiple(request, question):
         counter += 1
         key = "question_%s_multiple_%d" % (question.number, choice.sortid)
         
+        #print val
+        #print choice.value
         if key in request.POST or (val!=None and (choice.value in val)) or \
           (request.method == 'GET' and choice.value in defaults):
             choices.append( (choice, key, ' checked',) )
@@ -150,19 +149,7 @@ def process_multiple(question, answer):
     #print "Multiple" + str(multiple)
     return dumps(multiple)
 
-def get_aux_text(full_value, choice_value):
-    if (full_value==None):
-        return ''
-    _aux = full_value.split("#")
-    #print _aux
-    for v in _aux:
-        if choice_value in v:
-            values = re.findall(r'\{(.*?)\}', v)
-            print choice_value
-            print values
-            if (len(values)>0):
-                return values[0]
-    return ''
+
 
 @question_proc('choice-multiple', 'choice-multiple-freeform-options')
 def question_multiple_options(request, question):
@@ -177,30 +164,26 @@ def question_multiple_options(request, question):
     except:
         pass
     defaults = cd.get('default','').split(',')
-
+    import pdb
+    #pdb.set_trace()
     for choice in question.choices():
         counter += 1
-
         key = "question_%s_multiple_%d" % (question.number, choice.sortid)
-        key_value = "question_%s_%d_opt" % (question.number, choice.sortid)
-        if val!=None:
-            print "Val: " +val
-        if choice!=None:
-            print "choice.value: " + choice.value
-        _aux = ""
+        key_value = "question_%s_multiple_%d_opt" % (question.number, choice.sortid)
+        #print val
+        #print choice.value
         try:
-            _aux = request.POST[key_value]
+            _aux = request.POST['key_value']
+            print "@@@@VALUE:" + _aux
         except:
             pass
 
 
-        print "get_aux_text(val,choice.value )" + get_aux_text(val,choice.value )
-
         if key in request.POST or (val!=None and (choice.value in val)) or \
           (request.method == 'GET' and choice.value in defaults):
-            choices.append( (choice, key, ' checked',get_aux_text(val,choice.value )) )
+            choices.append( (choice, key, ' checked',) )
         else:
-            choices.append( (choice, key, '',get_aux_text(val,choice.value )) )
+            choices.append( (choice, key, '',) )
     extracount = int(cd.get('extracount', 0))
     if not extracount and question.type == 'choice-multiple-freeform-options':
         extracount = 1
