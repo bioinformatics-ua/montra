@@ -16,7 +16,11 @@
 
 
     <div id="qs_{{ k.sortid }}" class="{% if k.sortid == questionset.sortid %} {% else %} hide {% endif %} questionset">
+
+    {% if k.sortid != 0 and k.sortid != 99 %}
         <div><a id="collapseall_qs_{{ k.sortid }}"  class="btn pull-right" href="">Expand all </a></div>
+    {% endif %}
+
     <div class="questionset-title" style="font-size:6px">
     <h3>{{ k.text|removeh1 }}</h3>
 
@@ -207,17 +211,20 @@ function validate(question_number)
 
     help_text_popover();
 
-    $("#collapseall").bind('click', function (e) {
-        console.log('Collapse all');
-       alert("coiso");
-        return false;
-//        e.preventDefault();
-//        e.stopPropagation();
-//
-//       var div_id = 'accordion1';
-//       collapseAll($("#collapseall_metadata"), div_id);
+    {% for k, qlist in questions_list %}
+        {% if k.sortid != 0 and k.sortid != 99 %}
+    $("#collapseall_qs_{{ k.sortid }}").bind('click', function (e) {
+//        console.log('Collapse all');
+        e.preventDefault();
+        e.stopPropagation();
+
+       var div_id = 'accordion_{{ k.sortid }}';
+       collapseAll($("#collapseall_qs_{{ k.sortid }}"), div_id);
 
        });
+
+        {% endif %}
+        {% endfor %}
 
     function collapseAll(element, div_id){
         if (element.text().indexOf('Collapse') !== -1) {
