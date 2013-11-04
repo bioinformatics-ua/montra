@@ -474,6 +474,7 @@ def database_add(request, questionnaire_id, sortid):
 
 class RequestMonkeyPatch(object):
     POST = {}
+
     method = POST
 
     def __init__(self):
@@ -483,40 +484,33 @@ class RequestMonkeyPatch(object):
         return self.POST
 
 
-def database_edit(request, fingerprint_id, questionnaire_id, template_name="database_edit.html"):
-    #return render(request, template_name, {'request': request})
-    #print questionnaire_id
-    #logging.debug("Debugger")
-    #return show_full_questionnaire(request, questionnaire_id, 
-    #    reverse_name='questionaries_with_sets')
-    #return show_full_questionnaire(request, questionnaire_id)
-
-    c = CoreEngine()
-
-    results = c.search_fingerprint("id:" + fingerprint_id)
-    items = None
-    for r in results:
-        items = r
-        break
-    fingerprint_id = r['id']
-
-    users_db = r['user_t']
+def extract_answers(request2, questionnaire_id, question_set, qs_list):
+    question_set2 = question_set
+    request = request2
+    # Extract files if they exits 
     try:
-        fingerprint_name = r['database_name_t']
-    except:
-        fingerprint_name = 'unnamed'
-    qsobjs = QuestionSet.objects.filter(questionnaire=questionnaire_id)
-    questionnaire = qsobjs[0].questionnaire
-    sortid = None
-    try:
-        question_set = request.POST['active_qs']
-        sortid = request.POST['active_qs_sortid']
+        if request.FILES:
+            for name, f in request.FILES.items():
+                handle_uploaded_file(f)
     except:
         pass
+        #raise
 
+    qsobjs = QuestionSet.objects.filter(questionnaire=questionnaire_id)
+    questionnaire = qsobjs[0].questionnaire
+    
+    sortid = 0
+    
     if request.POST:
-        return check_database_add_conditions(request, questionnaire_id, sortid, template_name='database_edit.html', users_db=users_db)
-        # to confirm that we have the correct answers
+        try:
+            question_set = request.POST['active_qs']
+            sortid = request.POST['active_qs_sortid']
+            fingerprint_id = request.POST['fingerprint_id']
+        except:
+            for qs in qsobjs:
+                if qs.sortid == int(sortid):
+                    question_set = qs.pk
+                    break
 
     expected = []
     for qset in qsobjs:
@@ -524,68 +518,81 @@ def database_edit(request, fingerprint_id, questionnaire_id, template_name="data
         for q in questions:
             expected.append(q)
 
+    items = request.POST.items()
     extra = {} # question_object => { "ANSWER" : "123", ... }
 
     # this will ensure that each question will be processed, even if we did not receive
     # any fields for it. Also works to ensure the user doesn't add extra fields in
-    #for x in expected:
-    #    items.append( (u'question_%s_Trigger953' % x.number, None) )
+    for x in expected:
+        items.append((u'question_%s_Trigger953' % x.number, None))
 
     # generate the answer_dict for each question, and place in extra
-    request2 = RequestMonkeyPatch()
-    # print "REQUEST2: " + str(request2)
-    
     for item in items:
-        print "ITEM: " + str(item),
-        key = item
+        key, value = item[0], item[1]
+        
+        if key.startswith('question_'):
+            answer = key.split("_", 2)
+            question = get_question(answer[1], questionnaire)
+            if not question:
+                logging.warn("Unknown question when processing: %s" % answer[1])
+                continue
+            extra[question] = ans = extra.get(question, {})
+            if (len(answer) == 2):
+                ans['ANSWER'] = value
+            elif (len(answer) == 3):
+                ans[answer[2]] = value
+            else:
+                print "Poorly formed form element name: %r" % answer
+                logging.warn("Poorly formed form element name: %r" % answer)
+                continue
+            extra[question] = ans
 
-        value = items[key]
-        if item == '_version_':
-            continue
-        print " VALUE: " + str(value)
-        results = Slugs.objects.filter(slug1=str(item)[:-2])
-        print len(results)
-        if results == None or len(results) == 0:
-            
-            continue
-        question = results[0].question
-
-        #if key.startswith('question_'):
-        answer = str(question.number)
-        #question = get_question(answer[1], questionnaire)
-        #if not question:
-        #    logging.warn("Unknown question when processing: %s" % answer[1])
-        #    continue
-        extra[question] = ans = extra.get(question, {})
-        if "[" in value:
-            value = value.lower().replace("]", "").replace("[", "")
-        request2.get_post()['question_%s' % question.number] = value
-        ans['ANSWER'] = value
-
-        extra[question] = ans
-
-    # print extra
     errors = {}
+
+    def verify_answer(question, answer_dict):
+
+        type = question.get_type()
+
+        if "ANSWER" not in answer_dict:
+            answer_dict['ANSWER'] = None
+        answer = None
+        if type in Processors:
+            answer = Processors[type](question, answer_dict) or ''
+        else:
+            raise AnswerException("No Processor defined for question type %s" % type)
+
+        return True
+
+    active_qs_with_errors = False
+    #print "Active QuestionSet: " + question_set
+    for question, ans in extra.items():
+        
+        if u"Trigger953" not in ans:
+            logging.warn("User attempted to insert extra question (or it's a bug)")
+            continue
+        try:
+            cd = question.getcheckdict()
+            
+            depon = cd.get('requiredif', None) or cd.get('dependent', None)
+            
+            verify_answer(question, ans)
+            
+        except AnswerException, e:
+            errors[question.number] = e
+
+            if (str(question.questionset.id) == question_set):
+                #print "active enable"
+                active_qs_with_errors = True
+        except Exception:
+            logging.exception("Unexpected Exception")
+            raise
+
     try:
-        q_id = questionnaire_id
-        qs_id = 1
-        qs_list = QuestionSet.objects.filter(questionnaire=q_id)
-        #print "Q_id: " + q_id
-        #print "Qs_id: " + qs_id
-        #print "QS List: " + str(qs_list)
-
-        question_set = qs_list[int(qs_id)]
-        #questions = Question.objects.filter(questionset=qs_id)
-
-        questions = question_set.questions()
-        #print "Questions: " + str(questions)
-        #print "QuestionSet: " + str(question_set)
+        questions = question_set2.questions()
 
         questions_list = {}
         for qset_aux in qs_list:
-            #questions_aux = Question.objects.filter(questionset=qset_aux)
             questions_list[qset_aux.id] = qset_aux.questions()
-            #print "here"
 
         qlist = []
         jsinclude = []      # js files to include
@@ -599,14 +606,10 @@ def database_edit(request, fingerprint_id, questionnaire_id, template_name="data
             qlist = []
             qs_aux = None
             for question in questions_list[k.id]:
-
                 qs_aux = question.questionset
-                #print "Question: " + str(question)
                 Type = question.get_type()
                 _qnum, _qalpha = split_numal(question.number)
-                #print question.number
-
-
+                
                 qdict = {
                     'template': 'questionnaire/%s.html' % (Type),
                     'qnum': _qnum,
@@ -629,7 +632,7 @@ def database_edit(request, fingerprint_id, questionnaire_id, template_name="data
                     qvalues[question.number] = cd['default']
                 if Type in QuestionProcessors:
 
-                    qdict.update(QuestionProcessors[Type](request2, question))
+                    qdict.update(QuestionProcessors[Type](request, question))
                     if 'jsinclude' in qdict:
                         if qdict['jsinclude'] not in jsinclude:
                             jsinclude.extend(qdict['jsinclude'])
@@ -638,50 +641,110 @@ def database_edit(request, fingerprint_id, questionnaire_id, template_name="data
                             cssinclude.extend(qdict['jsinclude'])
                     if 'jstriggers' in qdict:
                         jstriggers.extend(qdict['jstriggers'])
-                        #if 'qvalue' in qdict and not question.number in cookiedict:
-                        #    qvalues[question.number] = qdict['qvalue']
-
+                        
                 qlist.append((question, qdict))
-                #if question.number=="2.01":
-                #    print question
-                #    print qdict
+                
             if qs_aux == None:
                 qs_aux = k
             qlist_general.append((qs_aux, qlist))
-        if (question_set.sortid == 99 or request.POST):
-            # Index on Solr
-            try:
-                index_answeres_from_qvalues(qlist_general, question_set.questionnaire, request.user.username,
-                                            fingerprint_id)
-            except:
-                raise
-
-        r = r2r(template_name, request,
-                questionset=question_set,
-                questionsets=question_set.questionnaire.questionsets,
-                runinfo=None,
-                errors=errors,
-                qlist=qlist,
-                progress=None,
-                triggers=jstriggers,
-                qvalues=qvalues,
-                jsinclude=jsinclude,
-                cssinclude=cssinclude,
-                fingerprint_id=fingerprint_id,
-                async_progress=None,
-                async_url=None,
-                qs_list=qs_list,
-                questions_list=qlist_general,
-                breadcrumb=True,
-                name=fingerprint_name,
-                id=fingerprint_id,
-        )
-        r['Cache-Control'] = 'no-cache'
-        r['Expires'] = "Thu, 24 Jan 1980 00:00:00 GMT"
     except:
         raise
-    return r
+    return (qlist_general, qlist, jstriggers, qvalues, jsinclude, cssinclude)
+    
 
+def database_edit(request, fingerprint_id, questionnaire_id, template_name="database_edit.html"):
+    c = CoreEngine()
+
+    results = c.search_fingerprint("id:" + fingerprint_id)
+    items = None
+    for r in results:
+        items = r
+        break
+    fingerprint_id = r['id']
+
+    users_db = r['user_t']
+    try:
+        fingerprint_name = r['database_name_t']
+    except:
+        fingerprint_name = 'unnamed'
+
+    extra = {} 
+    # Render page first time.
+
+    request2 = RequestMonkeyPatch()
+
+    request2.method = request.method
+    for item in items:
+        key = item
+        value = items[key]
+        
+        if item == '_version_':
+            continue
+
+        results = Slugs.objects.filter(slug1=str(item)[:-2])
+        print len(results)
+        if results == None or len(results) == 0:
+            continue
+        question = results[0].question
+        answer = str(question.number)
+
+        extra[question] = ans = extra.get(question, {})
+        if "[" in value:
+            value = value.lower().replace("]", "").replace("[", "")
+        request2.get_post()['question_%s' % question.number] = value
+        
+        ans['ANSWER'] = value
+        
+        extra[question] = ans
+
+    errors = {}
+
+    q_id = questionnaire_id
+    qs_id = 1
+
+    qs_list = QuestionSet.objects.filter(questionnaire=questionnaire_id)
+
+    print qs_list
+
+    question_set = qs_list[int(qs_id)]
+    if request.POST:
+        (qlist_general, qlist, jstriggers, qvalues, jsinclude, cssinclude) = extract_answers(request, questionnaire_id, question_set, qs_list)
+    else:
+        (qlist_general, qlist, jstriggers, qvalues, jsinclude, cssinclude) = extract_answers(request2, questionnaire_id, question_set, qs_list)
+
+    if (question_set.sortid == 99 or request.POST):
+        # Index on Solr
+        
+        try:
+            index_answeres_from_qvalues(qlist_general, question_set.questionnaire, request.user.username,
+                                        fingerprint_id)
+        except:
+            raise
+
+    r = r2r(template_name, request,
+            questionset=question_set,
+            questionsets=question_set.questionnaire.questionsets,
+            runinfo=None,
+            errors=errors,
+            qlist=qlist,
+            progress=None,
+            triggers=jstriggers,
+            qvalues=qvalues,
+            jsinclude=jsinclude,
+            cssinclude=cssinclude,
+            fingerprint_id=fingerprint_id,
+            async_progress=None,
+            async_url=None,
+            qs_list=qs_list,
+            questions_list=qlist_general,
+            breadcrumb=True,
+            name=fingerprint_name,
+            id=fingerprint_id,
+    )
+    r['Cache-Control'] = 'no-cache'
+    r['Expires'] = "Thu, 24 Jan 1980 00:00:00 GMT"
+    
+    return r
 
 class Database:
     id = ''
@@ -875,8 +938,7 @@ def createqsets(runcode, qsets=None):
                     question_group.list_ordered_tags.append(t)
 
                 qsets[qset.text] = question_group
-        #print list_qsets
-        #print "results"
+        
 
         for k in result:
             if k in blacklist:
@@ -1472,6 +1534,7 @@ def check_database_add_conditions(request, questionnaire_id, sortid,
 
     # print question_set
     # print sortid
+
     return show_fingerprint_page_errors(request, questionnaire_id, question_set,
                                         errors={}, template_name='database_add.html', next=True, sortid=sortid,
                                         fingerprint_id=fingerprint_id, users_db=users_db)
