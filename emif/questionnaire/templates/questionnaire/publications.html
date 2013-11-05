@@ -114,6 +114,7 @@ function PublicationWidget ()
             
             pw{{ question.number|removedots }}.addPublication();
         });
+
         $("#loadpubbtn" ).bind( "click", function() {
             
             pw{{ question.number|removedots }}.updateInformationFromPubMed();
@@ -123,13 +124,26 @@ function PublicationWidget ()
             pw{{ question.number|removedots }}.removeSelectedPublication();
         });
         
-        $( "#question_{{ question.number }}_pubmedid").bind( "keypress", function() {
-            console.log("lol");
-            
-            pw{{ question.number|removedots }}.updateInformationFromPubMed();
-        });
+        
+        /*
+        function stopRKey(evt) { 
+          console.log(evt);
+          var evt = (evt) ? evt : ((event) ? event : null); 
+          var node = (evt.target) ? evt.target : ((evt.srcElement) ? evt.srcElement : null); 
+          if ((evt.keyCode == 13) && (node.type=="text"))  {console.log("stop"); pw{{ question.number|removedots }}.addPublication(); return false;} 
+        } 
 
-        $( "#question_{{ question.number }}_pubmedid").bind( "paste", function() {
+        document.onkeypress = stopRKey; 
+        */
+        $( "#question_{{ question.number|removedots }}_pubmedid").bind( "keypress", function(args) {
+            
+            if (args.keyCode == 13) {
+                pw{{ question.number|removedots }}.updateInformationFromPubMed();
+               return false;
+            } 
+            
+        });
+        $( "#question_{{ question.number|removedots }}_pubmedid").bind( "paste", function() {
             
             pw{{ question.number|removedots }}.updateInformationFromPubMed();
         });
@@ -291,3 +305,4 @@ pw{{ question.number|removedots }}.bindElements();
 pw{{ question.number|removedots }}.loadInformation();
 
 </script>
+
