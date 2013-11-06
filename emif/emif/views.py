@@ -2316,6 +2316,10 @@ def import_questionnaire(request, template_name='import_questionnaire.html'):
     To-Do
     - validation of template structure and content fields
     """
+
+    #_debug=True to not save
+    _debug = False
+
     qNumber = QuestionNumber()
     slugs = []
     from openpyxl import load_workbook
@@ -2354,8 +2358,9 @@ def import_questionnaire(request, template_name='import_questionnaire.html'):
     log += '\nQuestionnaire created %s ' % questionnaire
 
     try:
-        questionnaire.save()
-        log += '\nQuestionnaire saved %s ' % questionnaire
+        if not _debug:
+            questionnaire.save()
+            log += '\nQuestionnaire saved %s ' % questionnaire
         _choices_array = {}
         _questions_rows = {}
 
@@ -2384,20 +2389,21 @@ def import_questionnaire(request, template_name='import_questionnaire.html'):
                         raise
                     text_en = 'h1. %s' % text_question_Column.value
                     slug_qs = str(slugQ) + "_" + convert_text_to_slug(str(text_question_Column.value))
-                    if row[5]:
+                    if row[5].value:
                         helpText = row[5].value
                     else:
                         helpText = ""
                     tooltip = False
-                    if row[6]:
+                    if row[6].value:
                         if str(row[6].value).lower() == 'yes':
                             tooltip = True
 
                     questionset = QuestionSet(questionnaire=questionnaire, checks='required', sortid=sortid, text_en=text_en, heading=slug_qs, help_text=helpText, tooltip=tooltip)
                     log += '\n%s - QuestionSet created %s - %s ' % (type_Column.row, sortid, text_en)
                     try:
-                        questionset.save()
-                        log += '\n%s - QuestionSet saved %s - %s ' % (type_Column.row, sortid, text_en)
+                        if not _debug:
+                            questionset.save()
+                            log += '\n%s - QuestionSet saved %s - %s ' % (type_Column.row, sortid, text_en)
                     except:
 
                         log += "\n%s - Error to save questionset %s - %s" % (type_Column.row, sortid, text_en)
@@ -2431,15 +2437,22 @@ def import_questionnaire(request, template_name='import_questionnaire.html'):
 
                         #If has dependencies
                         if row[8].value:
-                            dependencies_list = row[8]
-                            list_dep_aux = dependencies_list.value.split('|')
-                            question_num_parent = _questions_rows.get(list_dep_aux[0])
-                            index_aux = list_dep_aux[1]-1
-                            choice_parent = _choices_array[index_aux]
-                            _checks = 'dependent=\"' + str(question_num_parent) + ',' + str(choice_parent) + '\"'
-                            print str(row[0].row) + "LIST_DEP: " + str(list_dep_aux)
-                            print str(row[0].row) + "CHOICES_ARR: " + str(_choices_array)
-                            print str(row[0].row) + str(question_num_parent) + " - " + str(choice_parent)
+                            try:
+                                dependencies_list = row[8]
+                                list_dep_aux = dependencies_list.value.split('|')
+                                question_num_parent = str(_questions_rows.get(int(list_dep_aux[0])))
+
+                                # print str(row[0].row) + " str(list_dep_aux[0]: " + str(int(list_dep_aux[0]))
+                                # print str(row[0].row) + " question_num_parent: " + question_num_parent
+                                # print str(row[0].row) + " _questions_rows: " + str(_questions_rows)
+
+                                index_aux = int(str(list_dep_aux[1]))-1
+                                choice_parent_list = _choices_array.get(int(list_dep_aux[0]))
+                                choice_parent = choice_parent_list[index_aux]
+                                _checks = 'dependent=\"' + str(question_num_parent) + ',' + str(choice_parent) + '\"'
+
+                            except:
+                                raise
 
                         try:
                             questionNumber = qNumber.getNumber(level_number_column.value)
@@ -2452,12 +2465,15 @@ def import_questionnaire(request, template_name='import_questionnaire.html'):
                                             type='comment', help_text=helpText, slug=slug, stats=False, category=True,
                                             tooltip=_tooltip, checks=_checks)
 
-                        log += '\n%s - Category created %s ' % (type_Column.row, question)
-                        question.save()
+                        if not _debug:
+                            question.save()
+                            log += '\n%s - Category created %s ' % (type_Column.row, question)
 
                         _questions_rows[type_Column.row] = str(questionNumber)
 
-                        save_slug(question.slug,  question.text_en, question)
+                        if not _debug:
+                            save_slug(question.slug,  question.text_en, question)
+
                         # slugs.append((question.slug,  question.text_en, question))
                         log += '\n%s - Category saved %s ' % (type_Column.row, question)
                     except:
@@ -2491,21 +2507,22 @@ def import_questionnaire(request, template_name='import_questionnaire.html'):
 
                         #If has dependencies
                         if row[8].value:
-                            dependencies_list = row[8]
-                            list_dep_aux = dependencies_list.value.split('|')
-                            question_num_parent = str(_questions_rows.get(int(list_dep_aux[0])))
-                            print str(row[0].row) + " str(list_dep_aux[0]: " + str(int(list_dep_aux[0]))
-                            print str(row[0].row) + " question_num_parent: " + question_num_parent
-                            print str(row[0].row) + " _questions_rows: " + str(_questions_rows)
+                            try:
+                                dependencies_list = row[8]
+                                list_dep_aux = dependencies_list.value.split('|')
+                                question_num_parent = str(_questions_rows.get(int(list_dep_aux[0])))
 
-                            index_aux = int(str(list_dep_aux[1]))-1
-                            choice_parent_list = _choices_array.get(int(list_dep_aux[0]))
-                            choice_parent = choice_parent_list[index_aux]
+                                # print str(row[0].row) + " str(list_dep_aux[0]: " + str(int(list_dep_aux[0]))
+                                # print str(row[0].row) + " question_num_parent: " + question_num_parent
+                                # print str(row[0].row) + " _questions_rows: " + str(_questions_rows)
 
-                            _checks = 'dependent=\"' + str(question_num_parent) + ',' + str(choice_parent) + '\"'
-                            # print str(row[0].row) + "LIST_DEP: " + str(list_dep_aux)
-                            # print str(row[0].row) + "CHOICES_ARR: " + str(_choices_array)
-                            # print str(row[0].row) + str(question_num_parent) + " - " + str(choice_parent)
+                                index_aux = int(str(list_dep_aux[1]))-1
+                                choice_parent_list = _choices_array.get(int(list_dep_aux[0]))
+                                choice_parent = choice_parent_list[index_aux]
+                                _checks = 'dependent=\"' + str(question_num_parent) + ',' + str(choice_parent) + '\"'
+
+                            except:
+                                raise
 
                         try:
                             questionNumber = qNumber.getNumber(level_number_column.value)
@@ -2520,11 +2537,15 @@ def import_questionnaire(request, template_name='import_questionnaire.html'):
                                             category=False, tooltip=_tooltip, checks=_checks)
 
                         log += '\n%s - Question created %s ' % (type_Column.row, question)
-                        question.save()
+
+                        if not _debug:
+                            question.save()
 
                         _questions_rows[type_Column.row] = str(questionNumber)
 
-                        save_slug(question.slug,  question.text_en, question)
+                        if not _debug:
+                            save_slug(question.slug,  question.text_en, question)
+
                         # slugs.append((question.slug,  question.text_en, question))
                         log += '\n%s - Question saved %s ' % (type_Column.row, question)
                         if dataType_column.value in ['choice', 'choice-freeform', 'choice-multiple', 'choice-multiple-freeform']:
@@ -2538,7 +2559,8 @@ def import_questionnaire(request, template_name='import_questionnaire.html'):
                                     try:
                                         choice = Choice(question=question, sortid=i, text_en=ch, value=ch)
                                         log += '\n%s - Choice created %s ' % (type_Column.row, choice)
-                                        choice.save()
+                                        if not _debug:
+                                            choice.save()
                                         _choices_array_aux.append(ch)
 
                                         log += '\n%s - Choice saved %s ' % (type_Column.row, choice)
@@ -2559,7 +2581,6 @@ def import_questionnaire(request, template_name='import_questionnaire.html'):
         writeLog(log)
         raise
 
-
     # for a in slugs:
     #     (_slug, _desc, question) = a
     #     # Write Slug
@@ -2572,7 +2593,6 @@ def import_questionnaire(request, template_name='import_questionnaire.html'):
     log += '\nQuestionnaire %s, questionsets, questions and choices created with success!! ' % questionnaire
     writeLog(log)
     # print log
-
 
     return render_to_response(template_name, {'import_questionnaire': True,
                               'request': request, 'breadcrumb': True}, RequestContext(request))
