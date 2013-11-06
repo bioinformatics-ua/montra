@@ -1741,7 +1741,12 @@ def show_fingerprint_page_read_only(request, q_id, qs_id, errors={}, template_na
                 if depon:
                     # extra args to BooleanParser are not required for toString
                     parser = BooleanParser(dep_check)
-                    qdict['checkstring'] = ' checks="%s"' % parser.toString(depon)
+
+                    # qdict['checkstring'] = ' checks="%s"' % parser.toString(depon)
+
+                    #changed because the line above 
+                    qdict['checkstring'] = ' checks="dep_check(\'%s\')"' % depon
+
                     qdict['depon_class'] = ' depon_class'
                     jstriggers.append('qc_%s' % question.number)
                     if question.text[:2] == 'h1':
@@ -2317,8 +2322,8 @@ def import_questionnaire(request, template_name='import_questionnaire.html'):
     from django.template.defaultfilters import slugify
     # wb = load_workbook(filename = r'/Volumes/EXT1/Dropbox/MAPi-Dropbox/EMIF/Code/emif/emif/questionnaire_ad_v2.xlsx')
     # wb = load_workbook(filename = r'/Volumes/EXT1/Dropbox/MAPi-Dropbox/EMIF/Observational_Data_Sources_Template_v5.xlsx')
-    # wb = load_workbook(filename = r'C:/Questionnaire_template_v3.2.xlsx')
-    wb = load_workbook(filename =r'/Volumes/EXT1/trash/Questionnaire_template_v3.2.xlsx')
+    wb = load_workbook(filename = r'C:/Questionnaire_template_v3.3.xlsx')
+    # wb = load_workbook(filename =r'/Volumes/EXT1/trash/Questionnaire_template_v3.2.xlsx')
     ws = wb.get_active_sheet()
     log = ''
 
@@ -2347,9 +2352,12 @@ def import_questionnaire(request, template_name='import_questionnaire.html'):
 
     questionnaire = Questionnaire(name=name, disable=disable, slug=slugQ, redirect_url='/')
     log += '\nQuestionnaire created %s ' % questionnaire
+
     try:
         questionnaire.save()
         log += '\nQuestionnaire saved %s ' % questionnaire
+        _choices_array = {}
+        _questions_rows = {}
 
         #############################
         # TIPS:
@@ -2362,6 +2370,7 @@ def import_questionnaire(request, template_name='import_questionnaire.html'):
                 type_Column = row[0]
                 text_question_Column = row[1]
                 level_number_column = row[2]
+                _checks = ''
 
                 # Type = QUESTIONSET
                 # Columns required:  Type, Text/Question
@@ -2399,6 +2408,7 @@ def import_questionnaire(request, template_name='import_questionnaire.html'):
                 # Columns required:  Type, Text/Question, Level/Number, Category
                 # Columns optional:  Help text/Description, Slug, Tooltip
                 elif str(type_Column.value) == "Category":
+
                     try:
                         text_en = str(level_number_column.value) + '. ' + str(text_question_Column.value)
                         if row[7].value:
@@ -2414,9 +2424,23 @@ def import_questionnaire(request, template_name='import_questionnaire.html'):
                             helpText = ""
                         # print "HELP_TEXT1: " + str(helpText)
                         _tooltip = False
-                        if row[6]:
+
+                        if row[6].value:
                             if str(row[6].value).lower() == 'yes':
                                 _tooltip = True
+
+                        #If has dependencies
+                        if row[8].value:
+                            dependencies_list = row[8]
+                            list_dep_aux = dependencies_list.value.split('|')
+                            question_num_parent = _questions_rows.get(list_dep_aux[0])
+                            index_aux = list_dep_aux[1]-1
+                            choice_parent = _choices_array[index_aux]
+                            _checks = 'dependent=\"' + str(question_num_parent) + ',' + str(choice_parent) + '\"'
+                            print str(row[0].row) + "LIST_DEP: " + str(list_dep_aux)
+                            print str(row[0].row) + "CHOICES_ARR: " + str(_choices_array)
+                            print str(row[0].row) + str(question_num_parent) + " - " + str(choice_parent)
+
                         try:
                             questionNumber = qNumber.getNumber(level_number_column.value)
                             questionNumber = format_number(str(questionNumber))
@@ -2424,9 +2448,15 @@ def import_questionnaire(request, template_name='import_questionnaire.html'):
                             log += "\n%s - Error to create Category number %s" % (type_Column.row, text_en)
                             writeLog(log)
                             raise
-                        question = Question(questionset=questionset, text_en=text_en, number=str(questionNumber), type='comment', help_text=helpText, slug=slug, stats=False, category=True, tooltip=_tooltip)
+                        question = Question(questionset=questionset, text_en=text_en, number=str(questionNumber),
+                                            type='comment', help_text=helpText, slug=slug, stats=False, category=True,
+                                            tooltip=_tooltip, checks=_checks)
+
                         log += '\n%s - Category created %s ' % (type_Column.row, question)
                         question.save()
+
+                        _questions_rows[type_Column.row] = str(questionNumber)
+
                         save_slug(question.slug,  question.text_en, question)
                         # slugs.append((question.slug,  question.text_en, question))
                         log += '\n%s - Category saved %s ' % (type_Column.row, question)
@@ -2454,9 +2484,29 @@ def import_questionnaire(request, template_name='import_questionnaire.html'):
                             helpText = ''
                         # print "HELP_TEXT2: " + str(helpText)
                         _tooltip = False
+
                         if row[6].value:
                             if str(row[6].value).lower() == 'yes':
                                 _tooltip = True
+
+                        #If has dependencies
+                        if row[8].value:
+                            dependencies_list = row[8]
+                            list_dep_aux = dependencies_list.value.split('|')
+                            question_num_parent = str(_questions_rows.get(int(list_dep_aux[0])))
+                            print str(row[0].row) + " str(list_dep_aux[0]: " + str(int(list_dep_aux[0]))
+                            print str(row[0].row) + " question_num_parent: " + question_num_parent
+                            print str(row[0].row) + " _questions_rows: " + str(_questions_rows)
+
+                            index_aux = int(str(list_dep_aux[1]))-1
+                            choice_parent_list = _choices_array.get(int(list_dep_aux[0]))
+                            choice_parent = choice_parent_list[index_aux]
+
+                            _checks = 'dependent=\"' + str(question_num_parent) + ',' + str(choice_parent) + '\"'
+                            # print str(row[0].row) + "LIST_DEP: " + str(list_dep_aux)
+                            # print str(row[0].row) + "CHOICES_ARR: " + str(_choices_array)
+                            # print str(row[0].row) + str(question_num_parent) + " - " + str(choice_parent)
+
                         try:
                             questionNumber = qNumber.getNumber(level_number_column.value)
                             questionNumber = format_number(str(questionNumber))
@@ -2465,13 +2515,20 @@ def import_questionnaire(request, template_name='import_questionnaire.html'):
                             writeLog(log)
                             raise
 
-                        question = Question(questionset=questionset, text_en=text_en, number=str(questionNumber), type=dataType_column.value, help_text=helpText, slug=slug, stats=True, category=False, tooltip=_tooltip)
+                        question = Question(questionset=questionset, text_en=text_en, number=str(questionNumber),
+                                            type=dataType_column.value, help_text=helpText, slug=slug, stats=True,
+                                            category=False, tooltip=_tooltip, checks=_checks)
+
                         log += '\n%s - Question created %s ' % (type_Column.row, question)
                         question.save()
+
+                        _questions_rows[type_Column.row] = str(questionNumber)
+
                         save_slug(question.slug,  question.text_en, question)
                         # slugs.append((question.slug,  question.text_en, question))
                         log += '\n%s - Question saved %s ' % (type_Column.row, question)
                         if dataType_column.value in ['choice', 'choice-freeform', 'choice-multiple', 'choice-multiple-freeform']:
+                            _choices_array_aux = []
                             # Parse of values list
                             values_list = row[4]
                             if (values_list!=None and values_list.value!=None):
@@ -2482,12 +2539,15 @@ def import_questionnaire(request, template_name='import_questionnaire.html'):
                                         choice = Choice(question=question, sortid=i, text_en=ch, value=ch)
                                         log += '\n%s - Choice created %s ' % (type_Column.row, choice)
                                         choice.save()
+                                        _choices_array_aux.append(ch)
+
                                         log += '\n%s - Choice saved %s ' % (type_Column.row, choice)
                                         i += 1
                                     except:
                                         log += "\n%s - Error to save Choice %s" % (type_Column.row, choice)
                                         writeLog(log)
                                         raise
+                                _choices_array[type_Column.row] = _choices_array_aux
 
                     except:
                         log += "\n%s - Error to save question %s" % (type_Column.row, text_en)
