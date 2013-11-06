@@ -64,23 +64,7 @@
                             <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion_{{ k.sortid }}" href="#div_{{ iteratorQ.value }}">
                 {% endif %}
 
-                        {% if question.text|geths != 'h1' %}
-                             {% if request.user.is_staff %}
-                                    <span class="pull-right"> <a href="admin/questionnaire/question/{{ question.id }}/">
-                                        <i class="icon-edit"></i>
-                                    </a></span>
-                             {% endif %}
-                        {% endif %}
                         <div class="question type_{{ qdict.qtype }} {% if error %} error prepend-top{% endif %}{{ qdict.qnum_class }}{{ qdict.qalpha_class }} {{qdict.depon_class}}" id="qc_{{ question.number }}" {{qdict.checkstring|safe}} >
-
-                                <!--{% if request.user.is_staff %}-->
-                                <!--<div><span class="pull-right">-->
-                                    <!--<a href="admin/questionnaire/question/{{ question.id }}/">-->
-                                        <!--({% trans "edit" %} {{ question.number }})-->
-                                    <!--</a>-->
-                                <!--</span>-->
-                                    <!--</div>-->
-                            <!--{% endif %}-->
 
                             {% if qdict.custom %}
                                 {% if error %}
@@ -102,8 +86,16 @@
 
                                 {% endif %}
 
-                                        </span>
-
+                                   </span>
+                                {% if question.text|geths != 'h1' %}
+                                    {% if request.user.is_staff %}
+                                    <span class="pull-right">
+                                        <a href="admin/questionnaire/question/{{ question.id }}/">
+                                            <i class="icon-edit"></i>
+                                        </a>
+                                    </span>
+                                    {% endif %}
+                                {% endif %}
                                 </div>
                                 {% if question.text|geths == 'h1' %}
                                         </a>
