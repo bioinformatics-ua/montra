@@ -34,10 +34,7 @@
         <label class="control-label span2">Authors (last name initials):</label>
         <input class="" type="text" id="question_{{ question.number|removedots }}_pubauthors" />    
     </div>
-    <div class="control-group span12">
-        <label class="control-label span2">Link (URL):</label>
-        <input class="" type="text" id="question_{{ question.number|removedots }}_publink" />
-    </div>
+    
     <div class="control-group span12">
     <button id="addpub" type="button" class="btn btn-primary"><i class="icon-large icon-plus-sign"></i>Add Publication</button>
     
@@ -55,7 +52,7 @@
               <th>Volume</th>
               <th>Pages</th>
               <th>Authors</th>
-              <th>Link</th>
+              
             </tr>
         </thead>
 
@@ -114,6 +111,7 @@ function PublicationWidget ()
             
             pw{{ question.number|removedots }}.addPublication();
         });
+
         $("#loadpubbtn" ).bind( "click", function() {
             
             pw{{ question.number|removedots }}.updateInformationFromPubMed();
@@ -123,18 +121,29 @@ function PublicationWidget ()
             pw{{ question.number|removedots }}.removeSelectedPublication();
         });
         
-        $( "#question_{{ question.number }}_pubmedid").bind( "keypress", function() {
-            console.log("lol");
+        
+        /*
+        function stopRKey(evt) { 
+          console.log(evt);
+          var evt = (evt) ? evt : ((event) ? event : null); 
+          var node = (evt.target) ? evt.target : ((evt.srcElement) ? evt.srcElement : null); 
+          if ((evt.keyCode == 13) && (node.type=="text"))  {console.log("stop"); pw{{ question.number|removedots }}.addPublication(); return false;} 
+        } 
+
+        document.onkeypress = stopRKey; 
+        */
+        $( "#question_{{ question.number|removedots }}_pubmedid").bind( "keypress", function(args) {
+            
+            if (args.keyCode == 13) {
+                pw{{ question.number|removedots }}.updateInformationFromPubMed();
+               return false;
+            } 
+            
+        });
+        $( "#question_{{ question.number|removedots }}_pubmedid").bind( "paste", function() {
             
             pw{{ question.number|removedots }}.updateInformationFromPubMed();
         });
-
-        $( "#question_{{ question.number }}_pubmedid").bind( "paste", function() {
-            
-            pw{{ question.number|removedots }}.updateInformationFromPubMed();
-        });
-
-           
 
     };
 
@@ -149,7 +158,7 @@ function PublicationWidget ()
         var _pubauthors = $('#question_{{ question.number|removedots }}_pubauthors').val();  
         var _publink = $('#question_{{ question.number|removedots }}_publink').val();  
 
-        $('#question_{{ question.number|removedots }}_table > tbody:last').append('<tr><td><a class="deleteLink" href="#" ><img src="static/img/glyphicons_192_circle_remove.png"/></a></td><td>'+_pubmedid+'</td><td>'+_pubtitle+'</td><td>'+_pubjournal+'</td><td>'+_pubyear+'</td><td>'+_pubvolume+'</td><td>'+_pubpages+'</td><td>'+_pubauthors+'</td><td>'+_publink+'</td></tr>');
+        $('#question_{{ question.number|removedots }}_table > tbody:last').append('<tr><td><a class="deleteLink" href="#" ><img src="static/img/glyphicons_192_circle_remove.png"/></a></td><td>'+_pubmedid+'</td><td>'+_pubtitle+'</td><td>'+_pubjournal+'</td><td>'+_pubyear+'</td><td>'+_pubvolume+'</td><td>'+_pubpages+'</td><td>'+_pubauthors+'</td></tr>');
 
         $(".deleteLink").click(function(e) {
                 e.preventDefault();
@@ -291,3 +300,4 @@ pw{{ question.number|removedots }}.bindElements();
 pw{{ question.number|removedots }}.loadInformation();
 
 </script>
+

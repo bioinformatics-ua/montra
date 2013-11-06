@@ -20,7 +20,7 @@
 }
 
 .required:after {
-    content: "*";
+    content: "";
 }
 
 .questionset-title {
