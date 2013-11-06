@@ -203,3 +203,7 @@ div .tooltip {
 .qtext_h4 {
     margin-left: 60px;
 }
+
+.depon_class {
+    display: none;
+}
