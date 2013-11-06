@@ -1744,7 +1744,8 @@ def show_fingerprint_page_read_only(request, q_id, qs_id, errors={}, template_na
 
                     # qdict['checkstring'] = ' checks="%s"' % parser.toString(depon)
 
-                    #changed because the line above 
+                    #It allows only 1 dependency
+                    #The line above allows multiple dependencies but it has a bug when is parsing white spaces
                     qdict['checkstring'] = ' checks="dep_check(\'%s\')"' % depon
 
                     qdict['depon_class'] = ' depon_class'
@@ -2412,7 +2413,7 @@ def import_questionnaire(request, template_name='import_questionnaire.html'):
 
                 # Type = CATEGORY
                 # Columns required:  Type, Text/Question, Level/Number, Category
-                # Columns optional:  Help text/Description, Slug, Tooltip
+                # Columns optional:  Help text/Description, Slug, Tooltip, Dependencies
                 elif str(type_Column.value) == "Category":
 
                     try:
@@ -2483,7 +2484,7 @@ def import_questionnaire(request, template_name='import_questionnaire.html'):
 
                 # Type = QUESTION
                 # Columns required:  Type, Text/Question, Level/Number, Data Type, Category, Stats
-                # Columns optional:  Value List, Help text/Description, Tooltip
+                # Columns optional:  Value List, Help text/Description, Tooltip, Dependencies
                 else:
                     text_en = str(level_number_column.value) + '. ' + str(text_question_Column.value)
                     try:
