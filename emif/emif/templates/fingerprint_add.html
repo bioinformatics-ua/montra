@@ -100,7 +100,8 @@
                                     </span>
                                     {% endif %}
                                     <span class="pull-right answered" id="answered_{{ question.number }}">
-                                        <i class="fa fa-check-square-o fa-green">&nbsp;</i>
+                                        <a href="" onclick="toggle_comments({{question.number|removedots}}); return false;"><i class="fa fa-check-square-o fa-green">&nbsp;</i></a>
+
                                     </span>
                                 {% endif %}
                                 </div>
@@ -117,12 +118,12 @@
                                         <div class="alert-message block-message text-error input">{{ error }}</div>
                                     {% endif %}
                                     {% include qdict.template %}
+                                    <div id="comments_{{question.number|removedots}}" style="display:none;">
+                                     <a href="" class="span6" onclick="toggle_comments({{question.number|removedots}}); return false;">Comments</a>
+                                    <textarea class="span6" name="question_{{ question.number }}" cols="50" rows="5"></textarea>
+                                    </div>
                                 </div>
                             {% endif %}
-
-
-
-
 
                         {% if question.footer %}
                             <div class="question-footer">
@@ -198,6 +199,12 @@
 <script type="text/javascript">
 
     {% block scriptextra %}
+
+function toggle_comments(question_number)
+{
+    console.log("q + "+ question_number);
+    $("#comments_"+question_number).toggle();
+}
 
 function validate(question_number)
 {
