@@ -43,6 +43,20 @@ $(document).ready(function () {
  $(document).on('change', '#qform input, #qform select, #qform textarea', function (e) {
     formHasChanged = true;
     submitted = false;
+
+     e.preventDefault();
+//     TO DO: get parent span .answered ID and add show class and remove hide class
+     /********************************************************************************/
+     $(this).parentsUntil( ".question").find('.answered').first().html( "hilight" );
+
+    if($(this).val() != "") {
+        $($(this).closest('span:has(.answered)')).removeClass('hide');
+        $($(this).closest('span:has(.answered)')).addClass('show');
+    } else {
+        $($(this).closest('span:has(.answered)')).removeClass('hide');
+        $($(this).closest('span:has(.answered)')).addClass('show');
+    }
+     /********************************************************************************/
 });
 
  $("#qform").submit(function() {
