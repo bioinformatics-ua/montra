@@ -18,7 +18,7 @@
     font-size: 8px;
 
 }
-
+/* wildcard - mandatory fields */
 .required:after {
     content: "";
 }
