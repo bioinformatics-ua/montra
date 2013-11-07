@@ -40,11 +40,13 @@ from searchengine.search_indexes import index_answeres_from_qvalues
 from searchengine.search_indexes import convert_text_to_slug
 from emif.utils import *
 from emif.models import *
+from api.models import *
 
 from django.core.mail import send_mail, BadHeaderError
 
 from rest_framework.authtoken.models import Token
 
+import json
 import logging
 import re
 import md5
@@ -1003,8 +1005,22 @@ def createqsets(runcode, qsets=None):
 
 def fingerprint(request, runcode, qs, template_name='database_info.html'):
     qsets, name = createqsets(runcode)
-    return render(request, template_name,
-                  {'request': request, 'qsets': qsets, 'export_bd_answers': True, 'fingerprint_id': runcode,
+
+
+    def get_api_info(fingerprint_id):
+
+        result = {}
+    
+        
+        results = FingerprintAPI.objects.filter(fingerprintID=fingerprint_id)
+        result = {}
+        for r in results:
+            result[r.field] = r.value
+        return result
+
+    apiinfo = json.dumps(get_api_info(runcode));
+    return render(request, template_name, 
+        {'request': request, 'qsets': qsets, 'export_bd_answers': True, 'apiinfo': apiinfo, 'fingerprint_id': runcode,
                    'breadcrumb': True, 'breadcrumb_name': name, 'style': qs, 'collapseall': False})
 
 

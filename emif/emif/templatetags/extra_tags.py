@@ -31,6 +31,10 @@ register = template.Library()
 def removeh1(value):
     
     return value.replace('h1. ','')
+@register.filter(name='clean')
+@stringfilter
+def clean(value):
+    return value.replace('//','')
 
 
 @register.filter(name='removehs')
@@ -68,6 +72,7 @@ def geths(value):
 def removespaces(value):
     value = value.replace('h1. ','')
     value = value.replace(',','')
+    value = value.replace('/','')
     result = value.replace(' ','')
 
     return result

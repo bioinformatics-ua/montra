@@ -81,7 +81,7 @@ class SearchView(APIView):
     authentication_classes = (TokenAuthentication,)
 
     def get(self, request, *args, **kw):
-
+        
         # If authenticated
         if request.auth:
             user = request.user
