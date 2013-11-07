@@ -207,3 +207,7 @@ div .tooltip {
 .depon_class {
     display: none;
 }
+
+.fa-green {
+            color: limegreen;
+        }
