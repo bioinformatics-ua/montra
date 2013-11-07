@@ -62,6 +62,7 @@ filter: alpha(opacity=80);
 path.link {
   fill: none;
   stroke: #9ecae1;
+
   stroke-width: 1.5px;
 }
 
@@ -407,50 +408,97 @@ var vis = d3.select("#chart").append("svg:svg")
 function json_to_d3json(obj)
 {
   d3_result = {};
+  hash_childrens = {};
   d3_result['name'] = 'Extra Information';
   
   d3_aux = [];
   for (var key in obj)
   {
     var res = key.split("+");
-    var aux = {}
+    
+    var aux_root = d3_aux;
+
+    compact_slug = "";
+    console.log(key);
+    for (var j = 0 ; j<res.length ; j++)
+    {
+
+      var l = res[j];
+      if (compact_slug!="")
+      {
+        compact_slug = compact_slug + "+" + l;
+      }
+      else
+      {
+        compact_slug = l;
+      }
+      var aux = {}
+      aux['name'] = l;
+      
+      if (res.length-1 != j)
+      {
+        
+        if (compact_slug in hash_childrens)
+        {
+          aux_root = hash_childrens[compact_slug];
+        }
+        else
+        {
+          var aux_list = [];
+          aux['children'] = aux_list;
+          aux_root.push(aux);
+          aux_root = aux_list;
+          hash_childrens[compact_slug] = aux_list;
+        }
+
+      }
+      else 
+      {
+        
+        
+        
+        
+        if (compact_slug in hash_childrens)
+        {
+          var aux2 = {}
+          aux2['name'] = obj[key];
+          hash_childrens[compact_slug].push(aux2);
+
+        }
+        else
+        {
+          
+          var aux2 = {}
+          aux2['name'] = obj[key];
+          var aux_list = [aux2];
+          aux['children'] = aux_list;
+
+          hash_childrens[compact_slug] = aux_list
+          aux_root.push(aux);
+        }
+
+        
+      }
+
+    }
+
+
+    /*var aux = {}
     aux['name'] = key;
     
     var aux2 = {}
     aux2['name'] = obj[key];
-    
     aux['children'] = [aux2];
     d3_aux.push(aux);
-    /*var value = d3_result;
-    var i = 0; 
-    for (l in res)
-    {
+    */
 
-      if (l in value)
-      {
-        if (value[l].constructor == Array)
-        {
-          if (len(value)-1 == i)
-          {
-            value[l].push(obj[key]);  
-          }
-          
-        }
-        else
-        {
 
-        }
-        value = value[l];
-      }
-      else
-      {
-        value[l] = [];  
-      }
-      i = i + 1 
-
-    }*/
   }
+
   d3_result['children'] = d3_aux;
+  console.log(hash_childrens);
+  console.log(d3_result);
+  
   return d3_result;
 };
 
