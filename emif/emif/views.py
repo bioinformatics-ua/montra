@@ -1458,7 +1458,7 @@ def check_database_add_conditions(request, questionnaire_id, sortid,
             ans = {}            
             ans['ANSWER'] = value
             
-            extra[question] = ans
+            #extra[question] = ans
 
         if key.startswith('question_'):
             answer = key.split("_", 2)
@@ -1520,8 +1520,6 @@ def check_database_add_conditions(request, questionnaire_id, sortid,
                                             errors=errors, template_name='database_add.html', next=False, sortid=sortid,
                                             fingerprint_id=fingerprint_id)
         
-
-
 
     return show_fingerprint_page_errors(request, questionnaire_id, question_set,
                                         errors={}, template_name='database_add.html', next=True, sortid=sortid,
@@ -1608,7 +1606,7 @@ def show_fingerprint_page_errors(request, q_id, qs_id, errors={}, template_name=
             qlist_general.append((qs_aux, qlist))
             
         if (fingerprint_id != None):
-        
+
             if users_db==None:
                 users_db = request.user.username
             index_answeres_from_qvalues(qlist_general, question_set.questionnaire, users_db,
