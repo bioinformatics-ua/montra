@@ -253,10 +253,8 @@ def store_query(user_request, query_executed):
     else:
         results_tmp = QueryLog.objects.filter(query=query_executed, user__isnull=True)
     query = None
-    print results_tmp
-    print "lol"
+    
     if (results_tmp.exists()):
-        print "exists"
         # If the user exists, then update the Query 
         query = results_tmp[0]
     else:
@@ -319,9 +317,7 @@ def results_diff(request, page=1, template_name='results_diff.html'):
 
     c = CoreEngine()
     results = c.search_fingerprint("text_t:" + query)
-    #results = c.search_fingerprint("database_name_t:"+query)
-    print "Solr"
-    print results
+    
     list_databases = []
 
     for r in results:
