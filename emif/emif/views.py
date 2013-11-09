@@ -491,8 +491,7 @@ def extract_answers(request2, questionnaire_id, question_set, qs_list):
                 handle_uploaded_file(f)
     except:
         pass
-        #raise
-
+        
     qsobjs = QuestionSet.objects.filter(questionnaire=questionnaire_id)
     questionnaire = qsobjs[0].questionnaire
     
@@ -706,8 +705,6 @@ def database_edit(request, fingerprint_id, questionnaire_id, template_name="data
 
     qs_list = QuestionSet.objects.filter(questionnaire=questionnaire_id)
 
-    print qs_list
-
     question_set = qs_list[int(qs_id)]
     if request.POST:
         (qlist_general, qlist, jstriggers, qvalues, jsinclude, cssinclude) = extract_answers(request, questionnaire_id, question_set, qs_list)
@@ -716,7 +713,6 @@ def database_edit(request, fingerprint_id, questionnaire_id, template_name="data
 
     if (question_set.sortid == 99 or request.POST):
         # Index on Solr
-        
         try:
             index_answeres_from_qvalues(qlist_general, question_set.questionnaire, request.user.username,
                                         fingerprint_id)
@@ -995,17 +991,6 @@ def createqsets(runcode, qsets=None):
                     #qsets[qs] = question_group
         break
 
-    print "List of qsets " + str(qsets)
-    #qsets = qsets.order()
-    #print qsets.order()
-    #for qg in qsets:
-    #    print qg
-    #    for tt in qsets[qg].list_ordered_tags:
-    #        try:
-    #            print tt
-    #        except:
-    #            pass
-    #    #print qsets[qg].list_ordered_tags
     return (qsets, name)
 
 
@@ -1158,10 +1143,7 @@ def show_full_questionnaire(request, runinfo, errors={},
     Also add the javascript dependency code.
     """
 
-    #r = assure_authenticated_or_redirect(request)
-
-    #if r:
-    #    return r
+    
     questionnaire_id = runinfo
     qu = get_object_or_404(Questionnaire, id=questionnaire_id)
 
