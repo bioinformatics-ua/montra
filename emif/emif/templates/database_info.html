@@ -192,13 +192,17 @@ path.link {
 
 
             <div class="tab-pane" id="apiinfo">
-             <div class="12">
+             <div ><a id="btn_pivot_table"  class="btn pull-right" href="">Pivot table</a></div>
+             <div class="span12">
               <div id="chart" class="span4"></div>
               
+              <div id="pivot_table_extra_information" style="display:none;">
                 
 
+              </div> 
+
             </div>
-            <div class="8"></div>
+            <div class="span8"></div>
             </div>
 
         </div>
@@ -307,6 +311,22 @@ path.link {
 
     $('#li_workspace').addClass("active");
 
+
+
+   $("#btn_pivot_table").bind('click', function (e) {
+        $("#pivot_table_extra_information").toggle();
+        $("#chart").toggle();
+        
+        if ($('#btn_pivot_table').text() == 'Pivot table')
+        {
+          $('#btn_pivot_table').text('Tree view');
+        }
+        else
+        {
+          $('#btn_pivot_table').text('Pivot table');
+        }
+        return false;
+    });
    $("#collapseall_metadata").bind('click', function (e) {
         e.preventDefault();
         e.stopPropagation();
@@ -501,6 +521,26 @@ function json_to_d3json(obj)
   
   return d3_result;
 };
+function json_to_table(obj)
+{
+  var result = "<table class='table table-bordered table-hover'>";
+  result+="<thead>";
+  result+="<th>Tag</th>";
+  result+="<th>Value</th>";
+  result+="</thead>";
+  result+="<tbody>";
+  for (var key in obj)
+  {
+
+    result+="<tr><td>" + key + "</td>";
+    result+="<td>"+ obj[key] + "</td></tr>";
+
+  }
+  result+="</tbody>";
+  result+="</table>";
+  return result;
+
+}
 
 
 var json_aux = '{{apiinfo}}' ;
@@ -508,11 +548,14 @@ json_aux = json_aux.replace(/&quot;/g, "\"");
 json = JSON.parse( json_aux );
 console.log(json_aux);
 console.log(json);
+var json2 = json;
 json = json_to_d3json(json);
 json.x0 = 0;
 json.y0 = 0;
 
 update(root = json);
+
+$("#pivot_table_extra_information").html(json_to_table(json2));
 
 function update(source) {
 
