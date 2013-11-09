@@ -121,7 +121,7 @@
                                     {% include qdict.template %}
                                     <div id="comments_{{question.number|removedots}}" style="display:none;margin-left:40px;">
                                      <a href="" class="span6" onclick="toggle_comments({{question.number|removedots}}); return false;"><i class="fa fa-comment">&nbsp;</i> Comments</a>
-                                    <textarea style=" background-color:#EEE;color: #000;" class="span6" name="comment_question_{{ question.number }}" cols="50" rows="5"></textarea>
+                                    <textarea style=" background-color:#EEE;color: #000;" class="span6" name="comment_question_{{ question.number|removedots }}" cols="50" rows="5"></textarea>
                                     </div>
                                 </div>
                             {% endif %}

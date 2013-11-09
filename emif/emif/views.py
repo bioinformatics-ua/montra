@@ -481,6 +481,7 @@ class RequestMonkeyPatch(object):
 
 
 def extract_answers(request2, questionnaire_id, question_set, qs_list):
+    print "extract_answers"
     question_set2 = question_set
     request = request2
     # Extract files if they exits 
@@ -525,7 +526,12 @@ def extract_answers(request2, questionnaire_id, question_set, qs_list):
     # generate the answer_dict for each question, and place in extra
     for item in items:
         key, value = item[0], item[1]
-        
+        print "ITEM: " + key
+        if key.startswith('comment'):
+            import pdb
+            pdb.set_trace()
+            # Deal with comment
+
         if key.startswith('question_'):
             answer = key.split("_", 2)
             question = get_question(answer[1], questionnaire)
@@ -1405,10 +1411,7 @@ def check_database_add_conditions(request, questionnaire_id, sortid,
             for name, f in request.FILES.items():
                 print f
                 handle_uploaded_file(f)
-                #print request.FILES['file_uploaded']
-                #handle_uploaded_file(request.FILES['file_uploaded'])
-                #print request.POST
-                #print request.POST['file_uploaded']
+                
     except:
         raise
     qsobjs = QuestionSet.objects.filter(questionnaire=questionnaire_id)
@@ -1445,9 +1448,18 @@ def check_database_add_conditions(request, questionnaire_id, sortid,
 
     # generate the answer_dict for each question, and place in extra
     for item in items:
+
         key, value = item[0], item[1]
-        # print "KEY: %s" % str(key)
-        # print "VALUE: %s" % str(value)
+        
+        if key.startswith("comment"):
+            print "KEY: %s" % str(key)
+            print "VALUE: %s" % str(value)
+
+            ans = {}            
+            ans['ANSWER'] = value
+            
+            extra[question] = ans
+
         if key.startswith('question_'):
             answer = key.split("_", 2)
             question = get_question(answer[1], questionnaire)
@@ -1484,66 +1496,32 @@ def check_database_add_conditions(request, questionnaire_id, sortid,
     active_qs_with_errors = False
     #print "Active QuestionSet: " + question_set
     for question, ans in extra.items():
-        #if not question_satisfies_checks(question, runinfo):
-        #    continue
-        #    
-        #print ans 
 
         if u"Trigger953" not in ans:
             logging.warn("User attempted to insert extra question (or it's a bug)")
             continue
         try:
             cd = question.getcheckdict()
-            #print cd 
-            # requiredif is the new way
             depon = cd.get('requiredif', None) or cd.get('dependent', None)
-            #print depon
-            #if depon:
-            #depparser = BooleanParser(dep_check, runinfo, extra)
-            #if not depparser.parse(depon):
-            # if check is not the same as answer, then we don't care
-            # about this question plus we should delete it from the DB
-            #delete_answer(question, runinfo.subject, runinfo.runid)
-            #if cd.get('store', False):
-            #    runinfo.set_cookie(question.number, None)
-            #    continue
-            #add_answer(runinfo, question, ans)
             verify_answer(question, ans)
-            #if cd.get('store', False):
-            #    runinfo.set_cookie(question.number, ans['ANSWER'])
         except AnswerException, e:
             errors[question.number] = e
 
             if (str(question.questionset.id) == question_set):
-                #print "active enable"
                 active_qs_with_errors = True
+
         except Exception:
             logging.exception("Unexpected Exception")
             raise
 
     if len(errors) > 0 and active_qs_with_errors:
-        print "ERRORS"
+        
         return show_fingerprint_page_errors(request, questionnaire_id, question_set,
                                             errors=errors, template_name='database_add.html', next=False, sortid=sortid,
                                             fingerprint_id=fingerprint_id)
-        #print "show_fingerprint_page_errors"
+        
 
 
-    #question_set = int(question_set) + 1
-
-    # Commented to stay in the current questionset after save the questionnaire
-    ##########################
-    # next_qs = next_questionset_order_by_sortid(question_set, questionnaire_id)
-    # if next_qs == None:
-    #     # Redirect + handle that!!!
-    #     pass
-    # else:
-    #     sortid = next_qs.sortid
-    # question_set = str(next_qs.pk)
-    ##########################
-
-    # print question_set
-    # print sortid
 
     return show_fingerprint_page_errors(request, questionnaire_id, question_set,
                                         errors={}, template_name='database_add.html', next=True, sortid=sortid,
@@ -1560,26 +1538,19 @@ def show_fingerprint_page_errors(request, q_id, qs_id, errors={}, template_name=
     try:
 
         qs_list = QuestionSet.objects.filter(questionnaire=q_id).order_by('sortid')
-        #print "Q_id: " + q_id
-        #print "Qs_id: " + qs_id
-        #print "SortID: " + str(sortid)
-        #print "QS List: " + str(qs_list)
+        
         initial_sort = sortid
 
         if (int(sortid) == 99):
             sortid = len(qs_list) - 1
         question_set = qs_list[int(sortid)]
-        #questions = Question.objects.filter(questionset=qs_id)
-
+        
         questions = question_set.questions()
-        #print "Questions: " + str(questions)
-        #print "QuestionSet: " + str(question_set)
-
+        
         questions_list = {}
         for qset_aux in qs_list:
-            #questions_aux = Question.objects.filter(questionset=qset_aux)
             questions_list[qset_aux.id] = qset_aux.questions()
-            #print "here"
+        
 
         qlist = []
         jsinclude = []      # js files to include
@@ -1635,14 +1606,9 @@ def show_fingerprint_page_errors(request, q_id, qs_id, errors={}, template_name=
             if qs_aux == None:
                 qs_aux = k
             qlist_general.append((qs_aux, qlist))
-            #print "Next:"
-        #if (initial_sort == 99):
-        #    # Index on Solr
-        #    index_answeres_from_qvalues(qlist_general, question_set.questionnaire, request.user.username)
-        #print "Fingerprint"
+            
         if (fingerprint_id != None):
-            # print "Fingerprint: " + fingerprint_id
-            # print "QLIST_general: " + str(qlist_general)
+        
             if users_db==None:
                 users_db = request.user.username
             index_answeres_from_qvalues(qlist_general, question_set.questionnaire, users_db,
