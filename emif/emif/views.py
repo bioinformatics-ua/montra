@@ -1367,7 +1367,6 @@ def next_questionset_order_by_sortid(questionset_id, questionnaire_id):
             next = True
     return next_qs
 
-
 def handle_uploaded_file(f):
     print "abspath"
 
@@ -1389,9 +1388,9 @@ def check_database_add_conditions(request, questionnaire_id, sortid,
             print "file upload:"
             for name, f in request.FILES.items():
                 handle_uploaded_file(f)
-                
     except:
         raise
+
     qsobjs = QuestionSet.objects.filter(questionnaire=questionnaire_id)
     questionnaire = qsobjs[0].questionnaire
     question_set = None
@@ -1435,7 +1434,6 @@ def show_fingerprint_page_errors(request, q_id, qs_id, errors={}, template_name=
         for qset_aux in qs_list:
             questions_list[qset_aux.id] = qset_aux.questions()
         
-
         qlist = []
         jsinclude = []      # js files to include
         cssinclude = []     # css files to include
@@ -1443,13 +1441,13 @@ def show_fingerprint_page_errors(request, q_id, qs_id, errors={}, template_name=
         qvalues = {}
 
         qlist_general = []
-
+        extra_fields = {}
         for k in qs_list:
             qlist = []
             qs_aux = None
             for question in questions_list[k.id]:
                 qs_aux = question.questionset
-                #print "Question: " + str(question)
+                
                 Type = question.get_type()
                 _qnum, _qalpha = split_numal(question.number)
 
@@ -1487,6 +1485,10 @@ def show_fingerprint_page_errors(request, q_id, qs_id, errors={}, template_name=
                         #    qvalues[question.number] = qdict['qvalue']
 
                 qlist.append((question, qdict))
+                comment_id = "comment_question_"+question.number.replace(".","")
+                if request.POST[comment_id]!='':
+                    extra_fields[comment_id+'_t'] = request.POST[comment_id]
+
             if qs_aux == None:
                 qs_aux = k
             qlist_general.append((qs_aux, qlist))
@@ -1496,7 +1498,7 @@ def show_fingerprint_page_errors(request, q_id, qs_id, errors={}, template_name=
             if users_db==None:
                 users_db = request.user.username
             index_answeres_from_qvalues(qlist_general, question_set.questionnaire, users_db,
-                                        fingerprint_id)
+                                        fingerprint_id, extra_fields=extra_fields)
 
         r = r2r(template_name, request,
                 questionset=question_set,
