@@ -1382,12 +1382,12 @@ def check_database_add_conditions(request, questionnaire_id, sortid,
     # -------------------------------------
     # --- Process POST with QuestionSet ---
     # -------------------------------------
+
     print "check_database_add_conditions"
     try:
         if request.FILES:
             print "file upload:"
             for name, f in request.FILES.items():
-                print f
                 handle_uploaded_file(f)
                 
     except:
@@ -1406,99 +1406,7 @@ def check_database_add_conditions(request, questionnaire_id, sortid,
                 break
 
     fingerprint_id = request.POST['fingerprint_id']
-    #print "@QuestionSet" + str(question_set)
-    #print "@QuestionSet- sortid" + str(sortid)
-    # to confirm that we have the correct answers
-
-    expected = []
-    for qset in qsobjs:
-        questions = qset.questions()
-        for q in questions:
-            expected.append(q)
-
-    items = request.POST.items()
-    extra = {} # question_object => { "ANSWER" : "123", ... }
-
-    # this will ensure that each question will be processed, even if we did not receive
-    # any fields for it. Also works to ensure the user doesn't add extra fields in
-    for x in expected:
-        items.append((u'question_%s_Trigger953' % x.number, None))
-
-    # generate the answer_dict for each question, and place in extra
-    for item in items:
-
-        key, value = item[0], item[1]
-        
-        if key.startswith("comment"):
-            print "KEY: %s" % str(key)
-            print "VALUE: %s" % str(value)
-
-            ans = {}            
-            ans['ANSWER'] = value
-            
-            #extra[question] = ans
-
-        if key.startswith('question_'):
-            answer = key.split("_", 2)
-            question = get_question(answer[1], questionnaire)
-            if not question:
-                logging.warn("Unknown question when processing: %s" % answer[1])
-                continue
-            extra[question] = ans = extra.get(question, {})
-            if (len(answer) == 2):
-                ans['ANSWER'] = value
-            elif (len(answer) == 3):
-                ans[answer[2]] = value
-            else:
-                print "Poorly formed form element name: %r" % answer
-                logging.warn("Poorly formed form element name: %r" % answer)
-                continue
-            extra[question] = ans
-
-    errors = {}
-
-    def verify_answer(question, answer_dict):
-
-        type = question.get_type()
-
-        if "ANSWER" not in answer_dict:
-            answer_dict['ANSWER'] = None
-        answer = None
-        if type in Processors:
-            answer = Processors[type](question, answer_dict) or ''
-        else:
-            raise AnswerException("No Processor defined for question type %s" % type)
-
-        return True
-
-    active_qs_with_errors = False
-    #print "Active QuestionSet: " + question_set
-    for question, ans in extra.items():
-
-        if u"Trigger953" not in ans:
-            logging.warn("User attempted to insert extra question (or it's a bug)")
-            continue
-        try:
-            cd = question.getcheckdict()
-            depon = cd.get('requiredif', None) or cd.get('dependent', None)
-            verify_answer(question, ans)
-        except AnswerException, e:
-            errors[question.number] = e
-
-            if (str(question.questionset.id) == question_set):
-                active_qs_with_errors = True
-
-        except Exception:
-            logging.exception("Unexpected Exception")
-            raise
-
-    if len(errors) > 0 and active_qs_with_errors:
-        
-        return show_fingerprint_page_errors(request, questionnaire_id, question_set,
-                                            errors=errors, template_name='database_add.html', next=False, sortid=sortid,
-                                            fingerprint_id=fingerprint_id)
-        
-
+    
     return show_fingerprint_page_errors(request, questionnaire_id, question_set,
                                         errors={}, template_name='database_add.html', next=True, sortid=sortid,
                                         fingerprint_id=fingerprint_id, users_db=users_db)
