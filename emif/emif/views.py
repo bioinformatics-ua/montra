@@ -622,8 +622,17 @@ def extract_answers(request2, questionnaire_id, question_set, qs_list):
                 if depon:
                     # extra args to BooleanParser are not required for toString
                     parser = BooleanParser(dep_check)
-                    qdict['checkstring'] = ' checks="%s"' % parser.toString(depon)
+
+                    # qdict['checkstring'] = ' checks="%s"' % parser.toString(depon)
+
+                    #It allows only 1 dependency
+                    #The line above allows multiple dependencies but it has a bug when is parsing white spaces
+                    qdict['checkstring'] = ' checks="dep_check(\'%s\')"' % depon
+
+                    qdict['depon_class'] = ' depon_class'
                     jstriggers.append('qc_%s' % question.number)
+                    if question.text[:2] == 'h1':
+                        jstriggers.append('acc_qc_%s' % question.number)
                 if 'default' in cd and not question.number in cookiedict:
                     qvalues[question.number] = cd['default']
                 if Type in QuestionProcessors:
@@ -1466,8 +1475,16 @@ def show_fingerprint_page_errors(request, q_id, qs_id, errors={}, template_name=
                 if depon:
                     # extra args to BooleanParser are not required for toString
                     parser = BooleanParser(dep_check)
-                    qdict['checkstring'] = ' checks="%s"' % parser.toString(depon)
+                    # qdict['checkstring'] = ' checks="%s"' % parser.toString(depon)
+
+                    #It allows only 1 dependency
+                    #The line above allows multiple dependencies but it has a bug when is parsing white spaces
+                    qdict['checkstring'] = ' checks="dep_check(\'%s\')"' % depon
+
+                    qdict['depon_class'] = ' depon_class'
                     jstriggers.append('qc_%s' % question.number)
+                    if question.text[:2] == 'h1':
+                        jstriggers.append('acc_qc_%s' % question.number)
                 if 'default' in cd and not question.number in cookiedict:
                     qvalues[question.number] = cd['default']
                 if Type in QuestionProcessors:
@@ -1764,8 +1781,16 @@ def show_fingerprint_page(request, runinfo, errors={}, template_name='database_e
         if depon:
             # extra args to BooleanParser are not required for toString
             parser = BooleanParser(dep_check)
-            qdict['checkstring'] = ' checks="%s"' % parser.toString(depon)
+            # qdict['checkstring'] = ' checks="%s"' % parser.toString(depon)
+
+            #It allows only 1 dependency
+            #The line above allows multiple dependencies but it has a bug when is parsing white spaces
+            qdict['checkstring'] = ' checks="dep_check(\'%s\')"' % depon
+
+            qdict['depon_class'] = ' depon_class'
             jstriggers.append('qc_%s' % question.number)
+            if question.text[:2] == 'h1':
+                jstriggers.append('acc_qc_%s' % question.number)
         if 'default' in cd and not question.number in cookiedict:
             qvalues[question.number] = cd['default']
         if Type in QuestionProcessors:
