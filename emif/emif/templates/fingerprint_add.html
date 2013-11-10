@@ -61,6 +61,9 @@
                                     <i class="fa fa-pencil-square-o">&nbsp;</i>
                                 </a></span>
                             {% endif %}
+                            <span class="pull-right">
+                                <a href="" onclick="toggle_comments({{question.number|removedots}}); return false;"><i class="fa fa-comment">&nbsp;</i></a>
+                            </span>
                             <span class="pull-right answered hide" id="answered_{{ question.number }}">
                                 <i class="fa fa-check-square-o fa-green">&nbsp;</i>
                             </span>
@@ -68,8 +71,6 @@
                 {% endif %}
 
                         <div class="question type_{{ qdict.qtype }} {% if error %} error prepend-top{% endif %}{{ qdict.qnum_class }}{{ qdict.qalpha_class }} {{qdict.depon_class}}" id="qc_{{ question.number }}" {{qdict.checkstring|safe}} >
-
-
 
                             {% if qdict.custom %}
                                 {% if error %}
@@ -99,10 +100,11 @@
                                         </a>
                                     </span>
                                     {% endif %}
-
-                                    <span class="pull-right answered" id="answered_{{ question.number }}">
-                                        <a href="" ><i class="fa fa-check-square-o fa-green">&nbsp;</i></a>
+                                    <span class="pull-right">
                                         <a href="" onclick="toggle_comments({{question.number|removedots}}); return false;"><i class="fa fa-comment">&nbsp;</i></a>
+                                    </span>
+                                    <span class="pull-right answered hide" id="answered_{{ question.number }}">
+                                        <i class="fa fa-check-square-o fa-green">&nbsp;</i>
                                     </span>
                                 {% endif %}
                                 </div>
@@ -275,5 +277,3 @@ function validate(question_number)
 
 {% endblock %}
 </script>
-
-
