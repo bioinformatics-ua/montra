@@ -81,7 +81,7 @@ class SearchView(APIView):
     authentication_classes = (TokenAuthentication,)
 
     def get(self, request, *args, **kw):
-
+        
         # If authenticated
         if request.auth:
             user = request.user
@@ -338,6 +338,7 @@ def validate_and_save(user, data):
     :param data:
     """
     result = {}
+    fields_text = ""
     # Verify if json structure is valid
     if 'fingerprintID' in data.keys():
         fingerprintID = data['fingerprintID']
@@ -352,7 +353,8 @@ def validate_and_save(user, data):
                             fp = FingerprintAPI.objects.get(fingerprintID=fingerprintID, field=f)
                             if str(fp.value) != str(data['values'][f]):
                                 # Update value
-                                fp.value = data['values'][f]
+                                fp.value += ' ' + data['values'][f]
+                                fields_text = data['values'][f]
                                 fp.save()
                                 result[f] = "Updated successfully"
                             else:
@@ -366,6 +368,7 @@ def validate_and_save(user, data):
                             fingerprint = FingerprintAPI(fingerprintID=fingerprintID, field=f,
                                                          value=data['values'][f], user=user)
                             # Create new field-value
+                            fields_text += ' ' + data['values'][f]
                             fingerprint.save()
                             result[f] = "Created successfully"
                         except:
@@ -381,6 +384,19 @@ def validate_and_save(user, data):
     else:
         # print "Não tem nenhuma chave fingerprint"
         result['error'] = "No fingerprintID detected"
+
+    
+    c = CoreEngine()
+    results = c.search_fingerprint("id:" + fingerprintID)
+    _aux = None
+    for r in results:
+        _aux = r
+        break
+
+
+    if (_aux!=None):
+        _aux['text_t']  = _aux['text_t'] + fields_text  
+        c.index_fingerprint_as_json(_aux)
 
     return result
 

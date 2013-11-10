@@ -142,7 +142,7 @@ def get_slug_from_choice(v, q):
 
 
 
-def index_answeres_from_qvalues(qvalues, questionnaire, subject, fingerprint_id):
+def index_answeres_from_qvalues(qvalues, questionnaire, subject, fingerprint_id, extra_fields=None):
     #print("index_answeres_from_qvalues")
     c = CoreEngine()
     d = {}
@@ -255,7 +255,10 @@ def index_answeres_from_qvalues(qvalues, questionnaire, subject, fingerprint_id)
     d['created_t']= now.strftime('%Y-%m-%d %H:%M:%S.%f')
     d['user_t']= subject
     d['text_t']= text
-    # print(d)
+
+    if extra_fields!=None:
+        d = dict(d.items() + extra_fields.items())
+        
     c.index_fingerprint_as_json(d)
 
 
