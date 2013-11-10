@@ -61,15 +61,21 @@
                             {% if request.user.is_staff %}
                                 <span class="pull-right"> <a href="admin/questionnaire/question/{{ question.id }}/">
                                     <i class="icon-edit"></i>
-                                </a></span>
+                                </a>
+                                <a href="" onclick="toggle_comments({{question.number|removedots}}); return false;"><i class="fa fa-comment">&nbsp;</i></a>
+                                </span>
                              {% endif %}
+
                             <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion_{{ k.sortid }}" href="#div_{{ iteratorQ.value }}">
                 {% endif %}
                         {% if question.text|geths != 'h1' %}
                              {% if request.user.is_staff %}
                                     <span class="pull-right"> <a href="admin/questionnaire/question/{{ question.id }}/">
                                         <i class="icon-edit"></i>
-                                    </a></span>
+                                    </a>
+                                    <a href="" onclick="toggle_comments({{question.number|removedots}}); return false;"><i class="fa fa-comment">&nbsp;</i></a>
+                                    </span>
+
                              {% endif %}
                         {% endif %}
                         <div class="question type_{{ qdict.qtype }} {% if error %} error prepend-top{% endif %}{{ qdict.qnum_class }}{{ qdict.qalpha_class }}" id="qc_{{ question.number }}" {{qdict.checkstring|safe}} >
@@ -113,6 +119,10 @@
                                         <div class="alert-message block-message text-error input">{{ error }}</div>
                                     {% endif %}
                                     {% include qdict.template %}
+                                    <div id="comments_{{question.number|removedots}}" style="display:none;margin-left:40px;">
+                                     <a href="" class="span6" onclick="toggle_comments({{question.number|removedots}}); return false;"><i class="fa fa-comment">&nbsp;</i> Comments</a>
+                                    <textarea style=" background-color:#EEE;color: #000;" class="span6" name="comment_question_{{ question.number|removedots }}" cols="50" rows="5">{{qdict.comment}}</textarea>
+                                    </div>
                                 </div>
                             {% endif %}
 
@@ -193,6 +203,14 @@
 <script type="text/javascript">
 
     {% block scriptextra %}
+
+
+function toggle_comments(question_number)
+{
+    console.log("q + "+ question_number);
+    $("#comments_"+question_number).toggle();
+}
+
 
 function validate(question_number)
 {

@@ -523,8 +523,7 @@ def extract_answers(request2, questionnaire_id, question_set, qs_list):
         key, value = item[0], item[1]
         print "ITEM: " + key
         if key.startswith('comment'):
-            import pdb
-            pdb.set_trace()
+            pass
             # Deal with comment
 
         if key.startswith('question_'):
@@ -1486,8 +1485,9 @@ def show_fingerprint_page_errors(request, q_id, qs_id, errors={}, template_name=
 
                 qlist.append((question, qdict))
                 comment_id = "comment_question_"+question.number.replace(".","")
-                if request.POST[comment_id]!='':
+                if request.POST and request.POST[comment_id]!='':
                     extra_fields[comment_id+'_t'] = request.POST[comment_id]
+                    qdict['comment'] = request.POST[comment_id]
 
             if qs_aux == None:
                 qs_aux = k
@@ -1516,7 +1516,8 @@ def show_fingerprint_page_errors(request, q_id, qs_id, errors={}, template_name=
                 qs_list=qs_list,
                 questions_list=qlist_general,
                 fingerprint_id=fingerprint_id,
-                breadcrumb=True
+                breadcrumb=True,
+                extra_fields=extra_fields
         )
         r['Cache-Control'] = 'no-cache'
         r['Expires'] = "Thu, 24 Jan 1980 00:00:00 GMT"
