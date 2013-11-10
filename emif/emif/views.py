@@ -627,7 +627,7 @@ def extract_answers(request2, questionnaire_id, question_set, qs_list):
 
                     #It allows only 1 dependency
                     #The line above allows multiple dependencies but it has a bug when is parsing white spaces
-                    qdict['checkstring'] = ' checks="dep_check(\'%s\')"' % depon
+                    qdict['checkstring'] = ' checks="dep_check(\'question_%s\')"' % depon
 
                     qdict['depon_class'] = ' depon_class'
                     jstriggers.append('qc_%s' % question.number)
@@ -1479,7 +1479,7 @@ def show_fingerprint_page_errors(request, q_id, qs_id, errors={}, template_name=
 
                     #It allows only 1 dependency
                     #The line above allows multiple dependencies but it has a bug when is parsing white spaces
-                    qdict['checkstring'] = ' checks="dep_check(\'%s\')"' % depon
+                    qdict['checkstring'] = ' checks="dep_check(\'question_%s\')"' % depon
 
                     qdict['depon_class'] = ' depon_class'
                     jstriggers.append('qc_%s' % question.number)
@@ -1632,7 +1632,7 @@ def show_fingerprint_page_read_only(request, q_id, qs_id, errors={}, template_na
 
                     #It allows only 1 dependency
                     #The line above allows multiple dependencies but it has a bug when is parsing white spaces
-                    qdict['checkstring'] = ' checks="dep_check(\'%s\')"' % depon
+                    qdict['checkstring'] = ' checks="dep_check(\'question_%s\')"' % depon
 
                     qdict['depon_class'] = ' depon_class'
                     jstriggers.append('qc_%s' % question.number)
@@ -1785,7 +1785,7 @@ def show_fingerprint_page(request, runinfo, errors={}, template_name='database_e
 
             #It allows only 1 dependency
             #The line above allows multiple dependencies but it has a bug when is parsing white spaces
-            qdict['checkstring'] = ' checks="dep_check(\'%s\')"' % depon
+            qdict['checkstring'] = ' checks="dep_check(\'question_%s\')"' % depon
 
             qdict['depon_class'] = ' depon_class'
             jstriggers.append('qc_%s' % question.number)

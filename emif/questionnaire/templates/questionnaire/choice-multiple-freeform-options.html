@@ -7,7 +7,7 @@
             <li>
                 
                 <label class="control-label" style="display:inline;">
-                    <input onClick="valchanged('{{ question.number }}_{{ choice.value }}', this.checked);" type="checkbox" id="{{ key }}" name="{{ key }}" value="{{ choice.value }}" {{ checked }}>
+                    <input onClick="valchanged('question_{{ question.number }}_{{ choice.value }}', this.checked);" type="checkbox" id="{{ key }}" name="{{ key }}" value="{{ choice.value }}" {{ checked }}>
                     <span>{{ choice.text }}</span> 
                 </label>
                 <span class="controls">

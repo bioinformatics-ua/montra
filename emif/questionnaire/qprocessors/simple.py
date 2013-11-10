@@ -28,12 +28,12 @@ def question_yesno(request, question):
     checks = ''
     if hascomment:
         if cd.get('required-yes'):
-            jstriggers = ['%s_comment' % question.number]
-            checks = ' checks="dep_check(\'%s,yes\')"' % question.number
+            jstriggers = ['question_%s_comment' % question.number]
+            checks = ' checks="dep_check(\'question_%s,yes\')"' % question.number
         elif cd.get('required-no'):
-            checks = ' checks="dep_check(\'%s,no\')"' % question.number
+            checks = ' checks="dep_check(\'question_%s,no\')"' % question.number
         elif cd.get('required-dontknow'):
-            checks = ' checks="dep_check(\'%s,dontknow\')"' % question.number
+            checks = ' checks="dep_check(\'question_%s,dontknow\')"' % question.number
 
     return {
         'required' : True,

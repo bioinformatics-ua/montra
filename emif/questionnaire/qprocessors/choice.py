@@ -29,7 +29,7 @@ def question_choice(request, question):
         choices.append( ( choice.value == val, choice, ) )
 
     if question.type == 'choice-freeform':
-        jstriggers.append('%s_comment' % question.number)
+        jstriggers.append('question_%s_comment' % question.number)
 
     return {
         'choices'   : choices,
