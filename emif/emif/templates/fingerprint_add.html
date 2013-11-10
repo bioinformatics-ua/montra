@@ -61,7 +61,7 @@
                                     <i class="fa fa-pencil-square-o">&nbsp;</i>
                                 </a></span>
                             {% endif %}
-                            <span class="pull-right answered" id="answered_{{ question.number }}">
+                            <span class="pull-right answered hide" id="answered_{{ question.number }}">
                                 <i class="fa fa-check-square-o fa-green">&nbsp;</i>
                             </span>
                             <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion_{{ k.sortid }}" href="#div_{{ iteratorQ.value }}">
@@ -99,16 +99,14 @@
                                         </a>
                                     </span>
                                     {% endif %}
-                                    <span class="pull-right answered" id="answered_{{ question.number }}">
+                                    <span class="pull-right answered hide" id="answered_{{ question.number }}">
                                         <i class="fa fa-check-square-o fa-green">&nbsp;</i>
                                     </span>
                                 {% endif %}
                                 </div>
                                 {% if question.text|geths == 'h1' %}
-                                        </a>
-
                                     </div>
-
+                                    </a>
                                     <div id="div_{{ iteratorQ.value }}" class="accordion-body collapse">
                                         <div class="accordion-inner">
                                  {% endif %}
@@ -119,10 +117,6 @@
                                     {% include qdict.template %}
                                 </div>
                             {% endif %}
-
-
-
-
 
                         {% if question.footer %}
                             <div class="question-footer">
