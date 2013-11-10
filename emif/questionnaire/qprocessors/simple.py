@@ -58,6 +58,18 @@ def question_open(request, question):
         'value' : value,
     }
 
+@question_proc('datepicker')
+def question_datepicker(request, question):
+    key = "question_%s" % question.number
+    value = question.getcheckdict().get('default','')
+    if key in request.POST:
+        value = request.POST[key]
+    return {
+        'required' : question.getcheckdict().get('required', False),
+        'value' : value,
+        'template' : 'questionnaire/datepicker.html',
+    }
+
 @answer_proc('open', 'open-textfield', 'choice-yesno', 'choice-yesnocomment', 'choice-yesnodontknow',  'open-button', 'open-upload-image')
 def process_simple(question, ansdict):
     checkdict = question.getcheckdict()
@@ -90,6 +102,7 @@ add_type('open-textfield', 'Open Answer, multi-line [textarea]')
 add_type('choice-yesno', 'Yes/No Choice [radio]')
 add_type('choice-yesnocomment', 'Yes/No Choice with optional comment [radio, input]')
 add_type('choice-yesnodontknow', 'Yes/No/Don\'t know Choice [radio]')
+add_type('datepicker', 'Date choice')
 
 
 @answer_proc('comment')
