@@ -520,6 +520,8 @@ def extract_answers(request2, questionnaire_id, question_set, qs_list):
         if key.startswith('comment'):
             pass
             # Deal with comment
+            import pdb
+            pdb.set_trace()
 
         if key.startswith('question_'):
             answer = key.split("_", 2)
@@ -555,7 +557,7 @@ def extract_answers(request2, questionnaire_id, question_set, qs_list):
         return True
 
     active_qs_with_errors = False
-    #print "Active QuestionSet: " + question_set
+    
     for question, ans in extra.items():
         
         if u"Trigger953" not in ans:
@@ -772,9 +774,7 @@ def get_databases_from_solr(request, query="*:*"):
     for r in results:
         try:
             database_aux = Database()
-            #print r['id']
-            #print r['created_t']
-            #print r['database_name_t']
+            
             database_aux.id = r['id']
 
             if (not r.has_key('created_t')):
@@ -903,10 +903,8 @@ def createqsets(runcode, qsets=None):
 
     for result in results:
 
-        #print result['type_t']
         # Get the slug of fingerprint type
         q_aux = Questionnaire.objects.filter(slug=result['type_t'])
-        #print q_aux
 
         list_qsets = QuestionSet.objects.filter(questionnaire=q_aux[0]).order_by('sortid')
 
@@ -914,7 +912,7 @@ def createqsets(runcode, qsets=None):
             if (qset.sortid != 0 and qset.sortid != 99):
                 question_group = QuestionGroup()
                 question_group.sortid = qset.sortid
-                print qset.text
+                
                 qsets[qset.text] = question_group
                 qset.sortid
                 list_questions = Question.objects.filter(questionset=qset).order_by('number')
@@ -933,9 +931,6 @@ def createqsets(runcode, qsets=None):
                 continue
             t = Tag()
 
-            #if k.startswith("comment_question_"):
-            #    continue
-            
             aux_results = Slugs.objects.filter(slug1=k[:-2])
             qs = None
             question_group = None
@@ -953,9 +948,7 @@ def createqsets(runcode, qsets=None):
                     # Add a new QuestionGroup
             else:
                 text = k
-                #print qs
-            #info = text[:75] + (text[75:] and '..')
-
+                
             info = text
             t.tag = info
 
@@ -983,8 +976,7 @@ def createqsets(runcode, qsets=None):
                 except:
                     pass
         break
-    import pdb
-    pdb.set_trace()
+    
     return (qsets, name)
 
 
