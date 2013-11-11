@@ -177,11 +177,9 @@ def results_fulltext_aux(request, query, page=1, template_name='results.html'):
 
 
     c = CoreEngine()
-    #results = c.search_fingerprint("text_t:"+query,str(((int(page)-1)*rows)))
+    
     results = c.search_fingerprint(query, str(0))
-    #results = c.search_fingerprint("database_name_t:"+query)
-    #print "Solr"
-    #print results
+    
     list_databases = []
     if len(results) == 0:
         query_old = request.session.get('query', "")
@@ -190,9 +188,6 @@ def results_fulltext_aux(request, query, page=1, template_name='results.html'):
     for r in results:
         try:
             database_aux = Database()
-            #print r['id']
-            #print r['created_t']
-            #print r['database_name_t']
 
             if (not r.has_key('database_name_t')):
                 database_aux.name = '(Unnamed)'
@@ -477,7 +472,7 @@ class RequestMonkeyPatch(object):
 
 
 def extract_answers(request2, questionnaire_id, question_set, qs_list):
-    print "extract_answers"
+
     question_set2 = question_set
     request = request2
     # Extract files if they exits 
@@ -946,14 +941,18 @@ def createqsets(runcode, qsets=None):
             if k in blacklist:
                 continue
             t = Tag()
+
+            #if k.startswith("comment_question_"):
+            #    continue
             
             aux_results = Slugs.objects.filter(slug1=k[:-2])
             qs = None
             question_group = None
+            q_number = None
             if len(aux_results) > 0:
                 text = aux_results[0].description
                 qs = aux_results[0].question.questionset.text
-
+                q_number = qs = aux_results[0].question.number
                 if qsets.has_key(qs):
                     # Add the Tag to the QuestionGroup
                     question_group = qsets[qs]
@@ -968,6 +967,7 @@ def createqsets(runcode, qsets=None):
 
             info = text
             t.tag = info
+
             if question_group != None and question_group.list_ordered_tags != None:
                 try:
                     t = question_group.list_ordered_tags[question_group.list_ordered_tags.index(t)]
@@ -976,25 +976,24 @@ def createqsets(runcode, qsets=None):
 
             value = clean_value(str(result[k].encode('utf-8')))
             #value = value[:75] + (value[75:] and '..')
-            
+            if q_number!=None:
+               try:
+                   t.comment = result['comment_question_'+q_number.replace(".","")]
+               except KeyError:
+                   pass
         
             t.value = value.replace("#", " ")
             if k == "database_name_t":
                 name = t.value
             list_values.append(t)
             if question_group != None:
-                #try:
-                #    question_group.list_ordered_tags.remove(t)
-                #except:
-                #    pass
-                #question_group.list_ordered_tags.append(t)
                 try:
                     question_group.list_ordered_tags[question_group.list_ordered_tags.index(t)] = t
                 except:
                     pass
-                    #qsets[qs] = question_group
         break
-
+    import pdb
+    pdb.set_trace()
     return (qsets, name)
 
 
@@ -1453,7 +1452,9 @@ def show_fingerprint_page_errors(request, q_id, qs_id, errors={}, template_name=
         for k in qs_list:
             qlist = []
             qs_aux = None
+            
             for question in questions_list[k.id]:
+
                 qs_aux = question.questionset
                 
                 Type = question.get_type()
@@ -1501,15 +1502,18 @@ def show_fingerprint_page_errors(request, q_id, qs_id, errors={}, template_name=
                         #    qvalues[question.number] = qdict['qvalue']
 
                 qlist.append((question, qdict))
-                comment_id = "comment_question_"+question.number.replace(".","")
+                comment_id = "comment_question_"+question.number.replace(".", "")
                 if request.POST and request.POST[comment_id]!='':
-                    extra_fields[comment_id+'_t'] = request.POST[comment_id]
+                    comment_id_index = "comment_question_"+question.slug
+                    extra_fields[comment_id_index+'_t'] = request.POST[comment_id]
                     qdict['comment'] = request.POST[comment_id]
 
+            
             if qs_aux == None:
                 qs_aux = k
             qlist_general.append((qs_aux, qlist))
-            
+        
+        print "Extra fields : " + str(extra_fields)
         if (fingerprint_id != None):
 
             if users_db==None:
@@ -2221,8 +2225,8 @@ def import_questionnaire(request, template_name='import_questionnaire.html'):
     from django.template.defaultfilters import slugify
     # wb = load_workbook(filename = r'/Volumes/EXT1/Dropbox/MAPi-Dropbox/EMIF/Code/emif/emif/questionnaire_ad_v2.xlsx')
     # wb = load_workbook(filename = r'/Volumes/EXT1/Dropbox/MAPi-Dropbox/EMIF/Observational_Data_Sources_Template_v5.xlsx')
-    wb = load_workbook(filename = r'C:/Questionnaire_template_v3.3.xlsx')
-    # wb = load_workbook(filename =r'/Volumes/EXT1/trash/Questionnaire_template_v3.2.xlsx')
+    # wb = load_workbook(filename = r'C:/Questionnaire_template_v3.3.xlsx')
+    wb = load_workbook(filename =r'/Volumes/EXT1/trash/Questionnaire_template_v3.2.xlsx')
     ws = wb.get_active_sheet()
     log = ''
 

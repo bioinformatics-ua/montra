@@ -122,6 +122,7 @@ path.link {
                                     <tr>
                                         <td title="{{ t.tag|safe }}">{{ t.tag|removehs }}</td>
                                         <td title="{{ t.value|safe }}"> {{ t.value|safe }}</td>
+                                        <td title="{{ t.comment|safe }}"> {{ t.comment|safe }}</td>
                                     </tr>
                                     {% endfor %}
                                     </tbody>
@@ -131,25 +132,7 @@ path.link {
                     </div>
                     {% endfor %}
                 </div>
-                {% comment %}
-
-                <table class="table ">
-                    <thead>
-                    <tr>
-                        <th>Tag</th>
-                        <th>Value</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    {% for t in value_list %}
-                    <tr>
-                        <td>{{ t.tag }}</td>
-                        <td>{{ t.value }}</td>
-                    </tr>
-                    {% endfor %}
-                    </tbody>
-                </table>
-                {% endcomment %}
+                
             </div>
 
             <div class="tab-pane" id="literature">
@@ -194,9 +177,9 @@ path.link {
             <div class="tab-pane" id="apiinfo">
              <div ><a id="btn_pivot_table"  class="btn pull-right" href="">Pivot table</a></div>
              <div class="span12">
-              <div id="chart" class="span4"></div>
+              <div id="chart" class="span4" style="display:none;"></div>
               
-              <div id="pivot_table_extra_information" style="display:none;">
+              <div id="pivot_table_extra_information" >
                 
 
               </div> 
