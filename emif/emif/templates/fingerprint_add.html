@@ -67,11 +67,13 @@
                             <span class="pull-right answered hide" id="answered_{{ question.number }}">
                                 <i class="fa fa-check-square-o fa-green">&nbsp;</i>
                             </span>
-                            <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion_{{ k.sortid }}" href="#div_{{ iteratorQ.value }}">
+
                 {% endif %}
 
                         <div class="question type_{{ qdict.qtype }} {% if error %} error prepend-top{% endif %}{{ qdict.qnum_class }}{{ qdict.qalpha_class }} {{qdict.depon_class}}" id="qc_{{ question.number }}" {{qdict.checkstring|safe}} >
-
+                            {% if question.text|geths == 'h1' %}
+                                <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion_{{ k.sortid }}" href="#div_{{ iteratorQ.value }}">
+                            {% endif %}
                             {% if qdict.custom %}
                                 {% if error %}
                                     <div class="error">
@@ -109,12 +111,13 @@
                                 {% endif %}
                                 </div>
                                 {% if question.text|geths == 'h1' %}
-                                    </div>
+
                                     </a>
+                            </div>
                                     <div id="div_{{ iteratorQ.value }}" class="accordion-body collapse">
                                         <div class="accordion-inner">
                                  {% endif %}
-                                <div class="answer qtext_{{question.text|geths}}">
+                                <div class="answer qtext_{{question.text|geths}}" id="answer_{{ question.number }}">
                                     {% if error %}
                                         <div class="alert-message block-message text-error input">{{ error }}</div>
                                     {% endif %}
