@@ -2225,8 +2225,8 @@ def import_questionnaire(request, template_name='import_questionnaire.html'):
     from django.template.defaultfilters import slugify
     # wb = load_workbook(filename = r'/Volumes/EXT1/Dropbox/MAPi-Dropbox/EMIF/Code/emif/emif/questionnaire_ad_v2.xlsx')
     # wb = load_workbook(filename = r'/Volumes/EXT1/Dropbox/MAPi-Dropbox/EMIF/Observational_Data_Sources_Template_v5.xlsx')
-    # wb = load_workbook(filename = r'C:/Questionnaire_template_v3.3.xlsx')
-    wb = load_workbook(filename =r'/Volumes/EXT1/trash/Questionnaire_template_v3.2.xlsx')
+    wb = load_workbook(filename = r'C:/Questionnaire_template_v3.4.xlsx')
+    # wb = load_workbook(filename =r'/Volumes/EXT1/trash/Questionnaire_template_v3.3.xlsx')
     ws = wb.get_active_sheet()
     log = ''
 
@@ -2410,15 +2410,17 @@ def import_questionnaire(request, template_name='import_questionnaire.html'):
                                 list_dep_aux = dependencies_list.value.split('|')
                                 question_num_parent = str(_questions_rows.get(int(list_dep_aux[0])))
 
+                                # print "###############"
+                                # print str(row[0].row) + " dependencies_list: " + str(dependencies_list)
                                 # print str(row[0].row) + " str(list_dep_aux[0]: " + str(int(list_dep_aux[0]))
                                 # print str(row[0].row) + " question_num_parent: " + question_num_parent
                                 # print str(row[0].row) + " _questions_rows: " + str(_questions_rows)
+                                # print str(row[0].row) + " _choices_array: " + str(_choices_array)
 
                                 index_aux = int(str(list_dep_aux[1]))-1
                                 choice_parent_list = _choices_array.get(int(list_dep_aux[0]))
                                 choice_parent = choice_parent_list[index_aux]
                                 _checks = 'dependent=\"' + str(question_num_parent) + ',' + str(choice_parent) + '\"'
-
                             except:
                                 raise
 
@@ -2469,6 +2471,9 @@ def import_questionnaire(request, template_name='import_questionnaire.html'):
                                         raise
                                 _choices_array[type_Column.row] = _choices_array_aux
 
+                        if dataType_column.value in ['choice-yesno', 'choice-yesnocomment',
+                                                             'choice-yesnodontknow']:
+                            _choices_array[type_Column.row] = ['yes', 'no', 'dontknow']
                     except:
                         log += "\n%s - Error to save question %s" % (type_Column.row, text_en)
                         writeLog(log)
