@@ -58,17 +58,17 @@ $(document).ready(function () {
 function validate1(element, id_answered) {
     console.log("VAL: " + $(element).val());
     if($(element).val() != "") {
-            console.log('1 - #answered_'+id_answered);
+            //console.log('1 - #answered_'+id_answered);
             $('[id="answered_'+id_answered+'"]').show();
         } else {
-            console.log('2 - #answered_'+id_answered);
+            //console.log('2 - #answered_'+id_answered);
             $('[id="answered_'+id_answered+'"]').hide();
         }
 }
 
 
 $(document).ready(function () {
-    $(document).on('change', '.answer input,.answer select,.answer textarea', function (e) {
+    $(document).on('change', '.answer input,.answer select,.answer textarea, button', function (e) {
         e.preventDefault();
         var el = e.target;
         var id_answered = el.id.split("_")[1];
@@ -76,58 +76,68 @@ $(document).ready(function () {
         /*
             - verify the type to each question and create a respective processment for each one
             TYPES:
-            1 - open | open-button | open-upload-image | open-textfield | datepicker | range | timeperiod
+            1 - open | open-button | open-upload-image | open-textfield | datepicker | range | timeperiod | publication
             2 - choice | choice-yesno | choice-yesnocomment | choice-yesnodontknow | choice-multiple | choice-multiple-freeform | choice-freeform
-            3 -
-            4 -     publication
             None - comment | sameas | custom
 
         */
         if($('[id="qc_'+id_answered+'"]').hasClass('type_open') || $('[id="qc_'+id_answered+'"]').hasClass('type_open-button')
-            || $('[id="qc_'+id_answered+'"]').hasClass('type_open-upload-image') || $('[id="qc_'+id_answered+'"]').hasClass('type_open-textfield')) {
-//            console.log('OPEN - #qc_'+ id_answered);
+            || $('[id="qc_'+id_answered+'"]').hasClass('type_open-upload-image')
+            || $('[id="qc_'+id_answered+'"]').hasClass('type_open-textfield')
+            || $('[id="qc_'+id_answered+'"]').hasClass('type_publication')) {
+
+            //console.log('OPEN - #qc_'+ id_answered);
             validate1(this, id_answered);
         }
 
         if($('[id="qc_'+id_answered+'"]').hasClass('type_datepicker') || $('[id="qc_'+id_answered+'"]').hasClass('type_range')
             || $('[id="qc_'+id_answered+'"]').hasClass('type_timeperiod')) {
-//            console.log('DATEPICKER - #qc_'+ id_answered);
+            // console.log('DATEPICKER - #qc_'+ id_answered);
             validate1(this, id_answered);
         }
 
          if($('[id="qc_'+id_answered+'"]').hasClass('type_choice-yesnodontknow') || $('[id="qc_'+id_answered+'"]').hasClass('type_choice-yesno')
              || $('[id="qc_'+id_answered+'"]').hasClass('type_choice')
              || $('[id="qc_'+id_answered+'"]').hasClass('type_choice-freeform')) {
-//            console.log('CHOICE - #qc_'+ id_answered);
+             // console.log('CHOICE - #qc_'+ id_answered);
 
 
              if ($('[name="question_'+id_answered+'"]').is(':checked')) {
-                 console.log('1 - #answered_'+id_answered);
+                 //console.log('1 - #answered_'+id_answered);
                  $('[id="answered_'+id_answered+'"]').show();
              } else {
-                   console.log('2 - #answered_'+id_answered);
+                   //console.log('2 - #answered_'+id_answered);
                     $('[id="answered_'+id_answered+'"]').hide();
              }
         }
 
         if($('[id="qc_'+id_answered+'"]').hasClass('type_choice-multiple-freeform')
-             || $('[id="qc_'+id_answered+'"]').hasClass('type_choice-multiple')) {
+             || $('[id="qc_'+id_answered+'"]').hasClass('type_choice-multiple')
+             || $('[id="qc_'+id_answered+'"]').hasClass('type_choice-multiple-freeform-options')) {
 //            console.log('CHOICE - #qc_'+ id_answered);
 
-             console.log($('div[id="qc_'+id_answered+'"] input[type="checkbox"]').is(':checked'));
+
+             //console.log($('[id="answer_'+id_answered+'"] input[type="checkbox"]').length);
+            // console.log($('[id="answer_'+id_answered+'"] input[type="checkbox"]').length);
+            // console.log($('[id="answer_'+id_answered+'"] input[type="checkbox"]').length);
 //                validate1($('[name="question_'+id_answered+'"]'), id_answered);
 
-             if ($('div[id="qc_'+id_answered+'"] input[type="checkbox"]').is(':checked')) {
-                 console.log('1 - #answered_'+id_answered);
+             if ($('[id="answer_'+id_answered+'"] input[type="checkbox"]').is(':checked')) {
+                // console.log('1 - #answered_'+id_answered);
                  $('[id="answered_'+id_answered+'"]').show();
              } else {
-                  console.log('2 - #answered_'+id_answered);
+                 // console.log('2 - #answered_'+id_answered);
                     $('[id="answered_'+id_answered+'"]').hide();
              }
         }
 
-        /************************************************************************************/
-
     });
+
+//    $(document).on('click', '#addpub', function (e) {
+//        e.preventDefault();
+//        var el = e.target;
+//        var id_answered = el.id.split("_")[1];
+//
+//    });
 });
 /***************** END - CHECK IF ANSWER IS FILLED IN *****************/
