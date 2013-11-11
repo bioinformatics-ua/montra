@@ -2316,8 +2316,7 @@ def import_questionnaire(request, template_name='import_questionnaire.html'):
                             slug = row[7].value
                         else:
                             slug = convert_text_to_slug(str(row[1].value)[:50])
-
-                        slug = get_slug(slug)
+                            slug = get_slug(slug)
 
                         if row[5].value:
                             helpText = row[5].value
@@ -2387,7 +2386,7 @@ def import_questionnaire(request, template_name='import_questionnaire.html'):
                             slug = row[7].value
                         else:
                             slug = convert_text_to_slug(str(row[1].value)[:50])
-                        slug = get_slug(slug)
+                            slug = get_slug(slug)
 
                         if row[5].value:
                             helpText = row[5].value
