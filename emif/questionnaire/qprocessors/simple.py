@@ -28,12 +28,12 @@ def question_yesno(request, question):
     checks = ''
     if hascomment:
         if cd.get('required-yes'):
-            jstriggers = ['%s_comment' % question.number]
-            checks = ' checks="dep_check(\'%s,yes\')"' % question.number
+            jstriggers = ['question_%s_comment' % question.number]
+            checks = ' checks="dep_check(\'question_%s,yes\')"' % question.number
         elif cd.get('required-no'):
-            checks = ' checks="dep_check(\'%s,no\')"' % question.number
+            checks = ' checks="dep_check(\'question_%s,no\')"' % question.number
         elif cd.get('required-dontknow'):
-            checks = ' checks="dep_check(\'%s,dontknow\')"' % question.number
+            checks = ' checks="dep_check(\'question_%s,dontknow\')"' % question.number
 
     return {
         'required' : True,
@@ -56,6 +56,18 @@ def question_open(request, question):
     return {
         'required' : question.getcheckdict().get('required', False),
         'value' : value,
+    }
+
+@question_proc('datepicker')
+def question_datepicker(request, question):
+    key = "question_%s" % question.number
+    value = question.getcheckdict().get('default','')
+    if key in request.POST:
+        value = request.POST[key]
+    return {
+        'required' : question.getcheckdict().get('required', False),
+        'value' : value,
+        'template' : 'questionnaire/datepicker.html',
     }
 
 @answer_proc('open', 'open-textfield', 'choice-yesno', 'choice-yesnocomment', 'choice-yesnodontknow',  'open-button', 'open-upload-image')
@@ -90,6 +102,7 @@ add_type('open-textfield', 'Open Answer, multi-line [textarea]')
 add_type('choice-yesno', 'Yes/No Choice [radio]')
 add_type('choice-yesnocomment', 'Yes/No Choice with optional comment [radio, input]')
 add_type('choice-yesnodontknow', 'Yes/No/Don\'t know Choice [radio]')
+add_type('datepicker', 'Date choice')
 
 
 @answer_proc('comment')

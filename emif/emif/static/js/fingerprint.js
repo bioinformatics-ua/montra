@@ -43,20 +43,6 @@ $(document).ready(function () {
  $(document).on('change', '#qform input, #qform select, #qform textarea', function (e) {
     formHasChanged = true;
     submitted = false;
-
-     e.preventDefault();
-//     TO DO: get parent span .answered ID and add show class and remove hide class
-     /********************************************************************************/
-     $(this).parentsUntil( ".question").find('.answered').first().html( "hilight" );
-
-    if($(this).val() != "") {
-        $($(this).closest('span:has(.answered)')).removeClass('hide');
-        $($(this).closest('span:has(.answered)')).addClass('show');
-    } else {
-        $($(this).closest('span:has(.answered)')).removeClass('hide');
-        $($(this).closest('span:has(.answered)')).addClass('show');
-    }
-     /********************************************************************************/
 });
 
  $("#qform").submit(function() {
@@ -66,3 +52,32 @@ $(document).ready(function () {
 });
 <!-- End -- Check if user has unsaved changes -->
 
+$(document).ready(function () {
+    $(document).on('change', '.answer input,.answer select,.answer textarea', function (e) {
+        formHasChanged = true;
+        submitted = false;
+
+        e.preventDefault();
+
+        $(this).parent(".answer").html("coiso");
+        var el = e.target;
+
+
+        var id_answered = el.id.split("_")[1];
+//        console.log(id_answered);
+
+         /********************************************************************************/
+        /* TO-DO
+            - verify the type to each question and create a respective processment for each one
+        */
+
+        if($(this).val() != "") {
+            console.log('1 - #answered_'+id_answered);
+            $('[id="answered_'+id_answered+'"]').show();
+        } else {
+            console.log('2 - #answered_'+id_answered);
+            $('[id="answered_'+id_answered+'"]').hide();
+        }
+         /********************************************************************************/
+    });
+});

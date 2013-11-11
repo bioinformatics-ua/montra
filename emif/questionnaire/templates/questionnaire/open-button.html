@@ -3,7 +3,7 @@
 
   <div class="input span5">
     <div class="pull-left" >
-      <input type="text" class=" " size="50" id="{{ question.number }}" name="question_{{ question.number }}" value="{{ qdict.value }}">
+      <input type="text" class=" " size="50" id="question_{{ question.number }}" name="question_{{ question.number }}" value="{{ qdict.value }}">
       {% if question.extra %}
       <span class="help-block">{{ question.extra }}</span>
       {% endif %}
@@ -15,7 +15,7 @@
         <div class="input span2">         
       <div class="" style="vertical-align:center;padding-top:12px">
    
-        <a class="btn btn-small btn-success span2" href="" onclick="validate({{ question.number }}); return false;">Verify if this name is available</a>
+        <a class="btn btn-small btn-success span2" href="" onclick="validate('question_{{ question.number }}'); return false;">Verify if this name is available</a>
 <div id="warning_{{ question.number }}" class="hide">
   <font color="red">The name already exists</font>
 </div>

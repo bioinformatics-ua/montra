@@ -2,7 +2,6 @@
 {% load extra_tags %}
 {% load markup questionnaire i18n %}
 
-
 <div class="span8">
     <form name="qform" id="qform" action="dbEdit/{{fingerprint_id}}/{{questionset.questionnaire.pk}}" method="POST" enctype="multipart/form-data">
         <input type="hidden" name="active_qs" id="active_qs" value="0">
@@ -56,37 +55,23 @@
                     {% setglobal h1_already 1 %}
                     {% setglobal h1_last 1 %}
 
-                    <div class="accordion-group">
+                    <div class="accordion-group {{qdict.depon_class}}" id="acc_qc_{{ question.number }}" {{qdict.checkstring|safe}}>
                         <div class="accordion-heading">
                             {% if request.user.is_staff %}
                                 <span class="pull-right"> <a href="admin/questionnaire/question/{{ question.id }}/">
-                                    <i class="icon-edit"></i>
-                                </a>
+                                    <i class="fa fa-pencil-square-o">&nbsp;</i>
+                                </a></span>
+                            {% endif %}
+                            <span class="pull-right">
                                 <a href="" onclick="toggle_comments({{question.number|removedots}}); return false;"><i class="fa fa-comment">&nbsp;</i></a>
-                                </span>
-                             {% endif %}
-
+                            </span>
+                            <span class="pull-right answered hide" id="answered_{{ question.number }}">
+                                <i class="fa fa-check-square-o fa-green">&nbsp;</i>
+                            </span>
                             <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion_{{ k.sortid }}" href="#div_{{ iteratorQ.value }}">
                 {% endif %}
-                        {% if question.text|geths != 'h1' %}
-                             {% if request.user.is_staff %}
-                                    <span class="pull-right"> <a href="admin/questionnaire/question/{{ question.id }}/">
-                                        <i class="icon-edit"></i>
-                                    </a>
-                                    <a href="" onclick="toggle_comments({{question.number|removedots}}); return false;"><i class="fa fa-comment">&nbsp;</i></a>
-                                    </span>
 
-                             {% endif %}
-                        {% endif %}
-                        <div class="question type_{{ qdict.qtype }} {% if error %} error prepend-top{% endif %}{{ qdict.qnum_class }}{{ qdict.qalpha_class }}" id="qc_{{ question.number }}" {{qdict.checkstring|safe}} >
-                            <!--{% if request.user.is_staff %}-->
-                                <!--<div><span class="pull-right">-->
-                                    <!--<a href="admin/questionnaire/question/{{ question.id }}/">-->
-                                        <!--({% trans "edit" %} {{ question.number }})-->
-                                    <!--</a>-->
-                                <!--</span>-->
-                                    <!--</div>-->
-                            <!--{% endif %}-->
+                        <div class="question type_{{ qdict.qtype }} {% if error %} error prepend-top{% endif %}{{ qdict.qnum_class }}{{ qdict.qalpha_class }} {{qdict.depon_class}}" id="qc_{{ question.number }}" {{qdict.checkstring|safe}} >
 
                             {% if qdict.custom %}
                                 {% if error %}
@@ -95,6 +80,8 @@
                                     </div>
                                 {% endif %}
                                 {% include qdict.template %}
+
+
                             {% else %}
                                 <div class="question-text {% if qdict.required %}required{% endif %} {% if error %}text-error{% endif %} qtext_{{question.text|geths}}">
                                     <span class="qnumber_{{question.text|geths}}">{{ question.display_number }}.</span>
@@ -105,12 +92,26 @@
                                     </div>
 
                                 {% endif %}
-                                        </span>
+                                   </span>
+                                {% if question.text|geths != 'h1' %}
+                                    {% if request.user.is_staff %}
+                                    <span class="pull-right">
+                                        <a href="admin/questionnaire/question/{{ question.id }}/">
+                                            <i class="fa fa-pencil-square-o">&nbsp;</i>
+                                        </a>
+                                    </span>
+                                    {% endif %}
+                                    <span class="pull-right">
+                                        <a href="" onclick="toggle_comments({{question.number|removedots}}); return false;"><i class="fa fa-comment">&nbsp;</i></a>
+                                    </span>
+                                    <span class="pull-right answered hide" id="answered_{{ question.number }}">
+                                        <i class="fa fa-check-square-o fa-green">&nbsp;</i>
+                                    </span>
+                                {% endif %}
                                 </div>
                                 {% if question.text|geths == 'h1' %}
-                                        </a>
                                     </div>
-
+                                    </a>
                                     <div id="div_{{ iteratorQ.value }}" class="accordion-body collapse">
                                         <div class="accordion-inner">
                                  {% endif %}
@@ -126,9 +127,6 @@
                                 </div>
                             {% endif %}
 
-
-                        </div> <!-- /question container -->
-
                         {% if question.footer %}
                             <div class="question-footer">
                                 {{ question.footer|textile }}
@@ -136,7 +134,7 @@
                             </div>
                         {% endif %}
 
-
+                        </div> <!-- /question container -->
 
             {% endwith %}
 
@@ -204,13 +202,11 @@
 
     {% block scriptextra %}
 
-
 function toggle_comments(question_number)
 {
     console.log("q + "+ question_number);
     $("#comments_"+question_number).toggle();
 }
-
 
 function validate(question_number)
 {
@@ -280,7 +276,5 @@ function validate(question_number)
        }
     };
 
-    {% endblock %}
+{% endblock %}
 </script>
-
-

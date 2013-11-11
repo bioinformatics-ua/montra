@@ -619,8 +619,17 @@ def extract_answers(request2, questionnaire_id, question_set, qs_list):
                 if depon:
                     # extra args to BooleanParser are not required for toString
                     parser = BooleanParser(dep_check)
-                    qdict['checkstring'] = ' checks="%s"' % parser.toString(depon)
+
+                    # qdict['checkstring'] = ' checks="%s"' % parser.toString(depon)
+
+                    #It allows only 1 dependency
+                    #The line above allows multiple dependencies but it has a bug when is parsing white spaces
+                    qdict['checkstring'] = ' checks="dep_check(\'question_%s\')"' % depon
+
+                    qdict['depon_class'] = ' depon_class'
                     jstriggers.append('qc_%s' % question.number)
+                    if question.text[:2] == 'h1':
+                        jstriggers.append('acc_qc_%s' % question.number)
                 if 'default' in cd and not question.number in cookiedict:
                     qvalues[question.number] = cd['default']
                 if Type in QuestionProcessors:
@@ -1459,8 +1468,16 @@ def show_fingerprint_page_errors(request, q_id, qs_id, errors={}, template_name=
                 if depon:
                     # extra args to BooleanParser are not required for toString
                     parser = BooleanParser(dep_check)
-                    qdict['checkstring'] = ' checks="%s"' % parser.toString(depon)
+                    # qdict['checkstring'] = ' checks="%s"' % parser.toString(depon)
+
+                    #It allows only 1 dependency
+                    #The line above allows multiple dependencies but it has a bug when is parsing white spaces
+                    qdict['checkstring'] = ' checks="dep_check(\'question_%s\')"' % depon
+
+                    qdict['depon_class'] = ' depon_class'
                     jstriggers.append('qc_%s' % question.number)
+                    if question.text[:2] == 'h1':
+                        jstriggers.append('acc_qc_%s' % question.number)
                 if 'default' in cd and not question.number in cookiedict:
                     qvalues[question.number] = cd['default']
                 if Type in QuestionProcessors:
@@ -1611,7 +1628,7 @@ def show_fingerprint_page_read_only(request, q_id, qs_id, errors={}, template_na
 
                     #It allows only 1 dependency
                     #The line above allows multiple dependencies but it has a bug when is parsing white spaces
-                    qdict['checkstring'] = ' checks="dep_check(\'%s\')"' % depon
+                    qdict['checkstring'] = ' checks="dep_check(\'question_%s\')"' % depon
 
                     qdict['depon_class'] = ' depon_class'
                     jstriggers.append('qc_%s' % question.number)
@@ -1760,8 +1777,16 @@ def show_fingerprint_page(request, runinfo, errors={}, template_name='database_e
         if depon:
             # extra args to BooleanParser are not required for toString
             parser = BooleanParser(dep_check)
-            qdict['checkstring'] = ' checks="%s"' % parser.toString(depon)
+            # qdict['checkstring'] = ' checks="%s"' % parser.toString(depon)
+
+            #It allows only 1 dependency
+            #The line above allows multiple dependencies but it has a bug when is parsing white spaces
+            qdict['checkstring'] = ' checks="dep_check(\'question_%s\')"' % depon
+
+            qdict['depon_class'] = ' depon_class'
             jstriggers.append('qc_%s' % question.number)
+            if question.text[:2] == 'h1':
+                jstriggers.append('acc_qc_%s' % question.number)
         if 'default' in cd and not question.number in cookiedict:
             qvalues[question.number] = cd['default']
         if Type in QuestionProcessors:
@@ -2192,8 +2217,8 @@ def import_questionnaire(request, template_name='import_questionnaire.html'):
     from django.template.defaultfilters import slugify
     # wb = load_workbook(filename = r'/Volumes/EXT1/Dropbox/MAPi-Dropbox/EMIF/Code/emif/emif/questionnaire_ad_v2.xlsx')
     # wb = load_workbook(filename = r'/Volumes/EXT1/Dropbox/MAPi-Dropbox/EMIF/Observational_Data_Sources_Template_v5.xlsx')
-    # wb = load_workbook(filename = r'C:/Questionnaire_template_v3.3.xlsx')
-    wb = load_workbook(filename =r'/Volumes/EXT1/trash/Questionnaire_template_v3.2.xlsx')
+    wb = load_workbook(filename = r'C:/Questionnaire_template_v3.4.xlsx')
+    # wb = load_workbook(filename =r'/Volumes/EXT1/trash/Questionnaire_template_v3.3.xlsx')
     ws = wb.get_active_sheet()
     log = ''
 
@@ -2287,8 +2312,7 @@ def import_questionnaire(request, template_name='import_questionnaire.html'):
                             slug = row[7].value
                         else:
                             slug = convert_text_to_slug(str(row[1].value)[:50])
-
-                        slug = get_slug(slug)
+                            slug = get_slug(slug)
 
                         if row[5].value:
                             helpText = row[5].value
@@ -2358,7 +2382,7 @@ def import_questionnaire(request, template_name='import_questionnaire.html'):
                             slug = row[7].value
                         else:
                             slug = convert_text_to_slug(str(row[1].value)[:50])
-                        slug = get_slug(slug)
+                            slug = get_slug(slug)
 
                         if row[5].value:
                             helpText = row[5].value
@@ -2378,15 +2402,17 @@ def import_questionnaire(request, template_name='import_questionnaire.html'):
                                 list_dep_aux = dependencies_list.value.split('|')
                                 question_num_parent = str(_questions_rows.get(int(list_dep_aux[0])))
 
+                                # print "###############"
+                                # print str(row[0].row) + " dependencies_list: " + str(dependencies_list)
                                 # print str(row[0].row) + " str(list_dep_aux[0]: " + str(int(list_dep_aux[0]))
                                 # print str(row[0].row) + " question_num_parent: " + question_num_parent
                                 # print str(row[0].row) + " _questions_rows: " + str(_questions_rows)
+                                # print str(row[0].row) + " _choices_array: " + str(_choices_array)
 
                                 index_aux = int(str(list_dep_aux[1]))-1
                                 choice_parent_list = _choices_array.get(int(list_dep_aux[0]))
                                 choice_parent = choice_parent_list[index_aux]
                                 _checks = 'dependent=\"' + str(question_num_parent) + ',' + str(choice_parent) + '\"'
-
                             except:
                                 raise
 
@@ -2437,6 +2463,9 @@ def import_questionnaire(request, template_name='import_questionnaire.html'):
                                         raise
                                 _choices_array[type_Column.row] = _choices_array_aux
 
+                        if dataType_column.value in ['choice-yesno', 'choice-yesnocomment',
+                                                             'choice-yesnodontknow']:
+                            _choices_array[type_Column.row] = ['yes', 'no', 'dontknow']
                     except:
                         log += "\n%s - Error to save question %s" % (type_Column.row, text_en)
                         writeLog(log)
