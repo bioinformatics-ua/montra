@@ -62,7 +62,7 @@
                                 </a></span>
                             {% endif %}
                             <span class="pull-right">
-                                <a href="" onclick="toggle_comments({{question.number|removedots}}); return false;"><i class="fa fa-comment">&nbsp;</i></a>
+                                <a href="" onclick="toggle_comments({{question.number|removedots}}); return false;"><i class="fa fa-comment-o">&nbsp;</i></a>
                             </span>
                             <span class="pull-right answered hide" id="answered_{{ question.number|removedots }}">
                                 <i class="fa fa-check-square-o fa-green">&nbsp;</i>
@@ -103,7 +103,7 @@
                                     </span>
                                     {% endif %}
                                     <span class="pull-right">
-                                        <a href="" onclick="toggle_comments({{question.number|removedots}}); return false;"><i class="fa fa-comment">&nbsp;</i></a>
+                                        <a href="" onclick="toggle_comments({{question.number|removedots}}); return false;"><i class="fa fa-comment-o">&nbsp;</i></a>
                                     </span>
                                     <span class="pull-right answered hide" id="answered_{{ question.number|removedots }}">
                                         <i class="fa fa-check-square-o fa-green">&nbsp;</i>
@@ -123,7 +123,7 @@
                                     {% endif %}
                                     {% include qdict.template %}
                                     <div id="comments_{{question.number|removedots}}" style="display:none;margin-left:40px;">
-                                     <a href="" class="span6" onclick="toggle_comments({{question.number|removedots}}); return false;"><i class="fa fa-comment">&nbsp;</i> Comments</a>
+                                     <a href="" class="span6" onclick="toggle_comments({{question.number|removedots}}); return false;"><i class="fa fa-comment-o">&nbsp;</i> Comments</a>
                                     <textarea style=" background-color:#EEE;color: #000;" class="span6" name="comment_question_{{ question.number|removedots }}" cols="50" rows="5">{{qdict.comment}}</textarea>
                                     </div>
                                 </div>
