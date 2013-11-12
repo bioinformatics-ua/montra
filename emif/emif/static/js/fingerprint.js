@@ -72,7 +72,7 @@ $(document).ready(function () {
         e.preventDefault();
         var el = e.target;
         var id_answered = el.id.split("_")[1];
-        var id_answered_aux = el.id.split("_")[1].toString().replace(/\./g,'');
+        var id_answered_aux = el.id.split("_")[1].replace(/\./g,'');
 
         /*
             - verify the type to each question and create a respective processment for each one
