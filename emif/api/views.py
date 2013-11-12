@@ -190,10 +190,6 @@ class ValidateView(APIView):
                 json_test = json.loads(i[0])
                 print json_test
 
-            #database_name = request.POST['database_name']
-            # c = CoreEngine()
-            #results = c.search_fingerprint("database_name_t:"+database_name)
-            #result = {'contains': len(results)==0}
             result = {'test': 'teste2'}
             response = Response(result, status=status.HTTP_200_OK)
         except:

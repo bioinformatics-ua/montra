@@ -175,7 +175,6 @@ def results_fulltext_aux(request, query, page=1, template_name='results.html'):
         list_results = []
         paginator = None
 
-
     c = CoreEngine()
     
     results = c.search_fingerprint(query, str(0))
@@ -519,9 +518,7 @@ def extract_answers(request2, questionnaire_id, question_set, qs_list):
         print "ITEM: " + key
         if key.startswith('comment'):
             pass
-            # Deal with comment
-            import pdb
-            pdb.set_trace()
+            # TODO : implement here!!
 
         if key.startswith('question_'):
             answer = key.split("_", 2)
@@ -541,7 +538,8 @@ def extract_answers(request2, questionnaire_id, question_set, qs_list):
             extra[question] = ans
 
     errors = {}
-
+    
+    # Verification of qprocessor answers 
     def verify_answer(question, answer_dict):
 
         type = question.get_type()
@@ -900,6 +898,7 @@ def all_databases_data_table(request, template_name='alldatabases_data_table.htm
 
 
 def createqsets(runcode, qsets=None):
+    print "createqsets"
     c = CoreEngine()
     results = c.search_fingerprint('id:' + runcode)
 
@@ -938,6 +937,9 @@ def createqsets(runcode, qsets=None):
         for k in result:
             if k in blacklist:
                 continue
+            if k.startswith("comment_"):
+                continue
+
             t = Tag()
 
             aux_results = Slugs.objects.filter(slug1=k[:-2])
@@ -968,13 +970,14 @@ def createqsets(runcode, qsets=None):
                     pass
 
             value = clean_value(str(result[k].encode('utf-8')))
-            #value = value[:75] + (value[75:] and '..')
-            if q_number!=None:
-               try:
-                   t.comment = result['comment_question_'+q_number.replace(".","")]
-               except KeyError:
-                   pass
+            
         
+            try:
+
+               t.comment = result['comment_question_'+k[:-2]]
+            except KeyError:
+               pass
+    
             t.value = value.replace("#", " ")
             if k == "database_name_t":
                 name = t.value
@@ -985,7 +988,7 @@ def createqsets(runcode, qsets=None):
                 except:
                     pass
         break
-    
+    print qsets
     return (qsets, name)
 
 

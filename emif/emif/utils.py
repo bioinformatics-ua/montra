@@ -247,9 +247,6 @@ def convert_qvalues_to_query(qvalues, questionnaire_id):
     query = ""  
     for k in qvalues:
         try:
-            #print qvalues[k]
-            #print numbers[k]
-            
             if (qvalues[k]!=None and qvalues[k]!="" ):
                 query_parameters[numbers[k]] = qvalues[k]
             query = query + " " + qvalues[k]
