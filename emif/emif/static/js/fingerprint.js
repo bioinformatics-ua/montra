@@ -72,12 +72,16 @@ $(document).ready(function () {
         e.preventDefault();
         var el = e.target;
         var id_answered = el.id.split("_")[1];
+        var id_answered_aux = el.id.split("_")[1].toString().replace(/\./g,'');
+        console.log("READY: " + id_answered_aux)
 
         /*
             - verify the type to each question and create a respective processment for each one
             TYPES:
             1 - open | open-button | open-upload-image | open-textfield | datepicker | range | timeperiod | publication
-            2 - choice | choice-yesno | choice-yesnocomment | choice-yesnodontknow | choice-multiple | choice-multiple-freeform | choice-freeform
+                choice-yesno | choice-yesnocomment | choice-yesnodontknow
+            2 - choice | choice-freeform
+            3 - choice-multiple-freeform | choice-multiple | choice-multiple-freeform-options
             None - comment | sameas | custom
 
         */
@@ -86,58 +90,40 @@ $(document).ready(function () {
             || $('[id="qc_'+id_answered+'"]').hasClass('type_open-textfield')
             || $('[id="qc_'+id_answered+'"]').hasClass('type_publication')) {
 
-            //console.log('OPEN - #qc_'+ id_answered);
-            validate1(this, id_answered);
+            validate1(this, id_answered_aux);
         }
 
         if($('[id="qc_'+id_answered+'"]').hasClass('type_datepicker') || $('[id="qc_'+id_answered+'"]').hasClass('type_range')
-            || $('[id="qc_'+id_answered+'"]').hasClass('type_timeperiod')) {
-            // console.log('DATEPICKER - #qc_'+ id_answered);
-            validate1(this, id_answered);
+            || $('[id="qc_'+id_answered+'"]').hasClass('type_timeperiod')
+            || $('[id="qc_'+id_answered+'"]').hasClass('type_choice-yesnodontknow')
+            || $('[id="qc_'+id_answered+'"]').hasClass('type_choice-yesnocomment')
+            || $('[id="qc_'+id_answered+'"]').hasClass('type_choice-yesno')) {
+
+            validate1(this, id_answered_aux);
         }
 
-         if($('[id="qc_'+id_answered+'"]').hasClass('type_choice-yesnodontknow') || $('[id="qc_'+id_answered+'"]').hasClass('type_choice-yesno')
-             || $('[id="qc_'+id_answered+'"]').hasClass('type_choice')
+         if($('[id="qc_'+id_answered+'"]').hasClass('type_choice')
              || $('[id="qc_'+id_answered+'"]').hasClass('type_choice-freeform')) {
-             // console.log('CHOICE - #qc_'+ id_answered);
-
 
              if ($('[name="question_'+id_answered+'"]').is(':checked')) {
-                 //console.log('1 - #answered_'+id_answered);
-                 $('[id="answered_'+id_answered+'"]').show();
+                 $('[id="answered_'+id_answered_aux+'"]').show();
              } else {
-                   //console.log('2 - #answered_'+id_answered);
-                    $('[id="answered_'+id_answered+'"]').hide();
+                 $('[id="answered_'+id_answered_aux+'"]').hide();
              }
         }
 
         if($('[id="qc_'+id_answered+'"]').hasClass('type_choice-multiple-freeform')
              || $('[id="qc_'+id_answered+'"]').hasClass('type_choice-multiple')
              || $('[id="qc_'+id_answered+'"]').hasClass('type_choice-multiple-freeform-options')) {
-//            console.log('CHOICE - #qc_'+ id_answered);
-
-
-             //console.log($('[id="answer_'+id_answered+'"] input[type="checkbox"]').length);
-            // console.log($('[id="answer_'+id_answered+'"] input[type="checkbox"]').length);
-            // console.log($('[id="answer_'+id_answered+'"] input[type="checkbox"]').length);
-//                validate1($('[name="question_'+id_answered+'"]'), id_answered);
 
              if ($('[id="answer_'+id_answered+'"] input[type="checkbox"]').is(':checked')) {
-                // console.log('1 - #answered_'+id_answered);
-                 $('[id="answered_'+id_answered+'"]').show();
+                 $('[id="answered_'+id_answered_aux+'"]').show();
              } else {
-                 // console.log('2 - #answered_'+id_answered);
-                    $('[id="answered_'+id_answered+'"]').hide();
+                    $('[id="answered_'+id_answered_aux+'"]').hide();
              }
         }
 
     });
 
-//    $(document).on('click', '#addpub', function (e) {
-//        e.preventDefault();
-//        var el = e.target;
-//        var id_answered = el.id.split("_")[1];
-//
-//    });
 });
 /***************** END - CHECK IF ANSWER IS FILLED IN *****************/
