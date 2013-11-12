@@ -1,5 +1,5 @@
 {% load i18n %}
-
+{% load extra_tags %}
 <div class="clearfix">
     <div class="input">
         <ul class="inputs-list unstyled">
@@ -10,7 +10,11 @@
                     <span>{{ choice.text }}</span>
                 </label>
             </li>
-            
+            {% if checked %}
+            <script type="text/javascript">
+                $('[id="answered_'+{{ question.number|removedots }}+'"]').show();
+            </script>
+            {% endif %}
         {% endfor %}
 
         {% if qdict.extras %}

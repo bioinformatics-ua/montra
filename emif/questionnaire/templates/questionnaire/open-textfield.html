@@ -1,9 +1,15 @@
 {% load i18n %}
+{% load extra_tags %}
 <div class="clearfix">
     <div class="input">
         <textarea class="span6" id="question_{{ question.number }}" name="question_{{ question.number }}" cols="50" rows="5">{{qdict.value}}</textarea>
         {% if question.extra %}
             <span class="help-block">{{ question.extra }}</span>
+        {% endif %}
+        {% if qdict.value %}
+            <script type="text/javascript">
+                $('[id="answered_'+{{ question.number|removedots }}+'"]').show();
+            </script>
         {% endif %}
     </div>
 </div>

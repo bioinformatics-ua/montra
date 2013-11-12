@@ -1,4 +1,5 @@
 {% load i18n %}
+{% load extra_tags %}
 <div class="clearfix">
     <div class="input">
         <ul class="inputs-list unstyled">
@@ -8,7 +9,12 @@
                     <input onClick="valchanged('question_{{ question.number }}', this.value)" type="radio" id="question_{{ question.number }}_{{ forloop.counter }}" name="question_{{ question.number }}" value="{{ choice.value }}" {% if sel %} checked {% endif %}>
                     <span>{{ choice.text }}</span>
                 </label>
-            </li>            
+            </li>
+            {% if sel %}
+            <script type="text/javascript">
+                $('[id="answered_'+{{ question.number|removedots }}+'"]').show();
+            </script>
+            {% endif %}
         {% endfor %}
         </ul>
     </div>

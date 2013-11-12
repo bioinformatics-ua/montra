@@ -1,3 +1,5 @@
+{% load i18n %}
+{% load extra_tags %}
 <div class="clearfix rangeinput">
     <div class="input">
         <input id="question_{{ question.number }}" name="question_{{ question.number }}" type="range" min="{{ qdict.rmin }}" max="{{ qdict.rmax }}" step="{{ qdict.rstep }}" value="{{ qdict.current }}">
@@ -5,5 +7,10 @@
     <label data-unit="{{ qdict.runit }}">{{ qdict.runit }}</label>
     {% if question.extra %}
         <span class="help-block">{{ question.extra }}</span>
+    {% endif %}
+    {% if qdict.current %}
+        <script type="text/javascript">
+            $('[id="answered_'+{{ question.number|removedots }}+'"]').show();
+        </script>
     {% endif %}
 </div>

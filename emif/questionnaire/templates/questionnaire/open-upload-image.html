@@ -1,4 +1,5 @@
 {% load i18n %}
+{% load extra_tags %}
 <div class="clearfix row">
 
   <div class="row span2" style="padding-top:20px; padding-left:20px;">
@@ -26,6 +27,11 @@
     {% if question.extra %}
     <span class="help-block">{{ question.extra }}</span>
     {% endif %}
+      {% if qdict.value %}
+            <script type="text/javascript">
+                $('[id="answered_'+{{ question.number|removedots }}+'"]').show();
+            </script>
+        {% endif %}
   </div>
 
 </div>
