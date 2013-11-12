@@ -64,7 +64,7 @@
                             <span class="pull-right">
                                 <a href="" onclick="toggle_comments({{question.number|removedots}}); return false;"><i class="fa fa-comment">&nbsp;</i></a>
                             </span>
-                            <span class="pull-right answered hide" id="answered_{{ question.number }}">
+                            <span class="pull-right answered hide" id="answered_{{ question.number|removedots }}">
                                 <i class="fa fa-check-square-o fa-green">&nbsp;</i>
                             </span>
 
@@ -105,7 +105,7 @@
                                     <span class="pull-right">
                                         <a href="" onclick="toggle_comments({{question.number|removedots}}); return false;"><i class="fa fa-comment">&nbsp;</i></a>
                                     </span>
-                                    <span class="pull-right answered hide" id="answered_{{ question.number }}">
+                                    <span class="pull-right answered hide" id="answered_{{ question.number|removedots }}">
                                         <i class="fa fa-check-square-o fa-green">&nbsp;</i>
                                     </span>
                                 {% endif %}
