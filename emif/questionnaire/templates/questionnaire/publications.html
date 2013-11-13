@@ -194,14 +194,20 @@ function PublicationWidget ()
     {
         //var _aux = $("question_{{ question.number }}").val();
         var _aux = document.getElementById("question_{{ question.number }}").value ;
-        if (_aux===undefined)
+        if (_aux===undefined || _aux=="")
             return;
-        var _objs = JSON.parse("["+_aux+"]")
 
+        if (!_aux.startsWith("["))
+        {
+            var _objs = JSON.parse("["+_aux+"]");
+        }
+        else
+        {
+            var _objs = JSON.parse(_aux);    
+        }
+        
         for (var i = 0 ; i<_objs.length; i++)
         {
-
-
             var _pubmedid = _objs[i]['pmid'];    
             var _pubtitle = _objs[i]['title'];
             var _pubjournal = _objs[i]['journal'];
@@ -306,7 +312,10 @@ function PublicationWidget ()
 
 pw{{ question.number|removedots }} = new PublicationWidget();
 pw{{ question.number|removedots }}.bindElements();
-pw{{ question.number|removedots }}.loadInformation();
+
+pw{{ question.number|removedots }}.loadInformation();    
+
+
 
 </script>
 

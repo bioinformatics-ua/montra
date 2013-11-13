@@ -26,7 +26,6 @@ from __future__ import print_function
 import pysolr
 
 from questionnaire.models import RunInfoHistory
-#from questionnaire.models import Answer, Question
 
 from django.db.models.signals import post_save
 from django.dispatch import receiver
@@ -44,6 +43,9 @@ import md5
 import random
 
 from django.conf import settings
+
+
+from django.template.defaultfilters import slugify
 
 import datetime
 logger = logging.getLogger()
@@ -122,12 +124,15 @@ class CoreEngine:
         return similar
 
 
-def convert_text_to_slug(text):
+def convert_text_to_slug_old(text):
     #TODO: optimize
     text_aux = text.replace(' ', '_').replace('?','').replace('.', '').replace(',','')
     if text_aux[:-1] == '_':
         text_aux = text_aux[:-1]
     return text_aux
+
+def convert_text_to_slug(text):
+    return slugify(text)
 
 def clean_answer(answer):
     #TODO: optimize
@@ -143,7 +148,7 @@ def get_slug_from_choice(v, q):
 
 
 def index_answeres_from_qvalues(qvalues, questionnaire, subject, fingerprint_id, extra_fields=None):
-    #print("index_answeres_from_qvalues")
+    
     c = CoreEngine()
     d = {}
     
@@ -158,8 +163,7 @@ def index_answeres_from_qvalues(qvalues, questionnaire, subject, fingerprint_id,
 
     for qs_aux, qlist in qvalues:
         for question, qdict in qlist:
-            #print("qdict")
-            # print("################## QDICT:" + str(qdict))
+            
             try:
                 choices = None
                 value = None
@@ -178,13 +182,10 @@ def index_answeres_from_qvalues(qvalues, questionnaire, subject, fingerprint_id,
                         pass
 
                     value = qv
-                    # print(choices)
+                    
                     do_again = False
                     try:
                         for choice, unk, checked, _aux  in choices:
-                            # print("Choice value: " + str(choice.value))
-                            # print("checked value: " + str(checked))
-                            # print("unk value: " + str(unk))
                             if checked == " checked":
                                 if _aux != "":
                                     value = value + "#" + choice.value + "{" + _aux +"}"
@@ -312,7 +313,6 @@ def convert_answers_to_solr(runinfo):
         a.question.get_type() == "choice-multiple-freeform" or \
         a.question.get_type() == "comment":
 
-            #text_aux = a.answer
             x = None 
             if (len(text_aux)>0):
                 x = ast.literal_eval(text_aux)

@@ -4,7 +4,6 @@ from django.utils.simplejson import dumps
 
 import re
 
-
 @question_proc('choice', 'choice-freeform')
 def question_choice(request, question):
     choices = []
@@ -16,7 +15,6 @@ def question_choice(request, question):
     val = None
     if key in request.POST:
         val = request.POST[key]
-
     else:
         if 'default' in cd:
             val = cd['default']
@@ -24,8 +22,6 @@ def question_choice(request, question):
     if val != None and "#" in val:
         val = val.split("#")[0]
     for choice in question.choices():
-        #print "choice.value: " + str(choice.value )
-        #print "val" + str(val)
         choices.append( ( choice.value == val, choice, ) )
 
     if question.type == 'choice-freeform':
@@ -87,8 +83,7 @@ def question_multiple(request, question):
     if not extracount and question.type == 'choice-multiple-freeform':
         extracount = 1
     extras = []
-    if question.number=="16": 
-        print "Request POST "  + str(request.POST)
+    
     for x in range(1, extracount+1):
 
         key = "question_%s_more%d" % (question.number, x)
@@ -158,8 +153,8 @@ def get_aux_text(full_value, choice_value):
     for v in _aux:
         if choice_value in v:
             values = re.findall(r'\{(.*?)\}', v)
-            print choice_value
-            print values
+            #print choice_value
+            #print values
             if (len(values)>0):
                 return values[0]
     return ''
@@ -167,7 +162,7 @@ def get_aux_text(full_value, choice_value):
 @question_proc('choice-multiple', 'choice-multiple-freeform-options')
 def question_multiple_options(request, question):
     key = "question_%s" % question.number
-    print key
+    #print key
     choices = []
     counter = 0
     cd = question.getcheckdict()
@@ -183,18 +178,12 @@ def question_multiple_options(request, question):
 
         key = "question_%s_multiple_%d" % (question.number, choice.sortid)
         key_value = "question_%s_%d_opt" % (question.number, choice.sortid)
-        if val!=None:
-            print "Val: " +val
-        if choice!=None:
-            print "choice.value: " + choice.value
+        
         _aux = ""
         try:
             _aux = request.POST[key_value]
         except:
             pass
-
-
-        print "get_aux_text(val,choice.value )" + get_aux_text(val,choice.value )
 
         if key in request.POST or (val!=None and (choice.value in val)) or \
           (request.method == 'GET' and choice.value in defaults):
@@ -247,8 +236,6 @@ def process_multiple_options(question, answer):
         requiredcount = question.choices().count()
 
     for k, v in answer.items():
-        print "K: " + str(k)
-        print "V "
         if k.startswith('multiple'):
             multiple.append(v)
         if k.startswith('more') and len(v.strip()) > 0:

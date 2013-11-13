@@ -156,7 +156,6 @@ def results_fulltext(request, page=1, template_name='results.html'):
         request.session['query'] = query
     except:
         in_post = False
-        #raise
 
     if not in_post:
         query = request.session.get('query', "")
@@ -515,7 +514,6 @@ def extract_answers(request2, questionnaire_id, question_set, qs_list):
     # generate the answer_dict for each question, and place in extra
     for item in items:
         key, value = item[0], item[1]
-        print "ITEM: " + key
         if key.startswith('comment'):
             pass
             # TODO : implement here!!
@@ -690,7 +688,9 @@ def database_edit(request, fingerprint_id, questionnaire_id, template_name="data
 
         extra[question] = ans = extra.get(question, {})
         if "[" in value:
+            print value
             value = value.lower().replace("]", "").replace("[", "")
+            print value
         request2.get_post()['question_%s' % question.number] = value
         
         ans['ANSWER'] = value
@@ -971,7 +971,6 @@ def createqsets(runcode, qsets=None):
 
             value = clean_value(str(result[k].encode('utf-8')))
             
-        
             try:
 
                t.comment = result['comment_question_'+k[:-2]]
@@ -1449,7 +1448,7 @@ def show_fingerprint_page_errors(request, q_id, qs_id, errors={}, template_name=
             qs_aux = None
             
             for question in questions_list[k.id]:
-
+                
                 qs_aux = question.questionset
                 
                 Type = question.get_type()
@@ -2196,7 +2195,6 @@ def get_slug(slug):
 
     return slug_name_final
 
-
 def save_slug(slugName, desc, question):
     slugsAux = Slugs()
     slugsAux.slug1 = slugName
@@ -2220,8 +2218,8 @@ def import_questionnaire(request, template_name='import_questionnaire.html'):
     from django.template.defaultfilters import slugify
     # wb = load_workbook(filename = r'/Volumes/EXT1/Dropbox/MAPi-Dropbox/EMIF/Code/emif/emif/questionnaire_ad_v2.xlsx')
     # wb = load_workbook(filename = r'/Volumes/EXT1/Dropbox/MAPi-Dropbox/EMIF/Observational_Data_Sources_Template_v5.xlsx')
-    wb = load_workbook(filename = r'C:/Questionnaire_template_v3.4.xlsx')
-    # wb = load_workbook(filename =r'/Volumes/EXT1/trash/Questionnaire_template_v3.3.xlsx')
+    # wb = load_workbook(filename = r'C:/Questionnaire_template_v3.4.xlsx')
+    wb = load_workbook(filename =r'/Volumes/EXT1/trash/Questionnaire_template_v3.5.xlsx')
     ws = wb.get_active_sheet()
     log = ''
 
@@ -2267,7 +2265,11 @@ def import_questionnaire(request, template_name='import_questionnaire.html'):
         for row in ws.rows[2:]:
             if len(row) > 0:
                 type_Column = row[0]
+                
                 text_question_Column = row[1]
+
+                if (text_question_Column.value!=None):
+                    text_question_Column.value = text_question_Column.value.encode('ascii', 'ignore')
                 level_number_column = row[2]
                 _checks = ''
 
@@ -2378,7 +2380,11 @@ def import_questionnaire(request, template_name='import_questionnaire.html'):
                 # Columns required:  Type, Text/Question, Level/Number, Data Type, Category, Stats
                 # Columns optional:  Value List, Help text/Description, Tooltip, Dependencies
                 else:
+                    #try:
                     text_en = str(level_number_column.value) + '. ' + str(text_question_Column.value)
+                    #except:
+                        #import pdb
+                        #pdb.set_trace()
                     try:
                         dataType_column = row[3]
                         if row[7].value:
@@ -2391,7 +2397,7 @@ def import_questionnaire(request, template_name='import_questionnaire.html'):
                             helpText = row[5].value
                         else:
                             helpText = ''
-                        # print "HELP_TEXT2: " + str(helpText)
+                        
                         _tooltip = False
 
                         if row[6].value:
@@ -2471,6 +2477,7 @@ def import_questionnaire(request, template_name='import_questionnaire.html'):
                             _choices_array[type_Column.row] = ['yes', 'no', 'dontknow']
                     except:
                         log += "\n%s - Error to save question %s" % (type_Column.row, text_en)
+                        
                         writeLog(log)
                         raise
 

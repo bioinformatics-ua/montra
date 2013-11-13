@@ -52,19 +52,14 @@ urlpatterns = patterns('',
 
     # Advanced Search
     url(r'^advancedSearch/(?P<questionnaire_id>[0-9]+)/(?P<question_set>[0-9]+)/$', 'emif.views.advanced_search'),
-    #url(r'^q2/(?P<runcode>[^/]+)/$', questionaries_with_sets, name='questionaries_with_sets'),
-    #url(r'^q2/(?P<runcode>[^/]+)/(?P<qs>[-]{0,1}\d+)/$',
-    #        questionaries_with_sets, name='questionset_sets'),
-
+    
     # Database Add
 
     url(r'^add/(?P<questionnaire_id>[0-9]+)/(?P<sortid>[0-9]+)/$', 'emif.views.database_add'),
     url(r'^addPost/(?P<questionnaire_id>[0-9]+)/(?P<sortid>[0-9]+)$', 'emif.views.check_database_add_conditions'),
-    #url(r'^q2/(?P<runcode>[^/]+)/$', questionaries_with_sets, name='questionaries_with_sets'),
-    #url(r'^q2/(?P<runcode>[^/]+)/(?P<qs>[-]{0,1}\d+)/$',
-    #        questionaries_with_sets, name='questionset_sets'),
+    
 
-
+    
     # Database Edit
     url(r'^dbEdit/(?P<fingerprint_id>[^/]+)/(?P<questionnaire_id>[0-9]+)$$', 'emif.views.database_edit'),
     #url(r'^dbEdit/(?P<questionnaire_id>[0-9]+)/$$', 'emif.views.database_edit'),
@@ -119,10 +114,7 @@ urlpatterns = patterns('',
     url(r'q/', include('questionnaire.urls')),
 
     url(r'^take/(?P<questionnaire_id>[0-9]+)/$', 'questionnaire.views.generate_run'),
-    # url(r'^$', 'questionnaire.page.views.page', {'page': 'index'}),
-    # url(r'^(?P<page>.*)\.html$', 'questionnaire.page.views.page'),
-    # url(r'^(?P<lang>..)/(?P<page>.*)\.html$', 'questionnaire.page.views.langpage'),
-    # url(r'^setlang/$', 'questionnaire.views.set_language'),
+    
 
     #
     # User accounts URLs
