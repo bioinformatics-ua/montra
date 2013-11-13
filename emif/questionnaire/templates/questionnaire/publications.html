@@ -197,7 +197,7 @@ function PublicationWidget ()
         if (_aux===undefined || _aux=="")
             return;
 
-        if (!_aux.startsWith("["))
+        if (_aux[0] != "[")
         {
             var _objs = JSON.parse("["+_aux+"]");
         }
