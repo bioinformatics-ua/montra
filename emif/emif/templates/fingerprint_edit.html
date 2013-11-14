@@ -19,7 +19,7 @@
     <div id="qs_{{ k.sortid }}" class="{% if k.sortid == 0 %} {% else %} hide {% endif %} questionset">
 
     {% if k.sortid != 0 and k.sortid != 99 %}
-        <div><a id="collapseall_qs_{{ k.sortid }}"  class="btn pull-right" href="">Expand all </a></div>
+        <div><a id="collapseall_qs_{{ k.sortid }}"  class="btn pull-right" href="">Collapse all </a></div>
     {% endif %}
 
     <div class="questionset-title" style="font-size:6px">
@@ -115,7 +115,7 @@
 
                                     </a>
                             </div>
-                                    <div id="div_{{ iteratorQ.value }}" class="accordion-body collapse">
+                                    <div id="div_{{ iteratorQ.value }}" class="accordion-body in collapse">
                                         <div class="accordion-inner">
                                  {% endif %}
                                 <div class="answer qtext_{{question.text|geths}}" id="answer_{{ question.number }}">
