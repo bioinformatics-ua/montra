@@ -352,11 +352,13 @@ def results_diff(request, page=1, template_name='results_diff.html'):
         blacklist = ['created_t', 'type_t', '_version_']
         name = "Not defined"
         for result in results:
+            questionnaire_slug = result['type_t']
+            q_main = Questionnaire.objects.filter(slug=questionnaire_slug)[0]
             for k in result:
                 if k in blacklist:
                     continue
                 t = Tag()
-                results = Slugs.objects.filter(slug1=k[:-2])
+                results = Slugs.objects.filter(slug1=k[:-2], question__questionset__questionnaire=q_main.pk)
                 if len(results) > 0:
                     text = results[0].description
                 else:
@@ -698,7 +700,7 @@ def database_edit(request, fingerprint_id, questionnaire_id, template_name="data
         if item.startswith("comment_"):
             
             slug = item.split("comment_question_")[1]
-            results = Slugs.objects.filter(slug1=slug[:-2])
+            results = Slugs.objects.filter(slug1=slug[:-2], question__questionset__questionnaire=questionnaire_id)
             if results == None or len(results) == 0:
                 continue
             question = results[0].question
@@ -708,7 +710,7 @@ def database_edit(request, fingerprint_id, questionnaire_id, template_name="data
         if item == '_version_':
             continue
 
-        results = Slugs.objects.filter(slug1=str(item)[:-2])
+        results = Slugs.objects.filter(slug1=str(item)[:-2],question__questionset__questionnaire=questionnaire_id )
         print len(results)
         if results == None or len(results) == 0:
             continue
@@ -977,7 +979,7 @@ def createqsets(runcode, qsets=None):
 
             t = Tag()
 
-            aux_results = Slugs.objects.filter(slug1=k[:-2])
+            aux_results = Slugs.objects.filter(slug1=k[:-2], question__questionset__questionnaire=q_aux[0].pk)
             qs = None
             question_group = None
             q_number = None
@@ -2211,8 +2213,8 @@ def writeLog(log):
         f.write(log)
         f.close()
 
-def get_slug(slug):
-    slugs_objs = Slugs.objects.filter(slug1=slug)
+def get_slug(slug, q_id=None):
+    slugs_objs = Slugs.objects.filter(slug1=slug, question__questionset__questionnaire=q_id)
     slug_aux = None
     if (len(slugs_objs)>0):
         slug_aux=slugs_objs[0]
@@ -2355,7 +2357,7 @@ def import_questionnaire(request, template_name='import_questionnaire.html'):
                             slug = row[7].value
                         else:
                             slug = convert_text_to_slug(str(row[1].value)[:50])
-                            slug = get_slug(slug)
+                            slug = get_slug(slug, questionnaire.pk)
 
                         if row[5].value:
                             helpText = row[5].value
@@ -2429,7 +2431,7 @@ def import_questionnaire(request, template_name='import_questionnaire.html'):
                             slug = row[7].value
                         else:
                             slug = convert_text_to_slug(str(row[1].value)[:50])
-                            slug = get_slug(slug)
+                            slug = get_slug(slug, questionnaire.pk)
 
                         if row[5].value:
                             helpText = row[5].value

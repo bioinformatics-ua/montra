@@ -197,11 +197,14 @@ def get_database_from_id_with_tlv(db):
     name = "Not defined"
     
     for result in results:
+        questionnaire_slug = result['type_t']
+        q_main = Questionnaire.objects.filter(slug=questionnaire_slug)[0]
+
         for k in result:
             if k in blacklist:
                 continue
             t = Tag()
-            results = Slugs.objects.filter(slug1=k)
+            results = Slugs.objects.filter(slug1=k, question__questionset__questionnaire=q_main.pk)
             if len(results)>0:
                 text = results[0].description 
             else:
