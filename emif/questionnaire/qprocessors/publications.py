@@ -13,9 +13,9 @@ def question_pub(request, question):
     
     key = "question_%s" % question.number
     value = question.getcheckdict().get('default','')
-    print "PUB"
-    print key
-    print request.POST
+    #print "PUB"
+    #print key
+    #print request.POST
     if key in request.POST:
         value = request.POST[key]
         print "REQUEST" + value

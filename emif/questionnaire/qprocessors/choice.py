@@ -145,19 +145,26 @@ def process_multiple(question, answer):
     #print "Multiple" + str(multiple)
     return dumps(multiple)
 
-def get_aux_text(full_value, choice_value):
+def get_aux_text(full_value, choice_value, original_value=None):
     if (full_value==None):
+        return original_value
+    if isinstance(full_value, basestring):
+        print "full_value is string" 
+        _aux = full_value.split("#")
+        #print _aux
+        for v in _aux:
+            if choice_value in v:
+                values = re.findall(r'\{(.*?)\}', v)
+                #print choice_value
+                #print values
+                if (len(values)>0):
+                    return values[0]
         return ''
-    _aux = full_value.split("#")
-    #print _aux
-    for v in _aux:
-        if choice_value in v:
-            values = re.findall(r'\{(.*?)\}', v)
-            #print choice_value
-            #print values
-            if (len(values)>0):
-                return values[0]
-    return ''
+    else:
+        print "full_value is not string" 
+        return original_value
+
+
 
 @question_proc('choice-multiple', 'choice-multiple-freeform-options')
 def question_multiple_options(request, question):
@@ -185,11 +192,12 @@ def question_multiple_options(request, question):
         except:
             pass
 
+
         if key in request.POST or (val!=None and (choice.value in val)) or \
           (request.method == 'GET' and choice.value in defaults):
-            choices.append( (choice, key, ' checked',get_aux_text(val,choice.value )) )
+            choices.append( (choice, key, ' checked',get_aux_text(val,choice.value, _aux )) )
         else:
-            choices.append( (choice, key, '',get_aux_text(val,choice.value )) )
+            choices.append( (choice, key, '',get_aux_text(val,choice.value,_aux )) )
     extracount = int(cd.get('extracount', 0))
     if not extracount and question.type == 'choice-multiple-freeform-options':
         extracount = 1

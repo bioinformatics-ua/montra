@@ -1507,7 +1507,7 @@ def show_fingerprint_page_errors(request, q_id, qs_id, errors={}, template_name=
                 qs_aux = k
             qlist_general.append((qs_aux, qlist))
         
-        print "Extra fields : " + str(extra_fields)
+        #print "Extra fields : " + str(extra_fields)
         if (fingerprint_id != None):
 
             if users_db==None:
