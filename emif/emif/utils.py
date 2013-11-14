@@ -93,6 +93,7 @@ class Database:
     email_contact = ''
     number_patients = ''
     ttype = ''
+    type_name = ''
     logo = ''
 
 class ordered_dict(dict):

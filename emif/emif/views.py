@@ -177,7 +177,11 @@ def results_fulltext_aux(request, query, page=1, template_name='results.html'):
     c = CoreEngine()
     
     results = c.search_fingerprint(query, str(0))
-    
+    questionnaires_ids = {}
+    qqs = Questionnaire.objects.all()
+    for q in qqs:
+        questionnaires_ids[q.slug] = (q.pk, q.name)
+
     list_databases = []
     if len(results) == 0:
         query_old = request.session.get('query', "")
@@ -217,6 +221,9 @@ def results_fulltext_aux(request, query, page=1, template_name='results.html'):
                 database_aux.logo = r['upload-image_t']
             database_aux.id = r['id']
             database_aux.date = convert_date(r['created_t'])
+            (ttype, type_name) = questionnaires_ids[r['type_t']]
+            database_aux.ttype = ttype
+            database_aux.type_name = type_name
             list_databases.append(database_aux)
         except:
             raise
@@ -799,7 +806,7 @@ def get_databases_from_solr(request, query="*:*"):
     questionnaires_ids = {}
     qqs = Questionnaire.objects.all()
     for q in qqs:
-        questionnaires_ids[q.slug] = q.pk
+        questionnaires_ids[q.slug] = (q.pk, q.name)
 
     for r in results:
         try:
@@ -846,7 +853,9 @@ def get_databases_from_solr(request, query="*:*"):
             else:
                 database_aux.logo = r['upload-image_t']
 
-            database_aux.ttype = questionnaires_ids[r['type_t']]
+            (ttype, type_name) = questionnaires_ids[r['type_t']]
+            database_aux.ttype = ttype
+            database_aux.type_name = type_name
             list_databases.append(database_aux)
         except:
             pass
