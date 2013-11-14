@@ -21,10 +21,21 @@
         <div><a id="collapseall_qs_{{ k.sortid }}"  class="btn pull-right" href="">Collapse all </a></div>
     {% endif %}
 
-    <div class="questionset-title" style="font-size:6px">
-    <h3>{{ k.text|removeh1 }}</h3>
 
+
+    
+    <div class="questionset-title" style="font-size:6px">
+    <h3>
+    
+    {{ k.text|removeh1 }}
+
+    </h3>
     </div>
+
+    {% if k.help_text != "" %}
+    <div class="clearfix" style="padding-bottom:30px;">{{k.help_text}}</div>
+    {% endif %}
+        
 
 
         {% csrf_token %}
