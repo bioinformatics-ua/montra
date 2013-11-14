@@ -62,7 +62,7 @@
                                 </a></span>
                             {% endif %}
                             <span class="pull-right">
-                                <a href="" onclick="toggle_comments({{question.number|removedots}}); return false;"><i class="fa fa-comment-o">&nbsp;</i></a>
+                                <a href="" onclick="toggle_comments({{question.number|removedots}}); return false;"><i class="fa {% if qdict.comment %} fa-comment {% else %} fa-comment-o {% endif %}">&nbsp;</i></a>
                             </span>
                             <span class="pull-right answered hide" id="answered_{{ question.number|removedots }}">
                                 <i class="fa fa-check-square-o fa-green">&nbsp;</i>
@@ -103,7 +103,7 @@
                                     </span>
                                     {% endif %}
                                     <span class="pull-right">
-                                        <a href="" onclick="toggle_comments({{question.number|removedots}}); return false;"><i class="fa fa-comment-o">&nbsp;</i></a>
+                                        <a href="" onclick="toggle_comments({{question.number|removedots}}); return false;"><i class="fa {% if qdict.comment %} fa-comment {% else %} fa-comment-o {% endif %}">&nbsp;</i></a>
                                     </span>
                                     <span class="pull-right answered hide" id="answered_{{ question.number|removedots }}">
                                         <i class="fa fa-check-square-o fa-green">&nbsp;</i>

@@ -63,7 +63,7 @@
                                 </a></span>
                             {% endif %}
                             <span class="pull-right">
-                                <a href="" onclick="toggle_comments({{question.number|removedots}}); return false;"><i class="fa fa-comment-o">&nbsp;</i></a>
+                                <a href="" onclick="toggle_comments({{question.number|removedots}}); return false;"><i class="fa {% if qdict.comment %} fa-comment {% else %} fa-comment-o {% endif %}">&nbsp;</i></a>
                             </span>
                             <span class="pull-right answered hide" id="answered_{{ question.number|removedots }}">
                                 <i class="fa fa-check-square-o fa-green">&nbsp;</i>
@@ -104,7 +104,7 @@
                                     </span>
                                     {% endif %}
                                     <span class="pull-right">
-                                        <a href="" onclick="toggle_comments({{question.number|removedots}}); return false;"><i class="fa fa-comment-o">&nbsp;</i></a>
+                                        <a href="" onclick="toggle_comments({{question.number|removedots}}); return false;"><i class="fa {% if qdict.comment %} fa-comment {% else %} fa-comment-o {% endif %}">&nbsp;</i></a>
                                     </span>
                                     <span class="pull-right answered hide" id="answered_{{ question.number|removedots }}">
                                         <i class="fa fa-check-square-o fa-green">&nbsp;</i>
@@ -263,7 +263,7 @@ function validate(question_number)
            element.text('Expand all');
            if (!element.hasClass('disabled')){
             element.parents().find('#'+div_id +' .collapse').each(function(index){
-                $(this).addClass('in');
+                //$(this).addClass('in');
                 $(this).collapse('hide');
             });
            }
@@ -272,7 +272,7 @@ function validate(question_number)
             element.text('Collapse all');
            if (!element.hasClass('disabled')){
             element.parents().find('#'+div_id +' .collapse').each(function(index){
-                $(this).removeClass('in');
+                //$(this).removeClass('in');
                 $(this).collapse('show');
             });
            }
