@@ -505,7 +505,7 @@ def extract_answers(request2, questionnaire_id, question_set, qs_list):
 
     items = request.POST.items()
     extra = {} # question_object => { "ANSWER" : "123", ... }
-
+    extra_comments = {}
     # this will ensure that each question will be processed, even if we did not receive
     # any fields for it. Also works to ensure the user doesn't add extra fields in
     for x in expected:
@@ -515,7 +515,8 @@ def extract_answers(request2, questionnaire_id, question_set, qs_list):
     for item in items:
         key, value = item[0], item[1]
         if key.startswith('comment'):
-            pass
+            continue
+            
             # TODO : implement here!!
 
         if key.startswith('question_'):
@@ -535,6 +536,13 @@ def extract_answers(request2, questionnaire_id, question_set, qs_list):
                 continue
             extra[question] = ans
 
+            comment_id = "comment_question_"+question.number#.replace(".", "")
+            try:
+                if request.POST and request.POST[comment_id]!='':
+                    comment_id_index = "comment_question_"+question.slug
+                    extra_comments[question] = request.POST[comment_id]
+            except KeyError:
+                pass
     errors = {}
     
     # Verification of qprocessor answers 
@@ -631,6 +639,11 @@ def extract_answers(request2, questionnaire_id, question_set, qs_list):
                 if Type in QuestionProcessors:
 
                     qdict.update(QuestionProcessors[Type](request, question))
+                    try:
+                        qdict['comment'] = extra_comments[question]
+                    except KeyError:
+                        pass
+
                     if 'jsinclude' in qdict:
                         if qdict['jsinclude'] not in jsinclude:
                             jsinclude.extend(qdict['jsinclude'])
@@ -675,7 +688,16 @@ def database_edit(request, fingerprint_id, questionnaire_id, template_name="data
     for item in items:
         key = item
         value = items[key]
-        
+        if item.startswith("comment_"):
+            
+            slug = item.split("comment_question_")[1]
+            results = Slugs.objects.filter(slug1=slug[:-2])
+            if results == None or len(results) == 0:
+                continue
+            question = results[0].question
+            request2.get_post()['comment_question_%s' % question.number] = value
+            continue
+
         if item == '_version_':
             continue
 
@@ -692,6 +714,7 @@ def database_edit(request, fingerprint_id, questionnaire_id, template_name="data
             value = value.lower().replace("]", "").replace("[", "")
             print value
         request2.get_post()['question_%s' % question.number] = value
+        
         
         ans['ANSWER'] = value
         
@@ -916,7 +939,9 @@ def createqsets(runcode, qsets=None):
 
         list_qsets = QuestionSet.objects.filter(questionnaire=q_aux[0]).order_by('sortid')
 
+        
         for qset in list_qsets:
+
             if (qset.sortid != 0 and qset.sortid != 99):
                 question_group = QuestionGroup()
                 question_group.sortid = qset.sortid
@@ -931,10 +956,11 @@ def createqsets(runcode, qsets=None):
                     t.number = question.number
                     question_group.list_ordered_tags.append(t)
 
+
                 qsets[qset.text] = question_group
-        
 
         for k in result:
+            print k
             if k in blacklist:
                 continue
             if k.startswith("comment_"):
@@ -950,18 +976,20 @@ def createqsets(runcode, qsets=None):
                 text = aux_results[0].description
                 qs = aux_results[0].question.questionset.text
                 q_number = qs = aux_results[0].question.number
-                if qsets.has_key(qs):
+                if qsets.has_key(aux_results[0].question.questionset.text):
                     # Add the Tag to the QuestionGroup
-                    question_group = qsets[qs]
+                    question_group = qsets[aux_results[0].question.questionset.text]
                 else:
-                    question_group = QuestionGroup()
-                    qsets[qs] = question_group
                     # Add a new QuestionGroup
+                    question_group = QuestionGroup()
+                    qsets[aux_results[0].question.questionset.text] = question_group
+                    
             else:
                 text = k
-                
+
             info = text
             t.tag = info
+            print t.tag
 
             if question_group != None and question_group.list_ordered_tags != None:
                 try:
@@ -973,7 +1001,8 @@ def createqsets(runcode, qsets=None):
             
             try:
 
-               t.comment = result['comment_question_'+k[:-2]]
+               t.comment = result['comment_question_'+k]
+               print t.comment
             except KeyError:
                pass
     
@@ -987,7 +1016,7 @@ def createqsets(runcode, qsets=None):
                 except:
                     pass
         break
-    print qsets
+    
     return (qsets, name)
 
 
@@ -1496,7 +1525,7 @@ def show_fingerprint_page_errors(request, q_id, qs_id, errors={}, template_name=
                         #    qvalues[question.number] = qdict['qvalue']
 
                 qlist.append((question, qdict))
-                comment_id = "comment_question_"+question.number.replace(".", "")
+                comment_id = "comment_question_"+question.number#.replace(".", "")
                 if request.POST and request.POST[comment_id]!='':
                     comment_id_index = "comment_question_"+question.slug
                     extra_fields[comment_id_index+'_t'] = request.POST[comment_id]
