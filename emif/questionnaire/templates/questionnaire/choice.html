@@ -14,6 +14,7 @@
             {% if sel %}
             <script type="text/javascript">
                 $('[id="answered_'+{{ question.number|removedots }}+'"]').show();
+                valchanged('question_{{ question.number }}','{{ choice.value }}');
             </script>
             {% endif %}
         {% endfor %}

@@ -112,6 +112,7 @@ text-decoration: none;
 {% include "fingerprint_edit.html" %}
 </div>
 <script type="text/javascript">
+console.log("trigger");
         {% for trigger in triggers %}
             addtrigger("{{trigger}}");
         {% endfor %}
@@ -121,6 +122,7 @@ text-decoration: none;
         {% endfor %}
 
         for(key in qvalues) {
+            console.log(key);
             valchanged(key, qvalues[key]);
         }
     </script>
@@ -188,7 +190,11 @@ function questionsets_handle(id_questionset)
     document.body.scrollTop = document.documentElement.scrollTop = 0;
 };
 
+
+
 //questionsets_handle(qs_0);
+
+
 
 
 
