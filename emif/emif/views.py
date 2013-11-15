@@ -1747,9 +1747,9 @@ def feedback(request, template_name='feedback.html'):
         form = ContactForm(request.POST)
         if form.is_valid():  # All validation rules pass
 
-            subject = request.POST.get('topic', '')
-            name = request.POST.get('name', '')
-            message = request.POST.get('message', '')
+            subject = request.POST.get('topic', '').encode('ascii', 'ignore')
+            name = request.POST.get('name', '').encode('ascii', 'ignore')
+            message = request.POST.get('message', '').encode('ascii', 'ignore')
             from_email = request.POST.get('email', '')
 
             emails_to_feedback = []
