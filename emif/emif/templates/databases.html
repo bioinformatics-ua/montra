@@ -115,7 +115,7 @@ button {
 
 <div id="modal-from-dom" class="modal hide fade" style="display:none"  >
     <div class="modal-header">
-        <a href="#" class="close">&times;</a>
+        <a href="#" onclick="$('#modal-from-dom').modal('hide'); return false;" class="close">&times;</a>
          <h3>Delete Fingerprint</h3>
     </div>
     <div class="modal-body">
@@ -126,13 +126,13 @@ button {
     <div class="modal-footer">
         <a href="rm/ref" class="btn btn-danger">Yes</a>
         <!-- <a href="delete.php?some=param&ref=" class="btn danger">Yes 2</a> -->
-        <a href="javascript:$('#modal-from-dom').modal('hide')" class="btn btn-secondary">No</a>
+        <a href="#" onclick="$('#modal-from-dom').modal('hide'); return false;" class="btn btn-secondary">No</a>
     </div>
 </div>
 
 <div id="modal-from-dom-share" class="modal hide fade" style="display:none"  >
     <div class="modal-header">
-        <a href="#" class="close">&times;</a>
+        <a href="#" onclick="$('#modal-from-dom-share').modal('hide'); return false;" class="close">&times;</a>
          <h3>Share Database</h3>
     </div>
     <div class="modal-body">
@@ -145,7 +145,7 @@ button {
     <div class="modal-footer">
         <a href="share/ref" class="btn sharedb2" >Share</a>
         
-        <a href="javascript:$('#modal-from-dom-share').modal('hide')" class="btn btn-secondary">Cancel</a>
+        <a href="#" onclick="$('#modal-from-dom-share').modal('hide'); return false;" class="btn btn-secondary">Cancel</a>
     </div>
 </div>
 
