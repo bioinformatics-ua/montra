@@ -27,7 +27,9 @@
     <h3>{{ k.text|removeh1 }}</h3>
 
     </div>
-
+{% if k.help_text != "" %}
+    <div class="clearfix" style="padding-bottom:30px;">{{k.help_text|safe}}</div>
+    {% endif %}
 
         {% csrf_token %}
 
