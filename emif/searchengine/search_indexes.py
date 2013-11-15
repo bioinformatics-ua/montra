@@ -214,6 +214,7 @@ def index_answeres_from_qvalues(qvalues, questionnaire, subject, fingerprint_id,
                             if val:
                                 value = value + "||" + val
 
+                
                 else:
                     #print("continue")
                     pass

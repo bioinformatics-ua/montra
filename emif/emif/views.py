@@ -514,6 +514,7 @@ def extract_answers(request2, questionnaire_id, question_set, qs_list):
     items = request.POST.items()
     extra = {} # question_object => { "ANSWER" : "123", ... }
     extra_comments = {}
+    extra_fields = {}
     # this will ensure that each question will be processed, even if we did not receive
     # any fields for it. Also works to ensure the user doesn't add extra fields in
     for x in expected:
@@ -542,14 +543,20 @@ def extract_answers(request2, questionnaire_id, question_set, qs_list):
                 continue
             extra[question] = ans
 
+            
+
             comment_id = "comment_question_"+question.number#.replace(".", "")
             try:
                 if request.POST and request.POST[comment_id]!='':
                     comment_id_index = "comment_question_"+question.slug
                     extra_comments[question] = request.POST[comment_id]
+                    extra_fields[comment_id_index+'_t'] = request.POST[comment_id]
             except KeyError:
                 pass
     errors = {}
+
+    print "Extra comments"
+    print extra_comments
     
     # Verification of qprocessor answers 
     def verify_answer(question, answer_dict):
@@ -666,7 +673,7 @@ def extract_answers(request2, questionnaire_id, question_set, qs_list):
             qlist_general.append((qs_aux, qlist))
     except:
         raise
-    return (qlist_general, qlist, jstriggers, qvalues, jsinclude, cssinclude)
+    return (qlist_general, qlist, jstriggers, qvalues, jsinclude, cssinclude, extra_fields)
     
 
 def database_edit(request, fingerprint_id, questionnaire_id, template_name="database_edit.html"):
@@ -738,15 +745,15 @@ def database_edit(request, fingerprint_id, questionnaire_id, template_name="data
 
     question_set = qs_list[int(qs_id)]
     if request.POST:
-        (qlist_general, qlist, jstriggers, qvalues, jsinclude, cssinclude) = extract_answers(request, questionnaire_id, question_set, qs_list)
+        (qlist_general, qlist, jstriggers, qvalues, jsinclude, cssinclude, extra_fields) = extract_answers(request, questionnaire_id, question_set, qs_list)
     else:
-        (qlist_general, qlist, jstriggers, qvalues, jsinclude, cssinclude) = extract_answers(request2, questionnaire_id, question_set, qs_list)
+        (qlist_general, qlist, jstriggers, qvalues, jsinclude, cssinclude, extra_fields) = extract_answers(request2, questionnaire_id, question_set, qs_list)
 
     if (question_set.sortid == 99 or request.POST):
         # Index on Solr
         try:
             index_answeres_from_qvalues(qlist_general, question_set.questionnaire, users_db,
-                                        fingerprint_id, created_date=created_date)
+                                        fingerprint_id, extra_fields=extra_fields, created_date=created_date)
         except:
             raise
 
