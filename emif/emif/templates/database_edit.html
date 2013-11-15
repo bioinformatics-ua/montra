@@ -6,10 +6,10 @@
 {% block breadcrumbs %}
     {{ block.super }}
     {% breadcrumb "Databases" "databases" %}
-    {% with url_id="dbEdit/" %}
+    {% with url_id="dbEdit/1" %}
         {% with url_id=url_id|add:id  %}
             {% with url_id=url_id|add:"/1" %}
-                {% breadcrumb "Edit" url_id %}
+                {% breadcrumb "Edit" "databases" %}
             {% endwith %}
         {% endwith %}
     {% endwith %}
