@@ -747,7 +747,7 @@ def database_edit(request, fingerprint_id, questionnaire_id, template_name="data
     if (question_set.sortid == 99 or request.POST):
         # Index on Solr
         try:
-            index_answeres_from_qvalues(qlist_general, question_set.questionnaire, request.user.username,
+            index_answeres_from_qvalues(qlist_general, question_set.questionnaire, users_db=users_db,
                                         fingerprint_id, created_date=created_date)
         except:
             raise
