@@ -147,7 +147,7 @@ def get_slug_from_choice(v, q):
 
 
 
-def index_answeres_from_qvalues(qvalues, questionnaire, subject, fingerprint_id, extra_fields=None):
+def index_answeres_from_qvalues(qvalues, questionnaire, subject, fingerprint_id, extra_fields=None, created_date=None):
     
     c = CoreEngine()
     d = {}
@@ -253,7 +253,11 @@ def index_answeres_from_qvalues(qvalues, questionnaire, subject, fingerprint_id,
     d['id']=fingerprint_id
 
     d['type_t']=questionnaire.name.replace(" ", "").lower()
-    d['created_t']= now.strftime('%Y-%m-%d %H:%M:%S.%f')
+    if created_date==None:
+        d['created_t']= now.strftime('%Y-%m-%d %H:%M:%S.%f')
+    else:
+        d['created_t'] = created_date
+    d['date_last_modification_t']= now.strftime('%Y-%m-%d %H:%M:%S.%f')
     d['user_t']= subject
     d['text_t']= text
 
@@ -331,6 +335,7 @@ def convert_answers_to_solr(runinfo):
     print(d)
     d['id']=runid
     d['type_t']=runinfo.questionnaire.name.replace(" ", "").lower()
+
     d['created_t']=str(runinfo.completed)
     text += text_aux + runid + " " +str(runinfo.completed)
     d['text_t']= text

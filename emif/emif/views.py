@@ -221,6 +221,7 @@ def results_fulltext_aux(request, query, page=1, template_name='results.html'):
                 database_aux.logo = r['upload-image_t']
             database_aux.id = r['id']
             database_aux.date = convert_date(r['created_t'])
+            database_aux.date_modification = convert_date(r['date_last_modification_t'])
             (ttype, type_name) = questionnaires_ids[r['type_t']]
             database_aux.ttype = ttype
             database_aux.type_name = type_name
@@ -323,9 +324,7 @@ def results_diff(request, page=1, template_name='results_diff.html'):
     for r in results:
         try:
             database_aux = Database()
-            print r['id']
-            print r['created_t']
-            print r['database_name_t']
+            
             database_aux.id = r['id']
             database_aux.date = convert_date(r['created_t'])
 
@@ -349,7 +348,7 @@ def results_diff(request, page=1, template_name='results_diff.html'):
             value = ''
 
         list_values = []
-        blacklist = ['created_t', 'type_t', '_version_']
+        blacklist = ['created_t', 'type_t', '_version_', 'date_last_modification_t']
         name = "Not defined"
         for result in results:
             questionnaire_slug = result['type_t']
@@ -683,6 +682,9 @@ def database_edit(request, fingerprint_id, questionnaire_id, template_name="data
     fingerprint_id = r['id']
 
     users_db = r['user_t']
+
+    created_date = r['created_t']
+
     try:
         fingerprint_name = r['database_name_t']
     except:
@@ -746,7 +748,7 @@ def database_edit(request, fingerprint_id, questionnaire_id, template_name="data
         # Index on Solr
         try:
             index_answeres_from_qvalues(qlist_general, question_set.questionnaire, request.user.username,
-                                        fingerprint_id)
+                                        fingerprint_id, created_date=created_date)
         except:
             raise
 
@@ -769,6 +771,8 @@ def database_edit(request, fingerprint_id, questionnaire_id, template_name="data
             breadcrumb=True,
             name=fingerprint_name,
             id=fingerprint_id,
+            users_db=users_db,
+            created_date=created_date,
     )
     r['Cache-Control'] = 'no-cache'
     r['Expires'] = "Thu, 24 Jan 1980 00:00:00 GMT"
@@ -824,6 +828,16 @@ def get_databases_from_solr(request, query="*:*"):
                     database_aux.date = convert_date(r['created_t'])
                 except:
                     database_aux.date = ''
+
+
+            if (not r.has_key('date_last_modification_t')):
+                database_aux.date_modification = convert_date(r['created_t'])
+            else:
+
+                try:
+                    database_aux.date_modification = convert_date(r['date_last_modification_t'])
+                except:
+                    database_aux.date_modification = convert_date(r['created_t'])
 
             if (not r.has_key('database_name_t')):
                 database_aux.name = '(Unnamed)'
@@ -940,7 +954,7 @@ def createqsets(runcode, qsets=None):
         qsets = ordered_dict()
     name = ""
     list_values = []
-    blacklist = ['created_t', 'type_t', '_version_']
+    blacklist = ['created_t', 'type_t', '_version_', 'date_last_modification_t']
     name = "Not defined."
 
     for result in results:
@@ -1418,7 +1432,7 @@ def handle_uploaded_file(f):
 
 
 def check_database_add_conditions(request, questionnaire_id, sortid,
-                                  template_name='database_add.html', users_db=None):
+                                  template_name='database_add.html', users_db=None, created_date=None):
     # -------------------------------------
     # --- Process POST with QuestionSet ---
     # -------------------------------------
@@ -1449,11 +1463,11 @@ def check_database_add_conditions(request, questionnaire_id, sortid,
     
     return show_fingerprint_page_errors(request, questionnaire_id, question_set,
                                         errors={}, template_name='database_add.html', next=True, sortid=sortid,
-                                        fingerprint_id=fingerprint_id, users_db=users_db)
+                                        fingerprint_id=fingerprint_id, users_db=users_db, created_date=created_date)
 
 
 def show_fingerprint_page_errors(request, q_id, qs_id, errors={}, template_name='database_add.html',
-                                 next=False, sortid=0, fingerprint_id=None, users_db=None):
+                                 next=False, sortid=0, fingerprint_id=None, users_db=None, created_date=None):
     """
     Return the QuestionSet template
 
@@ -1553,7 +1567,7 @@ def show_fingerprint_page_errors(request, q_id, qs_id, errors={}, template_name=
             if users_db==None:
                 users_db = request.user.username
             index_answeres_from_qvalues(qlist_general, question_set.questionnaire, users_db,
-                                        fingerprint_id, extra_fields=extra_fields)
+                                        fingerprint_id, extra_fields=extra_fields, created_date=created_date)
 
         r = r2r(template_name, request,
                 questionset=question_set,
@@ -2066,6 +2080,9 @@ def save_answers_to_csv(list_databases, filename):
                     for q in list_aux:
                         writer.writerow([id, name, k.replace('h1. ', ''), str(q.tag), str(q.number), str(q.value).replace("\n", ". ").replace(";", ",")])
             writer.writerow([id, name, "System", "Date", "99.0", t.date])
+            writer.writerow([id, name, "System", "Date Modification", "99.1", t.date_modification])
+            writer.writerow([id, name, "System", "Type", "99.1", t.type_name])
+            writer.writerow([id, name, "System", "Type Identifier", "99.1", t.ttype])
 
     return response
 

@@ -88,6 +88,7 @@ class Database:
     id = ''
     name = ''
     date = ''
+    date_modification = ''
     institution = ''
     location = ''
     email_contact = ''
@@ -95,6 +96,7 @@ class Database:
     ttype = ''
     type_name = ''
     logo = ''
+
 
 class ordered_dict(dict):
     def __init__(self, *args, **kwargs):

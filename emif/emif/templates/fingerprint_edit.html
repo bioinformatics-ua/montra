@@ -8,6 +8,7 @@
         <input type="hidden" name="active_qs_sortid" id="active_qs_sortid" value="0">
         <input type="hidden" name="fingerprint_id" value="{{ fingerprint_id }}">
         <input type="hidden" name="users_db" value="{{ users_db }}">
+        <input type="hidden" name="created_date" value="{{ created_date }}">
 
     {% setglobal iteratorQ 0 %}
     {% for k, qlist in questions_list %}
