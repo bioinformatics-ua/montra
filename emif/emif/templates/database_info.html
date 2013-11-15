@@ -6,8 +6,8 @@
 
 {% block headextra %}
 
-<script type="text/javascript" src="http://mbostock.github.com/d3/d3.js?1.27.2"></script>
-<script type="text/javascript" src="http://mbostock.github.com/d3/d3.layout.js?1.27.2"></script>
+       <script src="static/js/d3/d3.v3.min.js"></script>
+ <script src="static/js/d3/d3.layout.cloud.js"></script>
 
 {% endblock %}
 
@@ -116,7 +116,17 @@ path.link {
                         <div id="collapse{{ k|removespaces|safe|clean }}" class="accordion-body collapse">
                             <div class="accordion-inner">
                                 <table id="t2" class="table table-bordered  table-hover">
-                                    <thead></thead>
+                                    <thead>
+                                      
+                                       <tr>  
+                                      <th>Tag</th>  
+                                      <th>Value</th>  
+                                      <th>Comment</th>  
+                                      
+                                    </tr>  
+                                    </thead>
+
+
                                     <tbody>
                                     {% for t in qs.list_ordered_tags %}
                                     <tr>
@@ -527,18 +537,31 @@ function json_to_table(obj)
 
 
 var json_aux = '{{apiinfo}}' ;
-json_aux = json_aux.replace(/&quot;/g, "\"");
-json = JSON.parse( json_aux );
-console.log(json_aux);
-console.log(json);
-var json2 = json;
-json = json_to_d3json(json);
-json.x0 = 0;
-json.y0 = 0;
+  console.log("ayx" + json_aux.length);
+  console.log("ayx" + json_aux);
+if (json_aux=='' || json_aux==null||json_aux.length==2)
+{
+  $("#pivot_table_extra_information").html('No information available. You can add information from external applications with API web services.');
+}
+else
+{
+  json_aux = json_aux.replace(/&quot;/g, "\"");
+  json = JSON.parse( json_aux );
+  console.log(json_aux);
+  console.log(json);
+  var json2 = json;
+  json = json_to_d3json(json);
+  json.x0 = 0;
+  json.y0 = 0;
 
-update(root = json);
+  update(root = json);
 
-$("#pivot_table_extra_information").html(json_to_table(json2));
+
+  $("#pivot_table_extra_information").html(json_to_table(json2));
+}
+
+
+
 
 function update(source) {
 
