@@ -522,11 +522,9 @@ def extract_answers(request2, questionnaire_id, question_set, qs_list):
     # generate the answer_dict for each question, and place in extra
     for item in items:
         key, value = item[0], item[1]
-        if key.startswith('comment'):
+        if key.startswith('comment_question_'):
             continue
             
-            # TODO : implement here!!
-
         if key.startswith('question_'):
             answer = key.split("_", 2)
             question = get_question(answer[1], questionnaire)
@@ -699,7 +697,7 @@ def database_edit(request, fingerprint_id, questionnaire_id, template_name="data
     for item in items:
         key = item
         value = items[key]
-        if item.startswith("comment_"):
+        if item.startswith("comment_question_"):
             
             slug = item.split("comment_question_")[1]
             results = Slugs.objects.filter(slug1=slug[:-2], question__questionset__questionnaire=questionnaire_id)
@@ -988,7 +986,7 @@ def createqsets(runcode, qsets=None):
             print k
             if k in blacklist:
                 continue
-            if k.startswith("comment_"):
+            if k.startswith("comment_question_"):
                 continue
 
             t = Tag()
