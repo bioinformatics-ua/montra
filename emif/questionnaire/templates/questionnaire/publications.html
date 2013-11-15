@@ -37,6 +37,7 @@
     
     <div class="control-group span12">
     <button id="addpub" type="button" class="btn btn-primary"><i class="icon-large icon-white icon-plus-sign"></i> Add Publication</button>
+    <button id="cleanpub" type="button" class="btn btn-primary"><i class="icon-large icon-white icon-cleaning"></i> Clean </button>
     
     </div>
 
@@ -116,6 +117,18 @@ function PublicationWidget ()
             
             pw{{ question.number|removedots }}.addPublication();
             $('[id="answered_'+{{ question.number|removedots }}+'"]').show();
+        });
+
+        $("#cleanpub" ).bind( "click", function() {
+            
+            $('#question_{{ question.number|removedots }}_pubmedid').val(''); 
+            $('#question_{{ question.number|removedots }}_pubtitle').val(''); 
+                $('#question_{{ question.number|removedots }}_pubjournal').val(''); 
+                $('#question_{{ question.number|removedots }}_pubyear').val(''); 
+                $('#question_{{ question.number|removedots }}_pubvolume').val(''); 
+                $('#question_{{ question.number|removedots }}_pubpages').val(''); 
+                $('#question_{{ question.number|removedots }}_pubauthors').val(''); 
+                $('#question_{{ question.number|removedots }}_publink').val(''); 
         });
 
         $("#loadpubbtn" ).bind( "click", function() {
