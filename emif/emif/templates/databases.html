@@ -19,6 +19,9 @@ button {
     display: none;
 }
 
+
+
+
 {% endblock %}
 
 {% block toolbar %}
@@ -29,6 +32,7 @@ button {
 {% block headextra %}
 <link rel="stylesheet" href="static/css/theme.blue.css">
 {% endblock %}
+
 
 
 {% block scriptextraincludes %}
@@ -80,8 +84,8 @@ button {
 <i class="icon-remove " ></i></div>-->
     
             <a  href="dbEdit/{{t.id}}/{{t.ttype}}" title="Edit Database"><img src="static/img/glyphicons_150_edit.png"  /></a>
-            <a class="confirm-delete" data-id="{{ t.id }}"  title="Remove Database"><img src="static/img/glyphicons_192_circle_remove.png"/></a>
-              <a class="sharedb" data-id="{{ t.id }}" title="Share Database" ><img src="static/img/glyphicons_308_share_alt.png"/></a>
+            <a href="#" onclick="return false;"  class="confirm-delete" data-id="{{ t.id }}"  title="Remove Database"><img src="static/img/glyphicons_192_circle_remove.png"/></a>
+              <a href="#" onclick="return false;" class="sharedb" data-id="{{ t.id }}" title="Share Database" ><img src="static/img/glyphicons_308_share_alt.png"/></a>
               </td>
             </td>
 
