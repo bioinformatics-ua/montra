@@ -1,14 +1,15 @@
 {% load i18n %}
 {% load extra_tags %}
 
-<div class="" style="margin-top: 20px;">
+<div class="row" style="margin-top: 20px;">
 
 
     <div class="control-group span12" >
         <label class="control-label span2">Pubmed id: </label>
         <input class="" type="text" id="question_{{ question.number|removedots }}_pubmedid"/>
-        <button id="loadpubbtn" type="button" class="btn btn-primary" ><i style="color:white;" class="icon-large icon-search icon-white"></i></button>
+        <button id="loadpubbtn" style="margin-bottom:10px;" type="button" class="btn btn-primary" ><i style="color:white;" class="icon-large icon-search icon-white"></i></button>
     </div>
+
 
     <div class="control-group span12">
         <label class="control-label span2 ">Publication title:</label>
@@ -37,16 +38,18 @@
     
     <div class="control-group span12">
     <button id="addpub" type="button" class="btn btn-primary"><i class="icon-large icon-white icon-plus-sign"></i> Add Publication</button>
-    <button id="cleanpub" type="button" class="btn btn-primary"><i class="icon-large icon-white icon-cleaning"></i> Clean </button>
-    
+    <button id="cleanpub" type="button" class="btn btn-primary"><i class="fa fa-trash-o"></i> Clean </button>
+    <input type="hidden"  id="question_{{ question.number }}" name="question_{{ question.number }}" value='{{qdict.value|replaceplicas}}'></input>
     </div>
 
-    <input type="hidden"  id="question_{{ question.number }}" name="question_{{ question.number }}" value="{{qdict.value}}">
+    
     {% if qdict.value %}
         <script type="text/javascript">
             $('[id="answered_'+{{ question.number|removedots }}+'"]').show();
         </script>
     {% endif %}
+    <div class="control-group span8">
+
     <table id="question_{{ question.number|removedots }}_table" class="table table-hover">
         <thead>
             <tr>
@@ -67,6 +70,7 @@
         </tbody>
 
     </table>
+    </div>
 
 </div>
 

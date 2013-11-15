@@ -31,10 +31,18 @@ register = template.Library()
 def removeh1(value):
     
     return value.replace('h1. ','')
+
 @register.filter(name='clean')
 @stringfilter
 def clean(value):
     return value.replace('//','')
+
+
+@register.filter(name='replaceplicas')
+@stringfilter
+def replaceplicas(value):
+    return value.replace('"',"'")
+
 
 
 @register.filter(name='removehs')
