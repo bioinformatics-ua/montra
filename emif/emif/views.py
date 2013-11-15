@@ -2081,8 +2081,8 @@ def save_answers_to_csv(list_databases, filename):
                         writer.writerow([id, name, k.replace('h1. ', ''), str(q.tag), str(q.number), str(q.value).replace("\n", ". ").replace(";", ",")])
             writer.writerow([id, name, "System", "Date", "99.0", t.date])
             writer.writerow([id, name, "System", "Date Modification", "99.1", t.date_modification])
-            writer.writerow([id, name, "System", "Type", "99.1", t.type_name])
-            writer.writerow([id, name, "System", "Type Identifier", "99.1", t.ttype])
+            writer.writerow([id, name, "System", "Type", "99.2", t.type_name])
+            writer.writerow([id, name, "System", "Type Identifier", "99.3", t.ttype])
 
     return response
 
