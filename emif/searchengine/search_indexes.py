@@ -185,11 +185,21 @@ def index_answeres_from_qvalues(qvalues, questionnaire, subject, fingerprint_id,
                     
                     do_again = False
                     try:
-                        for choice, unk, checked, _aux  in choices:
-                            if checked == " checked":
-                                if _aux != "":
-                                    value = value + "#" + choice.value + "{" + _aux +"}"
-                                else:
+                        if len(choices[0]==3):
+                            for choice, unk, checked  in choices:
+                                if checked == " checked":
+                                    value = value + "#" + choice.value    
+                        elif len(choices[0]==4):
+                            for choice, unk, checked, _aux  in choices:
+                                if checked == " checked":
+                                    if _aux != "":
+                                        value = value + "#" + choice.value + "{" + _aux +"}"
+                                    else:
+                                        value = value + "#" + choice.value
+                        elif len(choices[0]==2):
+                            for checked, choice  in choices:
+                                # print("checked" + str(checked))
+                                if checked:
                                     value = value + "#" + choice.value
                     except:
                         do_again = True
