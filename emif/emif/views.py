@@ -221,7 +221,11 @@ def results_fulltext_aux(request, query, page=1, template_name='results.html'):
                 database_aux.logo = r['upload-image_t']
             database_aux.id = r['id']
             database_aux.date = convert_date(r['created_t'])
-            database_aux.date_modification = convert_date(r['date_last_modification_t'])
+            try:
+                database_aux.date_modification = convert_date(r['date_last_modification_t'])
+            except KeyError:
+                pass
+                
             (ttype, type_name) = questionnaires_ids[r['type_t']]
             database_aux.ttype = ttype
             database_aux.type_name = type_name
