@@ -170,6 +170,7 @@ MIDDLEWARE_CLASSES = (
     # Uncomment the next line for simple clickjacking protection:
     # 'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'emif.middleware.LoginRequiredMiddleware',
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
 )
 
 ROOT_URLCONF = 'emif.urls'
@@ -227,6 +228,10 @@ INSTALLED_APPS = (
     'django_bootstrap_breadcrumbs',
     'bootstrap-pagination',
     'django_jenkins',
+
+    # Debug Toolbar
+    'django.contrib.staticfiles',
+    'debug_toolbar',
 
 
 )
@@ -371,3 +376,7 @@ REST_FRAMEWORK = {
     )
 
 }
+
+
+#DEBUG_TOOLBAR
+INTERNAL_IPS = ('127.0.0.1')
