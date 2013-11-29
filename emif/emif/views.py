@@ -2064,7 +2064,7 @@ def docs_api(request, template_name='docs/api.html'):
 
 
 def clean_str_exp(s):
-    return s.replace("\n", ". ").replace(";", ",").replace("\t", "    ")
+    return s.replace("\n", ". ").replace(";", ",").replace("\t", "    ").replace("\r","").replace("^M","")
 
 def save_answers_to_csv(list_databases, filename):
     """
