@@ -2072,7 +2072,7 @@ def save_answers_to_csv(list_databases, filename):
     response['Content-Disposition'] = 'attachment; filename="EMIF_Catalogue_%s_%s.csv"' % (filename, datetime.datetime.now().strftime("%Y%m%d-%H%M%S"))
 
     if list_databases:
-        writer = csv.writer(response)
+        writer = csv.writer(response, delimiter = '\t')
         writer.writerow(['DB_ID', 'DB_name', 'Questionset', 'Question', 'QuestioNumber', 'Answer'])
         for t in list_databases:
             id = t.id
