@@ -2088,7 +2088,10 @@ def save_answers_to_csv(list_databases, filename):
                     #import pdb
                     #pdb.set_trace()
                     for q in list_aux:
-                        writer.writerow([id, name, k.replace('h1. ', ''), clean_str_exp(str(q.tag)), str(q.number), clean_str_exp(str(q.value))])
+                        _answer = clean_str_exp(str(q.value))
+                        if (_answer == ""):
+                            _answer = "-"
+                        writer.writerow([id, name, k.replace('h1. ', ''), clean_str_exp(str(q.tag)), str(q.number), _answer])
             writer.writerow([id, name, "System", "Date", "99.0", t.date])
             writer.writerow([id, name, "System", "Date Modification", "99.1", t.date_modification])
             writer.writerow([id, name, "System", "Type", "99.2", t.type_name])
