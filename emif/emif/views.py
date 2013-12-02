@@ -730,9 +730,7 @@ def database_edit(request, fingerprint_id, questionnaire_id, template_name="data
 
         extra[question] = ans = extra.get(question, {})
         if "[" in value:
-            print value
             value = value.lower().replace("]", "").replace("[", "")
-            print value
         request2.get_post()['question_%s' % question.number] = value
         
         
@@ -988,7 +986,9 @@ def createqsets(runcode, qsets=None):
                     t.tag = question.text.encode('utf-8')
                     t.value = ""
                     t.number = question.number
+                    t.ttype = question.type
                     question_group.list_ordered_tags.append(t)
+
 
 
                 qsets[qset.text] = question_group
@@ -2065,6 +2065,9 @@ def docs_api(request, template_name='docs/api.html'):
     return render(request, template_name, {'request': request, 'breadcrumb': True})
 
 
+def clean_str_exp(s):
+    return s.replace("\n", ". ").replace(";", ",").replace("\t", "    ").replace("\r","").replace("^M","")
+
 def save_answers_to_csv(list_databases, filename):
     """
     Method to export answers of a given database to a csv file
@@ -2074,7 +2077,7 @@ def save_answers_to_csv(list_databases, filename):
     response['Content-Disposition'] = 'attachment; filename="EMIF_Catalogue_%s_%s.csv"' % (filename, datetime.datetime.now().strftime("%Y%m%d-%H%M%S"))
 
     if list_databases:
-        writer = csv.writer(response)
+        writer = csv.writer(response, delimiter = '\t')
         writer.writerow(['DB_ID', 'DB_name', 'Questionset', 'Question', 'QuestioNumber', 'Answer'])
         for t in list_databases:
             id = t.id
@@ -2087,7 +2090,10 @@ def save_answers_to_csv(list_databases, filename):
                     #import pdb
                     #pdb.set_trace()
                     for q in list_aux:
-                        writer.writerow([id, name, k.replace('h1. ', ''), str(q.tag), str(q.number), str(q.value).replace("\n", ". ").replace(";", ",")])
+                        _answer = clean_str_exp(str(q.value))
+                        if (_answer == "" and q.ttype=='comment'):
+                            _answer = "-"
+                        writer.writerow([id, name, k.replace('h1. ', ''), clean_str_exp(str(q.tag)), str(q.number), _answer])
             writer.writerow([id, name, "System", "Date", "99.0", t.date])
             writer.writerow([id, name, "System", "Date Modification", "99.1", t.date_modification])
             writer.writerow([id, name, "System", "Type", "99.2", t.type_name])
