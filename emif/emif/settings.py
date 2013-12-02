@@ -400,6 +400,39 @@ REST_FRAMEWORK = {
 
 }
 
+#MONGODB
+#=======
+#Settings of EMIF MongoDB server, this is used to store the analytic data of population characteristics
+MONGO_EMIF = {
+    'DB_NAME': 'emif_mongo',
+    'HOST': 'localhost',
+    'PORT': 27017,
+    'COLLECTION': 'jerboa_files'
+}
 
-#DEBUG_TOOLBAR
-INTERNAL_IPS = ('127.0.0.1')
+#CONNECT MONGODB
+#===============
+
+# Connect on MongoDB Database
+# from pymongo.connection import Connection
+from pymongo.errors import ConnectionFailure
+import sys
+# try:
+#     connection = Connection(MONGO_EMIF['HOST'], MONGO_EMIF['PORT'])
+#     DBCON = connection[MONGO_EMIF['DB_NAME']]
+# except ConnectionFailure, e:
+#     sys.stderr.write("Could not connect to MongoDB: %s" % e)
+#     sys.exit(1)
+
+
+from pymongo import MongoClient
+try:
+    client = MongoClient(MONGO_EMIF['HOST'], MONGO_EMIF['PORT'])
+    # db_name_mongo = MONGO_EMIF['DB_NAME']
+    # db_mongo = client.db_name_mongo
+    db_mongo = client.emif_mongo
+    # jerboa_collection = db_mongo.MONGO_EMIF['COLLECTION']
+    jerboa_collection = db_mongo.jerboa_files
+except ConnectionFailure, e:
+    sys.stderr.write("Could not connect to MongoDB: %s" % e)
+    sys.exit(1)
