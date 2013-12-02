@@ -129,6 +129,8 @@ class Tag:
             self.extra = ''   
             self.number = ''
             self.comment = ''
+            self.ttype = ''
+
 
         def __eq__(self, other):
             return other.tag == self.tag

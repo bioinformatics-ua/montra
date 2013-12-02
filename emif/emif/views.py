@@ -986,7 +986,9 @@ def createqsets(runcode, qsets=None):
                     t.tag = question.text.encode('utf-8')
                     t.value = ""
                     t.number = question.number
+                    t.ttype = question.type
                     question_group.list_ordered_tags.append(t)
+
 
 
                 qsets[qset.text] = question_group
@@ -2089,7 +2091,7 @@ def save_answers_to_csv(list_databases, filename):
                     #pdb.set_trace()
                     for q in list_aux:
                         _answer = clean_str_exp(str(q.value))
-                        if (_answer == ""):
+                        if (_answer == "" and q.ttype=='comment'):
                             _answer = "-"
                         writer.writerow([id, name, k.replace('h1. ', ''), clean_str_exp(str(q.tag)), str(q.number), _answer])
             writer.writerow([id, name, "System", "Date", "99.0", t.date])
