@@ -44,11 +44,15 @@ for qs in qsets:
         if len(slugs)!=1:
             print "Error (multiple slugs to the description): " +  q.number
             for s in slugs:
-                print s.slug1 + "| " + s.description + "| " + str(s.question.pk)
+                try:
+                    print s.slug1 + "| " + s.description + "| " + str(s.question.pk)
+                except:
+                    print s.slug1 + "| " + str(s.question.pk)
             continue
         s = slugs[0]
         if (s.slug1 != q.slug):
             print "Error (slug1!=slug): " + q.number
+            print s.slug1 + "| " + s.description + "| " + str(s.question.pk)
             continue
         if (s.question.pk!=q.pk):
             print "Error (q.pk!=pk): " + q.number
