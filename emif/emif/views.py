@@ -1072,7 +1072,7 @@ def fingerprint(request, runcode, qs, template_name='database_info.html'):
     apiinfo = json.dumps(get_api_info(runcode));
     return render(request, template_name, 
         {'request': request, 'qsets': qsets, 'export_bd_answers': True, 'apiinfo': apiinfo, 'fingerprint_id': runcode,
-                   'breadcrumb': True, 'breadcrumb_name': name, 'style': qs, 'collapseall': False})
+                   'breadcrumb': True, 'breadcrumb_name': name.encode('ascii', 'ignore'), 'style': qs, 'collapseall': False})
 
 
 def get_questionsets_list(runinfo):
