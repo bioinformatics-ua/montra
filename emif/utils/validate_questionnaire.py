@@ -40,7 +40,7 @@ for qs in qsets:
     
     expected = qs.questions()
     for q in expected:
-        slugs = Slugs.objects.filter(description=q.text)
+        slugs = Slugs.objects.filter(description__exact=q.text)
         if len(slugs)!=1:
             print "Error (multiple slugs to the description): " +  q.number
             for s in slugs:
