@@ -776,7 +776,7 @@ def database_edit(request, fingerprint_id, questionnaire_id, template_name="data
             qs_list=qs_list,
             questions_list=qlist_general,
             breadcrumb=True,
-            name=fingerprint_name,
+            name=fingerprint_name.decode('ascii', 'ignore'),
             id=fingerprint_id,
             users_db=users_db,
             created_date=created_date,
@@ -1056,7 +1056,6 @@ def createqsets(runcode, qsets=None):
 
 def fingerprint(request, runcode, qs, template_name='database_info.html'):
     qsets, name = createqsets(runcode)
-
 
     def get_api_info(fingerprint_id):
 
