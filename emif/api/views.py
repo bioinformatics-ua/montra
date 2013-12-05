@@ -47,9 +47,9 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from searchengine.search_indexes import CoreEngine
 from api.models import *
 
-
 # Import pubmed object
 from utils.pubmed import PubMedObject
+#from emif.literature import fetch_by_pmid_by_becas
 
 class JSONResponse(HttpResponse):
     """
@@ -70,7 +70,6 @@ def api_root(request, format=None):
         'stats': reverse('stats', request=request),
         'validate': reverse('validate', request=request),
         'pubmed': reverse('pubmed', request=request),
-
     })
 
 
@@ -285,8 +284,13 @@ class PublicationsView(APIView):
     """
 
     def get(self, request, *args, **kw):
-        pmid = int(request.GET['pmid'])
         results = dict()
+        pmid = request.GET['pmid']
+        if (pmid==None or pmid==''):
+            return Response(results, status=status.HTTP_400_BAD_REQUEST)    
+
+        pmid = int(request.GET['pmid'])
+        
         doi_object = PubMedObject("pmid:"+str(pmid))
         try:
             #print "Downloading " + doi_object.pubmed_url + "..."
