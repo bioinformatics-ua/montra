@@ -185,16 +185,27 @@
             {% block toolbar %}
             {% endblock %}
             </div>
-            {% block content %}
+<!--[if IE]>
+
+            <div>
+            You're using Internet Explorer. Our application is not currently supporing your browser version. The application is mainly optimized to Chrome, Firefox and Chrome.  
+            </div> 
+            
+<![endif]-->
+<![if !IE]>
+{% block content %}
                 
             {% endblock %}
+<![endif]>
 
+             
 
             <hr>
 
         <div class="row" style="text-align:center">
             <footer>
                 <p>&copy; EMIF Project 2013</p>
+
             </footer>
         </div>
         </div> <!-- /container -->
