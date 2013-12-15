@@ -41,7 +41,7 @@ from searchengine.search_indexes import convert_text_to_slug
 from emif.utils import *
 from emif.models import *
 from api.models import *
-
+from geopy import geocoders 
 from django.core.mail import send_mail, BadHeaderError
 
 from rest_framework.authtoken.models import Token
@@ -398,15 +398,23 @@ def geo(request, template_name='geo.html'):
     print "query@" + query
     list_databases = get_databases_from_solr(request, query)
     list_locations = []
+    _long_lats = []
+    g = geocoders.GoogleV3()
     for database in list_databases:
         if database.location.find(".")!= -1:
             _loc = database.location.split(".")[0]
         else:
             _loc = database.location
+        _temporary_location = g.geocode(_loc)
+        if (len(_temporary_location)==2):
+            (_discard, _tmp_lat_long) = _temporary_location
+            _long_lats.append(_tmp_lat_long)
+
+        print _loc
 
         list_locations.append(_loc)
     return render(request, template_name, {'request': request,
-                                           'list_cities': list_locations, 'breadcrumb': True})
+                                           'list_cities': list_locations, 'lats_longs': _long_lats, 'breadcrumb': True})
 
 
 

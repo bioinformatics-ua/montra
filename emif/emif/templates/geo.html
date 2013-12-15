@@ -31,7 +31,7 @@ function initialize(list_cities) {
 	$(list_cities).each(function(city_tmp)
 	{
 		console.log(list_cities[city_tmp]);
-		geocoder.geocode( { 'address': list_cities[city_tmp]}, function(results, status) {
+		geocoder.geocode( { 'location': list_cities[city_tmp][0] + ", " +list_cities[city_tmp][1] }, function(results, status) {
 
 				if (status == google.maps.GeocoderStatus.OK) {
 					var marker = new google.maps.Marker({
@@ -40,6 +40,7 @@ function initialize(list_cities) {
 						title: list_cities[city_tmp]
 					});
 				} else {
+
 					//alert("Geocode was not successful for the //following reason: " + status);
 				}
 		});
@@ -50,9 +51,9 @@ function initialize(list_cities) {
 }
 
 var list_cities_aux = []
-{% for city in list_cities %}
+{% for lat, lon in list_cities %}
 
-list_cities_aux.push('{{city}}')
+list_cities_aux.push(['{{lat}}','{{lon}}'] )
 
 {% endfor %}
 
