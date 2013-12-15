@@ -907,7 +907,10 @@ def databases(request, template_name='databases.html'):
 
     user = request.user
     #list_databases = get_databases_from_db(request)
-    list_databases = get_databases_from_solr(request, "user_t:" + user.username)
+    _filter = "user_t:" + user.username
+    if user. is_superuser:
+        _filter = "user_t:*" 
+    list_databases = get_databases_from_solr(request, _filter)
 
     return render(request, template_name, {'request': request, 'export_my_answers': True,
                                            'list_databases': list_databases, 'breadcrumb': True, 'collapseall': False,
