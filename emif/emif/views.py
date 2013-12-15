@@ -200,7 +200,6 @@ def results_fulltext_aux(request, query, page=1, template_name='results.html'):
                 database_aux.location = ''
             else:
                 database_aux.location = r['location_t']
-
             if (not r.has_key('institution_name_t')):
                 database_aux.institution = ''
             else:
@@ -400,6 +399,11 @@ def geo(request, template_name='geo.html'):
     list_databases = get_databases_from_solr(request, query)
     list_locations = []
     for database in list_databases:
+        if database.location.contains("."):
+            _loc = database.location.split(".")[0]
+        else:
+            _loc = database.location
+
         list_locations.append(database.location)
     return render(request, template_name, {'request': request,
                                            'list_cities': list_locations, 'breadcrumb': True})
