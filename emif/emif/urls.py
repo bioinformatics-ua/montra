@@ -220,4 +220,7 @@ urlpatterns = patterns('',
     # url(r'^api-upload-info/', 'rest_framework.authtoken.views.obtain_auth_token'),
     url(r'^api-info/', 'emif.views.create_auth_token', name="api-info"),
     url(r'^docs/api', 'emif.views.docs_api'),
+
+    # Population Characteristics URLs
+    url(r'population/', include('population_characteristics.urls')),
 )

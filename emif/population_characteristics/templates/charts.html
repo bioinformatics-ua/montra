@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+{% load url from future %}
+{% load django_bootstrap_breadcrumbs %}
+
+{% load nvd3_tags %}
+
+{% block headextra %}
+    {% include_chart_jscss %}
+    {% load_chart charttype chartdata chartcontainer extra %}
+{% endblock %}
+
+{% block breadcrumbs %}
+    {{ block.super }}
+    {% breadcrumb "Population Characteristics" "population" %}
+{% endblock %}
+
+{% load extra_tags %}
+
+{% load  i18n %}
+
+{% block content %}
+    <div class="container">
+        <div class="jumbotron">
+            <div class="span12" style="text-align:center">
+                <h2>Population Characteristics</h2>
+            </div>
+        </div>
+    </div>
+    <hr>
+
+
+
+    <h1>Fruits vs Calories</h1>
+    {% include_container chartcontainer 400 600 %}
+
+{% endblock %}
+
+{% block scriptextraincludes %}
+
+
+
+{% endblock %}
+
+{% block scriptextra %}
+
+    $('#li_workspace').addClass("active");
+
+{% endblock %}
