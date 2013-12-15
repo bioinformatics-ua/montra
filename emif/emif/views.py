@@ -399,7 +399,7 @@ def geo(request, template_name='geo.html'):
     list_databases = get_databases_from_solr(request, query)
     list_locations = []
     _long_lats = []
-    g = geocoders.GoogleV3()
+    g = geocoders.GeoNames(username='bastiao')
     for database in list_databases:
         if database.location.find(".")!= -1:
             _loc = database.location.split(".")[0]
@@ -408,7 +408,7 @@ def geo(request, template_name='geo.html'):
         _temporary_location = g.geocode(_loc)
         if (len(_temporary_location)==2):
             (_discard, _tmp_lat_long) = _temporary_location
-            _long_lats.append(_tmp_lat_long)
+            _long_lats.append(str(_tmp_lat_long[0])+ ", " + str(_tmp_lat_long[1])
 
         print _loc
 
