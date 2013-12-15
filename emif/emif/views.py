@@ -137,7 +137,7 @@ def results_comp(request, template_name='results_comp.html'):
 
     list_qsets = []
     for db_id in list_fingerprint_to_compare:
-        qsets, name = createqsets(db_id)
+        qsets, name, db_owners = createqsets(db_id)
         list_qsets.append((name, qsets))
     first_name = None
     if len(list_qsets) > 0:
@@ -946,7 +946,7 @@ def all_databases_data_table(request, template_name='alldatabases_data_table.htm
     if list_databases:
         for t in list_databases:
             id = t.id
-            qsets, name = createqsets(id)
+            qsets, name, db_owners = createqsets(id)
             q_list = []
             for group in qsets.ordered_items():
                 (k, qs) = group
@@ -980,11 +980,17 @@ def createqsets(runcode, qsets=None):
     list_values = []
     blacklist = ['created_t', 'type_t', '_version_', 'date_last_modification_t']
     name = "Not defined."
+    users = ""
 
     for result in results:
 
         # Get the slug of fingerprint type
         q_aux = Questionnaire.objects.filter(slug=result['type_t'])
+
+        try:
+            users = result['user_t']
+        except:
+            pass
 
         list_qsets = QuestionSet.objects.filter(questionnaire=q_aux[0]).order_by('sortid')
 
@@ -1068,11 +1074,14 @@ def createqsets(runcode, qsets=None):
                     pass
         break
     
-    return (qsets, name)
+    if (users!=""):
+        users.split(" \\ ")
+
+    return (qsets, name, db_owners)
 
 
 def fingerprint(request, runcode, qs, template_name='database_info.html'):
-    qsets, name = createqsets(runcode)
+    qsets, name, db_owners = createqsets(runcode)
 
     def get_api_info(fingerprint_id):
 
@@ -1086,9 +1095,14 @@ def fingerprint(request, runcode, qs, template_name='database_info.html'):
         return result
 
     apiinfo = json.dumps(get_api_info(runcode));
+    owner_fingerprint = False
+    for owner in db_owners:
+        if (owner == request.user.username):
+            owner_fingerprint = True
     return render(request, template_name, 
         {'request': request, 'qsets': qsets, 'export_bd_answers': True, 'apiinfo': apiinfo, 'fingerprint_id': runcode,
-                   'breadcrumb': True, 'breadcrumb_name': name.decode('ascii', 'ignore'), 'style': qs, 'collapseall': False})
+                   'breadcrumb': True, 'breadcrumb_name': name.decode('ascii', 'ignore'),
+                    'style': qs, 'collapseall': False, 'owner_fingerprint':owner_fingerprint})
 
 
 def get_questionsets_list(runinfo):
@@ -2097,7 +2111,7 @@ def save_answers_to_csv(list_databases, filename):
         writer.writerow(['DB_ID', 'DB_name', 'Questionset', 'Question', 'QuestioNumber', 'Answer'])
         for t in list_databases:
             id = t.id
-            qsets, name = createqsets(id)
+            qsets, name, db_owners = createqsets(id)
 
             for group in qsets.ordered_items():
                 (k, qs) = group
