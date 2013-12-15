@@ -132,6 +132,7 @@ else:
 # Example: "http://media.lawrence.com/static/"
 STATIC_URL = BASE_URL + 'static/'
 
+
 # Additional locations of static files
 STATICFILES_DIRS = (
     # Put strings here, like "/home/html/static" or "C:/www/django/static".
@@ -147,6 +148,7 @@ STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
     #    'django.contrib.staticfiles.finders.DefaultStorageFinder',
+    'djangobower.finders.BowerFinder',
 )
 
 # Make this unique, and don't share it with anybody.
@@ -183,6 +185,7 @@ TEMPLATE_DIRS = (
     # Don't forget to use absolute paths, not relative paths.
     os.path.abspath(PROJECT_DIR_ROOT + MIDDLE_DIR + 'apps/seantis-questionnaire/questionnaire/templates'),
     os.path.abspath(PROJECT_DIR_ROOT + MIDDLE_DIR + 'emif/templates'),
+    os.path.abspath(PROJECT_DIR_ROOT + MIDDLE_DIR + 'population_characteristics/templates'),
 )
 
 INSTALLED_APPS = (
@@ -227,6 +230,10 @@ INSTALLED_APPS = (
     'django_bootstrap_breadcrumbs',
     'bootstrap-pagination',
     'django_jenkins',
+
+    # Django NVD3
+    'django_nvd3',
+    'djangobower',
 
 )
 

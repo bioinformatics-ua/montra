@@ -80,6 +80,15 @@
           		      {% endif %}
                     {% endcomment %}
 
+
+			       {% if request.user.is_superuser %}
+
+                              <li class="divider"></li>
+                              <li><a href="/population">Population Characteristics</a></li>
+
+          		      {% endif %}
+
+
                               {% comment %}
                               <li class="divider"></li>
 

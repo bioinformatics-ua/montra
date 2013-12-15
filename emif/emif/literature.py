@@ -15,10 +15,7 @@ def fetch_by_pmid(pmid):
 	handle = Entrez.efetch(db='pubmed', id=pmid, retmode='xml')
 	#print(handle.read())
 	record = Entrez.read(handle)
-	 
-	#pprint(record[0]['PubmedData'])
 
-	#pprint(record[0]['MedlineCitation']['Article']['ArticleTitle'])
 	title = record[0]['MedlineCitation']['Article']['ArticleTitle']
 	#pprint(record[0]['MedlineCitation']['Article']['Abstract']['AbstractText'])
 	abstract = record[0]['MedlineCitation']['Article']['Abstract']['AbstractText']
@@ -26,6 +23,7 @@ def fetch_by_pmid(pmid):
 	for a in abstract:
 		abstract_text += a
 	print abstract_text
+	
 	return (title, abstract_text)
 
 #pprint(fetch_by_pmid(23225384))
@@ -33,7 +31,7 @@ def fetch_by_pmid(pmid):
 def fetch_by_pmid_by_becas(pmid):
 	becas.email="bastiao@ua.pt"
 	becas.annotate_publication(pmid)
-	becas.annotate_publication(23225384, groups={'MRNA':True})
+	becas.annotate_publication(23055546, groups={'MRNA':True})
 	return (a['title'], a['abstract'])
 
 
