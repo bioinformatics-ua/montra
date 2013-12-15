@@ -405,10 +405,10 @@ def geo(request, template_name='geo.html'):
             _loc = database.location.split(".")[0]
         else:
             _loc = database.location
-        _temporary_location = g.geocode(_loc)
-        if (len(_temporary_location)==2):
+        place, (lat, lng) = g.geocode(_loc)
+        if (_temporary_location != None and len(_temporary_location)==2):
             (_discard, _tmp_lat_long) = _temporary_location
-            _long_lats.append(str(_tmp_lat_long[0])+ ", " + str(_tmp_lat_long[1])
+            _long_lats.append(str(lat)+ ", " +str(lng))
 
         print _loc
 
