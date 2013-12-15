@@ -228,7 +228,6 @@ INSTALLED_APPS = (
     'bootstrap-pagination',
     'django_jenkins',
 
-
 )
 
 # Userena settings
@@ -264,6 +263,7 @@ USERENA_MODERATE_REGISTRATION = True                    #True - need admin appro
 USERENA_ACTIVATION_REJECTED = 'ACTIVATION_REJECTED'
 USERENA_PENDING_MODERATION = 'PENDING_MODERATION'
 USERENA_ACTIVATED = 'ALREADY_ACTIVATED'
+USERENA_REMEMBER_ME_DAYS = ('a day', 1)
 
 
 
@@ -326,6 +326,35 @@ LANGUAGES = (
 #   questionnaire is so huge that even the ajax request takes too long.
 QUESTIONNAIRE_PROGRESS = 'async'
 
+#DEBUG_TOOLBAR
+if DEBUG:
+    INTERNAL_IPS = ('127.0.0.1',)
+    MIDDLEWARE_CLASSES += (
+        'debug_toolbar.middleware.DebugToolbarMiddleware',
+    )
+
+    INSTALLED_APPS += (
+    'debug_toolbar',
+    )
+
+    DEBUG_TOOLBAR_PANELS = (
+    'debug_toolbar.panels.version.VersionDebugPanel',
+    'debug_toolbar.panels.timer.TimerDebugPanel',
+    'debug_toolbar.panels.settings_vars.SettingsVarsDebugPanel',
+    'debug_toolbar.panels.headers.HeaderDebugPanel',
+    'debug_toolbar.panels.profiling.ProfilingDebugPanel',
+    'debug_toolbar.panels.request_vars.RequestVarsDebugPanel',
+    'debug_toolbar.panels.sql.SQLDebugPanel',
+    'debug_toolbar.panels.template.TemplateDebugPanel',
+    'debug_toolbar.panels.cache.CacheDebugPanel',
+    'debug_toolbar.panels.signals.SignalDebugPanel',
+    'debug_toolbar.panels.logger.LoggingPanel',
+    )
+
+    DEBUG_TOOLBAR_CONFIG = {
+    # 'INTERCEPT_REDIRECTS': False,
+    }
+
 
 JENKINS_TASKS = (
     'django_jenkins.tasks.run_pylint',
@@ -370,3 +399,40 @@ REST_FRAMEWORK = {
     )
 
 }
+
+#MONGODB
+#=======
+#Settings of EMIF MongoDB server, this is used to store the analytic data of population characteristics
+MONGO_EMIF = {
+    'DB_NAME': 'emif_mongo',
+    'HOST': 'localhost',
+    'PORT': 27017,
+    'COLLECTION': 'jerboa_files'
+}
+
+#CONNECT MONGODB
+#===============
+
+# Connect on MongoDB Database
+# from pymongo.connection import Connection
+from pymongo.errors import ConnectionFailure
+import sys
+# try:
+#     connection = Connection(MONGO_EMIF['HOST'], MONGO_EMIF['PORT'])
+#     DBCON = connection[MONGO_EMIF['DB_NAME']]
+# except ConnectionFailure, e:
+#     sys.stderr.write("Could not connect to MongoDB: %s" % e)
+#     sys.exit(1)
+
+
+from pymongo import MongoClient
+try:
+    client = MongoClient(MONGO_EMIF['HOST'], MONGO_EMIF['PORT'])
+    # db_name_mongo = MONGO_EMIF['DB_NAME']
+    # db_mongo = client.db_name_mongo
+    db_mongo = client.emif_mongo
+    # jerboa_collection = db_mongo.MONGO_EMIF['COLLECTION']
+    jerboa_collection = db_mongo.jerboa_files
+except ConnectionFailure, e:
+    sys.stderr.write("Could not connect to MongoDB: %s" % e)
+    sys.exit(1)
