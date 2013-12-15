@@ -399,7 +399,7 @@ def geo(request, template_name='geo.html'):
     list_databases = get_databases_from_solr(request, query)
     list_locations = []
     for database in list_databases:
-        if database.location.contains("."):
+        if database.location.find(".")!= -1:
             _loc = database.location.split(".")[0]
         else:
             _loc = database.location
