@@ -152,7 +152,16 @@ path.link {
               {% if owner_fingerprint %}
 
 
-                
+                {% if contains_population %}
+
+                This database does not still aggregated data. Submit the Population Characteristics file (Jerboa)
+
+                {% else %}
+
+                You have already population characteristics. Your last activied is dated from: {{pc_last_activity}}
+
+                {% endif %}
+
               {% endif %}
 
             </div>
