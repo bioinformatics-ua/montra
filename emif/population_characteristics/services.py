@@ -18,6 +18,14 @@
 #
 
 
+class JerboaFormat(object):
+    """docstring for JerboaFormat"""
+    def __init__(self, arg):
+        super(JerboaFormat, self).__init__()
+        self.arg = arg
+        
+
+
 class Revision(object):
     """docstring for Revision"""
     def __init__(self, arg):

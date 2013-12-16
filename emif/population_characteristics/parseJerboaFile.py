@@ -23,9 +23,12 @@ import json
 from emif import settings
 
 
+
+
+
 def import_population_characteristics_data(filename='TEST_DataProfile_v1.5.6b.txt'):
     """
-    To-Do
+    This function is responsabible to parse Jerboa file
 
     """
 
