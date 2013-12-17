@@ -982,6 +982,8 @@ def createqsets(runcode, qsets=None):
     name = "Not defined."
     users = ""
 
+    db_owners = "" 
+
     for result in results:
 
         # Get the slug of fingerprint type
@@ -989,6 +991,7 @@ def createqsets(runcode, qsets=None):
 
         try:
             users = result['user_t']
+            db_owners = result['user_t']
         except:
             pass
 
