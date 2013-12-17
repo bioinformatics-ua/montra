@@ -147,7 +147,8 @@ path.link {
                 
             </div>
 
-            <div class="tab-pane" id="literature">
+            <div class="tab-pane" >
+              <div class="tab-pane active" id="populationcharacteristics">
 
 
               {% if owner_fingerprint %}
@@ -164,6 +165,7 @@ path.link {
                 {% endif %}
 
               {% endif %}
+              </div>
 
             </div>
 
@@ -206,14 +208,20 @@ path.link {
             </div>
 
 
-            <div class="tab-pane" id="populationchar_tab">
+              <div class="tab-pane" >
+                <div class="tab-pane active" id="documents">
+                  {% if documents_available %}
+                    The documents that are available are still .. 
+                  {% else %}
+                    <p>There is no documents for this fingerprint.</p>
+                    <p>You can upload documents to associate them to the fingerprint browser</p>
+
+                  {% endif %}
+                </div>
+
             </div>
 
 
-            <div class="tab-pane" id="docs_tab">
-            </div>
-
-            
 
 
             <div class="tab-pane" id="apiinfo">
@@ -251,7 +259,7 @@ path.link {
 
 </div>
 
-
+{% comment %}
 <!-- Include the widget embedding script -->
 <script src="//bioinformatics.ua.pt/becas/embed-widget.js"></script>
 <!--&lt;!&ndash; Use the widgets &ndash;&gt;-->
@@ -325,6 +333,7 @@ path.link {
             JavaScript in your web browser</a>.</h2>
     </div>
 </noscript>
+{% endcomment %}
 
 
 {% endblock %}
@@ -335,8 +344,6 @@ path.link {
     {% block scriptextra %}
 
     $('#li_workspace').addClass("active");
-
-
 
    $("#btn_pivot_table").bind('click', function (e) {
         $("#pivot_table_extra_information").toggle();
