@@ -22,3 +22,13 @@ def population(request, template_name='piechart.html'):
     }
     return render_to_response('charts.html', data)
 
+
+
+def upload_jerboa_request(request, template_name='uploadjerboa.html'):
+    """
+    This functions is responsabible to handle the upload files of jerboa 
+    """
+    pass
+
+
+    

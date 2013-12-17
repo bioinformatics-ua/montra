@@ -67,9 +67,9 @@
                               <li><a href="databases">Query History</a></li>
                               <li><a href="databases">Timeline</a></li>
                               {% endcomment %}
-			      {% comment %}
+			                        {% comment %}
 
-			       {% if request.user.is_superuser %}
+			                        {% if request.user.is_superuser %}
 
                               <li class="divider"></li>
                               <li class="dropdown-submenu">
@@ -77,16 +77,16 @@
                               <ul class="dropdown-menu">
                                 {% show_fingerprints_for_statistics %}
                               </ul>
-          		      {% endif %}
-                    {% endcomment %}
+                    		      {% endif %}
+                              {% endcomment %}
 
 
-			       {% if request.user.is_superuser %}
+			                       {% if request.user.is_superuser %}
 
                               <li class="divider"></li>
                               <li><a href="/population">Population Characteristics</a></li>
 
-          		      {% endif %}
+          		                 {% endif %}
 
 
                               {% comment %}
