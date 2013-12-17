@@ -34,6 +34,7 @@ urlpatterns = patterns('api.views',
     url(r'^stats$', StatsView.as_view(), name='stats'),
     url(r'^validate$', ValidateView.as_view(), name='validate'),
     url(r'^pubmed$', PublicationsView.as_view(), name='pubmed'),
+    url(r'^population$', PopulationView.as_view(), name='population'),
 
 )
 

@@ -826,7 +826,7 @@ def get_databases_from_db(request):
 
 def get_databases_from_solr(request, query="*:*"):
     c = CoreEngine()
-    results = c.search_fingerrint(query)
+    results = c.search_fingerprint(query)
     print "Solr"
     print results
     list_databases = []

@@ -73,6 +73,13 @@ def api_root(request, format=None):
     })
 
 
+
+
+############################################################
+##### Search (Extra information) - Web services
+############################################################
+
+
 class SearchView(APIView):
     """
     Class to search and return fingerprint details, like Name, ID and structure
@@ -102,6 +109,12 @@ class SearchView(APIView):
         return response
 
 
+
+############################################################
+##### Advanced Search - Web services
+############################################################
+
+
 class AdvancedSearchView(APIView):
     def get(self, request, *args, **kw):
         # Process any get params that you may need
@@ -113,6 +126,13 @@ class AdvancedSearchView(APIView):
         result = {'myValue': 'lol', 'myValue2': 'lol', }
         response = Response(result, status=status.HTTP_200_OK)
         return response
+
+
+
+
+############################################################
+##### Metadata - Managemnt (Extra Information) Web services
+############################################################
 
 
 class MetaDataView(APIView):
@@ -197,6 +217,12 @@ class ValidateView(APIView):
         return response
 
 
+
+############################################################
+############ Statistics Web services
+############################################################
+
+
 class StatsView(APIView):
     """
     Class that returns json values of answers to create stats (charts)
@@ -277,6 +303,10 @@ class StatsView(APIView):
 
 
 
+############################################################
+############ Publication Web services
+############################################################
+
 
 class PublicationsView(APIView):
     """
@@ -312,6 +342,35 @@ class PublicationsView(APIView):
         return Response(results, status=status.HTTP_200_OK)    
 
 
+
+############################################################
+############ Populations Characteristics Web services
+############################################################
+
+class PopulationView(object):
+    """PopulationCharactersticsService
+    This web service is responsabible to handle jerboa documents 
+
+    """
+    def __init__(self, arg):
+        super(PopulationCharactersticsService, self).__init__()
+        self.arg = arg
+        
+    def get(self, request, *args, **kw):
+        """
+        List the Jerboa documents 
+        """
+        pass
+
+    def post(self, request, *args, **kw):
+        pass
+
+
+
+
+############################################################
+############ Auxiliar functions ############################
+############################################################
 def validate_fingerprint(user, fingerprintID):
     """
     Verify if fingerprint belongs to given user

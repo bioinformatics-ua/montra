@@ -147,8 +147,7 @@ path.link {
                 
             </div>
 
-            <div class="tab-pane" >
-              <div class="tab-pane active" id="populationcharacteristics">
+            <div class="tab-pane" id="populationcharacteristics">
 
 
               {% if owner_fingerprint %}
@@ -165,7 +164,6 @@ path.link {
                 {% endif %}
 
               {% endif %}
-              </div>
 
             </div>
 
@@ -208,20 +206,20 @@ path.link {
             </div>
 
 
-              <div class="tab-pane" >
-                <div class="tab-pane active" id="documents">
+              <div class="tab-pane" id="documents">
                   {% if documents_available %}
-                    The documents that are available are still .. 
+                    <p >
+                      The documents that are available will be listed below. 
+                    </p>
+
                   {% else %}
-                    <p>There is no documents for this fingerprint.</p>
-                    <p>You can upload documents to associate them to the fingerprint browser</p>
+                    <p class="nodocs">There is no documents for this fingerprint.</p>
+                    <p class="nodocs">You can upload documents to associate them to the fingerprint browser</p>
 
                   {% endif %}
-                </div>
+                
 
             </div>
-
-
 
 
             <div class="tab-pane" id="apiinfo">
