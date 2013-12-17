@@ -5,6 +5,22 @@
 		{% if request.user.is_authenticated %} 
 		<div class="btn-group" id="group_toolbar">
 
+      {% if owner_fingerprint%}
+      <a class="btn btn dropdown-toggle" data-toggle="dropdown" href="" id="edit_list_toolbar"> <i class="icon-plus icon"></i>
+        Edit
+        <span class="caret" ></span>
+      </a>
+
+      <a class="btn btn dropdown-toggle" data-toggle="dropdown" href="" id="share_list_toolbar"> <i class="icon-plus icon"></i>
+        Share
+        <span class="caret" ></span>
+      </a>
+
+      <a class="btn btn dropdown-toggle" data-toggle="dropdown" href="" id="delete_list_toolbar"> <i class="icon-plus icon"></i>
+        Delete
+        <span class="caret" ></span>
+      </a>
+      {% endif %}
 			<a class="btn btn dropdown-toggle" data-toggle="dropdown" href="" id="add_list_toolbar"> <i class="icon-plus icon"></i>
 				Add
 				<span class="caret" ></span>
@@ -44,14 +60,16 @@
       </a>
       {% endif %}
 
-      {% if export_my_answers and request.user.is_superuser %}
-      <a class="btn" href="export_my_answers" onclick="" > <i class="icon-file"></i>
+      
+
+      {% if export_bd_answers and request.user.is_superuser %}
+      <a class="btn" href="export_bd_answers/{{ fingerprint_id }}" onclick="" > <i class="icon-file"></i>
         Export
       </a>
       {% endif %}
 
-      {% if export_bd_answers and request.user.is_superuser %}
-      <a class="btn" href="export_bd_answers/{{ fingerprint_id }}" onclick="" > <i class="icon-file"></i>
+      {% if export_my_answers and request.user.is_superuser %}
+      <a class="btn" href="export_my_answers" onclick="" > <i class="icon-file"></i>
         Export
       </a>
       {% endif %}
@@ -64,11 +82,6 @@
             {% endif %}
       {% endif %}
 
-
-
-
-		<!--<a href="" role="button" class="btn" title="Editar">
-			<i class="icon-edit"></i>-->
 		</a>
 		
 

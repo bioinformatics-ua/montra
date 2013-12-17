@@ -6,7 +6,7 @@
 
 {% block headextra %}
 
-       <script src="static/js/d3/d3.v3.min.js"></script>
+ <script src="static/js/d3/d3.v3.min.js"></script>
  <script src="static/js/d3/d3.layout.cloud.js"></script>
 
 {% endblock %}
@@ -98,8 +98,9 @@ path.link {
 <div class="row-fluid">
     <div class="tabbable">
         <ul class="nav nav-tabs">
-            <li class="active"><a href="#metadata" data-toggle="tab">Fingerprint</a></li>
+            <li class="active"><a href="#metadata" data-toggle="tab">Summary</a></li>
             <li><a href="#populationcharacteristics" data-toggle="tab">Population Characteristics</a></li>
+            <li><a href="#documents" data-toggle="tab">Documents</a></li>
             <!--<li><a href="#literature" data-toggle="tab">Literature</a></li>
             <li><a href="#apiinfo" data-toggle="tab">Extra Information</a></li>-->
         </ul>
@@ -204,6 +205,15 @@ path.link {
                 </div>
             </div>
 
+
+            <div class="tab-pane" id="populationchar_tab">
+            </div>
+
+
+            <div class="tab-pane" id="docs_tab">
+            </div>
+
+            
 
 
             <div class="tab-pane" id="apiinfo">
