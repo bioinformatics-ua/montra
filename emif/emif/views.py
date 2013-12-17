@@ -928,7 +928,7 @@ def databases(request, template_name='databases.html'):
 
     return render(request, template_name, {'request': request, 'export_my_answers': True,
                                            'list_databases': list_databases, 'breadcrumb': True, 'collapseall': False,
-                                           'api_token': True})
+                                           'api_token': True, 'owner_fingerprint': False})
 
 
 def all_databases(request, template_name='alldatabases.html'):
@@ -1099,7 +1099,9 @@ def fingerprint(request, runcode, qs, template_name='database_info.html'):
 
     apiinfo = json.dumps(get_api_info(runcode));
     owner_fingerprint = False
-    for owner in db_owners:
+    for owner in db_owners.split(" "):
+        print owner
+        print request.user.username
         if (owner == request.user.username):
             owner_fingerprint = True
     return render(request, template_name, 

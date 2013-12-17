@@ -51,8 +51,9 @@ button {
             <th>Name</th>
             <th>Date</th>
             <th>Type</th>
-
+            {% comment %}
             <th class="sorter-false filter-false">Modify</th>
+            {% endcomment %}
 
         </tr>
     </thead>
@@ -77,6 +78,7 @@ button {
         </td>
           <td>{{ t.date }} </td>
           <td>{{ t.type_name }} </td>
+          {% comment %}
           <td style="width:100px">
           
             <a  href="dbEdit/{{t.id}}/{{t.ttype}}" title="Edit Database"><img src="static/img/glyphicons_150_edit.png"  /></a>
@@ -85,6 +87,7 @@ button {
           
             </td>
 
+            {% endcomment %}
         </tr>
 
         {% endfor %}
@@ -156,30 +159,6 @@ button {
 <script>
 {% endcomment %}
 
-function post_to_url(path, params, method) {
-    method = method || "post"; // Set method to post by default if not specified.
-
-    // The rest of this code assumes you are not using a library.
-    // It can be made less wordy if you use one.
-    //var form = document.createElement("form");
-    var form = document.getElementById("send");
-    form.setAttribute("method", method);
-    form.setAttribute("action", path);
-
-    for(var key in params) {
-        if(params.hasOwnProperty(key)) {
-            var hiddenField = document.createElement("input");
-            hiddenField.setAttribute("type", "hidden");
-            hiddenField.setAttribute("name", key);
-            hiddenField.setAttribute("value", params[key]);
-
-            form.appendChild(hiddenField);
-         }
-    }
-
-    document.body.appendChild(form);
-    form.submit();
-}
 
 
 $(function() {
@@ -205,6 +184,10 @@ $(function() {
 
 $('#li_workspace').addClass("active");
 
+
+/***************************************************************
+************** Delete ******************************************
+****************************************************************/
 $('#modal-from-dom').bind('show', function() {
     var id = $(this).data('id'),
         removeBtn = $(this).find('.btn-danger'),
@@ -223,6 +206,41 @@ $('.confirm-delete').click(function(e) {
 });
 
 
+
+/***************************************************************
+************** Auxiliar method to post 
+****************************************************************/
+
+function post_to_url(path, params, method) {
+    method = method || "post"; // Set method to post by default if not specified.
+
+    // The rest of this code assumes you are not using a library.
+    // It can be made less wordy if you use one.
+    //var form = document.createElement("form");
+    var form = document.getElementById("send");
+    form.setAttribute("method", method);
+    form.setAttribute("action", path);
+
+    for(var key in params) {
+        if(params.hasOwnProperty(key)) {
+            var hiddenField = document.createElement("input");
+            hiddenField.setAttribute("type", "hidden");
+            hiddenField.setAttribute("name", key);
+            hiddenField.setAttribute("value", params[key]);
+
+            form.appendChild(hiddenField);
+         }
+    }
+
+    document.body.appendChild(form);
+    form.submit();
+};
+
+
+
+/***************************************************************
+************** Shared ******************************************
+****************************************************************/
 $('#modal-from-dom-share').bind('show', function() {
     var id = $(this).data('id'),
         removeBtn = $(this).find('.sharedb2'),
@@ -243,12 +261,6 @@ $(".sharedb2" ).click(function(e)
   e.preventDefault();
   post_to_url($(this).attr('href'), {"email": $("#share_email").val(), "csrfmiddlewaretoken": $('input[name="csrfmiddlewaretoken"]').prop('value')});
 
-});
-
-jQuery('#add_toolbar').click(function () {
-
-$('#group_toolbar').addClass("open");
-console.log($('#group_toolbar'))
 });
 
 

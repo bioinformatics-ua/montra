@@ -148,7 +148,7 @@ STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
     #    'django.contrib.staticfiles.finders.DefaultStorageFinder',
-    'djangobower.finders.BowerFinder',
+    #'djangobower.finders.BowerFinder',
 )
 
 # Make this unique, and don't share it with anybody.
@@ -233,7 +233,7 @@ INSTALLED_APPS = (
 
     # Django NVD3
     'django_nvd3',
-    'djangobower',
+    #'djangobower',
 
 )
 
@@ -334,7 +334,7 @@ LANGUAGES = (
 QUESTIONNAIRE_PROGRESS = 'async'
 
 #DEBUG_TOOLBAR
-if DEBUG:
+if not DEBUG:
     INTERNAL_IPS = ('127.0.0.1',)
     MIDDLEWARE_CLASSES += (
         'debug_toolbar.middleware.DebugToolbarMiddleware',
