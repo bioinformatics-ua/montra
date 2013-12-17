@@ -137,7 +137,7 @@ def results_comp(request, template_name='results_comp.html'):
 
     list_qsets = []
     for db_id in list_fingerprint_to_compare:
-        qsets, name, db_owners = createqsets(db_id)
+        qsets, name, db_owners, fingerprint_ttype = createqsets(db_id)
         list_qsets.append((name, qsets))
     first_name = None
     if len(list_qsets) > 0:
@@ -826,7 +826,7 @@ def get_databases_from_db(request):
 
 def get_databases_from_solr(request, query="*:*"):
     c = CoreEngine()
-    results = c.search_fingerprint(query)
+    results = c.search_fingerrint(query)
     print "Solr"
     print results
     list_databases = []
@@ -946,7 +946,7 @@ def all_databases_data_table(request, template_name='alldatabases_data_table.htm
     if list_databases:
         for t in list_databases:
             id = t.id
-            qsets, name, db_owners = createqsets(id)
+            qsets, name, db_owners, fingerprint_ttype = createqsets(id)
             q_list = []
             for group in qsets.ordered_items():
                 (k, qs) = group
@@ -981,10 +981,21 @@ def createqsets(runcode, qsets=None):
     blacklist = ['created_t', 'type_t', '_version_', 'date_last_modification_t']
     name = "Not defined."
     users = ""
+    fingerprint_ttype = ""
 
     db_owners = "" 
 
+
+    questionnaires_ids = {}
+    qqs = Questionnaire.objects.all()
+    for q in qqs:
+        questionnaires_ids[q.slug] = (q.pk, q.name)
+
+
     for result in results:
+
+
+        (fingerprint_ttype, type_name) = questionnaires_ids[result['type_t']]
 
         # Get the slug of fingerprint type
         q_aux = Questionnaire.objects.filter(slug=result['type_t'])
@@ -1080,22 +1091,32 @@ def createqsets(runcode, qsets=None):
     if (users!=""):
         users.split(" \\ ")
 
-    return (qsets, name, db_owners)
+    return (qsets, name, db_owners, fingerprint_ttype)
+
+
+
+# TODO: move to another place, maybe API? 
+def get_api_info(fingerprint_id):
+    """This is an auxiliar method to get the API Info
+    """
+
+    result = {}
+
+    
+    results = FingerprintAPI.objects.filter(fingerprintID=fingerprint_id)
+    result = {}
+    for r in results:
+        result[r.field] = r.value
+    return result
 
 
 def fingerprint(request, runcode, qs, template_name='database_info.html'):
-    qsets, name, db_owners = createqsets(runcode)
-
-    def get_api_info(fingerprint_id):
-
-        result = {}
     
-        
-        results = FingerprintAPI.objects.filter(fingerprintID=fingerprint_id)
-        result = {}
-        for r in results:
-            result[r.field] = r.value
-        return result
+    
+    qsets, name, db_owners, fingerprint_ttype = createqsets(runcode)
+
+    if fingerprint_ttype == "":
+        raise "There is missing ttype of questionarie, something is really wrong"
 
     apiinfo = json.dumps(get_api_info(runcode));
     owner_fingerprint = False
@@ -1104,10 +1125,15 @@ def fingerprint(request, runcode, qs, template_name='database_info.html'):
         print request.user.username
         if (owner == request.user.username):
             owner_fingerprint = True
+    
     return render(request, template_name, 
-        {'request': request, 'qsets': qsets, 'export_bd_answers': True, 'apiinfo': apiinfo, 'fingerprint_id': runcode,
+        {'request': request, 'qsets': qsets, 'export_bd_answers': True, 
+        'apiinfo': apiinfo, 'fingerprint_id': runcode,
                    'breadcrumb': True, 'breadcrumb_name': name.decode('ascii', 'ignore'),
-                    'style': qs, 'collapseall': False, 'owner_fingerprint':owner_fingerprint})
+                    'style': qs, 'collapseall': False, 
+                    'owner_fingerprint':owner_fingerprint,
+                    'fingerprint_ttype': fingerprint_ttype,
+                    })
 
 
 def get_questionsets_list(runinfo):
@@ -2116,7 +2142,7 @@ def save_answers_to_csv(list_databases, filename):
         writer.writerow(['DB_ID', 'DB_name', 'Questionset', 'Question', 'QuestioNumber', 'Answer'])
         for t in list_databases:
             id = t.id
-            qsets, name, db_owners = createqsets(id)
+            qsets, name, db_owners, fingerprint_ttype = createqsets(id)
 
             for group in qsets.ordered_items():
                 (k, qs) = group
