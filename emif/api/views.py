@@ -345,7 +345,7 @@ class PublicationsView(APIView):
 ############ Populations Characteristics Web services
 ############################################################
 
-class PopulationView(object):
+class PopulationView(APIView):
     """PopulationCharactersticsService
     This web service is responsabible to handle jerboa documents 
 

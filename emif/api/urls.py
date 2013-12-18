@@ -26,6 +26,7 @@ from api.views import MetaDataView
 from api.views import StatsView
 from api.views import ValidateView
 from api.views import PublicationsView
+from api.views import PopulationView
 
 urlpatterns = patterns('api.views',
     url(r'^root/$', 'api_root'),

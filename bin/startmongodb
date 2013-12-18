@@ -1,1 +1,2 @@
+mkdir /tmp/trash
 mongod --dbpath /tmp/trash
