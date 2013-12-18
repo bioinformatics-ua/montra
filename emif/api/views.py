@@ -73,8 +73,6 @@ def api_root(request, format=None):
     })
 
 
-
-
 ############################################################
 ##### Search (Extra information) - Web services
 ############################################################
@@ -363,6 +361,9 @@ class PopulationView(object):
         pass
 
     def post(self, request, *args, **kw):
+        """
+        Upload Jerboa files
+        """
         pass
 
 
