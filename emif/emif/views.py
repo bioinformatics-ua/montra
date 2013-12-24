@@ -405,7 +405,7 @@ def geo(request, template_name='geo.html'):
             _loc = database.location.split(".")[0]
         else:
             _loc = database.location
-        if _loc!= None and g!=None:
+        if _loc!= None and g!=None and len(_loc)>1:
             try:
                 place, (lat, lng) = g.geocode(_loc)
             except:
