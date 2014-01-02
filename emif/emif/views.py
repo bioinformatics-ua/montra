@@ -914,6 +914,8 @@ def delete_fingerprint(request, id):
     return databases(request)
 
 def force_delete_fingerprint(request, id):
+    if not request.user.is_superuser:
+        return HttpResponse('Permission denied. Contact administrator of EMIF Catalogue Team', status=403)
     user = request.user
     c = CoreEngine()
     results = c.search_fingerprint('id:' + id)
@@ -926,15 +928,13 @@ def force_delete_fingerprint(request, id):
     return databases(request)
 
 
-
-
 def databases(request, template_name='databases.html'):
     # Get the list of databases for a specific user
 
     user = request.user
     #list_databases = get_databases_from_db(request)
     _filter = "user_t:" + user.username
-    if user. is_superuser:
+    if user.is_superuser:
         _filter = "user_t:*" 
     list_databases = get_databases_from_solr(request, _filter)
 
@@ -2370,7 +2370,7 @@ def import_questionnaire(request, template_name='import_questionnaire.html'):
     # wb = load_workbook(filename = r'/Volumes/EXT1/Dropbox/MAPi-Dropbox/EMIF/Code/emif/emif/questionnaire_ad_v2.xlsx')
     # wb = load_workbook(filename = r'/Volumes/EXT1/Dropbox/MAPi-Dropbox/EMIF/Observational_Data_Sources_Template_v5.xlsx')
     # wb = load_workbook(filename = r'C:/Questionnaire_template_v3.4.xlsx')
-    wb = load_workbook(filename =r'/Volumes/EXT1/trash/Questionnaire_template_v3.5.xlsx')
+    wb = load_workbook(filename =r'/Volumes/EXT1/trash/Questionnaire_template_v3.5.3xlsx')
     ws = wb.get_active_sheet()
     log = ''
 

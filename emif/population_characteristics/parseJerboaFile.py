@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+w# -*- coding: utf-8 -*-
 
 # Copyright (C) 2013 Luís A. Bastião Silva and Universidade de Aveiro
 #
