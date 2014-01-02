@@ -4,7 +4,7 @@
 {% blocktrans with user.username as username %} Username: {{ username }} {% endblocktrans %}
 
 Name: {% blocktrans with user.first_name as fname %} {{ fname }} {% endblocktrans %} {% blocktrans with user.last_name as lname %} {{ lname }} {% endblocktrans %}
-
+Organization: {{ organization }}
 {% trans "To activate his account you should click on the link below:" %}
 
 {{ protocol }}://{{ site.domain }}{% url 'userena_activate' activation_key %}

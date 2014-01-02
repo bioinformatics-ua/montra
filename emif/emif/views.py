@@ -405,7 +405,7 @@ def geo(request, template_name='geo.html'):
             _loc = database.location.split(".")[0]
         else:
             _loc = database.location
-        if _loc!= None and g!=None:
+        if _loc!= None and g!=None and len(_loc)>1:
             try:
                 place, (lat, lng) = g.geocode(_loc)
             except:
@@ -986,7 +986,7 @@ def all_databases_data_table(request, template_name='alldatabases_data_table.htm
                                            'list_databases': list_databases})
 
 
-def createqsets(runcode, qsets=None):
+def createqsets(runcode, qsets=None, clean=True):
     print "createqsets"
     c = CoreEngine()
     results = c.search_fingerprint('id:' + runcode)
@@ -1093,8 +1093,11 @@ def createqsets(runcode, qsets=None):
                print t.comment
             except KeyError:
                pass
-    
-            t.value = value.replace("#", " ")
+            if clean:
+                t.value = value.replace("#", " ")
+            else:
+                t.value = value
+
             if k == "database_name_t":
                 name = t.value
             list_values.append(t)
@@ -2145,7 +2148,7 @@ def docs_api(request, template_name='docs/api.html'):
 
 
 def clean_str_exp(s):
-    return s.replace("\n", ". ").replace(";", ",").replace("\t", "    ").replace("\r","").replace("^M","")
+    return s.replace("\n", "|").replace(";", ",").replace("\t", "    ").replace("\r","").replace("^M","")
 
 def save_answers_to_csv(list_databases, filename):
     """
@@ -2160,7 +2163,8 @@ def save_answers_to_csv(list_databases, filename):
         writer.writerow(['DB_ID', 'DB_name', 'Questionset', 'Question', 'QuestioNumber', 'Answer'])
         for t in list_databases:
             id = t.id
-            qsets, name, db_owners, fingerprint_ttype = createqsets(id)
+
+            qsets, name, db_owners, fingerprint_ttype = createqsets(id, clean=False)
 
             for group in qsets.ordered_items():
                 (k, qs) = group
