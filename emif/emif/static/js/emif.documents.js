@@ -39,37 +39,6 @@ function PopulationCharacteristics (type)
 *********************************************************/
 
 
-
- (function( $ )
- {
-
-    var methods = {
-        init : function( options ) { 
-            
-        },
-        draw : function( options ) {
-            
-            
-        },
-        
-    };
-
-    $.fn.documentManager = function(method) {
-        // Method calling logic
-        if ( methods[method] ) {
-        return methods[ method ].apply( this, Array.prototype.slice.call( arguments, 1 ));
-        } else if ( typeof method === 'object' || ! method ) {
-        return methods.init.apply( this, arguments );
-        } else {
-        $.error( 'Method ' + method + ' does not exist on jQuery.populationCharts' );
-        }
-        return this;
-    };
-}( jQuery ));
-
-
-
-
 /* JQuery Plugin for Population Characteristics */
 
  (function( $ )
@@ -82,7 +51,6 @@ function PopulationCharacteristics (type)
             $(".chart_pc" ).on(eventToCatch, options.handle_type_chart);
         },
         draw : function( options ) {
-            
             
         },
         

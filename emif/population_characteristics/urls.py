@@ -25,6 +25,7 @@ urlpatterns = patterns('',
             population, name='population'),
     url(r'^$',
             population, name='population'),
-    #url(r'^new/$', document_form_view, name='upload-new'),
+    
+    url(r'^upload$', 'population_characteristics.documents.document_form_view_upload'),
     url(r'^new/(?P<runcode>[^/]+)/(?P<qs>[-]{0,1}\d+)/$', 'population_characteristics.documents.document_form_view'),
 )

@@ -20,6 +20,28 @@ def order_name(name):
     return name[:10] + "..." + name[-7:]
 
 
+
+
+
+def serialize_dummy(instance, file_attr='file'):
+    """serialize -- Serialize a Picture instance into a dict.
+
+    instance -- Picture instance
+    file_attr -- attribute name that contains the FileField or ImageField
+
+    """
+    
+    return {
+        'url': 'http://localhost',
+        'name': 'pic',
+        'type': 'image/png',
+        'thumbnailUrl': 'http://localhost',
+        'size': 45678,
+        'deleteUrl': 'http://localhost',
+        'deleteType': 'DELETE',
+    }
+
+
 def serialize(instance, file_attr='file'):
     """serialize -- Serialize a Picture instance into a dict.
 

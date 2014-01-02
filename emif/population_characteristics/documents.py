@@ -4,12 +4,36 @@ from django.http import HttpResponse
 from django.views.generic import CreateView, DeleteView, ListView
 from .models import Picture
 from .response import JSONResponse, response_mimetype
-from .serialize import serialize
+from .serialize import serialize, serialize_dummy
 from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import user_passes_test, login_required
 
 from emif.views import createqsets, get_api_info
 from django.shortcuts import render
+
+import os
+
+def handle_uploaded_file(f):
+    print "abspath"
+
+    with open(os.path.join(os.path.abspath(settings.PROJECT_DIR_ROOT + 'emif/static/upload_images/'), f.name),
+              'wb+') as destination:
+        for chunk in f.chunks():
+            destination.write(chunk)
+
+
+def document_form_view_upload(request, template_name='documents_upload_form.html'):
+
+    #if request.FILES:
+        #for name, f in request.FILES.items():
+            #handle_uploaded_file(f)
+    files = [serialize_dummy(request.FILES)]
+    data = {'files': files}
+    response = JSONResponse(data, mimetype=response_mimetype(request))
+    response['Content-Disposition'] = 'inline; filename=files.json'
+    return response
+
+    
 
 def document_form_view(request, runcode, qs, template_name='documents_upload_form.html'):
     
@@ -49,7 +73,7 @@ class PictureCreateView(CreateView):
         return super(PictureCreateView, self).dispatch(*args, **kwargs)
 
     def get_initial(self):
-        print "get_initialget_initialget_initialget_initialget_initialget_initial"
+        
         return { 'request': self.request }
 
 

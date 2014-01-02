@@ -10,9 +10,9 @@
  <script src="static/js/d3/d3.layout.cloud.js"></script>
  
 <!-- Generic page styles -->
-<link rel="stylesheet" href="{{ STATIC_URL }}css/style.css">
+<link rel="stylesheet" href="{{ STATIC_URL }}css/vendor/style.css">
 <!-- CSS to style the file input field as button and adjust the Bootstrap progress bars -->
-<link rel="stylesheet" href="{{ STATIC_URL }}css/jquery.fileupload-ui.css">
+<link rel="stylesheet" href="{{ STATIC_URL }}css/vendor/jquery.fileupload-ui.css">
 
 <script src="static/js/emif.documents.js"></script>
 
@@ -169,7 +169,8 @@ path.link {
 
 
 
-    {% block formupload %} {% endblock%}
+                {% block formupload %} 
+                {% endblock%}
 
 
                 You have already population characteristics. Your last activied is dated from: {{pc_last_activity}}
@@ -194,23 +195,23 @@ path.link {
                     
                     <li><a class="chart_pc" href="">Age at start of year - Total population</a></li>
                     <li><a class="chart_pc" href="#">Age at start of year - Female population</a></li>
-                    <li><a href="#">Age at start of year - Male population</a></li>
-                    <li><a href="#">Age at start in calendar year 2000</a></li>
+                    <li><a class="chart_pc" href="#">Age at start of year - Male population</a></li>
+                    <li><a class="chart_pc" href="#">Age at start in calendar year 2000</a></li>
                     <!-- You need to complete to dynamically -->
-                    <li><a href="#">Age at start - Total population</a></li>
-                    <li><a href="#">Age at start - Female population</a></li>
-                    <li><a href="#">Age at start - Male population</a></li>
-                    <li><a href="#">Age at end in calendar year 2001</a></li>
-                    <li><a href="#">Total patient time in a year - Total population</a></li>
-                    <li><a href="#">Total patient time in a year - Female population</a></li>
-                    <li><a href="#">Total patient time in a year - Male population</a></li>
-                    <li><a href="#">Patient time</a></li>
-                    <li><a href="#">Patient time per patient before a year - Total population</a></li>
-                    <li><a href="#">Patient time per patient before a year - Female population</a></li>
-                    <li><a href="#">Patient time per patient before a year - Male population</a></li>
-                    <li><a href="#">Patient time per patient after a year - Total population</a></li>
-                    <li><a href="#">Patient time per patient after a year - Female population</a></li>
-                    <li><a href="#">Patient time per patient after a year - Male population</a></li>
+                    <li><a class="chart_pc" href="#">Age at start - Total population</a></li>
+                    <li><a class="chart_pc" href="#">Age at start - Female population</a></li>
+                    <li><a class="chart_pc" href="#">Age at start - Male population</a></li>
+                    <li><a class="chart_pc" href="#">Age at end in calendar year 2001</a></li>
+                    <li><a class="chart_pc" href="#">Total patient time in a year - Total population</a></li>
+                    <li><a class="chart_pc" href="#">Total patient time in a year - Female population</a></li>
+                    <li><a class="chart_pc" href="#">Total patient time in a year - Male population</a></li>
+                    <li><a class="chart_pc" href="#">Patient time</a></li>
+                    <li><a class="chart_pc" href="#">Patient time per patient before a year - Total population</a></li>
+                    <li><a class="chart_pc" href="#">Patient time per patient before a year - Female population</a></li>
+                    <li><a class="chart_pc" href="#">Patient time per patient before a year - Male population</a></li>
+                    <li><a class="chart_pc" href="#">Patient time per patient after a year - Total population</a></li>
+                    <li><a class="chart_pc" href="#">Patient time per patient after a year - Female population</a></li>
+                    <li><a class="chart_pc" href="#">Patient time per patient after a year - Male population</a></li>
                     
                   </ul>
                   </li>
@@ -388,30 +389,28 @@ path.link {
 {% endcomment %}
 
 
-<script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
 <!-- The jQuery UI widget factory, can be omitted if jQuery UI is already included -->
 <script src="{{ STATIC_URL }}js/vendor/jquery.ui.widget.js"></script>
 <!-- The Load Image plugin is included for the preview images and image resizing functionality -->
-<script src="{{ STATIC_URL }}js/load-image.min.js"></script>
+<script src="{{ STATIC_URL }}js/vendor/load-image.min.js"></script>
 <!-- The Canvas to Blob plugin is included for image resizing functionality -->
-<script src="{{ STATIC_URL }}js/canvas-to-blob.min.js"></script>
-<!-- Bootstrap JS is not required, but included for the responsive demo navigation -->
-<script src="//netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>
+<script src="{{ STATIC_URL }}js/vendor/canvas-to-blob.min.js"></script>
+
 <!-- The Iframe Transport is required for browsers without support for XHR file uploads -->
-<script src="{{ STATIC_URL }}js/jquery.iframe-transport.js"></script>
+<script src="{{ STATIC_URL }}js/vendor/jquery.iframe-transport.js"></script>
 <!-- The basic File Upload plugin -->
-<script src="{{ STATIC_URL }}js/jquery.fileupload.js"></script>
+<script src="{{ STATIC_URL }}js/vendor/jquery.fileupload.js"></script>
 <!-- The File Upload processing plugin -->
-<script src="{{ STATIC_URL }}js/jquery.fileupload-process.js"></script>
+<script src="{{ STATIC_URL }}js/vendor/jquery.fileupload-process.js"></script>
 <!-- The File Upload image preview & resize plugin -->
-<script src="{{ STATIC_URL }}js/jquery.fileupload-image.js"></script>
+<script src="{{ STATIC_URL }}js/vendor/jquery.fileupload-image.js"></script>
 <!-- The File Upload audio preview plugin -->
-<script src="{{ STATIC_URL }}js/jquery.fileupload-audio.js"></script>
+<script src="{{ STATIC_URL }}js/vendor/jquery.fileupload-audio.js"></script>
 <!-- The File Upload video preview plugin -->
-<script src="{{ STATIC_URL }}js/jquery.fileupload-video.js"></script>
+<script src="{{ STATIC_URL }}js/vendor/jquery.fileupload-video.js"></script>
 <!-- The File Upload validation plugin -->
-<script src="{{ STATIC_URL }}js/jquery.fileupload-validate.js"></script>
-<script src="{{ STATIC_URL }}js/jquery.cookie.js"></script>
+<script src="{{ STATIC_URL }}js/vendor/jquery.fileupload-validate.js"></script>
+<script src="{{ STATIC_URL }}js/vendor/jquery.cookie.js"></script>
 <script>
 /*jslint unparam: true, regexp: true */
 /*global window, $ */
@@ -420,10 +419,11 @@ function csrfSafeMethod(method) {
     return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
 }
 $(function () {
+  console.log("jquery upload - getting ready");
     'use strict';
     var csrftoken = $.cookie('csrftoken');
     // Change this to the location of your server-side upload handler:
-    var url = '/upload/basic/plus/',
+    var url = '/population/upload',
         uploadButton = $('<button/>')
             .addClass('btn btn-primary')
             .prop('disabled', true)
@@ -444,7 +444,7 @@ $(function () {
             });
     $('#fileupload').fileupload({
         url: url,
-        crossDomain: false,
+        crossDomain: true,
         beforeSend: function(xhr, settings) {
             if (!csrfSafeMethod(settings.type)) {
                 xhr.setRequestHeader("X-CSRFToken", csrftoken);
@@ -895,9 +895,7 @@ function color(d) {
 }
 
 
-    
-
-    {% endblock %}
+{% endblock %}
 
 </script>
 
