@@ -902,18 +902,30 @@ def get_databases_from_solr(request, query="*:*"):
 
 def delete_fingerprint(request, id):
     user = request.user
-    #su = Subject.objects.filter(user=user)
-
-    #email = su[0].email
 
     c = CoreEngine()
     results = c.search_fingerprint('user_t:' + user.username)
+    
     for result in results:
         if (id == result['id']):
             c.delete(id)
             break
 
     return databases(request)
+
+def force_delete_fingerprint(request, id):
+    user = request.user
+    c = CoreEngine()
+    results = c.search_fingerprint('id:' + id)
+    
+    for result in results:
+        if (id == result['id']):
+            c.delete(id)
+            break
+
+    return databases(request)
+
+
 
 
 def databases(request, template_name='databases.html'):
