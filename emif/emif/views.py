@@ -928,7 +928,9 @@ def databases(request, template_name='databases.html'):
 
     return render(request, template_name, {'request': request, 'export_my_answers': True,
                                            'list_databases': list_databases, 'breadcrumb': True, 'collapseall': False,
-                                           'api_token': True, 'owner_fingerprint': False})
+                                           'api_token': True, 
+                                           'owner_fingerprint': False,
+                                           'add_databases': True})
 
 
 def all_databases(request, template_name='alldatabases.html'):
@@ -936,7 +938,10 @@ def all_databases(request, template_name='alldatabases.html'):
     list_databases = get_databases_from_solr(request, "*:*")
 
     return render(request, template_name, {'request': request, 'export_all_answers': True, 'data_table': True,
-                                           'list_databases': list_databases, 'breadcrumb': True, 'collapseall': False, 'geo': True})
+                                           'list_databases': list_databases,
+                                            'breadcrumb': True, 'collapseall': False, 
+                                            'geo': True,
+                                            'add_databases': True})
 
 
 def all_databases_data_table(request, template_name='alldatabases_data_table.html'):
@@ -1132,6 +1137,7 @@ def fingerprint(request, runcode, qs, template_name='database_info.html'):
                    'breadcrumb': True, 'breadcrumb_name': name.decode('ascii', 'ignore'),
                     'style': qs, 'collapseall': False, 
                     'owner_fingerprint':owner_fingerprint,
+                    'fingerprint_dump': True,
                     'fingerprint_ttype': fingerprint_ttype,
                     })
 

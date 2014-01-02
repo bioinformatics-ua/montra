@@ -17,13 +17,11 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-
 class JerboaFormat(object):
     """docstring for JerboaFormat"""
     def __init__(self, arg):
         super(JerboaFormat, self).__init__()
         self.arg = arg
-        
 
 
 class Revision(object):
