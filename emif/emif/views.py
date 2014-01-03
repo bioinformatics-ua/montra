@@ -41,7 +41,7 @@ from searchengine.search_indexes import convert_text_to_slug
 from emif.utils import *
 from emif.models import *
 from api.models import *
-
+from geopy import geocoders 
 from django.core.mail import send_mail, BadHeaderError
 
 from rest_framework.authtoken.models import Token
@@ -200,7 +200,6 @@ def results_fulltext_aux(request, query, page=1, template_name='results.html'):
                 database_aux.location = ''
             else:
                 database_aux.location = r['location_t']
-
             if (not r.has_key('institution_name_t')):
                 database_aux.institution = ''
             else:
@@ -399,10 +398,25 @@ def geo(request, template_name='geo.html'):
     print "query@" + query
     list_databases = get_databases_from_solr(request, query)
     list_locations = []
+    _long_lats = []
+    g = geocoders.GeoNames(username='bastiao')
     for database in list_databases:
-        list_locations.append(database.location)
+        if database.location.find(".")!= -1:
+            _loc = database.location.split(".")[0]
+        else:
+            _loc = database.location
+        if _loc!= None and g!=None and len(_loc)>1:
+            try:
+                place, (lat, lng) = g.geocode(_loc)
+            except:
+                continue
+            _long_lats.append(str(lat)+ ", " +str(lng))
+
+        print _loc
+
+        list_locations.append(_loc)
     return render(request, template_name, {'request': request,
-                                           'list_cities': list_locations, 'breadcrumb': True})
+                                           'list_cities': list_locations, 'lats_longs': _long_lats, 'breadcrumb': True})
 
 
 
@@ -776,7 +790,7 @@ def database_edit(request, fingerprint_id, questionnaire_id, template_name="data
             qs_list=qs_list,
             questions_list=qlist_general,
             breadcrumb=True,
-            name=fingerprint_name,
+            name=fingerprint_name.decode('ascii', 'ignore'),
             id=fingerprint_id,
             users_db=users_db,
             created_date=created_date,
@@ -907,7 +921,10 @@ def databases(request, template_name='databases.html'):
 
     user = request.user
     #list_databases = get_databases_from_db(request)
-    list_databases = get_databases_from_solr(request, "user_t:" + user.username)
+    _filter = "user_t:" + user.username
+    if user. is_superuser:
+        _filter = "user_t:*" 
+    list_databases = get_databases_from_solr(request, _filter)
 
     return render(request, template_name, {'request': request, 'export_my_answers': True,
                                            'list_databases': list_databases, 'breadcrumb': True, 'collapseall': False,
@@ -952,7 +969,7 @@ def all_databases_data_table(request, template_name='alldatabases_data_table.htm
                                            'list_databases': list_databases})
 
 
-def createqsets(runcode, qsets=None):
+def createqsets(runcode, qsets=None, clean=True):
     print "createqsets"
     c = CoreEngine()
     results = c.search_fingerprint('id:' + runcode)
@@ -1039,8 +1056,11 @@ def createqsets(runcode, qsets=None):
                print t.comment
             except KeyError:
                pass
-    
-            t.value = value.replace("#", " ")
+            if clean:
+                t.value = value.replace("#", " ")
+            else:
+                t.value = value
+
             if k == "database_name_t":
                 name = t.value
             list_values.append(t)
@@ -1057,7 +1077,6 @@ def createqsets(runcode, qsets=None):
 def fingerprint(request, runcode, qs, template_name='database_info.html'):
     qsets, name = createqsets(runcode)
 
-
     def get_api_info(fingerprint_id):
 
         result = {}
@@ -1072,7 +1091,7 @@ def fingerprint(request, runcode, qs, template_name='database_info.html'):
     apiinfo = json.dumps(get_api_info(runcode));
     return render(request, template_name, 
         {'request': request, 'qsets': qsets, 'export_bd_answers': True, 'apiinfo': apiinfo, 'fingerprint_id': runcode,
-                   'breadcrumb': True, 'breadcrumb_name': name, 'style': qs, 'collapseall': False})
+                   'breadcrumb': True, 'breadcrumb_name': name.decode('ascii', 'ignore'), 'style': qs, 'collapseall': False})
 
 
 def get_questionsets_list(runinfo):
@@ -2066,7 +2085,7 @@ def docs_api(request, template_name='docs/api.html'):
 
 
 def clean_str_exp(s):
-    return s.replace("\n", ". ").replace(";", ",").replace("\t", "    ").replace("\r","").replace("^M","")
+    return s.replace("\n", "|").replace(";", ",").replace("\t", "    ").replace("\r","").replace("^M","")
 
 def save_answers_to_csv(list_databases, filename):
     """
@@ -2081,7 +2100,7 @@ def save_answers_to_csv(list_databases, filename):
         writer.writerow(['DB_ID', 'DB_name', 'Questionset', 'Question', 'QuestioNumber', 'Answer'])
         for t in list_databases:
             id = t.id
-            qsets, name = createqsets(id)
+            qsets, name = createqsets(id, clean=False)
 
             for group in qsets.ordered_items():
                 (k, qs) = group

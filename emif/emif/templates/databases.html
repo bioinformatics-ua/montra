@@ -20,8 +20,6 @@ button {
 }
 
 
-
-
 {% endblock %}
 
 {% block toolbar %}
@@ -79,14 +77,12 @@ button {
         </td>
           <td>{{ t.date }} </td>
           <td>{{ t.type_name }} </td>
-          <td>
-<!--<div style="color:red">
-<i class="icon-remove " ></i></div>-->
-    
+          <td style="width:100px">
+          
             <a  href="dbEdit/{{t.id}}/{{t.ttype}}" title="Edit Database"><img src="static/img/glyphicons_150_edit.png"  /></a>
             <a href="#" onclick="return false;"  class="confirm-delete" data-id="{{ t.id }}"  title="Remove Database"><img src="static/img/glyphicons_192_circle_remove.png"/></a>
               <a href="#" onclick="return false;" class="sharedb" data-id="{{ t.id }}" title="Share Database" ><img src="static/img/glyphicons_308_share_alt.png"/></a>
-              </td>
+          
             </td>
 
         </tr>
@@ -126,7 +122,7 @@ button {
     <div class="modal-footer">
         <a href="rm/ref" class="btn btn-danger">Yes</a>
         <!-- <a href="delete.php?some=param&ref=" class="btn danger">Yes 2</a> -->
-        <a href="#" onclick="$('#modal-from-dom').modal('hide'); return false;" class="btn btn-secondary">No</a>
+        <a href="#" onclick="$('#modal-from-dom').modal('hide'); return false;" class="btn btn-secondary">Cancel</a>
     </div>
 </div>
 

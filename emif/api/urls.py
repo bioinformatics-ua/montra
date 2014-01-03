@@ -33,7 +33,7 @@ urlpatterns = patterns('api.views',
     url(r'^metadata', MetaDataView.as_view(), name='metadata'),
     url(r'^stats$', StatsView.as_view(), name='stats'),
     url(r'^validate$', ValidateView.as_view(), name='validate'),
-    url(r'^pubmed$', PublicationsView.as_view(), name='validate'),
+    url(r'^pubmed$', PublicationsView.as_view(), name='pubmed'),
 
 )
 
