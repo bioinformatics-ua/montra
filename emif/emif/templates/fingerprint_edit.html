@@ -1,9 +1,10 @@
-
+{% load url from future %}
 {% load extra_tags %}
 {% load markup questionnaire i18n %}
 
 <div class="span8">
     <form name="qform" id="qform" action="dbEdit/{{fingerprint_id}}/{{questionset.questionnaire.pk}}" method="POST" enctype="multipart/form-data">
+        <input type="hidden" id="edit_db_inputs" value="1">
         <input type="hidden" name="active_qs" id="active_qs" value="0">
         <input type="hidden" name="active_qs_sortid" id="active_qs_sortid" value="0">
         <input type="hidden" name="fingerprint_id" value="{{ fingerprint_id }}">
@@ -205,6 +206,10 @@
 <script src="static/js/vendor/bootstrap-popover.js"></script>
 <script src="static/js/fingerprint.js"></script>
 
+{% block scriptextraincludes %}
+        <script type="text/javascript" src="static/js/fingerprint_edit.js"></script>
+{% endblock %}
+
 <script type="text/javascript">
 
     {% block scriptextra %}
@@ -285,3 +290,4 @@ function validate(question_number)
 
 {% endblock %}
 </script>
+
