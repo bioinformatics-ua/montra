@@ -2,6 +2,13 @@
 
 <div class="span6">
 	<div class="btn-group pull-right">
+
+        {% if  request.user|safe in users_db %}
+        <button type="button" class="btn btn" onclick="edit_db_option();" title="Enable/Disabled edit option" data-toggle="button">
+			<i class="fa fa-pencil-square-o"></i> Edit
+		</button>
+         {% endif %}
+
 		{% if request.user.is_authenticated %} 
 		<div class="btn-group" id="group_toolbar">
 
