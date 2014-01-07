@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+/**********************************************************************
 # Copyright (C) 2013 Luís A. Bastião Silva and Universidade de Aveiro
 #
 # Authors: Luís A. Bastião Silva <bastiao@ua.pt>
@@ -16,20 +16,21 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
-from django.conf.urls.defaults import *
-from views import *
-from documents import * 
+***********************************************************************/
 
-urlpatterns = patterns('',
-    url(r'^$',
-            population, name='population'),
-    url(r'^$',
-            population, name='population'),
-    
-    url(r'^upload$', 'population_characteristics.documents.document_form_view_upload'),
-    url(r'^jerboaupload$', 'population_characteristics.documents.jerboa_form_view_upload'),
-    url(r'^jerboalistvalues/(?P<param>[^/]+)$', 'population_characteristics.documents.jerboa_list_values'),
 
-    url(r'^new/(?P<runcode>[^/]+)/(?P<qs>[-]{0,1}\d+)/$', 'population_characteristics.documents.document_form_view'),
-    url(r'^parsejerboa$', 'population_characteristics.documents.parsejerboa'),
-)
+
+/********************************************************
+**************** Population Characteristics API 
+*********************************************************/
+
+
+function PopulationCharacteristics (type) 
+{
+    this.handle_type_chart = function(e)     {
+            e.preventDefault();
+            e.stopPropagation();
+            console.log("Type of graph is: "); 
+
+    };
+};

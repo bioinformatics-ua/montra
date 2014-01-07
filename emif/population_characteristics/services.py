@@ -16,6 +16,11 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
+        
+from emif.settings import jerboa_collection
+from pymongo.errors import OperationFailure
+from .parseJerboaFile import * 
+import json 
 
 class JerboaFormat(object):
     """docstring for JerboaFormat"""
@@ -30,27 +35,61 @@ class Revision(object):
         super(Revision, self).__init__()
         self.arg = arg
         
-
     def get_uri(self):
         pass
 
     def version(self):
         pass
 
-class PopulationCharacteristic(object):
-    """docstring for PopulationCharacteristic"""
-    def __init__(self, arg):
-        super(PopulationCharacteristic, self).__init__()
+class PopulationCharacteristic(JerboaFormat):
+    """PopulationCharacteristic: This class controls the Jerboa File
+    """
+    def __init__(self, arg=None):
+        super(PopulationCharacteristic, self).__init__(arg)
         self.arg = arg
     
-
     def last_activity(self):
         pass
 
+    def __to_json(self):
+        self._json = import_population_characteristics_data()
 
     def revisions(self):
         pass
 
     def submit_new_revision(self):
+        path_file = "/Volumes/EXT1/Dropbox/MAPi-Dropbox/EMIF/Jerboa/TEST_DataProfile_v1.5.6b.txt"
+        
+        self._json = import_population_characteristics_data(filename=path_file)
+        #print self._json
+        f = open('/tmp/jerboa', 'w')
+        f.write(self._json)
+        f.close()
+        json_data = json.loads(self._json)
+        try:
+            # Create MONGO record
+            data_example = jerboa_collection.insert(json_data)
+            # get last inserted record
+            print jerboa_collection.find_one()
+            print "Sucess "
+        except OperationFailure:
+            print "Failure"
+
+    def get_variables(self, param):
+        #db.jerboa_files.distinct( 'values.Var' )
+        values =  jerboa_collection.distinct( 'values.' +  param )
+        return values
+
+
+    def get_var(self):
+        #db.jerboa_files.distinct( 'values.Var' )
+        values =  jerboa_collection.distinct( 'values.Var' )
+        
+        return values
+
+    def get_x_y(self):
+        # 
+        # 
+        # db.jerboa_files.find({"values.Name1": "YEAR", "values.Var":"Active patients"})
         pass
         

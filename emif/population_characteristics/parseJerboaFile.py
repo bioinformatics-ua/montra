@@ -1,4 +1,4 @@
-w# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 
 # Copyright (C) 2013 Luís A. Bastião Silva and Universidade de Aveiro
 #
@@ -24,6 +24,8 @@ from emif import settings
 
 
 
+def clean_value(value):
+    return str(value).replace('\n', '').rstrip()
 
 
 def import_population_characteristics_data(filename='TEST_DataProfile_v1.5.6b.txt'):
@@ -39,9 +41,8 @@ def import_population_characteristics_data(filename='TEST_DataProfile_v1.5.6b.tx
     json_data = ''
     comma = ''
 
-    f = open(r'C:/' + filename)
+    f = open(filename)
     log += '\nFile opened %s ' % filename
-    print r'C:/' + filename
     data = f.readlines()[1:]
     for line in data:
         file_line_info = {
@@ -54,33 +55,33 @@ def import_population_characteristics_data(filename='TEST_DataProfile_v1.5.6b.tx
         values = line.split('\t')
         print len(values)
         if len(values) > 0:
-            line_data['Var'] = str(values[0]).replace('\n', '')
+            line_data['Var'] = clean_value(values[0])
         if len(values) > 1:
-            line_data['Name1'] = str(values[1]).replace('\n', '')
+            line_data['Name1'] = clean_value(values[1])
         if len(values) > 2:
-            line_data['Value1'] = str(values[2]).replace('\n', '')
+            line_data['Value1'] = clean_value(values[2])
         if len(values) > 2:
-            line_data['Name2'] = str(values[3]).replace('\n', '')
+            line_data['Name2'] = clean_value(values[3])
         if len(values) > 4:
-            line_data['Value2'] = str(values[4]).replace('\n', '')
+            line_data['Value2'] = clean_value(values[4])
         if len(values) > 5:
-            line_data['Gender'] = str(values[5]).replace('\n', '')
+            line_data['Gender'] = clean_value(values[5])
         if len(values) > 6:
-            line_data['Min'] = str(values[6]).replace('\n', '')
+            line_data['Min'] = clean_value(values[6])
         if len(values) > 7:
-            line_data['Max'] = str(values[7]).replace('\n', '')
+            line_data['Max'] = clean_value(values[7])
         if len(values) > 8:
-            line_data['Count'] = str(values[8]).replace('\n', '')
+            line_data['Count'] = clean_value(values[8])
         if len(values) > 9:
-            line_data['Mean'] = str(values[9]).replace('\n', '')
+            line_data['Mean'] = clean_value(values[9])
         if len(values) > 10:
-            line_data['perc25'] = str(values[10]).replace('\n', '')
+            line_data['perc25'] = clean_value(values[10])
         if len(values) > 11:
-            line_data['Median'] = str(values[11]).replace('\n', '')
+            line_data['Median'] = clean_value(values[11])
         if len(values) > 12:
-            line_data['perc75'] = str(values[12]).replace('\n', '')
+            line_data['perc75'] = clean_value(values[12])
         if len(values) > 13:
-            line_data['SD'] = str(values[13]).replace('\n', '')
+            line_data['SD'] = clean_value(values[13])
 
         # print line_data
         file_line_info['values'] = line_data
@@ -89,5 +90,5 @@ def import_population_characteristics_data(filename='TEST_DataProfile_v1.5.6b.tx
         comma = ', '
     print json_data
     f.close()
-
-import_population_characteristics_data()
+    return "[" + json_data + "]"
+#import_population_characteristics_data()

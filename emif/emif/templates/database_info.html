@@ -13,8 +13,17 @@
 <link rel="stylesheet" href="{{ STATIC_URL }}css/vendor/style.css">
 <!-- CSS to style the file input field as button and adjust the Bootstrap progress bars -->
 <link rel="stylesheet" href="{{ STATIC_URL }}css/vendor/jquery.fileupload-ui.css">
+<link href="{{ STATIC_URL }}nvd3/src/nv.d3.css" rel="stylesheet" type="text/css">
+<script src="{{ STATIC_URL }}nvd3/lib/d3.v3.js"></script>
+<script src="{{ STATIC_URL }}nvd3/nv.d3.js"></script>
+<script src="{{ STATIC_URL }}nvd3/src/models/axis.js"></script>
+<script src="{{ STATIC_URL }}nvd3/src/models/historicalBar.js"></script>
+<script src="{{ STATIC_URL }}nvd3/src/models/historicalBarChart.js"></script>
+<script src="{{ STATIC_URL }}nvd3/src/utils.js"></script>
+<script src="{{ STATIC_URL }}nvd3/src/models/axis.js"></script>
+<script src="{{ STATIC_URL }}nvd3/src/models/discreteBar.js"></script>
+<script src="{{ STATIC_URL }}nvd3/src/models/discreteBarChart.js"></script>
 
-<script src="static/js/emif.documents.js"></script>
 
 
 
@@ -75,6 +84,17 @@ path.link {
   stroke-width: 1.5px;
 }
 
+svg {
+  display: block;
+}
+
+#chart svg{
+  height: 500px;
+  width: 500px;
+  min-width: 400px;
+  min-height: 400px;
+
+}
 
 
 
@@ -167,57 +187,175 @@ path.link {
 
                 {% else %}
 
-
-
-                {% block formupload %} 
+                {% block jerboaformupload %} 
                 {% endblock%}
 
-
                 You have already population characteristics. Your last activied is dated from: {{pc_last_activity}}
+                <div class="span12 populationcharacteristicsbar">
+                <div class="pull-right ">
+                    <div class="btn-group">
+                        <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
+                            Show/Hide
+                            <span class="caret"></span>
+                        </a>
 
-                <div id="pc_list">
-                  <ul class="nav nav-pills">
-                  <li class="dropdown">
-                  <a class="dropdown-toggle"
-                     data-toggle="dropdown"
-                     href="#">
-                      List
-                      <b class="caret"></b>
-                    </a>
-                  <ul class="dropdown-menu">
-                    <li><a class="chart_pc" href="#" onclick="return false;">Birth dates</a></li>
-                    <li><a class="chart_pc" href="#">Start dates</a></li>
-                    <li><a class="chart_pc" href="#">End dates</a></li>
-                    <li><a class="chart_pc" href="#">Active patients</a></li>
-                    <li><a class="chart_pc" href="#">Age at start of year 2000</a></li>
-                    <li><a class="chart_pc" href="#">Age at start of year 2001</a></li>
-                    <!-- You need to complete to dynamically -->
-                    
-                    <li><a class="chart_pc" href="">Age at start of year - Total population</a></li>
-                    <li><a class="chart_pc" href="#">Age at start of year - Female population</a></li>
-                    <li><a class="chart_pc" href="#">Age at start of year - Male population</a></li>
-                    <li><a class="chart_pc" href="#">Age at start in calendar year 2000</a></li>
-                    <!-- You need to complete to dynamically -->
-                    <li><a class="chart_pc" href="#">Age at start - Total population</a></li>
-                    <li><a class="chart_pc" href="#">Age at start - Female population</a></li>
-                    <li><a class="chart_pc" href="#">Age at start - Male population</a></li>
-                    <li><a class="chart_pc" href="#">Age at end in calendar year 2001</a></li>
-                    <li><a class="chart_pc" href="#">Total patient time in a year - Total population</a></li>
-                    <li><a class="chart_pc" href="#">Total patient time in a year - Female population</a></li>
-                    <li><a class="chart_pc" href="#">Total patient time in a year - Male population</a></li>
-                    <li><a class="chart_pc" href="#">Patient time</a></li>
-                    <li><a class="chart_pc" href="#">Patient time per patient before a year - Total population</a></li>
-                    <li><a class="chart_pc" href="#">Patient time per patient before a year - Female population</a></li>
-                    <li><a class="chart_pc" href="#">Patient time per patient before a year - Male population</a></li>
-                    <li><a class="chart_pc" href="#">Patient time per patient after a year - Total population</a></li>
-                    <li><a class="chart_pc" href="#">Patient time per patient after a year - Female population</a></li>
-                    <li><a class="chart_pc" href="#">Patient time per patient after a year - Male population</a></li>
-                    
-                  </ul>
-                  </li>
-                  </ul>
+                        <ul class="dropdown-menu">
+                            <!-- dropdown menu links -->                
+                            <li>
+                                <a id="chkpercentile1" href="#"> <i id="imatch" class="icon-ok icon-black active"></i>
+                                    1st Percentile
+                                </a>
+                            </li>
+                            <li>
+                                <a id="chkpercentile2" href="#"> <i id="iunmatch" class="icon-ok icon-black active"></i>
+                                    2nd Percentile
+                                </a>
+                            </li>
+                            <li>
+                                <a id="chkpercentil3" href="#">
+                                    <i id="iproximity" class="icon-ok icon-black active"></i>
+                                    3rd Percentile
+                                </a>
+                            </li>
+                            <li>
+                                <a id="chkMin" href="#">
+                                    <i id="iproximity" class="icon-ok icon-black active"></i>
+                                    Min
+                                </a>
+                            </li>
+                            <li>
+                                <a id="chkMax" href="#">
+                                    <i id="iproximity" class="icon-ok icon-black active"></i>
+                                    Max
+                                </a>
+                            </li>
+                            <li>
+                                <a id="proximity" href="#">
+                                    <i id="iproximity" class="icon-ok icon-black active"></i>
+                                    Count
+                                </a>
+                            </li>
+                            <li>
+                                <a id="proximity" href="#">
+                                    <i id="iproximity" class="icon-ok icon-black active"></i>
+                                    Mean
+                                </a>
+                            </li>
+                            <li>
+                                <a id="emptyrows" href="#">
+                                    <i id="iemptyrows" class="icon-ok icon-black disabled"></i>
+                                    Empty rows
+                                </a>
+                            </li>
+                        </ul>
+
+                    </div>
+                </div>
                 </div>
 
+                <div class="row">
+
+                <div class="well span3" id="pc_list">
+
+                    <ul class="nav nav-pills nav-stacked">
+                        <li>
+                            <a class="chart_pc" href="#" onclick="return false;">Birth dates</a>
+                        </li>
+                        <li>
+                            <a class="chart_pc" onclick="return false;" href="#">Start dates</a>
+                        </li>
+                        <li>
+                            <a class="chart_pc" onclick="return false;" href="#">End dates</a>
+                        </li>
+                        <li>
+                            <a class="chart_pc" onclick="return false;" href="#">Active patients</a>
+                        </li>
+                        <li>
+                            <a class="chart_pc" onclick="return false;" href="#">Age at start of year 2000</a>
+                        </li>
+                        <li>
+                            <a class="chart_pc" onclick="return false;" href="#">Age at start of year 2001</a>
+                        </li>
+                        <!-- You need to comple onclick="return false;" e to dynamically -->                
+
+                        <li>
+                            <a class="chart_pc" onclick="return false;" href="">Age at start of year - Total population</a>
+                        </li>
+                        <li>
+                            <a class="chart_pc" onclick="return false;" href="#">Age at start of year - Female population</a>
+                        </li>
+                        <li>
+                            <a class="chart_pc" onclick="return false;" href="#">Age at start of year - Male population</a>
+                        </li>
+                        <li>
+                            <a class="chart_pc" onclick="return false;" href="#">Age at start in calendar year 2000</a>
+                        </li>
+                        <!-- You need to comple onclick="return false;" e to dynamically -->                
+                        <li>
+                            <a class="chart_pc" onclick="return false;" href="#">Age at start - Total population</a>
+                        </li>
+                        <li>
+                            <a class="chart_pc" onclick="return false;" href="#">Age at start - Female population</a>
+                        </li>
+                        <li>
+                            <a class="chart_pc" onclick="return false;" href="#">Age at start - Male population</a>
+                        </li>
+                        <li>
+                            <a class="chart_pc" onclick="return false;" href="#">Age at end in calendar year 2001</a>
+                        </li>
+                        <li>
+                            <a class="chart_pc" onclick="return false;" href="#">Total patient time in a year - Total population</a>
+                        </li>
+                        <li>
+                            <a class="chart_pc" onclick="return false;" href="#">Total patient time in a year - Female population</a>
+                        </li>
+                        <li>
+                            <a class="chart_pc" onclick="return false;" href="#">Total patient time in a year - Male population</a>
+                        </li>
+                        <li>
+                            <a class="chart_pc" onclick="return false;" href="#">Patient time</a>
+                        </li>
+                        <li>
+                            <a class="chart_pc" onclick="return false;" href="#">Patient time per patient before a year - Total population</a>
+                        </li>
+                        <li>
+                            <a class="chart_pc" onclick="return false;" href="#">Patient time per patient before a year - Female population</a>
+                        </li>
+                        <li>
+                            <a class="chart_pc" onclick="return false;" href="#">Patient time per patient before a year - Male population</a>
+                        </li>
+                        <li>
+                            <a class="chart_pc" onclick="return false;" href="#">Patient time per patient after a year - Total population</a>
+                        </li>
+                        <li>
+                            <a class="chart_pc" onclick="return false;" href="#">Patient time per patient after a year - Female population</a>
+                        </li>
+                        <li>
+                            <a class="chart_pc" onclick="return false;" href="#">Patient time per patient after a year - Male population</a>
+                        </li>
+
+                    </ul>
+
+                </div>
+                
+                <div class="span6" id="chart">
+                <svg></svg>
+                </div>
+                
+
+                <div class="span3" id="">
+                    <div > Filter: </div>
+
+                    <div class="well">
+                        
+                    </div>
+                </div>
+
+
+                </div>
+
+                
+                
                 {% endif %}
 
               {% endif %}
@@ -265,13 +403,18 @@ path.link {
 
               <div class="tab-pane" id="documents">
                   {% if documents_available %}
-                    <p >
-                      The documents that are available will be listed below. 
-                    </p>
+                    <div class="docs_available"> 
+                        <p >
+                          The documents that are available will be listed below. 
+                        </p>
+                    </div>
 
                   {% else %}
                     <p class="nodocs">There is no documents for this fingerprint.</p>
                     <p class="nodocs">You can upload documents to associate them to the fingerprint browser</p>
+
+                    {% block documentsformupload %} 
+                    {% endblock%}
 
                   {% endif %}
                 
@@ -389,6 +532,7 @@ path.link {
 {% endcomment %}
 
 
+<script src="static/js/emif.documents.js"></script>
 <!-- The jQuery UI widget factory, can be omitted if jQuery UI is already included -->
 <script src="{{ STATIC_URL }}js/vendor/jquery.ui.widget.js"></script>
 <!-- The Load Image plugin is included for the preview images and image resizing functionality -->
@@ -419,7 +563,7 @@ function csrfSafeMethod(method) {
     return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
 }
 $(function () {
-  console.log("jquery upload - getting ready");
+  
     'use strict';
     var csrftoken = $.cookie('csrftoken');
     // Change this to the location of your server-side upload handler:
@@ -463,7 +607,7 @@ $(function () {
         previewMaxHeight: 100,
         previewCrop: true
     }).on('fileuploadadd', function (e, data) {
-        data.context = $('<div/>').appendTo('#files');
+        data.context = $('<div class="span6"/>').appendTo('#files');
         $.each(data.files, function (index, file) {
             var node = $('<p/>')
                     .append($('<span/>').text(file.name));

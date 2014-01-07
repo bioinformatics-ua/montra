@@ -213,20 +213,32 @@ div .tooltip {
 
 
 /**********************************************************************
-****** Documents 
+****** Documents ******************************************************
 **********************************************************************/
+
+#documents  {
+  font-weight: bold;
+  padding-left: 30px;
+}
+
 
 #documents .nodocs {
   font-weight: bold;
 }
 
-
-
-/** Population charactetistics */
+/**********************************************************************
+****** Population charactetistics *************************************
+**********************************************************************/
 
 #populationcharacteristics
 {
   height: 600px;
   padding-left: 30px;
 }
+
+.populationcharacteristicsbar {
+  padding-right: 70px;
+
+}
+
 

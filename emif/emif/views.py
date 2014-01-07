@@ -1113,8 +1113,6 @@ def createqsets(runcode, qsets=None, clean=True):
 
     return (qsets, name, db_owners, fingerprint_ttype)
 
-
-
 # TODO: move to another place, maybe API? 
 def get_api_info(fingerprint_id):
     """This is an auxiliar method to get the API Info

@@ -1,5 +1,22 @@
+# -*- coding: utf-8 -*-
 
-
+# Copyright (C) 2014 Luís A. Bastião Silva and Universidade de Aveiro
+#
+# Authors: Luís A. Bastião Silva <bastiao@ua.pt>
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
 
 import mimetypes
 import re
@@ -7,55 +24,21 @@ from django.core.urlresolvers import reverse
 
 # Code adapted from: https://github.com/sigurdga/django-jquery-file-upload
 
-def order_name(name):
-    """order_name -- Limit a text to 20 chars length, if necessary strips the
-    middle of the text and substitute it for an ellipsis.
+def serialize(instance, file_attr='file'):
+    """serialize -- Serialize a File instance into a dict.
 
-    name -- text to be limited.
-
-    """
-    name = re.sub(r'^.*/', '', name)
-    if len(name) <= 20:
-        return name
-    return name[:10] + "..." + name[-7:]
-
-
-
-
-
-def serialize_dummy(instance, file_attr='file'):
-    """serialize -- Serialize a Picture instance into a dict.
-
-    instance -- Picture instance
+    instance -- File instance
     file_attr -- attribute name that contains the FileField or ImageField
 
     """
     
     return {
-        'url': 'http://localhost',
-        'name': 'pic',
-        'type': 'image/png',
-        'thumbnailUrl': 'http://localhost',
-        'size': 45678,
-        'deleteUrl': 'http://localhost',
-        'deleteType': 'DELETE',
-    }
-
-
-def serialize(instance, file_attr='file'):
-    """serialize -- Serialize a Picture instance into a dict.
-
-    instance -- Picture instance
-    file_attr -- attribute name that contains the FileField or ImageField
-
-    """
-    obj = getattr(instance, file_attr)
-    return {
-        'url': obj.url,
-        'name': order_name(obj.name),
-        'type': mimetypes.guess_type(obj.path)[0] or 'image/png',
-        'thumbnailUrl': obj.url,
-        'size': obj.size,
-        'deleteUrl': reverse('upload-delete', args=[instance.pk]),
+        'url': '#',
+        'name': instance.name,
+        #'type': mimetypes.guess_type(obj.path)[0] or 'image/png',
+        'type': 'unknown',
+        'thumbnailUrl': '#',
+        'size': instance.size,
+        'deleteUrl': '#',
         'deleteType': 'DELETE',
     }
