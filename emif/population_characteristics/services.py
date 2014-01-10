@@ -80,6 +80,28 @@ class PopulationCharacteristic(JerboaFormat):
         values =  jerboa_collection.distinct( 'values.' +  param )
         return values
 
+    def get_variables_filter(self, gender=None, name1=None, value1=None, name2=None,
+        value2=None, var=None):
+        #db.jerboa_files.distinct( 'values.Var' )
+        values =  jerboa_collection.distinct( 'values.' +  param )
+        return values
+
+
+    def generic_filter(self, filters):
+        
+        json_acceptable_string = filters.replace("'", "\"")
+        print json_acceptable_string
+        d = json.loads(json_acceptable_string)
+        print d
+        values =  jerboa_collection.find(d)
+        r = []
+        for v in values:
+            v = unicode(v)
+            r.append(v);
+
+        return r
+
+
 
     def get_var(self):
         #db.jerboa_files.distinct( 'values.Var' )

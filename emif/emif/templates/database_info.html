@@ -339,6 +339,7 @@ svg {
                 </div>
                 
                 <div class="span6" id="chart">
+                <h2></h2>
                 <svg></svg>
                 </div>
                 
@@ -346,9 +347,11 @@ svg {
                 <div class="span3" id="">
                     <div > Filter: </div>
 
-                    <div class="well">
-                        
+                    <div id="pcBarContent" class="well">
+
                     </div>
+
+
                 </div>
 
 
@@ -531,8 +534,10 @@ svg {
 
 {% endcomment %}
 
-
+<script src="static/js/emif.populationcharacteristics.js"></script>
 <script src="static/js/emif.documents.js"></script>
+
+
 <!-- The jQuery UI widget factory, can be omitted if jQuery UI is already included -->
 <script src="{{ STATIC_URL }}js/vendor/jquery.ui.widget.js"></script>
 <!-- The Load Image plugin is included for the preview images and image resizing functionality -->

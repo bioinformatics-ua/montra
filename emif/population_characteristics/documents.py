@@ -114,6 +114,15 @@ def jerboa_list_values(request, param, template_name='documents_upload_form.html
     pc = PopulationCharacteristic(None)
     values = pc.get_variables(param)
     data = {'values': values}
+    response = JSONResponse(data, mimetype="application/json")
+    response['Content-Disposition'] = 'inline; filename=files.json'
+    return response
+
+def generic_filter(request, param, template_name='documents_upload_form.html'):
+
+    pc = PopulationCharacteristic(None)
+    values = pc.generic_filter(param)
+    data = {'values': values}
     response = JSONResponse(data, mimetype=response_mimetype(request))
     response['Content-Disposition'] = 'inline; filename=files.json'
     return response

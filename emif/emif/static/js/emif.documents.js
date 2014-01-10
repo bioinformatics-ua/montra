@@ -22,15 +22,52 @@ var eventToCatch = 'click';
 
 /* Population Characteristics */
 
-function PopulationCharacteristics (type) 
+
+function FingerprintPCAPI()
 {
-    this.handle_type_chart = function(e)     {
-            e.preventDefault();
-            e.stopPropagation();
-            console.log("Type of graph is: "); 
+
+    this.getGenericFilter = function()
+    {
+
+        var result = {}
+          
+        $.ajax({
+          dataType: "json",
+          url: "population/genericfilter/Var",
+          async: false,
+          data: result,
+          success: function (data){result=data;},
+        });
+        return result;
 
     };
 };
+
+
+function PopulationCharacteristics (type) 
+{
+    this.handle_type_chart = function(e)     {
+        e.preventDefault();
+        e.stopPropagation();
+        console.log("Type of graph is: "); 
+
+    };
+
+
+    this.handle_data = function(data){
+                    
+
+
+    };
+
+
+};
+
+
+
+
+
+
 
 /********************************************************
 **************** Document Manager - Uploads, etc 
@@ -43,42 +80,43 @@ function PopulationCharacteristics (type)
  (function( $ )
  {
 
+
     function exampleData() {
       return  [ 
          {
            key: "Cumulative Return",
            values: [
              { 
-               "label" : "CDS / Options" ,
-               "value" : -29.765957771107
+               "label" : "2000" ,
+               "value" : 30000
              } , 
              { 
-               "label" : "Cash" , 
-               "value" : 0
+               "label" : "2001" , 
+               "value" : 35000
              } , 
              { 
-               "label" : "Corporate Bonds" , 
-               "value" : 32.807804682612
+               "label" : "2002" , 
+               "value" : 25000
              } , 
              { 
-               "label" : "Equity" , 
-               "value" : 196.45946739256
+               "label" : "2003" , 
+               "value" : 29000
              } , 
              { 
-               "label" : "Index Futures" ,
-               "value" : 0.19434030906893
+               "label" : "2004" ,
+               "value" : 31000
              } , 
              { 
-               "label" : "Options" , 
-               "value" : -98.079782601442
+               "label" : "2005" , 
+               "value" : 35000
              } , 
              { 
-               "label" : "Preferred" , 
-               "value" : -13.925743130903
+               "label" : "2006" , 
+               "value" : 40000
              } , 
              { 
-               "label" : "Not Available" , 
-               "value" : -5.1387322875705
+               "label" : "2007" , 
+               "value" : 60000
              }
            ]
          }
@@ -99,7 +137,7 @@ function PopulationCharacteristics (type)
                    .x(function(d) { return d.label })
                    .y(function(d) { return d.value })
                    .staggerLabels(true)
-                   .tooltips(false)
+                   .tooltips(true)
                    .showValues(true)
              
                d3.select('#chart svg')
@@ -112,7 +150,7 @@ function PopulationCharacteristics (type)
                return chart;
              });
              
-
+            $("#chart h1").append("Number of patients yearly")
         },
         
     };

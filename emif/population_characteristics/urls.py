@@ -30,6 +30,8 @@ urlpatterns = patterns('',
     url(r'^jerboaupload$', 'population_characteristics.documents.jerboa_form_view_upload'),
     url(r'^jerboalistvalues/(?P<param>[^/]+)$', 'population_characteristics.documents.jerboa_list_values'),
 
+    url(r'^genericfilter/(?P<param>[^/]+)$', 'population_characteristics.documents.generic_filter'),
+
     url(r'^new/(?P<runcode>[^/]+)/(?P<qs>[-]{0,1}\d+)/$', 'population_characteristics.documents.document_form_view'),
     url(r'^parsejerboa$', 'population_characteristics.documents.parsejerboa'),
 )
