@@ -47,8 +47,8 @@ EMIF Platform - Fingerprint Browser
 5. Run
 
 
-        python manage.py migrate
         python manage.py syncdb
+        python manage.py migrate
         python manage.py loaddata emif\fixtures\emif_questionary_1.yaml
         python manage.py runserver
 
