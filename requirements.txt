@@ -16,9 +16,9 @@ pyparsing==1.5.6
 pytz==2012j
 textile==2.1.5
 wsgiref==0.1.2
-djangorestframework
-django-bootstrap-breadcrumbs
-django-bootstrap-pagination
+djangorestframework==2.2.6
+django-bootstrap-breadcrumbs==0.3
+django-bootstrap-pagination==0.1.10
 pysolr==3.0.6
 github3.py==0.7.0
 django-jenkins
