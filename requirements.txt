@@ -25,3 +25,4 @@ django-jenkins
 -e git://github.com/bioinformatics-ua/django-userena.git#egg=userena
 PIL==1.1.7
 geopy==0.96.2
+openpyxl==1.6.2
