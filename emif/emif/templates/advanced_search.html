@@ -7,6 +7,7 @@
 {% block headextra %}
 <script type="text/javascript" src="{{ STATIC_URL }}jquery.min.js"></script>
 <script type="text/javascript" src="{{ STATIC_URL }}questionset.js"></script>
+<link rel="stylesheet" href="{{ STATIC_URL }}css/vendor/chosen.css"></script>
 <link rel="stylesheet" href="{{ STATIC_URL }}progressbar.css"></script>
 {% for x in jsinclude %}
 <script type="text/javascript" src="{{ x }}"></script>
@@ -15,6 +16,8 @@
     {% for x in cssinclude %}
 <link rel="stylesheet" href="{{ x }}" type="text/css" />
 {% endfor %}
+
+
 
 {% if async_progress %}
 <script type="text/javascript">var progress_url = "{{ async_url }}";</script>
@@ -35,6 +38,23 @@
 
    <div class="span12" style="text-align:center">
     <h2>Advanced Search</h2>
+
+    <div>
+  <em>Filter: </em>
+          <select data-placeholder="Your Favorite Football Team" style="width:600px;" class="chosen-select" multiple tabindex="6">
+            <option value=""></option>
+            <optgroup label="NFC EAST">
+              <option>MCI - definition: Neuropsychological Test, Functional impairment (eg CDR)</option>
+              <option>Medication use: Collected</option>
+              <option>Urine: Routine</option>  
+
+            </optgroup>
+            
+          </select>
+        
+    </div>
+
+
   </div>
 
   </div>
@@ -70,8 +90,14 @@
 
 </div>
 </div>
+
+<div style="overflow-y:scroll;height:800px;">
 {% include "fingerprint_search.html" %}
 </div>
+
+</div>
+<script type="text/javascript" src="{{ STATIC_URL }}js/vendor/chosen.jquery.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}js/emif.advanced_search.js"></script>
 <script type="text/javascript">
         {% for trigger in triggers %}
             addtrigger("{{trigger}}");
