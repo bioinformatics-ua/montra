@@ -88,35 +88,44 @@ function PopulationCharacteristics (type)
            values: [
              { 
                "label" : "2000" ,
-               "value" : 30000
+               "value" : 30000,
+               "color" : "#0000ff",
              } , 
              { 
                "label" : "2001" , 
-               "value" : 35000
+               "value" : 35000,
+               "color" : "#0000ff",
              } , 
              { 
                "label" : "2002" , 
-               "value" : 25000
+               "value" : 25000,
+               "color" : "#0000ff",
              } , 
              { 
                "label" : "2003" , 
-               "value" : 29000
+               "value" : 29000,
+               "color" : "#0000ff",
              } , 
              { 
                "label" : "2004" ,
-               "value" : 31000
+               "value" : 31000,
+               "color" : "#0000ff",
              } , 
              { 
                "label" : "2005" , 
-               "value" : 35000
+               "value" : 35000,
+               "color" : "#0000ff",
              } , 
              { 
                "label" : "2006" , 
-               "value" : 40000
+               "value" : 40000,
+               "color" : "#0000ff",
              } , 
              { 
                "label" : "2007" , 
-               "value" : 60000
+               "value" : 60000,
+               "color" : "#0000ff",
+
              }
            ]
          }
@@ -136,7 +145,7 @@ function PopulationCharacteristics (type)
                var chart = nv.models.discreteBarChart()
                    .x(function(d) { return d.label })
                    .y(function(d) { return d.value })
-                   .staggerLabels(true)
+                   .staggerLabels(false)
                    .tooltips(true)
                    .showValues(true)
              
