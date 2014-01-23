@@ -293,6 +293,10 @@ function json_to_table(obj) {
 var json_aux = '{{apiinfo}}';
 console.log("ayx" + json_aux.length);
 console.log("ayx" + json_aux);
+
+
+
+$( document ).ready(function() {
 if (json_aux == '' || json_aux == null || json_aux.length == 2) {
     $("#pivot_table_extra_information").html('No information available. You can add information from external applications with API web services.');
 } else {
@@ -306,11 +310,8 @@ if (json_aux == '' || json_aux == null || json_aux.length == 2) {
     json.y0 = 0;
 
     update(root = json);
-
-
     $("#pivot_table_extra_information").html(json_to_table(json2));
-}
-
+}});
 
 
 
