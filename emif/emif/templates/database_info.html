@@ -1,10 +1,36 @@
-{% extends 'base.html' %} {% load url from future %} {% load extra_tags %} {% load django_bootstrap_breadcrumbs %} {% block headextra %}
+{% extends 'base.html' %} 
+{% load url from future %} 
+{% load extra_tags %} 
+{% load django_bootstrap_breadcrumbs %} 
 
-<script src="static/js/vendor/threadpool.js"></script>
-<script src="static/js/d3/d3.v3.min.js"></script>
-<script src="static/js/d3/d3.layout.cloud.js"></script>
+{% block headextra %}
 
-<link rel="stylesheet" href="static/css/database_info.css">{% endblock %} {% block breadcrumbs %} {{ block.super }} {% if style == '1' %} {% breadcrumb "Databases" "databases" %} {% breadcrumb "List" "databases" %} {% else %} {% breadcrumb "Databases" "alldatabases" %} {% breadcrumb "List" "alldatabases" %} {% endif %} {% breadcrumb breadcrumb_name "" %} {% endblock %} {% block toolbar %} {% include "menu_toolbar.html" with collapse=collapseall %} {% endblock %} {% block content %} {% if qsets %}
+<script src="{{ STATIC_URL}}js/vendor/threadpool.js"></script>
+<script src="{{ STATIC_URL}}js/d3/d3.v3.min.js"></script>
+<script src="{{ STATIC_URL}}js/d3/d3.layout.cloud.js"></script>
+
+<link rel="stylesheet" href="{{ STATIC_URL}}css/database_info.css" />
+
+{% endblock %} 
+
+{% block breadcrumbs %} 
+{{ block.super }} 
+    {% if style == '1' %} 
+        {% breadcrumb "Databases" "databases" %} 
+        {% breadcrumb "List" "databases" %} 
+    {% else %} 
+        {% breadcrumb "Databases" "alldatabases" %} 
+        {% breadcrumb "List" "alldatabases" %} 
+    {% endif %} 
+    {% breadcrumb breadcrumb_name "" %} 
+{% endblock %} 
+
+{% block toolbar %} 
+    {% include "menu_toolbar.html" with collapse=collapseall %} 
+{% endblock %} 
+
+{% block content %} 
+{% if qsets %}
 
 <div class="span12">
     <div class="row-fluid">
@@ -127,10 +153,9 @@
             </div>
         </div>
     </div>
+</div>
     {% endif %}
-</div>
 
-</div>
 <!-- Display a message to users with Javascript deactivated -->
 <noscript>
     <div style="position:absolute;top:0;left:0;width:500px;height:250px;border:2px solid #A00;padding:6px;background-color:#fff;color:#600;text-align:center">
@@ -145,7 +170,7 @@
 {% endblock %} {% block scriptextraincludes %}
 <!-- Include the widget embedding script -->
 <script src="//bioinformatics.ua.pt/becas/embed-widget.js"></script>
-<script src="static/js/database_info.js"></script>
+<script src="{{ STATIC_URL}}js/database_info.js"></script>
 {% endblock %}
 
 

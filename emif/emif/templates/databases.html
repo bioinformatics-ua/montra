@@ -28,15 +28,15 @@ button {
 {% endblock %}
 
 {% block headextra %}
-<link rel="stylesheet" href="static/css/theme.blue.css">
+<link rel="stylesheet" href="{{ STATIC_URL }}css/theme.blue.css">
 {% endblock %}
 
 
 
 {% block scriptextraincludes %}
 
-<script src="static/js/vendor/jquery.tablesorter.min.js"></script>
-<script src="static/js/vendor/jquery.tablesorter.widgets.js"></script>
+<script src="{{ STATIC_URL }}js/vendor/jquery.tablesorter.min.js"></script>
+<script src="{{ STATIC_URL }}js/vendor/jquery.tablesorter.widgets.js"></script>
 {% endblock %}
 
 
@@ -60,7 +60,7 @@ button {
         
         {% for t in list_databases %}
         <tr>
-            <td><img src="static/upload_images/{{t.logo}}" width="50px" height="50px"/></td>
+            <td><img class="db_logo" src="{{ STATIC_URL }}upload_images/{{t.logo}}" width="50px" height="50px" /></td>
           <td>
             <a href="fingerprint/{{ t.id }}/1">{{ t.name }}</a>
             
@@ -79,9 +79,9 @@ button {
           <td>{{ t.type_name }} </td>
           <td style="width:100px">
           
-            <a  href="dbEdit/{{t.id}}/{{t.ttype}}" title="Edit Database"><img src="static/img/glyphicons_150_edit.png"  /></a>
-            <a href="#" onclick="return false;"  class="confirm-delete" data-id="{{ t.id }}"  title="Remove Database"><img src="static/img/glyphicons_192_circle_remove.png"/></a>
-              <a href="#" onclick="return false;" class="sharedb" data-id="{{ t.id }}" title="Share Database" ><img src="static/img/glyphicons_308_share_alt.png"/></a>
+            <a  href="dbEdit/{{t.id}}/{{t.ttype}}" title="Edit Database"><img src="{{ STATIC_URL }}img/glyphicons_150_edit.png"  /></a>
+            <a href="#" onclick="return false;"  class="confirm-delete" data-id="{{ t.id }}"  title="Remove Database"><img src="{{ STATIC_URL }}img/glyphicons_192_circle_remove.png"/></a>
+              <a href="#" onclick="return false;" class="sharedb" data-id="{{ t.id }}" title="Share Database" ><img src="{{ STATIC_URL }}img/glyphicons_308_share_alt.png"/></a>
           
             </td>
 
@@ -201,7 +201,6 @@ $(function() {
   });
 
 });
-
 
 $('#li_workspace').addClass("active");
 

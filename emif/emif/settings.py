@@ -20,7 +20,6 @@
 # Django settings for emif project.
 import os.path
 
-
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
@@ -130,7 +129,7 @@ else:
 
 # URL prefix for static files.
 # Example: "http://media.lawrence.com/static/"
-STATIC_URL = BASE_URL + 'static/'
+STATIC_URL = BASE_URL+'static/'
 
 # Additional locations of static files
 STATICFILES_DIRS = (

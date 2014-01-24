@@ -5,19 +5,23 @@
 .img-rounded{behavior:url(static/js/vendor/PIE.htc)}
 .img-circle{behavior:url(static/js/vendor/PIE.htc)}
 .table-bordered{behavior:url(static/js/vendor/PIE.htc)}
-select,textarea,input,code,pre{behavior:url(static/js/vendor/PIE.htc)}
+select,textarea, input,code,pre{behavior:url(static/js/vendor/PIE.htc)}
 .input-group-addon{
     behavior:url(static/js/vendor/PIE.htc);
 }
-input{
+.navbar-search input, .navbar-form input{
     position: relative !important;
+}
+.tablesorter-filter-row input{
+    behavior: none !important;
 }
 .btn {
     position: relative !important;
     box-shadow: none;   
-
+    -pie-background: linear-gradient(top, #FFFFFF, #e6e6e6); 
     behavior: url(static/js/vendor/PIE.htc);
 }
+
 .panel{behavior:url(static/js/vendor/PIE.htc)}
 .well{behavior:url(static/js/vendor/PIE.htc)}
 .nav-tabs > li > a{behavior:url(static/js/vendor/PIE.htc)}
@@ -42,11 +46,6 @@ input{
 .carousel-indicators li{behavior:url(static/js/vendor/PIE.htc)}
 .jumbotron{behavior:url(static/js/vendor/PIE.htc)}
 
-/* Normal button */
-.btn {
-  -pie-background: linear-gradient(top, #FFFFFF, #e6e6e6); 
-  behavior: url(static/js/vendor/PIE.htc);
-}
 .btn:hover,
 .btn:active,
 .btn.active,
@@ -132,4 +131,10 @@ input{
 .btn-inverse[disabled] {
   -pie-background: linear-gradient(top, #222222, #222222); 
   behavior: url(static/js/vendor/PIE.htc); 
+}
+.lt-ie9 .db_logo {
+    width: 50px;
+}
+.lt-ie9 td {
+    display: block !important;
 }

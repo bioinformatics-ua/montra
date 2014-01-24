@@ -1073,7 +1073,6 @@ def createqsets(runcode, qsets=None, clean=True):
     
     return (qsets, name)
 
-
 def fingerprint(request, runcode, qs, template_name='database_info.html'):
     qsets, name = createqsets(runcode)
 
@@ -1089,6 +1088,7 @@ def fingerprint(request, runcode, qs, template_name='database_info.html'):
         return result
 
     apiinfo = json.dumps(get_api_info(runcode));
+    
     return render(request, template_name, 
         {'request': request, 'qsets': qsets, 'export_bd_answers': True, 'apiinfo': apiinfo, 'fingerprint_id': runcode,
                    'breadcrumb': True, 'breadcrumb_name': name.decode('ascii', 'ignore'), 'style': qs, 'collapseall': False})
@@ -2310,7 +2310,7 @@ def import_questionnaire(request, template_name='import_questionnaire.html'):
     # wb = load_workbook(filename = r'/Volumes/EXT1/Dropbox/MAPi-Dropbox/EMIF/Code/emif/emif/questionnaire_ad_v2.xlsx')
     # wb = load_workbook(filename = r'/Volumes/EXT1/Dropbox/MAPi-Dropbox/EMIF/Observational_Data_Sources_Template_v5.xlsx')
     # wb = load_workbook(filename = r'C:/Questionnaire_template_v3.4.xlsx')
-    wb = load_workbook(filename =r'/Volumes/EXT1/trash/Questionnaire_template_v3.5.xlsx')
+    wb = load_workbook(filename =r'/Users/ribeiro/Downloads/Questionnaire_template_v3.5.3.xlsx')
     ws = wb.get_active_sheet()
     log = ''
 
