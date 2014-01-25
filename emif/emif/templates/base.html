@@ -37,8 +37,12 @@
         </style>
          <script src="{{ STATIC_URL }}js/vendor/modernizr-2.6.2.min.js"></script>
         <!--[if lt IE 9]>
-            <link rel="stylesheet" href="{{ STATIC_URL }}css/bootstrap_ie_compatibility.css">
+            <link rel="stylesheet" href="{% url 'emif.views.bootstrap_ie_compatibility' %}">
+
             <script src="{{ STATIC_URL }}js/vendor/respond.min.js"></script>
+
+            <script type="text/javascript" src="{{ STATIC_URL }}js/vendor/aight.min.js"></script>
+
         <![endif]-->
         
         {% block headextra %}
@@ -64,14 +68,14 @@
                             <li id="li_workspace" class="dropdown">
                             <a href="#" class="dropdown-toggle" data-toggle="dropdown">Workspace <b class="caret"></b></a>
                             <ul class="dropdown-menu">
-                              <li><a href="databases">My Databases</a></li>
-                              <li><a href="alldatabases">All Databases</a></li>
+                              <li><a href="{% url 'emif.views.databases' %}">My Databases</a></li>
+                              <li><a href="{% url 'emif.views.all_databases' %}">All Databases</a></li>
 
                               
                               {% comment %}
-                              <li><a href="databases">Edit Databases</a></li>
-                              <li><a href="databases">Query History</a></li>
-                              <li><a href="databases">Timeline</a></li>
+                              <li><a href="{% url 'emif.views.databases' %}">Edit Databases</a></li>
+                              <li><a href="{% url 'emif.views.databases' %}">Query History</a></li>
+                              <li><a href="{% url 'emif.views.databases' %}">Timeline</a></li>
                               {% endcomment %}
 			      {% comment %}
 
@@ -89,7 +93,7 @@
                               {% comment %}
                               <li class="divider"></li>
 
-                              <li><a href="databases">Subscribe interests</a></li>
+                              <li><a href="{% url 'emif.views.databases' %}">Subscribe interests</a></li>
                               {% endcomment %}
                               <li class="divider"></li>
 
@@ -101,7 +105,7 @@
                             </li>
                                 {% comment %}<li class="divider"></li>
                                 <li>{% if request.user.is_superuser %}
-                                    <a href="import-questionnaire">Import Questionnaire</a>
+                                    <a href="{% url 'emif.views.import-questionnaire' %}">Import Questionnaire</a>
                                 {% endif %}
 
                                 </li>{% endcomment %}
@@ -110,7 +114,7 @@
                           </li>
 
                           {% comment %}
-                            <li id="li_search"><a href="search">Quick Search</a></li>
+                            <li id="li_search"><a href="{% url 'emif.views.quick_search' %}">Quick Search</a></li>
                            {% endcomment %}
 
                           <!-- <li id="li_advanced_search" class="dropdown">

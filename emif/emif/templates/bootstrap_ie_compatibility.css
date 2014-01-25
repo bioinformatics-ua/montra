@@ -1,0 +1,140 @@
+/* Base Reference for transformation from https://gist.github.com/coliff/5618329 to add CSS3PIE to bootstrap
+   Decided to also  fix the gradients to comply with default look (using pie defined manners)
+*/
+
+.img-rounded{behavior:url({{ STATIC_URL }}js/vendor/PIE.htc)}
+.img-circle{behavior:url({{ STATIC_URL }}js/vendor/PIE.htc)}
+.table-bordered{behavior:url({{ STATIC_URL }}js/vendor/PIE.htc)}
+select,textarea, input,code,pre{behavior:url({{ STATIC_URL }}js/vendor/PIE.htc)}
+.input-group-addon{
+    behavior:url({{ STATIC_URL }}js/vendor/PIE.htc);
+}
+.navbar-search input, .navbar-form input{
+    position: relative !important;
+}
+.tablesorter-filter-row input{
+    behavior: none !important;
+}
+.btn {
+    position: relative !important;
+    box-shadow: none;   
+    -pie-background: linear-gradient(top, #FFFFFF, #e6e6e6); 
+    behavior: url({{ STATIC_URL }}js/vendor/PIE.htc);
+}
+
+.panel{behavior:url({{ STATIC_URL }}js/vendor/PIE.htc)}
+.well{behavior:url({{ STATIC_URL }}js/vendor/PIE.htc)}
+.nav-tabs > li > a{behavior:url({{ STATIC_URL }}js/vendor/PIE.htc)}
+.nav-pills > li > a{behavior:url({{ STATIC_URL }}js/vendor/PIE.htc)}
+.navbar{behavior:url({{ STATIC_URL }}js/vendor/PIE.htc)}
+.navbar-nav > li > a{behavior:url({{ STATIC_URL }}js/vendor/PIE.htc)}
+.navbar-toggle{behavior:url({{ STATIC_URL }}js/vendor/PIE.htc)}
+.navbar-toggle .icon-bar{behavior:url({{ STATIC_URL }}js/vendor/PIE.htc)}
+.breadcrumb{behavior:url({{ STATIC_URL }}js/vendor/PIE.htc)}
+.pagination{behavior:url({{ STATIC_URL }}js/vendor/PIE.htc)}
+.pager li > a,.pager li > span{behavior:url({{ STATIC_URL }}js/vendor/PIE.htc)}
+.modal-content{behavior:url({{ STATIC_URL }}js/vendor/PIE.htc)}
+.tooltip-inner{behavior:url({{ STATIC_URL }}js/vendor/PIE.htc)}
+.popover{behavior:url({{ STATIC_URL }}js/vendor/PIE.htc)}
+.popover-title{behavior:url({{ STATIC_URL }}js/vendor/PIE.htc)}
+.alert{behavior:url({{ STATIC_URL }}js/vendor/PIE.htc)}
+.thumbnail,.img-thumbnail{behavior:url({{ STATIC_URL }}js/vendor/PIE.htc)}
+.label{behavior:url({{ STATIC_URL }}js/vendor/PIE.htc)}
+.badge{behavior:url({{ STATIC_URL }}js/vendor/PIE.htc)}
+.progress{behavior:url({{ STATIC_URL }}js/vendor/PIE.htc)}
+.accordion-group{behavior:url({{ STATIC_URL }}js/vendor/PIE.htc)}
+.carousel-indicators li{behavior:url({{ STATIC_URL }}js/vendor/PIE.htc)}
+.jumbotron{behavior:url({{ STATIC_URL }}js/vendor/PIE.htc)}
+
+.btn:hover,
+.btn:active,
+.btn.active,
+.btn.disabled,
+.btn[disabled] {
+  -pie-background: linear-gradient(top, #e6e6e6, #e6e6e6); 
+  behavior: url({{ STATIC_URL }}js/vendor/PIE.htc);
+}
+/* Primary button */
+.btn-primary {
+  -pie-background: linear-gradient(top, #0088cc, #0044cc); 
+  behavior: url({{ STATIC_URL }}js/vendor/PIE.htc);    
+}
+.btn-primary:hover,
+.btn-primary:active,
+.btn-primary.active,
+.btn-primary.disabled,
+.btn-primary[disabled] {
+  -pie-background: linear-gradient(top, #0044cc, #0044cc); 
+  behavior: url({{ STATIC_URL }}js/vendor/PIE.htc);  
+}
+/* Warning button */
+.btn-warning {
+  -pie-background: linear-gradient(top, #fbb450, #f89406); 
+  behavior: url({{ STATIC_URL }}js/vendor/PIE.htc);    
+}
+.btn-warning:hover,
+.btn-warning:active,
+.btn-warning.active,
+.btn-warning.disabled,
+.btn-warning[disabled] {
+  -pie-background: linear-gradient(top, #f89406, #f89406); 
+  behavior: url({{ STATIC_URL }}js/vendor/PIE.htc);    
+}
+/* Danger button */
+.btn-danger {
+    -pie-background: linear-gradient(top, #ee5f5b, #bd362f); 
+  behavior: url({{ STATIC_URL }}js/vendor/PIE.htc);
+}
+.btn-danger:hover,
+.btn-danger:active,
+.btn-danger.active,
+.btn-danger.disabled,
+.btn-danger[disabled] {
+    -pie-background: linear-gradient(top, #bd362f, #bd362f); 
+  behavior: url({{ STATIC_URL }}js/vendor/PIE.htc);
+}
+/* Success button */
+.btn-success {
+    -pie-background: linear-gradient(top, #62c462, #51a351);
+    behavior: url({{ STATIC_URL }}js/vendor/PIE.htc);
+}
+.btn-success:hover,
+.btn-success:active,
+.btn-success.active,
+.btn-success.disabled,
+.btn-success[disabled] {
+  -pie-background: linear-gradient(top, #51a351, #51a351);
+  behavior: url({{ STATIC_URL }}js/vendor/PIE.htc);
+}
+/* Info button */
+.btn-info {
+  -pie-background: linear-gradient(top, #5bc0de, #2f96b4); 
+  behavior: url({{ STATIC_URL }}js/vendor/PIE.htc);    
+}
+.btn-info:hover,
+.btn-info:active,
+.btn-info.active,
+.btn-info.disabled,
+.btn-info[disabled] {
+  -pie-background: linear-gradient(top, #2f96b4, #2f96b4); 
+  behavior: url({{ STATIC_URL }}js/vendor/PIE.htc);      
+}
+/* Inverse button */
+.btn-inverse {
+  -pie-background: linear-gradient(top, #444444, #222222); 
+  behavior: url({{ STATIC_URL }}js/vendor/PIE.htc); 
+}
+.btn-inverse:hover,
+.btn-inverse:active,
+.btn-inverse.active,
+.btn-inverse.disabled,
+.btn-inverse[disabled] {
+  -pie-background: linear-gradient(top, #222222, #222222); 
+  behavior: url({{ STATIC_URL }}js/vendor/PIE.htc); 
+}
+.lt-ie9 .db_logo {
+    width: 50px;
+}
+.lt-ie9 td {
+    display: block !important;
+}

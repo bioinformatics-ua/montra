@@ -48,6 +48,9 @@ urlpatterns = patterns('',
     
     url(r'^about$', 'emif.views.about'),
 
+    # must do this to be able to use custom paths on this css file
+    url(r'^bootstrap_ie_compatibility$', 'emif.views.bootstrap_ie_compatibility'),
+    
     # Quick Search
     url(r'^search$', 'emif.views.quick_search'),
 
@@ -94,8 +97,8 @@ urlpatterns = patterns('',
     url(r'^databases$', 'emif.views.databases', name="databases"),
     url(r'^alldatabases$', 'emif.views.all_databases'),
     url(r'^alldatabases/data-table$', 'emif.views.all_databases_data_table'),
-    url(r'^export_all_answers', 'emif.views.export_all_answers'),
-    url(r'^export_my_answers', 'emif.views.export_my_answers'),
+    url(r'^export_all_answers$', 'emif.views.export_all_answers'),
+    url(r'^export_my_answers$', 'emif.views.export_my_answers'),
     url(r'^export_bd_answers/(?P<runcode>[^/]+)/$', 'emif.views.export_bd_answers'),
     url(r'^import-questionnaire', 'emif.views.import_questionnaire'),
     url(r'^delete-questionnaire/(?P<qId>[0-9]+)/$', 'utils.delete_questionnaire.delete'),

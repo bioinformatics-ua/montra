@@ -73,6 +73,8 @@ def index(request, template_name='index.html'):
 def about(request, template_name='about.html'):
     return render(request, template_name, {'request': request, 'breadcrumb': True})
 
+def bootstrap_ie_compatibility(request, template_name='bootstrap_ie_compatibility.css'):
+    return render(request, template_name, {'request': request, 'breadcrumb': False})
 
 def quick_search(request, template_name='quick_search.html'):
     return render(request, template_name, {'request': request})
