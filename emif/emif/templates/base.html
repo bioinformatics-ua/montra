@@ -11,12 +11,13 @@
 <!--[if (gt IE 9)|!(IE)]><!--> <html lang="en" class="no-js"> <!--<![endif]-->
 
     <head>
+        <!-- This is WRONG and just for testing, on deploy it must be changed to static base url -->
+        <base href="http://{{request.get_host}}">
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
         <title>{% block title %}EMIF Catalogue{% endblock title %}</title>
         <meta name="description" content="EMIF Catalogue">
         <meta name="viewport" content="width=device-width">
-        <base href="/">
         <link rel="shortcut icon" href="{{ STATIC_URL }}img/favicon.ico" type="image/x-icon" />
         <link rel="stylesheet" href="{{ STATIC_URL }}css/bootstrap.min.css">
         <link rel="stylesheet" href="{{ STATIC_URL }}font-awesome-4.0.3/css/font-awesome.min.css">
@@ -146,8 +147,8 @@
                                 </ul>
                             {% endif %}
                         </li>
-                            <li id="li_feedback"><a href="feedback">Feedback</a></li>
-                            <li id="li_about"><a href="about">About</a></li>
+                            <li id="li_feedback"><a href="{% url 'emif.views.feedback' %}">Feedback</a></li>
+                            <li id="li_about"><a href="{% url 'emif.views.about' %}">About</a></li>
 
                             
 
