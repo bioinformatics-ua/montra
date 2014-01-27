@@ -6,8 +6,6 @@
 {% block headextra %}
 
 <script src="{{ STATIC_URL}}js/vendor/threadpool.js"></script>
-<script src="{{ STATIC_URL}}js/d3/d3.v3.min.js"></script>
-<script src="{{ STATIC_URL}}js/d3/d3.layout.cloud.js"></script>
 
 <link rel="stylesheet" href="{{ STATIC_URL}}css/database_info.css" />
 
@@ -170,7 +168,10 @@
 {% endblock %} {% block scriptextraincludes %}
 <!-- Include the widget embedding script -->
 <script src="//bioinformatics.ua.pt/becas/embed-widget.js"></script>
+<script src="{{ STATIC_URL}}js/d3/d3.v3.min.js"></script>
+<script src="{{ STATIC_URL}}js/d3/d3.layout.cloud.js"></script>
 <script src="{{ STATIC_URL}}js/database_info.js"></script>
+
 {% endblock %}
 
 

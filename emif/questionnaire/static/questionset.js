@@ -42,7 +42,11 @@ function dep_check(expr) {
 }
 
 function getChecksAttr(obj) {
-    return obj.getAttribute('checks');
+    /* while most browser consider getAttributes a function, IE 9< considers it a object
+     * So its actually better to use jquery for this
+    return obj.getAttribute('checks'); */
+    var $obj = $(obj);
+    return $obj.attr('checks');
 }
 
 function statusChanged(obj, res) {

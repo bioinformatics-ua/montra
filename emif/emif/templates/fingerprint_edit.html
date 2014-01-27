@@ -20,7 +20,7 @@
     <div id="qs_{{ k.sortid }}" class="{% if k.sortid == 0 %} {% else %} hide {% endif %} questionset">
 
     {% if k.sortid != 0 and k.sortid != 99 %}
-        <div><a id="collapseall_qs_{{ k.sortid }}"  class="btn pull-right" href="">Collapse all </a></div>
+        <div><a id="collapseall_qs_{{ k.sortid }}"  class="btn pull-right" href="#">Collapse all </a></div>
     {% endif %}
 
     <div class="questionset-title" style="font-size:6px">
@@ -67,7 +67,7 @@
                                 </a></span>
                             {% endif %}
                             <span class="pull-right">
-                                <a href="" onclick="toggle_comments({{question.number|removedots}}); return false;"><i class="fa {% if qdict.comment %} fa-comment {% else %} fa-comment-o {% endif %}">&nbsp;</i></a>
+                                <a href="#" onclick="toggle_comments('{{question.number|removedots}}'); return false;"><i class="fa {% if qdict.comment %} fa-comment {% else %} fa-comment-o {% endif %}">&nbsp;</i></a>
                             </span>
                             <span class="pull-right answered hide" id="answered_{{ question.number|removedots }}">
                                 <i class="fa fa-check-square-o fa-green">&nbsp;</i>
@@ -108,7 +108,7 @@
                                     </span>
                                     {% endif %}
                                     <span class="pull-right">
-                                        <a href="" onclick="toggle_comments({{question.number|removedots}}); return false;"><i class="fa {% if qdict.comment %} fa-comment {% else %} fa-comment-o {% endif %}">&nbsp;</i></a>
+                                        <a href="#" onclick="toggle_comments('{{question.number|removedots}}'); return false;"><i class="fa {% if qdict.comment %} fa-comment {% else %} fa-comment-o {% endif %}">&nbsp;</i></a>
                                     </span>
                                     <span class="pull-right answered hide" id="answered_{{ question.number|removedots }}">
                                         <i class="fa fa-check-square-o fa-green">&nbsp;</i>
@@ -128,7 +128,7 @@
                                     {% endif %}
                                     {% include qdict.template %}
                                     <div id="comments_{{question.number|removedots}}" style="display:none;margin-left:40px;">
-                                     <a href="" class="span6" onclick="toggle_comments({{question.number|removedots}}); return false;"><i class="fa fa-comment-o">&nbsp;</i> Comments</a>
+                                     <a href="#" class="span6" onclick="toggle_comments('{{question.number|removedots}}'); return false;"><i class="fa fa-comment-o">&nbsp;</i> Comments</a>
                                     <textarea style=" background-color:#EEE;color: #000;" class="span6" name="comment_question_{{ question.number }}" cols="50" rows="5">{{qdict.comment}}</textarea>
                                     </div>
                                 </div>
