@@ -230,7 +230,7 @@ select,textarea, input,code,pre{behavior:url({{ STATIC_URL }}js/vendor/PIE.htc)}
 }
 
 .navbar-search{
-float: left !important;
+    float: left !important;
 }
 
 #auth-logged-out{
@@ -238,6 +238,7 @@ float: left !important;
 }
 #auth-logged-in{
     width: 70px !important;
+    
 }
 #accordion1{
 clear: both;
@@ -276,4 +277,11 @@ padding: 2px;
 }
 .lt-ie8 table.tablesorter thead tr .tablesorter-headerAsc, table.tablesorter thead tr .tablesorter-headerDesc {
     background-color: #8dbdd8;
+}
+
+.gt-ie7 #li_feedback, 
+.gt-ie7 #li_about, 
+.gt-ie7 #auth-logged-in{
+    margin-top: -30px !important;
+    
 }

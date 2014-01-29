@@ -160,7 +160,6 @@
                           </li>
                         </ul>
                         {% endif %}
-
                         <ul class="nav pull-right">
                             {% if not request.user.is_authenticated %}
                             <li class="dropdown">
@@ -188,7 +187,7 @@
                             </li>
 
 
-                            
+                        
                         {% block headerlogin %} 
                         {% if not request.user.is_authenticated %}
                             <li id="auth-logged-out">
@@ -201,20 +200,19 @@
                             </li>
                         {% else %}
                             <li id="auth-logged-in">
-                        <p class="navbar-text pull-right">
+                                <p class="navbar-text pull-right">
 
                             
                             {% comment %}
-                            <em>{{ request.user.get_full_name }}{% endcomment %}</em>[
+                                <em>{{ request.user.get_full_name }}
+                            {% endcomment %}</em>[
                             <a href="{% url 'userena_signout' %}" class="navbar-link">Sign out</a>]
                         </p>
                         
                             </li>
                     {% endif %} 
                     {% endblock %}
-                            
                         </ul>
-
 
                 </div>
                 <!--/.nav-collapse -->
