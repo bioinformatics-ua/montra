@@ -1,45 +1,45 @@
-{% load url from future %}
-{% load extra_tags %}
-{% load django_bootstrap_breadcrumbs %}
-{% load staticfiles %}
+{% load url from future %} {% load extra_tags %} {% load django_bootstrap_breadcrumbs %} {% load staticfiles %}
 
 <!DOCTYPE html>
 <!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
 <!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
 <!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
 <!--[if IE 9 ]>    <html class="no-js ie9"> <![endif]-->
-<!--[if (gt IE 9)|!(IE)]><!--> <html lang="en" class="no-js"> <!--<![endif]-->
+<!--[if (gt IE 9)|!(IE)]><!-->
+<html lang="en" class="no-js">
+<!--<![endif]-->
 
-    <head>
-        <!-- This is WRONG and just for testing, on deploy it must be changed to static base url -->
-        <base href="http://{{request.get_host}}">
-        <meta charset="utf-8">
-        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-        <title>{% block title %}EMIF Catalogue{% endblock title %}</title>
-        <meta name="description" content="EMIF Catalogue">
-        <meta name="viewport" content="width=device-width">
-        <link rel="shortcut icon" href="{{ STATIC_URL }}img/favicon.ico" type="image/x-icon" />
-        <link rel="stylesheet" href="{{ STATIC_URL }}css/bootstrap.min.css">
-        <link rel="stylesheet" href="{{ STATIC_URL }}font-awesome-4.0.3/css/font-awesome.min.css">
-        <style>
-            body {
+<head>
+    <!-- This is WRONG and just for testing, on deploy it must be changed to static base url -->
+    <base href="http://{{request.get_host}}">
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>{% block title %}EMIF Catalogue{% endblock title %}</title>
+    <meta name="description" content="EMIF Catalogue">
+    <meta name="viewport" content="width=device-width">
+    <link rel="shortcut icon" href="{{ STATIC_URL }}img/favicon.ico" type="image/x-icon" />
+    <link rel="stylesheet" href="{{ STATIC_URL }}css/bootstrap.min.css">
+    <link rel="stylesheet" href="{{ STATIC_URL }}font-awesome-4.0.3/css/font-awesome.min.css">
+    <style>
+        body {
                 padding-top: 60px;
                 padding-bottom: 40px;
             }
             .navbar .nav.pull-right {
                 margin-left: 5px;
             }
-        </style>
-        <link rel="stylesheet" href="{{ STATIC_URL }}css/bootstrap-responsive.min.css">
-        <link rel="stylesheet" href="{{ STATIC_URL }}css/main.css">
-        <style type="text/css">
+    </style>
+    <link rel="stylesheet" href="{{ STATIC_URL }}css/bootstrap-responsive.min.css">
+    <link rel="stylesheet" href="{{ STATIC_URL }}css/main.css">
+    <style type="text/css">
         {% block styleextra %}
         {% endblock %}
-        </style>
-         <script src="{{ STATIC_URL }}js/vendor/modernizr-2.6.2.min.js"></script>
-        <script src="{{ STATIC_URL }}js/vendor/jquery-1.9.1.min.js"></script>
-        <script src="{{ STATIC_URL }}js/vendor/bootstrap.min.js"></script>        
-        <!--[if lt IE 9]>
+    </style>
+    <script src="{{ STATIC_URL }}js/vendor/modernizr-2.6.2.min.js"></script>
+    <script src="{{ STATIC_URL }}js/vendor/jquery-1.9.1.min.js"></script>
+    <script src="{{ STATIC_URL }}js/vendor/bootstrap.min.js"></script>
+
+    <!--[if lt IE 9]>
             <link rel="stylesheet" href="{% url 'emif.views.bootstrap_ie_compatibility' %}">
 
             <script src="{{ STATIC_URL }}js/vendor/respond.min.js"></script>
@@ -47,80 +47,101 @@
             <script type="text/javascript" src="{{ STATIC_URL }}js/vendor/aight.min.js"></script>
 
         <![endif]-->
-        
-        {% block headextra %}
-        {% endblock %}
+
+    {% block headextra %} 
+    {% endblock %}
 
 
-    </head>
-    <body>
-        
-        <div class="navbar navbar-fixed-top">
-            <div class="navbar-inner">
-                <div class="container">
-                    <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
-                        <span class="icon-bar"></span>
-                        <span class="icon-bar"></span>
-                        <span class="icon-bar"></span>
-                    </a>
-                    <a class="brand" href="">EMIF Catalogue</a>
-                    <div class="nav-collapse collapse">
+</head>
 
-                        <ul class="nav">
-                            {% if request.user.is_authenticated %}    
-                            <li id="li_workspace" class="dropdown">
-                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">Workspace <b class="caret"></b></a>
-                            <ul class="dropdown-menu">
-                              <li><a href="{% url 'emif.views.databases' %}">My Databases</a></li>
-                              <li><a href="{% url 'emif.views.all_databases' %}">All Databases</a></li>
+<body>
 
-                              
-                              {% comment %}
-                              <li><a href="{% url 'emif.views.databases' %}">Edit Databases</a></li>
-                              <li><a href="{% url 'emif.views.databases' %}">Query History</a></li>
-                              <li><a href="{% url 'emif.views.databases' %}">Timeline</a></li>
-                              {% endcomment %}
-			      {% comment %}
+    <div class="navbar navbar-fixed-top">
+        <div class="navbar-inner">
+            <div class="container">
+                <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </a>
+                <a class="brand" href="">EMIF Catalogue</a>
+                <div class="nav-collapse collapse">
+                            {% if request.user.is_authenticated %}
+                            <ul class="nav">
+                                <li id="li_workspace" class="dropdown">
+                                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">Workspace
+                                        <b class="caret"></b>
+                                    </a>
+                                        <ul class="dropdown-menu">
+                                        <li>
+                                            <a href="{% url 'emif.views.databases' %}">My Databases</a>
+                                        </li>
+                                        <li>
+                                            <a href="{% url 'emif.views.all_databases' %}">All Databases</a>
+                                        </li>
 
-			       {% if request.user.is_superuser %}
 
-                              <li class="divider"></li>
-                              <li class="dropdown-submenu">
-                              <a href="" onclick="return false;">Statistics</a>
-                              <ul class="dropdown-menu">
-                                {% show_fingerprints_for_statistics %}
-                              </ul>
-          		      {% endif %}
-                    {% endcomment %}
+                                        {% comment %}
+                                        <li>
+                                            <a href="{% url 'emif.views.databases' %}">Edit Databases</a>
+                                        </li>
+                                        <li>
+                                            <a href="{% url 'emif.views.databases' %}">Query History</a>
+                                        </li>
+                                        <li>
+                                            <a href="{% url 'emif.views.databases' %}">Timeline</a>
+                                        </li>
+                                        {% endcomment %} 
+                                        
+                                        {% comment %} 
+                                        {% if request.user.is_superuser %}
 
-                              {% comment %}
-                              <li class="divider"></li>
+                                        <li class="divider"></li>
+                                        <li class="dropdown-submenu">
+                                            <a href="" onclick="return false;">Statistics</a>
+                                            <ul class="dropdown-menu">
+                                                {% show_fingerprints_for_statistics %}
+                                            </ul>
+                                        </li>
+                                        {% endif %} 
+                                        {% endcomment %} 
+                                        
+                                        {% comment %}
+                                            <li class="divider"></li>
 
-                              <li><a href="{% url 'emif.views.databases' %}">Subscribe interests</a></li>
-                              {% endcomment %}
-                              <li class="divider"></li>
+                                            <li>
+                                                <a href="{% url 'emif.views.databases' %}">Subscribe interests</a>
+                                            </li>
+                                        {% endcomment %}
+                                            
+                                            <li class="divider"></li>
 
-                              <li class="dropdown-submenu">
-                              <a href="" onclick="return false;">Add new databases</a>
-                              <ul class="dropdown-menu">
-                                {% show_fingerprints %}
-                              </ul>
-                            </li>
-                                {% comment %}<li class="divider"></li>
-                                <li>{% if request.user.is_superuser %}
-                                    <a href="{% url 'emif.views.import-questionnaire' %}">Import Questionnaire</a>
-                                {% endif %}
+                                            <li class="dropdown-submenu">
+                                                <a href="" onclick="return false;">Add new databases</a>
+                                                <ul class="dropdown-menu">
+                                                    {% show_fingerprints %}
+                                                </ul>
+                                            </li>
+                                            
+                                        {% comment %}
+                                            <li class="divider"></li>
+                                            <li>{% if request.user.is_superuser %}
+                                                <a href="{% url 'emif.views.import-questionnaire' %}">Import Questionnaire</a>
+                                                {% endif %}
 
-                                </li>{% endcomment %}
+                                            </li>
+                                        {% endcomment %}
+                                        </li>
+                                    </ul>
+                                    </li>
 
-                            </ul>
-                          </li>
+                                        {% comment %}
+                                    <li id="li_search">
+                                        <a href="{% url 'emif.views.quick_search' %}">Quick Search</a>
+                                    </li>
+                                        {% endcomment %}
 
-                          {% comment %}
-                            <li id="li_search"><a href="{% url 'emif.views.quick_search' %}">Quick Search</a></li>
-                           {% endcomment %}
-
-                          <!-- <li id="li_advanced_search" class="dropdown">
+                                    <!-- <li id="li_advanced_search" class="dropdown">
                             <a href="#" class="dropdown-toggle" data-toggle="dropdown">Advanced Search <b class="caret"></b></a>
                             <ul class="dropdown-menu">
                               
@@ -128,84 +149,93 @@
 
                             </ul>
                           </li>-->
-
-                          <form class="navbar-search pull-right" method="POST" action="resultsdiff/1">{% csrf_token %}
-                            <div class="">
+                    <li>
+                            <form class="navbar-search pull-right" method="POST" action="resultsdiff/1">{% csrf_token %}
                                 <input title="Enter the terms you wish to search for." class="search-query span3 form-text" placeholder="{{search_old}}" type="text" id="edit-search-block-form--3" name="query" value="" size="25" maxlength="256">
-                            </div>
-                          </form>
-                        {% endif %}
+                            </form>
+                          </li>
                         </ul>
+                        {% endif %}
 
-                            <ul class="nav pull-right">
+                        <ul class="nav pull-right">
                             {% if not request.user.is_authenticated %}
-                                <li class="dropdown">
-                                <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="icon-user "></i>
-                                    <i class="icon-chevron-down"></i></a>
+                            <li class="dropdown">
+                                <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                                    <i class="icon-user "></i>
+                                    <i class="icon-chevron-down"></i>
+                                </a>
                                 <ul class="dropdown-menu">
-                                    <li id="li_signup"><a href="accounts/signup/">Sign up</a></li>
+                                    <li id="li_signup">
+                                        <a href="accounts/signup/">Sign up</a>
+                                    </li>
                                     <li class="divider"></li>
-                                    <li id="li_reset_password"><a href="accounts/password/reset/">Forgot the password?</a></li>
+                                    <li id="li_reset_password">
+                                        <a href="accounts/password/reset/">Forgot the password?</a>
+                                    </li>
                                 </ul>
-                            {% endif %}
-                        </li>
-                            <li id="li_feedback"><a href="{% url 'emif.views.feedback' %}">Feedback</a></li>
-                            <li id="li_about"><a href="{% url 'emif.views.about' %}">About</a></li>
+                               
+                            </li>
+                             {% endif %}
+                            <li id="li_feedback">
+                                <a href="{% url 'emif.views.feedback' %}">Feedback</a>
+                            </li>
+                            <li id="li_about">
+                                <a href="{% url 'emif.views.about' %}">About</a>
+                            </li>
+
 
                             
-
-                </ul>
-
-                        {% block headerlogin %}
+                        {% block headerlogin %} 
                         {% if not request.user.is_authenticated %}
+                            <li id="auth-logged-out">
                         <form class="navbar-form pull-right" method="post" action="{% url 'userena_signin' %}">
                             {% csrf_token %}
                             <input name="identification" class="signin-header-form-email" type="text" placeholder="Email">
                             <input name="password" class="signin-header-form-pass" type="password" placeholder="Password">
                             <button type="submit" class="btn">Sign in</button>
                         </form>
-
+                            </li>
                         {% else %}
+                            <li id="auth-logged-in">
                         <p class="navbar-text pull-right">
-                          
 
-                          {% comment %}<em>{{ request.user.get_full_name }}{% endcomment %}</em> [ <a href="{% url 'userena_signout' %}" class="navbar-link">Sign out</a> ]
+                            
+                            {% comment %}
+                            <em>{{ request.user.get_full_name }}{% endcomment %}</em>[
+                            <a href="{% url 'userena_signout' %}" class="navbar-link">Sign out</a>]
                         </p>
-                        {% endif %}
-                        {% endblock %}
+                        
+                            </li>
+                    {% endif %} 
+                    {% endblock %}
+                            
+                        </ul>
 
-                    </div><!--/.nav-collapse -->
+
                 </div>
+                <!--/.nav-collapse -->
             </div>
         </div>
+    </div>
 
-        <div class="container">
+    <div class="container">
 
-            {% if breadcrumb %}
-                
+        {% if breadcrumb %} {% block breadcrumbs %} {% breadcrumb "Workspace" "databases" %} {% endblock %}
 
-            {% block breadcrumbs %}
-                {% breadcrumb "Workspace" "databases" %}
 
-            {% endblock %}
-
-            
-            <div class="pull-left">
+        <div class="pull-left">
             {% render_breadcrumbs %}
-            </div>
-            {% endif %}
-            <div class="pull-right">
-            {% block toolbar %}
-            {% endblock %}
-            </div>
-            
-{% block content %}
-                
-            {% endblock %}
+        </div>
+        {% endif %}
+        <div class="pull-right">
+            {% block toolbar %} {% endblock %}
+        </div>
 
-             
+        {% block content %} {% endblock %}
 
-            <hr>
+
+
+        <hr>
 
         <div class="row" style="text-align:center">
             <footer>
@@ -213,39 +243,40 @@
 
             </footer>
         </div>
-        </div> <!-- /container -->
+    </div>
+    <!-- /container -->
 
-        <script src="{{ STATIC_URL }}js/main.js"></script>
+    <script src="{{ STATIC_URL }}js/main.js"></script>
 
-        <!-- backbone -->
-        {% comment %}
-        <script type="text/javascript" src="{{ STATIC_URL }}contrib/backbone/ICanHaz.min.js"></script>
-        <script type="text/javascript" src="{{ STATIC_URL }}contrib/backbone/json2.js"></script>
-        <script type="text/javascript" src="{{ STATIC_URL }}contrib/backbone/underscore-min.js"></script>
-        <script type="text/javascript" src="{{ STATIC_URL }}contrib/backbone/backbone-min.js"></script>
-        
-         {% endcomment %}
-        {% block scriptextraincludes %}
+    <!-- backbone -->
+    {% comment %}
+    <script type="text/javascript" src="{{ STATIC_URL }}contrib/backbone/ICanHaz.min.js"></script>
+    <script type="text/javascript" src="{{ STATIC_URL }}contrib/backbone/json2.js"></script>
+    <script type="text/javascript" src="{{ STATIC_URL }}contrib/backbone/underscore-min.js"></script>
+    <script type="text/javascript" src="{{ STATIC_URL }}contrib/backbone/backbone-min.js"></script>
+
+    {% endcomment %} {% block scriptextraincludes %} {% endblock %}
+    <script type="text/javascript">
+        {% block scriptextra %} 
         {% endblock %}
-        <script type="text/javascript">
-        {% block scriptextra %}
-        {% endblock %}
-        </script>
-        
-        <script type="text/javascript">
-        
-          var _gaq = _gaq || [];
-          _gaq.push(['_setAccount', 'UA-38876251-1']);
-          _gaq.push(['_trackPageview']);
-        
-          (function() {
-            var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    </script>
+
+    <script type="text/javascript">
+        var _gaq = _gaq || [];
+        _gaq.push(['_setAccount', 'UA-38876251-1']);
+        _gaq.push(['_trackPageview']);
+
+        (function() {
+            var ga = document.createElement('script');
+            ga.type = 'text/javascript';
+            ga.async = true;
             ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-            var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-          })();
-        
-        </script>
-        
-        
-    </body>
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(ga, s);
+        })();
+    </script>
+
+
+</body>
+
 </html>

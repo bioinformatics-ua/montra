@@ -138,3 +138,14 @@ select,textarea, input,code,pre{behavior:url({{ STATIC_URL }}js/vendor/PIE.htc)}
 .lt-ie9 td {
     display: block !important;
 }
+
+.navbar-search{
+float: left !important;
+}
+
+#auth-logged-out{
+    width: 380px !important;
+}
+#auth-logged-in{
+    width: 70px !important;
+}
