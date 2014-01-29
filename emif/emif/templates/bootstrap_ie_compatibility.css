@@ -242,3 +242,38 @@ float: left !important;
 #accordion1{
 clear: both;
 }
+
+.lt-ie8 .answer {
+    clear: both;
+
+}
+
+.lt-ie8 .icon-print{
+padding: 2px;
+}
+
+.lt-ie8 .tablesorter-filter{
+
+    width: 90% !important;
+
+}
+
+/* Fix from: http://stackoverflow.com/questions/17813737/tablesort-not-working-correctly-in-ie 
+    only occurs on ie7
+ */
+
+.lt-ie8 table.tablesorter thead tr .tablesorter-header {
+    background-image: url(http://tablesorter.com/themes/blue/bg.gif);
+    background-repeat: no-repeat;
+    background-position: center right;
+    cursor: pointer;
+}
+.lt-ie8 table.tablesorter thead tr .tablesorter-headerAsc {
+    background-image: url(http://tablesorter.com/themes/blue/asc.gif);
+}
+.lt-ie8 table.tablesorter thead tr .tablesorter-headerDesc {
+    background-image: url(http://tablesorter.com/themes/blue/desc.gif);
+}
+.lt-ie8 table.tablesorter thead tr .tablesorter-headerAsc, table.tablesorter thead tr .tablesorter-headerDesc {
+    background-color: #8dbdd8;
+}

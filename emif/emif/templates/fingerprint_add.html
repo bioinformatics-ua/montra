@@ -69,14 +69,14 @@
                         <div class="accordion-heading">
                             {% if request.user.is_staff %}
                                 <span class="pull-right"> <a href="admin/questionnaire/question/{{ question.id }}/">
-                                    <i class="fa fa-pencil-square-o">&nbsp;</i>
+                                    <i class="icon-pencil">&nbsp;</i>
                                 </a></span>
                             {% endif %}
                             <span class="pull-right">
-                                <a href="#" onclick="toggle_comments('{{question.number|removedots}}'); return false;"><i class="fa {% if qdict.comment %} fa-comment {% else %} fa-comment-o {% endif %}">&nbsp;</i></a>
+                                <a href="#" onclick="toggle_comments('{{question.number|removedots}}'); return false;"><i class="{% if qdict.comment %} icon-comment {% else %} icon-comment-alt {% endif %}">&nbsp;</i></a>
                             </span>
                             <span class="pull-right answered hide" id="answered_{{ question.number|removedots }}">
-                                <i class="fa fa-check-square-o fa-green">&nbsp;</i>
+                                <i class="icon-check green">&nbsp;</i>
                             </span>
 
                 {% endif %}
@@ -109,15 +109,15 @@
                                     {% if request.user.is_staff %}
                                     <span class="pull-right">
                                         <a href="admin/questionnaire/question/{{ question.id }}/">
-                                            <i class="fa fa-pencil-square-o">&nbsp;</i>
+                                            <i class="icon-pencil">&nbsp;</i>
                                         </a>
                                     </span>
                                     {% endif %}
                                     <span class="pull-right">
-                                        <a href="#" onclick="toggle_comments('{{question.number|removedots}}'); return false;"><i class="fa {% if qdict.comment %} fa-comment {% else %} fa-comment-o {% endif %}">&nbsp;</i></a>
+                                        <a href="#" onclick="toggle_comments('{{question.number|removedots}}'); return false;"><i class="{% if qdict.comment %} icon-comment {% else %} icon-comment-alt {% endif %}">&nbsp;</i></a>
                                     </span>
                                     <span class="pull-right answered hide" id="answered_{{ question.number|removedots }}">
-                                        <i class="fa fa-check-square-o fa-green">&nbsp;</i>
+                                        <i class="icon-check green">&nbsp;</i>
                                     </span>
                                 {% endif %}
                                 </div>
@@ -134,7 +134,7 @@
                                     {% endif %}
                                     {% include qdict.template %}
                                     <div id="comments_{{question.number|removedots}}" style="display:none;margin-left:40px;">
-                                     <a href="#" class="span6" onclick="toggle_comments('{{question.number|removedots}}'); return false;"><i class="fa fa-comment-o">&nbsp;</i> Comments</a>
+                                     <a href="#" class="span6" onclick="toggle_comments('{{question.number|removedots}}'); return false;"><i class="icon-comment-alt">&nbsp;</i> Comments</a>
                                     <textarea style=" background-color:#EEE;color: #000;" class="span6" name="comment_question_{{ question.number }}" cols="50" rows="5">{{qdict.comment}}</textarea>
                                     </div>
                                 </div>
