@@ -211,3 +211,10 @@ div .tooltip {
 .fa-green {
             color: limegreen;
         }
+#contact_wrap{
+clear: both;
+}
+.cleared_separator{
+    clear:both; 
+    margin-bottom: -20px;
+}

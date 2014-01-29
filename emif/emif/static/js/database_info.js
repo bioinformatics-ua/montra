@@ -289,31 +289,6 @@ function json_to_table(obj) {
 }
 
 
-var json_aux = '{{apiinfo}}';
-console.log("ayx" + json_aux.length);
-console.log("ayx" + json_aux);
-
-
-
-$(document).ready(function() {
-    if (json_aux == '' || json_aux == null || json_aux.length == 2) {
-        $("#pivot_table_extra_information").html('No information available. You can add information from external applications with API web services.');
-    } else {
-        json_aux = json_aux.replace("/&quot;/g", "\"");
-        json = JSON.parse(json_aux);
-        console.log(json_aux);
-        console.log(json);
-        var json2 = json;
-        json = json_to_d3json(json);
-        json.x0 = 0;
-        json.y0 = 0;
-    
-        update(root = json);
-        $("#pivot_table_extra_information").html(json_to_table(json2));
-    }
-});
-
-
 
 function update(source) {
 
