@@ -7,7 +7,7 @@
             <li>
                 <label>
                     <input onClick="valchanged('question_{{ question.number }}_{{ choice.value|trim|esc }}', this.checked);" type="checkbox" id="{{ key }}" name="{{ key }}" value="{{ choice.value|trim|esc }}" {{ checked }} />
-                    <span>{{ choice.text|trim|esc }}</span>
+                    <span>{{ choice.text|trim }}</span>
                 </label>
             </li>
             {% if checked %}

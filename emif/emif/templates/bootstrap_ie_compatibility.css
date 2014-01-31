@@ -277,6 +277,13 @@ padding: 2px;
 .gt-ie7 #li_feedback, 
 .gt-ie7 #li_about, 
 .gt-ie7 #auth-logged-in{
-    margin-top: -30px !important;
+    margin-top: -5px !important;
     
+}
+.gt-ie7 #search_li {
+    margin-top: -8px !important;
+}
+
+.gt-ie7 #li_workspace {
+    margin-top: -8px !important;
 }
