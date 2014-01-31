@@ -83,7 +83,7 @@
 
     {% load bootstrap_pagination %}
 
-    {% bootstrap_paginate page_obj url_view_name="views.databases" range=10  show_prev_next="false" show_first_last="true"%}
+    {% bootstrap_paginate page_obj url_view_name="views.create_auth_token" range=10  show_prev_next="false" show_first_last="true"%}
 
     {% else %}
     <p><strong>Info: </strong> Currently, there are no databases in your account. You can add new ones through the
