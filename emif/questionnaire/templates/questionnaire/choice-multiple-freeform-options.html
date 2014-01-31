@@ -7,11 +7,11 @@
             <li>
                 
                 <label class="control-label" style="display:inline;">
-                    <input onClick="valchanged('question_{{ question.number }}_{{ choice.value }}', this.checked);" type="checkbox" id="{{ key }}" name="{{ key }}" value="{{ choice.value }}" {{ checked }}>
-                    <span>{{ choice.text }}</span> 
+                    <input onClick="valchanged('question_{{ question.number }}_{{ choice.value|trim|esc }}', this.checked);" type="checkbox" id="{{ key }}" name="{{ key }}" value="{{ choice.value|trim|esc }}" {{ checked }} />
+                    <span>{{ choice.text|trim }}</span> 
                 </label>
                 <span class="controls">
-                    <input type="text" id="question_{{ question.number }}_{{ choice.sortid }}_opt" name="question_{{ question.number }}_{{ choice.sortid }}_opt" value="{{ aux }}" >
+                    <input type="text" id="question_{{ question.number }}_{{ choice.sortid }}_opt" name="question_{{ question.number }}_{{ choice.sortid }}_opt" value="{{ aux }}" />
                 </span>
                 
             </li>
@@ -29,7 +29,7 @@
                 {% if not forloop.last or not forloop.first %}
                     <b>{{ forloop.counter }}.</b> 
                 {% endif %}
-                <input type="text" name="{{ key }}" size="50" value="{{ value }}">    
+                <input type="text" name="{{ key }}" size="50" value="{{ value }}" />    
             </li>
             {% endfor %}
         {% endif %}

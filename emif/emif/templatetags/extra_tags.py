@@ -60,10 +60,15 @@ def removehs(value):
 
 @register.filter(name='trim')
 @stringfilter
-def trim(value)
-    value = values.strip()
+def trim(value):
+    value = value.strip()
     
     return value
+
+@register.filter(name='esc')
+@stringfilter
+def esc(value):
+    return re.escape(value)
 
 @register.filter(name='removedots')
 @stringfilter
