@@ -15,7 +15,7 @@
     
         {% csrf_token %}
 
-        <input type="hidden" name="questionset_id" value="{{ questionset.id }}">
+        <input type="hidden" name="questionset_id" value="{{ questionset.id }}" />
     
         {% for question, qdict in qlist %}
         {% with errors|dictget:question.number as error %}
@@ -63,8 +63,8 @@
         {% endfor %}
     
             <div style="text-align: center;" class="well questionset-submit">
-                <input class="btn large primary" name="submit" onclick="next_questionset(qs_{{ k.pk }}); return false;" type="submit" value="{% trans "Continue" %}" >
-                  <input type="submit" class="btn btn-inverse" value="Search" >
+                <input class="btn large primary" name="submit" onclick="next_questionset(qs_{{ k.pk }}); return false;" type="submit" value="{% trans "Continue" %}" />
+                  <input type="submit" class="btn btn-inverse" value="Search" />
                 
             </div>
             

@@ -21,7 +21,7 @@
     <link rel="stylesheet" href="{{ STATIC_URL }}css/bootstrap.min.css">
     <link rel="stylesheet" href="{{ STATIC_URL }}font-awesome/css/font-awesome.min.css">
     <!-- IE 7 doesnt recognize awesome icons correctly... -->
-    <!--[if IE 7]>
+    <!--[if IE]>
         <link rel="stylesheet" media="all" href="{{ STATIC_URL }}font-awesome/css/font-awesome-ie7.min.css" />
         <script src="{{ STATIC_URL }}js/ie7_fixes.js"></script>
     <![endif]-->
@@ -68,12 +68,12 @@
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </a>
-                <a class="brand" href="">EMIF Catalogue</a>
+                <a class="brand" href="#">EMIF Catalogue</a>
                 <div class="nav-collapse collapse">
                             {% if request.user.is_authenticated %}
                             <ul class="nav">
                                 <li id="li_workspace" class="dropdown">
-                                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">Workspace
+                                    <a href="" class="dropdown-toggle" data-toggle="dropdown">Workspace
                                         <b class="caret"></b>
                                     </a>
                                         <ul class="dropdown-menu">
@@ -153,8 +153,8 @@
 
                             </ul>
                           </li>-->
-                    <li>
-                            <form class="navbar-search pull-right" method="POST" action="resultsdiff/1">{% csrf_token %}
+                    <li id="search_li" class="pull-left">
+                            <form class="navbar-search pull-left" method="POST" action="resultsdiff/1">{% csrf_token %}
                                 <input title="Enter the terms you wish to search for." class="search-query span3 form-text" placeholder="{{search_old}}" type="text" id="edit-search-block-form--3" name="query" value="" size="25" maxlength="256">
                             </form>
                           </li>

@@ -58,7 +58,12 @@ def removehs(value):
 
     return value
 
-
+@register.filter(name='trim')
+@stringfilter
+def trim(value)
+    value = values.strip()
+    
+    return value
 
 @register.filter(name='removedots')
 @stringfilter

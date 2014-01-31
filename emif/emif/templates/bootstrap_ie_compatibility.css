@@ -220,12 +220,7 @@ select,textarea, input,code,pre{behavior:url({{ STATIC_URL }}js/vendor/PIE.htc)}
   filter: progid:dximagetransform.microsoft.gradient(startColorstr='#ff222222', endColorstr='#ff222222', GradientType=0) progid:dximagetransform.microsoft.dropshadow(color='#ff303030', offX=1, offY=0) progid:dximagetransform.microsoft.dropshadow(color='#ff303030', offX=-1, offY=0) progid:dximagetransform.microsoft.dropshadow(color='#ff303030', offX=0, offY=-1) progid:dximagetransform.microsoft.dropshadow(color='#ff292929', offX=0, offY=1);
 }
 
-
-
-.lt-ie9 .db_logo {
-    width: 50px;
-}
-.lt-ie9 td {
+.lt-ie9 td, .ie9 td {
     display: block !important;
 }
 

@@ -222,3 +222,13 @@ clear: both;
 .green {
     color: green;
 }
+
+.lt-ie9 .db_logo, .ie9 .db_logo {
+    width: 50px;
+}
+
+.ie9 #search_li {
+
+list-style-type: none;
+    
+}
