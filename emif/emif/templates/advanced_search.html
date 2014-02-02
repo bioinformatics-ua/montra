@@ -72,7 +72,7 @@
       <li{% if questionset.text == qs.text %} class="active" {% endif %} id="li_qs_{{qs.id}}">
         <!--<a href="q2/{{runinfo.random}}/{{ qs.sortid }}">
         -->
-        <a href="advancedSearch/{{qs.questionnaire.pk}}/{{ qs.pk }}" onclick="questionsets_handle(qs_{{ qs.pk }}); return false;">
+        <a href="advancedSearch/{{qs.questionnaire.pk}}/{{ qs.sortid }}" onclick="questionsets_handle(qs_{{ qs.pk }}); return false;">
           <table>
             <tr>
               <td width="80%">{{ qs.text|removeh1 }}</td>
