@@ -1,0 +1,58 @@
+/******** Database Info Specific Styling **********/
+
+body {
+    font-family: "Helvetica Neue", Helvetica, sans-serif;
+    background-color: #fff;
+    color: #333;
+}
+.widget-container {
+    max-width: 800px;
+}
+table {
+    table-layout: fixed;
+}
+th,
+td {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    -o-text-overflow: ellipsis;
+    -ms-text-overflow: ellipsis;
+}
+.tooltip.in {
+    opacity: 0.8;
+    filter: alpha(opacity=80);
+}
+{
+    # .tooltip.in {
+        #
+    }
+    {
+        # opacity: 1;
+        #
+    }
+    {
+        # filter: alpha(opacity=100);
+        #
+    }
+    {
+        #
+    }
+    #
+}
+.node rect {
+    cursor: pointer;
+    fill: #fff;
+    fill-opacity: .5;
+    stroke: #3182bd;
+    stroke-width: 1.5px;
+}
+.node text {
+    font: 10px sans-serif;
+    pointer-events: none;
+}
+path.link {
+    fill: none;
+    stroke: #9ecae1;
+    stroke-width: 1.5px;
+}

@@ -31,7 +31,8 @@ EMIF Platform - Fingerprint Browser
 
 
         (path) ...\environments>virtualenv emif
-        (path) ...\environments\emif\Scripts>activate.bat
+        (path) ...\environments\emif\Scripts>activate.bat (for windows users)
+        (path) source ...\environments\emif\Scripts>activate (for unix users)
 
 3. Go to project folder
     
