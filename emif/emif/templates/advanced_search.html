@@ -4,6 +4,32 @@
 {% load markup questionnaire i18n %}
 
 
+{% block styleextra %}
+
+button {
+    border: 1px #AAA solid;
+    padding: 4px 10px;
+}
+.hide {
+    display: none;
+}
+
+.accordion-inner {
+    padding: 9px 15px;
+    border-top: 0px solid #e5e5e5;
+}
+.accordion-heading .accordion-toggle {
+display: block;
+padding: 5px 15px;
+}
+
+.accordion-heading a {
+color: #333;
+text-decoration: none;
+}
+{% endblock %}
+
+
 {% block headextra %}
 <script type="text/javascript" src="{{ STATIC_URL }}jquery.min.js"></script>
 <script type="text/javascript" src="{{ STATIC_URL }}questionset.js"></script>
