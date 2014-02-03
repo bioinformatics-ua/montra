@@ -194,7 +194,7 @@
                         {% block headerlogin %} 
                         {% if not request.user.is_authenticated %}
                             <li id="auth-logged-out">
-                        <form class="navbar-form pull-right" method="post" action="accounts/signin">
+                        <form class="navbar-form pull-right" method="post" action="accounts/signin/">
                             {% csrf_token %}
                             <input name="identification" class="signin-header-form-email" type="text" placeholder="Email">
                             <input name="password" class="signin-header-form-pass" type="password" placeholder="Password">
@@ -209,7 +209,7 @@
                             {% comment %}
                                 <em>{{ request.user.get_full_name }}
                             {% endcomment %}</em>[
-                            <a href="accounts/signout" class="navbar-link">Sign out</a>]
+                            <a href="accounts/signout/" class="navbar-link">Sign out</a>]
                         </p>
                         
                             </li>
@@ -225,7 +225,10 @@
 
     <div class="container">
 
-        {% if breadcrumb %} {% block breadcrumbs %} {% breadcrumb "Workspace" "databases" %} {% endblock %}
+        {% if breadcrumb %}
+            {% block breadcrumbs %}
+                {% breadcrumb "Workspace" "databases" %}
+            {% endblock %}
 
 
         <div class="pull-left">
@@ -236,7 +239,8 @@
             {% block toolbar %} {% endblock %}
         </div>
 
-        {% block content %} {% endblock %}
+        {% block content %}
+        {% endblock %}
 
 
 
