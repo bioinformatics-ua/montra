@@ -16,8 +16,12 @@
 
 
 {% block scriptextraincludes %}
+
     <script src="{{ STATIC_URL }}js/vendor/jquery.tablesorter.min.js"></script>
     <script src="{{ STATIC_URL }}js/vendor/jquery.tablesorter.widgets.js"></script>
+    <script src="{{ STATIC_URL }}js/emif.paginator.js"></script>
+
+
 {% endblock %}
 
 {% block content %}
@@ -54,7 +58,7 @@
         </thead>
         <tbody>
 
-        {% for t in list_databases %}
+        {% for t in page_obj %}
         <tr>
             <td><img class="db_logo" src="{{ STATIC_URL }}upload_images/{{t.logo}}" width="50px" height="50px"/></td>
             <td>
@@ -80,6 +84,11 @@
 
         </tbody>
     </table>
+
+    {% load bootstrap_pagination %}
+
+    {% bootstrap_paginate page_obj url_view_name="views.create_auth_token" range=10  show_prev_next="false" show_first_last="true"%}
+
     {% else %}
     <p><strong>Info: </strong> Currently, there are no databases in your account. You can add new ones through the
         option "Workspace -> Add new databases"</p>
@@ -92,6 +101,8 @@
     {% comment %}
     <script>
         {% endcomment %}
+
+       
 
         $('#li_workspace').addClass("active");
 

@@ -58,7 +58,7 @@ button {
     </thead>
     <tbody>
         
-        {% for t in list_databases %}
+        {% for t in page_obj %}
         <tr>
             <td><img class="db_logo" src="{{ STATIC_URL }}upload_images/{{t.logo}}" width="50px" height="50px" /></td>
           <td>
@@ -91,6 +91,10 @@ button {
 
     </tbody>
 </table>
+
+{% load bootstrap_pagination %}
+
+{% bootstrap_paginate page_obj url_view_name="views.databases" range=10  show_prev_next="false" show_first_last="true"%}
 
 {% else %}
 <div class="row">  
@@ -155,6 +159,13 @@ button {
 {% comment %}
 <script>
 {% endcomment %}
+
+// URL Hack to make paginator work with base
+$(document).ready(function(){
+    $('a[href="#"]').attr('href', function(i, val){
+        return window.location + val;
+    });
+});
 
 function post_to_url(path, params, method) {
     method = method || "post"; // Set method to post by default if not specified.
