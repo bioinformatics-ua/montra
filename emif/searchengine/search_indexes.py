@@ -157,21 +157,25 @@ def index_answeres_from_qvalues(qvalues, questionnaire, subject, fingerprint_id,
     slugs = []
     for s in slugs_objs:
         slugs.append(s.description)
-
+    appending_text = ""
     slugs_objs = None
     now = datetime.datetime.now()
 
     for qs_aux, qlist in qvalues:
         for question, qdict in qlist:
-            
+
             try:
                 choices = None
                 value = None
                 choices_txt = None
                 if qdict.has_key('value'):
                     value = qdict['value']
-                    
+                    if "yes" in qdict['value']:
+                        appending_text += question.text
+
                 elif qdict.has_key('choices'):
+                    #import pdb
+                    #pdb.set_trace()     
                     choices = qdict['choices']
                     qv = ""
                     try:
@@ -188,7 +192,8 @@ def index_answeres_from_qvalues(qvalues, questionnaire, subject, fingerprint_id,
                         if len(choices[0])==3:
                             for choice, unk, checked  in choices:
                                 if checked == " checked":
-                                    value = value + "#" + choice.value    
+                                    value = value + "#" + choice.value   
+                                    
                         elif len(choices[0])==4:
                             for choice, unk, checked, _aux  in choices:
                                 if checked == " checked":
@@ -196,11 +201,14 @@ def index_answeres_from_qvalues(qvalues, questionnaire, subject, fingerprint_id,
                                         value = value + "#" + choice.value + "{" + _aux +"}"
                                     else:
                                         value = value + "#" + choice.value
+                                    
+
                         elif len(choices[0])==2:
                             for checked, choice  in choices:
                                 # print("checked" + str(checked))
                                 if checked:
                                     value = value + "#" + choice.value
+                                    
                     except:
                         do_again = True
 
@@ -208,7 +216,9 @@ def index_answeres_from_qvalues(qvalues, questionnaire, subject, fingerprint_id,
                         for checked, choice  in choices:
                             # print("checked" + str(checked))
                             if checked:
+                                
                                 value = value + "#" + choice.value
+                                
 
                     # print("choice value " + value)
 
@@ -271,7 +281,7 @@ def index_answeres_from_qvalues(qvalues, questionnaire, subject, fingerprint_id,
         d['created_t'] = created_date
     d['date_last_modification_t']= now.strftime('%Y-%m-%d %H:%M:%S.%f')
     d['user_t']= subject
-    d['text_t']= text
+    d['text_t']= text + " " + appending_text
 
     if extra_fields!=None:
         d = dict(d.items() + extra_fields.items())
