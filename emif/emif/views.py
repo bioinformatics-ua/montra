@@ -399,22 +399,39 @@ def geo(request, template_name='geo.html'):
         query = "*:*"
     print "query@" + query
     list_databases = get_databases_from_solr(request, query)
+
     list_locations = []
     _long_lats = []
     g = geocoders.GeoNames(username='bastiao')
+
+    # since the geolocation is now adding the locations, we no longer need to look it up when showing,
+    # we rather get it directly
+
     for database in list_databases:
+
         if database.location.find(".")!= -1:
             _loc = database.location.split(".")[0]
         else:
             _loc = database.location
-        if _loc!= None and g!=None and len(_loc)>1:
-            try:
-                place, (lat, lng) = g.geocode(_loc)
-            except:
-                continue
-            _long_lats.append(str(lat)+ ", " +str(lng))
 
-        print _loc
+        city=None
+
+        if _loc!= None and g!=None and len(_loc)>1:
+            #try:
+            #    place, (lat, lng) = g.geocode(_loc)
+            #except:
+            #    continue
+            try:
+                city = City.objects.get(name=_loc.lower())
+
+            # if dont have this city on the db
+            except City.DoesNotExist:
+                print "-- Error: The city " + _loc + " doesnt exist on the database. Ignored on geolocation generation"
+                continue
+
+            _long_lats.append(str(city.lat) + ", " + str(city.long))
+
+        #print _loc
 
         list_locations.append(_loc)
     return render(request, template_name, {'request': request,
@@ -770,6 +787,8 @@ def database_edit(request, fingerprint_id, questionnaire_id, template_name="data
     if (question_set.sortid == 99 or request.POST):
         # Index on Solr
         try:
+            add_city(qlist_general)
+
             index_answeres_from_qvalues(qlist_general, question_set.questionnaire, users_db,
                                         fingerprint_id, extra_fields=extra_fields, created_date=created_date)
         except:
@@ -1596,6 +1615,10 @@ def show_fingerprint_page_errors(request, q_id, qs_id, errors={}, template_name=
 
             if users_db==None:
                 users_db = request.user.username
+
+            # adding city to cities database (if doesnt exist)
+            add_city(qlist_general)
+
             index_answeres_from_qvalues(qlist_general, question_set.questionnaire, users_db,
                                         fingerprint_id, extra_fields=extra_fields, created_date=created_date)
 
@@ -1624,6 +1647,43 @@ def show_fingerprint_page_errors(request, q_id, qs_id, errors={}, template_name=
         raise
     return r
 
+
+# Adds a city to the internal database of cities with his location (if it doesnt exist yet)
+# receives as input a qlist
+def add_city(qlist_general):
+
+    # iterate until we find the location field (City or location fields)
+    for qs_aux, qlist in qlist_general:
+        for question, qdict in qlist:
+            if question.text == 'Location' or question.text == 'City':
+                city_name = qdict['value'].lower()
+                # check if the city is on the db
+                try:
+                    city = City.objects.get(name=city_name)
+
+                # if dont have this city yet on the db
+                except City.DoesNotExist:
+                    print "City "+qdict['value'].lower()+" is not on the db yet"
+
+                    g = geocoders.GeoNames(username='bastiao')
+
+                    #obtain lat and longitude
+                    try:
+                        place, (lat, lng) = g.geocode(city_name)
+
+                        # add to the db
+                        city = City(name=city_name, lat=lat, long=lng)
+                        print city
+                        city.save()
+
+                    except:
+                        print "-- error retrieving geolocation"
+
+                else:
+                    print "City already is on the db."
+
+
+    return True
 
 def show_fingerprint_page_read_only(request, q_id, qs_id, errors={}, template_name='advanced_search.html'):
     """
@@ -1658,9 +1718,7 @@ def show_fingerprint_page_read_only(request, q_id, qs_id, errors={}, template_na
         cssinclude = []     # css files to include
         jstriggers = []
         qvalues = {}
-
         if request.POST:
-
             for k, v in request.POST.items():
                 if k.startswith("question_"):
                     s = k.split("_")
@@ -1679,7 +1737,7 @@ def show_fingerprint_page_read_only(request, q_id, qs_id, errors={}, template_na
                             qvalues[s[1]] = v
                             #print qvalues
             query = convert_qvalues_to_query(qvalues, q_id)
-            #print "Query: " + query
+            print "Query: " + query
             return results_fulltext_aux(request, query)
 
         qlist_general = []
