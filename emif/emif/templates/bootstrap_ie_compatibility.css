@@ -5,7 +5,7 @@
 .img-rounded{behavior:url({{ STATIC_URL }}js/vendor/PIE.htc)}
 .img-circle{behavior:url({{ STATIC_URL }}js/vendor/PIE.htc)}
 .table-bordered{behavior:url({{ STATIC_URL }}js/vendor/PIE.htc)}
-select,textarea, /*input*/,code,pre{behavior:url({{ STATIC_URL }}js/vendor/PIE.htc)}
+select,textarea, input,code,pre{behavior:url({{ STATIC_URL }}js/vendor/PIE.htc)}
 .input-group-addon{
     behavior:url({{ STATIC_URL }}js/vendor/PIE.htc);
 }
