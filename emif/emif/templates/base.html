@@ -45,7 +45,7 @@
     <script src="{{ STATIC_URL }}js/vendor/bootstrap.min.js"></script>
 
     <!--[if lt IE 9]>
-            <link rel="stylesheet" href="{% url 'emif.views.bootstrap_ie_compatibility' %}">
+            <link rel="stylesheet" href="bootstrap_ie_compatibility">
 
             <script src="{{ STATIC_URL }}js/vendor/respond.min.js"></script>
 
@@ -78,22 +78,22 @@
                                     </a>
                                         <ul class="dropdown-menu">
                                         <li>
-                                            <a href="{% url 'emif.views.databases' %}">My Databases</a>
+                                            <a href="databases">My Databases</a>
                                         </li>
                                         <li>
-                                            <a href="{% url 'emif.views.all_databases' %}">All Databases</a>
+                                            <a href="alldatabases">All Databases</a>
                                         </li>
 
 
                                         {% comment %}
                                         <li>
-                                            <a href="{% url 'emif.views.databases' %}">Edit Databases</a>
+                                            <a href="databases">Edit Databases</a>
                                         </li>
                                         <li>
-                                            <a href="{% url 'emif.views.databases' %}">Query History</a>
+                                            <a href="databases">Query History</a>
                                         </li>
                                         <li>
-                                            <a href="{% url 'emif.views.databases' %}">Timeline</a>
+                                            <a href="databases">Timeline</a>
                                         </li>
                                         {% endcomment %} 
                                         
@@ -114,7 +114,7 @@
                                             <li class="divider"></li>
 
                                             <li>
-                                                <a href="{% url 'emif.views.databases' %}">Subscribe interests</a>
+                                                <a href="databases">Subscribe interests</a>
                                             </li>
                                         {% endcomment %}
                                             
@@ -130,7 +130,7 @@
                                         {% comment %}
                                             <li class="divider"></li>
                                             <li>{% if request.user.is_superuser %}
-                                                <a href="{% url 'emif.views.import-questionnaire' %}">Import Questionnaire</a>
+                                                <a href="import-questionnaire">Import Questionnaire</a>
                                                 {% endif %}
 
                                             </li>
@@ -141,7 +141,7 @@
 
                                         {% comment %}
                                     <li id="li_search">
-                                        <a href="{% url 'emif.views.quick_search' %}">Quick Search</a>
+                                        <a href="search">Quick Search</a>
                                     </li>
                                         {% endcomment %}
 
@@ -180,10 +180,10 @@
                             </li>
                              {% endif %}
                             <li id="li_feedback">
-                                <a href="{% url 'emif.views.feedback' %}">Feedback</a>
+                                <a href="feedback">Feedback</a>
                             </li>
                             <li id="li_about">
-                                <a href="{% url 'emif.views.about' %}">About</a>
+                                <a href="about">About</a>
                             </li>
 
 
