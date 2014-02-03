@@ -145,12 +145,14 @@
                                     </li>
                                         {% endcomment %}
 
+
                                     <li id="li_advanced_search" class="dropdown">
                                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">
                                             Advanced Search <b class="caret"></b>
                                         </a>
                                         <ul class="dropdown-menu">{% show_fingerprints_for_search %}</ul>
                                     </li>
+
                     <li id="search_li" class="pull-left">
                             <form class="navbar-search pull-left" method="POST" action="resultsdiff/1">{% csrf_token %}
                                 <input title="Enter the terms you wish to search for." class="search-query span3 form-text" placeholder="{{search_old}}" type="text" id="edit-search-block-form--3" name="query" value="" size="25" maxlength="256">
