@@ -18,6 +18,7 @@
 {% block scriptextraincludes %}
     <script src="static/js/vendor/jquery.tablesorter.min.js"></script>
     <script src="static/js/vendor/jquery.tablesorter.widgets.js"></script>
+    <script src="static/js/emif.paginator.js"></script>
 {% endblock %}
 
 {% block content %}
@@ -98,12 +99,7 @@
     <script>
         {% endcomment %}
 
-        // URL Hack to make paginator work with base
-        $(document).ready(function(){
-            $('a[href="#"]').attr('href', function(i, val){
-                return window.location + val;
-            });
-        });
+       
 
         $('#li_workspace').addClass("active");
 
