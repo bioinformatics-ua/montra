@@ -1,4 +1,7 @@
-{% load url from future %} {% load extra_tags %} {% load django_bootstrap_breadcrumbs %} {% load staticfiles %}
+{% load url from future %}
+{% load extra_tags %}
+{% load django_bootstrap_breadcrumbs %}
+{% load staticfiles %}
 
 <!DOCTYPE html>
 <!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
@@ -45,7 +48,7 @@
     <script src="{{ STATIC_URL }}js/vendor/bootstrap.min.js"></script>
 
     <!--[if lt IE 9]>
-            <link rel="stylesheet" href="{% url 'emif.views.bootstrap_ie_compatibility' %}">
+            <link rel="stylesheet" href="bootstrap_ie_compatibility">
 
             <script src="{{ STATIC_URL }}js/vendor/respond.min.js"></script>
 
@@ -78,22 +81,22 @@
                                     </a>
                                         <ul class="dropdown-menu">
                                         <li>
-                                            <a href="{% url 'emif.views.databases' %}">My Databases</a>
+                                            <a href="databases">My Databases</a>
                                         </li>
                                         <li>
-                                            <a href="{% url 'emif.views.all_databases' %}">All Databases</a>
+                                            <a href="alldatabases">All Databases</a>
                                         </li>
 
 
                                         {% comment %}
                                         <li>
-                                            <a href="{% url 'emif.views.databases' %}">Edit Databases</a>
+                                            <a href="databases">Edit Databases</a>
                                         </li>
                                         <li>
-                                            <a href="{% url 'emif.views.databases' %}">Query History</a>
+                                            <a href="databases">Query History</a>
                                         </li>
                                         <li>
-                                            <a href="{% url 'emif.views.databases' %}">Timeline</a>
+                                            <a href="databases">Timeline</a>
                                         </li>
                                         {% endcomment %} 
                                         
@@ -114,7 +117,7 @@
                                             <li class="divider"></li>
 
                                             <li>
-                                                <a href="{% url 'emif.views.databases' %}">Subscribe interests</a>
+                                                <a href="databases">Subscribe interests</a>
                                             </li>
                                         {% endcomment %}
                                             
@@ -130,7 +133,7 @@
                                         {% comment %}
                                             <li class="divider"></li>
                                             <li>{% if request.user.is_superuser %}
-                                                <a href="{% url 'emif.views.import-questionnaire' %}">Import Questionnaire</a>
+                                                <a href="import-questionnaire">Import Questionnaire</a>
                                                 {% endif %}
 
                                             </li>
@@ -141,18 +144,18 @@
 
                                         {% comment %}
                                     <li id="li_search">
-                                        <a href="{% url 'emif.views.quick_search' %}">Quick Search</a>
+                                        <a href="search">Quick Search</a>
                                     </li>
                                         {% endcomment %}
 
-                                    <!-- <li id="li_advanced_search" class="dropdown">
-                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">Advanced Search <b class="caret"></b></a>
-                            <ul class="dropdown-menu">
-                              
-                              {% show_fingerprints_for_search %}
 
-                            </ul>
-                          </li>-->
+                                    <li id="li_advanced_search" class="dropdown">
+                                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                                            Advanced Search <b class="caret"></b>
+                                        </a>
+                                        <ul class="dropdown-menu">{% show_fingerprints_for_search %}</ul>
+                                    </li>
+
                     <li id="search_li" class="pull-left">
                             <form class="navbar-search pull-left" method="POST" action="resultsdiff/1">{% csrf_token %}
                                 <input title="Enter the terms you wish to search for." class="search-query span3 form-text" placeholder="{{search_old}}" type="text" id="edit-search-block-form--3" name="query" value="" size="25" maxlength="256">
@@ -180,10 +183,10 @@
                             </li>
                              {% endif %}
                             <li id="li_feedback">
-                                <a href="{% url 'emif.views.feedback' %}">Feedback</a>
+                                <a href="feedback">Feedback</a>
                             </li>
                             <li id="li_about">
-                                <a href="{% url 'emif.views.about' %}">About</a>
+                                <a href="about">About</a>
                             </li>
 
 
@@ -191,7 +194,7 @@
                         {% block headerlogin %} 
                         {% if not request.user.is_authenticated %}
                             <li id="auth-logged-out">
-                        <form class="navbar-form pull-right" method="post" action="{% url 'userena_signin' %}">
+                        <form class="navbar-form pull-right" method="post" action="accounts/signin/">
                             {% csrf_token %}
                             <input name="identification" class="signin-header-form-email" type="text" placeholder="Email">
                             <input name="password" class="signin-header-form-pass" type="password" placeholder="Password">
@@ -206,7 +209,7 @@
                             {% comment %}
                                 <em>{{ request.user.get_full_name }}
                             {% endcomment %}</em>[
-                            <a href="{% url 'userena_signout' %}" class="navbar-link">Sign out</a>]
+                            <a href="accounts/signout/" class="navbar-link">Sign out</a>]
                         </p>
                         
                             </li>
@@ -222,7 +225,10 @@
 
     <div class="container">
 
-        {% if breadcrumb %} {% block breadcrumbs %} {% breadcrumb "Workspace" "databases" %} {% endblock %}
+        {% if breadcrumb %}
+            {% block breadcrumbs %}
+                {% breadcrumb "Workspace" "databases" %}
+            {% endblock %}
 
 
         <div class="pull-left">
@@ -233,7 +239,8 @@
             {% block toolbar %} {% endblock %}
         </div>
 
-        {% block content %} {% endblock %}
+        {% block content %}
+        {% endblock %}
 
 
 

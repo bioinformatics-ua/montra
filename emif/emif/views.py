@@ -937,7 +937,7 @@ def delete_fingerprint(request, id):
     return databases(request)
 
 
-def databases(request, template_name='databases.html'):
+def databases(request, page=1, template_name='databases.html'):
     # Get the list of databases for a specific user
 
     user = request.user
@@ -947,17 +947,36 @@ def databases(request, template_name='databases.html'):
         _filter = "user_t:*" 
     list_databases = get_databases_from_solr(request, _filter)
 
+
+    ## Paginator ##
+    rows = 5
+    myPaginator = Paginator(list_databases, rows)
+    try:
+        pager =  myPaginator.page(page)
+    except PageNotAnInteger, e:
+        pager =  myPaginator.page(1)
+    ## End Paginator ##
+
     return render(request, template_name, {'request': request, 'export_my_answers': True,
                                            'list_databases': list_databases, 'breadcrumb': True, 'collapseall': False,
-                                           'api_token': True})
+                                           'api_token': True, 'page_obj': pager})
 
 
-def all_databases(request, template_name='alldatabases.html'):
+def all_databases(request, page=1, template_name='alldatabases.html'):
     #list_databases = get_databases_from_db(request)
     list_databases = get_databases_from_solr(request, "*:*")
 
+    ## Paginator ##
+    rows = 5
+    myPaginator = Paginator(list_databases, rows)
+    try:
+        pager =  myPaginator.page(page)
+    except PageNotAnInteger, e:
+        pager =  myPaginator.page(1)
+    ## End Paginator ##
+    
     return render(request, template_name, {'request': request, 'export_all_answers': True, 'data_table': True,
-                                           'list_databases': list_databases, 'breadcrumb': True, 'collapseall': False, 'geo': True})
+                                           'list_databases': list_databases, 'breadcrumb': True, 'collapseall': False, 'geo': True, 'page_obj': pager})
 
 
 def all_databases_data_table(request, template_name='alldatabases_data_table.html'):
@@ -1994,7 +2013,7 @@ def show_fingerprint_page(request, runinfo, errors={}, template_name='database_e
     return r
 
 
-def create_auth_token(request, templateName='api-key.html'):
+def create_auth_token(request, page=1, templateName='api-key.html'):
     """
     Method to create token to authenticate when calls REST API
     """
@@ -2011,8 +2030,17 @@ def create_auth_token(request, templateName='api-key.html'):
     # for database in list_databases:
     #     print database.id
 
+     ## Paginator ##
+    rows = 5
+    myPaginator = Paginator(list_databases, rows)
+    try:
+        pager =  myPaginator.page(page)
+    except PageNotAnInteger, e:
+        pager =  myPaginator.page(1)
+    ## End Paginator ##
+
     return render_to_response(templateName, {'list_databases': list_databases, 'token': token, 'user': user,
-                              'request': request, 'breadcrumb': True}, RequestContext(request))
+                              'request': request, 'breadcrumb': True, 'page_obj': pager}, RequestContext(request))
 
 
 def sharedb(request, db_id, template_name="sharedb.html"):

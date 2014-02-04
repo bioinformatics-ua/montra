@@ -94,8 +94,8 @@ urlpatterns = patterns('',
     url(r'^fingerprint/(?P<runcode>[^/]+)/(?P<qs>[-]{0,1}\d+)/$', 'emif.views.fingerprint'),
 
     # List Databases
-    url(r'^databases$', 'emif.views.databases', name="databases"),
-    url(r'^alldatabases$', 'emif.views.all_databases'),
+    url(r'^databases/(?P<page>[-]{0,1}\d+)?$', 'emif.views.databases', name="databases"),
+    url(r'^alldatabases/(?P<page>[-]{0,1}\d+)?$', 'emif.views.all_databases'),
     url(r'^alldatabases/data-table$', 'emif.views.all_databases_data_table'),
     url(r'^export_all_answers$', 'emif.views.export_all_answers'),
     url(r'^export_my_answers$', 'emif.views.export_my_answers'),
@@ -222,7 +222,7 @@ urlpatterns = patterns('',
         name='userena_profile_list'),
 
     # url(r'^api-upload-info/', 'rest_framework.authtoken.views.obtain_auth_token'),
-    url(r'^api-info/', 'emif.views.create_auth_token', name="api-info"),
+    url(r'^api-info/(?P<page>[-]{0,1}\d+)?', 'emif.views.create_auth_token', name="api-info"),
     url(r'^docs/api', 'emif.views.docs_api'),
     
 
