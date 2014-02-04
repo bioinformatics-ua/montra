@@ -19,9 +19,13 @@
     {% else %} 
         {% breadcrumb "Databases" "alldatabases" %} 
         {% breadcrumb "List" "alldatabases" %} 
-    {% endif %} 
-    {% breadcrumb breadcrumb_name "" %} 
-{% endblock %} 
+    {% endif %}
+
+    {% comment %}
+        <!-- this gives a error ?? -->
+        {% <breadcrumb></breadcrumb> breadcrumb_name "" %}
+    {% endcomment %}
+{% endblock %}
 
 {% block toolbar %} 
     {% include "menu_toolbar.html" with collapse=collapseall %} 
