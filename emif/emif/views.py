@@ -402,8 +402,6 @@ def geo(request, template_name='geo.html'):
 
     list_locations = []
     _long_lats = []
-    g = geocoders.GeoNames(username='bastiao')
-
     # since the geolocation is now adding the locations, we no longer need to look it up when showing,
     # we rather get it directly
 
@@ -415,8 +413,9 @@ def geo(request, template_name='geo.html'):
             _loc = database.location
 
         city=None
+        g = geocoders.GeoNames(username='bastiao')
 
-        if _loc!= None and g!=None and len(_loc)>1:
+        if _loc!= None and g != None and len(_loc)>1:
             #try:
             #    place, (lat, lng) = g.geocode(_loc)
             #except:
@@ -426,8 +425,19 @@ def geo(request, template_name='geo.html'):
 
             # if dont have this city on the db
             except City.DoesNotExist:
-                print "-- Error: The city " + _loc + " doesnt exist on the database. Ignored on geolocation generation"
-                continue
+                print "-- Error: The city " + _loc + " doesnt exist on the database. Maybe too much requests were being made when it happened ? Trying again..."
+
+                #obtain lat and longitude
+                city = retrieve_geolocation(_loc.lower())
+
+                if city != None:
+                    print city
+
+                    city.save()
+
+                else:
+                    print "-- Error: retrieving geolocation"
+                    continue
 
             _long_lats.append(str(city.lat) + ", " + str(city.long))
 
@@ -1680,29 +1690,46 @@ def add_city(qlist_general):
                 try:
                     city = City.objects.get(name=city_name)
 
+                    print "-- City already is on the db."
                 # if dont have this city yet on the db
                 except City.DoesNotExist:
                     print "City "+qdict['value'].lower()+" is not on the db yet"
 
-                    g = geocoders.GeoNames(username='bastiao')
-
                     #obtain lat and longitude
-                    try:
-                        place, (lat, lng) = g.geocode(city_name)
+                    city = retrieve_geolocation(city_name)
 
-                        # add to the db
-                        city = City(name=city_name, lat=lat, long=lng)
+                    if city != None:
                         print city
+
                         city.save()
+                        return True
 
-                    except:
-                        print "-- error retrieving geolocation"
-
-                else:
-                    print "City already is on the db."
+                    else:
+                        print "-- Error: retrieving geolocation"
+                        return False
 
 
-    return True
+    print "-- No city found at all on questionary"
+    return False
+
+def retrieve_geolocation(city_name):
+
+    try:
+        g = geocoders.GeoNames(username='bastiao')
+
+        if g == None:
+            return None
+
+        place, (lat, lng) = g.geocode(city_name)
+
+        # add to the db
+        city = City(name=city_name, lat=lat, long=lng)
+
+        return city
+
+    except:
+        return None
+
 
 def show_fingerprint_page_read_only(request, q_id, qs_id, errors={}, template_name='advanced_search.html'):
     """
