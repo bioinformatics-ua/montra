@@ -72,6 +72,7 @@ function valchanged(qnum, value) {
 
 function addtrigger(elemid) {
     var elem = document.getElementById(elemid);
+    console.log(elemid + " : " +elem + " : "+document.getElementById(elemid));
     if(!elem) {
       alert("addtrigger: Element with id "+elemid+" not found.");
       return;

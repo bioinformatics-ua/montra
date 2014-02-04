@@ -126,21 +126,28 @@ text-decoration: none;
         <form name="qform" id="qform" action="{{ request.path }}" method="POST">
             {% csrf_token %}
                     <div style="overflow-y:scroll;height:800px;" id="set_container">
-                    </div> 
+                    </div>
+        </form>
             {% comment %}
 {% include "fingerprint_search.html" %}
     {% endcomment  %}      
         </div>
     
-     
-    
-
-
 </div>
+
 <script type="text/javascript" src="{{ STATIC_URL }}js/vendor/chosen.jquery.js"></script>
 <script type="text/javascript" src="{{ STATIC_URL }}js/emif.advanced_search.js"></script>
 <script type="text/javascript">
-        function add_triggers() {
+    var parts_missing = 0;    
+
+    </script>
+{% endblock %}
+
+{% block scriptextra %}
+
+function add_triggers() {
+            
+            console.log("adding triggers");
             {% for trigger in triggers %}
                 addtrigger("{{trigger}}");
             {% endfor %}
@@ -152,22 +159,14 @@ text-decoration: none;
             for(key in qvalues) {
                 valchanged(key, qvalues[key]);
             }
-            ended_loading = true;
-            this.complete();
-        }
-    </script>
-{% endblock %}
+}
 
-{% block scriptextra %}
 $('#li_advanced_search').addClass("active");
 
 $( document ).ready(function() {
     load_questionnary();
-    //add_triggers();
 });
 var threads = {};
-var ended_loading = false;
-    
 function load_questionnary(){
 
         console.log("Creating questionnary set containers (so they are in order)");
@@ -185,6 +184,8 @@ function load_questionnary(){
         console.log( "Loading questionnary by parts, we have {{questionset.questionnaire.questionsets.count}} sets");  
         
         var threadpool = new ThreadPool({{ questionset.questionnaire.questionsets.count }});
+        parts_missing = {{ questionset.questionnaire.questionsets.count }};
+
 
         // i dont everything on a single run, because i just add the containers all at once, not by parts
         // only the constainers content are loaded by parts
@@ -195,10 +196,18 @@ function load_questionnary(){
             threadpool.run(thread);
             threads['qs_{{ qs.sortid }}'] = thread;
         {% endfor %}
-        console.log(threads);
-        // When we end loading, we add the triggers
-        threadpool.run(new Runnable(add_triggers, priority++));
-        
+        //  we add the triggers thread
+        //threadpool.run(new Runnable(add_triggers, priority+10));
+        threadpool.run(new Runnable(dummy, priority+10));
+        threadpool.destroy();
+}
+
+function dummy(){
+
+         setTimeout(function() {
+                  add_triggers();
+            }, 6000);
+        return this.complete();
 }
 
 function loadqspart(sortid, pk){
@@ -210,6 +219,7 @@ function loadqspart(sortid, pk){
     });
 
     threads['qs_'+sortid] = null;
+    parts_missing--;
     this.complete();
 }
 

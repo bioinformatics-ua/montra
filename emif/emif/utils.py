@@ -228,7 +228,7 @@ def get_database_from_id_with_tlv(db):
     return db
 
 WORKSPACE_PATH={'Workspace'}
- def convert_dict_to_query2(params):
+def convert_dict_to_query2(params):
     query = ""
     i = 0
     size_params = len(params)
