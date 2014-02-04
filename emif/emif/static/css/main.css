@@ -208,6 +208,10 @@ div .tooltip {
     display: none;
 }
 
+.pull-center {
+    text-align:center;
+}
+
 .fa-green {
             color: limegreen;
         }
