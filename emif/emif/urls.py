@@ -81,7 +81,7 @@ urlpatterns = patterns('',
     # Results
     #url(r'^results/(?P<query>[a-zA-Z0-9]+)/$', 'emif.views.results'),
     url(r'^results$', 'emif.views.results_fulltext'),
-
+    
     #Statistics
     url(r'^statistics/(?P<questionnaire_id>[0-9]+)/(?P<question_set>[0-9]+)/$', 'emif.views.statistics'),
     # url(r'^statistics$', 'emif.views.statistics'),
@@ -104,6 +104,8 @@ urlpatterns = patterns('',
     url(r'^delete-questionnaire/(?P<qId>[0-9]+)/$', 'utils.delete_questionnaire.delete'),
     # Documentation
     url(r'^docs/api$', 'emif.views.docs_api'),
+    #More Like This!
+    url(r'^databases/mlt/(?P<doc_id>[^/]+)/(?P<page>[-]{0,1}\d+)?$', 'emif.views.more_like_that'),
 
 
     url(r'^rm/(?P<id>[^/]+)', 'emif.views.delete_fingerprint'),
@@ -223,7 +225,5 @@ urlpatterns = patterns('',
 
     # url(r'^api-upload-info/', 'rest_framework.authtoken.views.obtain_auth_token'),
     url(r'^api-info/(?P<page>[-]{0,1}\d+)?', 'emif.views.create_auth_token', name="api-info"),
-    url(r'^docs/api', 'emif.views.docs_api'),
-    
-
+    url(r'^docs/api', 'emif.views.docs_api'),    
 )

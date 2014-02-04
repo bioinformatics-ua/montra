@@ -97,8 +97,7 @@
             <td><img class="db_logo" src="static/upload_images/{{t.logo}}" width="50px" height="50px"/></td>
           
           <td>
-            <a href="fingerprint/{{ t.id }}/1">{{ t.name }}</a>
-
+            <a href="fingerprint/{{ t.id }}/1">{{ t.name }}</a> - <a href="databases/mlt/{{ t.id }}/1">More Like This!</a>
             <div style="margin-left:20px">
              Institution Name: {{t.institution}}
             </div>
@@ -169,12 +168,14 @@
     {% else %}
     <div style="margin-top: 60px;"></div>
   {% endif %}
-
+  {{list_results.paginator_url}}
   {% if page_obj != None %}
-
-{% bootstrap_paginate page_obj range=10 url_view_name="views.results_diff" show_prev_next="false" show_first_last="true"%}
-{% endif %}
-
+    {% if list_results.paginator_url != None %}
+      {% bootstrap_paginate page_obj range=10 url_view_name=list_results.paginator_url url_extra_kwargs=list_results.paginator_kwargs show_prev_next="false" show_first_last="true"%}
+    {% else %}
+      {% bootstrap_paginate page_obj range=10 url_view_name="views.results_diff" show_prev_next="false" show_first_last="true"%}
+    {% endif %} 
+  {% endif %}
 {% endblock %}
 
 {% comment %}

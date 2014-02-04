@@ -120,7 +120,7 @@ class CoreEngine:
         return results
 
     def more_like_this(self, id_doc):
-        similar = self.solr.more_like_this(q='id:doc_2', mltfl='text')
+        similar = self.solr.more_like_this(q='id:'+id_doc, mltfl='text_t', mltmintf=2, mltmindf=2, mltminwl=4)
         return similar
 
 

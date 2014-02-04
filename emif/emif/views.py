@@ -2113,6 +2113,112 @@ def sharedb_activation(request, activation_code, template_name="sharedb_invited.
 def docs_api(request, template_name='docs/api.html'):
     return render(request, template_name, {'request': request, 'breadcrumb': True})
 
+def more_like_that(request, doc_id,  page=1, template_name='results.html'):
+    #print 'doc_id'
+    c = CoreEngine()
+    similar = c.more_like_this(doc_id)
+
+    nameResultSet = c.search_fingerprint("id: "+doc_id, 0, 1)    
+    query_old = "More_Like This"
+    for r in nameResultSet:
+        if len(nameResultSet) > 0 and r.has_key('database_name_t'):
+            query_old = 'More Like "'+r['database_name_t'] +'"'
+        
+    snipets = generate_database_snipet(similar, page)
+    snipets.paginator_url = "views.more_like_that"
+    snipets.paginator_kwargs = {"doc_id": doc_id}
+
+    #print len(similar)
+    #print page
+    #print snipets.num_results
+    #print snipets.paginator_url
+    
+    return render(request, template_name, {'request': request,
+                                           'list_results': snipets, 'page_obj': snipets.list_results,
+                                           'search_old': query_old, 'breadcrumb': True})
+
+def generate_database_snipet(results, page=1, rows=5):
+    class ResultSnipet:
+        num_results = 0
+        list_results = []
+        paginator = None
+        paginator_url = None
+        paginator_kwargs = []
+
+        def setPage(self, pageN):
+            if self.paginator == None:
+                return
+            try:
+                self.list_results = self.paginator.page(pageN)
+            except PageNotAnInteger, e:
+                self.list_results = self.paginator.page(1)
+    
+    questionnaires_ids = {}
+    qqs = Questionnaire.objects.all()
+    for q in qqs:
+        questionnaires_ids[q.slug] = (q.pk, q.name)
+
+    list_results = ResultSnipet()
+
+    list_databases = []
+    if len(results) == 0:
+        return list_results
+
+    for r in results:
+        try:
+            database_aux = Database()
+
+            if (not r.has_key('database_name_t')):
+                database_aux.name = '(Unnamed)'
+            else:
+                database_aux.name = r['database_name_t']
+
+            if (not r.has_key('location_t')):
+                database_aux.location = ''
+            else:
+                database_aux.location = r['location_t']
+            if (not r.has_key('institution_name_t')):
+                database_aux.institution = ''
+            else:
+                database_aux.institution = r['institution_name_t']
+
+            if (not r.has_key('contact_administrative_t')):
+                database_aux.email_contact = ''
+            else:
+                database_aux.email_contact = r['contact_administrative_t']
+
+            if (not r.has_key('number_active_patients_jan2012_t')):
+                database_aux.number_patients = ''
+            else:
+                database_aux.number_patients = r['number_active_patients_jan2012_t']
+            if (not r.has_key('upload-image_t')):
+                database_aux.logo = 'nopic.gif'
+            else:
+                database_aux.logo = r['upload-image_t']
+            database_aux.id = r['id']
+            database_aux.date = convert_date(r['created_t'])
+            try:
+                database_aux.date_modification = convert_date(r['date_last_modification_t'])
+            except KeyError:
+                pass
+                
+            (ttype, type_name) = questionnaires_ids[r['type_t']]
+            database_aux.ttype = ttype
+            database_aux.type_name = type_name
+            list_databases.append(database_aux)
+        except:
+            raise
+
+    pp = Paginator(list_databases, rows)
+    
+    list_results.num_results = results.hits
+    list_results.paginator = pp
+
+    list_results.setPage(page)
+ 
+    return list_results
+    
+
 
 def clean_str_exp(s):
     return s.replace("\n", "|").replace(";", ",").replace("\t", "    ").replace("\r","").replace("^M","")
