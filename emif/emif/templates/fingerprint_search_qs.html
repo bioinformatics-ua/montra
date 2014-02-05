@@ -45,7 +45,8 @@
                         </div>
 
                     {% endif %}
-
+                    <!-- missing accordio here -->
+                    <div class="accordion" id="accordion_{{ questions_list.0.0.sortid }}">
                     <div class="accordion-group {{qdict.depon_class}}" id="acc_qc_{{ question.number }}" {{qdict.checkstring|safe}}>
                         <div class="accordion-heading">
                             {% if request.user.is_staff %}
@@ -215,31 +216,11 @@ function validate(question_number)
        collapseAll($("#collapseall_qs_{{ k.sortid }}"), div_id);
 
        });
-
+         
         {% endif %}
         {% endfor %}
 
-    function collapseAll(element, div_id){
-        if (element.text().indexOf('Collapse') !== -1) {
-           console.log('Collapse all');
-           element.text('Expand all');
-           if (!element.hasClass('disabled')){
-            element.parents().find('#'+div_id +' .collapse').each(function(index){
-                $(this).addClass('in');
-                $(this).collapse('hide');
-            });
-           }
-       } else {
-           console.log('Expand all');
-            element.text('Collapse all');
-           if (!element.hasClass('disabled')){
-            element.parents().find('#'+div_id +' .collapse').each(function(index){
-                $(this).removeClass('in');
-                $(this).collapse('show');
-            });
-           }
-       }
-    };
+
 
 {% endblock %}
 </script>
