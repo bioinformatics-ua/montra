@@ -59,4 +59,10 @@ class ContactForm(forms.Form):
     message = forms.CharField(label='Message', widget=forms.Textarea(attrs={'cols': 30, 'rows': 10, 'class': 'span6'}))
     topic = forms.CharField()
 
+class BugReportForm(forms.Form):
+    title = forms.CharField(label='Title')
+    
+    description = forms.CharField(label='Description', initial='Description: \n\nSteps to reproduce:\n\nExpected result:\n\nPriority:\n\n',widget=forms.Textarea(attrs={'cols': 30, 'rows': 10, 'class': 'span6'}))
+
+
 
