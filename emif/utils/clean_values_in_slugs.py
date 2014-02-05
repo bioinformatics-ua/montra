@@ -28,7 +28,7 @@ import sys
 
 from searchengine.models import *
 
-rem = 1
+rem = 3
 
 
 qu = get_object_or_404(Questionnaire, id=rem)

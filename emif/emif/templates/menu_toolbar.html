@@ -2,7 +2,7 @@
 
 <div class="span6">
 	<div class="btn-group pull-right">
-		{% if request.user.is_authenticated %} 
+		{% if request.user.is_authenticated and not hide_add %} 
 		<div class="btn-group" id="group_toolbar">
 
 			<a class="btn dropdown-toggle" data-toggle="dropdown" href="#" id="add_list_toolbar"> <i class="icon-plus icon"></i>
