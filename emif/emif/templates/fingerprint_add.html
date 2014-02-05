@@ -190,7 +190,7 @@
             </div>
             <div class="span2 text-right">
                 {% if k.sortid != 0 %}
-                    <input class="btn large btn-primary" name="submit" type="submit" value="{% trans 'Save' %}" />
+                    <input class="btn large btn-primary" name="submit" type="submit" value="{% trans 'Save' %}"/>
                 {% endif %}
                 {% if k.sortid == 0 %}
                 {% endif %}
@@ -221,33 +221,60 @@ function toggle_comments(question_number)
     $("#comments_"+question_number).toggle();
 }
 
+$(document).ready(function(){
+
+    $("#qform").submit(function(evnt){
+        
+        evnt.preventDefault();
+        validateForm(evnt);
+    });
+
+});
+
+function validateForm(evnt){
+    $(".open-button_validator").each(function(i, v) {        
+        if( !validate( $(v).attr("id").replace("open-button_validator_", "question_")))
+            evnt.preventDefault();     
+    });
+}
+
 function validate(question_number)
 {
-    //console.log($('#'+question_number).val());
     question_number = question_number + "";
     question_number = question_number.replace(".","\\.");
-    $.getJSON('api/validate?name='+$('#'+question_number).val(), function(data) {
-      var items = [];
-      console.log(data['contains'])
-      if (data['contains'] == true)
-      {
-        $('#warning_'+question_number).addClass("show");
-        $('#warning_'+question_number).removeClass("hide");
-        $('#success_'+question_number).addClass("hide");
-        $('#success_'+question_number).removeClass("show");
+    var text = $('#'+question_number).val();
+    if (text.length == 0)
+        return false;
 
+    //console.log($('#'+question_number).val());
 
-      } else {
-        $('#warning_'+question_number).addClass("hide");
-        $('#warning_'+question_number).removeClass("show");
-        $('#success_'+question_number).addClass("show");
-        $('#success_'+question_number).removeClass("hide");
-      }
-      
+    var validated = false;
+
+    $.ajax({
+        type: 'GET',
+        url: 'api/validate?name='+text,
+        dataType: 'json',
+        success: function(data) {
+              //console.log(data['contains'])
+                //getValidator
+              var validator = $('#open-button_validator_'+question_number.replace("question_",""));
+              
+              if (data['contains'] == false)
+              {
+                validator.removeClass("error");
+                validator.addClass("success");
+                $("span", validator).html("Database Name Available.");
+                validated = true;
+              } else {        
+                validator.removeClass("success");
+                validator.addClass("error");
+                $("span", validator).text("Database Name already exists.");
+              }      
+            },
+        data: {},
+        async: false
     });
-    
-
-
+    return validated;
 };
 
     help_text_popover();
