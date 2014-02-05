@@ -502,7 +502,7 @@ def calculate_databases_per_location():
 
 def advanced_search(request, questionnaire_id, question_set):
 
-    return show_fingerprint_page_read_only(request, questionnaire_id, question_set)
+    return show_fingerprint_page_read_only(request, questionnaire_id, question_set, True)
 
 
 def database_add(request, questionnaire_id, sortid):
@@ -1883,7 +1883,9 @@ def retrieve_geolocation(city_name):
         return None
 
 
-def show_fingerprint_page_read_only(request, q_id, qs_id, errors={}, template_name='advanced_search.html'):
+
+def show_fingerprint_page_read_only(request, q_id, qs_id, SouMesmoReadOnly=False, errors={}, template_name='advanced_search.html'):
+
     """
     Return the QuestionSet template
 
@@ -1955,6 +1957,9 @@ def show_fingerprint_page_read_only(request, q_id, qs_id, errors={}, template_na
                 qs_aux = question.questionset
                 #print "Question: " + str(question)
                 Type = question.get_type()
+                if SouMesmoReadOnly and Type == 'open-button':
+                   Type = "open"
+               
                 _qnum, _qalpha = split_numal(question.number)
 
                 qdict = {
@@ -2001,6 +2006,7 @@ def show_fingerprint_page_read_only(request, q_id, qs_id, errors={}, template_na
                         #
 
                 qlist.append((question, qdict))
+                
             if qs_aux == None:
                 #print "$$$$$$ NONE"
                 qs_aux = k
