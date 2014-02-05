@@ -470,10 +470,7 @@ def calculate_databases_per_location():
 
 
 def advanced_search(request, questionnaire_id, question_set):
-    #return render(request, template_name, {'request': request})
-    print questionnaire_id
 
-    #return show_full_questionnaire(request, questionnaire_id)
     return show_fingerprint_page_read_only(request, questionnaire_id, question_set)
 
 
@@ -1837,6 +1834,9 @@ def show_fingerprint_page_read_only(request, q_id, qs_id, errors={}, template_na
         if request.POST:
 
             for k, v in request.POST.items():
+                
+                if (len(v)==0):
+                    continue
                 if k.startswith("question_"):
                     s = k.split("_")
                     if len(s) == 4:
