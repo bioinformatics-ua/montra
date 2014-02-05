@@ -946,6 +946,7 @@ def database_edit(request, fingerprint_id, questionnaire_id, template_name="data
             id=fingerprint_id,
             users_db=users_db,
             created_date=created_date,
+            hide_add=True
     )
     r['Cache-Control'] = 'no-cache'
     r['Expires'] = "Thu, 24 Jan 1980 00:00:00 GMT"
@@ -1800,6 +1801,11 @@ def show_fingerprint_page_read_only(request, q_id, qs_id, errors={}, template_na
 
     Also add the javascript dependency code.
     """
+    if template_name == "database_add.html" :
+        hide_add = True
+    else:
+        hide_add = False
+    
     try:
 
         qs_list = QuestionSet.objects.filter(questionnaire=q_id).order_by('sortid')
@@ -1930,6 +1936,7 @@ def show_fingerprint_page_read_only(request, q_id, qs_id, errors={}, template_na
                 questions_list=qlist_general,
                 fingerprint_id=fingerprint_id,
                 breadcrumb=True,
+                hide_add = hide_add,
         )
         r['Cache-Control'] = 'no-cache'
         r['Expires'] = "Thu, 24 Jan 1980 00:00:00 GMT"
