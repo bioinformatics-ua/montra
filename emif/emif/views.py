@@ -177,15 +177,19 @@ def results_fulltext_aux(request, query, page=1, template_name='results.html'):
         paginator = None
 
     c = CoreEngine()
-    
-    results = c.search_fingerprint(query, str(0))
+    error_searching = False
+    try:
+        results = c.search_fingerprint(query, str(0))
+    except: 
+        error_searching = True
+
     questionnaires_ids = {}
     qqs = Questionnaire.objects.all()
     for q in qqs:
         questionnaires_ids[q.slug] = (q.pk, q.name)
 
     list_databases = []
-    if len(results) == 0:
+    if error_searching or len(results) == 0 :
         query_old = request.session.get('query', "")
         return render(request, "results.html", {'request': request, 'breadcrumb': True,
                                                 'list_results': [], 'page_obj': None, 'search_old': query_old})
