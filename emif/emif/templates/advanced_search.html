@@ -159,6 +159,7 @@ function add_triggers() {
             for(key in qvalues) {
                 valchanged(key, qvalues[key]);
             }
+    this.complete();
 }
 
 $('#li_advanced_search').addClass("active");
@@ -183,7 +184,7 @@ function load_questionnary(){
 
         console.log( "Loading questionnary by parts, we have {{questionset.questionnaire.questionsets.count}} sets");  
         
-        var threadpool = new ThreadPool({{ questionset.questionnaire.questionsets.count }});
+        var threadpool = new ThreadPool(1);
         parts_missing = {{ questionset.questionnaire.questionsets.count }};
 
 
@@ -197,22 +198,13 @@ function load_questionnary(){
             threads['qs_{{ qs.sortid }}'] = thread;
         {% endfor %}
         //  we add the triggers thread
-        //threadpool.run(new Runnable(add_triggers, priority+10));
-        threadpool.run(new Runnable(dummy, priority+10));
+        threadpool.run(new Runnable(add_triggers, priority+1));
         threadpool.destroy();
-}
-
-function dummy(){
-
-         setTimeout(function() {
-                  add_triggers();
-            }, 6000);
-        return this.complete();
 }
 
 function loadqspart(sortid, pk){
     
-    console.log("getting part from searchqs/"+pk+"/"+sortid+"/");
+    //console.log("getting part from searchqs/"+pk+"/"+sortid+"/");
     
     $.get( "searchqs/"+pk+"/"+sortid+"/", function( data ) {
       $( "#qs_"+sortid ).html( data );
