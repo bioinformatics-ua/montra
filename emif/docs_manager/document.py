@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 # Copyright (C) 2013 Luís A. Bastião Silva and Universidade de Aveiro
 #
 # Authors: Luís A. Bastião Silva <bastiao@ua.pt>
@@ -17,26 +18,26 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-from django.db import models
-
-from questionnaire.models import *
-from django import forms
-
-from django.core.mail import send_mail, BadHeaderError
 
 
-class Slugs(models.Model):
-	slug1 = models.CharField(max_length=1256)
-	# TODO: delete 
-	description = models.TextField()
-	question = models.ForeignKey(Question, help_text = u"The question that this is an answer to")
+class Document(object):
+    """Document for each fingerprint"""
+    def __init__(self, arg):
+        super(Document, self).__init__()
+        self.arg = arg
+        
+
+    def get_name(self):
+        pass
+
+    def get_description(self):
+        pass
+
+    def store(self):
+        pass
 
 
-class Nomenclature(models.Model):
-	name = models.CharField(max_length=256)
+    def load(self):
+        pass
 
-class ContactForm(forms.Form):
-    name = forms.CharField()
-    email = forms.EmailField()
-    topic = forms.CharField()
-    message = forms.CharField(widget=forms.Textarea)
+

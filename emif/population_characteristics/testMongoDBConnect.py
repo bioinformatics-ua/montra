@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # Copyright (C) 2013 Luís A. Bastião Silva and Universidade de Aveiro
 #
-# Authors: Luís A. Bastião Silva <bastiao@ua.pt>
+# Authors: Rui Mendes and Luís A. Bastião Silva <bastiao@ua.pt>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -17,26 +17,22 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-from django.db import models
 
-from questionnaire.models import *
-from django import forms
-
-from django.core.mail import send_mail, BadHeaderError
+from emif.settings import jerboa_collection
+from pymongo.errors import OperationFailure
 
 
-class Slugs(models.Model):
-	slug1 = models.CharField(max_length=1256)
-	# TODO: delete 
-	description = models.TextField()
-	question = models.ForeignKey(Question, help_text = u"The question that this is an answer to")
+json_data = {
+    'name': 'mongo3',
+    'teste': 5,
+    'cenas': 'coiso2'
+}
 
-
-class Nomenclature(models.Model):
-	name = models.CharField(max_length=256)
-
-class ContactForm(forms.Form):
-    name = forms.CharField()
-    email = forms.EmailField()
-    topic = forms.CharField()
-    message = forms.CharField(widget=forms.Textarea)
+try:
+    # Create MONGO record
+    data_example = jerboa_collection.insert(json_data)
+    # get last inserted record
+    print jerboa_collection.find_one()
+    print "Sucesso!"
+except OperationFailure:
+    print "Erro!"

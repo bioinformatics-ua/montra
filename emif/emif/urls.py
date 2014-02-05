@@ -107,7 +107,8 @@ urlpatterns = patterns('',
 
 
     url(r'^rm/(?P<id>[^/]+)', 'emif.views.delete_fingerprint'),
-
+    url(r'^force-rm/(?P<id>[^/]+)', 'emif.views.force_delete_fingerprint'),
+    
     url(r'^share/activation/(?P<activation_code>[^/]+)', 'emif.views.sharedb_activation'),
     url(r'^share/(?P<db_id>[^/]+)', 'emif.views.sharedb'),
 
@@ -224,6 +225,7 @@ urlpatterns = patterns('',
     # url(r'^api-upload-info/', 'rest_framework.authtoken.views.obtain_auth_token'),
     url(r'^api-info/(?P<page>[-]{0,1}\d+)?', 'emif.views.create_auth_token', name="api-info"),
     url(r'^docs/api', 'emif.views.docs_api'),
-    
 
+    # Population Characteristics URLs
+    url(r'population/', include('population_characteristics.urls')),
 )

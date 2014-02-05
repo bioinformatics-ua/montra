@@ -2,10 +2,36 @@
 
 <div class="span6">
 	<div class="btn-group pull-right">
+
+        {% if  request.user|safe in users_db %}
+        <button type="button" class="btn btn" onclick="edit_db_option();" title="Enable/Disabled edit option" data-toggle="button">
+			<i class="fa fa-pencil-square-o"></i> Edit
+		</button>
+         {% endif %}
+
 		{% if request.user.is_authenticated %} 
 		<div class="btn-group" id="group_toolbar">
 
-			<a class="btn dropdown-toggle" data-toggle="dropdown" href="#" id="add_list_toolbar"> <i class="icon-plus icon"></i>
+
+      {% if fingerprint_dump and owner_fingerprint or fingerprint_dump and request.user.is_superuser %}
+      <a class="btn btn " href="dbEdit/{{fingerprint_id}}/{{fingerprint_ttype}}" id="edit_list_toolbar" title="Edit Database" title="Share Database"> <i class="icon-pencil icon"></i>
+        Edit
+        
+      </a>
+
+      <a class="btn btn sharedb" href="" id="share_list_toolbar" onclick="return false;"> <i class="icon-share icon"></i>
+        Share
+        
+      </a>
+
+      <a class="btn btn confirm-delete" href="" id="delete_list_toolbar" onclick="return false;"data-id="{{ fingerprint_id }}"  title="Remove Database"> <i class="icon-trash icon"></i>
+        Delete
+        
+      </a>
+      {% endif %}
+      {% if add_databases %}
+			
+      <a class="btn dropdown-toggle" data-toggle="dropdown" href="#" id="add_list_toolbar"> <i class="icon-plus icon"></i>
 				Add
 				<span class="caret" ></span>
 			</a>
@@ -14,6 +40,7 @@
 				{% show_fingerprints %}
 
 			</ul>
+      {% endif %}
 		</div>
 		{% endif %}
         {% if  collapse %}
@@ -44,14 +71,15 @@
       </a>
       {% endif %}
 
-      {% if export_my_answers and request.user.is_superuser %}
-      <a class="btn" href="export_my_answers" onclick="" > <i class="icon-file"></i>
+
+      {% if export_bd_answers and request.user.is_superuser %}
+      <a class="btn" href="export_bd_answers/{{ fingerprint_id }}" onclick="" > <i class="icon-file"></i>
         Export
       </a>
       {% endif %}
 
-      {% if export_bd_answers and request.user.is_superuser %}
-      <a class="btn" href="export_bd_answers/{{ fingerprint_id }}" onclick="" > <i class="icon-file"></i>
+      {% if export_my_answers and request.user.is_superuser %}
+      <a class="btn" href="export_my_answers" onclick="" > <i class="icon-file"></i>
         Export
       </a>
       {% endif %}
@@ -64,13 +92,153 @@
             {% endif %}
       {% endif %}
 
-
-
-
-		<!--<a href="" role="button" class="btn" title="Editar">
-			<i class="icon-edit"></i>-->
-		</a>
+		<button type="button" class="btn btn" onclick="window.print();" title="Print">
+      <i class="icon-print"></i>
+    </button>
 		
 
 	</div>
 </div>
+
+
+
+<!-- **********************************************************************
+***** Model to delete the fingerprint. It will show a window to confirm the
+***** deletion of the fingerprint
+ ***************************************************************************-->
+
+
+<div id="modal-from-dom" class="modal hide fade" style="display:none"  >
+    <div class="modal-header">
+        <a href="#" onclick="$('#modal-from-dom').modal('hide'); return false;" class="close">&times;</a>
+         <h3>Delete Fingerprint</h3>
+    </div>
+    <div class="modal-body">
+        <p>You are removing the database fingerprint. This procedure is irreversible.</p>
+        <p>Do you want to proceed?</p>
+        <p id="debug-url"></p>
+    </div>
+    <div class="modal-footer">
+        <a href="rm/ref" class="btn btn-danger">Yes</a>
+        <!-- <a href="delete.php?some=param&ref=" class="btn danger">Yes 2</a> -->
+        <a href="#" onclick="$('#modal-from-dom').modal('hide'); return false;" class="btn btn-secondary">Cancel</a>
+    </div>
+</div>
+
+
+<!-- **********************************************************************
+***** Model to share the fingerprint. It will show a window to share the
+***** the fingerprint. A list of email addresses should entered. 
+ ***************************************************************************-->
+
+<div id="modal-from-dom-share" class="modal hide fade" style="display:none"  >
+    <div class="modal-header">
+        <a href="#" onclick="$('#modal-from-dom-share').modal('hide'); return false;" class="close">&times;</a>
+         <h3>Share Database</h3>
+    </div>
+    <div class="modal-body">
+        <p>What are the email address of your team member?</p>
+        
+        <p id="debug-url"></p>
+        Email: <input type="text" id="share_email"/>
+         
+    </div>
+    <div class="modal-footer">
+        <a href="share/ref" class="btn sharedb2" >Share</a>
+        
+        <a href="#" onclick="$('#modal-from-dom-share').modal('hide'); return false;" class="btn btn-secondary">Cancel</a>
+    </div>
+</div>
+
+<form id="send" method="POST" > {% csrf_token %}
+</form>
+
+
+<script>
+
+
+/***************************************************************
+************** Delete ******************************************
+****************************************************************/
+$('#modal-from-dom').bind('show', function() {
+    var id = $(this).data('id'),
+        removeBtn = $(this).find('.btn-danger'),
+        href = removeBtn.attr('href');
+    console.log('id' + id);
+
+    removeBtn.attr('href', href.replace('ref', '' + id));
+});
+
+
+$('.confirm-delete').click(function(e) {
+    e.preventDefault();
+    
+    var id = $(this).data('id');
+    $('#modal-from-dom').data('id', id).modal('show');
+});
+
+
+
+/***************************************************************
+************** Auxiliar method to post 
+****************************************************************/
+
+function post_to_url(path, params, method) {
+    method = method || "post"; // Set method to post by default if not specified.
+
+    // The rest of this code assumes you are not using a library.
+    // It can be made less wordy if you use one.
+    //var form = document.createElement("form");
+    var form = document.getElementById("send");
+    form.setAttribute("method", method);
+    form.setAttribute("action", path);
+
+    for(var key in params) {
+        if(params.hasOwnProperty(key)) {
+            var hiddenField = document.createElement("input");
+            hiddenField.setAttribute("type", "hidden");
+            hiddenField.setAttribute("name", key);
+            hiddenField.setAttribute("value", params[key]);
+
+            form.appendChild(hiddenField);
+         }
+    }
+
+    document.body.appendChild(form);
+    form.submit();
+};
+
+/***************************************************************
+************** Shared ******************************************
+****************************************************************/
+$('#modal-from-dom-share').bind('show', function() {
+    var id = $(this).data('id'),
+        removeBtn = $(this).find('.sharedb2'),
+        href = removeBtn.attr('href');
+    
+    removeBtn.attr('href', href.replace('ref', '' + id));
+});
+
+// This bind is handle the click in share button
+$(".sharedb" ).click(function(e) 
+{
+  console.log("Share DB ");
+  e.preventDefault();
+  var id = $(this).data('id');
+  $('#modal-from-dom-share').data('id', id).modal('show');
+       
+});
+
+// This bind will share the email. 
+$(".sharedb2" ).click(function(e) 
+{
+  e.preventDefault();
+  
+  post_to_url($(this).attr('href'), {"email": $("#share_email").val(), "csrfmiddlewaretoken": $('input[name="csrfmiddlewaretoken"]').prop('value')});
+
+});
+
+
+
+
+</script>

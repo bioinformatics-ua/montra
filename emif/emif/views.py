@@ -139,7 +139,7 @@ def results_comp(request, template_name='results_comp.html'):
 
     list_qsets = []
     for db_id in list_fingerprint_to_compare:
-        qsets, name = createqsets(db_id)
+        qsets, name, db_owners, fingerprint_ttype = createqsets(db_id)
         list_qsets.append((name, qsets))
     first_name = None
     if len(list_qsets) > 0:
@@ -904,12 +904,24 @@ def get_databases_from_solr(request, query="*:*"):
 
 def delete_fingerprint(request, id):
     user = request.user
-    #su = Subject.objects.filter(user=user)
-
-    #email = su[0].email
 
     c = CoreEngine()
     results = c.search_fingerprint('user_t:' + user.username)
+    
+    for result in results:
+        if (id == result['id']):
+            c.delete(id)
+            break
+
+    return databases(request)
+
+def force_delete_fingerprint(request, id):
+    if not request.user.is_superuser:
+        return HttpResponse('Permission denied. Contact administrator of EMIF Catalogue Team', status=403)
+    user = request.user
+    c = CoreEngine()
+    results = c.search_fingerprint('id:' + id)
+    
     for result in results:
         if (id == result['id']):
             c.delete(id)
@@ -924,7 +936,7 @@ def databases(request, page=1, template_name='databases.html'):
     user = request.user
     #list_databases = get_databases_from_db(request)
     _filter = "user_t:" + user.username
-    if user. is_superuser:
+    if user.is_superuser:
         _filter = "user_t:*" 
     list_databases = get_databases_from_solr(request, _filter)
 
@@ -940,7 +952,10 @@ def databases(request, page=1, template_name='databases.html'):
 
     return render(request, template_name, {'request': request, 'export_my_answers': True,
                                            'list_databases': list_databases, 'breadcrumb': True, 'collapseall': False,
-                                           'api_token': True, 'page_obj': pager})
+                                           'page_obj': pager,
+                                           'api_token': True, 
+                                           'owner_fingerprint': False,
+                                           'add_databases': True})
 
 
 def all_databases(request, page=1, template_name='alldatabases.html'):
@@ -957,7 +972,11 @@ def all_databases(request, page=1, template_name='alldatabases.html'):
     ## End Paginator ##
     
     return render(request, template_name, {'request': request, 'export_all_answers': True, 'data_table': True,
-                                           'list_databases': list_databases, 'breadcrumb': True, 'collapseall': False, 'geo': True, 'page_obj': pager})
+                                           'list_databases': list_databases,
+                                            'breadcrumb': True, 'collapseall': False, 
+                                            'geo': True,
+                                            'page_obj': pager,
+                                            'add_databases': True})
 
 
 def all_databases_data_table(request, template_name='alldatabases_data_table.html'):
@@ -967,7 +986,7 @@ def all_databases_data_table(request, template_name='alldatabases_data_table.htm
     if list_databases:
         for t in list_databases:
             id = t.id
-            qsets, name = createqsets(id)
+            qsets, name, db_owners, fingerprint_ttype = createqsets(id)
             q_list = []
             for group in qsets.ordered_items():
                 (k, qs) = group
@@ -1001,11 +1020,31 @@ def createqsets(runcode, qsets=None, clean=True):
     list_values = []
     blacklist = ['created_t', 'type_t', '_version_', 'date_last_modification_t']
     name = "Not defined."
+    users = ""
+    fingerprint_ttype = ""
+
+    db_owners = "" 
+
+
+    questionnaires_ids = {}
+    qqs = Questionnaire.objects.all()
+    for q in qqs:
+        questionnaires_ids[q.slug] = (q.pk, q.name)
+
 
     for result in results:
 
+
+        (fingerprint_ttype, type_name) = questionnaires_ids[result['type_t']]
+
         # Get the slug of fingerprint type
         q_aux = Questionnaire.objects.filter(slug=result['type_t'])
+
+        try:
+            users = result['user_t']
+            db_owners = result['user_t']
+        except:
+            pass
 
         list_qsets = QuestionSet.objects.filter(questionnaire=q_aux[0]).order_by('sortid')
 
@@ -1091,28 +1130,54 @@ def createqsets(runcode, qsets=None, clean=True):
                 except:
                     pass
         break
+    # What should I do with this code?
+    # I know that it actually do nothing    
+    if (users!=""):
+        users.split(" \\ ")
+
+    return (qsets, name, db_owners, fingerprint_ttype)
+
+   
+# TODO: move to another place, maybe API? 
+def get_api_info(fingerprint_id):
+    """This is an auxiliar method to get the API Info
+    """
+    result = {}
+
     
-    return (qsets, name)
+    results = FingerprintAPI.objects.filter(fingerprintID=fingerprint_id)
+    result = {}
+    for r in results:
+        result[r.field] = r.value
+    return result
+
 
 def fingerprint(request, runcode, qs, template_name='database_info.html'):
-    qsets, name = createqsets(runcode)
-
-    def get_api_info(fingerprint_id):
-
-        result = {}
     
-        
-        results = FingerprintAPI.objects.filter(fingerprintID=fingerprint_id)
-        result = {}
-        for r in results:
-            result[r.field] = r.value
-        return result
+    
+    qsets, name, db_owners, fingerprint_ttype = createqsets(runcode)
+
+    if fingerprint_ttype == "":
+        raise "There is missing ttype of questionarie, something is really wrong"
 
     apiinfo = json.dumps(get_api_info(runcode));
+
+    owner_fingerprint = False
+    for owner in db_owners.split(" "):
+        print owner
+        print request.user.username
+        if (owner == request.user.username):
+            owner_fingerprint = True
     
     return render(request, template_name, 
-        {'request': request, 'qsets': qsets, 'export_bd_answers': True, 'apiinfo': apiinfo, 'fingerprint_id': runcode,
-                   'breadcrumb': True, 'breadcrumb_name': name.decode('ascii', 'ignore'), 'style': qs, 'collapseall': False})
+        {'request': request, 'qsets': qsets, 'export_bd_answers': True, 
+        'apiinfo': apiinfo, 'fingerprint_id': runcode,
+                   'breadcrumb': True, 'breadcrumb_name': name.decode('ascii', 'ignore'),
+                    'style': qs, 'collapseall': False, 
+                    'owner_fingerprint':owner_fingerprint,
+                    'fingerprint_dump': True,
+                    'fingerprint_ttype': fingerprint_ttype,
+                    })
 
 
 def get_questionsets_list(runinfo):
@@ -2130,7 +2195,8 @@ def save_answers_to_csv(list_databases, filename):
         writer.writerow(['DB_ID', 'DB_name', 'Questionset', 'Question', 'QuestioNumber', 'Answer'])
         for t in list_databases:
             id = t.id
-            qsets, name = createqsets(id, clean=False)
+
+            qsets, name, db_owners, fingerprint_ttype = createqsets(id, clean=False)
 
             for group in qsets.ordered_items():
                 (k, qs) = group
@@ -2340,7 +2406,11 @@ def import_questionnaire(request, template_name='import_questionnaire.html'):
     # wb = load_workbook(filename = r'/Volumes/EXT1/Dropbox/MAPi-Dropbox/EMIF/Code/emif/emif/questionnaire_ad_v2.xlsx')
     # wb = load_workbook(filename = r'/Volumes/EXT1/Dropbox/MAPi-Dropbox/EMIF/Observational_Data_Sources_Template_v5.xlsx')
     # wb = load_workbook(filename = r'C:/Questionnaire_template_v3.4.xlsx')
+<<<<<<< HEAD
     wb = load_workbook(filename =r'/Users/ribeiro/Downloads/Questionnaire_template_v3.5.3.xlsx')
+=======
+    wb = load_workbook(filename =r'/Volumes/EXT1/trash/Questionnaire_template_v3.5.3xlsx')
+>>>>>>> origin/populationcharacteristics
     ws = wb.get_active_sheet()
     log = ''
 
