@@ -75,6 +75,7 @@ urlpatterns = patterns('',
 
     url(r'^feedback/thankyou/', 'emif.views.feedback_thankyou'),
     url(r'^feedback$', 'emif.views.feedback', name="feedback"),
+    url(r'^bugreport$', 'emif.views.bugreport', name="bugreport"),
 
 
     (r'^contact/thankyou/', 'searchengine.views.thankyou'),

@@ -41,6 +41,7 @@ from searchengine.search_indexes import convert_text_to_slug
 from emif.utils import *
 from emif.models import *
 from api.models import *
+from emif.github import report_bug
 from geopy import geocoders 
 from django.core.mail import send_mail, BadHeaderError
 
@@ -2080,6 +2081,10 @@ def feedback(request, template_name='feedback.html'):
 
 def feedback_thankyou(request, template_name='feedback_thankyou.html'):
     return render(request, template_name, {'request': request, 'breadcrumb': True})
+
+def bugreport(request, template_name='bugreport.html'):
+
+    return report_bug(request)
 
 
 def show_fingerprint_page(request, runinfo, errors={}, template_name='database_edit.html'):
