@@ -39,7 +39,7 @@
         <input type="hidden" name="questionset_id" value="{{ questionset.id }}">
 
         <div class="accordion" id="accordion_{{ k.sortid }}">
-
+<!-- begin question on set -->
         {% for question, qdict in qlist %}
 
             {% incrementglobal iteratorQ %}
@@ -65,7 +65,7 @@
                         <div class="accordion-heading">
                             {% if request.user.is_staff %}
                                 <span class="pull-right"> <a href="admin/questionnaire/question/{{ question.id }}/">
-                                    <i class="fa fa-pencil-square-o">&nbsp;</i>
+                                    <i class="icon-pencil">&nbsp;</i>
                                 </a></span>
                             {% endif %}
                             <span class="pull-right">
@@ -105,15 +105,15 @@
                                     {% if request.user.is_staff %}
                                     <span class="pull-right">
                                         <a href="admin/questionnaire/question/{{ question.id }}/">
-                                            <i class="fa fa-pencil-square-o">&nbsp;</i>
+                                            <i class="icon-pencil">&nbsp;</i>
                                         </a>
                                     </span>
                                     {% endif %}
                                     <span class="pull-right">
-                                        <a href="" onclick="toggle_comments({{question.number|removedots}}); return false;"><i class="fa {% if qdict.comment %} fa-comment {% else %} fa-comment-o {% endif %}">&nbsp;</i></a>
+                                        <a href="" onclick="toggle_comments({{question.number|removedots}}); return false;"><i class="fa {% if qdict.comment %} icon-comment {% else %} icon-comment-alt {% endif %}">&nbsp;</i></a>
                                     </span>
                                     <span class="pull-right answered hide" id="answered_{{ question.number|removedots }}">
-                                        <i class="fa fa-check-square-o fa-green">&nbsp;</i>
+                                        <i class="icon-check green">&nbsp;</i>
                                     </span>
                                 {% endif %}
                                 </div>
@@ -148,7 +148,7 @@
             {% endwith %}
 
         {% endfor %}
-
+        <!-- end set generation -->
         {% if h1_last.value == '1' %}
                 </div>
                 </div>

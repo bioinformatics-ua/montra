@@ -177,15 +177,19 @@ def results_fulltext_aux(request, query, page=1, template_name='results.html'):
         paginator = None
 
     c = CoreEngine()
-    
-    results = c.search_fingerprint(query, str(0))
+    error_searching = False
+    try:
+        results = c.search_fingerprint(query, str(0))
+    except: 
+        error_searching = True
+
     questionnaires_ids = {}
     qqs = Questionnaire.objects.all()
     for q in qqs:
         questionnaires_ids[q.slug] = (q.pk, q.name)
 
     list_databases = []
-    if len(results) == 0:
+    if error_searching or len(results) == 0 :
         query_old = request.session.get('query', "")
         return render(request, "results.html", {'request': request, 'breadcrumb': True,
                                                 'list_results': [], 'page_obj': None, 'search_old': query_old})
@@ -399,22 +403,49 @@ def geo(request, template_name='geo.html'):
         query = "*:*"
     print "query@" + query
     list_databases = get_databases_from_solr(request, query)
+
     list_locations = []
     _long_lats = []
-    g = geocoders.GeoNames(username='bastiao')
+    # since the geolocation is now adding the locations, we no longer need to look it up when showing,
+    # we rather get it directly
+
     for database in list_databases:
+
         if database.location.find(".")!= -1:
             _loc = database.location.split(".")[0]
         else:
             _loc = database.location
-        if _loc!= None and g!=None and len(_loc)>1:
-            try:
-                place, (lat, lng) = g.geocode(_loc)
-            except:
-                continue
-            _long_lats.append(str(lat)+ ", " +str(lng))
 
-        print _loc
+        city=None
+        g = geocoders.GeoNames(username='bastiao')
+
+        if _loc!= None and g != None and len(_loc)>1:
+            #try:
+            #    place, (lat, lng) = g.geocode(_loc)
+            #except:
+            #    continue
+            try:
+                city = City.objects.get(name=_loc.lower())
+
+            # if dont have this city on the db
+            except City.DoesNotExist:
+                print "-- Error: The city " + _loc + " doesnt exist on the database. Maybe too much requests were being made when it happened ? Trying again..."
+
+                #obtain lat and longitude
+                city = retrieve_geolocation(_loc.lower())
+
+                if city != None:
+                    print city
+
+                    city.save()
+
+                else:
+                    print "-- Error: retrieving geolocation"
+                    continue
+
+            _long_lats.append(str(city.lat) + ", " + str(city.long))
+
+        #print _loc
 
         list_locations.append(_loc)
     return render(request, template_name, {'request': request,
@@ -470,11 +501,8 @@ def calculate_databases_per_location():
 
 
 def advanced_search(request, questionnaire_id, question_set):
-    #return render(request, template_name, {'request': request})
-    print questionnaire_id
 
-    #return show_full_questionnaire(request, questionnaire_id)
-    return show_fingerprint_page_read_only(request, questionnaire_id, question_set)
+    return show_fingerprint_page_read_only(request, questionnaire_id, question_set, True)
 
 
 def database_add(request, questionnaire_id, sortid):
@@ -483,6 +511,156 @@ def database_add(request, questionnaire_id, sortid):
                                                template_name='database_add.html')
 
     return response
+
+def database_search_qs(request, questionnaire_id, sortid):
+
+    response = render_one_questionset(request, questionnaire_id, sortid,
+                                               template_name='fingerprint_search_qs.html')
+
+    return response
+
+def render_one_questionset(request, q_id, qs_id, errors={}, template_name='fingerprint_add_qs.html'):
+    """
+    Return the QuestionSet template
+
+    Also add the javascript dependency code.
+    """
+    try:
+
+        qs_list = QuestionSet.objects.filter(questionnaire=q_id, sortid=qs_id).order_by('sortid')
+
+        if (int(qs_id) == 99):
+            qs_id = len(qs_list) - 1
+        question_set = qs_list[0]
+        #questions = Question.objects.filter(questionset=qs_id)
+
+        questions = question_set.questions()
+        #print "Questions: " + str(questions)
+        #print "QuestionSet: " + str(question_set)
+
+        questions_list = {}
+        for qset_aux in qs_list:
+            #questions_aux = Question.objects.filter(questionset=qset_aux)
+            questions_list[qset_aux.id] = qset_aux.questions()
+            #print "here"
+
+        qlist = []
+        jsinclude = []      # js files to include
+        cssinclude = []     # css files to include
+        jstriggers = []
+        qvalues = {}
+
+        if request.POST:
+
+            for k, v in request.POST.items():
+                if k.startswith("question_"):
+                    s = k.split("_")
+                    if len(s) == 4:
+                        #qvalues[s[1]+'_'+v] = '1' # evaluates true in JS
+                        if (qvalues.has_key(s[1])):
+                            qvalues[s[1]] += " " + v # evaluates true in JS
+                        else:
+                            qvalues[s[1]] = v # evaluates true in JS
+                    elif len(s) == 3 and s[2] == 'comment':
+                        qvalues[s[1] + '_' + s[2]] = v
+                    else:
+                        if (qvalues.has_key(s[1])):
+                            qvalues[s[1]] += " " + v
+                        else:
+                            qvalues[s[1]] = v
+                            #print qvalues
+            query = convert_qvalues_to_query(qvalues, q_id)
+            #print "Query: " + query
+            return results_fulltext_aux(request, query)
+
+        qlist_general = []
+
+        for k in qs_list:
+            qlist = []
+            qs_aux = None
+            for question in questions_list[k.id]:
+                qs_aux = question.questionset
+                #print "Question: " + str(question)
+                Type = question.get_type()
+                _qnum, _qalpha = split_numal(question.number)
+
+                qdict = {
+                    'template': 'questionnaire/%s.html' % (Type),
+                    'qnum': _qnum,
+                    'qalpha': _qalpha,
+                    'qtype': Type,
+                    'qnum_class': (_qnum % 2 == 0) and " qeven" or " qodd",
+                    'qalpha_class': _qalpha and (ord(_qalpha[-1]) % 2 \
+                                                     and ' alodd' or ' aleven') or '',
+                }
+
+                # add javascript dependency checks
+                cd = question.getcheckdict()
+                depon = cd.get('requiredif', None) or cd.get('dependent', None)
+                if depon:
+                    # extra args to BooleanParser are not required for toString
+                    parser = BooleanParser(dep_check)
+
+                    # qdict['checkstring'] = ' checks="%s"' % parser.toString(depon)
+
+                    #It allows only 1 dependency
+                    #The line above allows multiple dependencies but it has a bug when is parsing white spaces
+                    qdict['checkstring'] = ' checks="dep_check(\'question_%s\')"' % depon
+
+                    qdict['depon_class'] = ' depon_class'
+                    jstriggers.append('qc_%s' % question.number)
+                    if question.text[:2] == 'h1':
+                        jstriggers.append('acc_qc_%s' % question.number)
+                if 'default' in cd and not question.number in cookiedict:
+                    qvalues[question.number] = cd['default']
+                if Type in QuestionProcessors:
+                    qdict.update(QuestionProcessors[Type](request, question))
+                    if 'jsinclude' in qdict:
+                        if qdict['jsinclude'] not in jsinclude:
+                            jsinclude.extend(qdict['jsinclude'])
+                    if 'cssinclude' in qdict:
+                        if qdict['cssinclude'] not in cssinclude:
+                            cssinclude.extend(qdict['jsinclude'])
+                    if 'jstriggers' in qdict:
+                        jstriggers.extend(qdict['jstriggers'])
+                        #if 'qvalue' in qdict and not question.number in cookiedict:
+                        #    qvalues[question.number] = qdict['qvalue']
+                        #
+
+                qlist.append((question, qdict))
+            if qs_aux == None:
+                #print "$$$$$$ NONE"
+                qs_aux = k
+            qlist_general.append((qs_aux, qlist))
+
+        errors = {}
+        fingerprint_id = generate_hash()
+        r = r2r(template_name, request,
+                questionset=question_set,
+                questionsets=question_set.questionnaire.questionsets,
+                runinfo=None,
+                errors=errors,
+                qlist=qlist,
+                progress=None,
+                triggers=jstriggers,
+                qvalues=qvalues,
+                jsinclude=jsinclude,
+                cssinclude=cssinclude,
+                async_progress=None,
+                async_url=None,
+                qs_list=qs_list,
+                questions_list=qlist_general,
+                fingerprint_id=fingerprint_id,
+                breadcrumb=True,
+        )
+        r['Cache-Control'] = 'no-cache'
+        r['Expires'] = "Thu, 24 Jan 1980 00:00:00 GMT"
+
+    except:
+
+        raise
+    return r
+
 
 
 class RequestMonkeyPatch(object):
@@ -770,6 +948,8 @@ def database_edit(request, fingerprint_id, questionnaire_id, template_name="data
     if (question_set.sortid == 99 or request.POST):
         # Index on Solr
         try:
+            add_city(qlist_general)
+
             index_answeres_from_qvalues(qlist_general, question_set.questionnaire, users_db,
                                         fingerprint_id, extra_fields=extra_fields, created_date=created_date)
         except:
@@ -1616,6 +1796,10 @@ def show_fingerprint_page_errors(request, q_id, qs_id, errors={}, template_name=
 
             if users_db==None:
                 users_db = request.user.username
+
+            # adding city to cities database (if doesnt exist)
+            add_city(qlist_general)
+
             index_answeres_from_qvalues(qlist_general, question_set.questionnaire, users_db,
                                         fingerprint_id, extra_fields=extra_fields, created_date=created_date)
 
@@ -1645,7 +1829,63 @@ def show_fingerprint_page_errors(request, q_id, qs_id, errors={}, template_name=
     return r
 
 
-def show_fingerprint_page_read_only(request, q_id, qs_id, errors={}, template_name='advanced_search.html'):
+# Adds a city to the internal database of cities with his location (if it doesnt exist yet)
+# receives as input a qlist
+def add_city(qlist_general):
+
+    # iterate until we find the location field (City or location fields)
+    for qs_aux, qlist in qlist_general:
+        for question, qdict in qlist:
+            if question.text == 'Location' or question.text == 'City':
+                city_name = qdict['value'].lower()
+                # check if the city is on the db
+                try:
+                    city = City.objects.get(name=city_name)
+
+                    print "-- City already is on the db."
+                # if dont have this city yet on the db
+                except City.DoesNotExist:
+                    print "City "+qdict['value'].lower()+" is not on the db yet"
+
+                    #obtain lat and longitude
+                    city = retrieve_geolocation(city_name)
+
+                    if city != None:
+                        print city
+
+                        city.save()
+                        return True
+
+                    else:
+                        print "-- Error: retrieving geolocation"
+                        return False
+
+
+    print "-- No city found at all on questionary"
+    return False
+
+def retrieve_geolocation(city_name):
+
+    try:
+        g = geocoders.GeoNames(username='bastiao')
+
+        if g == None:
+            return None
+
+        place, (lat, lng) = g.geocode(city_name)
+
+        # add to the db
+        city = City(name=city_name, lat=lat, long=lng)
+
+        return city
+
+    except:
+        return None
+
+
+
+def show_fingerprint_page_read_only(request, q_id, qs_id, SouMesmoReadOnly=False, errors={}, template_name='advanced_search.html'):
+
     """
     Return the QuestionSet template
 
@@ -1683,10 +1923,11 @@ def show_fingerprint_page_read_only(request, q_id, qs_id, errors={}, template_na
         cssinclude = []     # css files to include
         jstriggers = []
         qvalues = {}
-
         if request.POST:
-
             for k, v in request.POST.items():
+                
+                if (len(v)==0):
+                    continue
                 if k.startswith("question_"):
                     s = k.split("_")
                     if len(s) == 4:
@@ -1704,7 +1945,7 @@ def show_fingerprint_page_read_only(request, q_id, qs_id, errors={}, template_na
                             qvalues[s[1]] = v
                             #print qvalues
             query = convert_qvalues_to_query(qvalues, q_id)
-            #print "Query: " + query
+            print "Query: " + query
             return results_fulltext_aux(request, query)
 
         qlist_general = []
@@ -1716,6 +1957,9 @@ def show_fingerprint_page_read_only(request, q_id, qs_id, errors={}, template_na
                 qs_aux = question.questionset
                 #print "Question: " + str(question)
                 Type = question.get_type()
+                if SouMesmoReadOnly and Type == 'open-button':
+                   Type = "open"
+               
                 _qnum, _qalpha = split_numal(question.number)
 
                 qdict = {
@@ -1762,6 +2006,7 @@ def show_fingerprint_page_read_only(request, q_id, qs_id, errors={}, template_na
                         #
 
                 qlist.append((question, qdict))
+                
             if qs_aux == None:
                 #print "$$$$$$ NONE"
                 qs_aux = k
