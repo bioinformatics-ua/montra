@@ -23,8 +23,9 @@ from github3 import login
 from emif.models import *
 from django.shortcuts import render
 from django.conf import settings
+from django.core.mail import send_mail, BadHeaderError
 
-#from emif.views import feedback_thankyou
+
 
 """
 Put this variables in settings.py or local_settings.py
@@ -50,7 +51,11 @@ def report_bug(request):
             issue = Issue(settings.GITHUB_USERNAME, settings.GITHUB_PASSWD)
             description = description + "\n\nReported by %s, email: %s" % (name, from_email)
             issue.create(title, description)
-            send_mail(title, description, settings.DEFAULT_FROM_EMAIL, [from_email])
+            
+            try:
+                send_mail(title, description, settings.DEFAULT_FROM_EMAIL, [from_email])
+            except:
+                pass
             return feedback_thankyou(request)
 
     else:
@@ -65,7 +70,7 @@ class Issue(object):
 		self.gh = login(user, pw)
 
 	def create(self, title, body ):
-		return self.hg.create_issue(settings.GITHUB_ACCOUNT,settings.GITHUB_REPO, title, body)
+		return self.gh.create_issue(settings.GITHUB_ACCOUNT,settings.GITHUB_REPO, title, body)
 
 """
 >>> from github3 import login

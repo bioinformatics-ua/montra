@@ -61,8 +61,7 @@ class ContactForm(forms.Form):
 
 class BugReportForm(forms.Form):
     title = forms.CharField(label='Title')
-    name = forms.CharField(label='Name')
-    email = forms.EmailField(label='Email')
+    
     description = forms.CharField(label='Description', initial='Description: \n\nSteps to reproduce:\n\nExpected result:\n\nPriority:\n\n',widget=forms.Textarea(attrs={'cols': 30, 'rows': 10, 'class': 'span6'}))
 
 
