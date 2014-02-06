@@ -65,6 +65,7 @@ function PCAPI ()
         return result;
     };
 
+
     this.getValue1 = function(){
           var result = {}
           
@@ -92,6 +93,33 @@ function PCAPI ()
         return result;
     };
 
+    this.getNameN = function(nameN){
+          var result = {}
+          
+        $.ajax({
+          dataType: "json",
+          url: "population/jerboalistvalues/" + nameN,
+          async: false,
+          data: result,
+          success: function (data){result=data;},
+        });
+        return result;
+    };
+
+
+    this.getValueN = function(valueN){
+          var result = {}
+          
+        $.ajax({
+          dataType: "json",
+          url: "population/jerboalistvalues/" + valueN,
+          async: false,
+          data: result,
+          success: function (data){result=data;},
+        });
+        return result;
+    };
+
     this.getVar = function(){
         var result = {}
           
@@ -104,9 +132,21 @@ function PCAPI ()
         });
         return result;
     };
-};
 
- 
+    this.getChart = function(){
+        var result = {}
+          
+        $.ajax({
+          dataType: "json",
+          url: "population/jerboalistvalues/Var",
+          async: false,
+          data: result,
+          success: function (data){result=data;},
+        });
+        return result;
+    };
+
+};
 
 /********************************************************************
 **************** Population Characteristics - Bar (Jquery Plugin) 
@@ -160,18 +200,6 @@ function PCAPI ()
                 tmpUl.append('<li><a class="filterBar" href="#" onclick="return false;"><i id="iproximity" class="icon-ok icon-black active"></i> '+values.values[data]+'</a></li>')
             });
             
-
-            self.append("Var: ");
-            tmpUl = $('<ul class="nav nav-pills nav-stacked">');
-            values = options.getVar();
-            self.append(tmpUl);
-            $.each(values.values, function (data){
-                if (values.values[data]==="")
-                    return;
-                
-                tmpUl.append('<li><a class="filterBar" href="#" onclick="return false;"><i id="iproximity" class="icon-ok icon-black active"></i> '+values.values[data]+'</a></li>')
-            });
-            
             $(".filterBar").bind('click',function(e)
                     { 
                       e.preventDefault(); 
@@ -213,13 +241,83 @@ function PCAPI ()
 
 
 
+/********************************************************************
+**************** Population Characteristics Types
+*********************************************************************/
+
+ (function( $ )
+ {
+
+    var methods = {
+        init : function( options ) {
+
+            
+            var self = this;
+            self.append("Var: ");
+            tmpUl = $('<ul class="nav nav-pills nav-stacked">');
+            values = options.getVar();
+            self.append(tmpUl);
+            $.each(values.values, function (data){
+                if (values.values[data]==="")
+                    return;
+                
+                tmpUl.append('<li><a class="filterBar" href="#" onclick="return false;"><i id="iproximity" class="icon-ok icon-black active"></i> '+values.values[data]+'</a></li>')
+            });
+
+            var myPC = options;
+
+            $(".filterBar").bind('click',function(e)
+                    { 
+                      e.preventDefault(); 
+                      e.stopPropagation();
+                      
+                      console.log(myPC);
+                      if ($(e.toElement.firstChild).hasClass('icon-ok')) 
+                      {
+                        $(e.toElement.firstChild).removeClass('icon-ok') 
+                      }
+                      else
+                      {
+                        $(e.toElement.firstChild).addClass('icon-ok') 
+                      }
+                      return false;
+                    });
+        },
+        draw : function( options ) {
+            
+        },
+
+    };
+
+    $.fn.populationChartsTypes = function(method) {
+        // Method calling logic
+        if ( methods[method] ) {
+        return methods[ method ].apply( this, Array.prototype.slice.call( arguments, 1 ));
+        } else if ( typeof method === 'object' || ! method ) {
+        return methods.init.apply( this, arguments );
+        } else {
+        $.error( 'Method ' + method + ' does not exist on jQuery.populationChartsTypes' );
+        }
+        return this;
+    };
+}( jQuery ));
+
+
+
+
+
 $(document).ready(
     function(){
 
         var pc = new PCAPI();
 
         $("#pcBarContent").populationChartsBar(pc);
-        $("#pcBarContent").populationChartsBar('draw', pc);    
+        $("#pcBarContent").populationChartsBar('draw', pc); 
+
+
+        $("#pc_list").populationChartsTypes(pc);
+        $("#pc_list").populationChartsTypes('draw', pc); 
+
     }
 );
 

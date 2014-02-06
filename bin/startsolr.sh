@@ -1,4 +1,4 @@
-if [ -z "$SOLR_PATH" ] 
+ if [ -z "$SOLR_PATH" ] 
 then
     SOLR_PATH="/usr/local/solr-4.1.0/example"
 fi

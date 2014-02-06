@@ -20,30 +20,39 @@
 
 import json
 
+"""
+The goal of this class is to generate the configurations files/templates
+for the charts library
+"""
+
+
 class Operation:
     SUM = 'sum'
     UNIQUE = 'unique'
-
+    LIST = 'list'
+    MIN = 'min'
+    MAX = 'max'
+    COUNT = 'count'
+    MEAN = 'mean'
+    PERC25 = 'Perc25'
+    PERC75 = 'Perc75'
+    SD = 'SD'
 
 class Scale(object):
     def __init__(self):
-        self.fixed_title = 'None'
-        self.operation = None
-        self.var = None
+        self.unit = None
+        self.steps = None
         
     def to_JSON(self):
         return json.dumps(self, default=lambda o: o.__dict__, sort_keys=True, indent=4)
 
 class Filter(object):
     def __init__(self):
-        self.fixed_title = 'None'
-        self.operation = None
+        self.name = None
         self.var = None
         
     def to_JSON(self):
         return json.dumps(self, default=lambda o: o.__dict__, sort_keys=True, indent=4)
-
-
 
 class Title(object):
     def __init__(self):
@@ -75,6 +84,39 @@ class Chart(object):
     def to_JSON(self):
         return json.dumps(self, default=lambda o: o.__dict__, sort_keys=True, indent=4)
 
+# Active patients
+# Birth in year
+# Age at patient start
+# Age at patient end
+# Age at start of year
+# Observation time
+# Observation time before a year
+# Observation time after a year
+# Observation time in a year
+
+### Active patients  
+c = Chart()
+c.title = Title()
+c.title.operation = Operation.UNIQUE
+c.title.var = "Var" 
+c.x_axis = Axis()
+c.x_axis.operation = "unique"
+c.x_axis.var = "Name1"
+c.y_axis = Axis()
+c.y_axis.operation = "unique"
+c.y_axis.var = "Count"
+f1 = Filter()
+f1.name = 'Year'
+f1.var = 'Name1'
+
+f1 = Filter()
+f1.name = 'Age'
+f1.var = 'Name2'
+
+c.filters = [f1]
+
+print c.to_JSON()
+
 
 
 ### Age starts at 
@@ -84,9 +126,28 @@ c.title.operation = Operation.UNIQUE
 c.title.var = "Var" 
 c.x_axis = Axis()
 c.x_axis.operation = "unique"
-c.x_axis.var = "Age"
+c.x_axis.var = "Name1"
 c.y_axis = Axis()
 c.y_axis.operation = "unique"
-c.y_axis.var = "Age"
+c.y_axis.var = "Count"
+f1 = Filter()
+f1.name = 'Sex'
+f1.var = 'Name2'
+c.filters = [f1]
 
 print c.to_JSON()
+
+c = Chart()
+c.title = Title()
+c.title.operation = Operation.UNIQUE
+c.title.var = "Var" 
+c.x_axis = Axis()
+c.x_axis.operation = "unique"
+c.x_axis.var = "Name1"
+c.y_axis = Axis()
+c.y_axis.operation = "unique"
+c.y_axis.var = "Count"
+f1 = Filter()
+f1.name = 'Sex'
+f1.var = 'Name2'
+c.filters = [f1]
