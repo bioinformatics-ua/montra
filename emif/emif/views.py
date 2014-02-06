@@ -1144,20 +1144,21 @@ def all_databases(request, page=1, template_name='alldatabases.html'):
                                            'list_databases': list_databases, 'breadcrumb': True, 'collapseall': False, 'geo': True, 'page_obj': pager})
 
 def qs_data_table(request, template_name='qs_data_table.html'):
-    answers = []
-    list_databases = get_databases_from_solr(request, "*:*")
-    titles = []
     db_type = request.POST.get("db_type")
     qset = request.POST.get("qset")
-        
+    
+    answers = []
+    # get only databases with correct type
+    list_databases = get_databases_from_solr(request, "type_t:"+re.sub(r'\s+', '', db_type.lower()))
+    titles = []
+    
     for t in list_databases:
 
         if t.type_name == db_type:
             qsets, name = createqsets(t.id)
-                        
-            id = t.id
-            qsets, name = createqsets(id)
+            
             q_list = []
+            a_list = []            
             for group in qsets.ordered_items():
 
                 (k, qs) = group    
@@ -1165,15 +1166,11 @@ def qs_data_table(request, template_name='qs_data_table.html'):
                 if k == qset:
                     for q in qs.list_ordered_tags:
                         q_list.append(q)
+                        a_list.append(q.value)
+                continue
             titles = ('Name', (q_list))
             
-            a_list = []
-            for group in qsets.ordered_items():
-                (k, qs) = group
-                if k == qset:
-                    
-                    for q in qs.list_ordered_tags:
-                        a_list.append(q.value)
+
             answers.append((name, (a_list)))
                 # print answers
             

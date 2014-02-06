@@ -18,53 +18,9 @@
 
 
 {% block scriptextraincludes %}
-<script src="static/js/vendor/jquery.tablesorter.min.js"></script>
-<script src="static/js/vendor/jquery.tablesorter.widgets.js"></script>
-
-        
-        <script type="text/javascript" language="javascript" src="static/js/jquery.dataTables.js"></script>
-        <script type="text/javascript" charset="utf-8">
-            $(document).ready(function() {
-            /*    $('#table_databases').dataTable( {
-                        "sScrollY": 200,
-                    "sScrollX": "200%",
-                    "sScrollXInner": "210%",
-                    "bScrollCollapse": true,
-                    
-                } );
-*/
-                // Add handlers to the db type selector
-                $('#db_type').change(function(){
-                    var value_selected = $(this).val();
-                    if(value_selected == '0'){
-                        $('.qsets').each(function(){
-                            $(this).addClass('depon_class');
-                        });
-                    } else {
-                        $('.qsets').each(function(){
-                            if($(this).attr('id') == 'q_select_'+value_selected){
-                                $(this).removeClass('depon_class');
-                                $(this).val('0');
-                            } else 
-                                $(this).addClass('depon_class');
-                        });
-                    }
-                });
-                $('.qsets').change(function(){
-                    var db_selected = $('#db_type').val();
-                    var qset_selected = $(this).val();
-                    //alert(qset_selected);
-                    $('#tabular_container').html("Loading...");
-                    $.post( "qs_data_table", {db_type: db_selected, qset: qset_selected })
-                      .done(function( data ) {
-                        $('#tabular_container').html(data);
-                      });
-                });
-            });
-
-
-             
-        </script>
+<script src="{{STATIC_URL}}js/vendor/jquery.tablesorter.min.js"></script>
+<script src="{{STATIC_URL}}js/vendor/jquery.tablesorter.widgets.js"></script>
+<script src="{{STATIC_URL}}js/databases_datatable.js"></script>
 
 
 {% endblock %}
@@ -92,8 +48,6 @@ button {
 {% if list_databases %}
 <div style="margin-bottom: 70px;"></div>
 
-
-
 <select id="db_type">
 <option value="0">-- Select a database type</option>
 {% for k in databases_types  %}
@@ -110,8 +64,8 @@ button {
 </select>
 {% endfor %}
 
-<div id="tabular_container" class="pull-center">
-To see a tabular view of all databases, please choose a database type and a questionset.
+<div id="tabular_container" class="pull-center well">
+    To see a tabular view of all databases, please choose a database type and a questionset.
 </div>
 
 
