@@ -45,6 +45,8 @@ from emif.github import report_bug
 from geopy import geocoders 
 from django.core.mail import send_mail, BadHeaderError
 
+from modules.geo import *
+
 from rest_framework.authtoken.models import Token
 
 import json
@@ -1830,58 +1832,6 @@ def show_fingerprint_page_errors(request, q_id, qs_id, errors={}, template_name=
     return r
 
 
-# Adds a city to the internal database of cities with his location (if it doesnt exist yet)
-# receives as input a qlist
-def add_city(qlist_general):
-
-    # iterate until we find the location field (City or location fields)
-    for qs_aux, qlist in qlist_general:
-        for question, qdict in qlist:
-            if question.text == 'Location' or question.text == 'City':
-                city_name = qdict['value'].lower()
-                # check if the city is on the db
-                try:
-                    city = City.objects.get(name=city_name)
-
-                    print "-- City already is on the db."
-                # if dont have this city yet on the db
-                except City.DoesNotExist:
-                    print "City "+qdict['value'].lower()+" is not on the db yet"
-
-                    #obtain lat and longitude
-                    city = retrieve_geolocation(city_name)
-
-                    if city != None:
-                        print city
-
-                        city.save()
-                        return True
-
-                    else:
-                        print "-- Error: retrieving geolocation"
-                        return False
-
-
-    print "-- No city found at all on questionary"
-    return False
-
-def retrieve_geolocation(city_name):
-
-    try:
-        g = geocoders.GeoNames(username='bastiao')
-
-        if g == None:
-            return None
-
-        place, (lat, lng) = g.geocode(city_name)
-
-        # add to the db
-        city = City(name=city_name, lat=lat, long=lng)
-
-        return city
-
-    except:
-        return None
 
 
 
