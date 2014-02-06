@@ -119,8 +119,8 @@
                                 {% endif %}
                                 </div>
                                 {% if question.text|geths == 'h1' %}
-
                                     </a>
+
                             </div>
                                     <div id="div_{{ iteratorQ.value }}" class="accordion-body in collapse">
                                         <div class="accordion-inner">
@@ -221,8 +221,6 @@ function toggle_comments(question_number)
 $(document).ready(function(){
 
     $("#qform").submit(function(evnt){
-        
-        evnt.preventDefault();
         validateForm(evnt);
     });
 
@@ -230,8 +228,10 @@ $(document).ready(function(){
 
 function validateForm(evnt){
     $(".open-button_validator").each(function(i, v) {        
-        if( !validate( $(v).attr("id").replace("open-button_validator_", "question_")))
+        if( !validate( $(v).attr("id").replace("open-button_validator_", "question_"))){
             evnt.preventDefault();     
+            //console.log("DefaultPrevented");
+        }
     });
 }
 
@@ -271,6 +271,9 @@ function validate(question_number)
         data: {},
         async: false
     });
+
+    //console.log(validated);
+
     return validated;
 };
 
