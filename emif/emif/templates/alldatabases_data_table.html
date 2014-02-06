@@ -25,14 +25,42 @@
         <script type="text/javascript" language="javascript" src="static/js/jquery.dataTables.js"></script>
         <script type="text/javascript" charset="utf-8">
             $(document).ready(function() {
-                $('#table_databases').dataTable( {
+            /*    $('#table_databases').dataTable( {
                         "sScrollY": 200,
                     "sScrollX": "200%",
                     "sScrollXInner": "210%",
-                    "bScrollCollapse": true
+                    "bScrollCollapse": true,
+                    
                 } );
-
-
+*/
+                // Add handlers to the db type selector
+                $('#db_type').change(function(){
+                    var value_selected = $(this).val();
+                    if(value_selected == '0'){
+                        $('.qsets').each(function(){
+                            $(this).addClass('depon_class');
+                        });
+                    } else {
+                        $('.qsets').each(function(){
+                            if($(this).attr('id') == 'q_select_'+value_selected){
+                                $(this).removeClass('depon_class');
+                                $(this).val('0');
+                            } else 
+                                $(this).addClass('depon_class');
+                        });
+                    }
+                });
+                $('.qsets').change(function(){
+                    var db_selected = $('#db_type').val();
+                    var qset_selected = $(this).val();
+                    //alert(qset_selected);
+                    $('#tabular_container').html("Loading...");
+                    $.post( "qs_data_table", {db_type: db_selected, qset: qset_selected })
+                      .done(function( data ) {
+                        $('#tabular_container').html(data);
+                      });
+                });
+            });
 
 
              
@@ -66,34 +94,27 @@ button {
 
 
 
+<select id="db_type">
+<option value="0">-- Select a database type</option>
+{% for k in databases_types  %}
+ <option value="{{k}}">{{k}}</option>
+{% endfor %}
+</select>
 
+{% for k, qsets in databases_types.items  %}
+<select id="q_select_{{k}}" class="depon_class qsets">
+<option value="0">-- Select a questionset</option>
+    {% for text, ref in qsets  %}
+     <option value="{{text}}">{{text|removeh1}}</option>
+    {% endfor %}
+</select>
+{% endfor %}
 
-
-
-<div class="dataTables_scrollBody" style="overflow: auto; width: 100%; height: 540px;">
-<table cellpadding="0" cellspacing="0" border="1" class="display dataTable table table-hover tablesorter "  data-provides="rowlink" id="table_databases" style="margin-left: 0px; ;">
-	<thead>
-		<tr>
-			<th >{{ titles.0 }}</th>
-            {% for t in titles.1 %}
-               <th  title="{{ t.tag }}">{{t.tag|truncate}} </th>
-            {% endfor %}
-		</tr>
-	</thead>
-    <tbody>
-
-            {% for ans in answers %}
-            <tr class="">
-                <td>{{ ans.0 }}</td>
-                {% for a in ans.1 %}
-                    <td title="{{a}}"> {{ a|truncate  }}</td>
-                {% endfor %}
-                </tr>
-            {% endfor %}
-
-    </tbody>
-</table>
+<div id="tabular_container" class="pull-center">
+To see a tabular view of all databases, please choose a database type and a questionset.
 </div>
+
+
 {% else %}
 <div class="row">
 <div class="span4">
