@@ -170,6 +170,7 @@ def index_answeres_from_qvalues(qvalues, questionnaire, subject, fingerprint_id,
                 choices_txt = None
                 if qdict.has_key('value'):
                     value = qdict['value']
+
                     if "yes" in qdict['value']:
                         appending_text += question.text
 

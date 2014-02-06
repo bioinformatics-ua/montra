@@ -1,35 +1,26 @@
 
 {% load extra_tags %}
 {% load markup questionnaire i18n %}
-<div class="span8">
-    <form name="qform" id="qform" action="{{ request.path }}" method="POST">
 
+                    <!-- Set variable h1 to accordion -->
+                    {% setglobal h1_already 1 %}
+                    {% setglobal h1_last 1 %}
 
-
-    {% setglobal iteratorQ 0 %}
-    {% for k, qlist in questions_list %}
-
-        {% setglobal h1_already 0 %}
-        {% setglobal h1_last 0 %}
-
-
-    <div id="qs_{{ k.sortid }}" class="{% if k.sortid == questionset.sortid %} {% else %} hide {% endif %} questionset">
-
-    {% if k.sortid != 0 and k.sortid != 99 %}
-        <div><a id="collapseall_qs_{{ k.sortid }}"  class="btn pull-right" href="">Collapse all </a></div>
+    {% if questions_list.0.0.sortid != 0 and questions_list.0.0.sortid != 99 %}
+        <div><a id="collapseall_qs_{{ questions_list.0.0.sortid }}"  class="btn pull-right" href="">Collapse all </a></div>
     {% endif %}
 
     
     <div class="questionset-title" style="font-size:6px">
     <h3>
     
-    {{ k.text|removeh1 }}
+    {{ questions_list.0.0.text|removeh1 }}
 
     </h3>
     </div>
 
-    {% if k.help_text != "" %}
-    <div class="clearfix">{{k.help_text|safe}}</div>
+    {% if questions_list.0.0.help_text != "" %}
+    <div class="clearfix">{{questions_list.0.0.help_text|safe}}</div>
     {% endif %}
         
 
@@ -38,8 +29,6 @@
 
         <input type="hidden" name="questionset_id" value="{{ questionset.id }}">
 
-        <div class="accordion" id="accordion_{{ k.sortid }}">
-<!-- begin question on set -->
         {% for question, qdict in qlist %}
 
             {% incrementglobal iteratorQ %}
@@ -51,16 +40,13 @@
                     <!-- If has already appear another h1 before close accordion-group -->
                     {% if h1_already.value == '1' %}
 
-                        </div>
+                       </div>
                         </div>
                         </div>
 
                     {% endif %}
-
-                    <!-- Set variable h1 to accordion -->
-                    {% setglobal h1_already 1 %}
-                    {% setglobal h1_last 1 %}
-
+                    <!-- missing accordio here -->
+                    <div class="accordion" id="accordion_{{ questions_list.0.0.sortid }}">
                     <div class="accordion-group {{qdict.depon_class}}" id="acc_qc_{{ question.number }}" {{qdict.checkstring|safe}}>
                         <div class="accordion-heading">
                             {% if request.user.is_staff %}
@@ -144,38 +130,22 @@
                         {% endif %}
 
                         </div> <!-- /question container -->
-
             {% endwith %}
 
-        {% endfor %}
-        <!-- end set generation -->
-        {% if h1_last.value == '1' %}
-                </div>
-                </div>
-            </div>
-
-        {% endif %}
-
-        </div>  <!-- div accordion2 -->
-
-
-        <!--{% if k.sortid != 99 and k.sortid != 0%}-->
-            <!--<span>* Required</span>-->
-        <!--{% endif  %}-->
-
+        {% endfor %} 
         <div class="well questionset-submit">
             <!-- Previous | Next buttons -->
             <div class="span5 text-center">
             <!-- If Questionset is not the first (Introduction) or the final (Thank you) -->
 
-                {% if k.prev %}
-                    <a href="add/{{ questionset.questionnaire.pk }}/{{ k.prev.sortid }}" class="btn large primary" onclick="questionsets_handle(qs_{{ k.prev.sortid }});  return false;">{% trans "Previous" %}</a>
+                {% if questions_list.0.0.prev %}
+                    <a href="add/{{ questionset.questionnaire.pk }}/{{ questions_list.0.0.prev.sortid }}" class="btn large primary" onclick="questionsets_handle(qs_{{ questions_list.0.0.prev.sortid }});  return false;">{% trans "Previous" %}</a>
                 {% endif %}
-                {% if k.prev and k.next %}
+                {% if questions_list.0.0.prev and questions_list.0.0.next %}
 
                 {% endif %}
-                {% if k.next %}
-                    <a href="add/{{ questionset.questionnaire.pk }}/{{ k.next.sortid }}" class="btn large primary" onclick="questionsets_handle(qs_{{ k.next.sortid }});  return false;">{% trans "Next" %}</a>
+                {% if questions_list.0.0.next %}
+                    <a href="advancedSearch/{{ questionset.questionnaire.pk }}/{{ questions_list.0.0.next.sortid }}" class="btn large primary" onclick="questionsets_handle(qs_{{ questions_list.0.0.next.sortid }});  return false;">{% trans "Next" %}</a>
                 {% endif %}
 
 
@@ -183,27 +153,17 @@
 
             </div>
             <div class="span2 text-right">
-                {% if k.sortid != 0 %}
+                {% if questions_list.0.0.sortid != 0 %}
                     <input type="submit" class="btn btn-inverse" value="Search" >
                 {% endif %}
-                {% if k.sortid == 0 %}
+                {% if questions_list.0.0.sortid == 0 %}
                 {% endif %}
                     <!-- Last Questionset - Thank You -->
-                {% if k.sortid == 99 %}
+                {% if questions_list.0.0.sortid == 99 %}
                     <!--<input class="btn large btn-primary" name="submit" type="submit" value="{% trans 'Save' %}" />-->
                 {% endif %}
             </div>    
-        </div>
-    </div>
-    {% endfor %}        
-    </form>
-</div>
-
-<!-- Fix later -->
-<script src="static/js/vendor/bootstrap-tooltip.js"></script>
-<script src="static/js/vendor/bootstrap-popover.js"></script>
-<script src="static/js/fingerprint.js"></script>
-
+        </div>                                        
 <script type="text/javascript">
 
     {% block scriptextra %}
@@ -256,31 +216,11 @@ function validate(question_number)
        collapseAll($("#collapseall_qs_{{ k.sortid }}"), div_id);
 
        });
-
+         
         {% endif %}
         {% endfor %}
 
-    function collapseAll(element, div_id){
-        if (element.text().indexOf('Collapse') !== -1) {
-           console.log('Collapse all');
-           element.text('Expand all');
-           if (!element.hasClass('disabled')){
-            element.parents().find('#'+div_id +' .collapse').each(function(index){
-                $(this).addClass('in');
-                $(this).collapse('hide');
-            });
-           }
-       } else {
-           console.log('Expand all');
-            element.text('Collapse all');
-           if (!element.hasClass('disabled')){
-            element.parents().find('#'+div_id +' .collapse').each(function(index){
-                $(this).removeClass('in');
-                $(this).collapse('show');
-            });
-           }
-       }
-    };
+
 
 {% endblock %}
 </script>

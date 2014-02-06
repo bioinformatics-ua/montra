@@ -169,7 +169,9 @@
 </noscript>
 
 
-{% endblock %} {% block scriptextraincludes %}
+{% endblock %} 
+
+{% block scriptextraincludes %}
 <!-- Include the widget embedding script -->
 <script src="//bioinformatics.ua.pt/becas/embed-widget.js"></script>
 <!--[if lte IE 8]><script src="{{ STATIC_URL}}js/d3/r2d3.min.js" charset="utf-8"></script><![endif]-->
@@ -180,6 +182,8 @@
 <script src="{{ STATIC_URL}}js/database_info.js"></script>
 
 {% endblock %}
+
+{% block scriptextra %}
 
 <!-- This must be here because of dynamic code -->
 $(document).ready(function() {
@@ -205,4 +209,5 @@ console.log("ayx" + json_aux);
     }
 });
 
+{% endblock %}
 

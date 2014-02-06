@@ -60,6 +60,7 @@ urlpatterns = patterns('',
     # Database Add
 
     url(r'^add/(?P<questionnaire_id>[0-9]+)/(?P<sortid>[0-9]+)/$', 'emif.views.database_add'),
+    url(r'^searchqs/(?P<questionnaire_id>[0-9]+)/(?P<sortid>[0-9]+)/$', 'emif.views.database_search_qs'),
     url(r'^addPost/(?P<questionnaire_id>[0-9]+)/(?P<sortid>[0-9]+)$', 'emif.views.check_database_add_conditions'),
     
 
@@ -74,6 +75,7 @@ urlpatterns = patterns('',
 
     url(r'^feedback/thankyou/', 'emif.views.feedback_thankyou'),
     url(r'^feedback$', 'emif.views.feedback', name="feedback"),
+    url(r'^bugreport$', 'emif.views.bugreport', name="bugreport"),
 
 
     (r'^contact/thankyou/', 'searchengine.views.thankyou'),
