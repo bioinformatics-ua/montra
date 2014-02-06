@@ -350,9 +350,7 @@ class PopulationView(APIView):
     This web service is responsabible to handle jerboa documents 
 
     """
-    def __init__(self, arg):
-        super(PopulationCharactersticsService, self).__init__()
-        self.arg = arg
+    
         
     def get(self, request, *args, **kw):
         """

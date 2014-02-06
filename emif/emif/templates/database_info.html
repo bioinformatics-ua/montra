@@ -9,6 +9,22 @@
 
 <link rel="stylesheet" href="{{ STATIC_URL}}css/database_info.css" />
 
+<!-- Generic page styles -->
+<link rel="stylesheet" href="{{ STATIC_URL }}css/vendor/style.css">
+<!-- CSS to style the file input field as button and adjust the Bootstrap progress bars -->
+<link rel="stylesheet" href="{{ STATIC_URL }}css/vendor/jquery.fileupload-ui.css">
+<link href="{{ STATIC_URL }}nvd3/src/nv.d3.css" rel="stylesheet" type="text/css">
+<script src="{{ STATIC_URL }}nvd3/lib/d3.v3.js"></script>
+<script src="{{ STATIC_URL }}nvd3/nv.d3.js"></script>
+<script src="{{ STATIC_URL }}nvd3/src/models/axis.js"></script>
+<script src="{{ STATIC_URL }}nvd3/src/models/historicalBar.js"></script>
+<script src="{{ STATIC_URL }}nvd3/src/models/historicalBarChart.js"></script>
+<script src="{{ STATIC_URL }}nvd3/src/utils.js"></script>
+<script src="{{ STATIC_URL }}nvd3/src/models/axis.js"></script>
+<script src="{{ STATIC_URL }}nvd3/src/models/discreteBar.js"></script>
+<script src="{{ STATIC_URL }}nvd3/src/models/discreteBarChart.js"></script>
+
+
 {% endblock %} 
 
 {% block breadcrumbs %} 
@@ -41,8 +57,19 @@
                 <li class="active">
                     <a href="#metadata" data-toggle="tab">Fingerprint</a>
                 </li>
-                <!--<li><a href="#literature" data-toggle="tab">Literature</a></li>
-            <li><a href="#apiinfo" data-toggle="tab">Extra Information</a></li>-->
+                <li>
+                    <a href="#populationcharacteristics" data-toggle="tab">Population Characteristics</a>
+                </li>
+                <li>
+                    <a href="#documents" data-toggle="tab">Documents</a>
+                </li>
+                <li>
+                    <a href="#literature" data-toggle="tab">Literature</a>
+                    </li>
+                
+                <li>
+                    <a href="#apiinfo" data-toggle="tab">Extra Information</a>
+                </li>
             </ul>
             <div class="tab-content">
                 <div class="tab-pane active" id="metadata">
