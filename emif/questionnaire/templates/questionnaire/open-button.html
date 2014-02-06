@@ -4,7 +4,15 @@
 
   <div class="input span5">
     <div class="pull-left" >
-      <input type="text" class=" " size="50" id="question_{{ question.number }}" name="question_{{ question.number }}" value="{{ qdict.value }}" />
+      {% if question.slug == "database_name" %}
+          <div id='open-button_validator_{{question.number}}' class="control-group open-button_validator">  
+            <input type="text" class=" " size="50" id="question_{{ question.number }}" name="question_{{ question.number }}" value="{{ qdict.value }}" onchange="validate('question_{{ question.number }}')"/>
+            <span class="help-inline"></span>
+          </div>
+         
+      {% else %}
+          <input type="text" class=" " size="50" id="question_{{ question.number }}" name="question_{{ question.number }}" value="{{ qdict.value }}" />
+      {% endif %}
       {% if question.extra %}
       <span class="help-block">{{ question.extra }}</span>
       {% endif %}
@@ -17,24 +25,4 @@
 
     
   </div>
-  {% if question.slug == "database_name" %}
-        <div class="input span2">         
-      <div class="" style="vertical-align:center;padding-top:12px">
-   
-        <a class="btn btn-small btn-success span2" href="" onclick="validate('question_{{ question.number }}'); return false;">Verify if this name is available</a>
-<div id="warning_{{ question.number }}" class="hide">
-  <font color="red">The name already exists</font>
 </div>
-<div id="success_{{ question.number }}" class="hide">
-  <font color="green">The name is available</font>
-</div>
-      </div>
-      </div>
-      {% endif %}
-
-
-</div>
-
-
-
-

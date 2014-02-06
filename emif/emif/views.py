@@ -41,6 +41,7 @@ from searchengine.search_indexes import convert_text_to_slug
 from emif.utils import *
 from emif.models import *
 from api.models import *
+from emif.github import report_bug
 from geopy import geocoders 
 from django.core.mail import send_mail, BadHeaderError
 
@@ -403,22 +404,49 @@ def geo(request, template_name='geo.html'):
         query = "*:*"
     print "query@" + query
     list_databases = get_databases_from_solr(request, query)
+
     list_locations = []
     _long_lats = []
-    g = geocoders.GeoNames(username='bastiao')
+    # since the geolocation is now adding the locations, we no longer need to look it up when showing,
+    # we rather get it directly
+
     for database in list_databases:
+
         if database.location.find(".")!= -1:
             _loc = database.location.split(".")[0]
         else:
             _loc = database.location
-        if _loc!= None and g!=None and len(_loc)>1:
-            try:
-                place, (lat, lng) = g.geocode(_loc)
-            except:
-                continue
-            _long_lats.append(str(lat)+ ", " +str(lng))
 
-        print _loc
+        city=None
+        g = geocoders.GeoNames(username='bastiao')
+
+        if _loc!= None and g != None and len(_loc)>1:
+            #try:
+            #    place, (lat, lng) = g.geocode(_loc)
+            #except:
+            #    continue
+            try:
+                city = City.objects.get(name=_loc.lower())
+
+            # if dont have this city on the db
+            except City.DoesNotExist:
+                print "-- Error: The city " + _loc + " doesnt exist on the database. Maybe too much requests were being made when it happened ? Trying again..."
+
+                #obtain lat and longitude
+                city = retrieve_geolocation(_loc.lower())
+
+                if city != None:
+                    print city
+
+                    city.save()
+
+                else:
+                    print "-- Error: retrieving geolocation"
+                    continue
+
+            _long_lats.append(str(city.lat) + ", " + str(city.long))
+
+        #print _loc
 
         list_locations.append(_loc)
     return render(request, template_name, {'request': request,
@@ -475,7 +503,7 @@ def calculate_databases_per_location():
 
 def advanced_search(request, questionnaire_id, question_set):
 
-    return show_fingerprint_page_read_only(request, questionnaire_id, question_set)
+    return show_fingerprint_page_read_only(request, questionnaire_id, question_set, True)
 
 
 def database_add(request, questionnaire_id, sortid):
@@ -921,6 +949,8 @@ def database_edit(request, fingerprint_id, questionnaire_id, template_name="data
     if (question_set.sortid == 99 or request.POST):
         # Index on Solr
         try:
+            add_city(qlist_general)
+
             index_answeres_from_qvalues(qlist_general, question_set.questionnaire, users_db,
                                         fingerprint_id, extra_fields=extra_fields, created_date=created_date)
         except:
@@ -1832,6 +1862,10 @@ def show_fingerprint_page_errors(request, q_id, qs_id, errors={}, template_name=
 
             if users_db==None:
                 users_db = request.user.username
+
+            # adding city to cities database (if doesnt exist)
+            add_city(qlist_general)
+
             index_answeres_from_qvalues(qlist_general, question_set.questionnaire, users_db,
                                         fingerprint_id, extra_fields=extra_fields, created_date=created_date)
 
@@ -1861,7 +1895,63 @@ def show_fingerprint_page_errors(request, q_id, qs_id, errors={}, template_name=
     return r
 
 
-def show_fingerprint_page_read_only(request, q_id, qs_id, errors={}, template_name='advanced_search.html'):
+# Adds a city to the internal database of cities with his location (if it doesnt exist yet)
+# receives as input a qlist
+def add_city(qlist_general):
+
+    # iterate until we find the location field (City or location fields)
+    for qs_aux, qlist in qlist_general:
+        for question, qdict in qlist:
+            if question.text == 'Location' or question.text == 'City':
+                city_name = qdict['value'].lower()
+                # check if the city is on the db
+                try:
+                    city = City.objects.get(name=city_name)
+
+                    print "-- City already is on the db."
+                # if dont have this city yet on the db
+                except City.DoesNotExist:
+                    print "City "+qdict['value'].lower()+" is not on the db yet"
+
+                    #obtain lat and longitude
+                    city = retrieve_geolocation(city_name)
+
+                    if city != None:
+                        print city
+
+                        city.save()
+                        return True
+
+                    else:
+                        print "-- Error: retrieving geolocation"
+                        return False
+
+
+    print "-- No city found at all on questionary"
+    return False
+
+def retrieve_geolocation(city_name):
+
+    try:
+        g = geocoders.GeoNames(username='bastiao')
+
+        if g == None:
+            return None
+
+        place, (lat, lng) = g.geocode(city_name)
+
+        # add to the db
+        city = City(name=city_name, lat=lat, long=lng)
+
+        return city
+
+    except:
+        return None
+
+
+
+def show_fingerprint_page_read_only(request, q_id, qs_id, SouMesmoReadOnly=False, errors={}, template_name='advanced_search.html'):
+
     """
     Return the QuestionSet template
 
@@ -1899,9 +1989,7 @@ def show_fingerprint_page_read_only(request, q_id, qs_id, errors={}, template_na
         cssinclude = []     # css files to include
         jstriggers = []
         qvalues = {}
-
         if request.POST:
-
             for k, v in request.POST.items():
                 
                 if (len(v)==0):
@@ -1923,7 +2011,7 @@ def show_fingerprint_page_read_only(request, q_id, qs_id, errors={}, template_na
                             qvalues[s[1]] = v
                             #print qvalues
             query = convert_qvalues_to_query(qvalues, q_id)
-            #print "Query: " + query
+            print "Query: " + query
             return results_fulltext_aux(request, query)
 
         qlist_general = []
@@ -1935,6 +2023,9 @@ def show_fingerprint_page_read_only(request, q_id, qs_id, errors={}, template_na
                 qs_aux = question.questionset
                 #print "Question: " + str(question)
                 Type = question.get_type()
+                if SouMesmoReadOnly and Type == 'open-button':
+                   Type = "open"
+               
                 _qnum, _qalpha = split_numal(question.number)
 
                 qdict = {
@@ -1981,6 +2072,7 @@ def show_fingerprint_page_read_only(request, q_id, qs_id, errors={}, template_na
                         #
 
                 qlist.append((question, qdict))
+                
             if qs_aux == None:
                 #print "$$$$$$ NONE"
                 qs_aux = k
@@ -2054,6 +2146,10 @@ def feedback(request, template_name='feedback.html'):
 
 def feedback_thankyou(request, template_name='feedback_thankyou.html'):
     return render(request, template_name, {'request': request, 'breadcrumb': True})
+
+def bugreport(request, template_name='bugreport.html'):
+
+    return report_bug(request)
 
 
 def show_fingerprint_page(request, runinfo, errors={}, template_name='database_edit.html'):
