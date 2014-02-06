@@ -228,17 +228,30 @@ def get_database_from_id_with_tlv(db):
     return db
 
 WORKSPACE_PATH={'Workspace'}
- 
-def convert_dict_to_query(params):
+def convert_dict_to_query2(params):
     query = ""
-    i = 0 
+    i = 0
     size_params = len(params)
     for key in params:
         query += key+"_t:" + params[key]+"*"
-        i = i + 1 
+        i = i + 1
         if (size_params != i ):
             query += " AND "
 
+    return query
+def is_only_space(s):
+    return s == len(s) * ' '
+def convert_dict_to_query(params):
+    query = ""
+    i = 0
+    size_params = len(params)
+    for key in params:
+        if (params[key]!="" or not is_only_space(params[key])):
+            query += key+"_t:" + params[key]+"*"
+            i = i + 1
+            if (size_params != i ):
+                query += " AND "
+    print query
     return query
 
 

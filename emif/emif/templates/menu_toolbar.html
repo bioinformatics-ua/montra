@@ -3,6 +3,7 @@
 <div class="span6">
 	<div class="btn-group pull-right">
 
+
         {% if  request.user|safe in users_db %}
         <button type="button" class="btn btn" onclick="edit_db_option();" title="Enable/Disabled edit option" data-toggle="button">
 			<i class="fa fa-pencil-square-o"></i> Edit
@@ -29,7 +30,7 @@
         
       </a>
       {% endif %}
-      {% if add_databases %}
+      {% if add_databases or not hide_add %}
 			
       <a class="btn dropdown-toggle" data-toggle="dropdown" href="#" id="add_list_toolbar"> <i class="icon-plus icon"></i>
 				Add
