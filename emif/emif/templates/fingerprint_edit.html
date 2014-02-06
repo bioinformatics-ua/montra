@@ -233,11 +233,17 @@ $(document).ready(function(){
 
 });
 
+var qs_number_pattern = /open-button_validator_(\d+).01/i;
 function validateForm(evnt){
-    $(".open-button_validator").each(function(i, v) {        
-        if( !validate( $(v).attr("id").replace("open-button_validator_", "question_"))){
+            
+    $(".open-button_validator").each(function(i, v) {
+        var validator_id = $(v).attr("id");
+        if( !validate( validator_id.replace("open-button_validator_", "question_"))){
             evnt.preventDefault();     
-            //console.log("DefaultPrevented");
+            var result = validator_id.match(qs_number_pattern);
+            if(result.length == 2){
+                questionsets_handle( $("#qs_"+result[1]).get(0) );        
+            }
         }
     });
 }
