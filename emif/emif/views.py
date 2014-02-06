@@ -1159,8 +1159,10 @@ def qs_data_table(request, template_name='qs_data_table.html'):
             qsets, name = createqsets(id)
             q_list = []
             for group in qsets.ordered_items():
-                (k, qs) = group                
-                if True:
+
+                (k, qs) = group    
+              
+                if k == qset:
                     for q in qs.list_ordered_tags:
                         q_list.append(q)
             titles = ('Name', (q_list))
@@ -1168,7 +1170,7 @@ def qs_data_table(request, template_name='qs_data_table.html'):
             a_list = []
             for group in qsets.ordered_items():
                 (k, qs) = group
-                if True:
+                if k == qset:
                     
                     for q in qs.list_ordered_tags:
                         a_list.append(q.value)

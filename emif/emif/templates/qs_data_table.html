@@ -25,3 +25,22 @@
     </tbody>
 </table>
 </div>
+<script type="application/javascript">
+$(function() {
+
+  // call the tablesorter plugin
+  $("table").tablesorter({
+    theme : 'blue',
+
+    // sort on the first column and third column in ascending order
+    sortList: [[0,0],[2,0]],
+
+    // hidden filter input/selects will resize the columns, so try to minimize the change
+    widthFixed : true,
+
+    // initialize zebra striping and filter widgets
+    widgets: ["zebra", "filter"]
+
+  });
+
+});</script>
