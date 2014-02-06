@@ -4,11 +4,11 @@
 
 <div class="span8">
     <form name="qform" id="qform" action="dbEdit/{{fingerprint_id}}/{{questionset.questionnaire.pk}}" method="POST" enctype="multipart/form-data">
-        <input type="hidden" name="active_qs" id="active_qs" value="0">
-        <input type="hidden" name="active_qs_sortid" id="active_qs_sortid" value="0">
-        <input type="hidden" name="fingerprint_id" value="{{ fingerprint_id }}">
-        <input type="hidden" name="users_db" value="{{ users_db }}">
-        <input type="hidden" name="created_date" value="{{ created_date }}">
+        <input type="hidden" name="active_qs" id="active_qs" value="0" />
+        <input type="hidden" name="active_qs_sortid" id="active_qs_sortid" value="0" />
+        <input type="hidden" name="fingerprint_id" value="{{ fingerprint_id }}" />
+        <input type="hidden" name="users_db" value="{{ users_db }}" />
+        <input type="hidden" name="created_date" value="{{ created_date }}" />
 
     {% setglobal iteratorQ 0 %}
     {% for k, qlist in questions_list %}
@@ -20,7 +20,7 @@
     <div id="qs_{{ k.sortid }}" class="{% if k.sortid == 0 %} {% else %} hide {% endif %} questionset">
 
     {% if k.sortid != 0 and k.sortid != 99 %}
-        <div><a id="collapseall_qs_{{ k.sortid }}"  class="btn pull-right" href="">Collapse all </a></div>
+        <div><a id="collapseall_qs_{{ k.sortid }}"  class="btn pull-right" href="#">Collapse all </a></div>
     {% endif %}
 
     <div class="questionset-title" style="font-size:6px">
@@ -34,7 +34,7 @@
 
         {% csrf_token %}
 
-        <input type="hidden" name="questionset_id" value="{{ questionset.id }}">
+        <input type="hidden" name="questionset_id" value="{{ questionset.id }}" />
 
         <div class="accordion" id="accordion_{{ k.sortid }}">
 
@@ -63,14 +63,14 @@
                         <div class="accordion-heading">
                             {% if request.user.is_staff %}
                                 <span class="pull-right"> <a href="admin/questionnaire/question/{{ question.id }}/">
-                                    <i class="fa fa-pencil-square-o">&nbsp;</i>
+                                    <i class="icon-pencil">&nbsp;</i>
                                 </a></span>
                             {% endif %}
                             <span class="pull-right">
-                                <a href="" onclick="toggle_comments({{question.number|removedots}}); return false;"><i class="fa {% if qdict.comment %} fa-comment {% else %} fa-comment-o {% endif %}">&nbsp;</i></a>
+                                <a href="#" onclick="toggle_comments('{{question.number|removedots}}'); return false;"><i class="{% if qdict.comment %} icon-comment {% else %} icon-comment-alt {% endif %}">&nbsp;</i></a>
                             </span>
                             <span class="pull-right answered hide" id="answered_{{ question.number|removedots }}">
-                                <i class="fa fa-check-square-o fa-green">&nbsp;</i>
+                                <i class="icon-check green">&nbsp;</i>
                             </span>
 
                 {% endif %}
@@ -103,15 +103,15 @@
                                     {% if request.user.is_staff %}
                                     <span class="pull-right">
                                         <a href="admin/questionnaire/question/{{ question.id }}/">
-                                            <i class="fa fa-pencil-square-o">&nbsp;</i>
+                                            <i class="icon-pencil">&nbsp;</i>
                                         </a>
                                     </span>
                                     {% endif %}
                                     <span class="pull-right">
-                                        <a href="" onclick="toggle_comments({{question.number|removedots}}); return false;"><i class="fa {% if qdict.comment %} fa-comment {% else %} fa-comment-o {% endif %}">&nbsp;</i></a>
+                                        <a href="#" onclick="toggle_comments('{{question.number|removedots}}'); return false;"><i class="{% if qdict.comment %} icon-comment {% else %} icon-comment-alt {% endif %}">&nbsp;</i></a>
                                     </span>
                                     <span class="pull-right answered hide" id="answered_{{ question.number|removedots }}">
-                                        <i class="fa fa-check-square-o fa-green">&nbsp;</i>
+                                        <i class="icon-check green">&nbsp;</i>
                                     </span>
                                 {% endif %}
                                 </div>
@@ -128,7 +128,7 @@
                                     {% endif %}
                                     {% include qdict.template %}
                                     <div id="comments_{{question.number|removedots}}" style="display:none;margin-left:40px;">
-                                     <a href="" class="span6" onclick="toggle_comments({{question.number|removedots}}); return false;"><i class="fa fa-comment-o">&nbsp;</i> Comments</a>
+                                     <a href="#" class="span6" onclick="toggle_comments('{{question.number|removedots}}'); return false;"><i class="icon-comment">&nbsp;</i> Comments</a>
                                     <textarea style=" background-color:#EEE;color: #000;" class="span6" name="comment_question_{{ question.number }}" cols="50" rows="5">{{qdict.comment}}</textarea>
                                     </div>
                                 </div>

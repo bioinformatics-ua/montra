@@ -20,14 +20,17 @@
 # Django settings for emif project.
 import os.path
 
-
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
 SITE_NAME = "EMIF Catalogue"
 
 #BASE_URL = '/emif-dev/'
+# Note: When changing this to something not /, all is automatically changed on the links (except for links inside css files)
+# for this files we must change it manually (or serve them as dinamic files), this problem only ocurrs on IE
+# so if changing to something that not /, we should also change on file /static/css/bootstrap_ie_compatibility.css all relative # paths. This is necessary because i cant use django template variables inside a considered static file.
 BASE_URL = '/'
+
 PROJECT_DIR_ROOT = '/projects/emif-dev/'
 
 if DEBUG:
@@ -130,7 +133,7 @@ else:
 
 # URL prefix for static files.
 # Example: "http://media.lawrence.com/static/"
-STATIC_URL = BASE_URL + 'static/'
+STATIC_URL = BASE_URL+'static/'
 
 # Additional locations of static files
 STATICFILES_DIRS = (
@@ -203,7 +206,7 @@ INSTALLED_APPS = (
     'transmeta',
     'questionnaire',
     'questionnaire.page',
-
+    
     # User signup/signin/management
     'userena',
     'guardian',
@@ -350,6 +353,8 @@ LOGIN_EXEMPT_URLS = (
     r'^api-token-auth-create/',
     r'^import-questionnaire',
     r'^delete-questionnaire',
+    r'^bootstrap_ie_compatibility',
+    
 )
 
 #Set session idle timeout (seconds)

@@ -45,8 +45,12 @@ urlpatterns = patterns('',
 
     # Index page
     url(r'^$', 'emif.views.index', name="home"),
+    
     url(r'^about$', 'emif.views.about'),
 
+    # must do this to be able to use custom paths on this css file
+    url(r'^bootstrap_ie_compatibility$', 'emif.views.bootstrap_ie_compatibility'),
+    
     # Quick Search
     url(r'^search$', 'emif.views.quick_search'),
 
@@ -56,6 +60,7 @@ urlpatterns = patterns('',
     # Database Add
 
     url(r'^add/(?P<questionnaire_id>[0-9]+)/(?P<sortid>[0-9]+)/$', 'emif.views.database_add'),
+    url(r'^searchqs/(?P<questionnaire_id>[0-9]+)/(?P<sortid>[0-9]+)/$', 'emif.views.database_search_qs'),
     url(r'^addPost/(?P<questionnaire_id>[0-9]+)/(?P<sortid>[0-9]+)$', 'emif.views.check_database_add_conditions'),
     
 
@@ -70,6 +75,7 @@ urlpatterns = patterns('',
 
     url(r'^feedback/thankyou/', 'emif.views.feedback_thankyou'),
     url(r'^feedback$', 'emif.views.feedback', name="feedback"),
+    url(r'^bugreport$', 'emif.views.bugreport', name="bugreport"),
 
 
     (r'^contact/thankyou/', 'searchengine.views.thankyou'),
@@ -90,11 +96,11 @@ urlpatterns = patterns('',
     url(r'^fingerprint/(?P<runcode>[^/]+)/(?P<qs>[-]{0,1}\d+)/$', 'emif.views.fingerprint'),
 
     # List Databases
-    url(r'^databases$', 'emif.views.databases', name="databases"),
-    url(r'^alldatabases$', 'emif.views.all_databases'),
+    url(r'^databases/(?P<page>[-]{0,1}\d+)?$', 'emif.views.databases', name="databases"),
+    url(r'^alldatabases/(?P<page>[-]{0,1}\d+)?$', 'emif.views.all_databases'),
     url(r'^alldatabases/data-table$', 'emif.views.all_databases_data_table'),
-    url(r'^export_all_answers', 'emif.views.export_all_answers'),
-    url(r'^export_my_answers', 'emif.views.export_my_answers'),
+    url(r'^export_all_answers$', 'emif.views.export_all_answers'),
+    url(r'^export_my_answers$', 'emif.views.export_my_answers'),
     url(r'^export_bd_answers/(?P<runcode>[^/]+)/$', 'emif.views.export_bd_answers'),
     url(r'^import-questionnaire', 'emif.views.import_questionnaire'),
     url(r'^delete-questionnaire/(?P<qId>[0-9]+)/$', 'utils.delete_questionnaire.delete'),
@@ -218,7 +224,7 @@ urlpatterns = patterns('',
         name='userena_profile_list'),
 
     # url(r'^api-upload-info/', 'rest_framework.authtoken.views.obtain_auth_token'),
-    url(r'^api-info/', 'emif.views.create_auth_token', name="api-info"),
+    url(r'^api-info/(?P<page>[-]{0,1}\d+)?', 'emif.views.create_auth_token', name="api-info"),
     url(r'^docs/api', 'emif.views.docs_api'),
     
 

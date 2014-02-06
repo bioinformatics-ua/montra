@@ -28,15 +28,15 @@ button {
 {% endblock %}
 
 {% block headextra %}
-<link rel="stylesheet" href="static/css/theme.blue.css">
+<link rel="stylesheet" href="{{ STATIC_URL }}css/theme.blue.css">
 {% endblock %}
 
 
 
 {% block scriptextraincludes %}
 
-<script src="static/js/vendor/jquery.tablesorter.min.js"></script>
-<script src="static/js/vendor/jquery.tablesorter.widgets.js"></script>
+<script src="{{ STATIC_URL }}js/vendor/jquery.tablesorter.min.js"></script>
+<script src="{{ STATIC_URL }}js/vendor/jquery.tablesorter.widgets.min.js"></script>
 {% endblock %}
 
 
@@ -58,9 +58,9 @@ button {
     </thead>
     <tbody>
         
-        {% for t in list_databases %}
+        {% for t in page_obj %}
         <tr>
-            <td><img src="static/upload_images/{{t.logo}}" width="50px" height="50px"/></td>
+            <td><img class="db_logo" src="{{ STATIC_URL }}upload_images/{{t.logo}}" width="50px" height="50px" /></td>
           <td>
             <a href="fingerprint/{{ t.id }}/1">{{ t.name }}</a>
             
@@ -79,9 +79,9 @@ button {
           <td>{{ t.type_name }} </td>
           <td style="width:100px">
           
-            <a  href="dbEdit/{{t.id}}/{{t.ttype}}" title="Edit Database"><img src="static/img/glyphicons_150_edit.png"  /></a>
-            <a href="#" onclick="return false;"  class="confirm-delete" data-id="{{ t.id }}"  title="Remove Database"><img src="static/img/glyphicons_192_circle_remove.png"/></a>
-              <a href="#" onclick="return false;" class="sharedb" data-id="{{ t.id }}" title="Share Database" ><img src="static/img/glyphicons_308_share_alt.png"/></a>
+            <a  href="dbEdit/{{t.id}}/{{t.ttype}}" title="Edit Database"><img src="{{ STATIC_URL }}img/glyphicons_150_edit.png"  /></a>
+            <a href="#" onclick="return false;"  class="confirm-delete" data-id="{{ t.id }}"  title="Remove Database"><img src="{{ STATIC_URL }}img/glyphicons_192_circle_remove.png"/></a>
+              <a href="#" onclick="return false;" class="sharedb" data-id="{{ t.id }}" title="Share Database" ><img src="{{ STATIC_URL }}img/glyphicons_308_share_alt.png"/></a>
           
             </td>
 
@@ -92,11 +92,15 @@ button {
     </tbody>
 </table>
 
+{% load bootstrap_pagination %}
+
+{% bootstrap_paginate page_obj url_view_name="views.databases" range=10  show_prev_next="false" show_first_last="true"%}
+
 {% else %}
 <div class="row">  
 <div class="span4">  
 <div class="alert">  
-  <a class="close" data-dismiss="error">×</a>  
+  
   <strong>Info: </strong> Currently, there are no databases in your account. You can add new ones through the option "Workspace -> Add new databases"
 </div>  
 </div>  
@@ -156,6 +160,13 @@ button {
 <script>
 {% endcomment %}
 
+// URL Hack to make paginator work with base
+$(document).ready(function(){
+    $('a[href="#"]').attr('href', function(i, val){
+        return window.location + val;
+    });
+});
+
 function post_to_url(path, params, method) {
     method = method || "post"; // Set method to post by default if not specified.
 
@@ -201,7 +212,6 @@ $(function() {
   });
 
 });
-
 
 $('#li_workspace').addClass("active");
 

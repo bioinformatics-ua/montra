@@ -2,14 +2,14 @@
 
 <div class="span6">
 	<div class="btn-group pull-right">
-		{% if request.user.is_authenticated %} 
+		{% if request.user.is_authenticated and not hide_add %} 
 		<div class="btn-group" id="group_toolbar">
 
-			<a class="btn btn dropdown-toggle" data-toggle="dropdown" href="" id="add_list_toolbar"> <i class="icon-plus icon"></i>
+			<a class="btn dropdown-toggle" data-toggle="dropdown" href="#" id="add_list_toolbar"> <i class="icon-plus icon"></i>
 				Add
 				<span class="caret" ></span>
 			</a>
-			<ul class="dropdown-menu">
+			<ul class="dropdown-menu pull-right">
 				
 				{% show_fingerprints %}
 
@@ -17,15 +17,15 @@
 		</div>
 		{% endif %}
         {% if  collapse %}
-		 <a id="collapseall" class="btn" href="" >
+		 <a id="collapseall" class="btn" href="#" >
             Expand all
          </a>
         {% endif %}
-
-		<button type="button" class="btn btn" onclick="window.print();" title="Print">
+        {% if list_databases|length > 0 %}
+		<button type="button" class="btn" onclick="window.print();" title="Print">
 			<i class="icon-print"></i>
 		</button>
-
+        {% endif  %}
 	  {% if  geo %}
       <a class="btn" href="geo" onclick="" > <i class=" icon"></i>
         Geolocation

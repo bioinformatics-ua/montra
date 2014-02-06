@@ -4,9 +4,40 @@
 {% load markup questionnaire i18n %}
 
 
+{% block styleextra %}
+
+button {
+    border: 1px #AAA solid;
+    padding: 4px 10px;
+}
+.hide {
+    display: none;
+}
+
+.accordion-inner {
+    padding: 9px 15px;
+    border-top: 0px solid #e5e5e5;
+}
+.accordion-heading .accordion-toggle {
+display: block;
+padding: 5px 15px;
+}
+
+.accordion-heading a {
+color: #333;
+text-decoration: none;
+}
+{% endblock %}
+
+
 {% block headextra %}
-<script type="text/javascript" src="{{ STATIC_URL }}jquery.min.js"></script>
 <script type="text/javascript" src="{{ STATIC_URL }}questionset.js"></script>
+<script src="{{ STATIC_URL}}js/vendor/threadpool.js"></script>
+<script src="static/js/vendor/bootstrap-tooltip.js"></script>
+<script src="static/js/vendor/bootstrap-popover.js"></script>
+<script src="static/js/fingerprint.js"></script>
+
+<link rel="stylesheet" href="{{ STATIC_URL }}css/vendor/chosen.css"></script>
 <link rel="stylesheet" href="{{ STATIC_URL }}progressbar.css"></script>
 {% for x in jsinclude %}
 <script type="text/javascript" src="{{ x }}"></script>
@@ -15,6 +46,8 @@
     {% for x in cssinclude %}
 <link rel="stylesheet" href="{{ x }}" type="text/css" />
 {% endfor %}
+
+
 
 {% if async_progress %}
 <script type="text/javascript">var progress_url = "{{ async_url }}";</script>
@@ -35,6 +68,23 @@
 
    <div class="span12" style="text-align:center">
     <h2>Advanced Search</h2>
+
+    <div style="display:none">
+  <em>Filter: </em>
+          <select data-placeholder="Your Favorite Football Team" style="width:600px;" class="chosen-select" multiple tabindex="6">
+            <option value=""></option>
+            <optgroup label="NFC EAST">
+              <option>MCI - definition: Neuropsychological Test, Functional impairment (eg CDR)</option>
+              <option>Medication use: Collected</option>
+              <option>Urine: Routine</option>  
+
+            </optgroup>
+            
+          </select>
+        
+    </div>
+
+
   </div>
 
   </div>
@@ -49,10 +99,9 @@
       {% for qs in questionset.questionnaire.questionsets %}
 
       {% if qs.sortid != 0 and qs.sortid != 99 %}
-      <li{% if questionset.text == qs.text %} class="active" {% endif %} id="li_qs_{{qs.id}}">
-        <!--<a href="q2/{{runinfo.random}}/{{ qs.sortid }}">
-        -->
-        <a href="advancedSearch/{{qs.questionnaire.pk}}/{{ qs.pk }}" onclick="questionsets_handle(qs_{{ qs.pk }}); return false;">
+      <li{% if questionset.text == qs.text %} class="active" {% endif %} id="li_qs_{{qs.sortid}}">
+        <!--<a href="q2/{{runinfo.random}}/{{ qs.sortid }}">-->
+        <a href="advancedSearch/{{qs.questionnaire.pk}}/{{ qs.sortid }}" onclick="questionsets_handle(qs_{{ qs.sortid }}); return false;">
           <table>
             <tr>
               <td width="80%">{{ qs.text|removeh1 }}</td>
@@ -70,25 +119,101 @@
 
 </div>
 </div>
+
+    <div class="span8">
+
+
+        <form name="qform" id="qform" action="{{ request.path }}" method="POST">
+            {% csrf_token %}
+                    <div style="overflow-y:scroll;height:800px;" id="set_container">
+                    </div>
+        </form>
+            {% comment %}
 {% include "fingerprint_search.html" %}
+    {% endcomment  %}      
+        </div>
+    
 </div>
+
+<script type="text/javascript" src="{{ STATIC_URL }}js/vendor/chosen.jquery.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}js/emif.advanced_search.js"></script>
 <script type="text/javascript">
-        {% for trigger in triggers %}
-            addtrigger("{{trigger}}");
-        {% endfor %}
-        
-        {% for k,v in qvalues.items %}
-            qvalues['{{ k|escapejs }}'] = '{{ v|escapejs }}';
-        {% endfor %}
-        
-        for(key in qvalues) {
-            valchanged(key, qvalues[key]);
-        }
+    var parts_missing = 0;    
+
     </script>
 {% endblock %}
 
 {% block scriptextra %}
+
+function add_triggers() {
+            
+            console.log("adding triggers");
+            {% for trigger in triggers %}
+                addtrigger("{{trigger}}");
+            {% endfor %}
+            
+            {% for k,v in qvalues.items %}
+                qvalues['{{ k|escapejs }}'] = '{{ v|escapejs }}';
+            {% endfor %}
+            
+            for(key in qvalues) {
+                valchanged(key, qvalues[key]);
+            }
+    this.complete();
+}
+
 $('#li_advanced_search').addClass("active");
+
+$( document ).ready(function() {
+    load_questionnary();
+});
+var threads = {};
+function load_questionnary(){
+
+        console.log("Creating questionnary set containers (so they are in order)");
+        
+        var containers = [];
+
+        // We build the qs containers in memory and just do dom op, on the end, for speed
+        // on ie joins are significantly faster than concatenation
+        {% for qs in questionset.questionnaire.questionsets %}
+            containers.push('<div id="qs_{{ qs.sortid }}" class="{% if qs.sortid == questionset.sortid %} {% else %} hide {% endif %} questionset"><div class="pull-center">Loading...</div></div>\n')
+        {% endfor %}
+
+        $('#set_container').append(containers.join(''));
+
+        console.log( "Loading questionnary by parts, we have {{questionset.questionnaire.questionsets.count}} sets");  
+        
+        var threadpool = new ThreadPool(1);
+        parts_missing = {{ questionset.questionnaire.questionsets.count }};
+
+
+        // i dont everything on a single run, because i just add the containers all at once, not by parts
+        // only the constainers content are loaded by parts
+
+        var priority=1;
+        {% for qs in questionset.questionnaire.questionsets %}
+            var thread = new Runnable(loadqspart, priority++, {{ qs.sortid }}, {{qs.questionnaire.pk}});
+            threadpool.run(thread);
+            threads['qs_{{ qs.sortid }}'] = thread;
+        {% endfor %}
+        //  we add the triggers thread
+        threadpool.run(new Runnable(add_triggers, priority+1));
+        threadpool.destroy();
+}
+
+function loadqspart(sortid, pk){
+    
+    //console.log("getting part from searchqs/"+pk+"/"+sortid+"/");
+    
+    $.get( "searchqs/"+pk+"/"+sortid+"/", function( data ) {
+      $( "#qs_"+sortid ).html( data );
+    });
+
+    threads['qs_'+sortid] = null;
+    parts_missing--;
+    this.complete();
+}
 
 function next_questionset(id_questionset)
 {
@@ -99,53 +224,79 @@ function next_questionset(id_questionset)
     console.log("next" + next);
     if (next==true)
     {
-      questionsets_handle(obj);
+      questionsets_handle(obj, "");
       next = false;
 
   }
     if (obj.id==id_questionset.id)
     {
       next = true; 
-    }
-    
- 
-      
+    }    
   }
 
   );
 
 }
 
-
-
 function questionsets_handle(id_questionset)
 {
 
-  console.log("Clicked QuestionSet: " + id_questionset.id);
+    var idString = id_questionset.id
+    var id = idString.split('_');
+
+    $('#active_qs').val(id_questionset.id);
+    $('#active_qs_sortid').val(id[1]);
+
   $('.questionset').each(function(i, obj) {
-    console.log("obj.id: " + obj.id);
+
     if (obj.id==id_questionset.id)
     {
-        console.log("show " + obj.id);
+       // Check if we are still loading
+        console.log("Thread state for "+id_questionset.id+": "+threads[id_questionset.id]);
+       if(threads[id_questionset.id] != null){
+            threads[id_questionset.id].setPriority(0);
+        }
+            
+    
        $('#'+obj.id).addClass("show");
        $('#li_'+id_questionset.id).addClass("active");
+       $('#'+obj.id).removeClass("hide");
 
+       
     }
-  
     else {
-      console.log("hide " + obj.id);
       $('#li_'+obj.id).removeClass("active");
       $('#'+obj.id).addClass("hide");
       $('#'+obj.id).removeClass("show");
     }
- 
-      
+    
   }
 
   );
-
+    document.body.scrollTop = document.documentElement.scrollTop = 0;
 };
 
-
+    function collapseAll(element, div_id){
+        if (element.text().indexOf('Collapse') !== -1) {
+           console.log('Collapse all');
+           element.text('Expand all');
+           if (!element.hasClass('disabled')){
+            console.log('#'+div_id +' .collapse');
+            element.parents().find('#'+div_id +' .collapse').each(function(index){
+                $(this).addClass('in');
+                $(this).collapse('hide');
+            });
+           }
+       } else {
+           console.log('Expand all');
+            element.text('Collapse all');
+           if (!element.hasClass('disabled')){
+            element.parents().find('#'+div_id +' .collapse').each(function(index){
+                $(this).removeClass('in');
+                $(this).collapse('show');
+            });
+           }
+       }
+    };
 
 {% endblock %}

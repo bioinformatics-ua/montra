@@ -6,22 +6,22 @@
 
     <div class="control-group span12" >
         <label class="control-label span2">Pubmed id: </label>
-        <input class="" type="text" id="question_{{ question.number|removedots }}_pubmedid"/>
+        <input class="" type="text" id="question_{{ question.number|removedots }}_pubmedid" />
         <button id="loadpubbtn" style="margin-bottom:10px;" type="button" class="btn btn-primary" ><i style="color:white;" class="icon-large icon-search icon-white"></i></button>
     </div>
 
 
     <div class="control-group span12">
         <label class="control-label span2 ">Publication title:</label>
-        <input class="" type="text" id="question_{{ question.number|removedots }}_pubtitle" cols="80"/>    
+        <input class="" type="text" id="question_{{ question.number|removedots }}_pubtitle" cols="80" />    
     </div>
     <div class="control-group span12">
         <label class="control-label span2">Journal:</label>
-        <input class="" type="text" id="question_{{ question.number|removedots }}_pubjournal"/>    
+        <input class="" type="text" id="question_{{ question.number|removedots }}_pubjournal" />    
     </div>
     <div class="control-group span12" >
         <label class="control-label span2">Year:</label>
-        <input class="" type="text" id="question_{{ question.number|removedots }}_pubyear"/>  
+        <input class="" type="text" id="question_{{ question.number|removedots }}_pubyear" />  
     </div>
     <div class="control-group span12">
         <label class="control-label span2">Volume:</label>
@@ -39,7 +39,7 @@
     <div class="control-group span12">
     <button id="addpub" type="button" class="btn btn-primary"><i class="icon-large icon-white icon-plus-sign"></i> Add Publication</button>
     <button id="cleanpub" type="button" class="btn btn-primary"><i class="fa fa-trash-o"></i> Clean </button>
-    <input type="hidden"  id="question_{{ question.number }}" name="question_{{ question.number }}" value='{{qdict.value|replaceplicas}}'></input>
+    <input type="hidden"  id="question_{{ question.number }}" name="question_{{ question.number }}" value='{{qdict.value|replaceplicas}}' />
     </div>
 
     

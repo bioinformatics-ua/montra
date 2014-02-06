@@ -46,7 +46,7 @@
     
         {% csrf_token %}
 
-        <input type="hidden" name="questionset_id" value="{{ questionset.id }}">
+        <input type="hidden" name="questionset_id" value="{{ questionset.id }}" />
     
         {% for question, qdict in qlist %}
         {% with errors|dictget:question.number as error %}
@@ -92,7 +92,7 @@
         
             
             <div style="text-align: center;" class="well questionset-submit">
-                <input class="btn large primary" name="submit" type="submit" value="{% trans "Continue" %}">
+                <input class="btn large primary" name="submit" type="submit" value="{% trans "Continue" %}" />
                 
             </div>
             

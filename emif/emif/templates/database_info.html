@@ -1,10 +1,38 @@
-{% extends 'base.html' %} {% load url from future %} {% load extra_tags %} {% load django_bootstrap_breadcrumbs %} {% block headextra %}
+{% extends 'base.html' %} 
+{% load url from future %} 
+{% load extra_tags %} 
+{% load django_bootstrap_breadcrumbs %} 
 
-<script src="static/js/vendor/threadpool.js"></script>
-<script src="static/js/d3/d3.v3.min.js"></script>
-<script src="static/js/d3/d3.layout.cloud.js"></script>
+{% block headextra %}
 
-<link rel="stylesheet" href="static/css/database_info.css">{% endblock %} {% block breadcrumbs %} {{ block.super }} {% if style == '1' %} {% breadcrumb "Databases" "databases" %} {% breadcrumb "List" "databases" %} {% else %} {% breadcrumb "Databases" "alldatabases" %} {% breadcrumb "List" "alldatabases" %} {% endif %} {% breadcrumb breadcrumb_name "" %} {% endblock %} {% block toolbar %} {% include "menu_toolbar.html" with collapse=collapseall %} {% endblock %} {% block content %} {% if qsets %}
+<script src="{{ STATIC_URL}}js/vendor/threadpool.js"></script>
+
+<link rel="stylesheet" href="{{ STATIC_URL}}css/database_info.css" />
+
+{% endblock %} 
+
+{% block breadcrumbs %} 
+{{ block.super }} 
+    {% if style == '1' %} 
+        {% breadcrumb "Databases" "databases" %} 
+        {% breadcrumb "List" "databases" %} 
+    {% else %} 
+        {% breadcrumb "Databases" "alldatabases" %} 
+        {% breadcrumb "List" "alldatabases" %} 
+    {% endif %}
+
+    {% comment %}
+        <!-- this gives a error ?? -->
+        {% <breadcrumb></breadcrumb> breadcrumb_name "" %}
+    {% endcomment %}
+{% endblock %}
+
+{% block toolbar %} 
+    {% include "menu_toolbar.html" with collapse=collapseall %} 
+{% endblock %} 
+
+{% block content %} 
+{% if qsets %}
 
 <div class="span12">
     <div class="row-fluid">
@@ -127,10 +155,9 @@
             </div>
         </div>
     </div>
+</div>
     {% endif %}
-</div>
 
-</div>
 <!-- Display a message to users with Javascript deactivated -->
 <noscript>
     <div style="position:absolute;top:0;left:0;width:500px;height:250px;border:2px solid #A00;padding:6px;background-color:#fff;color:#600;text-align:center">
@@ -142,13 +169,45 @@
 </noscript>
 
 
-{% endblock %} {% block scriptextraincludes %}
+{% endblock %} 
+
+{% block scriptextraincludes %}
 <!-- Include the widget embedding script -->
 <script src="//bioinformatics.ua.pt/becas/embed-widget.js"></script>
-<script src="static/js/database_info.js"></script>
+<!--[if lte IE 8]><script src="{{ STATIC_URL}}js/d3/r2d3.min.js" charset="utf-8"></script><![endif]-->
+<!--[if gte IE 9]><!-->
+    <script src="{{ STATIC_URL}}js/d3/d3.v3.min.js"></script>
+    <script src="{{ STATIC_URL}}js/d3/d3.layout.cloud.js"></script>
+<!--<![endif]-->
+<script src="{{ STATIC_URL}}js/database_info.js"></script>
+
 {% endblock %}
 
+{% block scriptextra %}
 
+<!-- This must be here because of dynamic code -->
+$(document).ready(function() {
+    var json_aux = '{{apiinfo}}';
+console.log("ayx" + json_aux.length);
+console.log("ayx" + json_aux);
+    
+    if (json_aux == '' || json_aux == null || json_aux.length == 2) {
+        $("#pivot_table_extra_information").html('No information available. You can add information from external applications with API web services.');
+    } else {
+        json_aux = json_aux.replace("/&quot;/g", "\"");
+        alert(json_aux);
+        json = JSON.parse(json_aux);
+        //console.log(json_aux);
+        //console.log(json);
+        var json2 = json;
+        json = json_to_d3json(json);
+        json.x0 = 0;
+        json.y0 = 0;
+    
+        update(root = json);
+        $("#pivot_table_extra_information").html(json_to_table(json2));
+    }
+});
 
-
+{% endblock %}
 

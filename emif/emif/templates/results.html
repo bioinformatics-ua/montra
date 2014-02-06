@@ -4,7 +4,7 @@
 
 {% block breadcrumbs %}
     {{ block.super }}
-    {% breadcrumb "Search" "/resultsdiff/1" %}
+    {% breadcrumb "Search" "resultsdiff/1" %}
     {% if search_old == None %}
         {% breadcrumb "None" "" %}
     {% else %}
@@ -54,7 +54,7 @@
 
 {% block content %}
 
-  <div class="row">
+  <div id="row_loading" class="row">
 
 
     <div class="span12" style="text-align:center">
@@ -94,7 +94,7 @@
   {% for t in list_results.list_results %}
 
    <tr>
-            <td><img src="static/upload_images/{{t.logo}}" width="50px" height="50px"/></td>
+            <td><img class="db_logo" src="static/upload_images/{{t.logo}}" width="50px" height="50px"/></td>
           
           <td>
             <a href="fingerprint/{{ t.id }}/1">{{ t.name }}</a>
@@ -200,6 +200,13 @@ $(function() {
     widgets: ["zebra", "filter"]
   });
 
+});
+
+// URL Hack to make paginator work with base
+$(document).ready(function(){
+    $('a[href="#"]').attr('href', function(i, val){
+        return window.location + val;
+    });
 });
 {% endif %}
 

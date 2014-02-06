@@ -1,0 +1,293 @@
+/* Base Reference for transformation from https://gist.github.com/coliff/5618329 to add CSS3PIE to bootstrap
+   Decided to also  fix the gradients to comply with default look (using pie defined manners)
+*/
+
+.img-rounded{behavior:url({{ STATIC_URL }}js/vendor/PIE.htc)}
+.img-circle{behavior:url({{ STATIC_URL }}js/vendor/PIE.htc)}
+.table-bordered{behavior:url({{ STATIC_URL }}js/vendor/PIE.htc)}
+select,textarea, /*input*/,code,pre{behavior:url({{ STATIC_URL }}js/vendor/PIE.htc)}
+.input-group-addon{
+    behavior:url({{ STATIC_URL }}js/vendor/PIE.htc);
+}
+.navbar-search input, .navbar-form input{
+    position: relative !important;
+}
+.tablesorter-filter-row input{
+    behavior: none !important;
+}
+
+.panel{behavior:url({{ STATIC_URL }}js/vendor/PIE.htc)}
+.well{behavior:url({{ STATIC_URL }}js/vendor/PIE.htc)}
+.nav-tabs > li > a{behavior:url({{ STATIC_URL }}js/vendor/PIE.htc)}
+.nav-pills > li > a{behavior:url({{ STATIC_URL }}js/vendor/PIE.htc)}
+.navbar{behavior:url({{ STATIC_URL }}js/vendor/PIE.htc)}
+.navbar-nav > li > a{behavior:url({{ STATIC_URL }}js/vendor/PIE.htc)}
+.navbar-toggle{behavior:url({{ STATIC_URL }}js/vendor/PIE.htc)}
+.navbar-toggle .icon-bar{behavior:url({{ STATIC_URL }}js/vendor/PIE.htc)}
+.breadcrumb{behavior:url({{ STATIC_URL }}js/vendor/PIE.htc)}
+.pagination{behavior:url({{ STATIC_URL }}js/vendor/PIE.htc)}
+.pager li > a,.pager li > span{behavior:url({{ STATIC_URL }}js/vendor/PIE.htc)}
+.modal-content{behavior:url({{ STATIC_URL }}js/vendor/PIE.htc)}
+.tooltip-inner{behavior:url({{ STATIC_URL }}js/vendor/PIE.htc)}
+.popover{behavior:url({{ STATIC_URL }}js/vendor/PIE.htc)}
+.popover-title{behavior:url({{ STATIC_URL }}js/vendor/PIE.htc)}
+.alert{behavior:url({{ STATIC_URL }}js/vendor/PIE.htc)}
+.thumbnail,.img-thumbnail{behavior:url({{ STATIC_URL }}js/vendor/PIE.htc)}
+.label{behavior:url({{ STATIC_URL }}js/vendor/PIE.htc)}
+.badge{behavior:url({{ STATIC_URL }}js/vendor/PIE.htc)}
+.progress{behavior:url({{ STATIC_URL }}js/vendor/PIE.htc)}
+.accordion-group{behavior:url({{ STATIC_URL }}js/vendor/PIE.htc)}
+.carousel-indicators li{behavior:url({{ STATIC_URL }}js/vendor/PIE.htc)}
+.jumbotron{behavior:url({{ STATIC_URL }}js/vendor/PIE.htc)}
+
+.gt-ie7 .btn {
+    position: relative !important;
+    box-shadow: none;   
+    -pie-background: linear-gradient(top, #FFFFFF, #e6e6e6); 
+    behavior: url({{ STATIC_URL }}js/vendor/PIE.htc);
+}
+.lt-ie8 .btn{
+      filter: progid:dximagetransform.microsoft.gradient(startColorstr='#ffffffff', endColorstr='#ffe6e6e6', GradientType=0)
+    progid:dximagetransform.microsoft.dropshadow(color='#ffd0d0d0', offX=1, offY=0) progid:dximagetransform.microsoft.dropshadow(color='#ffd0d0d0', offX=-1, offY=0) progid:dximagetransform.microsoft.dropshadow(color='#ffd0d0d0', offX=0, offY=-1) progid:dximagetransform.microsoft.dropshadow(color='#ffb8b8b8', offX=0, offY=1);
+
+}
+
+.gt-ie7 .btn:hover,
+.gt-ie7 .btn:active,
+.gt-ie7 .btn.active,
+.gt-ie7 .btn.disabled,
+.gt-ie7 .btn[disabled] {
+  -pie-background: linear-gradient(top, #e6e6e6, #e6e6e6); 
+  behavior: url({{ STATIC_URL }}js/vendor/PIE.htc);
+}
+
+.lt-ie8 .btn:hover,
+.lt-ie8 .btn:active,
+.lt-ie8 .btn.active,
+.lt-ie8 .btn.disabled,
+.lt-ie8 .btn[disabled] {
+  filter: progid:dximagetransform.microsoft.gradient(startColorstr='#ffe6e6e6', endColorstr='#ffe6e6e6', GradientType=0) progid:dximagetransform.microsoft.dropshadow(color='#ffd0d0d0', offX=1, offY=0) progid:dximagetransform.microsoft.dropshadow(color='#ffd0d0d0', offX=-1, offY=0) progid:dximagetransform.microsoft.dropshadow(color='#ffd0d0d0', offX=0, offY=-1) progid:dximagetransform.microsoft.dropshadow(color='#ffb8b8b8', offX=0, offY=1);
+}
+
+/* Primary button */
+.gt-ie7 .btn-primary {
+  -pie-background: linear-gradient(top, #0088cc, #0044cc); 
+  behavior: url({{ STATIC_URL }}js/vendor/PIE.htc);    
+}
+.gt-ie7 .btn-primary:hover,
+.gt-ie7 .btn-primary:active,
+.gt-ie7 .btn-primary.active,
+.gt-ie7 .btn-primary.disabled,
+.gt-ie7 .btn-primary[disabled] {
+  -pie-background: linear-gradient(top, #0044cc, #0044cc); 
+  behavior: url({{ STATIC_URL }}js/vendor/PIE.htc);  
+}
+
+
+.lt-ie8 .btn-primary {
+  filter: progid:dximagetransform.microsoft.gradient(startColorstr='#ff0088cc', endColorstr='#ff0044cc', GradientType=0) progid:dximagetransform.microsoft.dropshadow(color='#ff0062b8', offX=1, offY=0) progid:dximagetransform.microsoft.dropshadow(color='#ff0062b8', offX=-1, offY=0) progid:dximagetransform.microsoft.dropshadow(color='#ff0062b8', offX=0, offY=-1) progid:dximagetransform.microsoft.dropshadow(color='#ff01529A', offX=0, offY=1);
+}
+.lt-ie8 .btn-primary:hover,
+.lt-ie8 .btn-primary:active,
+.lt-ie8 .btn-primary.active,
+.lt-ie8 .btn-primary.disabled,
+.lt-ie8 .btn-primary[disabled] {
+    filter: progid:dximagetransform.microsoft.gradient(startColorstr='#ff0044cc', endColorstr='#ff0044cc', GradientType=0) progid:dximagetransform.microsoft.dropshadow(color='#ff0062b8', offX=1, offY=0) progid:dximagetransform.microsoft.dropshadow(color='#ff0062b8', offX=-1, offY=0) progid:dximagetransform.microsoft.dropshadow(color='#ff0062b8', offX=0, offY=-1) progid:dximagetransform.microsoft.dropshadow(color='#ff01529A', offX=0, offY=1);
+}
+
+/* Warning button */
+.gt-ie7 .btn-warning {
+  -pie-background: linear-gradient(top, #fbb450, #f89406); 
+  behavior: url({{ STATIC_URL }}js/vendor/PIE.htc);    
+}
+.gt-ie7 .btn-warning:hover,
+.gt-ie7 .btn-warning:active,
+.gt-ie7 .btn-warning.active,
+.gt-ie7 .btn-warning.disabled,
+.gt-ie7 .btn-warning[disabled] {
+  -pie-background: linear-gradient(top, #f89406, #f89406); 
+  behavior: url({{ STATIC_URL }}js/vendor/PIE.htc);    
+}
+
+.lt-ie8 .btn-warning {
+  filter: progid:dximagetransform.microsoft.gradient(startColorstr='#fffbb450', endColorstr='#fff89406', GradientType=0) progid:dximagetransform.microsoft.dropshadow(color='#ffe1962d', offX=1, offY=0) progid:dximagetransform.microsoft.dropshadow(color='#ffe1962d', offX=-1, offY=0) progid:dximagetransform.microsoft.dropshadow(color='#ffe1962d', offX=0, offY=-1) progid:dximagetransform.microsoft.dropshadow(color='#ffbc7e26', offX=0, offY=1);
+}
+.lt-ie8 .btn-warning:hover,
+.lt-ie8 .btn-warning:active,
+.lt-ie8 .btn-warning.active,
+.lt-ie8 .btn-warning.disabled,
+.lt-ie8 .btn-warning[disabled] {
+  filter: progid:dximagetransform.microsoft.gradient(startColorstr='#fff89406', endColorstr='#fff89406', GradientType=0) progid:dximagetransform.microsoft.dropshadow(color='#ffe1962d', offX=1, offY=0) progid:dximagetransform.microsoft.dropshadow(color='#ffe1962d', offX=-1, offY=0) progid:dximagetransform.microsoft.dropshadow(color='#ffe1962d', offX=0, offY=-1) progid:dximagetransform.microsoft.dropshadow(color='#ffbc7e26', offX=0, offY=1);
+}
+
+/* Danger button */
+.gt-ie7 .btn-danger {
+    -pie-background: linear-gradient(top, #ee5f5b, #bd362f); 
+  behavior: url({{ STATIC_URL }}js/vendor/PIE.htc);
+}
+.gt-ie7 .btn-danger:hover,
+.gt-ie7 .btn-danger:active,
+.gt-ie7 .btn-danger.active,
+.gt-ie7 .btn-danger.disabled,
+.gt-ie7 .btn-danger[disabled] {
+    -pie-background: linear-gradient(top, #bd362f, #bd362f); 
+  behavior: url({{ STATIC_URL }}js/vendor/PIE.htc);
+}
+
+.lt-ie8 .btn-danger {
+  filter: progid:dximagetransform.microsoft.gradient(startColorstr='#ffee5f5b', endColorstr='#ffbd362f', GradientType=0) progid:dximagetransform.microsoft.dropshadow(color='#ffc44741', offX=1, offY=0) progid:dximagetransform.microsoft.dropshadow(color='#ffc44741', offX=-1, offY=0) progid:dximagetransform.microsoft.dropshadow(color='#ffc44741', offX=0, offY=-1) progid:dximagetransform.microsoft.dropshadow(color='#ffa43c37', offX=0, offY=1);
+}
+.lt-ie8 .btn-danger:hover,
+.lt-ie8 .btn-danger:active,
+.lt-ie8 .btn-danger.active,
+.lt-ie8 .btn-danger.disabled,
+.lt-ie8 .btn-danger[disabled] {
+  filter: progid:dximagetransform.microsoft.gradient(startColorstr='#ffbd362f', endColorstr='#ffbd362f', GradientType=0) progid:dximagetransform.microsoft.dropshadow(color='#ffc44741', offX=1, offY=0) progid:dximagetransform.microsoft.dropshadow(color='#ffc44741', offX=-1, offY=0) progid:dximagetransform.microsoft.dropshadow(color='#ffc44741', offX=0, offY=-1) progid:dximagetransform.microsoft.dropshadow(color='#ffa43c37', offX=0, offY=1);
+}
+
+/* Success button */
+.gt-ie7 .btn-success {
+    -pie-background: linear-gradient(top, #62c462, #51a351);
+    behavior: url({{ STATIC_URL }}js/vendor/PIE.htc);
+}
+.gt-ie7 .btn-success:hover,
+.gt-ie7 .btn-success:active,
+.gt-ie7 .btn-success.active,
+.gt-ie7 .btn-success.disabled,
+.gt-ie7 .btn-success[disabled] {
+  -pie-background: linear-gradient(top, #51a351, #51a351);
+  behavior: url({{ STATIC_URL }}js/vendor/PIE.htc);
+}
+
+.lt-ie8 .btn-success {
+  filter: progid:dximagetransform.microsoft.gradient(startColorstr='#ff62c462', endColorstr='#ff51a351', GradientType=0) progid:dximagetransform.microsoft.dropshadow(color='#ff52a552', offX=1, offY=0) progid:dximagetransform.microsoft.dropshadow(color='#ff52a552', offX=-1, offY=0) progid:dximagetransform.microsoft.dropshadow(color='#ff52a552', offX=0, offY=-1) progid:dximagetransform.microsoft.dropshadow(color='#ff458a45', offX=0, offY=1);
+}
+.lt-ie8 .btn-success:hover,
+.lt-ie8 .btn-success:active,
+.lt-ie8 .btn-success.active,
+.lt-ie8 .btn-success.disabled,
+.lt-ie8 .btn-success[disabled] {
+  filter: progid:dximagetransform.microsoft.gradient(startColorstr='#ff51a351', endColorstr='#ff51a351', GradientType=0) progid:dximagetransform.microsoft.dropshadow(color='#ff52a552', offX=1, offY=0) progid:dximagetransform.microsoft.dropshadow(color='#ff52a552', offX=-1, offY=0) progid:dximagetransform.microsoft.dropshadow(color='#ff52a552', offX=0, offY=-1) progid:dximagetransform.microsoft.dropshadow(color='#ff458a45', offX=0, offY=1);
+}
+
+/* Info button */
+.gt-ie7 .btn-info {
+  -pie-background: linear-gradient(top, #5bc0de, #2f96b4); 
+  behavior: url({{ STATIC_URL }}js/vendor/PIE.htc);    
+}
+.gt-ie7 .btn-info:hover,
+.gt-ie7 .btn-info:active,
+.gt-ie7 .btn-info.active,
+.gt-ie7 .btn-info.disabled,
+.gt-ie7 .btn-info[disabled] {
+  -pie-background: linear-gradient(top, #2f96b4, #2f96b4); 
+  behavior: url({{ STATIC_URL }}js/vendor/PIE.htc);      
+}
+
+.lt-ie8 .btn-info {
+  filter: progid:dximagetransform.microsoft.gradient(startColorstr='#ff5bc0de', endColorstr='#ff2f96b4', GradientType=0) progid:dximagetransform.microsoft.dropshadow(color='#ff419db8', offX=1, offY=0) progid:dximagetransform.microsoft.dropshadow(color='#ff419db8', offX=-1, offY=0) progid:dximagetransform.microsoft.dropshadow(color='#ff419db8', offX=0, offY=-1) progid:dximagetransform.microsoft.dropshadow(color='#ff37849a', offX=0, offY=1);
+}
+.lt-ie8 .btn-info:hover,
+.lt-ie8 .btn-info:active,
+.lt-ie8 .btn-info.active,
+.lt-ie8 .btn-info.disabled,
+.lt-ie8 .btn-info[disabled] {
+  filter: progid:dximagetransform.microsoft.gradient(startColorstr='#ff2f96b4', endColorstr='#ff2f96b4', GradientType=0) progid:dximagetransform.microsoft.dropshadow(color='#ff419db8', offX=1, offY=0) progid:dximagetransform.microsoft.dropshadow(color='#ff419db8', offX=-1, offY=0) progid:dximagetransform.microsoft.dropshadow(color='#ff419db8', offX=0, offY=-1) progid:dximagetransform.microsoft.dropshadow(color='#ff37849a', offX=0, offY=1);
+}
+
+/* Inverse button */
+.gt-ie7 .btn-inverse {
+  -pie-background: linear-gradient(top, #444444, #222222); 
+  behavior: url({{ STATIC_URL }}js/vendor/PIE.htc); 
+}
+.gt-ie7 .btn-inverse:hover,
+.gt-ie7 .btn-inverse:active,
+.gt-ie7 .btn-inverse.active,
+.gt-ie7 .btn-inverse.disabled,
+.gt-ie7 .btn-inverse[disabled] {
+  -pie-background: linear-gradient(top, #222222, #222222); 
+  behavior: url({{ STATIC_URL }}js/vendor/PIE.htc); 
+}
+
+.lt-ie8 .btn-inverse {
+  filter: progid:dximagetransform.microsoft.gradient(startColorstr='#ff444444', endColorstr='#ff222222', GradientType=0) progid:dximagetransform.microsoft.dropshadow(color='#ff303030', offX=1, offY=0) progid:dximagetransform.microsoft.dropshadow(color='#ff303030', offX=-1, offY=0) progid:dximagetransform.microsoft.dropshadow(color='#ff303030', offX=0, offY=-1) progid:dximagetransform.microsoft.dropshadow(color='#ff292929', offX=0, offY=1);
+}
+.lt-ie8 .btn-inverse:hover,
+.lt-ie8 .btn-inverse:active,
+.lt-ie8 .btn-inverse.active,
+.lt-ie8 .btn-inverse.disabled,
+.lt-ie8 .btn-inverse[disabled] {
+  filter: progid:dximagetransform.microsoft.gradient(startColorstr='#ff222222', endColorstr='#ff222222', GradientType=0) progid:dximagetransform.microsoft.dropshadow(color='#ff303030', offX=1, offY=0) progid:dximagetransform.microsoft.dropshadow(color='#ff303030', offX=-1, offY=0) progid:dximagetransform.microsoft.dropshadow(color='#ff303030', offX=0, offY=-1) progid:dximagetransform.microsoft.dropshadow(color='#ff292929', offX=0, offY=1);
+}
+
+.lt-ie9 td, .ie9 td {
+    display: block !important;
+}
+
+.navbar-search{
+    float: left !important;
+}
+
+#auth-logged-out{
+    width: 380px !important;
+}
+#auth-logged-in{
+    width: 70px !important;
+    
+}
+#accordion1{
+clear: both;
+}
+
+.lt-ie8 .answer {
+    clear: both;
+
+}
+
+.lt-ie8 .icon-print{
+padding: 2px;
+}
+
+.lt-ie8 .tablesorter-filter{
+
+    width: 90% !important;
+
+}
+
+/* Fix from: http://stackoverflow.com/questions/17813737/tablesort-not-working-correctly-in-ie 
+    only occurs on ie7
+ */
+
+.lt-ie8 table.tablesorter thead tr .tablesorter-header {
+    background-image: url(http://tablesorter.com/themes/blue/bg.gif);
+    background-repeat: no-repeat;
+    background-position: center right;
+    cursor: pointer;
+}
+.lt-ie8 table.tablesorter thead tr .tablesorter-headerAsc {
+    background-image: url(http://tablesorter.com/themes/blue/asc.gif);
+}
+.lt-ie8 table.tablesorter thead tr .tablesorter-headerDesc {
+    background-image: url(http://tablesorter.com/themes/blue/desc.gif);
+}
+.lt-ie8 table.tablesorter thead tr .tablesorter-headerAsc, table.tablesorter thead tr .tablesorter-headerDesc {
+    background-color: #8dbdd8;
+}
+
+.gt-ie7 #li_feedback, 
+.gt-ie7 #li_about, 
+.gt-ie7 #auth-logged-in{
+    margin-top: -5px !important;
+    
+}
+.gt-ie7 #search_li {
+    margin-top: -8px !important;
+}
+
+.gt-ie7 #li_workspace {
+    margin-top: -8px !important;
+}
+
+.lt-ie8 #row_loading {
+    clear: both;
+}

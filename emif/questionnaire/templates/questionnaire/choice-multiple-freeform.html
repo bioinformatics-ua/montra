@@ -6,8 +6,8 @@
         {% for choice, key, checked in qdict.choices %}
             <li>
                 <label>
-                    <input onClick="valchanged('question_{{ question.number }}_{{ choice.value }}', this.checked);" type="checkbox" id="{{ key }}" name="{{ key }}" value="{{ choice.value }}" {{ checked }}>
-                    <span>{{ choice.text }}</span>
+                    <input onClick="valchanged('question_{{ question.number }}_{{ choice.value|trim|esc }}', this.checked);" type="checkbox" id="{{ key }}" name="{{ key }}" value="{{ choice.value|trim|esc }}" {{ checked }} />
+                    <span>{{ choice.text|trim }}</span>
                 </label>
             </li>
             {% if checked %}
@@ -23,7 +23,7 @@
                 {% if not forloop.last or not forloop.first %}
                     <b>{{ forloop.counter }}.</b> 
                 {% endif %}
-                <input type="text" name="{{ key }}" size="50" value="{{ value }}">    
+                <input type="text" name="{{ key }}" size="50" value="{{ value }}" />    
             </li>
             {% endfor %}
         {% endif %}

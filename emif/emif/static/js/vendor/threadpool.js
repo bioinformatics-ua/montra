@@ -104,7 +104,7 @@ ThreadPool.prototype = {
 
     destroy : function() {
         this.die = true;
-    },
+    }
 };
 
 
@@ -179,6 +179,5 @@ Runnable.prototype = {
             self.fRun.apply(self, self.args);
         }, 0);
 
-    },
-
+    }
 };
