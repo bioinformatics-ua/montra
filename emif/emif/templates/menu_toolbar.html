@@ -9,7 +9,7 @@
 				Add
 				<span class="caret" ></span>
 			</a>
-			<ul class="dropdown-menu">
+			<ul class="dropdown-menu pull-right">
 				
 				{% show_fingerprints %}
 
@@ -21,11 +21,11 @@
             Expand all
          </a>
         {% endif %}
-
+        {% if list_databases|length > 0 %}
 		<button type="button" class="btn" onclick="window.print();" title="Print">
 			<i class="icon-print"></i>
 		</button>
-
+        {% endif  %}
 	  {% if  geo %}
       <a class="btn" href="geo" onclick="" > <i class=" icon"></i>
         Geolocation
