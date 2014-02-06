@@ -2245,8 +2245,8 @@ def sharedb(request, db_id, template_name="sharedb.html"):
         message = """Dear %s,\n\n
             \n\n
             %s has shared a new database with you. 
-            Now you're able to edit and management the database. \n\n
-            To activate the database to your account, please open this link:
+            Now you're able to edit and manage the database. \n\n
+            To activate the database in your account, please open this link:
             %s 
             \n\nSincerely,\nEMIF Catalogue
         """ % (name,request.user.get_full_name(), link_activation)
@@ -2292,7 +2292,7 @@ def sharedb_activation(request, activation_code, template_name="sharedb_invited.
         subject = "EMIF Catalogue: Accepted database shared"
         message = """Dear %s,\n\n
             \n\n
-            %s has been actived. You can access the new database in "Workspace" -> My Databases".
+            %s has been activated. You can access the new database in "Workspace" -> My Databases".
             \n\nSincerely,\nEMIF Catalogue
         """ % (request.user.get_full_name(), _aux['database_name_t'] )
 
