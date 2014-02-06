@@ -255,3 +255,17 @@ background-color: #e5e5e5;
 -moz-box-shadow: inset 0 3px 8px rgba(0,0,0,0.125);
 box-shadow: inset 0 3px 8px rgba(0,0,0,0.125);
 }
+.not-supported{
+    display: none;
+    margin: 50px;
+}
+.supported {
+    display: block;
+}
+/* Block access to browsers with ns class */
+.ns .not-supported{
+    display: block !important;
+}
+.ns .supported {
+    display: none !important;
+}
