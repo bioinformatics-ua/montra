@@ -68,7 +68,7 @@ text-decoration: none;
 
    <div class="span12" style="text-align:center">
     <h2>Advanced Search</h2>
-
+       {% comment %}
     <div>
   <em>Filter: </em>
           <select data-placeholder="Your Favorite Football Team" style="width:600px;" class="chosen-select" multiple tabindex="6">
@@ -83,7 +83,7 @@ text-decoration: none;
           </select>
         
     </div>
-
+       {% endcomment  %}
 
   </div>
 
@@ -197,8 +197,9 @@ function load_questionnary(){
             threadpool.run(thread);
             threads['qs_{{ qs.sortid }}'] = thread;
         {% endfor %}
+
         //  we add the triggers thread
-        threadpool.run(new Runnable(add_triggers, priority+1));
+        threadpool.run(new Runnable(add_triggers, priority+2));
         threadpool.destroy();
 }
 
