@@ -217,13 +217,18 @@ function toggle_comments(question_number)
     console.log("q + "+ question_number);
     $("#comments_"+question_number).toggle();
 }
-
+function tabindexer(){
+    var index=1;
+    $('input').each(function(){
+        $(this).attr('tabindex',index++);
+    });
+}   
 $(document).ready(function(){
 
     $("#qform").submit(function(evnt){
         validateForm(evnt);
     });
-
+    tabindexer();
 });
 
 function validateForm(evnt){

@@ -1143,13 +1143,57 @@ def all_databases(request, page=1, template_name='alldatabases.html'):
     return render(request, template_name, {'request': request, 'export_all_answers': True, 'data_table': True,
                                            'list_databases': list_databases, 'breadcrumb': True, 'collapseall': False, 'geo': True, 'page_obj': pager})
 
+def qs_data_table(request, template_name='qs_data_table.html'):
+    db_type = request.POST.get("db_type")
+    qset = request.POST.get("qset")
+    
+    answers = []
+    # get only databases with correct type
+    list_databases = get_databases_from_solr(request, "type_t:"+re.sub(r'\s+', '', db_type.lower()))
+    titles = []
+    
+    for t in list_databases:
+
+        if t.type_name == db_type:
+            qsets, name = createqsets(t.id)
+            
+            q_list = []
+            a_list = []            
+            for group in qsets.ordered_items():
+
+                (k, qs) = group    
+              
+                if k == qset:
+                    for q in qs.list_ordered_tags:
+                        q_list.append(q)
+                        a_list.append(q.value)
+                continue
+            titles = ('Name', (q_list))
+            
+
+            answers.append((name, (a_list)))
+                # print answers
+            
+            
+    return render(request, template_name, {'request': request, 'export_all_answers': True, 'breadcrumb': False, 'collapseall': False, 'geo': False, 'titles': titles, 'answers': answers})
 
 def all_databases_data_table(request, template_name='alldatabases_data_table.html'):
     answers = []
     list_databases = get_databases_from_solr(request, "*:*")
     titles = []
+    
+    #dictionary of database types
+    databases_types = {}
+
     if list_databases:
+        # Creating list of database types
         for t in list_databases:
+            if not t.type_name in databases_types:
+                qsets, name = createqsets(t.id)
+                
+                databases_types[t.type_name] = qsets.ordered_items()  
+            
+            '''    this code was loading all the qsets of all the dbs etc etctera
             id = t.id
             qsets, name = createqsets(id)
             q_list = []
@@ -1166,16 +1210,27 @@ def all_databases_data_table(request, template_name='alldatabases_data_table.htm
             answers.append((name, (a_list)))
                 # print answers
 
+        # since we dont have access to the structure directly (?)
+        # i use a random id for each type to get the qset types ?
+        if databases_types:
+            #print databases_types['adcohort'][0].id
+            for type in databases_types:
+                qsets, name = createqsets(databases_types[type][0].id)
+                
+                qsets_by_type[type] = qsets.ordered_items()
+ '''           
     # print titles
     # print answers
 
     return render(request, template_name, {'request': request, 'export_all_answers': True, 'titles': titles,
                                            'answers': answers, 'breadcrumb': True, 'collapseall': False, 'geo': True,
-                                           'list_databases': list_databases})
+                                           'list_databases': list_databases,
+                                           'databases_types': databases_types
+                                           })
 
 
 def createqsets(runcode, qsets=None, clean=True):
-    print "createqsets"
+    #print "createqsets"
     c = CoreEngine()
     results = c.search_fingerprint('id:' + runcode)
 
@@ -1216,7 +1271,7 @@ def createqsets(runcode, qsets=None, clean=True):
                 qsets[qset.text] = question_group
 
         for k in result:
-            print k
+            #print k
             if k in blacklist:
                 continue
             if k.startswith("comment_question_"):
@@ -1245,7 +1300,7 @@ def createqsets(runcode, qsets=None, clean=True):
 
             info = text
             t.tag = info
-            print t.tag
+            #print t.tag
 
             if question_group != None and question_group.list_ordered_tags != None:
                 try:
@@ -1258,7 +1313,7 @@ def createqsets(runcode, qsets=None, clean=True):
             try:
 
                t.comment = result['comment_question_'+k]
-               print t.comment
+               #print t.comment
             except KeyError:
                pass
             if clean:
