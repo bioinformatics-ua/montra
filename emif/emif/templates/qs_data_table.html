@@ -8,7 +8,7 @@
 		<tr>
 			<th>{{ titles.0 }}</th>
             {% for t in titles.1 %}
-               <th  title="{{ t.tag|removeh1 }}">{{t.tag|truncate|removeh1}} </th>
+               <th  title="{{ t.tag|removehs }}">{{t.tag|truncate|removehs}} </th>
             {% endfor %}
 		</tr>
 	</thead>
