@@ -24,13 +24,16 @@ import json
 
 from .jerboa import *
 
+from .conf_charts import *
+
 class PopulationCharacteristic(JerboaFormat):
     """PopulationCharacteristic: This class controls the Jerboa File
     """
     def __init__(self, arg=None):
         super(PopulationCharacteristic, self).__init__(arg)
         self.arg = arg
-    
+
+
     def last_activity(self):
         pass
 
@@ -97,4 +100,7 @@ class PopulationCharacteristic(JerboaFormat):
         # 
         # db.jerboa_files.find({"values.Name1": "YEAR", "values.Var":"Active patients"})
         pass
-        
+    
+    def get_settings(self):
+        cc = ConfCharts()
+        return cc.get_main_settings()

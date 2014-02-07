@@ -152,8 +152,11 @@ function PCAPI ()
 **************** Population Characteristics - Bar (Jquery Plugin) 
 *********************************************************************/
 
+
  (function( $ )
  {
+
+
 
     var methods = {
         init : function( options ) {
@@ -240,7 +243,6 @@ function PCAPI ()
 }( jQuery ));
 
 
-
 /********************************************************************
 **************** Population Characteristics Types
 *********************************************************************/
@@ -248,30 +250,18 @@ function PCAPI ()
  (function( $ )
  {
 
-    var methods = {
-        init : function( options ) {
-
-            
-            var self = this;
-            self.append("Var: ");
-            tmpUl = $('<ul class="nav nav-pills nav-stacked">');
-            values = options.getVar();
-            self.append(tmpUl);
-            $.each(values.values, function (data){
-                if (values.values[data]==="")
-                    return;
-                
-                tmpUl.append('<li><a class="filterBar" href="#" onclick="return false;"><i id="iproximity" class="icon-ok icon-black active"></i> '+values.values[data]+'</a></li>')
-            });
-
-            var myPC = options;
-
-            $(".filterBar").bind('click',function(e)
+    var PC = null;
+    function Filters()
+    {
+      this.drawFilters = function(){
+      };
+      this.bindFilters = function(){
+            $(".graphTypes").bind('click',function(e)
                     { 
                       e.preventDefault(); 
                       e.stopPropagation();
                       
-                      console.log(myPC);
+                      console.log(e.toElement);
                       if ($(e.toElement.firstChild).hasClass('icon-ok')) 
                       {
                         $(e.toElement.firstChild).removeClass('icon-ok') 
@@ -282,6 +272,33 @@ function PCAPI ()
                       }
                       return false;
                     });
+      };
+      this.drawScales = function(){
+      };
+      this.bindScales = function(){
+      };   
+    };
+
+    var methods = {
+        init : function( options ) {
+
+            
+            var self = this;
+            self.append("Var: ");
+            tmpUl = $('<ul class="nav nav-pills nav-stacked">');
+            values = options.getChartTitles();
+            self.append(tmpUl);
+            $.each(values, function (data){
+                if (values[data]==="")
+                    return;
+                console.log(values[data]);
+                tmpUl.append('<li><a class="graphTypes" href="#" onclick="return false;"><i id="iproximity" class="icon-ok icon-black active"></i> '+values[data]+'</a></li>')
+            });
+
+            var myPC = options;
+            filters = new Filters();
+            filters.bindFilters();
+
         },
         draw : function( options ) {
             
@@ -303,20 +320,18 @@ function PCAPI ()
 }( jQuery ));
 
 
-
-
-
 $(document).ready(
     function(){
 
         var pc = new PCAPI();
 
         $("#pcBarContent").populationChartsBar(pc);
-        $("#pcBarContent").populationChartsBar('draw', pc); 
+        $("#pcBarContent").populationChartsBar('draw', pc);
 
+        var chartLayout = new ChartLayout();
 
-        $("#pc_list").populationChartsTypes(pc);
-        $("#pc_list").populationChartsTypes('draw', pc); 
+        $("#pc_list").populationChartsTypes(chartLayout);
+        $("#pc_list").populationChartsTypes('draw', chartLayout); 
 
     }
 );

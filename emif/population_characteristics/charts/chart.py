@@ -20,6 +20,10 @@
 
 import json
 
+from django.utils import simplejson
+
+json.dumps = simplejson.dumps
+
 """
 The goal of this class is to generate the configurations files/templates
 for the charts library
@@ -83,6 +87,14 @@ class Chart(object):
 
     def to_JSON(self):
         return json.dumps(self, default=lambda o: o.__dict__, sort_keys=True, indent=4)
+class SetCharst(object):
+    def __init__(self):
+        self.charts = None
+        
+    def to_JSON(self):
+        return json.dumps(self, default=lambda o: o.__dict__, sort_keys=True, indent=4)
+
+
 
 # Active patients
 # Birth in year
@@ -116,7 +128,9 @@ f1.var = 'Name2'
 c.filters = [f1]
 
 print c.to_JSON()
-
+sc = SetCharst()
+sc.charts = [c,c]
+print sc.to_JSON()
 
 
 ### Age starts at 

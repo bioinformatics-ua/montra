@@ -34,4 +34,6 @@ urlpatterns = patterns('',
 
     url(r'^new/(?P<runcode>[^/]+)/(?P<qs>[-]{0,1}\d+)/$', 'population_characteristics.documents.document_form_view'),
     url(r'^parsejerboa$', 'population_characteristics.documents.parsejerboa'),
+    url(r'^settings/(?P<runcode>[^/]+)/$', 'population_characteristics.views.get_settings'),
+    
 )
