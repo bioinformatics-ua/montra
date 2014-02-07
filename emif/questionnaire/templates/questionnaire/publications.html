@@ -7,7 +7,7 @@
     <div class="control-group span12" >
         <label class="control-label span2">Pubmed id: </label>
         <input class="" type="text" id="question_{{ question.number|removedots }}_pubmedid" />
-        <button id="loadpubbtn" style="margin-bottom:10px;" type="button" class="btn btn-primary" ><i style="color:white;" class="icon-large icon-search icon-white"></i></button>
+        <button id="loadpubbtn" style="margin-bottom:10px;" type="button" class="btn btn-primary disabled" ><i style="color:white;" class="icon-large icon-search icon-white"></i></button>
     </div>
 
 
@@ -90,7 +90,6 @@ function PublicationWidget ()
         $('#question_{{ question.number|removedots }}_pubpages').val(""); 
         $('#question_{{ question.number|removedots }}_pubauthors').val(""); 
         $('#question_{{ question.number|removedots }}_publink').val(""); 
-    
     }
 
     this.updateInformationFromPubMed = function()
@@ -136,8 +135,8 @@ function PublicationWidget ()
         });
 
         $("#loadpubbtn" ).bind( "click", function() {
-            
-            pw{{ question.number|removedots }}.updateInformationFromPubMed();
+            if (!$(this).hasClass("disabled")) 
+                pw{{ question.number|removedots }}.updateInformationFromPubMed();
         });
 
         $( "#removepub" ).bind( "click", function() {
@@ -156,16 +155,23 @@ function PublicationWidget ()
         document.onkeypress = stopRKey; 
         */
         $( "#question_{{ question.number|removedots }}_pubmedid").bind( "keypress", function(args) {
-            
-            if (args.keyCode == 13) {
+           if (args.keyCode == 13) {
                 pw{{ question.number|removedots }}.updateInformationFromPubMed();
                return false;
             } 
-            
+           
         });
         $( "#question_{{ question.number|removedots }}_pubmedid").bind( "paste", function() {
             
             pw{{ question.number|removedots }}.updateInformationFromPubMed();
+        });
+
+        $( "#question_{{ question.number|removedots }}_pubmedid").bind( "change", function() {
+            if( $(this).val().length > 0){
+                $("#loadpubbtn").removeClass("disabled");       
+            }else{
+                $("#loadpubbtn").addClass("disabled");       
+            }
         });
 
     };
