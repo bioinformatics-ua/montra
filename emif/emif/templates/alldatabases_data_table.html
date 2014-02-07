@@ -20,8 +20,10 @@
 {% block scriptextraincludes %}
 <script src="{{STATIC_URL}}js/vendor/jquery.tablesorter.min.js"></script>
 <script src="{{STATIC_URL}}js/vendor/jquery.tablesorter.widgets.js"></script>
-<script src="{{STATIC_URL}}js/databases_datatable.js"></script>
+<script src="{{STATIC_URL}}js/vendor/jquery.dataTables.min.js"></script>
+<script src="{{STATIC_URL}}js/vendor/jquery.stickytableheaders.min.js"></script>
 
+<script src="{{STATIC_URL}}js/databases_datatable.js"></script>
 
 {% endblock %}
 
@@ -46,7 +48,7 @@ button {
 {% block content %}
 
 {% if list_databases %}
-<div style="margin-bottom: 70px;"></div>
+<div style="clear: both;"></div>
 
 <select id="db_type">
 <option value="0">-- Select a database type</option>
@@ -64,8 +66,10 @@ button {
 </select>
 {% endfor %}
 
-<div id="tabular_container" class="pull-center well">
+<div id="tabular_container">
+    <div class="well pull-center">
     To see a tabular view of all databases, please choose a database type and a questionset.
+    </div>
 </div>
 
 

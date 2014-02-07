@@ -2,8 +2,8 @@
 
 
 
-<div class="dataTables_scrollBody" style="overflow: auto; width: 100%; height: 540px;">
-<table cellpadding="0" cellspacing="0" border="1" class="display dataTable table table-hover tablesorter "  data-provides="rowlink" id="table_databases" style="margin-left: 0px; ;">
+<div class="dataTables_scrollBody" style="overflow: auto; width: 100%; height: 470px;">
+    <table cellpadding="0" cellspacing="0" border="1" class="display dataTable table table-hover tablesorter "  data-provides="rowlink" id="table_databases" style="margin: 0px;">
 	<thead>
 		<tr>
 			<th>{{ titles.0 }}</th>
@@ -29,7 +29,7 @@
 $(function() {
 
   // call the tablesorter plugin
-  $("table").tablesorter({
+  $("#table_databases").tablesorter({
     theme : 'blue',
 
     // sort on the first column and third column in ascending order
@@ -40,7 +40,11 @@ $(function() {
 
     // initialize zebra striping and filter widgets
     widgets: ["zebra", "filter"]
-
+    
   });
+        $("#table_databases").stickyTableHeaders({container: ".dataTables_scrollBody"});
 
-});</script>
+	
+});
+
+</script>
