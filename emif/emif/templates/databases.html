@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load extra_tags %}
 {% load url from future %}
 {% load django_bootstrap_breadcrumbs %}
 
@@ -75,7 +76,18 @@ button {
              Number of patients: {{t.number_patients}}
             </div>
         </td>
-          <td>{{ t.date }} </td>
+          <td style="min-width: 140px;">            <strong>Creation:</strong>
+            <div style="margin-left:20px">
+                 {{ t.date }}
+            </div>
+            <strong>Last Activity:</strong>
+            <div style="margin-left:20px">
+                {% if t.last_activity %}
+                    {{t.last_activity|datehhmm}}
+                {% else %}
+                    {{ t.date }}
+                {% endif %}
+            </div> </td>
           <td>{{ t.type_name }} </td>
           <td style="width:100px">
           

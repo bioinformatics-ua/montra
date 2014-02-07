@@ -58,6 +58,14 @@ def removehs(value):
 
     return value
 
+@register.filter(name='datehhmm')
+@stringfilter
+def datehhmm(value):
+    
+    value = value[:-10]
+    
+    return value
+
 @register.filter(name='trim')
 @stringfilter
 def trim(value):
