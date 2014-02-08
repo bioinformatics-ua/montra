@@ -46,7 +46,24 @@
     <script src="{{ STATIC_URL }}js/vendor/modernizr-2.6.2.min.js"></script>
     <script src="{{ STATIC_URL }}js/vendor/jquery-1.9.1.min.js"></script>
     <script src="{{ STATIC_URL }}js/vendor/bootstrap.min.js"></script>
+    <script src="{{ STATIC_URL }}js/vendor/jquery.cookie.js"></script>
+    <script type="application/javascript">
+        // We need to configure this to be able to send requests by json with the csrftoken
+        var csrftoken = $.cookie('csrftoken');
 
+                    function csrfSafeMethod(method) {
+                // these HTTP methods do not require CSRF protection
+                return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+            }
+            $.ajaxSetup({
+                crossDomain: false, // obviates need for sameOrigin test
+                beforeSend: function(xhr, settings) {
+                    if (!csrfSafeMethod(settings.type)) {
+                        xhr.setRequestHeader("X-CSRFToken", csrftoken);
+                    }
+                }
+            });
+    </script>
     <!--[if lt IE 9]>
             <link rel="stylesheet" href="bootstrap_ie_compatibility">
 
@@ -68,9 +85,10 @@
             <div class="container">
                             <a class="brand" href="#">EMIF Catalogue</a>
 </div>
-            </div></div>
-                You seem to be using a old version of Internet Explorer.<br /><br />
-                The Internet browser you're currently using is not supported by the EMIF Catalogue. We currently only support I9-IE11, Chrome, Safari, Firefox and Opera. To be able to use our webpage we recommend you to update your Internet Explorer, or use another modern browser from the supported list.
+            </div>
+            </div>
+            <!--    You seem to be using a old version of Internet Explorer.<br /><br />
+                The Internet browser you're currently using is not supported by the EMIF Catalogue. We currently only support I9-IE11, Chrome, Safari, Firefox and Opera. To be able to use our webpage we recommend you to update your Internet Explorer, or use another modern browser from the supported list.-->
         </div>
         <div class="supported">
     <div class="navbar navbar-fixed-top">

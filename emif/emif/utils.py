@@ -96,6 +96,7 @@ class Database:
     ttype = ''
     type_name = ''
     logo = ''
+    last_activity = ''
 
 
 class ordered_dict(dict):
