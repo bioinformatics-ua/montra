@@ -37,47 +37,7 @@ from django.conf import settings
 
 from .parseJerboaFile import * 
 from .services import * 
-
-class HandleFile(object):
-    """This class handle with the file upload for multiple backends
-    """
-    def __init__(self, wrapper):
-        self._handler_wrapper = wrapper
-
-    def handle_file(self, f):
-        """
-        Handle File
-        """
-        self._handler_wrapper.handle_uploaded_file(f)
-
-        # Store the metadata   
-
-
-class FileSystemHandleFile(object):
-    """Store the file in file system
-    """
-    def __init__(self):
-        pass
-
-    def handle_uploaded_file(self, f):
-        """Store the files in file disk 
-        """
-
-        with open(os.path.join(os.path.abspath(settings.PROJECT_DIR_ROOT + 'emif/static/files/'), f.name),
-                  'wb+') as destination:
-            for chunk in f.chunks():
-                destination.write(chunk)
-
-class MongoDBHandleFile(object):
-    """Store the file in MongoDB
-    """
-    def __init__(self):
-        pass
-
-    def handle_uploaded_file(self, f):
-        """Store the files in file disk 
-        """
-        pass
+from .storage_handler import *
 
 
 def document_form_view_upload(request, template_name='documents_upload_form.html'):
@@ -109,30 +69,14 @@ def jerboa_form_view_upload(request, template_name='documents_upload_form.html')
     # TODO: for now it is only calling the documents 
     return document_form_view_upload(request, template_name='documents_upload_form.html')
 
-def jerboa_list_values(request, param, template_name='documents_upload_form.html'):
-
-    pc = PopulationCharacteristic(None)
-    values = pc.get_variables(param)
-    data = {'values': values}
-    response = JSONResponse(data, mimetype="application/json")
-    response['Content-Disposition'] = 'inline; filename=files.json'
-    return response
-
-def generic_filter(request, param, template_name='documents_upload_form.html'):
-
-    pc = PopulationCharacteristic(None)
-    values = pc.generic_filter(param)
-    data = {'values': values}
-    response = JSONResponse(data, mimetype=response_mimetype(request))
-    response['Content-Disposition'] = 'inline; filename=files.json'
-    return response
 
 
 
 def parsejerboa(request, template_name='documents_upload_form.html'):
     """ Parse files from Jerboa
     """
-    path_file = "/Volumes/EXT1/Dropbox/MAPi-Dropbox/EMIF/Jerboa/TEST_DataProfile_v1.5.6b.txt"
+    path_file = "C:/Users/lbastiao/Projects/TEST_DataProfile_v1.5.6b.txt"
+
     _json = import_population_characteristics_data(filename=path_file)
 
     pc = PopulationCharacteristic()

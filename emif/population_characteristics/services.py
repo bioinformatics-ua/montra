@@ -22,24 +22,9 @@ from pymongo.errors import OperationFailure
 from .parseJerboaFile import * 
 import json 
 
-class JerboaFormat(object):
-    """docstring for JerboaFormat"""
-    def __init__(self, arg):
-        super(JerboaFormat, self).__init__()
-        self.arg = arg
+from .jerboa import *
 
-
-class Revision(object):
-    """docstring for Revision"""
-    def __init__(self, arg):
-        super(Revision, self).__init__()
-        self.arg = arg
-        
-    def get_uri(self):
-        pass
-
-    def version(self):
-        pass
+from .conf_charts import *
 
 class PopulationCharacteristic(JerboaFormat):
     """PopulationCharacteristic: This class controls the Jerboa File
@@ -47,7 +32,8 @@ class PopulationCharacteristic(JerboaFormat):
     def __init__(self, arg=None):
         super(PopulationCharacteristic, self).__init__(arg)
         self.arg = arg
-    
+
+
     def last_activity(self):
         pass
 
@@ -58,11 +44,11 @@ class PopulationCharacteristic(JerboaFormat):
         pass
 
     def submit_new_revision(self):
-        path_file = "/Volumes/EXT1/Dropbox/MAPi-Dropbox/EMIF/Jerboa/TEST_DataProfile_v1.5.6b.txt"
+        path_file = "C:/Users/lbastiao/Projects/TEST_DataProfile_v1.5.6b.txt"
         
         self._json = import_population_characteristics_data(filename=path_file)
         #print self._json
-        f = open('/tmp/jerboa', 'w')
+        f = open('jerboaTmp', 'w')
         f.write(self._json)
         f.close()
         json_data = json.loads(self._json)
@@ -114,4 +100,7 @@ class PopulationCharacteristic(JerboaFormat):
         # 
         # db.jerboa_files.find({"values.Name1": "YEAR", "values.Var":"Active patients"})
         pass
-        
+    
+    def get_settings(self):
+        cc = ConfCharts()
+        return cc.get_main_settings()

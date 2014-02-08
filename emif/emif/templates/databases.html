@@ -90,6 +90,7 @@ button {
                 {% endif %}
           </td>
           <td>{{ t.type_name }} </td>
+          {% comment %}
           <td style="width:100px">
           
             <a  href="dbEdit/{{t.id}}/{{t.ttype}}" title="Edit Database"><img src="{{ STATIC_URL }}img/glyphicons_150_edit.png"  /></a>
@@ -97,6 +98,7 @@ button {
               <a href="#" onclick="return false;" class="sharedb" data-id="{{ t.id }}" title="Share Database" ><img src="{{ STATIC_URL }}img/glyphicons_308_share_alt.png"/></a>
           
             </td>
+            {% endcomment %}
 
 
         </tr>

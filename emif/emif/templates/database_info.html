@@ -9,6 +9,22 @@
 
 <link rel="stylesheet" href="{{ STATIC_URL}}css/database_info.css" />
 
+<!-- Generic page styles -->
+<link rel="stylesheet" href="{{ STATIC_URL }}css/vendor/style.css">
+<!-- CSS to style the file input field as button and adjust the Bootstrap progress bars -->
+<link rel="stylesheet" href="{{ STATIC_URL }}css/vendor/jquery.fileupload-ui.css">
+<link href="{{ STATIC_URL }}nvd3/src/nv.d3.css" rel="stylesheet" type="text/css">
+<script src="{{ STATIC_URL }}nvd3/lib/d3.v3.js"></script>
+<script src="{{ STATIC_URL }}nvd3/nv.d3.js"></script>
+<script src="{{ STATIC_URL }}nvd3/src/models/axis.js"></script>
+<script src="{{ STATIC_URL }}nvd3/src/models/historicalBar.js"></script>
+<script src="{{ STATIC_URL }}nvd3/src/models/historicalBarChart.js"></script>
+<script src="{{ STATIC_URL }}nvd3/src/utils.js"></script>
+<script src="{{ STATIC_URL }}nvd3/src/models/axis.js"></script>
+<script src="{{ STATIC_URL }}nvd3/src/models/discreteBar.js"></script>
+<script src="{{ STATIC_URL }}nvd3/src/models/discreteBarChart.js"></script>
+
+
 {% endblock %} 
 
 {% block breadcrumbs %} 
@@ -41,8 +57,19 @@
                 <li class="active">
                     <a href="#metadata" data-toggle="tab">Fingerprint</a>
                 </li>
-                <!--<li><a href="#literature" data-toggle="tab">Literature</a></li>
-            <li><a href="#apiinfo" data-toggle="tab">Extra Information</a></li>-->
+                <li>
+                    <a href="#populationcharacteristics" data-toggle="tab">Population Characteristics</a>
+                </li>
+                <li>
+                    <a href="#documents" data-toggle="tab">Documents</a>
+                </li>
+                <li>
+                    <a href="#literature" data-toggle="tab">Literature</a>
+                    </li>
+                
+                <li>
+                    <a href="#apiinfo" data-toggle="tab">Extra Information</a>
+                </li>
             </ul>
             <div class="tab-content">
                 <div class="tab-pane active" id="metadata">
@@ -172,84 +199,7 @@
 
                 <div class="well span3" id="pc_list">
 
-                    <ul class="nav nav-pills nav-stacked">
-                        <li>
-                            <a class="chart_pc" href="#" onclick="return false;">Birth dates</a>
-                        </li>
-                        <li>
-                            <a class="chart_pc" onclick="return false;" href="#">Start dates</a>
-                        </li>
-                        <li>
-                            <a class="chart_pc" onclick="return false;" href="#">End dates</a>
-                        </li>
-                        <li>
-                            <a class="chart_pc" onclick="return false;" href="#">Active patients</a>
-                        </li>
-                        <li>
-                            <a class="chart_pc" onclick="return false;" href="#">Age at start of year 2000</a>
-                        </li>
-                        <li>
-                            <a class="chart_pc" onclick="return false;" href="#">Age at start of year 2001</a>
-                        </li>
-                        <!-- You need to comple onclick="return false;" e to dynamically -->                
-
-                        <li>
-                            <a class="chart_pc" onclick="return false;" href="">Age at start of year - Total population</a>
-                        </li>
-                        <li>
-                            <a class="chart_pc" onclick="return false;" href="#">Age at start of year - Female population</a>
-                        </li>
-                        <li>
-                            <a class="chart_pc" onclick="return false;" href="#">Age at start of year - Male population</a>
-                        </li>
-                        <li>
-                            <a class="chart_pc" onclick="return false;" href="#">Age at start in calendar year 2000</a>
-                        </li>
-                        <!-- You need to comple onclick="return false;" e to dynamically -->                
-                        <li>
-                            <a class="chart_pc" onclick="return false;" href="#">Age at start - Total population</a>
-                        </li>
-                        <li>
-                            <a class="chart_pc" onclick="return false;" href="#">Age at start - Female population</a>
-                        </li>
-                        <li>
-                            <a class="chart_pc" onclick="return false;" href="#">Age at start - Male population</a>
-                        </li>
-                        <li>
-                            <a class="chart_pc" onclick="return false;" href="#">Age at end in calendar year 2001</a>
-                        </li>
-                        <li>
-                            <a class="chart_pc" onclick="return false;" href="#">Total patient time in a year - Total population</a>
-                        </li>
-                        <li>
-                            <a class="chart_pc" onclick="return false;" href="#">Total patient time in a year - Female population</a>
-                        </li>
-                        <li>
-                            <a class="chart_pc" onclick="return false;" href="#">Total patient time in a year - Male population</a>
-                        </li>
-                        <li>
-                            <a class="chart_pc" onclick="return false;" href="#">Patient time</a>
-                        </li>
-                        <li>
-                            <a class="chart_pc" onclick="return false;" href="#">Patient time per patient before a year - Total population</a>
-                        </li>
-                        <li>
-                            <a class="chart_pc" onclick="return false;" href="#">Patient time per patient before a year - Female population</a>
-                        </li>
-                        <li>
-                            <a class="chart_pc" onclick="return false;" href="#">Patient time per patient before a year - Male population</a>
-                        </li>
-                        <li>
-                            <a class="chart_pc" onclick="return false;" href="#">Patient time per patient after a year - Total population</a>
-                        </li>
-                        <li>
-                            <a class="chart_pc" onclick="return false;" href="#">Patient time per patient after a year - Female population</a>
-                        </li>
-                        <li>
-                            <a class="chart_pc" onclick="return false;" href="#">Patient time per patient after a year - Male population</a>
-                        </li>
-
-                    </ul>
+                    
 
                 </div>
                 
@@ -396,8 +346,11 @@
 <!--<![endif]-->
 <script src="{{ STATIC_URL}}js/database_info.js"></script>
 
-<script src="static/js/emif.populationcharacteristics.js"></script>
-<script src="static/js/emif.documents.js"></script>
+
+<script src="{{ STATIC_URL}}js/emif.populationcharacteristics.charts.js"></script>
+
+<script src="{{ STATIC_URL}}js/emif.populationcharacteristics.js"></script>
+<script src="{{ STATIC_URL}}js/emif.documents.js"></script>
 
 
 <!-- The jQuery UI widget factory, can be omitted if jQuery UI is already included -->
