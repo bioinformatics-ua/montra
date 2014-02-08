@@ -54,7 +54,7 @@ def report_bug(request):
             except:
                 pass
 
-            description = description + "\n\nReported by %s, email: %s with: " % (name, from_email, browser)
+            description = description + "\n\nReported by %s, email: %s with: %s" % (name, from_email, browser)
             issue.create(title, description)
             
             try:

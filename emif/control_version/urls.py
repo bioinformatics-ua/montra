@@ -24,5 +24,6 @@ from control_version.views import *
 urlpatterns = patterns('api.views',
     
     url(r'^history$', list_issues),
+    url(r'^bugreport$', bug_report),
     
 )
