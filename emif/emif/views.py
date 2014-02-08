@@ -92,6 +92,7 @@ def results_db(request, template_name='results.html'):
         id = ''
         name = ''
         date = ''
+        last_activity = ''
 
     class Results:
         num_results = 0
@@ -102,6 +103,7 @@ def results_db(request, template_name='results.html'):
         database_aux = Database()
         database_aux.id = database.runid
         database_aux.date = database.completed
+        
         answers = Answer.objects.filter(runid=database.runid)
         text = clean_value(str(answers[1].answer))
         info = text[:75] + (text[75:] and '..')
@@ -223,6 +225,12 @@ def results_fulltext_aux(request, query, page=1, template_name='results.html'):
                 database_aux.number_patients = ''
             else:
                 database_aux.number_patients = r['number_active_patients_jan2012_t']
+                
+            if (not r.has_key('date_last_modification_t')):
+                database_aux.last_activity = ''
+            else:
+                database_aux.last_activity = r['date_last_modification_t']                  
+                
             if (not r.has_key('upload-image_t')):
                 database_aux.logo = 'nopic.gif'
             else:
@@ -341,6 +349,8 @@ def results_diff(request, page=1, template_name='results_diff.html'):
             database_aux.date = convert_date(r['created_t'])
 
             database_aux.name = r['database_name_t']
+            database_aux.last_activity = r['date_last_modification_t']
+            
             list_databases.append(database_aux)
             if (len(list_databases) == 3):
                 break
@@ -990,6 +1000,8 @@ class Database:
     id = ''
     name = ''
     date = ''
+    last_activity = ''
+    
 
 
 def get_databases_from_db(request):
@@ -1071,6 +1083,11 @@ def get_databases_from_solr(request, query="*:*"):
             else:
                 database_aux.number_patients = r['number_active_patients_jan2012_t']
 
+            if (not r.has_key('date_last_modification_t')):
+                database_aux.last_activity = ''
+            else:
+                database_aux.last_activity = r['date_last_modification_t']                
+                
             if (not r.has_key('upload-image_t')):
                 database_aux.logo = 'nopic.gif'
             else:
