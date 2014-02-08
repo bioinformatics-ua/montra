@@ -176,6 +176,45 @@ function PublicationWidget ()
 
     };
 
+    this.validate_form = function(pubmedid, pubtitle, pubjournal, pubyear, pubauthors) {
+        if(pubmedid.length == 0)
+            return false;
+
+        if(pubtitle.length == 0)
+            return false;
+        
+        if(pubjournal.length == 0)
+            return false;
+        
+        if(pubyear.length == 0)
+            return false;
+        
+        if(pubauthors.length == 0)
+            return false;
+
+        var _aux = document.getElementById("question_{{ question.number }}").value ;
+        if (!(_aux===undefined || _aux=="")){
+            if (_aux[0] != "[")
+            {
+                var _objs = JSON.parse("["+_aux+"]");
+            }
+            else
+            {
+                var _objs = JSON.parse(_aux);    
+            }
+
+            for (var i = 0 ; i<_objs.length; i++)
+            {
+                if(_objs[i]['pmid'] == pubmedid)
+                    return false;
+
+                if( _objs[i]['title'].toLowerCase() == pubtitle.toLowerCase() && _objs[i]['journal'].toLowerCase() == pubjournal.toLowerCase() && _objs[i]['year'] == pubyear )
+                    return false;
+           }
+        }
+        return true;
+    }
+
     this.addPublication = function() 
     {
         var _pubmedid = $('#question_{{ question.number|removedots }}_pubmedid').val(); 
@@ -186,6 +225,10 @@ function PublicationWidget ()
         var _pubpages = $('#question_{{ question.number|removedots }}_pubpages').val();  
         var _pubauthors = $('#question_{{ question.number|removedots }}_pubauthors').val();  
         var _publink = $('#question_{{ question.number|removedots }}_publink').val();  
+
+        if( !pw{{ question.number|removedots }}.validate_form(_pubmedid, _pubtitle, _pubjournal, _pubyear, _pubauthors) ){
+            return;
+        }
 
         $('#question_{{ question.number|removedots }}_table > tbody:last').append('<tr><td><a class="deleteLink" href="#" ><img src="static/img/glyphicons_192_circle_remove.png"/></a></td><td>'+_pubmedid+'</td><td>'+_pubtitle+'</td><td>'+_pubjournal+'</td><td>'+_pubyear+'</td><td>'+_pubvolume+'</td><td>'+_pubpages+'</td><td>'+_pubauthors+'</td></tr>');
 
