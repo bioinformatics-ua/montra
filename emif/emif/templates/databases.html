@@ -50,7 +50,8 @@ button {
         <tr>
             <th class="sorter-false filter-false"></th>
             <th>Name</th>
-            <th>Date</th>
+            <th>Creation Date</th>
+            <th>Modification Date</th>            
             <th>Type</th>
 
             <th class="sorter-false filter-false">Modify</th>
@@ -76,18 +77,17 @@ button {
              Number of patients: {{t.number_patients}}
             </div>
         </td>
-          <td style="min-width: 140px;">            <strong>Creation:</strong>
-            <div style="margin-left:20px">
+          <td style="min-width: 120px;">            
                  {{ t.date }}
-            </div>
-            <strong>Last Activity:</strong>
-            <div style="margin-left:20px">
+
+          </td>
+          <td style="min-width: 120px;">            
                 {% if t.last_activity %}
                     {{t.last_activity|datehhmm}}
                 {% else %}
                     {{ t.date }}
                 {% endif %}
-            </div> </td>
+          </td>
           <td>{{ t.type_name }} </td>
           <td style="width:100px">
           
