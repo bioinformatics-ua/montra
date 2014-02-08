@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load extra_tags %}
 {% load url from future %}
 {% load django_bootstrap_breadcrumbs %}
 
@@ -49,7 +50,8 @@ button {
         <tr>
             <th class="sorter-false filter-false"></th>
             <th>Name</th>
-            <th>Date</th>
+            <th>Creation Date</th>
+            <th>Modification Date</th>            
             <th>Type</th>
             {% comment %}
             <th class="sorter-false filter-false">Modify</th>
@@ -76,7 +78,17 @@ button {
              Number of patients: {{t.number_patients}}
             </div>
         </td>
-          <td>{{ t.date }} </td>
+          <td style="min-width: 120px;">            
+                 {{ t.date }}
+
+          </td>
+          <td style="min-width: 120px;">            
+                {% if t.last_activity %}
+                    {{t.last_activity|datehhmm}}
+                {% else %}
+                    {{ t.date }}
+                {% endif %}
+          </td>
           <td>{{ t.type_name }} </td>
           <td style="width:100px">
           

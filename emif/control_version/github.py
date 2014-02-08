@@ -20,11 +20,10 @@
 
 
 from github3 import login
-from emif.models import *
+from control_version.models import *
 from django.shortcuts import render
 from django.conf import settings
 from django.core.mail import send_mail, BadHeaderError
-
 
 
 """
@@ -48,8 +47,14 @@ def report_bug(request):
             name = request.user.get_full_name()
             description = request.POST.get('description', '').encode('ascii', 'ignore')
             from_email = request.user.email
-            issue = Issue(settings.GITHUB_USERNAME, settings.GITHUB_PASSWD)
-            description = description + "\n\nReported by %s, email: %s" % (name, from_email)
+            issue = IssueManager(settings.GITHUB_USERNAME, settings.GITHUB_PASSWD)
+            browser = ''
+            try: 
+                browser = request.META['HTTP_USER_AGENT']
+            except:
+                pass
+
+            description = description + "\n\nReported by %s, email: %s with: %s" % (name, from_email, browser)
             issue.create(title, description)
             
             try:
@@ -63,17 +68,65 @@ def report_bug(request):
     return render(request, 'bugreport.html', {'form': form, 'request': request, 'breadcrumb': True})
 
 
+def issues_handler(request):
+    issue = IssueManager(settings.GITHUB_USERNAME, settings.GITHUB_PASSWD)
+    error_loading_issues = False
+
+    try:
+        issues_open = issue.list('open', None)
+    except:
+        issues_open = []
+        error_loading_issues = True
+
+    try:
+        issues_closed = issue.list('closed', None)
+    except:
+        issues_closed = []
+        error_loading_issues = True
+
+    try:
+        milestones = issue.list_milestones()
+    except:
+        raise
+        milestones = []
+        error_loading_issues = True
 
 
-class Issue(object):
-	def __init__(self, user, pw):
-		self.gh = login(user, pw)
+    
+    return render(request, 'list_issues.html', {'request': request,
+     'breadcrumb': True,
+     'issues_open': issues_open, 'issues_closed':issues_closed, 'milestones': milestones})
 
-	def create(self, title, body ):
-		return self.gh.create_issue(settings.GITHUB_ACCOUNT,settings.GITHUB_REPO, title, body)
+class IssueManager(object):
+    def __init__(self, user, pw):
+        self.gh = login(user, pw)
+	
+    def create(self, title, body ):
+        return self.gh.create_issue(settings.GITHUB_ACCOUNT,settings.GITHUB_REPO, title, body)
+
+    def list(self, state_of, labels_of):
+        """
+        should do:
+        for i in issuemanager.list(state='open'):
+            print i.created_at
+            print i.body_text
+            print i.title
+
+        """
+        return self.gh.iter_repo_issues(settings.GITHUB_ACCOUNT,settings.GITHUB_REPO, state=state_of, labels=labels_of)
+
+    def list_labels(self):
+        # I'm adding this shit statically due to the use case of the EMIF Catalogue
+        # It's the only way that this will make sense. 
+        return ['Use Case 1', 'Use Case 2', 'Use Case 3', 'Use Case 4', 'Use Case 5', 'Use Case 6']
+    
+    def list_milestones(self):
+        repo = self.gh.repository(settings.GITHUB_ACCOUNT,settings.GITHUB_REPO)
+        return repo.iter_milestones()
 
 """
 >>> from github3 import login
 >>> gh = login('bastiao','GOFUCKYOURSELF')
 >>> gh.create_issue('bioinformatics-ua', 'emif-fb', 'bastiao test inserting issue programtically')
+
 """
