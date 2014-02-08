@@ -131,6 +131,7 @@ def fingerprints_list():
     return results
 
 
+
 def show_fingerprints():
     
     return {'fingerprints':fingerprints_list()}
@@ -228,4 +229,21 @@ def incrementglobal( parser, token ):
   except ValueError:
     raise template.TemplateSyntaxError("%r tag requires arguments" % token.contents.split()[0])
   return GlobalVariableIncrementNode(varname)
+
 register.tag( 'incrementglobal', incrementglobal )
+
+class VersionNode( template.Node ):
+  def __init__( self, varname ):
+    self.varname = varname
+  def render( self, context ):
+    return get_version()
+
+def get_version():
+    return settings.VERSION + " " + settings.VERSION_DATE
+
+def get_version_tag(parser, token):
+    return VersionNode('')
+register.tag( 'get_version', get_version_tag )
+
+
+
