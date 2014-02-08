@@ -31,14 +31,18 @@ text-decoration: none;
 
 
 {% block headextra %}
-<script type="text/javascript" src="{{ STATIC_URL }}questionset.js"></script>
-<script src="{{ STATIC_URL}}js/vendor/threadpool.js"></script>
-<script src="static/js/vendor/bootstrap-tooltip.js"></script>
-<script src="static/js/vendor/bootstrap-popover.js"></script>
-<script src="static/js/fingerprint.js"></script>
-
 <link rel="stylesheet" href="{{ STATIC_URL }}css/vendor/chosen.css"></script>
 <link rel="stylesheet" href="{{ STATIC_URL }}progressbar.css"></script>
+<link rel="stylesheet" href="{{ STATIC_URL }}css/vendor/jquery.boolrelwidget.css"></script>
+
+<script type="text/javascript" src="{{ STATIC_URL }}questionset.js"></script>
+<script src="{{ STATIC_URL}}js/vendor/threadpool.js"></script>
+<script src="{{ STATIC_URL}}js/vendor/bootstrap-tooltip.js"></script>
+<script src="{{ STATIC_URL}}js/vendor/bootstrap-popover.js"></script>
+<script src="{{ STATIC_URL}}js/fingerprint.js"></script>
+<script src="{{ STATIC_URL}}js/vendor/jquery.boolrelwidget.js"></script>
+
+
 {% for x in jsinclude %}
 <script type="text/javascript" src="{{ x }}"></script>
 {% endfor %}
@@ -67,9 +71,11 @@ text-decoration: none;
   <div class="jumbotron">
 
    <div class="span12" style="text-align:center">
+ 
     <h2>Advanced Search</h2>
+        <div id="bool_container">t</div>
+    <div style="display: none;">
 
-    <div style="display:none">
   <em>Filter: </em>
           <select data-placeholder="Your Favorite Football Team" style="width:600px;" class="chosen-select" multiple tabindex="6">
             <option value=""></option>
@@ -125,7 +131,7 @@ text-decoration: none;
 
         <form name="qform" id="qform" action="{{ request.path }}" method="POST">
             {% csrf_token %}
-                    <div style="overflow-y:scroll;height:800px;" id="set_container">
+                    <div id="set_container">
                     </div>
         </form>
             {% comment %}
@@ -134,7 +140,7 @@ text-decoration: none;
         </div>
     
 </div>
-
+<button id="eu">yo</button>
 <script type="text/javascript" src="{{ STATIC_URL }}js/vendor/chosen.jquery.js"></script>
 <script type="text/javascript" src="{{ STATIC_URL }}js/emif.advanced_search.js"></script>
 <script type="text/javascript">
@@ -165,6 +171,16 @@ function add_triggers() {
 $('#li_advanced_search').addClass("active");
 
 $( document ).ready(function() {
+/*
+    var bool_container = $('#bool_container').boolrelwidget();
+    var bv = new BooleanVariable(new BooleanVariable(
+                        new BooleanVariable('E',BOOL['XOR'],'F'),
+                        BOOL['OR'],
+                        'B')
+,BOOL['AND'],
+new BooleanVariable('C',BOOL['OR'],'D'));
+    alert(bv.toString());
+*/
     load_questionnary();
 });
 var threads = {};
