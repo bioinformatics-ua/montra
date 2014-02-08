@@ -117,6 +117,9 @@ urlpatterns = patterns('',
     # API
     url(r'^api/', include('api.urls')),
 
+    # Control version
+    url(r'^controlversion/', include('control_version.urls')),
+
     # Questionnaire URLs
     url(r'q/', include('questionnaire.urls')),
 

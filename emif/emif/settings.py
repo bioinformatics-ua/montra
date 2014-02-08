@@ -186,6 +186,7 @@ TEMPLATE_DIRS = (
     # Don't forget to use absolute paths, not relative paths.
     os.path.abspath(PROJECT_DIR_ROOT + MIDDLE_DIR + 'apps/seantis-questionnaire/questionnaire/templates'),
     os.path.abspath(PROJECT_DIR_ROOT + MIDDLE_DIR + 'emif/templates'),
+    os.path.abspath(PROJECT_DIR_ROOT + MIDDLE_DIR + 'control_version/templates'),
 )
 
 INSTALLED_APPS = (
@@ -226,6 +227,7 @@ INSTALLED_APPS = (
 
     'searchengine',
     'api',
+    'control_version',
 
     'django_bootstrap_breadcrumbs',
     'bootstrap-pagination',
