@@ -30,8 +30,8 @@ THE SOFTWARE.
     $.fn.boolrelwidget = function (options) {
         // so we dont lose track of who we are, and used to ensure chainability
         var self = this;
-        var variables = [];
-
+        var loose_variables = [];
+        var boolean_definitions = [];
         // Default Options
         var settings = $.extend({
             expand_text:'To define the relations between the terms click here.',
@@ -66,13 +66,13 @@ THE SOFTWARE.
         });
         return {
             push: function (str) {
-                variables.push(str);
+                loose_variables.push(str);
                 console.log('Pushed new variable ' + str + ' to variables pool.');
 
                 return self;
             },
             pop: function (str) {
-                variables.pop(str);
+                loose_variables.pop(str);
                 console.log('Popped variable ' + str + ' from variables pool.');
 
                 return self;
@@ -104,8 +104,14 @@ function isBool(op){
         return false;
 }
 
+/* Defining a unique counter of ids to attribute booleanVariable instances 
+ * (this is used to facilitate encountering nested references */
+
+var boolrelwidgetuniqueidcounter=10000;
+
 /* Defining BooleanVariable class 
  *  A BooleanVariable object has:
+ *      -   a id to facilitate encountering the element when nested
  *      -   two operators of type either string or BooleanVariable
  *      -   a relation of enum type BOOL
  */
@@ -123,7 +129,7 @@ function BooleanVariable(obj1, op, obj2) {
         console.warn('Relation between operators must be of a BOOL valid type.');
         return null;
     }
-    
+    this.id = boolrelwidgetuniqueidcounter++;
     this.oper1 = obj1;
     this.relation= op;
     this.oper2 = obj2;
@@ -156,7 +162,35 @@ BooleanVariable.prototype = {
             return null;
         }    
         this.oper2= obj1;
-    }, 
+    },
+    removeById : function(other_id){
+        this.removeByIdAux(null, null, other_id);
+    },
+    removeByIdAux : function(parent, branch, other_id) {
+        if(typeof other_id != 'number'){
+            console.warn('When removing by id, a number value must be specified. Found type ' + typeof other_id);
+        }
+        else {
+            console.log('value :'+this);
+            if(this.id == other_id){
+                // If not on root remove reference
+                if(parent && branch){
+                    if(branch == 1)
+                        parent.clearOper1();
+                    if(branch == 2)
+                        parent.clearOper2();
+                }
+                return this;
+            }
+            
+            if(this.oper1 instanceof BooleanVariable){
+                this.oper1.removeByIdAux(this,1, other_id);
+            }
+            if(this.oper2 instanceof BooleanVariable){
+                this.oper2.removeByIdAux(this,2, other_id);
+            }
+        }
+    },
     clearOper1 : function (){
         this.oper1=null;
     },
@@ -165,6 +199,14 @@ BooleanVariable.prototype = {
     },    
     /* This returns a string representation of this object in boole's arithmetic format */
     toString : function(){
+        // single operators either oper1 or oper2 only
+        if(this.oper1 == null && this.oper2 == null)
+            return "";        
+        else if(this.oper1 == null)
+            return this.oper2.toString();
+        else if(this.oper2 == null)
+            return this.oper1.toString();
+        
         return "("+this.oper1.toString()+' '+this.relation.name+' '+this.oper2.toString()+")";
     },
     destroy : function() {
