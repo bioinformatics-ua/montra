@@ -83,10 +83,19 @@ def issues_handler(request):
     except:
         issues_closed = []
         error_loading_issues = True
+
+    try:
+        milestones = issue.list_milestones()
+    except:
+        raise
+        milestones = []
+        error_loading_issues = True
+
+
     
     return render(request, 'list_issues.html', {'request': request,
      'breadcrumb': True,
-     'issues_open': issues_open, 'issues_closed':issues_closed})
+     'issues_open': issues_open, 'issues_closed':issues_closed, 'milestones': milestones})
 
 class IssueManager(object):
     def __init__(self, user, pw):
@@ -107,12 +116,17 @@ class IssueManager(object):
         return self.gh.iter_repo_issues(settings.GITHUB_ACCOUNT,settings.GITHUB_REPO, state=state_of, labels=labels_of)
 
     def list_labels(self):
+        # I'm adding this shit statically due to the use case of the EMIF Catalogue
+        # It's the only way that this will make sense. 
         return ['Use Case 1', 'Use Case 2', 'Use Case 3', 'Use Case 4', 'Use Case 5', 'Use Case 6']
-        
-
+    
+    def list_milestones(self):
+        repo = self.gh.repository(settings.GITHUB_ACCOUNT,settings.GITHUB_REPO)
+        return repo.iter_milestones()
 
 """
 >>> from github3 import login
 >>> gh = login('bastiao','GOFUCKYOURSELF')
 >>> gh.create_issue('bioinformatics-ua', 'emif-fb', 'bastiao test inserting issue programtically')
+
 """
