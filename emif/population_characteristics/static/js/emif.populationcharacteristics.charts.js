@@ -8,7 +8,7 @@
 function PCConfs () 
 {
     this.getSettings = function(fingerprintId){
-          var result = {}
+        var result = {}
           
         $.ajax({
           dataType: "json",
@@ -36,6 +36,21 @@ function ChartLayout ()
         return charts_titles;
     };
 
+
+    this.getFilters = function(graph_type, fingerprintId){
+        // TODO
+        return null;
+    };
+
+    this.getScales = function(graph_type, fingerprintId){
+        // TODO
+        return null;
+    };
+
+    this.getAxis = function(graph_type, fingerprintId){
+        // TODO
+        return null;
+    };
 
 
 };

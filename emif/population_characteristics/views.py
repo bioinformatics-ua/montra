@@ -23,10 +23,10 @@ from .response import JSONResponse, response_mimetype
 from .serialize import serialize
     
 
-def jerboa_list_values(request, param, template_name='documents_upload_form.html'):
+def jerboa_list_values(request, var, row, fingerprint_id, template_name='documents_upload_form.html'):
 
     pc = PopulationCharacteristic(None)
-    values = pc.get_variables(param)
+    values = pc.get_variables(var, row, fingerprint_id)
     data = {'values': values}
     response = JSONResponse(data, mimetype="application/json")
     response['Content-Disposition'] = 'inline; filename=files.json'
@@ -55,6 +55,18 @@ def get_pde_types(self):
     """This function returns the Primary Data Extract type of graphs
     """
 
+
+def upload_jerboa_request(request, template_name='uploadjerboa.html'):
+    """
+    This functions is responsabible to handle the upload files of jerboa 
+    """
+    pass
+
+
+#################### This is just trash that I'm keeping while coding
+### I just need to finish this shit, and then I'll remove this code 
+### If the population characteristics is running, please remove this 
+### shit function: population(request, template_name='piechart.html'):
 def population(request, template_name='piechart.html'):
 
     xdata = ["Apple", "Apricot", "Avocado", "Banana", "Boysenberries", "Blueberries", "Dates", "Grapefruit", "Kiwi", "Lemon"]
@@ -73,10 +85,4 @@ def population(request, template_name='piechart.html'):
             'jquery_on_ready': False,
         }
     }
-    return render_to_response('charts.html', data)
-
-def upload_jerboa_request(request, template_name='uploadjerboa.html'):
-    """
-    This functions is responsabible to handle the upload files of jerboa 
-    """
-    pass
+    return render_to_response('charts.html', data)    

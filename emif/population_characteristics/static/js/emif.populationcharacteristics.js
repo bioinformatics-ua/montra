@@ -24,6 +24,20 @@
 *********************************************************/
 
 
+function getFingerprintID(){
+  var url = document.URL;
+  var fingerprint_id='abcd';
+  try{
+    fingerprint_id = url.split("population/new/")[1].split("/1")[0];
+  }
+  catch(err){
+    fingerprint_id='abcd'
+  };
+  return fingerprint_id;
+
+};
+
+
 function PCAPI () 
 {
     this.getGender = function(){
@@ -31,7 +45,7 @@ function PCAPI ()
           
         $.ajax({
           dataType: "json",
-          url: "population/jerboalistvalues/Gender",
+          url: "population/jerboalistvalues/Active patients/Gender/abcd",
           async: false,
           data: result,
           success: function (data){result=data;},
@@ -44,7 +58,7 @@ function PCAPI ()
           
         $.ajax({
           dataType: "json",
-          url: "population/jerboalistvalues/Name1",
+          url: "population/jerboalistvalues/Active patients/Name1/abcd",
           async: false,
           data: result,
           success: function (data){result=data;},
@@ -57,7 +71,7 @@ function PCAPI ()
           
         $.ajax({
           dataType: "json",
-          url: "population/jerboalistvalues/Name2",
+          url: "population/jerboalistvalues/Active patients/Name2/abcd",
           async: false,
           data: result,
           success: function (data){result=data;},
@@ -71,7 +85,7 @@ function PCAPI ()
           
         $.ajax({
           dataType: "json",
-          url: "population/jerboalistvalues/Value1",
+          url: "population/jerboalistvalues/Active patients/Value1/abcd",
           async: false,
           data: result,
           success: function (data){result=data;},
@@ -85,7 +99,7 @@ function PCAPI ()
           
         $.ajax({
           dataType: "json",
-          url: "population/jerboalistvalues/Value2",
+          url: "population/jerboalistvalues/Active patients/Name2/abcd",
           async: false,
           data: result,
           success: function (data){result=data;},
@@ -145,6 +159,18 @@ function PCAPI ()
         });
         return result;
     };
+    this.getValuesRow = function(Var, Row, fingerprintID){
+        var result = {}
+          
+        $.ajax({
+          dataType: "json",
+          url: "population/jerboalistvalues/"+Var+"/"+Row+"/" + fingerprintID,
+          async: false,
+          data: result,
+          success: function (data){result=data;},
+        });
+        return result;
+    };
 
 };
 
@@ -155,8 +181,6 @@ function PCAPI ()
 
  (function( $ )
  {
-
-
 
     var methods = {
         init : function( options ) {
@@ -260,8 +284,22 @@ function PCAPI ()
                     { 
                       e.preventDefault(); 
                       e.stopPropagation();
+                      console.log(this.parent);
                       
-                      console.log(e.toElement);
+                      // Anyone have a better suggestion to do it?
+                      // I'm more focuses in other staff right now.
+                      // Bastiao, 2014.Feb.09
+                      $('.graphTypes').closest('li').removeClass('active')
+                      $(this.parentNode).closest('li').addClass('active')
+
+
+                      console.log();
+                      PC = new PCAPI();
+                      fingerprintID = getFingerprintID();
+                      console.log(fingerprintID);
+                      var valuesFromGraph = PC.getValuesRow(e.toElement.innerHTML, 
+                        'Count', 'abcd');
+                      console.log(valuesFromGraph);
                       if ($(e.toElement.firstChild).hasClass('icon-ok')) 
                       {
                         $(e.toElement.firstChild).removeClass('icon-ok') 
@@ -280,22 +318,22 @@ function PCAPI ()
     };
 
     var methods = {
-        init : function( options ) {
+        init : function( options, api ) {
 
-            
             var self = this;
             self.append("Var: ");
-            tmpUl = $('<ul class="nav nav-pills nav-stacked">');
+            tmpUl = $('<ul class="nav nav-list nav-pills nav-stacked">');
             values = options.getChartTitles();
             self.append(tmpUl);
             $.each(values, function (data){
                 if (values[data]==="")
                     return;
                 console.log(values[data]);
-                tmpUl.append('<li><a class="graphTypes" href="#" onclick="return false;"><i id="iproximity" class="icon-ok icon-black active"></i> '+values[data]+'</a></li>')
+                tmpUl.append('<li class=""><a class="graphTypes" href="#" onclick="return false;">'+values[data]+'</a></li>')
             });
-
+            console.log(api);
             var myPC = options;
+            
             filters = new Filters();
             filters.bindFilters();
 
@@ -330,7 +368,7 @@ $(document).ready(
 
         var chartLayout = new ChartLayout();
 
-        $("#pc_list").populationChartsTypes(chartLayout);
+        $("#pc_list").populationChartsTypes(chartLayout, PCAPI);
         $("#pc_list").populationChartsTypes('draw', chartLayout); 
 
     }

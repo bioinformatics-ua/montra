@@ -44,8 +44,8 @@ class PopulationCharacteristic(JerboaFormat):
         pass
 
     def submit_new_revision(self):
-        path_file = "C:/Users/lbastiao/Projects/TEST_DataProfile_v1.5.6b.txt"
-        
+        #path_file = "C:/Users/lbastiao/Projects/TEST_DataProfile_v1.5.6b.txt"
+        path_file = "/Volumes/EXT1/Dropbox/MAPi-Dropbox/EMIF/Jerboa/TEST_DataProfile_v1.5.6b.txt"        
         self._json = import_population_characteristics_data(filename=path_file)
         #print self._json
         f = open('jerboaTmp', 'w')
@@ -61,10 +61,24 @@ class PopulationCharacteristic(JerboaFormat):
         except OperationFailure:
             print "Failure"
 
-    def get_variables(self, param):
+    def get_variables(self, var, row, fingerprint_id='abcd'):
         #db.jerboa_files.distinct( 'values.Var' )
-        values =  jerboa_collection.distinct( 'values.' +  param )
-        return values
+        # Need to filter by Fingerprint, otherwise, we're trapped.
+        print "get_variables"
+        print "var: " + var
+        print "row: " + row 
+        print "fingerprint_id:" + fingerprint_id
+
+        import pdb
+        #pdb.set_trace() 
+        values =  jerboa_collection.find( {'fingerprint_id':fingerprint_id, 'values.Var': var})
+        #values =  jerboa_collection.find( {'fingerprint_id':'abcd', 'values.Var': 'Active patients'}  )
+        results = []
+        for v in values:
+            results.append(v[u'values'])
+
+        print results
+        return results
 
     def get_variables_filter(self, gender=None, name1=None, value1=None, name2=None,
         value2=None, var=None):
