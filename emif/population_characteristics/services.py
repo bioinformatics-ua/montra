@@ -48,15 +48,15 @@ class PopulationCharacteristic(JerboaFormat):
         path_file = "/Volumes/EXT1/Dropbox/MAPi-Dropbox/EMIF/Jerboa/TEST_DataProfile_v1.5.6b.txt"        
         self._json = import_population_characteristics_data(filename=path_file)
         #print self._json
-        f = open('jerboaTmp', 'w')
-        f.write(self._json)
-        f.close()
+        #f = open('jerboaTmp', 'w')
+        #f.write(self._json)
+        #f.close()
         json_data = json.loads(self._json)
         try:
             # Create MONGO record
             data_example = jerboa_collection.insert(json_data)
             # get last inserted record
-            print jerboa_collection.find_one()
+            #print jerboa_collection.find_one()
             print "Sucess "
         except OperationFailure:
             print "Failure"
