@@ -515,6 +515,7 @@ def calculate_databases_per_location():
 
 def advanced_search(request, questionnaire_id, question_set):
 
+
     return show_fingerprint_page_read_only(request, questionnaire_id, question_set, True)
 
 
@@ -1953,6 +1954,12 @@ def show_fingerprint_page_read_only(request, q_id, qs_id, SouMesmoReadOnly=False
         cssinclude = []     # css files to include
         jstriggers = []
         qvalues = {}
+        if not request.POST:
+            try:
+                del request.session['query']
+            except:
+                pass
+
         if request.POST:
             for k, v in request.POST.items():
                 
