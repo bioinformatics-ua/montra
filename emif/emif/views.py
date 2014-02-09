@@ -1145,6 +1145,10 @@ def databases(request, page=1, template_name='databases.html'):
 
 
 def all_databases(request, page=1, template_name='alldatabases.html'):
+    
+    # lets clear the geolocation session search filter (if any)
+    del request.session['query']
+    
     #list_databases = get_databases_from_db(request)
     list_databases = get_databases_from_solr(request, "*:*")
 
