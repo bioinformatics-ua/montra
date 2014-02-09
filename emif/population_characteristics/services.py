@@ -71,7 +71,13 @@ class PopulationCharacteristic(JerboaFormat):
 
         import pdb
         #pdb.set_trace() 
-        values =  jerboa_collection.find( {'fingerprint_id':fingerprint_id, 'values.Var': var})
+        vars_that_should_exists = ['Count']
+
+        dict_query = {'fingerprint_id':fingerprint_id, 'values.Count': { "$exists" : 'true' }, 
+            'values.Var': var}
+        for ve in vars_that_should_exists:
+            dict_query['values.'+ve] = { "$exists" : 'true' }
+        values =  jerboa_collection.find(dict_query )
         #values =  jerboa_collection.find( {'fingerprint_id':'abcd', 'values.Var': 'Active patients'}  )
         results = []
         for v in values:
