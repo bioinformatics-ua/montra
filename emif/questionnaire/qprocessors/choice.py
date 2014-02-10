@@ -149,7 +149,7 @@ def get_aux_text(full_value, choice_value, original_value=None):
     if (full_value==None):
         return original_value
     if isinstance(full_value, basestring):
-        print "full_value is string" 
+        #print "full_value is string" 
         _aux = full_value.split("#")
         #print _aux
         for v in _aux:
@@ -161,7 +161,6 @@ def get_aux_text(full_value, choice_value, original_value=None):
                     return values[0]
         return ''
     else:
-        print "full_value is not string" 
         return original_value
 
 

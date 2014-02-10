@@ -41,7 +41,7 @@ from searchengine.search_indexes import convert_text_to_slug
 from emif.utils import *
 from emif.models import *
 from api.models import *
-from emif.github import report_bug
+
 from geopy import geocoders 
 from django.core.mail import send_mail, BadHeaderError
 
@@ -92,6 +92,7 @@ def results_db(request, template_name='results.html'):
         id = ''
         name = ''
         date = ''
+        last_activity = ''
 
     class Results:
         num_results = 0
@@ -102,6 +103,7 @@ def results_db(request, template_name='results.html'):
         database_aux = Database()
         database_aux.id = database.runid
         database_aux.date = database.completed
+        
         answers = Answer.objects.filter(runid=database.runid)
         text = clean_value(str(answers[1].answer))
         info = text[:75] + (text[75:] and '..')
@@ -153,7 +155,7 @@ def results_comp(request, template_name='results_comp.html'):
                                            'results': list_qsets, 'database_to_compare': first_name})
 
 
-def results_fulltext(request, page=1, template_name='results.html'):
+def results_fulltext(request, page=1, full_text=True, template_name='results.html'):
     query = ""
     in_post = True
     try:
@@ -164,7 +166,8 @@ def results_fulltext(request, page=1, template_name='results.html'):
 
     if not in_post:
         query = request.session.get('query', "")
-
+    if not full_text:
+        return results_fulltext_aux(request, query, page, template_name)
     return results_fulltext_aux(request, "text_t:" + query, page, template_name)
 
 
@@ -223,6 +226,12 @@ def results_fulltext_aux(request, query, page=1, template_name='results.html'):
                 database_aux.number_patients = ''
             else:
                 database_aux.number_patients = r['number_active_patients_jan2012_t']
+                
+            if (not r.has_key('date_last_modification_t')):
+                database_aux.last_activity = ''
+            else:
+                database_aux.last_activity = r['date_last_modification_t']                  
+                
             if (not r.has_key('upload-image_t')):
                 database_aux.logo = 'nopic.gif'
             else:
@@ -299,7 +308,9 @@ def results_diff(request, page=1, template_name='results_diff.html'):
         #raise
     if not in_post:
         query = request.session.get('query', "")
-
+    import pdb
+    #pdb.set_trace()
+    print "query_@" + query
     if query == "":
         return render(request, "results.html", {'request': request,
                                                 'list_results': [], 'page_obj': None, 'breadcrumb': True})
@@ -308,9 +319,10 @@ def results_diff(request, page=1, template_name='results_diff.html'):
         # Store query by the user
         search_full = request.POST['search_full']
         if search_full == "search_full":
-            return results_fulltext(request, page)
+            return results_fulltext(request, page, full_text=True)
     except:
-        return results_fulltext(request, page)
+        pass
+    return results_fulltext(request, page, full_text=False)
 
 
     class Results:
@@ -341,6 +353,8 @@ def results_diff(request, page=1, template_name='results_diff.html'):
             database_aux.date = convert_date(r['created_t'])
 
             database_aux.name = r['database_name_t']
+            database_aux.last_activity = r['date_last_modification_t']
+            
             list_databases.append(database_aux)
             if (len(list_databases) == 3):
                 break
@@ -378,7 +392,7 @@ def results_diff(request, page=1, template_name='results_diff.html'):
 
                 t.tag = info
 
-                value = clean_value(str(result[k]))
+                value = clean_value(str(result[k].encode('utf-8')))
                 value = value[:75] + (value[75:] and '..')
                 t.value = value
                 if k == "database_name_t":
@@ -504,6 +518,7 @@ def calculate_databases_per_location():
 
 
 def advanced_search(request, questionnaire_id, question_set):
+
 
     return show_fingerprint_page_read_only(request, questionnaire_id, question_set, True)
 
@@ -958,6 +973,9 @@ def database_edit(request, fingerprint_id, questionnaire_id, template_name="data
         except:
             raise
 
+    #import pdb
+    #pdb.set_trace()
+
     r = r2r(template_name, request,
             questionset=question_set,
             questionsets=question_set.questionnaire.questionsets,
@@ -975,7 +993,7 @@ def database_edit(request, fingerprint_id, questionnaire_id, template_name="data
             qs_list=qs_list,
             questions_list=qlist_general,
             breadcrumb=True,
-            name=fingerprint_name.decode('ascii', 'ignore'),
+            name=fingerprint_name.encode('utf-8'),
             id=fingerprint_id,
             users_db=users_db,
             created_date=created_date,
@@ -990,6 +1008,8 @@ class Database:
     id = ''
     name = ''
     date = ''
+    last_activity = ''
+    
 
 
 def get_databases_from_db(request):
@@ -1071,6 +1091,11 @@ def get_databases_from_solr(request, query="*:*"):
             else:
                 database_aux.number_patients = r['number_active_patients_jan2012_t']
 
+            if (not r.has_key('date_last_modification_t')):
+                database_aux.last_activity = ''
+            else:
+                database_aux.last_activity = r['date_last_modification_t']                
+                
             if (not r.has_key('upload-image_t')):
                 database_aux.logo = 'nopic.gif'
             else:
@@ -1128,6 +1153,13 @@ def databases(request, page=1, template_name='databases.html'):
 
 
 def all_databases(request, page=1, template_name='alldatabases.html'):
+    
+    # lets clear the geolocation session search filter (if any)
+    try:
+        del request.session['query']
+    except:
+        pass
+    
     #list_databases = get_databases_from_db(request)
     list_databases = get_databases_from_solr(request, "*:*")
 
@@ -1143,13 +1175,57 @@ def all_databases(request, page=1, template_name='alldatabases.html'):
     return render(request, template_name, {'request': request, 'export_all_answers': True, 'data_table': True,
                                            'list_databases': list_databases, 'breadcrumb': True, 'collapseall': False, 'geo': True, 'page_obj': pager})
 
+def qs_data_table(request, template_name='qs_data_table.html'):
+    db_type = request.POST.get("db_type")
+    qset = request.POST.get("qset")
+    
+    answers = []
+    # get only databases with correct type
+    list_databases = get_databases_from_solr(request, "type_t:"+re.sub(r'\s+', '', db_type.lower()))
+    titles = []
+    
+    for t in list_databases:
+
+        if t.type_name == db_type:
+            qsets, name = createqsets(t.id)
+            
+            q_list = []
+            a_list = []            
+            for group in qsets.ordered_items():
+
+                (k, qs) = group    
+              
+                if k == qset:
+                    for q in qs.list_ordered_tags:
+                        q_list.append(q)
+                        a_list.append(q.value)
+                continue
+            titles = ('Name', (q_list))
+            
+
+            answers.append((name, (a_list)))
+                # print answers
+            
+            
+    return render(request, template_name, {'request': request, 'export_all_answers': True, 'breadcrumb': False, 'collapseall': False, 'geo': False, 'titles': titles, 'answers': answers})
 
 def all_databases_data_table(request, template_name='alldatabases_data_table.html'):
     answers = []
     list_databases = get_databases_from_solr(request, "*:*")
     titles = []
+    
+    #dictionary of database types
+    databases_types = {}
+
     if list_databases:
+        # Creating list of database types
         for t in list_databases:
+            if not t.type_name in databases_types:
+                qsets, name = createqsets(t.id)
+                
+                databases_types[t.type_name] = qsets.ordered_items()  
+            
+            '''    this code was loading all the qsets of all the dbs etc etctera
             id = t.id
             qsets, name = createqsets(id)
             q_list = []
@@ -1166,16 +1242,27 @@ def all_databases_data_table(request, template_name='alldatabases_data_table.htm
             answers.append((name, (a_list)))
                 # print answers
 
+        # since we dont have access to the structure directly (?)
+        # i use a random id for each type to get the qset types ?
+        if databases_types:
+            #print databases_types['adcohort'][0].id
+            for type in databases_types:
+                qsets, name = createqsets(databases_types[type][0].id)
+                
+                qsets_by_type[type] = qsets.ordered_items()
+ '''           
     # print titles
     # print answers
 
     return render(request, template_name, {'request': request, 'export_all_answers': True, 'titles': titles,
                                            'answers': answers, 'breadcrumb': True, 'collapseall': False, 'geo': True,
-                                           'list_databases': list_databases})
+                                           'list_databases': list_databases,
+                                           'databases_types': databases_types
+                                           })
 
 
 def createqsets(runcode, qsets=None, clean=True):
-    print "createqsets"
+    #print "createqsets"
     c = CoreEngine()
     results = c.search_fingerprint('id:' + runcode)
 
@@ -1216,7 +1303,7 @@ def createqsets(runcode, qsets=None, clean=True):
                 qsets[qset.text] = question_group
 
         for k in result:
-            print k
+            #print k
             if k in blacklist:
                 continue
             if k.startswith("comment_question_"):
@@ -1245,7 +1332,7 @@ def createqsets(runcode, qsets=None, clean=True):
 
             info = text
             t.tag = info
-            print t.tag
+            #print t.tag
 
             if question_group != None and question_group.list_ordered_tags != None:
                 try:
@@ -1258,7 +1345,7 @@ def createqsets(runcode, qsets=None, clean=True):
             try:
 
                t.comment = result['comment_question_'+k]
-               print t.comment
+               #print t.comment
             except KeyError:
                pass
             if clean:
@@ -1293,10 +1380,15 @@ def fingerprint(request, runcode, qs, template_name='database_info.html'):
         return result
 
     apiinfo = json.dumps(get_api_info(runcode));
-    
+    name_bc = name
+    try:
+        name_bc = name.encode('utf-8')
+    except:
+        pass
+
     return render(request, template_name, 
         {'request': request, 'qsets': qsets, 'export_bd_answers': True, 'apiinfo': apiinfo, 'fingerprint_id': runcode,
-                   'breadcrumb': True, 'breadcrumb_name': name.decode('ascii', 'ignore'), 'style': qs, 'collapseall': False})
+                   'breadcrumb': True, 'breadcrumb_name': name_bc, 'style': qs, 'collapseall': False})
 
 
 def get_questionsets_list(runinfo):
@@ -1874,6 +1966,12 @@ def show_fingerprint_page_read_only(request, q_id, qs_id, SouMesmoReadOnly=False
         cssinclude = []     # css files to include
         jstriggers = []
         qvalues = {}
+        if not request.POST:
+            try:
+                del request.session['query']
+            except:
+                pass
+
         if request.POST:
             for k, v in request.POST.items():
                 
@@ -1897,6 +1995,7 @@ def show_fingerprint_page_read_only(request, q_id, qs_id, SouMesmoReadOnly=False
                             #print qvalues
             query = convert_qvalues_to_query(qvalues, q_id)
             print "Query: " + query
+            request.session['query'] = query
             return results_fulltext_aux(request, query)
 
         qlist_general = []
@@ -2032,9 +2131,6 @@ def feedback(request, template_name='feedback.html'):
 def feedback_thankyou(request, template_name='feedback_thankyou.html'):
     return render(request, template_name, {'request': request, 'breadcrumb': True})
 
-def bugreport(request, template_name='bugreport.html'):
-
-    return report_bug(request)
 
 
 def show_fingerprint_page(request, runinfo, errors={}, template_name='database_edit.html'):
