@@ -171,7 +171,11 @@ function add_triggers() {
 $('#li_advanced_search').addClass("active");
 
 $( document ).ready(function() {
+
     var bool_container = $('#bool_container').boolrelwidget();
+
+    bool_container.push('little_box');
+    bool_container.push('other_little_box');
 
     var group1 = new BooleanGroup('A');
 

@@ -27,7 +27,6 @@ THE SOFTWARE.
 # */
 
 .boolrelwidget-container {
-    cursor          :   pointer;
     position        :   fixed;
     bottom          :   0;
     left            :   0; 
@@ -53,6 +52,7 @@ THE SOFTWARE.
 
 }
 .boolrelwidget-menu-container-panel{
+        cursor          :   pointer;
     text-align: center;
     width: 100%;
     margin: 0.7em 0 0 0 !important;
@@ -106,4 +106,111 @@ I could use images from bootstrap or my own, but for standalone is better withou
     height: 20em;
     display: none;
     background-color: white;
+}
+
+#boolrelwidget-basicblocks{
+    margin: 0.5em;
+    padding: 0.5em;
+    min-height:1em;
+    border:0.1em solid #999999;
+
+}
+.boolrelwidget-block{
+    cursor          :   pointer;
+    font-size: 80%;
+    margin: 0.3em;
+    -moz-user-select: -moz-none;
+    -khtml-user-select: none;
+    -webkit-user-select: none;
+    /* Ref from: http://stackoverflow.com/questions/6900124/make-some-text-unselectable-with-css
+     Introduced in IE 10.
+     See http://ie.microsoft.com/testdrive/HTML5/msUserSelect/
+    */
+    -ms-user-select: none;
+    user-select: none;    
+}
+.boolrelwidget-block-inner{
+    padding: 0.5em;
+    background-color: #eeeeee;
+    border-left:0.1em solid #999999;
+    border-bottom:0.1em solid #999999;
+    border-top:0.1em solid #999999;
+
+}
+.boolrelwidget-block-inner:hover{
+    color: white;
+    background-color: #0088cc;
+    border:0.1em solid #006598;
+}
+.boolrelwidget-delete{
+    padding: 0.5em;    
+    background-color: white;
+    border:0.1em solid #999999;
+}
+.boolrelwidget-delete:hover{
+    color: white;
+    background-color: red;
+    border:0.1em solid #AA0000;
+}
+
+#boolrelwidget-query{
+    margin: 0.5em;
+    border:0.1em solid #999999;    
+    text-align: center;
+    width: 100%;
+    padding: 0.5em;
+    background-color: #eeeeee;
+}
+
+.boolrelwidget-query-box, .boolrelwidget-query-dropper{
+    border-left:0.1em solid #999999;
+    border-bottom:0.1em solid #999999;
+    border-top:0.1em solid #999999;    
+    display: table-cell;
+    padding:0.3em;
+    
+}
+.boolrelwidget-odd{
+    background-color: #7adeeb;
+}
+.boolrelwidget-even{
+    background-color: #a7dba7;
+}
+.boolrelwidget-query-delete{
+    cursor          :   pointer;
+    clear: both;
+    display: table-cell;
+    border:0.1em solid #9b0303;
+    padding-left:0.5em;
+    padding-right:0.5em;
+    background-color: #ed5252;
+    color: white;
+
+}
+.boolrelwidget-query-delete:hover{
+    background-color: red;
+    border:0.1em solid #AA0000;
+    background-color: red;
+}
+.boolrelwidget-query-operator{
+    display: table-cell;
+        height: 100%;
+    vertical-align:center;
+    border: 1px solid black;
+    background-color: white;
+}
+.boolrelwidget-select {
+    width: 60px;
+   padding: 5px 8px;
+    width: 130%;
+    border: none;
+    box-shadow: none;
+    background: transparent;
+    background-image: none;
+    -webkit-appearance: none;  
+}
+.boolrelwidget-query-box-outer{
+    display: table-cell;
+    margin: 0.3em;
+    height: auto;
 }
