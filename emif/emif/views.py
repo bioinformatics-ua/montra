@@ -969,6 +969,9 @@ def database_edit(request, fingerprint_id, questionnaire_id, template_name="data
         except:
             raise
 
+    #import pdb
+    #pdb.set_trace()
+
     r = r2r(template_name, request,
             questionset=question_set,
             questionsets=question_set.questionnaire.questionsets,
@@ -986,7 +989,7 @@ def database_edit(request, fingerprint_id, questionnaire_id, template_name="data
             qs_list=qs_list,
             questions_list=qlist_general,
             breadcrumb=True,
-            name=fingerprint_name.decode('ascii', 'ignore'),
+            name=fingerprint_name.encode('utf-8'),
             id=fingerprint_id,
             users_db=users_db,
             created_date=created_date,
@@ -1376,7 +1379,7 @@ def fingerprint(request, runcode, qs, template_name='database_info.html'):
     
     return render(request, template_name, 
         {'request': request, 'qsets': qsets, 'export_bd_answers': True, 'apiinfo': apiinfo, 'fingerprint_id': runcode,
-                   'breadcrumb': True, 'breadcrumb_name': name.decode('ascii', 'ignore'), 'style': qs, 'collapseall': False})
+                   'breadcrumb': True, 'breadcrumb_name': name.encode('utf-8'), 'style': qs, 'collapseall': False})
 
 
 def get_questionsets_list(runinfo):
