@@ -188,6 +188,7 @@
                     <li id="search_li" class="pull-left">
                             <form class="navbar-search pull-left" method="POST" action="resultsdiff/1">{% csrf_token %}
                                 <input title="Enter the terms you wish to search for." class="search-query span3 form-text" placeholder="" type="text" id="edit-search-block-form--3" name="query" value="{{search_old}}" size="25" maxlength="256">
+                                <input name='search_full' value='search_full' type='hidden'>
                             </form>
                           </li>
                         </ul>
@@ -211,10 +212,11 @@
                                
                             </li>
                              {% endif %}
-                            
+                            {% if request.user.is_authenticated %}
                             <li id="li_history">
                                 <a href="controlversion/history">History</a>
                             </li>
+                            {%endif%}
 
                             <li id="li_feedback">
                                 <a href="feedback">Feedback</a>

@@ -48,10 +48,10 @@ button {
 <table class="table table-hover tablesorter" id="table_databases" data-provides="rowlink">
     <thead>
         <tr>
-            <th class="sorter-false filter-false"></th>
+            <!--<th class="sorter-false filter-false"></th>-->
             <th>Name</th>
-            <th>Creation Date</th>
-            <th>Modification Date</th>
+            <!--<th>Creation Date</th>-->
+            <th>Last update</th>
             <th>Type</th>
 
         </tr>
@@ -60,7 +60,7 @@ button {
         
         {% for t in page_obj %}
         <tr>
-            <td><img class="db_logo" src="static/upload_images/{{t.logo}}" width="50px" height="50px"/></td>
+            <!--<td><img class="db_logo" src="static/upload_images/{{t.logo}}" width="50px" height="50px"/></td>-->
           
           <td>
             <a href="fingerprint/{{ t.id }}/2">{{ t.name }}</a>
@@ -76,10 +76,10 @@ button {
              Number of patients: {{t.number_patients}}
             </div>
         </td>
-          <td style="min-width: 120px;">            
+          <!--<td style="min-width: 120px;">            
                  {{ t.date }}
 
-          </td>
+          </td>-->
           <td style="min-width: 120px;">            
                 {% if t.last_activity %}
                     {{t.last_activity|datehhmm}}

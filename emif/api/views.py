@@ -173,8 +173,9 @@ class ValidateView(APIView):
     def get(self, request, *args, **kw):
 
         database_name = request.GET['name']
+        
         c = CoreEngine()
-        results = c.search_fingerprint("database_name_t:" + database_name)
+        results = c.search_fingerprint("database_name_t:\"" +database_name+'"')
         result = {'contains': len(results) != 0}
 
         response = Response(result, status=status.HTTP_200_OK)
