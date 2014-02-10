@@ -155,7 +155,7 @@ def results_comp(request, template_name='results_comp.html'):
                                            'results': list_qsets, 'database_to_compare': first_name})
 
 
-def results_fulltext(request, page=1, template_name='results.html'):
+def results_fulltext(request, page=1, full_text=True, template_name='results.html'):
     query = ""
     in_post = True
     try:
@@ -166,7 +166,8 @@ def results_fulltext(request, page=1, template_name='results.html'):
 
     if not in_post:
         query = request.session.get('query', "")
-
+    if not full_text:
+        return results_fulltext_aux(request, query, page, template_name)
     return results_fulltext_aux(request, "text_t:" + query, page, template_name)
 
 
@@ -307,18 +308,26 @@ def results_diff(request, page=1, template_name='results_diff.html'):
         #raise
     if not in_post:
         query = request.session.get('query', "")
-
+    import pdb
+    #pdb.set_trace()
+    print "query_@" + query
     if query == "":
         return render(request, "results.html", {'request': request,
                                                 'list_results': [], 'page_obj': None, 'breadcrumb': True})
     store_query(request, query)
     try:
         # Store query by the user
-        search_full = request.POST['search_full']
+        if 'search_full' in request.POST:
+            search_full = request.POST['search_full']
+            request.session['search_full'] = 'search_full'
+        else:
+            print "try to get in session"
+            search_full = request.session.get('search_full', "")
         if search_full == "search_full":
-            return results_fulltext(request, page)
+            return results_fulltext(request, page, full_text=True)
     except:
-        return results_fulltext(request, page)
+        raise
+    return results_fulltext(request, page, full_text=False)
 
 
     class Results:
@@ -388,7 +397,7 @@ def results_diff(request, page=1, template_name='results_diff.html'):
 
                 t.tag = info
 
-                value = clean_value(str(result[k]))
+                value = clean_value(str(result[k].encode('utf-8')))
                 value = value[:75] + (value[75:] and '..')
                 t.value = value
                 if k == "database_name_t":
@@ -514,6 +523,7 @@ def calculate_databases_per_location():
 
 
 def advanced_search(request, questionnaire_id, question_set):
+
 
     return show_fingerprint_page_read_only(request, questionnaire_id, question_set, True)
 
@@ -968,6 +978,9 @@ def database_edit(request, fingerprint_id, questionnaire_id, template_name="data
         except:
             raise
 
+    #import pdb
+    #pdb.set_trace()
+
     r = r2r(template_name, request,
             questionset=question_set,
             questionsets=question_set.questionnaire.questionsets,
@@ -985,7 +998,7 @@ def database_edit(request, fingerprint_id, questionnaire_id, template_name="data
             qs_list=qs_list,
             questions_list=qlist_general,
             breadcrumb=True,
-            name=fingerprint_name.decode('ascii', 'ignore'),
+            name=fingerprint_name.encode('utf-8'),
             id=fingerprint_id,
             users_db=users_db,
             created_date=created_date,
@@ -1160,6 +1173,13 @@ def databases(request, page=1, template_name='databases.html'):
 
 
 def all_databases(request, page=1, template_name='alldatabases.html'):
+    
+    # lets clear the geolocation session search filter (if any)
+    try:
+        del request.session['query']
+    except:
+        pass
+    
     #list_databases = get_databases_from_db(request)
     list_databases = get_databases_from_solr(request, "*:*")
 
@@ -1425,15 +1445,22 @@ def fingerprint(request, runcode, qs, template_name='database_info.html'):
         if (owner == request.user.username):
             owner_fingerprint = True
     
+    name_bc = name
+    try:
+        name_bc = name.encode('utf-8')
+    except:
+        pass
+
     return render(request, template_name, 
         {'request': request, 'qsets': qsets, 'export_bd_answers': True, 
         'apiinfo': apiinfo, 'fingerprint_id': runcode,
-                   'breadcrumb': True, 'breadcrumb_name': name.decode('ascii', 'ignore'),
+                   'breadcrumb': True, 'breadcrumb_name':name_bc,
                     'style': qs, 'collapseall': False, 
                     'owner_fingerprint':owner_fingerprint,
                     'fingerprint_dump': True,
                     'fingerprint_ttype': fingerprint_ttype,
                     })
+
 
 
 def get_questionsets_list(runinfo):
@@ -2011,6 +2038,13 @@ def show_fingerprint_page_read_only(request, q_id, qs_id, SouMesmoReadOnly=False
         cssinclude = []     # css files to include
         jstriggers = []
         qvalues = {}
+        if not request.POST:
+            
+            if 'query' in request.session:
+                del request.session['query']
+            if 'search_full' in request.session:
+                del request.session['search_full']
+
         if request.POST:
             for k, v in request.POST.items():
                 
@@ -2034,6 +2068,7 @@ def show_fingerprint_page_read_only(request, q_id, qs_id, SouMesmoReadOnly=False
                             #print qvalues
             query = convert_qvalues_to_query(qvalues, q_id)
             print "Query: " + query
+            request.session['query'] = query
             return results_fulltext_aux(request, query)
 
         qlist_general = []

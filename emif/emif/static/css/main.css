@@ -308,3 +308,11 @@ box-shadow: inset 0 3px 8px rgba(0,0,0,0.125);
     display: none !important;
 }
 
+.navbar .nav>li>a{
+    /* Overriding default bootstrap behaviour*/
+    padding: 10px 10px 10px !important;
+}
+.navbar .brand{
+     /* Overriding default bootstrap behaviour*/
+    padding: 10px 10px 10px !important;   
+}

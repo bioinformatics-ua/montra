@@ -46,6 +46,7 @@ for r in results:
             pass
     print to_append
     r['text_t'] += ' '+to_append 
+    del r['_version_']
     docs.append(r)
     solr.delete(r['id'])
     solr.optimize()
