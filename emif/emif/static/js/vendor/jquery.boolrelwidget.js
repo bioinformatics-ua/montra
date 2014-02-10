@@ -65,13 +65,31 @@ THE SOFTWARE.
                 
                 return block;
             },
+            pushBooleanGroup: function (obj) {
+                if(!(obj instanceof BooleanGroup && obj.variables.length == 1)){
+                    console.warn('When adding, a valid simple BooleanGroup child must be found.');
+                    return false;
+                }
+                if(!((typeof obj.variables[0] == 'string' || obj.variables[0] instanceof String)
+                   && this.getIndex(obj.variables[0])== -1)){
+                    console.warn('Variable ' + obj + ' already on basic blocks pool.');  
+                    return false;
+                }
+                
+                basic_blocks.push(obj);
+                console.warn('Pushed new variable ' + obj + ' to basic blocks pool.');
+
+                this.draw();
+                
+                return true
+            },            
             splice: function (str) {
                 var id = this.getIndex(str)
                 if(id < 0){
                    console.warn('No basic block ' + str + ' from basic blocks pool to slice out.');
                    return null; 
                 }
-                var block = basic_blocks.splice();
+                var block = basic_blocks.splice(id,1)[0];
                 console.warn('Sliced out variable ' + str + ' from basic blocks pool.');
 
                 this.draw();
@@ -88,16 +106,39 @@ THE SOFTWARE.
                 }
                 return -1;
             },
+            spliceById: function (number) {
+                var id = this.getIndexById(number)
+                if(id < 0){
+                   console.warn('No basic block with id ' + number + ' from basic blocks pool to slice out.');
+                   return null; 
+                }
+                var block = basic_blocks.splice(id, 1)[0];
+                console.warn('Sliced out variable with id ' + number + ' from basic blocks pool.');
+                
+                this.draw();
+                
+                return block;
+            },
+            // I define this manually because IE<=8 js lists doesnt have the method indexOF()
+            getIndexById: function(id){
+                var i = 0;
+                for(i=0;i<basic_blocks.length;i++){
+                    // We must check this is a "empty" container with only one element (the one we want).
+                    if(basic_blocks[i].id==id)
+                        return i;
+                }
+                return -1;
+            },
             draw: function(){
                 // Drawing concepts
                 var little_boxes = [];
                 
                 var i=0;
                 for(i=0;i<basic_blocks.length;i++){
-                    little_boxes.push('<span unselectable="on" id="boolrelwidget-block');
+                    little_boxes.push('<span unselectable="on" class="boolrelwidget-block">');
+                    little_boxes.push('<span id="boolrelwidget-bb-');
                     little_boxes.push(basic_blocks[i].id);
-                    little_boxes.push('" class="boolrelwidget-block">');
-                    little_boxes.push('<span class="boolrelwidget-block-inner">');
+                    little_boxes.push('" class="boolrelwidget-block-inner">');
                     little_boxes.push(basic_blocks[i].variables[0]);
                     little_boxes.push('</span>');
                     little_boxes.push('<span class="boolrelwidget-delete">');
@@ -107,13 +148,15 @@ THE SOFTWARE.
 
                 }
                 
-                if(little_boxes.length == 0)
-                    $('#boolrelwidget-basicblocks').html("You must add concepts before manipulating their logic.");    
-                else
+                if(little_boxes.length == 0){
+                    $('#boolrelwidget-basicblocks').html("You must add concepts before manipulating their logic.");             
+                } else{
                     $('#boolrelwidget-basicblocks').html(little_boxes.join(''));
-                
-                // Drawing query itself(if any already)
-                
+                                    // Make them draggable
+                $(".boolrelwidget-block-inner").draggable({containment: "#boolrelwidget-panel", 
+                                                           revert: true, opacity: 0.9, helper: "clone"}); 
+                }
+                // Drawing query itself(if any already)                
                 if(mastergroup && mastergroup.variables.length>0){
                     var big_box = [];
                     var i = 0;
@@ -121,8 +164,58 @@ THE SOFTWARE.
                     
                     $('#boolrelwidget-query').html(big_box.join(''));
                     
+                    var master = this;
+                    $( ".boolrelwidget-query-dropper" ).droppable({
+                      drop: function( event, ui ) {
+                        var droper = Number(ui.draggable.attr('id').replace('boolrelwidget-bb-',''));
+                        var dropee = Number($(this).attr('id').replace('boolrelwidget-dp-',''));
+                        console.log("Event drop: "+droper+" on "+dropee);
+                        
+                          var sliced = master.spliceById(droper);
+                        
+                        // Try to add this to the master group
+                        // If we cant, we insert the basic block back into the basic_blocks list
+                        if(!mastergroup.addById(dropee, sliced)){
+                            this.pushBooleanGroup(sliced);
+                        }                     
+                        master.draw();  
+                      }
+                    });
+                        // Add 
+                        $(".boolrelwidget-query-delete").click(function(){
+                            // ANCHOR
+                            console.log("ACTION REMOVE "+$(this).attr('id').replace('boolrelwidget-dl-',''));
+                            var removed = Number($(this).attr('id').replace('boolrelwidget-dl-',''));
+                            var result = mastergroup.removeById(removed);
+                            
+                            var little_boxes_contained = result.extractAllSimple();
+                            
+                            var k=0;
+                            for(k=0;k<little_boxes_contained.length;k++){
+                                master.pushBooleanGroup(little_boxes_contained[k]);
+                            }
+                            
+                            master.draw();
+                        }); 
+                    
                 } else {
-                    $('#boolrelwidget-query').html('Drag and Drop concepts here to start building a query...');
+                    var master = this;
+                    mastergroup=null;
+                    $('#boolrelwidget-query').html('<div class="boolrelwidget-first-droppable">Drag and Drop concepts here to start building a query...</div>');
+                  $( ".boolrelwidget-first-droppable" ).droppable({
+                      drop: function( event, ui ) {
+                        var droper = Number(ui.draggable.attr('id').replace('boolrelwidget-bb-',''));
+                        console.log("Event drop: "+droper+" on empty space, creating new booleangroup.");
+                        
+                          var sliced = master.spliceById(droper);
+                        
+                        // Try to add this to the master group
+                        // If we cant, we insert the basic block back into the basic_blocks list
+                        mastergroup = new BooleanGroup(sliced);
+                          
+                        master.draw();  
+                      }
+                    });  
                 }
             },
             // This recursive functions runs down in the BooleanGroups and puts everything on the big box.
@@ -149,12 +242,15 @@ THE SOFTWARE.
                         this.harvest(something.variables[k], big_box, counter+1);
                     }
                     big_box.push("</div>");
-                    if(counter%2 == 0)
-                        big_box.push('<div class="boolrelwidget-odd boolrelwidget-query-dropper">[drop]</div><div class="boolrelwidget-odd boolrelwidget-query-delete">X</div>');
-                    else 
-                        big_box.push('<div class="boolrelwidget-even boolrelwidget-query-dropper">[drop]</div><div class="boolrelwidget-even boolrelwidget-query-delete">X</div>');
-                    
-                    big_box.push('</div>');
+                    big_box.push('<div id="boolrelwidget-dp-');
+                    big_box.push(something.id);
+                    if(counter%2 == 0){
+                        big_box.push('" class="boolrelwidget-odd boolrelwidget-query-dropper">[drop]</div><div class="boolrelwidget-odd boolrelwidget-query-delete" id="boolrelwidget-dl-');
+                    } else {
+                        big_box.push('" class="boolrelwidget-even boolrelwidget-query-dropper">[drop]</div><div class="boolrelwidget-even boolrelwidget-query-delete" id="boolrelwidget-dl-');
+                    }
+                    big_box.push(something.id);
+                    big_box.push('">X</div></div>');
                 } else {
                     console.error(something+' cant be put in the big_box, because its not of type string nor BooleanGroup.');
                 }
@@ -288,7 +384,7 @@ BooleanGroup.prototype = {
     removeById : function(other_id){
         return this.removeByIdAux(null, null, other_id); 
     },
-  removeByIdAux : function(parent, branch, other_id) {
+    removeByIdAux : function(parent, branch, other_id) {
         if(typeof other_id != 'number'){
             console.warn('When removing by id, a number value must be specified. Found type ' + typeof other_id);
         }
@@ -309,6 +405,33 @@ BooleanGroup.prototype = {
             }
             return returnable;
         }
+    },     
+    addById : function(parent_id, child){
+        if(!(child instanceof BooleanGroup)){
+            console.warn('When adding, a valid BooleanGroup child must be found.');
+        }
+        return this.addByIdAux(parent_id, child); 
+    },    
+  addByIdAux : function(parent_id, child) {
+        if(typeof parent_id != 'number'){
+            console.warn('When adding by id, a number value must be specified. Found type ' + typeof parent_id);
+        }
+        else {
+            if(this.id == parent_id){
+                //Add reference
+                this.relations.push(BOOL['OR']);
+                this.variables.push(child);
+                return true;
+            }
+            var returnable=false;
+            var k = 0;
+            for(k=0;k<this.variables.length;k++){
+                if(this.variables[k] instanceof BooleanGroup){
+                    returnable = this.variables[k].addByIdAux(parent_id, child);
+                }
+            }
+            return returnable;
+        }
     }, 
     containsOnly : function(str){
         if(this.variables.length>1)
@@ -318,6 +441,39 @@ BooleanGroup.prototype = {
             return true;
         
         return false;
+    },
+    isSimple : function(){
+        if(this.variables.length>1)
+            return false;
+        
+        if(typeof this.variables[0] == 'string' || this.variables[0] instanceof String)
+            return true;
+        
+        return false;
+    },
+    extractAllSimple : function(){
+        if(this.isSimple())
+            return [this];
+        
+        var little_boxes = [];
+        this.extractAllSimpleAux(little_boxes);
+        
+        return little_boxes;
+    }, 
+    extractAllSimpleAux : function(little_boxes){
+        if($.isArray(little_boxes)){
+           
+        var k=0;    
+        for(k=0;k<this.variables.length;k++){
+            if(this.variables[k].isSimple())
+                little_boxes.push(this.variables[k]);
+            else
+                this.variables[k].extractAllSimpleAux();
+        } 
+            
+        } else {
+            console.warn("You must pass a list empty, as a container for the removed elements.");    
+        }
     },
     destroy : function() {
         this.variables=null;

@@ -168,7 +168,7 @@ I could use images from bootstrap or my own, but for standalone is better withou
     border-top:0.1em solid #999999;    
     display: table-cell;
     padding:0.3em;
-    
+    height: 100%;
 }
 .boolrelwidget-odd{
     background-color: #7adeeb;
