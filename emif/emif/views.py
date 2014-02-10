@@ -317,11 +317,16 @@ def results_diff(request, page=1, template_name='results_diff.html'):
     store_query(request, query)
     try:
         # Store query by the user
-        search_full = request.POST['search_full']
+        if 'search_full' in request.POST:
+            search_full = request.POST['search_full']
+            request.session['search_full'] = 'search_full'
+        else:
+            print "try to get in session"
+            search_full = request.session.get('search_full', "")
         if search_full == "search_full":
             return results_fulltext(request, page, full_text=True)
     except:
-        pass
+        raise
     return results_fulltext(request, page, full_text=False)
 
 
@@ -1967,10 +1972,11 @@ def show_fingerprint_page_read_only(request, q_id, qs_id, SouMesmoReadOnly=False
         jstriggers = []
         qvalues = {}
         if not request.POST:
-            try:
+            
+            if 'query' in request.session:
                 del request.session['query']
-            except:
-                pass
+            if 'search_full' in request.session:
+                del request.session['search_full']
 
         if request.POST:
             for k, v in request.POST.items():
