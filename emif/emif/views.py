@@ -155,7 +155,7 @@ def results_comp(request, template_name='results_comp.html'):
                                            'results': list_qsets, 'database_to_compare': first_name})
 
 
-def results_fulltext(request, page=1, template_name='results.html'):
+def results_fulltext(request, page=1, full_text=True, template_name='results.html'):
     query = ""
     in_post = True
     try:
@@ -166,7 +166,8 @@ def results_fulltext(request, page=1, template_name='results.html'):
 
     if not in_post:
         query = request.session.get('query', "")
-
+    if not full_text:
+        return results_fulltext_aux(request, query, page, template_name)
     return results_fulltext_aux(request, "text_t:" + query, page, template_name)
 
 
@@ -307,18 +308,26 @@ def results_diff(request, page=1, template_name='results_diff.html'):
         #raise
     if not in_post:
         query = request.session.get('query', "")
-
+    import pdb
+    #pdb.set_trace()
+    print "query_@" + query
     if query == "":
         return render(request, "results.html", {'request': request,
                                                 'list_results': [], 'page_obj': None, 'breadcrumb': True})
     store_query(request, query)
     try:
         # Store query by the user
-        search_full = request.POST['search_full']
+        if 'search_full' in request.POST:
+            search_full = request.POST['search_full']
+            request.session['search_full'] = 'search_full'
+        else:
+            print "try to get in session"
+            search_full = request.session.get('search_full', "")
         if search_full == "search_full":
-            return results_fulltext(request, page)
+            return results_fulltext(request, page, full_text=True)
     except:
-        return results_fulltext(request, page)
+        raise
+    return results_fulltext(request, page, full_text=False)
 
 
     class Results:
@@ -388,7 +397,7 @@ def results_diff(request, page=1, template_name='results_diff.html'):
 
                 t.tag = info
 
-                value = clean_value(str(result[k]))
+                value = clean_value(str(result[k].encode('utf-8')))
                 value = value[:75] + (value[75:] and '..')
                 t.value = value
                 if k == "database_name_t":
@@ -1963,10 +1972,11 @@ def show_fingerprint_page_read_only(request, q_id, qs_id, SouMesmoReadOnly=False
         jstriggers = []
         qvalues = {}
         if not request.POST:
-            try:
+            
+            if 'query' in request.session:
                 del request.session['query']
-            except:
-                pass
+            if 'search_full' in request.session:
+                del request.session['search_full']
 
         if request.POST:
             for k, v in request.POST.items():
@@ -1991,6 +2001,7 @@ def show_fingerprint_page_read_only(request, q_id, qs_id, SouMesmoReadOnly=False
                             #print qvalues
             query = convert_qvalues_to_query(qvalues, q_id)
             print "Query: " + query
+            request.session['query'] = query
             return results_fulltext_aux(request, query)
 
         qlist_general = []
