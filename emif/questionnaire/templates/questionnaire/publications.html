@@ -39,7 +39,7 @@
     <div class="control-group span12">
     <button id="addpub" type="button" class="btn btn-primary"><i class="icon-large icon-white icon-plus-sign"></i> Add Publication</button>
     <button id="cleanpub" type="button" class="btn btn-primary"><i class="fa fa-trash-o"></i> Clean </button>
-    <input type="hidden"  id="question_{{ question.number }}" name="question_{{ question.number }}" value='{{qdict.value|replaceplicas}}' />
+    <input type="hidden"  id="question_{{ question.number }}" name="question_{{ question.number }}" value='{{qdict.value}}' />
     </div>
 
     
@@ -173,7 +173,6 @@ function PublicationWidget ()
                 $("#loadpubbtn").addClass("disabled");       
             }
         });
-
     };
 
     this.validate_form = function(pubmedid, pubtitle, pubjournal, pubyear, pubauthors) {
@@ -244,6 +243,10 @@ function PublicationWidget ()
                 if(pw{{ question.number|removedots }}.stringfy().length == 0) {
                     $('[id="answered_'+{{ question.number|removedots }}+'"]').hide();
                 }
+
+
+                pw{{ question.number|removedots }}.saveInformation();
+
                 return false;
         });
         pw{{ question.number|removedots }}.saveInformation();
@@ -272,6 +275,8 @@ function PublicationWidget ()
         if (_aux===undefined || _aux=="")
             return;
 
+        console.log(_aux);
+
         if (_aux[0] != "[")
         {
             var _objs = JSON.parse("["+_aux+"]");
@@ -296,7 +301,18 @@ function PublicationWidget ()
             $('#question_{{ question.number|removedots }}_table > tbody:last').append('<tr><td><a class="deleteLink" href="#" ><img src="static/img/glyphicons_192_circle_remove.png"/></a></td><td>'+_pubmedid+'</td><td>'+_pubtitle+'</td><td>'+_pubjournal+'</td><td>'+_pubyear+'</td><td>'+_pubvolume+'</td><td>'+_pubpages+'</td><td>'+_pubauthors+'</td><td>'+_publink+'</td></tr>'); 
 
         }
+        $(".deleteLink").click(function(e) {
+                e.preventDefault();
+                $(this).closest('tr').remove()
+                
+                if(pw{{ question.number|removedots }}.stringfy().length == 0) {
+                    $('[id="answered_'+{{ question.number|removedots }}+'"]').hide();
+                }
 
+                pw{{ question.number|removedots }}.saveInformation();
+
+                return false;
+        });
         
     };
 

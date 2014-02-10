@@ -15,6 +15,7 @@ class PubMedObject:
 
     def __init__(self, pmid):
         self.pmid = pmid
+        self.authors = []
 
         Entrez.email = "tmgodinho@ua.pt"
         Entrez.tool = "test-tool"
@@ -59,7 +60,7 @@ class PubMedObject:
                 temp_authors = record[0]["MedlineCitation"]["Article"]["AuthorList"]
 
                 for author in temp_authors:
-                    self.authors.append( author["ForeName"] + " "+ author["LastName"] ) 
+                    self.authors.append( author["LastName"] +" " +author["Initials"]) 
             except Exception, e:
                 pass
                 
@@ -73,13 +74,3 @@ class PubMedObject:
 
             return 0
         return None
-
-    def get_formatted(self):
-        new_file = ''
-        new_file += ('\t<tr>\n\t\t<td valign="top" class="resourcesICO">')
-        new_file +=     ('<a href="%s" target="_blank"><img src="../../image/ico_sitelink.gif" width="24" height="24" /></a></td>\n') % (self.external_url)
-        new_file += ('\t\t<td><a href="%s" target="_blank">%s</a><br />\n') % (self.external_url, self.title)
-        new_file += ('\t\t%s<br />\n') % (', '.join(self.authors))
-        new_file += ('\t\t<em>%s, %s, %s, %s.</em></td>\n') % (self.journal, self.pub_year, self.volume, self.pages)
-        new_file += ('\t</tr>\n')
-        return new_file
