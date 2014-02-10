@@ -168,6 +168,17 @@
 
     {% block scriptextra %}
 
+$(function(){
+    tabindexer();
+});    
+    
+function tabindexer(){
+    var index=1;
+    $('input').each(function(){
+        $(this).attr('tabindex',index++);
+    });
+}    
+    
 function toggle_comments(question_number)
 {
     console.log("q + "+ question_number);

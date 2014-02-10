@@ -30,7 +30,8 @@ SITE_NAME = "EMIF Catalogue"
 # for this files we must change it manually (or serve them as dinamic files), this problem only ocurrs on IE
 # so if changing to something that not /, we should also change on file /static/css/bootstrap_ie_compatibility.css all relative # paths. This is necessary because i cant use django template variables inside a considered static file.
 BASE_URL = '/'
-
+VERSION = '0.3.1'
+VERSION_DATE = '2014.Feb.08'
 PROJECT_DIR_ROOT = '/projects/emif-dev/'
 
 if DEBUG:
@@ -141,7 +142,7 @@ STATICFILES_DIRS = (
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
     os.path.abspath(PROJECT_DIR_ROOT + MIDDLE_DIR + 'emif/static'),
-    os.path.abspath(PROJECT_DIR_ROOT + MIDDLE_DIR + 'apps/seantis-questionnaire/questionnaire/static/')
+    os.path.abspath(PROJECT_DIR_ROOT + MIDDLE_DIR + 'questionnaire/static/')
 )
 
 # List of finder classes that know how to find static files in
@@ -186,6 +187,7 @@ TEMPLATE_DIRS = (
     # Don't forget to use absolute paths, not relative paths.
     os.path.abspath(PROJECT_DIR_ROOT + MIDDLE_DIR + 'apps/seantis-questionnaire/questionnaire/templates'),
     os.path.abspath(PROJECT_DIR_ROOT + MIDDLE_DIR + 'emif/templates'),
+    os.path.abspath(PROJECT_DIR_ROOT + MIDDLE_DIR + 'control_version/templates'),
 )
 
 INSTALLED_APPS = (
@@ -226,6 +228,7 @@ INSTALLED_APPS = (
 
     'searchengine',
     'api',
+    'control_version',
 
     'django_bootstrap_breadcrumbs',
     'bootstrap-pagination',

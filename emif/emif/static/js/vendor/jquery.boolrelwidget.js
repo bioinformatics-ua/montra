@@ -108,110 +108,78 @@ function isBool(op){
  * (this is used to facilitate encountering nested references */
 
 var boolrelwidgetuniqueidcounter=10000;
-
 /* Defining BooleanVariable class 
  *  A BooleanVariable object has:
  *      -   a id to facilitate encountering the element when nested
  *      -   two operators of type either string or BooleanVariable
  *      -   a relation of enum type BOOL
  */
-function BooleanVariable(obj1, op, obj2) {
-    
-    if(!(obj1 instanceof BooleanVariable || typeof obj1 == 'string' || obj1 instanceof String)){
-        console.warn('First operator of Boolean Variable object must be a BooleanVariable or a string');
-        return null;
-    }
-    if(!(obj2 instanceof BooleanVariable || typeof obj2 == 'string' || obj2 instanceof String)){
-        console.warn('Second operator of Boolean Variable object must be a BooleanVariable or a string');
-        return null;
-    }    
-    if(!isBool(op)){
-        console.warn('Relation between operators must be of a BOOL valid type.');
+
+function BooleanGroup(obj1){
+    if(!(obj1 instanceof BooleanGroup || typeof obj1 == 'string' || obj1 instanceof String)){
+        console.warn('First operator of Boolean Group object must be a BooleanGroup or a string');
         return null;
     }
     this.id = boolrelwidgetuniqueidcounter++;
-    this.oper1 = obj1;
-    this.relation= op;
-    this.oper2 = obj2;
+    this.variables = [];
+    this.relations = [];
     
-};
-
-/* 
- *  Elaborating prototypes for BooleanVariable
- */
-BooleanVariable.prototype = { 
-    setRelation : function(op){
-        // We must check the enum type exists
-        if(!isBool(rel)){
+    this.variables.push(obj1);
+}
+BooleanGroup.prototype = { 
+    addBoolean  :   function(op, obj1){
+    
+        if(!(obj1 instanceof BooleanGroup || typeof obj1 == 'string' || obj1 instanceof String)){
+            console.warn('Operator of Boolean Group object must be a BooleanGroup or a string.');
+            return null;
+        }        
+        if(!isBool(op)){
             console.warn('Relation between operators must be of a BOOL valid type.');
-            return false;
+            return null;
+        }        
+        this.variables.push(obj1);
+        this.relations.push(op);
+    },
+        /* This returns a string representation of this object in boole's arithmetic format */
+    toString : function(){
+        var output=this.variables[0]
+        var i=0;
+        for(i=1;i<this.variables.length;i++){
+            output+=" "+this.relations[i-1].name+" "+this.variables[i].toString();
         }
-        this.relation = op;   
-        return true;
-    },
-    setOper1 : function (obj1){
-        if(!(obj1 instanceof BooleanVariable || typeof obj1 == 'string' || obj1 instanceof String)){
-            console.warn('First operator of Boolean Variable object must be a BooleanVariable or a string');
-            return null;
-        }    
-        this.oper1= obj1;
-    },
-    setOper2 : function (obj1){
-        if(!(obj2 instanceof BooleanVariable || typeof obj2 == 'string' || obj2 instanceof String)){
-            console.warn('Second operator of Boolean Variable object must be a BooleanVariable or a string');
-            return null;
-        }    
-        this.oper2= obj1;
+        if(this.variables.length>1)
+            output="("+output+")";
+        
+        return output;
     },
     removeById : function(other_id){
-        this.removeByIdAux(null, null, other_id);
+        return this.removeByIdAux(null, null, other_id); 
     },
-    removeByIdAux : function(parent, branch, other_id) {
+  removeByIdAux : function(parent, branch, other_id) {
         if(typeof other_id != 'number'){
             console.warn('When removing by id, a number value must be specified. Found type ' + typeof other_id);
         }
         else {
-            console.log('value :'+this);
             if(this.id == other_id){
                 // If not on root remove reference
-                if(parent && branch){
-                    if(branch == 1)
-                        parent.clearOper1();
-                    if(branch == 2)
-                        parent.clearOper2();
+                if(parent){
+                    parent.variables.splice(branch,1);
                 }
                 return this;
             }
-            
-            if(this.oper1 instanceof BooleanVariable){
-                this.oper1.removeByIdAux(this,1, other_id);
+            var returnable=null;
+            var k = 0;
+            for(k=0;k<this.variables.length;k++){
+                if(this.variables[k] instanceof BooleanGroup){
+                    returnable = this.variables[k].removeByIdAux(this, k, other_id);
+                }
             }
-            if(this.oper2 instanceof BooleanVariable){
-                this.oper2.removeByIdAux(this,2, other_id);
-            }
+            return returnable;
         }
-    },
-    clearOper1 : function (){
-        this.oper1=null;
-    },
-    clearOper2 : function (){
-        this.oper2=null;
     },    
-    /* This returns a string representation of this object in boole's arithmetic format */
-    toString : function(){
-        // single operators either oper1 or oper2 only
-        if(this.oper1 == null && this.oper2 == null)
-            return "";        
-        else if(this.oper1 == null)
-            return this.oper2.toString();
-        else if(this.oper2 == null)
-            return this.oper1.toString();
-        
-        return "("+this.oper1.toString()+' '+this.relation.name+' '+this.oper2.toString()+")";
-    },
     destroy : function() {
-        this.oper1=null;
-        this.oper2=null;
+        this.variables=null;
+        this.relations=null;
         this=null;
     }
 };
