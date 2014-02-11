@@ -135,13 +135,13 @@ THE SOFTWARE.
 
                 var i=0;
                 for(i=0;i<basic_blocks.length;i++){
-                    little_boxes.push('<span unselectable="on" class="boolrelwidget-block">');
+                    little_boxes.push('<span unselectable="on" class="btn-group boolrelwidget-block">');
                     little_boxes.push('<span id="boolrelwidget-bb-');
                     little_boxes.push(basic_blocks[i].id);
-                    little_boxes.push('" class="boolrelwidget-block-inner">');
+                    little_boxes.push('" class="btn boolrelwidget-block-inner">');
                     little_boxes.push(basic_blocks[i].variables[0]);
                     little_boxes.push('</span>');
-                    little_boxes.push('<span class="boolrelwidget-delete">');
+                    little_boxes.push('<span class="btn btn-danger boolrelwidget-delete">');
                     little_boxes.push('X');
                     little_boxes.push('</span>');
                     little_boxes.push('</span>');
@@ -197,6 +197,23 @@ THE SOFTWARE.
                             
                             master.draw();
                         }); 
+                        $(".boolrelwidget-select").change(function(){
+                            console.log(mastergroup);
+                            
+                            var changed = $(this).attr('id').replace('boolrelwidget-query-sl-','');
+                            changed = changed.split('-');
+                            if(changed.length == 2){
+                                console.log('Changed relationship to ' + $(this).val() + ' in ' + changed[0] + ' at position '+ changed[1]);
+                                
+                                mastergroup.changeRelation(Number(changed[0]), Number(changed[1]), BOOL[$(this).val()]);
+                                
+                                console.log(mastergroup);
+                                
+                            } else {
+                                console.error('Impossible to select correctly a relation');
+                            }
+                        }); 
+                   
                     
                 } else {
                     var master = this;
@@ -228,16 +245,16 @@ THE SOFTWARE.
                     var k = 0;
                     
                     // First one doesnt have a operator associated
-                    big_box.push('<div class="boolrelwidget-query-box-outer">');
+                    big_box.push('<div class="btn-group boolrelwidget-query-box-outer">');
                     if(counter%2 == 0)
-                        big_box.push('<div class="boolrelwidget-odd boolrelwidget-query-box">');
-                    else big_box.push('<div class="boolrelwidget-even boolrelwidget-query-box">');
+                        big_box.push('<div class="btn boolrelwidget-odd boolrelwidget-query-box">');
+                    else big_box.push('<div class="btn btn-inverse boolrelwidget-even boolrelwidget-query-box">');
                     this.harvest(something.variables[k++], big_box, counter+1);
    
                     // All others in the big box have
                     for(k=1;k<something.variables.length;k++){
                         // Add relation box
-                        big_box.push(this.operator_selectbox(something.relations[k-1].name, counter));
+                        big_box.push(this.operator_selectbox(something, k-1, counter));
                         
                         this.harvest(something.variables[k], big_box, counter+1);
                     }
@@ -245,20 +262,20 @@ THE SOFTWARE.
                     big_box.push('<div id="boolrelwidget-dp-');
                     big_box.push(something.id);
                     if(counter%2 == 0){
-                        big_box.push('" class="boolrelwidget-odd boolrelwidget-query-dropper">[drop]</div>');
+                        big_box.push('" class="btn boolrelwidget-query-dropper-odd boolrelwidget-query-dropper">&nbsp;&nbsp;</div>');
                     } else {
-                        big_box.push('" class="boolrelwidget-even boolrelwidget-query-dropper">[drop]</div>');
+                        big_box.push('" class="btn btn-inverse boolrelwidget-query-dropper-even boolrelwidget-query-dropper">&nbsp;&nbsp;</div>');
                     }
                     
                     // Cant delete mastergroup, other can be deleted
                     if(counter!=0){
                         if(counter%2 == 0){
-                            big_box.push('<div class="boolrelwidget-odd boolrelwidget-query-delete" id="boolrelwidget-dl-');
+                            big_box.push('<div class="btn btn-danger boolrelwidget-odd boolrelwidget-query-delete" id="boolrelwidget-dl-');
                         } else {
-                            big_box.push('<div class="boolrelwidget-even boolrelwidget-query-delete" id="boolrelwidget-dl-');
+                            big_box.push('<div class="btn btn-danger boolrelwidget-even boolrelwidget-query-delete" id="boolrelwidget-dl-');
                         }
                         big_box.push(something.id);
-                        big_box.push('">X</div>');
+                        big_box.push('"></div>');
                     }
                     
                     big_box.push('</div>');
@@ -266,14 +283,18 @@ THE SOFTWARE.
                     console.error(something+' cant be put in the big_box, because its not of type string nor BooleanGroup.');
                 }
             },
-            operator_selectbox: function(selected, counter){
+            operator_selectbox: function(something, selected, counter){
                 var select = [];
-
-                select.push('<span class="boolrelwidget-query-operator"><select class="boolrelwidget-select">');
-
+                var relation = something.relations[selected].name;
                 
+                select.push('<span class="boolrelwidget-query-operator"><select id="boolrelwidget-query-sl-');
+                select.push(something.id);
+                select.push('-');
+                select.push(selected);
+                select.push('" class="boolrelwidget-select">');
+
                 for(var index in BOOL) {
-                    if(BOOL[index].name == selected)
+                    if(BOOL[index].name == relation)
                         select.push('<option selected="selected">');
                     else
                         select.push('<option>');
@@ -328,10 +349,10 @@ THE SOFTWARE.
  *  This must be because if we try a BOOL.TYPE that doesn't exist on ie 7 everything crashes (oh my life...)
  */
 var BOOL = {
-  NOP   : { value: -1,name: "nop"}, // No operation, means its a edge branch 
-  AND   : { value: 0, name: "and"}, 
-  OR    : { value: 1, name: "or"}, 
-  XOR   : { value: 2, name: "xor"}
+  NOP   : { value: -1,name: "NOP"}, // No operation, means its a edge branch 
+  AND   : { value: 0, name: "AND"}, 
+  OR    : { value: 1, name: "OR"}, 
+  XOR   : { value: 2, name: "XOR"}
 };
 
 function isBool(op){
@@ -437,7 +458,7 @@ BooleanGroup.prototype = {
         }
         return this.addByIdAux(parent_id, child); 
     },    
-  addByIdAux : function(parent_id, child) {
+    addByIdAux : function(parent_id, child) {
         if(typeof parent_id != 'number'){
             console.warn('When adding by id, a number value must be specified. Found type ' + typeof parent_id);
         }
@@ -458,6 +479,34 @@ BooleanGroup.prototype = {
             return returnable;
         }
     }, 
+    changeRelation: function(container_id, index, new_value){
+        if(typeof container_id != 'number'){
+            console.warn('When changing a relation the id must be a number. Found type ' + typeof parent_id);
+        }
+        else if(typeof index != 'number'){
+            console.warn('When changing a relation the index must be a number. Found type ' + typeof parent_id);
+        }   
+        else if(!isBool(new_value)){
+            console.warn('When changing a relation the new value must be a valid BOOL enum.');
+            
+        } else {
+            console.log("IDs: "+this.id+'=='+ container_id);
+
+            if(this.id == container_id){
+            
+              if(this.variables.length > index){
+                this.relations[index] = new_value;
+                //  this.relations.splice(index,1,new_value);
+              }  
+                return;
+            }     
+            for(var k=0;k<this.variables.length;k++){
+                if(this.variables[k] instanceof BooleanGroup){
+                    this.variables[k].changeRelation(container_id, index, new_value);
+                }
+            }            
+        }
+    },
     containsOnly : function(str){
         if(this.variables.length>1)
             return false;
