@@ -103,7 +103,9 @@ I could use images from bootstrap or my own, but for standalone is better withou
 }
 
 #boolrelwidget-panel{
-    height: 20em;
+    height: 100%;
+    max-height: 43em;
+    width: 100%;
     display: none;
     background-color: white;
 }
@@ -236,7 +238,7 @@ background-position:center;
 }
 
 .boolrelwidget-query-operator{
-    display: table-cell;
+    display: inline-block;
     padding-top:0.9em;
     padding-left: 0.5em;
     padding-right: 0.5em;
@@ -262,19 +264,26 @@ background-position:center;
     */
 }
 .boolrelwidget-query-box-outer{
-    display: table-cell !important;
+    display: inline-block !important;
     /*
     margin: 0.3em;
     height: auto;*/
 }
-.boolrelwidget-collapse{
+.boolrelwidget-collapser{
      display: table-cell !important;
     font-weight: bold;
 }
 .boolrelwidget-simple{
-    width: 100 px !important;
+    width: 100px !important;
     overflow: hidden;
     text-overflow: ellipsis;
-    -o-text-overflow: ellipsis;
-    -ms-text-overflow: ellipsis;
+
+}
+
+.boolrelwidget-expandable{
+    display:none;
+}
+
+.boolrelwidget-menu{
+margin: 5px;
 }

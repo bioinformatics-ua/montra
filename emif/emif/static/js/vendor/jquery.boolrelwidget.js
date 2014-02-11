@@ -37,6 +37,18 @@ THE SOFTWARE.
             collapse_text:'Click here to close this panel.'
         }, options);
         
+        var bg1 = new BooleanGroup('teste de nome muito grande mesmo');
+        var bg2 = new BooleanGroup('outro name ainda maior que o anterior, mas nao muito');
+        var bg3 = new BooleanGroup('nome curto');
+        
+        var bg4 = new BooleanGroup(bg1);
+        bg4.addBoolean(BOOL['OR'], bg2);
+        
+        mastergroup = new BooleanGroup(bg4);
+        mastergroup.addBoolean(BOOL['AND'], bg3);
+
+        basic_blocks.push(new BooleanGroup('outro nome grande, mas mesmo bue grande para ficar aqui para eu depois arranjar isto com ...'));
+        
         var funcs = {
             push: function (str) {
                 
@@ -151,7 +163,8 @@ THE SOFTWARE.
                     little_boxes.push(basic_blocks[i].id);
                     little_boxes.push('" class="btn boolrelwidget-block-inner">');
                     if(basic_blocks[i].variables[0].length > 10){
-                        little_boxes.push('<div class="boolwidget-simple">');
+                        little_boxes.push('<div class="boolrelwidget-simple" data-toggle="tooltip" title="'+
+                                     basic_blocks[i].variables[0]+'">');
                     }
                     little_boxes.push(basic_blocks[i].variables[0]);
                     if(basic_blocks[i].variables[0].length > 10){
@@ -195,7 +208,7 @@ THE SOFTWARE.
                         // Try to add this to the master group
                         // If we cant, we insert the basic block back into the basic_blocks list
                         if(!mastergroup.addById(dropee, sliced)){
-                            this.pushBooleanGroup(sliced);
+                            master.pushBooleanGroup(sliced);
                         }                     
                         master.draw();  
                       }
@@ -218,9 +231,11 @@ THE SOFTWARE.
                                     used_blocks.splice(other_id, 1);
                                 }
                             }
-                            
+
                             master.draw();
-                        }); 
+                        });
+                        $(".boolrelwidget-simple").tooltip({container: 'body'});
+                    
                         $(".boolrelwidget-select").change(function(){
                             console.log(mastergroup);
                             
@@ -237,8 +252,22 @@ THE SOFTWARE.
                                 console.error('Impossible to select correctly a relation');
                             }
                         }); 
-                   
-                    
+                        $(".boolrelwidget-collapser").click(function(){
+                           
+                            var collapsing = Number($(this).attr('id').replace('boolrelwidget-cl-',''));
+                            if($(this).hasClass("boolrelwidget-collapsed")){
+                                $(this).removeClass('boolrelwidget-collapsed');
+                                $(this).addClass('boolrelwidget-expanded');
+                                $(this).text('See nested relations');
+                                $("#"+$(this).parent().attr('id')+' > .boolrelwidget-expandable').fadeOut('fast');
+                                
+                            } else {
+                                $(this).removeClass('boolrelwidget-expanded');
+                                $(this).addClass('boolrelwidget-collapsed');
+                                $(this).text('Hide this relation');
+                                $("#"+$(this).parent().attr('id')+' > .boolrelwidget-expandable').fadeIn('fast').css("display","table-cell");
+                            }
+                        }); 
                 } else {
                     var master = this;
                     mastergroup=null;
@@ -267,7 +296,8 @@ THE SOFTWARE.
             harvest: function(something, big_box, counter){
                 if(typeof something == 'string' || something instanceof String){
                     if(something.length > 10){
-                        big_box.push('<div class="boolrelwidget-simple">');
+                        big_box.push('<div class="boolrelwidget-simple" data-toggle="tooltip" title="'+
+                                     something+'">');
                     }
                     big_box.push(something);
                     if(something.length > 10){
@@ -278,15 +308,29 @@ THE SOFTWARE.
                     var k = 0;
                     
                     // First one doesnt have a operator associated
-                    big_box.push('<div class="btn-group boolrelwidget-query-box-outer">');
+                    big_box.push('<span class="btn-group boolrelwidget-query-box-outer" id="boolrelwidget-ob-');
+                    big_box.push(something.id);
+                    big_box.push('">');
                     if(counter%2 == 0){
-                        if(!something.isSimple())
-                            big_box.push('<div class="btn boolrelwidget-collapse">+</div>');
-                        big_box.push('<div class="btn boolrelwidget-odd boolrelwidget-query-box">');
+                        if(!something.isSimple() && counter >0){
+                            big_box.push('<div class="btn boolrelwidget-collapser boolrelwidget-collapsed" id="boolrelwidget-cl-');
+                            big_box.push(something.id);
+                            big_box.push('">See nested relations</div>');
+                        }
+                        big_box.push('<div class="btn boolrelwidget-odd boolrelwidget-query-box');
+                        if( counter >0 && !something.isSimple())
+                            big_box.push(' boolrelwidget-expandable');
+                        big_box.push('">');
                     } else {
-                        if(!something.isSimple())
-                            big_box.push('<div class="btn btn-inverse boolrelwidget-collapse">+</div>');
-                        big_box.push('<div class="btn btn-inverse boolrelwidget-even boolrelwidget-query-box">');
+                        if(!something.isSimple() && counter >0){
+                            big_box.push('<div class="btn btn-inverse boolrelwidget-collapser" id="boolrelwidget-cl-');
+                            big_box.push(something.id);
+                            big_box.push('">See nested relations</div>');
+                        }
+                        big_box.push('<div class="btn btn-inverse boolrelwidget-even boolrelwidget-query-box');
+                        if( counter >0 && !something.isSimple())
+                            big_box.push(' boolrelwidget-expandable');
+                        big_box.push('">');
                     }
                     this.harvest(something.variables[k++], big_box, counter+1);
    
@@ -298,26 +342,39 @@ THE SOFTWARE.
                         this.harvest(something.variables[k], big_box, counter+1);
                     }
                     big_box.push("</div>");
-                    big_box.push('<div id="boolrelwidget-dp-');
-                    big_box.push(something.id);
-                    if(counter%2 == 0){
-                        big_box.push('" class="btn boolrelwidget-query-dropper boolrelwidget-query-dropper-odd">&nbsp;&nbsp;</div>');
-                    } else {
-                        big_box.push('" class="btn btn-inverse boolrelwidget-query-dropper boolrelwidget-query-dropper-even">&nbsp;&nbsp;</div>');
-                    }
+                    
+                        big_box.push('<div id="boolrelwidget-dp-');
+                        big_box.push(something.id);
+                        if(counter%2 == 0){
+                            big_box.push('" class="btn boolrelwidget-query-dropper');
+                            if(!something.isSimple()  && counter >0)
+                                big_box.push(' boolrelwidget-expandable');
+                            big_box.push(' boolrelwidget-query-dropper-odd">&nbsp;&nbsp;</div>');
+                        } else {
+                            big_box.push('" class="btn btn-inverse boolrelwidget-query-dropper');
+                            if(!something.isSimple() && counter >0)
+                                big_box.push(' boolrelwidget-expandable');
+                            big_box.push(' boolrelwidget-query-dropper-even">&nbsp;&nbsp;</div>');
+                        }
                     
                     // Cant delete mastergroup, other can be deleted
                     if(counter!=0){
                         if(counter%2 == 0){
-                            big_box.push('<div class="btn boolrelwidget-query-delete boolrelwidget-query-delete-odd" id="boolrelwidget-dl-');
+                            big_box.push('<div class="btn boolrelwidget-query-delete');
+                            if(!something.isSimple())
+                                big_box.push(' boolrelwidget-expandable');
+                            big_box.push(' boolrelwidget-query-delete-odd" id="boolrelwidget-dl-');
                         } else {
-                            big_box.push('<div class="btn btn-inverse boolrelwidget-query-delete boolrelwidget-query-delete-even" id="boolrelwidget-dl-');
+                            big_box.push('<div class="btn btn-inverse boolrelwidget-query-delete');
+                            if(!something.isSimple())
+                                big_box.push(' boolrelwidget-expandable');
+                            big_box.push(' boolrelwidget-query-delete-even" id="boolrelwidget-dl-');
                         }
                         big_box.push(something.id);
                         big_box.push('"></div>');
                     }
                     
-                    big_box.push('</div>');
+                    big_box.push('</span>');
                 } else {
                     console.error(something+' cant be put in the big_box, because its not of type string nor BooleanGroup.');
                 }
@@ -359,9 +416,7 @@ THE SOFTWARE.
         self = self.html('');
         
         // Now lets add the toolbar
-        self = self.append('<ul id="boolrelwidget-expand" class="boolrelwidget-menu-container"><li class="boolrelwidget-menu"><div class="boolrelwidget-arrow-l"><div class="boolrelwidget-arrow-up"></div></div></li><li class="boolrelwidget-menu">'+settings.expand_text+'</li><li class="boolrelwidget-menu"><div class="boolrelwidget-arrow-r"><div class="boolrelwidget-arrow-up"></div></div></li></ul><ul id="boolrelwidget-collapse" class="boolrelwidget-menu-container-panel"><li class="boolrelwidget-menu"><div class="boolrelwidget-arrow-l"><div class="boolrelwidget-arrow-down"></div></div></li><li class="boolrelwidget-menu">'+settings.collapse_text+'</li><li class="boolrelwidget-menu"><div class="boolrelwidget-arrow-r"><div class="boolrelwidget-arrow-down"></div></div></li></ul><div id="boolrelwidget-panel"><strong>Concepts</strong><div id="boolrelwidget-basicblocks" class="well well-small">Loading...</div><strong>Boolean Query</strong><div id="boolrelwidget-query" class="well well-small">Loading...</div></div>');
-
-
+        self = self.append('<ul id="boolrelwidget-expand" class="boolrelwidget-menu-container"><li class="boolrelwidget-menu"><div class="boolrelwidget-arrow-l"><div class="boolrelwidget-arrow-up"></div></div></li><li class="boolrelwidget-menu">'+settings.expand_text+'</li><li class="boolrelwidget-menu"><div class="boolrelwidget-arrow-r"><div class="boolrelwidget-arrow-up"></div></div></li></ul><ul id="boolrelwidget-collapse" class="boolrelwidget-menu-container-panel"><li class="boolrelwidget-menu"><div class="boolrelwidget-arrow-l"><div class="boolrelwidget-arrow-down"></div></div></li><li class="boolrelwidget-menu">'+settings.collapse_text+'</li><li class="boolrelwidget-menu"><div class="boolrelwidget-arrow-r"><div class="boolrelwidget-arrow-down"></div></div></li></ul><div id="boolrelwidget-panel"><strong>Concepts</strong><div id="boolrelwidget-basicblocks" class="well well-small">Loading...</div><div class="clearfix"><div class="boolrelwidget-menu pull-left"><strong>Boolean Query</strong></div><div class="pull-right boolrelwidget-menu btn-group"><button class="btn">Collapse All</button><button class="btn">Or All Concepts</button><button class="btn">And All Concepts</button></div></div><div id="boolrelwidget-query" class="well well-small">Loading...</div></div>');
         
         // Lets add the event handlersx
         $( '#boolrelwidget-expand' ).click(function() {
@@ -492,6 +547,7 @@ BooleanGroup.prototype = {
         }
     },     
     addById : function(parent_id, child){
+        console.error(parent_id+':'+child);
         if(!(child instanceof BooleanGroup)){
             console.warn('When adding, a valid BooleanGroup child must be found.');
         }
