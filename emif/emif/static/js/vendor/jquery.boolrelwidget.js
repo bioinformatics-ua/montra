@@ -40,8 +40,8 @@ THE SOFTWARE.
         var group2 = new BooleanGroup('B');
         var group3 = new BooleanGroup('C');
 
-        var group_xpto = new BooleanGroup(group1);
-        group_xpto.addBoolean(BOOL['OR'],group2);
+        var group_xpto = new BooleanGroup(group2);
+        group_xpto.addBoolean(BOOL['OR'],group1);
         group_xpto.addBoolean(BOOL['OR'],group3);
         var group_xpto2 = new BooleanGroup(new BooleanGroup('Z'));
         group_xpto2.addBoolean(BOOL['XOR'],group_xpto);
@@ -132,7 +132,7 @@ THE SOFTWARE.
             draw: function(){
                 // Drawing concepts
                 var little_boxes = [];
-                
+
                 var i=0;
                 for(i=0;i<basic_blocks.length;i++){
                     little_boxes.push('<span unselectable="on" class="boolrelwidget-block">');
@@ -155,7 +155,8 @@ THE SOFTWARE.
                                     // Make them draggable
                 $(".boolrelwidget-block-inner").draggable({containment: "#boolrelwidget-panel", 
                                                            revert: true, opacity: 0.9, helper: "clone"}); 
-                }
+                }                
+                
                 // Drawing query itself(if any already)                
                 if(mastergroup && mastergroup.variables.length>0){
                     var big_box = [];
@@ -183,16 +184,15 @@ THE SOFTWARE.
                     });
                         // Add 
                         $(".boolrelwidget-query-delete").click(function(){
-                            // ANCHOR
-                            console.log("ACTION REMOVE "+$(this).attr('id').replace('boolrelwidget-dl-',''));
                             var removed = Number($(this).attr('id').replace('boolrelwidget-dl-',''));
-                            var result = mastergroup.removeById(removed);
                             
-                            var little_boxes_contained = result.extractAllSimple();
+                            var removed_bool = mastergroup.removeById(removed);
+                            var contained = removed_bool.extractAllSimple();
                             
-                            var k=0;
-                            for(k=0;k<little_boxes_contained.length;k++){
-                                master.pushBooleanGroup(little_boxes_contained[k]);
+                            console.log(contained);                            
+
+                            for(var j=0;j<contained.length;j++){
+                                master.pushBooleanGroup(contained[j]);
                             }
                             
                             master.draw();
@@ -245,12 +245,23 @@ THE SOFTWARE.
                     big_box.push('<div id="boolrelwidget-dp-');
                     big_box.push(something.id);
                     if(counter%2 == 0){
-                        big_box.push('" class="boolrelwidget-odd boolrelwidget-query-dropper">[drop]</div><div class="boolrelwidget-odd boolrelwidget-query-delete" id="boolrelwidget-dl-');
+                        big_box.push('" class="boolrelwidget-odd boolrelwidget-query-dropper">[drop]</div>');
                     } else {
-                        big_box.push('" class="boolrelwidget-even boolrelwidget-query-dropper">[drop]</div><div class="boolrelwidget-even boolrelwidget-query-delete" id="boolrelwidget-dl-');
+                        big_box.push('" class="boolrelwidget-even boolrelwidget-query-dropper">[drop]</div>');
                     }
-                    big_box.push(something.id);
-                    big_box.push('">X</div></div>');
+                    
+                    // Cant delete mastergroup, other can be deleted
+                    if(counter!=0){
+                        if(counter%2 == 0){
+                            big_box.push('<div class="boolrelwidget-odd boolrelwidget-query-delete" id="boolrelwidget-dl-');
+                        } else {
+                            big_box.push('<div class="boolrelwidget-even boolrelwidget-query-delete" id="boolrelwidget-dl-');
+                        }
+                        big_box.push(something.id);
+                        big_box.push('">X</div>');
+                    }
+                    
+                    big_box.push('</div>');
                 } else {
                     console.error(something+' cant be put in the big_box, because its not of type string nor BooleanGroup.');
                 }
@@ -381,10 +392,21 @@ BooleanGroup.prototype = {
         
         return output;
     },
+    /* While i realize this approach isnt the best, i was having problems with the recursivity and this worked
+     * Maybe to review with more time at a later time
+    */
     removeById : function(other_id){
-        return this.removeByIdAux(null, null, other_id); 
+        var returnable = []
+        this.removeByIdAux(null, null, other_id,returnable);
+        
+        if(returnable.length==1)
+            return returnable[0]
+            
+        else 
+            return null;
+
     },
-    removeByIdAux : function(parent, branch, other_id) {
+    removeByIdAux : function(parent, branch, other_id, returnable) {
         if(typeof other_id != 'number'){
             console.warn('When removing by id, a number value must be specified. Found type ' + typeof other_id);
         }
@@ -393,17 +415,20 @@ BooleanGroup.prototype = {
                 // If not on root remove reference
                 if(parent){
                     parent.variables.splice(branch,1);
+                    if(branch=0)
+                        parent.relations.splice(branch,1);
+                    else 
+                        parent.relations.splice(branch-1,1);
                 }
-                return this;
+                
+                returnable.push(this);
             }
-            var returnable=null;
             var k = 0;
             for(k=0;k<this.variables.length;k++){
                 if(this.variables[k] instanceof BooleanGroup){
-                    returnable = this.variables[k].removeByIdAux(this, k, other_id);
+                    this.variables[k].removeByIdAux(this, k, other_id, returnable);
                 }
             }
-            return returnable;
         }
     },     
     addById : function(parent_id, child){
@@ -443,37 +468,31 @@ BooleanGroup.prototype = {
         return false;
     },
     isSimple : function(){
-        if(this.variables.length>1)
-            return false;
-        
-        if(typeof this.variables[0] == 'string' || this.variables[0] instanceof String)
+        if(this.variables.length == 1 && (typeof this.variables[0] == 'string' || this.variables[0] instanceof String))
             return true;
         
         return false;
     },
     extractAllSimple : function(){
+        var returnable = [];
+        
         if(this.isSimple())
-            return [this];
+            returnable.push(this);
+        else
+            this.extractAllSimpleAux(returnable);
         
-        var little_boxes = [];
-        this.extractAllSimpleAux(little_boxes);
-        
-        return little_boxes;
+        return returnable;
     }, 
-    extractAllSimpleAux : function(little_boxes){
-        if($.isArray(little_boxes)){
+    extractAllSimpleAux : function(returnable){
            
         var k=0;    
         for(k=0;k<this.variables.length;k++){
             if(this.variables[k].isSimple())
-                little_boxes.push(this.variables[k]);
+                returnable.push(this.variables[k]);
             else
-                this.variables[k].extractAllSimpleAux();
+                this.variables[k].extractAllSimpleAux(returnable);
         } 
             
-        } else {
-            console.warn("You must pass a list empty, as a container for the removed elements.");    
-        }
     },
     destroy : function() {
         this.variables=null;

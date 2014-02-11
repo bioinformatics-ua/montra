@@ -140,7 +140,6 @@ text-decoration: none;
         </div>
     
 </div>
-<button id="eu">yo</button>
 <script type="text/javascript" src="{{ STATIC_URL }}js/vendor/chosen.jquery.js"></script>
 <script type="text/javascript" src="{{ STATIC_URL }}js/emif.advanced_search.js"></script>
 <script type="text/javascript">
@@ -173,29 +172,6 @@ $('#li_advanced_search').addClass("active");
 $( document ).ready(function() {
 
     var bool_container = $('#bool_container').boolrelwidget();
-
-    bool_container.push('little_box');
-    bool_container.push('other_little_box');
-
-    var group1 = new BooleanGroup('A');
-
-    var group2 = new BooleanGroup('B');
-
-    var group3 = new BooleanGroup('C');
-
-    var mastergroup = new BooleanGroup(group1);
-    mastergroup.addBoolean(BOOL['OR'],group2);
-    mastergroup.addBoolean(BOOL['OR'],group3);
-
-    var godgroup = new BooleanGroup(mastergroup);
-
-    godgroup.addBoolean(BOOL['XOR'], 'Z');
-
-    console.log(godgroup.toString());
-    console.log('Remove id:'+mastergroup.id);
-    console.log(godgroup.removeById(mastergroup.id));
-
-    console.log(godgroup.toString());
 
     load_questionnary();
 });
