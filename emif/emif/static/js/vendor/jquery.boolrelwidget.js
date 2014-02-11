@@ -29,25 +29,13 @@ THE SOFTWARE.
         // so we dont lose track of who we are, and used to ensure chainability
         var self = this;
         var basic_blocks = [];
+        var used_blocks = [];
         var mastergroup=null;
         // Default Options
         var settings = $.extend({
             expand_text:'To define the relations between the terms click here.',
             collapse_text:'Click here to close this panel.'
         }, options);
-        
-        var group1 = new BooleanGroup('A');
-        var group2 = new BooleanGroup('B');
-        var group3 = new BooleanGroup('C');
-
-        var group_xpto = new BooleanGroup(group2);
-        group_xpto.addBoolean(BOOL['OR'],group1);
-        group_xpto.addBoolean(BOOL['OR'],group3);
-        var group_xpto2 = new BooleanGroup(new BooleanGroup('Z'));
-        group_xpto2.addBoolean(BOOL['XOR'],group_xpto);
-
-        
-        mastergroup = new BooleanGroup(group_xpto2);
         
         var funcs = {
             push: function (str) {
@@ -77,21 +65,35 @@ THE SOFTWARE.
                 }
                 
                 basic_blocks.push(obj);
-                console.warn('Pushed new variable ' + obj + ' to basic blocks pool.');
+                console.log('Pushed new variable ' + obj + ' to basic blocks pool.');
 
                 this.draw();
                 
                 return true
-            },            
+            },
             splice: function (str) {
+                var block;
                 var id = this.getIndex(str)
                 if(id < 0){
-                   console.warn('No basic block ' + str + ' from basic blocks pool to slice out.');
-                   return null; 
+                    
+                    // If it fails, lets check if its being used
+                    var other_id = this.getUsedIndex(str);
+                    if(other_id <0){
+                        console.warn('No basic block ' + str + ' from basic blocks pool to slice out.');
+                        return null;
+                    }
+                    
+                    console.log('Variable is being used, removing it from mastergroup and removing it from used variables');
+                    block = used_blocks.splice(other_id, 1)[0];
+                    mastergroup.removeById(block.id);
+                    
+                    this.draw();
+                    
+                    return block;
                 }
-                var block = basic_blocks.splice(id,1)[0];
-                console.warn('Sliced out variable ' + str + ' from basic blocks pool.');
-
+                block = basic_blocks.splice(id,1)[0];
+                console.log('Sliced out variable ' + str + ' from basic blocks pool.');
+                                
                 this.draw();
                 
                 return block;
@@ -102,6 +104,15 @@ THE SOFTWARE.
                 for(i=0;i<basic_blocks.length;i++){
                     // We must check this is a "empty" container with only one element (the one we want).
                     if(basic_blocks[i].containsOnly(element))
+                        return i;
+                }
+                return -1;
+            },
+            getUsedIndex: function(element){
+                var i = 0;
+                for(i=0;i<used_blocks.length;i++){
+                    // We must check this is a "empty" container with only one element (the one we want).
+                    if(used_blocks[i].containsOnly(element))
                         return i;
                 }
                 return -1;
@@ -139,11 +150,17 @@ THE SOFTWARE.
                     little_boxes.push('<span id="boolrelwidget-bb-');
                     little_boxes.push(basic_blocks[i].id);
                     little_boxes.push('" class="btn boolrelwidget-block-inner">');
+                    if(basic_blocks[i].variables[0].length > 10){
+                        little_boxes.push('<div class="boolwidget-simple">');
+                    }
                     little_boxes.push(basic_blocks[i].variables[0]);
+                    if(basic_blocks[i].variables[0].length > 10){
+                        little_boxes.push('</div>');
+                    }
                     little_boxes.push('</span>');
-                    little_boxes.push('<span class="btn btn-danger boolrelwidget-delete">');
-                    little_boxes.push('X');
-                    little_boxes.push('</span>');
+                    //little_boxes.push('<span class="btn btn-danger boolrelwidget-delete">');
+                    //little_boxes.push('X');
+                    //little_boxes.push('</span>');
                     little_boxes.push('</span>');
 
                 }
@@ -173,7 +190,8 @@ THE SOFTWARE.
                         console.log("Event drop: "+droper+" on "+dropee);
                         
                           var sliced = master.spliceById(droper);
-                        
+                            
+                          used_blocks.push(sliced);
                         // Try to add this to the master group
                         // If we cant, we insert the basic block back into the basic_blocks list
                         if(!mastergroup.addById(dropee, sliced)){
@@ -193,6 +211,12 @@ THE SOFTWARE.
 
                             for(var j=0;j<contained.length;j++){
                                 master.pushBooleanGroup(contained[j]);
+                                
+                                var other_id = this.getUsedIndex(contained[j].name);
+                                if(other_id >0){
+                                    console.log('Removing from used variables');
+                                    used_blocks.splice(other_id, 1);
+                                }
                             }
                             
                             master.draw();
@@ -229,6 +253,9 @@ THE SOFTWARE.
                         // Try to add this to the master group
                         // If we cant, we insert the basic block back into the basic_blocks list
                         mastergroup = new BooleanGroup(sliced);
+                        
+                        // Put in used blocks
+                        used_blocks.push(sliced);
                           
                         master.draw();  
                       }
@@ -239,16 +266,28 @@ THE SOFTWARE.
             // I pass a counter to be able to style differently (so i know the recursion level couldnt find a better way to style it different
             harvest: function(something, big_box, counter){
                 if(typeof something == 'string' || something instanceof String){
+                    if(something.length > 10){
+                        big_box.push('<div class="boolrelwidget-simple">');
+                    }
                     big_box.push(something);
+                    if(something.length > 10){
+                        big_box.push('</div>');
+                    }
                 }
                 else if(something instanceof BooleanGroup){
                     var k = 0;
                     
                     // First one doesnt have a operator associated
                     big_box.push('<div class="btn-group boolrelwidget-query-box-outer">');
-                    if(counter%2 == 0)
+                    if(counter%2 == 0){
+                        if(!something.isSimple())
+                            big_box.push('<div class="btn boolrelwidget-collapse">+</div>');
                         big_box.push('<div class="btn boolrelwidget-odd boolrelwidget-query-box">');
-                    else big_box.push('<div class="btn btn-inverse boolrelwidget-even boolrelwidget-query-box">');
+                    } else {
+                        if(!something.isSimple())
+                            big_box.push('<div class="btn btn-inverse boolrelwidget-collapse">+</div>');
+                        big_box.push('<div class="btn btn-inverse boolrelwidget-even boolrelwidget-query-box">');
+                    }
                     this.harvest(something.variables[k++], big_box, counter+1);
    
                     // All others in the big box have
@@ -262,17 +301,17 @@ THE SOFTWARE.
                     big_box.push('<div id="boolrelwidget-dp-');
                     big_box.push(something.id);
                     if(counter%2 == 0){
-                        big_box.push('" class="btn boolrelwidget-query-dropper-odd boolrelwidget-query-dropper">&nbsp;&nbsp;</div>');
+                        big_box.push('" class="btn boolrelwidget-query-dropper boolrelwidget-query-dropper-odd">&nbsp;&nbsp;</div>');
                     } else {
-                        big_box.push('" class="btn btn-inverse boolrelwidget-query-dropper-even boolrelwidget-query-dropper">&nbsp;&nbsp;</div>');
+                        big_box.push('" class="btn btn-inverse boolrelwidget-query-dropper boolrelwidget-query-dropper-even">&nbsp;&nbsp;</div>');
                     }
                     
                     // Cant delete mastergroup, other can be deleted
                     if(counter!=0){
                         if(counter%2 == 0){
-                            big_box.push('<div class="btn btn-danger boolrelwidget-odd boolrelwidget-query-delete" id="boolrelwidget-dl-');
+                            big_box.push('<div class="btn boolrelwidget-query-delete boolrelwidget-query-delete-odd" id="boolrelwidget-dl-');
                         } else {
-                            big_box.push('<div class="btn btn-danger boolrelwidget-even boolrelwidget-query-delete" id="boolrelwidget-dl-');
+                            big_box.push('<div class="btn btn-inverse boolrelwidget-query-delete boolrelwidget-query-delete-even" id="boolrelwidget-dl-');
                         }
                         big_box.push(something.id);
                         big_box.push('"></div>');
@@ -320,7 +359,7 @@ THE SOFTWARE.
         self = self.html('');
         
         // Now lets add the toolbar
-        self = self.append('<ul id="boolrelwidget-expand" class="boolrelwidget-menu-container"><li class="boolrelwidget-menu"><div class="boolrelwidget-arrow-l"><div class="boolrelwidget-arrow-up"></div></div></li><li class="boolrelwidget-menu">'+settings.expand_text+'</li><li class="boolrelwidget-menu"><div class="boolrelwidget-arrow-r"><div class="boolrelwidget-arrow-up"></div></div></li></ul><ul id="boolrelwidget-collapse" class="boolrelwidget-menu-container-panel"><li class="boolrelwidget-menu"><div class="boolrelwidget-arrow-l"><div class="boolrelwidget-arrow-down"></div></div></li><li class="boolrelwidget-menu">'+settings.collapse_text+'</li><li class="boolrelwidget-menu"><div class="boolrelwidget-arrow-r"><div class="boolrelwidget-arrow-down"></div></div></li></ul><div id="boolrelwidget-panel"><strong>Concepts</strong><div id="boolrelwidget-basicblocks">Loading...</div><strong>Boolean Query</strong><div id="boolrelwidget-query">Loading...</div></div>');
+        self = self.append('<ul id="boolrelwidget-expand" class="boolrelwidget-menu-container"><li class="boolrelwidget-menu"><div class="boolrelwidget-arrow-l"><div class="boolrelwidget-arrow-up"></div></div></li><li class="boolrelwidget-menu">'+settings.expand_text+'</li><li class="boolrelwidget-menu"><div class="boolrelwidget-arrow-r"><div class="boolrelwidget-arrow-up"></div></div></li></ul><ul id="boolrelwidget-collapse" class="boolrelwidget-menu-container-panel"><li class="boolrelwidget-menu"><div class="boolrelwidget-arrow-l"><div class="boolrelwidget-arrow-down"></div></div></li><li class="boolrelwidget-menu">'+settings.collapse_text+'</li><li class="boolrelwidget-menu"><div class="boolrelwidget-arrow-r"><div class="boolrelwidget-arrow-down"></div></div></li></ul><div id="boolrelwidget-panel"><strong>Concepts</strong><div id="boolrelwidget-basicblocks" class="well well-small">Loading...</div><strong>Boolean Query</strong><div id="boolrelwidget-query" class="well well-small">Loading...</div></div>');
 
 
         

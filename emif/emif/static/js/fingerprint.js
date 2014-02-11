@@ -25,8 +25,6 @@ function help_text_popover() {
         });
     });
 }
-
-
     /* Begin -- Check if user has unsaved changes */
  var formHasChanged = false;
  var submitted = true;
@@ -60,10 +58,20 @@ function validate1(element, id_answered) {
     if($(element).val() != "") {
             //console.log('1 - #answered_'+id_answered);
             $('[id="answered_'+id_answered+'"]').show();
+        
+            if(bool_container){
+                bool_container.push($('#qc_'+id_answered+" > .question-text > .qtext").text().trim());
+            }
+        
         } else {
             //console.log('2 - #answered_'+id_answered);
             $('[id="answered_'+id_answered+'"]').hide();
+            if(bool_container){
+                bool_container.splice($('#qc_'+id_answered+" > .question-text > .qtext").text().trim());
+            }
         }
+            // If we have a boolean container, maker
+
 }
 
 
@@ -73,7 +81,7 @@ $(document).ready(function () {
         var el = e.target;
         var id_answered = el.id.split("_")[1];
         var id_answered_aux = el.id.split("_")[1].replace(/\./g,'');
-
+        
         /*
             - verify the type to each question and create a respective processment for each one
             TYPES:
@@ -106,8 +114,14 @@ $(document).ready(function () {
 
              if ($('[name="question_'+id_answered+'"]').is(':checked')) {
                  $('[id="answered_'+id_answered_aux+'"]').show();
+                if(bool_container){
+                    bool_container.push($('#qc_'+id_answered+" > .question-text > .qtext").text().trim());
+                }
              } else {
                  $('[id="answered_'+id_answered_aux+'"]').hide();
+                 if(bool_container){
+                    bool_container.splice($('#qc_'+id_answered+" > .question-text > .qtext").text().trim());
+                 }
              }
         }
 
@@ -117,8 +131,14 @@ $(document).ready(function () {
 
              if ($('[id="answer_'+id_answered+'"] input[type="checkbox"]').is(':checked')) {
                  $('[id="answered_'+id_answered_aux+'"]').show();
+                 if(bool_container){
+                    bool_container.push($('#qc_'+id_answered+" > .question-text > .qtext").text().trim());
+                 }
              } else {
                     $('[id="answered_'+id_answered_aux+'"]').hide();
+                    if(bool_container){
+                        bool_container.splice($('#qc_'+id_answered+" > .question-text > .qtext").text().trim());
+                    }
              }
         }
 
