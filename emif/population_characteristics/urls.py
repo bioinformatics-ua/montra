@@ -25,7 +25,10 @@ urlpatterns = patterns('',
             population, name='population'),
     url(r'^$',
             population, name='population'),
-    
+    url(r'^testpc$',
+            test_pc, name='test_pc'),
+
+
     url(r'^upload$', 'population_characteristics.documents.document_form_view_upload'),
     url(r'^jerboaupload$', 'population_characteristics.documents.jerboa_form_view_upload'),
     url(r'^jerboalistvalues/(?P<var>[^/]+)/(?P<row>[^/]+)/(?P<fingerprint_id>[^/]+)$', 'population_characteristics.views.jerboa_list_values'),

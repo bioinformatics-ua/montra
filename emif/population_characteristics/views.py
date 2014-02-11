@@ -67,6 +67,11 @@ def upload_jerboa_request(request, template_name='uploadjerboa.html'):
 ### I just need to finish this shit, and then I'll remove this code 
 ### If the population characteristics is running, please remove this 
 ### shit function: population(request, template_name='piechart.html'):
+
+def test_pc(request, template_name='population_characteristics.html'):
+
+    return render(request,template_name, {'request': request,})    
+
 def population(request, template_name='piechart.html'):
 
     xdata = ["Apple", "Apricot", "Avocado", "Banana", "Boysenberries", "Blueberries", "Dates", "Grapefruit", "Kiwi", "Lemon"]

@@ -44,8 +44,8 @@ class PopulationCharacteristic(JerboaFormat):
         pass
 
     def submit_new_revision(self):
-        #path_file = "C:/Users/lbastiao/Projects/TEST_DataProfile_v1.5.6b.txt"
-        path_file = "/Volumes/EXT1/Dropbox/MAPi-Dropbox/EMIF/Jerboa/TEST_DataProfile_v1.5.6b.txt"        
+        path_file = "C:/Users/lbastiao/Projects/TEST_DataProfile_v1.5.6b.txt"
+        #path_file = "/Volumes/EXT1/Dropbox/MAPi-Dropbox/EMIF/Jerboa/TEST_DataProfile_v1.5.6b.txt"        
         self._json = import_population_characteristics_data(filename=path_file)
         #print self._json
         #f = open('jerboaTmp', 'w')
@@ -71,16 +71,24 @@ class PopulationCharacteristic(JerboaFormat):
 
         import pdb
         #pdb.set_trace() 
-        vars_that_should_exists = ['Count']
+        vars_that_should_exists = ['Min']
 
-        dict_query = {'fingerprint_id':fingerprint_id, 'values.Count': { "$exists" : 'true' }, 
+        dict_query = {'fingerprint_id':fingerprint_id, 
             'values.Var': var}
         for ve in vars_that_should_exists:
-            dict_query['values.'+ve] = { "$exists" : 'true' }
+            dict_query['values.'+ve] = { "$exists" : True }
+        print dict_query
         values =  jerboa_collection.find(dict_query )
-        #values =  jerboa_collection.find( {'fingerprint_id':'abcd', 'values.Var': 'Active patients'}  )
+        #print values 
+        #values =  jerboa_collection.find( {'fingerprint_id':'abcd', 
+        #    'values.Var': 'Active patients', 
+        #    'values.Count': { "$exists" : True }}  )
+
+        
+        #values = jerboa_collection.find( {'fingerprint_id':'abcd', 'values.Var': 'Active patients', 'values.Count': { "$exists" : True  }}  )
         results = []
         for v in values:
+            print v
             results.append(v[u'values'])
 
         print results
