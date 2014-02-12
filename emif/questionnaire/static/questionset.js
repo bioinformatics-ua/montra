@@ -59,6 +59,18 @@ function statusChanged(obj, res) {
 }
 
 function valchanged(qnum, value) {
+    if (!(typeof bool_container === 'undefined')) {
+        var clean = qnum.replace('question_','').replace(/(\\)/g, '');
+        // We have to get the question
+        var the_question = $('#question_'+clean.split('_')[0].replace(/(\.)/g,'')).text().trim(); 
+        if(value==true){
+
+            bool_container.push(clean.replace('_','. ')+' ('+the_question+')');
+        } else if(value==false){
+            bool_container.splice(clean.replace('_','. ')+' ('+the_question+')');
+        }
+    }    
+
     qvalues[qnum] = value;
     // qnum may be 'X_Y' for option Y of multiple choice question X
     qnum = qnum.split('_')[0];
@@ -74,10 +86,20 @@ function addtrigger(elemid) {
     var elem = document.getElementById(elemid);
     //console.log(elemid + " : " + elem + " : "+document.getElementById(elemid));
     if(!elem) {
-      alert("addtrigger: Element with id "+elemid+" not found.");
+      console.error("addtrigger: Element with id "+elemid+" not found.");
       return;
     }
     qtriggers[qtriggers.length] = elem;
+}
+
+function clear_selection(question_name, response){
+    $(":radio[name='" + question_name + "']").prop('checked', false);
+    if (!(typeof bool_container === 'undefined')) {
+            console.log(response);
+            bool_container.splice(response);
+    
+    }        
+    
 }
 
 /* 

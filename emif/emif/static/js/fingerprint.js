@@ -59,15 +59,24 @@ function validate1(element, id_answered) {
             //console.log('1 - #answered_'+id_answered);
             $('[id="answered_'+id_answered+'"]').show();
         
-            if(bool_container){
-                bool_container.push($('#question_nr_'+id_answered).text().trim()+" "+$('#question_'+id_answered).text().trim());
+            if (!(typeof bool_container === 'undefined')) {
+                
+                /* Tip from: http://viralpatel.net/blogs/jquery-get-text-element-without-child-element/ */
+            var just_question = $('#question_'+id_answered)
+        .clone()    //clone the element
+        .children() //select all the children
+        .remove()   //remove all the children
+        .end()  //again go back to selected element
+        .text().trim();    //get the text of element
+                
+                bool_container.push($('#question_nr_'+id_answered).text().trim()+" "+just_question);
             }
         
         } else {
             //console.log('2 - #answered_'+id_answered);
             $('[id="answered_'+id_answered+'"]').hide();
-            if(bool_container){
-                bool_container.splice($('#question_nr_'+id_answered).text().trim()+" "+$('#question_'+id_answered).text().trim());
+            if (!(typeof bool_container === 'undefined')) {
+                bool_container.splice($('#question_nr_'+id_answered).text().trim()+" "+just_question);
             }
         }
             // If we have a boolean container, maker
@@ -114,14 +123,10 @@ $(document).ready(function () {
 
              if ($('[name="question_'+id_answered+'"]').is(':checked')) {
                  $('[id="answered_'+id_answered_aux+'"]').show();
-                if(bool_container){
-                    bool_container.push($('#qc_'+id_answered+" > .question-text > .qtext").text().trim());
-                }
+  
              } else {
                  $('[id="answered_'+id_answered_aux+'"]').hide();
-                 if(bool_container){
-                    bool_container.splice($('#qc_'+id_answered+" > .question-text > .qtext").text().trim());
-                 }
+    
              }
         }
 
@@ -131,14 +136,9 @@ $(document).ready(function () {
 
              if ($('[id="answer_'+id_answered+'"] input[type="checkbox"]').is(':checked')) {
                  $('[id="answered_'+id_answered_aux+'"]').show();
-                 if(bool_container){
-                    bool_container.push($('#qc_'+id_answered+" > .question-text > .qtext").text().trim());
-                 }
+
              } else {
-                    $('[id="answered_'+id_answered_aux+'"]').hide();
-                    if(bool_container){
-                        bool_container.splice($('#qc_'+id_answered+" > .question-text > .qtext").text().trim());
-                    }
+
              }
         }
 

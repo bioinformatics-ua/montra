@@ -185,8 +185,17 @@
                     $('#boolrelwidget-basicblocks').html(little_boxes.join(''));
                                     // Make them draggable
                     
+                    // Clone makes ie7 crash and burn
                 $(".boolrelwidget-block-inner").draggable({containment: "#boolrelwidget-panel", 
-                                                           revert: true, opacity: 0.9, helper: "clone", cursor: "move", cursorAt: { top: 10, left: 50 }}); 
+                                                           revert: true, opacity: 0.9, /*helper: "clone",*/ cursor: "move", cursorAt: { top: 10, left: 50 },
+                    start: function(){
+                        $(".boolrelwidget-simple").tooltip('destroy');
+                    }, drag: function(){
+                        $(".boolrelwidget-simple").tooltip('destroy');
+                    }, stop: function(){
+                        $(".boolrelwidget-simple").tooltip('destroy');
+                    }
+                                                          }); 
                 }                
                 
                 // Drawing query itself(if any already)                
@@ -277,6 +286,7 @@
                                         
                   $( ".boolrelwidget-first-droppable" ).droppable({
                       drop: function( event, ui ) {
+                          
                         var droper = Number(ui.draggable.attr('id').replace('boolrelwidget-bb-',''));
                         console.log("Event drop0: "+droper+" on empty space, creating new booleangroup.");
                         
@@ -290,10 +300,11 @@
                         used_blocks.push(sliced);
                           
                         master.draw();
+                        
                       }
                     });  
                 }
-                $(".boolrelwidget-simple").tooltip({container: 'body'});
+                $(".boolrelwidget-simple").tooltip({container: 'body', delay: { show: 500, hide: 0 }});
 
                     // If we have collapsing preferences, apply them
                 if(this.getCookie('boolrelwidget-collapse-preferences')){
@@ -643,10 +654,10 @@ BooleanGroup.prototype = {
         var output=this.variables[0]
         var i=0;
         for(i=1;i<this.variables.length;i++){
-            output+=" "+this.relations[i-1].name+" "+this.variables[i].toString();
+            output+=" __"+this.relations[i-1].name+"__ "+this.variables[i].toString();
         }
         if(this.variables.length>1)
-            output="("+output+")";
+            output="{"+output+"}";
         
         return output;
     },
