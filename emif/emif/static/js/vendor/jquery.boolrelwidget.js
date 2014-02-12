@@ -36,7 +36,7 @@ THE SOFTWARE.
             expand_text:'To define the relations between the terms click here.',
             collapse_text:'Click here to close this panel.'
         }, options);
-        /*
+        
         var bg1 = new BooleanGroup('teste de nome muito grande mesmo');
         var bg2 = new BooleanGroup('outro name ainda maior que o anterior, mas nao muito');
         var bg3 = new BooleanGroup('nome curto');
@@ -48,7 +48,7 @@ THE SOFTWARE.
         mastergroup.addBoolean(BOOL['AND'], bg3);
         
         basic_blocks.push(new BooleanGroup('outro nome grande, mas mesmo bue grande para ficar aqui para eu depois arranjar isto com ...'));
-        */
+        
         var funcs = {
             push: function (str) {
                 
@@ -295,7 +295,17 @@ THE SOFTWARE.
                       }
                     });  
                 }
-                
+                    // If we have collapsing preferences, apply them
+                if(this.getCookie('boolrelwidget-collapse-preferences')){
+                    console.log(this.getCookie('boolrelwidget-collapse-preferences'));
+                    if(this.getCookie('boolrelwidget-collapse-preferences') == 'expanded'){
+                        var context = $('boolrelwidget-collapseall');
+                        $('#boolrelwidget-collapseall').text('Collapse All');
+                        $('#boolrelwidget-collapseall').addClass('boolrelwidget-all-expanded');
+
+                        this.collapseAll(context);  
+                    } 
+                }
             },
             // This recursive functions runs down in the BooleanGroups and puts everything on the big box.
             // I pass a counter to be able to style differently (so i know the recursion level couldnt find a better way to style it different
@@ -440,6 +450,38 @@ THE SOFTWARE.
                 this.draw();
                     
                 return true;
+            },
+            /* Ref on this on : http://stackoverflow.com/questions/1458724/how-to-set-unset-cookie-with-jquery */
+            setCookie: function(key, value){
+                var expires = new Date();
+                expires.setTime(expires.getTime() + (1 * 24 * 60 * 60 * 1000));
+                document.cookie = key + '=' + value + ';path=/' + ';expires=' + expires.toUTCString();
+            },
+            getCookie: function(key){
+                var keyValue = document.cookie.match('(^|;) ?' + key + '=([^;]*)(;|$)');
+                return keyValue ? keyValue[2] : null;            
+            },
+            collapseAll: function(context){
+            
+                if($(context).hasClass('boolrelwidget-all-expanded')){
+                
+                    $('.boolrelwidget-expandable').fadeOut('fast');
+                    $("#"+$('.boolrelwidget-expandable').parent().attr('id')+' > .boolrelwidget-collapser').text('See nested relations');
+
+                    $(context).text('Expand All');
+                    $(context).removeClass('boolrelwidget-all-expanded');
+                    
+                    funcs.setCookie('boolrelwidget-collapse-preferences','collapsed');
+                } else {
+                    
+                    $('.boolrelwidget-expandable').fadeIn('fast').css('display','table-cell');
+                    $("#"+$('.boolrelwidget-expandable').parent().attr('id')+' > .boolrelwidget-collapser').text('Hide this relation');
+                    $(context).text('Collapse All');
+                    $(context).addClass('boolrelwidget-all-expanded');
+                    
+                    funcs.setCookie('boolrelwidget-collapse-preferences','expanded');
+                }
+            
             }
         };
 
@@ -471,17 +513,7 @@ THE SOFTWARE.
         });
         
         $( '#boolrelwidget-collapseall' ).click(function() {
-            if($(this).hasClass('boolrelwidget-all-expanded')){
-                
-                $('.boolrelwidget-expandable').fadeOut('fast');
-                $(this).text('Expand All');
-                $(this).removeClass('boolrelwidget-all-expanded');
-            } else {
-                
-                $('.boolrelwidget-expandable').fadeIn('fast').css('display','table-cell');
-                $(this).text('Collapse All');
-                $(this).addClass('boolrelwidget-all-expanded');
-            }
+            funcs.collapseAll(this);
         });
         $( '#boolrelwidget-orall' ).click(function() {
             funcs.opAll(BOOL['OR']);          
