@@ -17,43 +17,37 @@ function GraphicChartD3(divArg, dataArg)
     console.log(objects);
     /*** Lets translate our data model to the d3 support data model */ 
     
-   /* dataset = [[{'xvalue':'2000', 'yvalue':200}, 
+    dataset = [[{'xvalue':'2000', 'yvalue':200}, 
                   {'xvalue':'2001', 'yvalue':300},
-                  {'xvalue':'2002', 'yvalue':.356}], 
+                  {'xvalue':'2002', 'yvalue':356}], 
                  
                  ];
-             */
 
+    var i = 1;
     dataset = [[], 
                  
                  ];
-
-    var i = 1
-
     objects.values.forEach(function(row){
       
-
-      
-      if (i<10){
+      if (i<30){
           console.log(row.Min);
-      console.log(row.Value1);  
-          dataset.push([{'xvalue':row.Value1, 'yvalue':parseInt(row.Min)}]);
+          console.log(row.Value1);  
+          dataset[0].push({'xvalue':row.Value1, 'yvalue':parseInt(row.Min)});
       }
-      
 
       i++;
 
-
     });
     
-
+    console.log("Final dataset is: "  );
+    console.log(dataset  );
 
   };
 
   this.draw = function(div, dataset){
     
-      var margin = {top: 20, right: 20, bottom: 30, left: 40},
-          width = 360 - margin.left - margin.right,
+      var margin = {top: 20, right: 20, bottom: 30, left: 60},
+          width = 460 - margin.left - margin.right,
           height = 500 - margin.top - margin.bottom;
 
       var formatPercent = d3.format("000.0");

@@ -74,6 +74,7 @@ class PopulationCharacteristic(JerboaFormat):
         vars_that_should_exists = ['Min']
 
         dict_query = {'fingerprint_id':fingerprint_id, 
+            'values.Gender':'M',
             'values.Var': var}
         for ve in vars_that_should_exists:
             dict_query['values.'+ve] = { "$exists" : True }
