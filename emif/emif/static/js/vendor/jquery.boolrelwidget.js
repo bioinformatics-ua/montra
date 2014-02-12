@@ -1,28 +1,7 @@
 /**********************************************************************
-# Copyright (C) 2014 Ricardo Ribeiro
 #
 # Author: Ricardo Ribeiro <ribeiro.r@ua.pt>
 #
-
-The MIT License (MIT)
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE.
 # */
 (function ($) {
     $.fn.boolrelwidget = function (options) {
@@ -203,7 +182,7 @@ THE SOFTWARE.
                         var dropee = Number($(this).attr('id').replace('boolrelwidget-dp-',''));
                         console.log("Event drop: "+droper+" on "+dropee);
                         
-                          var sliced = master.spliceById(droper);
+                        var sliced = master.spliceById(droper);
                             
                           used_blocks.push(sliced);
                         // Try to add this to the master group
@@ -211,10 +190,8 @@ THE SOFTWARE.
                         if(!mastergroup.addById(dropee, sliced)){
                             master.pushBooleanGroup(sliced);
                         }               
-                          
                         master.draw(); 
-                          
-                        return this;
+
                       }
                     });
                         // Add 
@@ -275,6 +252,7 @@ THE SOFTWARE.
                     var master = this;
                     mastergroup=null;
                     $('#boolrelwidget-query').html('<div class="boolrelwidget-first-droppable">Drag and Drop concepts here to start building a query...</div>');
+                                        
                   $( ".boolrelwidget-first-droppable" ).droppable({
                       drop: function( event, ui ) {
                         var droper = Number(ui.draggable.attr('id').replace('boolrelwidget-bb-',''));
@@ -288,9 +266,7 @@ THE SOFTWARE.
                         
                         // Put in used blocks
                         used_blocks.push(sliced);
-                        
-                        
-                          
+
                         master.draw();  
                       }
                     });  

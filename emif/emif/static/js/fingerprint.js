@@ -54,20 +54,20 @@ $(document).ready(function () {
 /***************** BEGIN - CHECK IF ANSWER IS FILLED IN *****************/
 /* Function to validate for fields of type 1 (see comments below)*/
 function validate1(element, id_answered) {
-    console.log("VAL: " + $(element).val());
+    // console.log("VAL: " + $(element).val());
     if($(element).val() != "") {
             //console.log('1 - #answered_'+id_answered);
             $('[id="answered_'+id_answered+'"]').show();
         
             if(bool_container){
-                bool_container.push($('#qc_'+id_answered+" > .question-text > .qtext").text().trim());
+                bool_container.push($('#question_'+id_answered).text().trim());
             }
         
         } else {
             //console.log('2 - #answered_'+id_answered);
             $('[id="answered_'+id_answered+'"]').hide();
             if(bool_container){
-                bool_container.splice($('#qc_'+id_answered+" > .question-text > .qtext").text().trim());
+                bool_container.splice($('#question_'+id_answered).text().trim());
             }
         }
             // If we have a boolean container, maker
