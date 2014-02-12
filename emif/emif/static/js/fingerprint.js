@@ -66,13 +66,22 @@ function validate1(element, id_answered) {
         }
 }
 
+var classNamePatternAUX = /type_(\S+)/i;
+var advValidator;
 
 $(document).ready(function () {
+    advValidator = new Fingerprint_Validator();
+    advValidator.onInit();
     $(document).on('change', '.answer input,.answer select,.answer textarea, button', function (e) {
         e.preventDefault();
         var el = e.target;
         var id_answered = el.id.split("_")[1];
         var id_answered_aux = el.id.split("_")[1].replace(/\./g,'');
+
+        var className = $('[id="qc_'+id_answered+'"]').attr("class");
+        className = classNamePatternAUX.exec(className)[1];
+        if(className != undefined)
+            advValidator.validate(className, id_answered, el);
 
         /*
             - verify the type to each question and create a respective processment for each one

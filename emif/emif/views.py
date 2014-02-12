@@ -848,7 +848,7 @@ def extract_answers(request2, questionnaire_id, question_set, qs_list):
                     'qtype': Type,
                     'qnum_class': (_qnum % 2 == 0) and " qeven" or " qodd",
                     'qalpha_class': _qalpha and (ord(_qalpha[-1]) % 2 \
-                                                     and ' alodd' or ' aleven') or '',
+                                                     and ' alodd' or ' aleven') or '',                    
                 }
 
                 # add javascript dependency checks
@@ -878,6 +878,9 @@ def extract_answers(request2, questionnaire_id, question_set, qs_list):
                     except KeyError:
                         pass
 
+                    if question.number in errors:
+                        qdict["qprocessor_errors"] = errors[question.number].message
+
                     if 'jsinclude' in qdict:
                         if qdict['jsinclude'] not in jsinclude:
                             jsinclude.extend(qdict['jsinclude'])
@@ -886,7 +889,7 @@ def extract_answers(request2, questionnaire_id, question_set, qs_list):
                             cssinclude.extend(qdict['jsinclude'])
                     if 'jstriggers' in qdict:
                         jstriggers.extend(qdict['jstriggers'])
-                        
+                    
                 qlist.append((question, qdict))
                 
             if qs_aux == None:
@@ -894,7 +897,7 @@ def extract_answers(request2, questionnaire_id, question_set, qs_list):
             qlist_general.append((qs_aux, qlist))
     except:
         raise
-    return (qlist_general, qlist, jstriggers, qvalues, jsinclude, cssinclude, extra_fields)
+    return (qlist_general, qlist, jstriggers, qvalues, jsinclude, cssinclude, extra_fields, len(errors)!=0)
     
 
 def database_edit(request, fingerprint_id, questionnaire_id, template_name="database_edit.html"):
@@ -964,16 +967,19 @@ def database_edit(request, fingerprint_id, questionnaire_id, template_name="data
 
     question_set = qs_list[int(qs_id)]
     if request.POST:
-        (qlist_general, qlist, jstriggers, qvalues, jsinclude, cssinclude, extra_fields) = extract_answers(request, questionnaire_id, question_set, qs_list)
+        (qlist_general, qlist, jstriggers, qvalues, jsinclude, cssinclude, extra_fields, hasErrors) = extract_answers(request, questionnaire_id, question_set, qs_list)
     else:
-        (qlist_general, qlist, jstriggers, qvalues, jsinclude, cssinclude, extra_fields) = extract_answers(request2, questionnaire_id, question_set, qs_list)
+        (qlist_general, qlist, jstriggers, qvalues, jsinclude, cssinclude, extra_fields, hasErrors) = extract_answers(request2, questionnaire_id, question_set, qs_list)
+
+    print hasErrors
 
     if (question_set.sortid == 99 or request.POST):
         # Index on Solr
         try:
-            add_city(qlist_general)
-
-            index_answeres_from_qvalues(qlist_general, question_set.questionnaire, users_db,
+            if not hasErrors:
+                print "FOOOOOOOOOOOOOOO"
+                add_city(qlist_general)
+                index_answeres_from_qvalues(qlist_general, question_set.questionnaire, users_db,
                                         fingerprint_id, extra_fields=extra_fields, created_date=created_date)
         except:
             raise
