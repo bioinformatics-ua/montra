@@ -60,14 +60,14 @@ function validate1(element, id_answered) {
             $('[id="answered_'+id_answered+'"]').show();
         
             if(bool_container){
-                bool_container.push($('#question_'+id_answered).text().trim());
+                bool_container.push($('#question_nr_'+id_answered).text().trim()+" "+$('#question_'+id_answered).text().trim());
             }
         
         } else {
             //console.log('2 - #answered_'+id_answered);
             $('[id="answered_'+id_answered+'"]').hide();
             if(bool_container){
-                bool_container.splice($('#question_'+id_answered).text().trim());
+                bool_container.splice($('#question_nr_'+id_answered).text().trim()+" "+$('#question_'+id_answered).text().trim());
             }
         }
             // If we have a boolean container, maker

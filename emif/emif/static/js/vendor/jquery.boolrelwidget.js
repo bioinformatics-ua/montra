@@ -176,11 +176,12 @@
                     $('#boolrelwidget-query').html(big_box.join(''));
                     
                     var master = this;
+                    
                     $( ".boolrelwidget-query-dropper" ).droppable({
                       drop: function( event, ui ) {
                         var droper = Number(ui.draggable.attr('id').replace('boolrelwidget-bb-',''));
                         var dropee = Number($(this).attr('id').replace('boolrelwidget-dp-',''));
-                        console.log("Event drop: "+droper+" on "+dropee);
+                        console.log("Event drop 1: "+droper+" on "+dropee);
                         
                         var sliced = master.spliceById(droper);
                             
@@ -189,7 +190,8 @@
                         // If we cant, we insert the basic block back into the basic_blocks list
                         if(!mastergroup.addById(dropee, sliced)){
                             master.pushBooleanGroup(sliced);
-                        }               
+                        }       
+                          
                         master.draw(); 
 
                       }
@@ -212,9 +214,7 @@
                             }
 
                             master.draw();
-                        });
-                        $(".boolrelwidget-simple").tooltip({container: 'body'});
-                    
+                        });                    
                         $(".boolrelwidget-select").change(function(){
                             console.log(mastergroup);
                             
@@ -256,7 +256,7 @@
                   $( ".boolrelwidget-first-droppable" ).droppable({
                       drop: function( event, ui ) {
                         var droper = Number(ui.draggable.attr('id').replace('boolrelwidget-bb-',''));
-                        console.log("Event drop: "+droper+" on empty space, creating new booleangroup.");
+                        console.log("Event drop0: "+droper+" on empty space, creating new booleangroup.");
                         
                           var sliced = master.spliceById(droper);
                         
@@ -271,6 +271,8 @@
                       }
                     });  
                 }
+                $(".boolrelwidget-simple").tooltip({container: 'body'});
+
                     // If we have collapsing preferences, apply them
                 if(this.getCookie('boolrelwidget-collapse-preferences')){
                     console.log(this.getCookie('boolrelwidget-collapse-preferences'));
@@ -458,6 +460,19 @@
                     funcs.setCookie('boolrelwidget-collapse-preferences','expanded');
                 }
             
+            },
+            expandPanel: function(){
+                $('#boolrelwidget-expand').toggle();
+                $('#boolrelwidget-collapse').toggle();
+                $('#boolrelwidget-panel').toggle();
+                funcs.setCookie('boolrelwidget-panel-open','true');
+            },
+            collapsePanel: function(){
+                $('#boolrelwidget-expand').toggle();
+                $('#boolrelwidget-collapse').toggle();
+                $('#boolrelwidget-panel').toggle();
+            
+                funcs.setCookie('boolrelwidget-panel-open','false');  
             }
         };
 
@@ -478,15 +493,15 @@
         
         // Lets add the event handlersx
         $( '#boolrelwidget-expand' ).click(function() {
-            $('#boolrelwidget-expand').toggle();
-            $('#boolrelwidget-collapse').toggle();
-            $('#boolrelwidget-panel').toggle();
+            funcs.expandPanel();
         });
         $( '#boolrelwidget-collapse' ).click(function() {
-            $('#boolrelwidget-expand').toggle();
-            $('#boolrelwidget-collapse').toggle();
-            $('#boolrelwidget-panel').toggle();
+            funcs.collapsePanel();
         });
+        
+        if(funcs.getCookie('boolrelwidget-panel-open') == 'true'){
+            funcs.expandPanel();
+        }
         
         $( '#boolrelwidget-collapseall' ).click(function() {
             funcs.collapseAll(this);
@@ -582,12 +597,15 @@ BooleanGroup.prototype = {
      * Maybe to review with more time at a later time
     */
     removeById : function(other_id){
-        var returnable = []
+        var returnable = [];
         this.removeByIdAux(null, null, other_id,returnable);
         
-        if(returnable.length==1)
-            return returnable[0]
-            
+        if(returnable.length==2){
+            this.removeUnnecessary(returnable[1]);
+            return returnable[0];
+        }
+        else if(returnable.length==1)
+            return returnable[0];
         else 
             return null;
 
@@ -598,16 +616,21 @@ BooleanGroup.prototype = {
         }
         else {
             if(this.id == other_id){
+                returnable.push(this);
+                
                 // If not on root remove reference
                 if(parent){
                     parent.variables.splice(branch,1);
                     if(branch=0)
                         parent.relations.splice(branch,1);
                     else 
-                        parent.relations.splice(branch-1,1);
+                        parent.relations.splice(branch-1,1);      
+                    
+                    // I also return this, to be able to later remove unnecessary
+                    returnable.push(parent.id);
                 }
                 
-                returnable.push(this);
+                
             }
             var k = 0;
             for(k=0;k<this.variables.length;k++){
@@ -616,7 +639,34 @@ BooleanGroup.prototype = {
                 }
             }
         }
-    },     
+    },    
+    removeUnnecessary: function(id_to_check){
+        this.removeUnnecessaryAux(null, null, id_to_check);  
+    },
+    removeUnnecessaryAux: function(parent, branch, other_id){
+        if(typeof other_id != 'number'){
+            console.warn('When removing unnecessary by id, a number value must be specified. Found type ' + typeof other_id);
+        } else {
+            if(this.id == other_id){
+                // If has root
+                if(parent){
+                        // If this has only 1 element and is complexe, theres no need for this, we can revert back to
+                        //only one level
+                        if(this.variables.length == 1 && 
+                           !(typeof this.variables[0] == 'string' || this.variables[0] instanceof String)){
+                            parent.variables[branch] = this.variables[0];
+                        }
+                }                
+            }
+            var k = 0;
+            for(k=0;k<this.variables.length;k++){
+                if(this.variables[k] instanceof BooleanGroup){
+                    this.variables[k].removeUnnecessaryAux(this, k, other_id);
+                }
+            }      
+        }     
+        
+    },
     addById : function(parent_id, child){
         if(!(child instanceof BooleanGroup)){
             console.warn('When adding, a valid BooleanGroup child must be found.');
@@ -629,9 +679,17 @@ BooleanGroup.prototype = {
         }
         else {
             if(this.id == parent_id){
-                //Add reference
-                this.relations.push(BOOL['OR']);
-                this.variables.push(child);
+                if(this.isSimple()){
+                    this.variables[0]=new BooleanGroup(this.variables[0]);
+                    //Add reference
+                    this.relations.push(BOOL['OR']);
+                    this.variables.push(child);
+                }
+                else {
+                    //Add reference
+                    this.relations.push(BOOL['OR']);
+                    this.variables.push(child);
+                }
                 return true;
             }
             var returnable=false;
