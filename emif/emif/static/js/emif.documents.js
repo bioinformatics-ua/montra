@@ -81,57 +81,6 @@ function PopulationCharacteristics (type)
  {
 
 
-    function exampleData() {
-      return  [ 
-         {
-           key: "Cumulative Return",
-           values: [
-             { 
-               "label" : "2000" ,
-               "value" : 30000,
-               "color" : "#0000ff",
-             } , 
-             { 
-               "label" : "2001" , 
-               "value" : 35000,
-               "color" : "#0000ff",
-             } , 
-             { 
-               "label" : "2002" , 
-               "value" : 25000,
-               "color" : "#0000ff",
-             } , 
-             { 
-               "label" : "2003" , 
-               "value" : 29000,
-               "color" : "#0000ff",
-             } , 
-             { 
-               "label" : "2004" ,
-               "value" : 31000,
-               "color" : "#0000ff",
-             } , 
-             { 
-               "label" : "2005" , 
-               "value" : 35000,
-               "color" : "#0000ff",
-             } , 
-             { 
-               "label" : "2006" , 
-               "value" : 40000,
-               "color" : "#0000ff",
-             } , 
-             { 
-               "label" : "2007" , 
-               "value" : 60000,
-               "color" : "#0000ff",
-
-             }
-           ]
-         }
-       ];
-     };
-
 
     var methods = {
         init : function( options ) { 
@@ -141,25 +90,7 @@ function PopulationCharacteristics (type)
         },
         draw : function( options ) {
             
-            nv.addGraph(function() {
-               var chart = nv.models.discreteBarChart()
-                   .x(function(d) { return d.label })
-                   .y(function(d) { return d.value })
-                   .staggerLabels(false)
-                   .tooltips(true)
-                   .showValues(true)
-             
-               d3.select('#chart svg')
-                   .datum(exampleData())
-                 .transition().duration(500)
-                   .call(chart);
-             
-               nv.utils.windowResize(chart.update);
-             
-               return chart;
-             });
-             
-            $("#chart h1").append("Number of patients yearly")
+           
         },
         
     };

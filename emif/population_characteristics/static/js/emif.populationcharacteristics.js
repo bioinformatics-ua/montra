@@ -292,14 +292,17 @@ function PCAPI ()
                       $('.graphTypes').closest('li').removeClass('active')
                       $(this.parentNode).closest('li').addClass('active')
 
-
-                      console.log();
                       PC = new PCAPI();
                       fingerprintID = getFingerprintID();
                       console.log(fingerprintID);
                       var valuesFromGraph = PC.getValuesRow(e.toElement.innerHTML, 
                         'Count', 'abcd');
+                      console.log('valuesFromGraph: '+valuesFromGraph);
                       console.log(valuesFromGraph);
+                      $("#d3test").graphicChart('init');
+                      $("#d3test").graphicChart('drawBarChart', valuesFromGraph,valuesFromGraph,valuesFromGraph);
+
+                      
                       if ($(e.toElement.firstChild).hasClass('icon-ok')) 
                       {
                         $(e.toElement.firstChild).removeClass('icon-ok') 
@@ -321,7 +324,7 @@ function PCAPI ()
         init : function( options, api ) {
 
             var self = this;
-            self.append("Var: ");
+            self.append("Characteristic Type: ");
             tmpUl = $('<ul class="nav nav-list nav-pills nav-stacked">');
             values = options.getChartTitles();
             self.append(tmpUl);

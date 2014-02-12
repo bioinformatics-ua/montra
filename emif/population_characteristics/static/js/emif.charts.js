@@ -3,25 +3,47 @@
 * Should provide an abstractoin to the API's
 
 */ 
-
-
-
-
-
+/* This should allow generic components 
+ * should decorate other class
+*/ 
 
  (function( $ )
  {
 
+    var div='';
+    var data='';
    
     var methods = {
-        init : function( options, api ) {
+        init : function( options, _div, _data ) {
 
             var self = this;
-            
+            var div = _div;
+            var data = _data;
 
         },
-        draw : function( options ) {
+        drawBarChart : function( options, _div, _data ) {
+            console.log('who is this: ' + this);
+            console.log('who is this: ' + self);
+            console.log(div);
+            console.log(data);
+            g = new GraphicChartD3();
+
+            g.div = div;
+            g.dataValues = data;
+            g.init(div, data);
+
+            console.log('This is the data that we got: ' +  _data);
+
+            dataset = [[{'xvalue':'2000', 'yvalue':200}, 
+                  {'xvalue':'2001', 'yvalue':300},
+                  {'xvalue':'2002', 'yvalue':.356}], 
+                 
+                 ];
+
+            g.translateData(_data);
+            g.draw('#d3test', dataset);
             
+
         },
 
     };
@@ -40,3 +62,12 @@
 }( jQuery ));
 
 
+
+$(document).ready(
+    function(){
+
+
+
+
+    }
+);
