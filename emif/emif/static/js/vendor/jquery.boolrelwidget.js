@@ -183,8 +183,9 @@ THE SOFTWARE.
                 } else{
                     $('#boolrelwidget-basicblocks').html(little_boxes.join(''));
                                     // Make them draggable
+                    
                 $(".boolrelwidget-block-inner").draggable({containment: "#boolrelwidget-panel", 
-                                                           revert: true, opacity: 0.9, helper: "clone"}); 
+                                                           revert: true, opacity: 0.9, helper: "clone", cursor: "move", cursorAt: { top: 10, left: 50 }}); 
                 }                
                 
                 // Drawing query itself(if any already)                
@@ -220,12 +221,10 @@ THE SOFTWARE.
                             var removed_bool = mastergroup.removeById(removed);
                             var contained = removed_bool.extractAllSimple();
                             
-                            console.log(contained);                            
-
                             for(var j=0;j<contained.length;j++){
                                 master.pushBooleanGroup(contained[j]);
                                 
-                                var other_id = this.getUsedIndex(contained[j].name);
+                                var other_id = master.getUsedIndex(contained[j].variables[0]);
                                 if(other_id >0){
                                     console.log('Removing from used variables');
                                     used_blocks.splice(other_id, 1);
@@ -265,7 +264,8 @@ THE SOFTWARE.
                                 $(this).removeClass('boolrelwidget-expanded');
                                 $(this).addClass('boolrelwidget-collapsed');
                                 $(this).text('Hide this relation');
-                                $("#"+$(this).parent().attr('id')+' > .boolrelwidget-expandable').fadeIn('fast').css("display","table-cell");
+                                $("#"+$(this).parent().attr('id')+' > .boolrelwidget-expandable').fadeIn('fast');
+                                $("#"+$(this).parent().attr('id')+' > .boolrelwidget-expandable').css("display","table-cell");
                             }
                         }); 
                 } else {
@@ -349,29 +349,31 @@ THE SOFTWARE.
                             big_box.push('" class="btn boolrelwidget-query-dropper');
                             if(!something.isSimple()  && counter >0)
                                 big_box.push(' boolrelwidget-expandable');
-                            big_box.push(' boolrelwidget-query-dropper-odd">&nbsp;&nbsp;</div>');
+                            big_box.push('"><div class="boolrelwidget-query-dropper-odd">&nbsp;&nbsp;</div></div>');
                         } else {
                             big_box.push('" class="btn btn-inverse boolrelwidget-query-dropper');
                             if(!something.isSimple() && counter >0)
                                 big_box.push(' boolrelwidget-expandable');
-                            big_box.push(' boolrelwidget-query-dropper-even">&nbsp;&nbsp;</div>');
+                            big_box.push('"><div class="boolrelwidget-query-dropper-even">&nbsp;&nbsp;</div></div>');
                         }
                     
                     // Cant delete mastergroup, other can be deleted
                     if(counter!=0){
-                        if(counter%2 == 0){
+                        if(counter%2 == 0)
                             big_box.push('<div class="btn boolrelwidget-query-delete');
-                            if(!something.isSimple())
-                                big_box.push(' boolrelwidget-expandable');
-                            big_box.push(' boolrelwidget-query-delete-odd" id="boolrelwidget-dl-');
-                        } else {
+                        else
                             big_box.push('<div class="btn btn-inverse boolrelwidget-query-delete');
-                            if(!something.isSimple())
-                                big_box.push(' boolrelwidget-expandable');
-                            big_box.push(' boolrelwidget-query-delete-even" id="boolrelwidget-dl-');
-                        }
+                        
+                        if(!something.isSimple())
+                            big_box.push(' boolrelwidget-expandable');
+                        
+                        big_box.push('" id="boolrelwidget-dl-');                        
                         big_box.push(something.id);
-                        big_box.push('"></div>');
+                        
+                        if(counter%2 == 0)
+                            big_box.push('"><div class="boolrelwidget-query-delete-odd"></div></div>');
+                        else 
+                            big_box.push('"><div class="boolrelwidget-query-delete-even"></div></div>');
                     }
                     
                     big_box.push('</span>');
@@ -443,7 +445,7 @@ THE SOFTWARE.
  *  This must be because if we try a BOOL.TYPE that doesn't exist on ie 7 everything crashes (oh my life...)
  */
 var BOOL = {
-  NOP   : { value: -1,name: "NOP"}, // No operation, means its a edge branch 
+  NOP   : { value: -1, name: "NOP"}, // No operation, means its a edge branch 
   AND   : { value: 0, name: "AND"}, 
   OR    : { value: 1, name: "OR"}, 
   XOR   : { value: 2, name: "XOR"}
@@ -547,7 +549,6 @@ BooleanGroup.prototype = {
         }
     },     
     addById : function(parent_id, child){
-        console.error(parent_id+':'+child);
         if(!(child instanceof BooleanGroup)){
             console.warn('When adding, a valid BooleanGroup child must be found.');
         }
@@ -641,6 +642,5 @@ BooleanGroup.prototype = {
     destroy : function() {
         this.variables=null;
         this.relations=null;
-        this=null;
     }
 };
