@@ -211,10 +211,11 @@
                                
                             </li>
                              {% endif %}
-                            
+                            {% if request.user.is_authenticated %}
                             <li id="li_history">
                                 <a href="controlversion/history">History</a>
                             </li>
+                            {%endif%}
 
                             <li id="li_feedback">
                                 <a href="feedback">Feedback</a>
