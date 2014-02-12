@@ -947,7 +947,7 @@ def database_edit(request, fingerprint_id, questionnaire_id, template_name="data
 
         extra[question] = ans = extra.get(question, {})
         if "[" in value:
-            value = value.lower().replace("]", "").replace("[", "")
+            value = value.replace("]", "").replace("[", "")
         request2.get_post()['question_%s' % question.number] = value
         
         
