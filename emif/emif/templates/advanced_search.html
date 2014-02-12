@@ -174,6 +174,7 @@ $( document ).ready(function() {
     bool_container = $('#bool_container').boolrelwidget();
 
     load_questionnary();
+
 });
 var threads = {};
 function load_questionnary(){
@@ -283,7 +284,7 @@ function questionsets_handle(id_questionset)
   );
     document.body.scrollTop = document.documentElement.scrollTop = 0;
 };
-
+    
     function collapseAll(element, div_id){
         if (element.text().indexOf('Collapse') !== -1) {
            console.log('Collapse all');

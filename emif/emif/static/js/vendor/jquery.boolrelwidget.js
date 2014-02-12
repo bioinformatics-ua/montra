@@ -36,7 +36,7 @@ THE SOFTWARE.
             expand_text:'To define the relations between the terms click here.',
             collapse_text:'Click here to close this panel.'
         }, options);
-        
+        /*
         var bg1 = new BooleanGroup('teste de nome muito grande mesmo');
         var bg2 = new BooleanGroup('outro name ainda maior que o anterior, mas nao muito');
         var bg3 = new BooleanGroup('nome curto');
@@ -46,9 +46,9 @@ THE SOFTWARE.
         
         mastergroup = new BooleanGroup(bg4);
         mastergroup.addBoolean(BOOL['AND'], bg3);
-
-        basic_blocks.push(new BooleanGroup('outro nome grande, mas mesmo bue grande para ficar aqui para eu depois arranjar isto com ...'));
         
+        basic_blocks.push(new BooleanGroup('outro nome grande, mas mesmo bue grande para ficar aqui para eu depois arranjar isto com ...'));
+        */
         var funcs = {
             push: function (str) {
                 
@@ -210,8 +210,11 @@ THE SOFTWARE.
                         // If we cant, we insert the basic block back into the basic_blocks list
                         if(!mastergroup.addById(dropee, sliced)){
                             master.pushBooleanGroup(sliced);
-                        }                     
-                        master.draw();  
+                        }               
+                          
+                        master.draw(); 
+                          
+                        return this;
                       }
                     });
                         // Add 
@@ -285,11 +288,14 @@ THE SOFTWARE.
                         
                         // Put in used blocks
                         used_blocks.push(sliced);
+                        
+                        
                           
                         master.draw();  
                       }
                     });  
                 }
+                
             },
             // This recursive functions runs down in the BooleanGroups and puts everything on the big box.
             // I pass a counter to be able to style differently (so i know the recursion level couldnt find a better way to style it different
@@ -402,6 +408,38 @@ THE SOFTWARE.
                 select.push('</select></span>');
                 
                 return select.join('');
+            },
+            reset: function(){
+                if(mastergroup != null){
+                    var simples = mastergroup.extractAllSimple();
+                    mastergroup=null;
+                    used_blocks=[];
+                    for(var i=0;i<simples.length;i++)
+                        this.pushBooleanGroup(simples[i]);
+                }
+            },
+            opAll: function(func){
+                if(!isBool(func)){
+                    console.error('Tried to make a op_all operatiom with a invalid bool enum');
+                    return false;
+                }    
+                // First we reset
+                    this.reset();
+                
+                // Then we add all to a new mastergroup
+                if(basic_blocks.length>0){
+                    var j=0;
+                    mastergroup = new BooleanGroup(basic_blocks[j++]);
+                    for(var j=1;j<basic_blocks.length;j++){
+                        mastergroup.addBoolean(func, basic_blocks[j]);
+                    }
+                    
+                used_blocks=basic_blocks;
+                basic_blocks=[];                
+                }
+                this.draw();
+                    
+                return true;
             }
         };
 
@@ -418,7 +456,7 @@ THE SOFTWARE.
         self = self.html('');
         
         // Now lets add the toolbar
-        self = self.append('<ul id="boolrelwidget-expand" class="boolrelwidget-menu-container"><li class="boolrelwidget-menu"><div class="boolrelwidget-arrow-l"><div class="boolrelwidget-arrow-up"></div></div></li><li class="boolrelwidget-menu">'+settings.expand_text+'</li><li class="boolrelwidget-menu"><div class="boolrelwidget-arrow-r"><div class="boolrelwidget-arrow-up"></div></div></li></ul><ul id="boolrelwidget-collapse" class="boolrelwidget-menu-container-panel"><li class="boolrelwidget-menu"><div class="boolrelwidget-arrow-l"><div class="boolrelwidget-arrow-down"></div></div></li><li class="boolrelwidget-menu">'+settings.collapse_text+'</li><li class="boolrelwidget-menu"><div class="boolrelwidget-arrow-r"><div class="boolrelwidget-arrow-down"></div></div></li></ul><div id="boolrelwidget-panel"><strong>Concepts</strong><div id="boolrelwidget-basicblocks" class="well well-small">Loading...</div><div class="clearfix"><div class="boolrelwidget-menu pull-left"><strong>Boolean Query</strong></div><div class="pull-right boolrelwidget-menu btn-group"><button class="btn">Collapse All</button><button class="btn">Or All Concepts</button><button class="btn">And All Concepts</button></div></div><div id="boolrelwidget-query" class="well well-small">Loading...</div></div>');
+        self = self.append('<ul id="boolrelwidget-expand" class="boolrelwidget-menu-container"><li class="boolrelwidget-menu"><div class="boolrelwidget-arrow-l"><div class="boolrelwidget-arrow-up"></div></div></li><li class="boolrelwidget-menu">'+settings.expand_text+'</li><li class="boolrelwidget-menu"><div class="boolrelwidget-arrow-r"><div class="boolrelwidget-arrow-up"></div></div></li></ul><ul id="boolrelwidget-collapse" class="boolrelwidget-menu-container-panel"><li class="boolrelwidget-menu"><div class="boolrelwidget-arrow-l"><div class="boolrelwidget-arrow-down"></div></div></li><li class="boolrelwidget-menu">'+settings.collapse_text+'</li><li class="boolrelwidget-menu"><div class="boolrelwidget-arrow-r"><div class="boolrelwidget-arrow-down"></div></div></li></ul><div id="boolrelwidget-panel"><strong>Concepts</strong><div id="boolrelwidget-basicblocks" class="well well-small">Loading...</div><div class="clearfix"><div class="boolrelwidget-menu pull-left"><strong>Boolean Query</strong></div><div class="pull-right boolrelwidget-menu btn-group"><button id="boolrelwidget-collapseall" class="btn">Expand All</button><button class="btn" id="boolrelwidget-orall">Or All Concepts</button><button class="btn" id="boolrelwidget-andall">And All Concepts</button><button class="btn" id="boolrelwidget-clear">Reset</button></div></div><div id="boolrelwidget-query" class="well well-small">Loading...</div></div>');
         
         // Lets add the event handlersx
         $( '#boolrelwidget-expand' ).click(function() {
@@ -431,6 +469,29 @@ THE SOFTWARE.
             $('#boolrelwidget-collapse').toggle();
             $('#boolrelwidget-panel').toggle();
         });
+        
+        $( '#boolrelwidget-collapseall' ).click(function() {
+            if($(this).hasClass('boolrelwidget-all-expanded')){
+                
+                $('.boolrelwidget-expandable').fadeOut('fast');
+                $(this).text('Expand All');
+                $(this).removeClass('boolrelwidget-all-expanded');
+            } else {
+                
+                $('.boolrelwidget-expandable').fadeIn('fast').css('display','table-cell');
+                $(this).text('Collapse All');
+                $(this).addClass('boolrelwidget-all-expanded');
+            }
+        });
+        $( '#boolrelwidget-orall' ).click(function() {
+            funcs.opAll(BOOL['OR']);          
+        });   
+        $( '#boolrelwidget-andall' ).click(function() {
+            funcs.opAll(BOOL['AND']);
+        });
+        $( '#boolrelwidget-clear' ).click(function() {
+            funcs.reset();
+        }); 
         // Draw things up
         funcs.draw();
         

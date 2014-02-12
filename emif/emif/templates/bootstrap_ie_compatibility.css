@@ -22,9 +22,6 @@
 
 .lt-ie8 .boolrelwidget-query-box-outer,
 { 
-    behavior: url({{ STATIC_URL }}js/vendor/display-table.min.htc); 
-    float: left;
-    
 }
 
 .img-rounded{behavior:url({{ STATIC_URL }}js/vendor/PIE.htc)}
