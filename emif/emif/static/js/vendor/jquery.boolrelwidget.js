@@ -36,7 +36,7 @@ THE SOFTWARE.
             expand_text:'To define the relations between the terms click here.',
             collapse_text:'Click here to close this panel.'
         }, options);
-        
+        /*
         var bg1 = new BooleanGroup('teste de nome muito grande mesmo');
         var bg2 = new BooleanGroup('outro name ainda maior que o anterior, mas nao muito');
         var bg3 = new BooleanGroup('nome curto');
@@ -48,7 +48,7 @@ THE SOFTWARE.
         mastergroup.addBoolean(BOOL['AND'], bg3);
         
         basic_blocks.push(new BooleanGroup('outro nome grande, mas mesmo bue grande para ficar aqui para eu depois arranjar isto com ...'));
-        
+        */
         var funcs = {
             push: function (str) {
                 
