@@ -9,6 +9,7 @@
         var self = this;
         var basic_blocks = [];
         var used_blocks = [];
+        var expanded_containers = [];
         var mastergroup=null;
         // Default Options
         var settings = $.extend({
@@ -31,7 +32,7 @@
         var funcs = {
             push: function (str) {
                 
-                if(this.getIndex(str)!= -1){
+                if(this.getBooleanIndex(str)!= -1){
                     console.warn('Variable ' + str + ' already on basic blocks pool.');  
                     return null;
                 }
@@ -50,7 +51,7 @@
                     return false;
                 }
                 if(!((typeof obj.variables[0] == 'string' || obj.variables[0] instanceof String)
-                   && this.getIndex(obj.variables[0])== -1)){
+                   && this.getBooleanIndex(obj.variables[0])== -1)){
                     console.warn('Variable ' + obj + ' already on basic blocks pool.');  
                     return false;
                 }
@@ -64,7 +65,7 @@
             },
             splice: function (str) {
                 var block;
-                var id = this.getIndex(str)
+                var id = this.getBooleanIndex(str);
                 if(id < 0){
                     
                     // If it fails, lets check if its being used
@@ -89,8 +90,9 @@
                 
                 return block;
             },
-            // I define this manually because IE<=8 js lists doesnt have the method indexOF()
-            getIndex: function(element){
+            // ONLY ALLOWS SIMPLE BOOLEANS I define this manually because IE<=8 js lists doesnt have the method indexOF()
+            getBooleanIndex: function(element){
+
                 var i = 0;
                 for(i=0;i<basic_blocks.length;i++){
                     // We must check this is a "empty" container with only one element (the one we want).
@@ -99,6 +101,19 @@
                 }
                 return -1;
             },
+            // GENERIC I define this manually because IE<=8 js lists doesnt have the method indexOF()
+            getIndex: function(list, element){
+                // Ref from: http://stackoverflow.com/questions/1058427/how-to-detect-if-a-variable-is-an-array
+                if(!(Object.prototype.toString.call(list) === '[object Array]')){
+                    console.warn('Tried to pass a list which is not a list');
+                }
+                var i = 0;
+                for(i=0;i<list.length;i++){
+                    // We must check this is a "empty" container with only one element (the one we want).
+                    return i;
+                }
+                return -1;
+            },            
             getUsedIndex: function(element){
                 var i = 0;
                 for(i=0;i<used_blocks.length;i++){
@@ -239,15 +254,18 @@
                                 $(this).addClass('boolrelwidget-expanded');
                                 $(this).text('See nested relations');
                                 $("#"+$(this).parent().attr('id')+' > .boolrelwidget-expandable').fadeOut('fast');
-                                
+                                master.removeExpandedContainer($(this).parent().attr('id'));
                             } else {
                                 $(this).removeClass('boolrelwidget-expanded');
                                 $(this).addClass('boolrelwidget-collapsed');
                                 $(this).text('Hide this relation');
                                 $("#"+$(this).parent().attr('id')+' > .boolrelwidget-expandable').fadeIn('fast');
                                 $("#"+$(this).parent().attr('id')+' > .boolrelwidget-expandable').css("display","table-cell");
+                                master.addExpandedContainer($(this).parent().attr('id'));
                             }
                         }); 
+                    
+
                 } else {
                     var master = this;
                     mastergroup=null;
@@ -284,6 +302,9 @@
                         this.collapseAll(context);  
                     } 
                 }
+                
+                // Expand all already open if memorized
+                master.expandAllMemorized();
             },
             // This recursive functions runs down in the BooleanGroups and puts everything on the big box.
             // I pass a counter to be able to style differently (so i know the recursion level couldnt find a better way to style it different
@@ -473,6 +494,38 @@
                 $('#boolrelwidget-panel').toggle();
             
                 funcs.setCookie('boolrelwidget-panel-open','false');  
+            },
+            addExpandedContainer: function(container){
+                if(this.getIndex(expanded_containers, container) == -1){
+                    expanded_containers.push(container);
+                } else {
+                    console.log('-- Expanded container is already on the list');
+                }
+            },
+            removeExpandedContainer: function(container){
+                var index = this.getIndex(expanded_containers, container);
+                if( index != -1){
+                    expanded_containers.splice(index,1);
+                } else {
+                    console.log('-- Expanded container is not on the list');
+                }
+            },
+            expandAllMemorized: function(){
+                for(var j=0;j<expanded_containers.length;j++){
+                    // Lets check if this container really exists (it can be erased by inference)
+                    if(!this.containerExists(expanded_containers[j]))
+                        expanded_containers.splice(j,1);
+                    else{    
+                        $("#"+expanded_containers[j]+' > .boolrelwidget-expandable').fadeIn('fast');
+                        $("#"+expanded_containers[j]+' > .boolrelwidget-expandable').css("display","table-cell");
+                    }
+                }
+            },
+            containerExists: function(container_id){
+                if ($('#'+container_id).length)
+                    return true;
+                
+                return false;
             }
         };
 
@@ -732,6 +785,8 @@ BooleanGroup.prototype = {
     },
     containsOnly : function(str){
         if(this.variables.length>1)
+            return false;
+        if(this.variables[0] instanceof BooleanGroup)
             return false;
         
         if(this.variables[0] == str)
