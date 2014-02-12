@@ -32,6 +32,14 @@
         var funcs = {
             push: function (str) {
                 
+                var block = this.pushWithoutDraw(str);
+                
+                this.draw();
+                
+                return block;
+            },
+            pushWithoutDraw: function(str) {
+                
                 if(this.getBooleanIndex(str)!= -1){
                     console.warn('Variable ' + str + ' already on basic blocks pool.');  
                     return null;
@@ -40,8 +48,6 @@
                 var block = new BooleanGroup(str);
                 basic_blocks.push(block);
                 console.warn('Pushed new variable ' + str + ' to basic blocks pool.');
-
-                this.draw();
                 
                 return block;
             },
@@ -131,9 +137,7 @@
                 }
                 var block = basic_blocks.splice(id, 1)[0];
                 console.warn('Sliced out variable with id ' + number + ' from basic blocks pool.');
-                
-                this.draw();
-                
+                                
                 return block;
             },
             // I define this manually because IE<=8 js lists doesnt have the method indexOF()
@@ -147,7 +151,10 @@
                 return -1;
             },
             draw: function(){
+                //$('#boolrelwidget-basicblocks').html('');
+                //$('#boolrelwidget-query').html('');
                 // Drawing concepts
+                
                 var little_boxes = [];
 
                 var i=0;
@@ -191,7 +198,6 @@
                     $('#boolrelwidget-query').html(big_box.join(''));
                     
                     var master = this;
-                    
                     $( ".boolrelwidget-query-dropper" ).droppable({
                       drop: function( event, ui ) {
                         var droper = Number(ui.draggable.attr('id').replace('boolrelwidget-bb-',''));
@@ -206,9 +212,7 @@
                         if(!mastergroup.addById(dropee, sliced)){
                             master.pushBooleanGroup(sliced);
                         }       
-                          
-                        master.draw(); 
-
+                          master.draw();
                       }
                     });
                         // Add 
@@ -284,8 +288,8 @@
                         
                         // Put in used blocks
                         used_blocks.push(sliced);
-
-                        master.draw();  
+                          
+                        master.draw();
                       }
                     });  
                 }
