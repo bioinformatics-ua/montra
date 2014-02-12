@@ -68,7 +68,8 @@ function valchanged(qnum, value) {
             bool_container.push(clean.replace('_','. ')+' ('+the_question+')');
         } else if(value==false){
             bool_container.splice(clean.replace('_','. ')+' ('+the_question+')');
-        }
+        } else {
+            bool_container.push(clean.replace('_','')+'. '+the_question+'');        }
     }    
 
     qvalues[qnum] = value;
