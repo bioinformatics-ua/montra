@@ -14,7 +14,8 @@
         // Default Options
         var settings = $.extend({
             expand_text:'To define the relations between the terms click here.',
-            collapse_text:'Click here to close this panel.'
+            collapse_text:'Click here to close this panel.',
+            form_anchor: null
         }, options);
         /*
         var bg1 = new BooleanGroup('teste de nome muito grande mesmo');
@@ -557,7 +558,17 @@
         self = self.html('');
         
         // Now lets add the toolbar
-        self = self.append('<ul id="boolrelwidget-expand" class="boolrelwidget-menu-container"><li class="boolrelwidget-menu"><div class="boolrelwidget-arrow-l"><div class="boolrelwidget-arrow-up"></div></div></li><li class="boolrelwidget-menu">'+settings.expand_text+'</li><li class="boolrelwidget-menu"><div class="boolrelwidget-arrow-r"><div class="boolrelwidget-arrow-up"></div></div></li></ul><ul id="boolrelwidget-collapse" class="boolrelwidget-menu-container-panel"><li class="boolrelwidget-menu"><div class="boolrelwidget-arrow-l"><div class="boolrelwidget-arrow-down"></div></div></li><li class="boolrelwidget-menu">'+settings.collapse_text+'</li><li class="boolrelwidget-menu"><div class="boolrelwidget-arrow-r"><div class="boolrelwidget-arrow-down"></div></div></li></ul><div id="boolrelwidget-panel"><strong>Concepts</strong><div id="boolrelwidget-basicblocks" class="well well-small">Loading...</div><div class="clearfix"><div class="boolrelwidget-menu pull-left"><strong>Boolean Query</strong></div><div class="pull-right boolrelwidget-menu btn-group"><button id="boolrelwidget-collapseall" class="btn">Expand All</button><button class="btn" id="boolrelwidget-orall">Or All Concepts</button><button class="btn" id="boolrelwidget-andall">And All Concepts</button><button class="btn" id="boolrelwidget-clear">Reset</button></div></div><div id="boolrelwidget-query" class="well well-small">Loading...</div></div>');
+        var toolbar_content = '<ul id="boolrelwidget-expand" class="boolrelwidget-menu-container"><li class="boolrelwidget-menu"><div class="boolrelwidget-arrow-l"><div class="boolrelwidget-arrow-up"></div></div></li><li class="boolrelwidget-menu">'+settings.expand_text+'</li><li class="boolrelwidget-menu"><div class="boolrelwidget-arrow-r"><div class="boolrelwidget-arrow-up"></div></div></li></ul><ul id="boolrelwidget-collapse" class="boolrelwidget-menu-container-panel"><li class="boolrelwidget-menu"><div class="boolrelwidget-arrow-l"><div class="boolrelwidget-arrow-down"></div></div></li><li class="boolrelwidget-menu">'+settings.collapse_text+'</li><li class="boolrelwidget-menu"><div class="boolrelwidget-arrow-r"><div class="boolrelwidget-arrow-down"></div></div></li></ul><div id="boolrelwidget-panel"><strong>Concepts</strong><div id="boolrelwidget-basicblocks" class="well well-small">Loading...</div><div class="clearfix"><div class="boolrelwidget-menu pull-left"><strong>Boolean Query</strong></div><div class="pull-right boolrelwidget-menu btn-group">';
+        
+        if( settings.form_anchor ){
+            toolbar_content+='<button id="boolrelwidget-search" class="btn">Search</button>';
+            
+            // Also add the hidden input to the form
+            $(settings.form_anchor).append('<input type="hidden" id="boolrelwidget-boolean-representation" name="boolrelwidget-boolean-representation" value="" />');
+        }
+        
+        toolbar_content+='<button id="boolrelwidget-collapseall" class="btn">Expand All</button><button class="btn" id="boolrelwidget-orall">Or All Concepts</button><button class="btn" id="boolrelwidget-andall">And All Concepts</button><button class="btn" id="boolrelwidget-clear">Reset</button></div></div><div id="boolrelwidget-query" class="well well-small">Loading...</div></div>';
+        self = self.append(toolbar_content);
         
         // Lets add the event handlersx
         $( '#boolrelwidget-expand' ).click(function() {
@@ -570,7 +581,14 @@
         if(funcs.getCookie('boolrelwidget-panel-open') == 'true'){
             funcs.expandPanel();
         }
-        
+        $( '#boolrelwidget-search' ).click(function() {
+            if(mastergroup != null)
+                $('boolrelwidget-boolean-representation').val(mastergroup.toString());
+            else
+                $('boolrelwidget-boolean-representation').val('');
+            
+            $(settings.form_anchor).submit();
+        });
         $( '#boolrelwidget-collapseall' ).click(function() {
             funcs.collapseAll(this);
         });
