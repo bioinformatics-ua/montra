@@ -21,12 +21,7 @@ from views import *
 from documents import * 
 
 urlpatterns = patterns('',
-    url(r'^$',
-            population, name='population'),
-    url(r'^$',
-            population, name='population'),
-    url(r'^testpc$',
-            test_pc, name='test_pc'),
+    
 
 
     url(r'^upload$', 'population_characteristics.documents.document_form_view_upload'),

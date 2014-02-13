@@ -62,32 +62,3 @@ def upload_jerboa_request(request, template_name='uploadjerboa.html'):
     """
     pass
 
-
-#################### This is just trash that I'm keeping while coding
-### I just need to finish this shit, and then I'll remove this code 
-### If the population characteristics is running, please remove this 
-### shit function: population(request, template_name='piechart.html'):
-
-def test_pc(request, template_name='population_characteristics.html'):
-
-    return render(request,template_name, {'request': request,})    
-
-def population(request, template_name='piechart.html'):
-
-    xdata = ["Apple", "Apricot", "Avocado", "Banana", "Boysenberries", "Blueberries", "Dates", "Grapefruit", "Kiwi", "Lemon"]
-    ydata = [52, 48, 160, 94, 75, 71, 490, 82, 46, 17]
-    chartdata = {'x': xdata, 'y': ydata}
-    charttype = "pieChart"
-    chartcontainer = 'piechart_container'
-    data = {
-        'charttype': charttype,
-        'chartdata': chartdata,
-        'chartcontainer': chartcontainer,
-        'extra': {
-            'x_is_date': False,
-            'x_axis_format': '',
-            'tag_script_js': False,
-            'jquery_on_ready': False,
-        }
-    }
-    return render_to_response('charts.html', data)    

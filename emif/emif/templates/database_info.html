@@ -63,9 +63,11 @@
                 <li>
                     <a href="#documents" data-toggle="tab">Documents</a>
                 </li>
+                <!--
                 <li>
                     <a href="#literature" data-toggle="tab">Literature</a>
-                    </li>
+                </li>
+                -->
                 
                 <li>
                     <a href="#apiinfo" data-toggle="tab">Extra Information</a>
@@ -246,7 +248,9 @@
                     </div>
 
                   {% else %}
-                    <p class="nodocs">There is no documents for this fingerprint.</p>
+                    <div class="docs_not_available"> 
+                        <p class="nodocs">There is no documents for this fingerprint.</p>
+                    </div>
                     <p class="nodocs">You can upload documents to associate them to the fingerprint browser</p>
 
                     {% block documentsformupload %} 
@@ -301,7 +305,6 @@
                         <div id="chart" class="span4" style="display:none;"></div>
 
                         <div  class='span9' id="pivot_table_extra_information">
-
 
                         </div>
 
