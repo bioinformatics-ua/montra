@@ -15,7 +15,10 @@
         var settings = $.extend({
             expand_text:'To define the relations between the terms click here.',
             collapse_text:'Click here to close this panel.',
-            form_anchor: null
+            form_anchor: null,
+            auto_add: true, 
+            default_relation: BOOL['AND'],
+            hide_concepts: true
         }, options);
         /*
         var bg1 = new BooleanGroup('teste de nome muito grande mesmo');
@@ -34,18 +37,30 @@
             push: function (str) {
                 
                 var block = this.pushWithoutDraw(str);
-                
+                /* Only auto-add in case auto-add is on */
+
+                if(settings.auto_add && block != 'null'){
+                    var sliced = this.spliceById(block.id);
+                    
+                    used_blocks.push(sliced);
+                    
+                    if(mastergroup==null)
+                        mastergroup= new BooleanGroup(sliced);
+                    else mastergroup.addById(mastergroup.id, sliced, settings.default_relation);
+                }
                 this.draw();
                 
                 return block;
             },
-            pushWithoutDraw: function(str) {
-                
-                if(this.getBooleanIndex(str)!= -1){
-                    console.warn('Variable ' + str + ' already on basic blocks pool.');  
-                    return null;
-                }
-                
+            pushWithoutDraw: function(str) {      
+            if(this.getBooleanIndex(str)!= -1){
+                console.warn('Variable ' + str + ' already on basic blocks pool.');  
+                return null;
+            }
+            if(this.getUsedIndex(str)!= -1){
+                console.warn('Variable ' + str + ' already on used basic blocks pool.');  
+                return null;
+            }
                 var block = new BooleanGroup(str);
                 basic_blocks.push(block);
                 console.warn('Pushed new variable ' + str + ' to basic blocks pool.');
@@ -156,6 +171,8 @@
                 //$('#boolrelwidget-query').html('');
                 // Drawing concepts
                 
+                
+                if(!settings.hide_concepts){
                 var little_boxes = [];
 
                 var i=0;
@@ -164,14 +181,12 @@
                     little_boxes.push('<span id="boolrelwidget-bb-');
                     little_boxes.push(basic_blocks[i].id);
                     little_boxes.push('" class="btn boolrelwidget-block-inner">');
-                    if(basic_blocks[i].variables[0].length > 10){
-                        little_boxes.push('<div class="boolrelwidget-simple" data-toggle="tooltip" title="'+
-                                     basic_blocks[i].variables[0]+'">');
-                    }
+                    little_boxes.push('<div class="boolrelwidget-simple" data-toggle="tooltip" title="');
                     little_boxes.push(basic_blocks[i].variables[0]);
-                    if(basic_blocks[i].variables[0].length > 10){
-                        little_boxes.push('</div>');
-                    }
+                    little_boxes.push('">');
+                    
+                    little_boxes.push(basic_blocks[i].variables[0]);
+                    little_boxes.push('</div>');
                     little_boxes.push('</span>');
                     //little_boxes.push('<span class="btn btn-danger boolrelwidget-delete">');
                     //little_boxes.push('X');
@@ -192,6 +207,10 @@
                                                           }); 
                 }                
                 
+            } else {
+                $('#boolrelwidget-basicblocks-out').fadeOut('fast');
+            }
+                
                 // Drawing query itself(if any already)                
                 if(mastergroup && mastergroup.variables.length>0){
                     var big_box = [];
@@ -203,23 +222,46 @@
                     var master = this;
                     $( ".boolrelwidget-query-dropper" ).droppable({
                       drop: function( event, ui ) {
-                        var droper = Number(ui.draggable.attr('id').replace('boolrelwidget-bb-',''));
-                        var dropee = Number($(this).attr('id').replace('boolrelwidget-dp-',''));
-                        console.log("Event drop 1: "+droper+" on "+dropee);
-                        
-                        var sliced = master.spliceById(droper);
+                        var drag = ui.draggable.attr('id');
+                          // If coming from basic blocks
+                        if(typeof drag != 'undefined' && drag.lastIndexOf('boolrelwidget-bb-', 0) === 0){
+                            var droper = Number(ui.draggable.attr('id').replace('boolrelwidget-bb-',''));
+                            var dropee = Number($(this).attr('id').replace('boolrelwidget-dp-',''));
+                            console.log("Event drop 1: "+droper+" on "+dropee);
                             
-                          used_blocks.push(sliced);
-                        // Try to add this to the master group
-                        // If we cant, we insert the basic block back into the basic_blocks list
-                        if(!mastergroup.addById(dropee, sliced)){
-                            master.pushBooleanGroup(sliced);
-                        }       
+                            var sliced = master.spliceById(droper);
+                                
+                              used_blocks.push(sliced);
+                            // Try to add this to the master group
+                            // If we cant, we insert the basic block back into the basic_blocks list
+                            if(!mastergroup.addById(dropee, sliced, settings.default_relation)){
+                                master.pushBooleanGroup(sliced);
+                            }       
+                        } 
+                          // If comming from the query itself
+                        else {
+                            var droper = Number(ui.draggable.attr('id').replace('boolrelwidget-ii-',''));
+                            var dropee = Number($(this).attr('id').replace('boolrelwidget-dp-',''));
+                            console.log("Event drop 1: "+droper+" on "+dropee);
+                            
+                            // Makes no sense to move self to self
+                            if(droper != dropee){
+                                var sliced = mastergroup.removeById(droper);
+                            
+                                mastergroup.addById(dropee, sliced, settings.default_relation);
+                                
+                            }
+                        }
                         $(".tooltip").remove();
                           
                           master.draw();
+                            
                       }
                     });
+                    $(".boolrelwidget-query-box > .boolrelwidget-simple").parent().draggable({containment: "#boolrelwidget-panel", 
+                                                               revert: true, opacity: 0.9, /*helper: "clone",*/ cursor: "move", cursorAt: { top: 10, left: 50 }
+                                                              }); 
+                                         
                         // Add 
                         $(".boolrelwidget-query-delete").click(function(){
                             var removed = Number($(this).attr('id').replace('boolrelwidget-dl-',''));
@@ -228,7 +270,8 @@
                             var contained = removed_bool.extractAllSimple();
                             
                             for(var j=0;j<contained.length;j++){
-                                master.pushBooleanGroup(contained[j]);
+                                if(!settings.hide_concepts)
+                                    master.pushBooleanGroup(contained[j]);
                                 
                                 var other_id = master.getUsedIndex(contained[j].variables[0]);
                                 if(other_id >0){
@@ -321,14 +364,11 @@
             // I pass a counter to be able to style differently (so i know the recursion level couldnt find a better way to style it different
             harvest: function(something, big_box, counter){
                 if(typeof something == 'string' || something instanceof String){
-                    if(something.length > 10){
                         big_box.push('<div class="boolrelwidget-simple" data-toggle="tooltip" title="'+
                                      something+'">');
-                    }
+                    
                     big_box.push(something);
-                    if(something.length > 10){
-                        big_box.push('</div>');
-                    }
+                    big_box.push('</div>');
                 }
                 else if(something instanceof BooleanGroup){
                     var k = 0;
@@ -346,6 +386,8 @@
                         big_box.push('<div class="btn boolrelwidget-odd boolrelwidget-query-box');
                         if( counter >0 && !something.isSimple())
                             big_box.push(' boolrelwidget-expandable');
+                        big_box.push('" id="boolrelwidget-ii-');
+                        big_box.push(something.id);
                         big_box.push('">');
                     } else {
                         if(!something.isSimple() && counter >0){
@@ -356,6 +398,8 @@
                         big_box.push('<div class="btn btn-inverse boolrelwidget-even boolrelwidget-query-box');
                         if( counter >0 && !something.isSimple())
                             big_box.push(' boolrelwidget-expandable');
+                        big_box.push('" id="boolrelwidget-ii-');
+                        big_box.push(something.id);
                         big_box.push('">');
                     }
                     this.harvest(something.variables[k++], big_box, counter+1);
@@ -553,7 +597,7 @@
         self = self.html('');
         
         // Now lets add the toolbar
-        var toolbar_content = '<ul id="boolrelwidget-expand" class="boolrelwidget-menu-container"><li class="boolrelwidget-menu"><div class="boolrelwidget-arrow-l"><div class="boolrelwidget-arrow-up"></div></div></li><li class="boolrelwidget-menu">'+settings.expand_text+'</li><li class="boolrelwidget-menu"><div class="boolrelwidget-arrow-r"><div class="boolrelwidget-arrow-up"></div></div></li></ul><ul id="boolrelwidget-collapse" class="boolrelwidget-menu-container-panel"><li class="boolrelwidget-menu"><div class="boolrelwidget-arrow-l"><div class="boolrelwidget-arrow-down"></div></div></li><li class="boolrelwidget-menu">'+settings.collapse_text+'</li><li class="boolrelwidget-menu"><div class="boolrelwidget-arrow-r"><div class="boolrelwidget-arrow-down"></div></div></li></ul><div id="boolrelwidget-panel"><strong>Concepts</strong><div id="boolrelwidget-basicblocks" class="well well-small">Loading...</div><div class="clearfix"><div class="boolrelwidget-menu pull-left"><strong>Boolean Query</strong></div><div class="pull-right boolrelwidget-menu btn-group">';
+        var toolbar_content = '<ul id="boolrelwidget-expand" class="boolrelwidget-menu-container"><li class="boolrelwidget-menu"><div class="boolrelwidget-arrow-l"><div class="boolrelwidget-arrow-up"></div></div></li><li class="boolrelwidget-menu">'+settings.expand_text+'</li><li class="boolrelwidget-menu"><div class="boolrelwidget-arrow-r"><div class="boolrelwidget-arrow-up"></div></div></li></ul><ul id="boolrelwidget-collapse" class="boolrelwidget-menu-container-panel"><li class="boolrelwidget-menu"><div class="boolrelwidget-arrow-l"><div class="boolrelwidget-arrow-down"></div></div></li><li class="boolrelwidget-menu">'+settings.collapse_text+'</li><li class="boolrelwidget-menu"><div class="boolrelwidget-arrow-r"><div class="boolrelwidget-arrow-down"></div></div></li></ul><div id="boolrelwidget-panel"><div id="boolrelwidget-basicblocks-out"><strong>Concepts</strong><div id="boolrelwidget-basicblocks" class="well well-small">Loading...</div></div><div class="clearfix"><div class="boolrelwidget-menu pull-left"><strong>Boolean Query</strong></div><div class="pull-right boolrelwidget-menu btn-group">';
         
         if( settings.form_anchor ){
             toolbar_content+='<button id="boolrelwidget-search" class="btn">Search</button>';
@@ -578,9 +622,9 @@
         }
         $( '#boolrelwidget-search' ).click(function() {
             if(mastergroup != null)
-                $('boolrelwidget-boolean-representation').val(mastergroup.toString());
+                $('#boolrelwidget-boolean-representation').val('x'+mastergroup.toString());
             else
-                $('boolrelwidget-boolean-representation').val('');
+                $('#boolrelwidget-boolean-representation').val('');
             
             $(settings.form_anchor).submit();
         });
@@ -593,6 +637,9 @@
         $( '#boolrelwidget-andall' ).click(function() {
             funcs.opAll(BOOL['AND']);
         });
+        if(settings.hide_concepts){
+          $( '#boolrelwidget-clear' ).fadeOut('fast');  
+        }
         $( '#boolrelwidget-clear' ).click(function() {
             funcs.reset();
         }); 
@@ -748,13 +795,17 @@ BooleanGroup.prototype = {
         }     
         
     },
-    addById : function(parent_id, child){
+    addById : function(parent_id, child, relation){
         if(!(child instanceof BooleanGroup)){
             console.warn('When adding, a valid BooleanGroup child must be found.');
+        } else if(!isBool(relation)){
+            console.warn('The relation must be a valid BOOL enum.');
+            
         }
-        return this.addByIdAux(parent_id, child); 
+        
+        return this.addByIdAux(parent_id, child, relation); 
     },    
-    addByIdAux : function(parent_id, child) {
+    addByIdAux : function(parent_id, child, relation) {
         if(typeof parent_id != 'number'){
             console.warn('When adding by id, a number value must be specified. Found type ' + typeof parent_id);
         }
@@ -762,22 +813,18 @@ BooleanGroup.prototype = {
             if(this.id == parent_id){
                 if(this.isSimple()){
                     this.variables[0]=new BooleanGroup(this.variables[0]);
-                    //Add reference
-                    this.relations.push(BOOL['OR']);
-                    this.variables.push(child);
                 }
-                else {
-                    //Add reference
-                    this.relations.push(BOOL['OR']);
-                    this.variables.push(child);
-                }
+                //Add reference
+                this.relations.push(relation);
+                this.variables.push(child);
+
                 return true;
             }
             var returnable=false;
             var k = 0;
             for(k=0;k<this.variables.length;k++){
                 if(this.variables[k] instanceof BooleanGroup){
-                    returnable = this.variables[k].addByIdAux(parent_id, child);
+                    returnable = this.variables[k].addByIdAux(parent_id, child, relation);
                 }
             }
             return returnable;

@@ -277,7 +277,26 @@ def convert_qvalues_to_query(qvalues, questionnaire_id):
     
     return convert_dict_to_query(query_parameters)
 
+def convert_qvalues_to_query(qvalues, questionnaire_id, qexpression):
+    questionsets = QuestionSet.objects.filter(questionnaire=questionnaire_id)
+    
+    questions = Question.objects.filter(questionset__in=questionsets)
+    
+    numbers = {}
 
+    for q in questions:
+        numbers[q.number] = q.slug
+    query_parameters = {}
+    query = ""  
+    for k in qvalues:
+        try:
+            if (qvalues[k]!=None and qvalues[k]!="" ):
+                query_parameters[numbers[k]] = qvalues[k]
+            query = query + " " + qvalues[k]
+        except:
+            pass
+    
+    return convert_dict_to_query(query_parameters)
 
 
 

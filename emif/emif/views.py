@@ -1971,6 +1971,8 @@ def show_fingerprint_page_read_only(request, q_id, qs_id, SouMesmoReadOnly=False
         cssinclude = []     # css files to include
         jstriggers = []
         qvalues = {}
+        qexpression = None  # boolean expression
+        
         if not request.POST:
             
             if 'query' in request.session:
@@ -1999,7 +2001,10 @@ def show_fingerprint_page_read_only(request, q_id, qs_id, SouMesmoReadOnly=False
                         else:
                             qvalues[s[1]] = v
                             #print qvalues
-            query = convert_qvalues_to_query(qvalues, q_id)
+                elif k == "boolrelwidget-boolean-representation":            
+                    qexpression = v[1:-1]
+                        
+            query = convert_qvalues_to_query(qvalues, q_id, qexpression)
             print "Query: " + query
             request.session['query'] = query
             return results_fulltext_aux(request, query)
