@@ -29,14 +29,11 @@ function GraphicChartD3(divArg, dataArg)
                  ];
     objects.values.forEach(function(row){
       
-      if (i<30){
-          console.log(row.Min);
-          console.log(row.Value1);  
-          dataset[0].push({'xvalue':row.Value1, 'yvalue':parseInt(row.Min)});
-      }
-
-      i++;
-
+      
+      console.log(row.Min);
+      console.log(row.Value1);  
+      dataset[0].push({'xvalue':row.Value1, 'yvalue':parseInt(row.Min)});
+  
     });
     
     console.log("Final dataset is: "  );
@@ -77,7 +74,7 @@ function GraphicChartD3(divArg, dataArg)
         console.log(data);
         
 
-        x.domain(data.map(function(d) { return d.xvalue; }));
+        x.domain(data.map(function(d) { if (d.xvalue%10==0 ) return d.xvalue; else return ''}));
         y.domain([0, d3.max(data, function(d) { return d.yvalue; })]);
 
         svg.append("g")

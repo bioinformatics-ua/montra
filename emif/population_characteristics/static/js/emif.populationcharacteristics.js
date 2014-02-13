@@ -299,6 +299,7 @@ function PCAPI ()
                         'Count', 'abcd');
                       console.log('valuesFromGraph: '+valuesFromGraph);
                       console.log(valuesFromGraph);
+                      $("#d3test").html('');
                       $("#d3test").graphicChart('init');
                       $("#d3test").graphicChart('drawBarChart', valuesFromGraph,valuesFromGraph,valuesFromGraph);
 

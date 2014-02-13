@@ -41,14 +41,14 @@ class ConfCharts(object):
         c.x_axis.var = "Name1"
         c.y_axis = Axis()
         c.y_axis.operation = "unique"
-        c.y_axis.var = "Count"
+        c.y_axis.var = "Min"
         f1 = Filter()
         f1.name = 'Year'
         f1.var = 'Name1'
 
         f1 = Filter()
-        f1.name = 'Age'
-        f1.var = 'Name2'
+        f1.name = 'Gender'
+        f1.var = 'Gender'
 
         c.filters = [f1]
 
@@ -179,6 +179,7 @@ class ConfCharts(object):
         sc = SetCharst()
 
         sc.charts = [c,c1, c2, c3, c4, c5, c6, c7, c8, c9]
+        sc.charts = [c,c1]
 
         return sc
 

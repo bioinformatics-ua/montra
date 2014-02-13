@@ -22,6 +22,9 @@
 
         },
         drawBarChart : function( options, _div, _data ) {
+            
+
+
             console.log('who is this: ' + this);
             console.log('who is this: ' + self);
             console.log(div);
