@@ -54,13 +54,6 @@ $(document).ready(function () {
 /***************** BEGIN - CHECK IF ANSWER IS FILLED IN *****************/
 /* Function to validate for fields of type 1 (see comments below)*/
 function validate1(element, id_answered) {
-    // console.log("VAL: " + $(element).val());
-    if($(element).val() != "") {
-            //console.log('1 - #answered_'+id_answered);
-            $('[id="answered_'+id_answered+'"]').show();
-        
-            if (!(typeof bool_container === 'undefined')) {
-                
                 /* Tip from: http://viralpatel.net/blogs/jquery-get-text-element-without-child-element/ */
             var just_question = $('#question_'+id_answered)
         .clone()    //clone the element
@@ -68,6 +61,12 @@ function validate1(element, id_answered) {
         .remove()   //remove all the children
         .end()  //again go back to selected element
         .text().trim();    //get the text of element
+    
+    if($(element).val() != "") {
+            //console.log('1 - #answered_'+id_answered);
+            $('[id="answered_'+id_answered+'"]').show();
+        
+            if (!(typeof bool_container === 'undefined')) {
                 
                 bool_container.push($('#question_nr_'+id_answered).text().trim()+" "+just_question);
             }

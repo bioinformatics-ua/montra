@@ -262,14 +262,20 @@ box-shadow: inset 0 3px 8px rgba(0,0,0,0.125);
 .supported {
     display: block;
 }
-/* Block access to browsers with ns class */
+/* Block access to browsers with ns class 
 .ns .not-supported{
     display: block !important;
 }
 .ns .supported {
     display: none !important;
 }
-
+*/
+.not-supported{
+    display: none !important;
+}
+.supported {
+    display: block !important;
+}
 .navbar .nav>li>a{
     /* Overriding default bootstrap behaviour*/
     padding: 10px 10px 10px !important;

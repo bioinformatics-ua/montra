@@ -188,14 +188,7 @@
                     
                     // Clone makes ie7 crash and burn
                 $(".boolrelwidget-block-inner").draggable({containment: "#boolrelwidget-panel", 
-                                                           revert: true, opacity: 0.9, /*helper: "clone",*/ cursor: "move", cursorAt: { top: 10, left: 50 },
-                    start: function(){
-                        $(".boolrelwidget-simple").tooltip('destroy');
-                    }, drag: function(){
-                        $(".boolrelwidget-simple").tooltip('destroy');
-                    }, stop: function(){
-                        $(".boolrelwidget-simple").tooltip('destroy');
-                    }
+                                                           revert: true, opacity: 0.9, /*helper: "clone",*/ cursor: "move", cursorAt: { top: 10, left: 50 }
                                                           }); 
                 }                
                 
@@ -222,6 +215,8 @@
                         if(!mastergroup.addById(dropee, sliced)){
                             master.pushBooleanGroup(sliced);
                         }       
+                        $(".tooltip").remove();
+                          
                           master.draw();
                       }
                     });
@@ -266,13 +261,13 @@
                             if($(this).hasClass("boolrelwidget-collapsed")){
                                 $(this).removeClass('boolrelwidget-collapsed');
                                 $(this).addClass('boolrelwidget-expanded');
-                                $(this).text('See nested relations');
+                                $(this).html('<i class="icon-zoom-in"></i>Expand');
                                 $("#"+$(this).parent().attr('id')+' > .boolrelwidget-expandable').fadeOut('fast');
                                 master.removeExpandedContainer($(this).parent().attr('id'));
                             } else {
                                 $(this).removeClass('boolrelwidget-expanded');
                                 $(this).addClass('boolrelwidget-collapsed');
-                                $(this).text('Hide this relation');
+                                $(this).html('<i class="icon-zoom-out"></i> Collapse');
                                 $("#"+$(this).parent().attr('id')+' > .boolrelwidget-expandable').fadeIn('fast');
                                 $("#"+$(this).parent().attr('id')+' > .boolrelwidget-expandable').css("display","table-cell");
                                 master.addExpandedContainer($(this).parent().attr('id'));
@@ -298,8 +293,8 @@
                         mastergroup = new BooleanGroup(sliced);
                         
                         // Put in used blocks
-                        used_blocks.push(sliced);
-                          
+                        $(".tooltip").fadeOut('fast');
+   
                         master.draw();
                         
                       }
@@ -346,7 +341,7 @@
                         if(!something.isSimple() && counter >0){
                             big_box.push('<div class="btn boolrelwidget-collapser boolrelwidget-collapsed" id="boolrelwidget-cl-');
                             big_box.push(something.id);
-                            big_box.push('">See nested relations</div>');
+                            big_box.push('"><i class="icon-zoom-in"></i> Expand</div>');
                         }
                         big_box.push('<div class="btn boolrelwidget-odd boolrelwidget-query-box');
                         if( counter >0 && !something.isSimple())
@@ -356,7 +351,7 @@
                         if(!something.isSimple() && counter >0){
                             big_box.push('<div class="btn btn-inverse boolrelwidget-collapser" id="boolrelwidget-cl-');
                             big_box.push(something.id);
-                            big_box.push('">See nested relations</div>');
+                            big_box.push('"><i class="icon-zoom-in"></i> Expand</div>');
                         }
                         big_box.push('<div class="btn btn-inverse boolrelwidget-even boolrelwidget-query-box');
                         if( counter >0 && !something.isSimple())
@@ -481,7 +476,7 @@
                 if($(context).hasClass('boolrelwidget-all-expanded')){
                 
                     $('.boolrelwidget-expandable').fadeOut('fast');
-                    $("#"+$('.boolrelwidget-expandable').parent().attr('id')+' > .boolrelwidget-collapser').text('See nested relations');
+                    $("#"+$('.boolrelwidget-expandable').parent().attr('id')+' > .boolrelwidget-collapser').html('<i class="icon-zoom-in"></i> Expand');
 
                     $(context).text('Expand All');
                     $(context).removeClass('boolrelwidget-all-expanded');
@@ -490,7 +485,7 @@
                 } else {
                     
                     $('.boolrelwidget-expandable').fadeIn('fast').css('display','table-cell');
-                    $("#"+$('.boolrelwidget-expandable').parent().attr('id')+' > .boolrelwidget-collapser').text('Hide this relation');
+                    $("#"+$('.boolrelwidget-expandable').parent().attr('id')+' > .boolrelwidget-collapser').html('<i class="icon-zoom-out"></i> Collapse');
                     $(context).text('Collapse All');
                     $(context).addClass('boolrelwidget-all-expanded');
                     
