@@ -110,9 +110,9 @@ Fingerprint_Validator.prototype ={
         });
     },
     validate : function (clas, questionNumber, controllerDOM){
-        var validator = this.validators[clas].v;
+        var validator = this.validators[clas];
         if(validator != undefined){
-            validator.validate(questionNumber, controllerDOM);
+            validator.v.validate(questionNumber, controllerDOM);
         }
     },
     draw_validator: function(validator, validated, feedback_message){
