@@ -184,7 +184,7 @@ I could use images from bootstrap or my own, but for standalone is better withou
 .boolrelwidget-query-box, .boolrelwidget-query-dropper{
     display: table-cell;
     -dt-display: table-cell;
-   /* border-left:0.1em solid #999999;
+    /* border-left:0.1em solid #999999;
     border-bottom:0.1em solid #999999;
     border-top:0.1em solid #999999;    
     

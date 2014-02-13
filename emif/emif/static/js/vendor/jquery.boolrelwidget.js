@@ -258,9 +258,13 @@
                             
                       }
                     });
-                    $(".boolrelwidget-query-box > .boolrelwidget-simple").parent().draggable({containment: "#boolrelwidget-panel", 
-                                                               revert: true, opacity: 0.9, /*helper: "clone",*/ cursor: "move", cursorAt: { top: 10, left: 50 }
-                                                              }); 
+                    /* Firefox has a problem with the container if its not cloned ... */
+                    if(navigator.userAgent.indexOf("Firefox")!=-1){
+                        $(".boolrelwidget-query-box > .boolrelwidget-simple").parent().draggable({containment: "#boolrelwidget-panel",revert: true, opacity: 0.9, cursor: "move", cursorAt: { top: 10, left: 50 }, helper: 'clone'}); 
+                    }else {
+                        $(".boolrelwidget-query-box > .boolrelwidget-simple").parent().draggable({containment: "#boolrelwidget-panel",revert: true, opacity: 0.9, cursor: "move", cursorAt: { top: 10, left: 50 } }); 
+                    }
+                    
                                          
                         // Add 
                         $(".boolrelwidget-query-delete").click(function(){
