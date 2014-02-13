@@ -917,7 +917,7 @@ def database_edit(request, fingerprint_id, questionnaire_id, template_name="data
     try:
         fingerprint_name = r['database_name_t']
     except:
-        fingerprint_name = 'unnamed'
+        fingerprint_name = 'unnamed'        
 
     extra = {} 
     # Render page first time.
@@ -977,7 +977,6 @@ def database_edit(request, fingerprint_id, questionnaire_id, template_name="data
         # Index on Solr
         try:
             if not hasErrors:
-                print "FOOOOOOOOOOOOOOO"
                 add_city(qlist_general)
                 index_answeres_from_qvalues(qlist_general, question_set.questionnaire, users_db,
                                         fingerprint_id, extra_fields=extra_fields, created_date=created_date)
@@ -1794,126 +1793,34 @@ def check_database_add_conditions(request, questionnaire_id, sortid,
             if qs.sortid == int(sortid):
                 question_set = qs.pk
                 break
+    if (int(sortid) == 99):
+            sortid = len(qs_list) - 1
+    
+    question_set2 = qsobjs[int(sortid)]
 
     fingerprint_id = request.POST['fingerprint_id']
-    
-    return show_fingerprint_page_errors(request, questionnaire_id, question_set,
-                                        errors={}, template_name='database_add.html', next=True, sortid=sortid,
-                                        fingerprint_id=fingerprint_id, users_db=users_db, created_date=created_date)
 
+    request2 = RequestMonkeyPatch()
+    print question_set
+    if request.POST:
+        (qlist_general, qlist, jstriggers, qvalues, jsinclude, cssinclude, extra_fields, hasErrors) = extract_answers(request, questionnaire_id, question_set2, qsobjs)
+    else:
+        (qlist_general, qlist, jstriggers, qvalues, jsinclude, cssinclude, extra_fields, hasErrors) = extract_answers(request2, questionnaire_id, question_set2, qsobjs)
 
-def show_fingerprint_page_errors(request, q_id, qs_id, errors={}, template_name='database_add.html',
-                                 next=False, sortid=0, fingerprint_id=None, users_db=None, created_date=None):
-    """
-    Return the QuestionSet template
+    if fingerprint_id != None:
+        if users_db==None:
+            users_db = request.user.username
 
-    Also add the javascript dependency code.
-    """
-    try:
-
-        qs_list = QuestionSet.objects.filter(questionnaire=q_id).order_by('sortid')
-        
-        initial_sort = sortid
-
-        if (int(sortid) == 99):
-            sortid = len(qs_list) - 1
-        question_set = qs_list[int(sortid)]
-        
-        questions = question_set.questions()
-        
-        questions_list = {}
-        for qset_aux in qs_list:
-            questions_list[qset_aux.id] = qset_aux.questions()
-        
-        qlist = []
-        jsinclude = []      # js files to include
-        cssinclude = []     # css files to include
-        jstriggers = []
-        qvalues = {}
-
-        qlist_general = []
-        extra_fields = {}
-        for k in qs_list:
-            qlist = []
-            qs_aux = None
-            
-            for question in questions_list[k.id]:
-                
-                qs_aux = question.questionset
-                
-                Type = question.get_type()
-                _qnum, _qalpha = split_numal(question.number)
-
-                qdict = {
-                    'template': 'questionnaire/%s.html' % (Type),
-                    'qnum': _qnum,
-                    'qalpha': _qalpha,
-                    'qtype': Type,
-                    'qnum_class': (_qnum % 2 == 0) and " qeven" or " qodd",
-                    'qalpha_class': _qalpha and (ord(_qalpha[-1]) % 2 \
-                                                     and ' alodd' or ' aleven') or '',
-                }
-
-                # add javascript dependency checks
-                cd = question.getcheckdict()
-                depon = cd.get('requiredif', None) or cd.get('dependent', None)
-                if depon:
-                    # extra args to BooleanParser are not required for toString
-                    parser = BooleanParser(dep_check)
-                    # qdict['checkstring'] = ' checks="%s"' % parser.toString(depon)
-
-                    #It allows only 1 dependency
-                    #The line above allows multiple dependencies but it has a bug when is parsing white spaces
-                    qdict['checkstring'] = ' checks="dep_check(\'question_%s\')"' % depon
-
-                    qdict['depon_class'] = ' depon_class'
-                    jstriggers.append('qc_%s' % question.number)
-                    if question.text[:2] == 'h1':
-                        jstriggers.append('acc_qc_%s' % question.number)
-                if 'default' in cd and not question.number in cookiedict:
-                    qvalues[question.number] = cd['default']
-                if Type in QuestionProcessors:
-                    qdict.update(QuestionProcessors[Type](request, question))
-                    if 'jsinclude' in qdict:
-                        if qdict['jsinclude'] not in jsinclude:
-                            jsinclude.extend(qdict['jsinclude'])
-                    if 'cssinclude' in qdict:
-                        if qdict['cssinclude'] not in cssinclude:
-                            cssinclude.extend(qdict['jsinclude'])
-                    if 'jstriggers' in qdict:
-                        jstriggers.extend(qdict['jstriggers'])
-                        #if 'qvalue' in qdict and not question.number in cookiedict:
-                        #    qvalues[question.number] = qdict['qvalue']
-
-                qlist.append((question, qdict))
-                comment_id = "comment_question_"+question.number#.replace(".", "")
-                if request.POST and request.POST[comment_id]!='':
-                    comment_id_index = "comment_question_"+question.slug
-                    extra_fields[comment_id_index+'_t'] = request.POST[comment_id]
-                    qdict['comment'] = request.POST[comment_id]
-
-            
-            if qs_aux == None:
-                qs_aux = k
-            qlist_general.append((qs_aux, qlist))
-        
-        #print "Extra fields : " + str(extra_fields)
-        if (fingerprint_id != None):
-
-            if users_db==None:
-                users_db = request.user.username
-
-            # adding city to cities database (if doesnt exist)
+        if not hasErrors:
             add_city(qlist_general)
-
-            index_answeres_from_qvalues(qlist_general, question_set.questionnaire, users_db,
+            index_answeres_from_qvalues(qlist_general, question_set2.questionnaire, users_db,
                                         fingerprint_id, extra_fields=extra_fields, created_date=created_date)
 
-        r = r2r(template_name, request,
-                questionset=question_set,
-                questionsets=question_set.questionnaire.questionsets,
+    r = r2r(template_name, request,
+                questionset=question_set2,
+                questionsets=question_set2.questionnaire.questionsets,
                 runinfo=None,
-                errors=errors,
+                errors={},
                 qlist=qlist,
                 progress=None,
                 triggers=jstriggers,
@@ -1922,23 +1829,158 @@ def show_fingerprint_page_errors(request, q_id, qs_id, errors={}, template_name=
                 cssinclude=cssinclude,
                 async_progress=None,
                 async_url=None,
-                qs_list=qs_list,
+                qs_list=qsobjs,
                 questions_list=qlist_general,
                 fingerprint_id=fingerprint_id,
                 breadcrumb=True,
                 extra_fields=extra_fields
         )
-        r['Cache-Control'] = 'no-cache'
-        r['Expires'] = "Thu, 24 Jan 1980 00:00:00 GMT"
-    except:
-        raise
+    r['Cache-Control'] = 'no-cache'
+    r['Expires'] = "Thu, 24 Jan 1980 00:00:00 GMT"
+
     return r
+## ###############
+##  STIL MIGHT BE USEFULL FOR DEBUG PORPOSES
+## #######################
+
+    #return show_fingerprint_page_errors(request, questionnaire_id, question_set,
+    #                                    errors={}, template_name='database_add.html', next=True, sortid=sortid,
+    #                                    fingerprint_id=fingerprint_id, users_db=users_db, created_date=created_date)
 
 
+# def show_fingerprint_page_errors(request, q_id, qs_id, errors={}, template_name='database_add.html',
+#                                  next=False, sortid=0, fingerprint_id=None, users_db=None, created_date=None):
+#     """
+#     Return the QuestionSet template
 
+#     Also add the javascript dependency code.
+#     """
+#     try:
 
+#         qs_list = QuestionSet.objects.filter(questionnaire=q_id).order_by('sortid')
+        
+#         initial_sort = sortid
 
-def show_fingerprint_page_read_only(request, q_id, qs_id, SouMesmoReadOnly=False, errors={}, template_name='advanced_search.html'):
+#         if (int(sortid) == 99):
+#             sortid = len(qs_list) - 1
+#         question_set = qs_list[int(sortid)]
+        
+#         questions = question_set.questions()
+        
+#         questions_list = {}
+#         for qset_aux in qs_list:
+#             questions_list[qset_aux.id] = qset_aux.questions()
+        
+#         qlist = []
+#         jsinclude = []      # js files to include
+#         cssinclude = []     # css files to include
+#         jstriggers = []
+#         qvalues = {}
+
+#         qlist_general = []
+#         extra_fields = {}
+#         for k in qs_list:
+#             qlist = []
+#             qs_aux = None
+            
+#             for question in questions_list[k.id]:
+                
+#                 qs_aux = question.questionset
+                
+#                 Type = question.get_type()
+#                 _qnum, _qalpha = split_numal(question.number)
+
+#                 qdict = {
+#                     'template': 'questionnaire/%s.html' % (Type),
+#                     'qnum': _qnum,
+#                     'qalpha': _qalpha,
+#                     'qtype': Type,
+#                     'qnum_class': (_qnum % 2 == 0) and " qeven" or " qodd",
+#                     'qalpha_class': _qalpha and (ord(_qalpha[-1]) % 2 \
+#                                                      and ' alodd' or ' aleven') or '',
+#                 }
+
+#                 # add javascript dependency checks
+#                 cd = question.getcheckdict()
+#                 depon = cd.get('requiredif', None) or cd.get('dependent', None)
+#                 if depon:
+#                     # extra args to BooleanParser are not required for toString
+#                     parser = BooleanParser(dep_check)
+#                     # qdict['checkstring'] = ' checks="%s"' % parser.toString(depon)
+
+#                     #It allows only 1 dependency
+#                     #The line above allows multiple dependencies but it has a bug when is parsing white spaces
+#                     qdict['checkstring'] = ' checks="dep_check(\'question_%s\')"' % depon
+
+#                     qdict['depon_class'] = ' depon_class'
+#                     jstriggers.append('qc_%s' % question.number)
+#                     if question.text[:2] == 'h1':
+#                         jstriggers.append('acc_qc_%s' % question.number)
+#                 if 'default' in cd and not question.number in cookiedict:
+#                     qvalues[question.number] = cd['default']
+#                 if Type in QuestionProcessors:
+#                     qdict.update(QuestionProcessors[Type](request, question))
+#                     if 'jsinclude' in qdict:
+#                         if qdict['jsinclude'] not in jsinclude:
+#                             jsinclude.extend(qdict['jsinclude'])
+#                     if 'cssinclude' in qdict:
+#                         if qdict['cssinclude'] not in cssinclude:
+#                             cssinclude.extend(qdict['jsinclude'])
+#                     if 'jstriggers' in qdict:
+#                         jstriggers.extend(qdict['jstriggers'])
+#                         #if 'qvalue' in qdict and not question.number in cookiedict:
+#                         #    qvalues[question.number] = qdict['qvalue']
+
+#                 qlist.append((question, qdict))
+#                 comment_id = "comment_question_"+question.number#.replace(".", "")
+#                 if request.POST and request.POST[comment_id]!='':
+#                     comment_id_index = "comment_question_"+question.slug
+#                     extra_fields[comment_id_index+'_t'] = request.POST[comment_id]
+#                     qdict['comment'] = request.POST[comment_id]
+
+            
+#             if qs_aux == None:
+#                 qs_aux = k
+#             qlist_general.append((qs_aux, qlist))
+        
+#         #print "Extra fields : " + str(extra_fields)
+#         if (fingerprint_id != None):
+
+#             if users_db==None:
+#                 users_db = request.user.username
+
+#             # adding city to cities database (if doesnt exist)
+#             add_city(qlist_general)
+
+#             index_answeres_from_qvalues(qlist_general, question_set.questionnaire, users_db,
+#                                         fingerprint_id, extra_fields=extra_fields, created_date=created_date)
+
+#         r = r2r(template_name, request,
+#                 questionset=question_set,
+#                 questionsets=question_set.questionnaire.questionsets,
+#                 runinfo=None,
+#                 errors=errors,
+#                 qlist=qlist,
+#                 progress=None,
+#                 triggers=jstriggers,
+#                 qvalues=qvalues,
+#                 jsinclude=jsinclude,
+#                 cssinclude=cssinclude,
+#                 async_progress=None,
+#                 async_url=None,
+#                 qs_list=qs_list,
+#                 questions_list=qlist_general,
+#                 fingerprint_id=fingerprint_id,
+#                 breadcrumb=True,
+#                 extra_fields=extra_fields
+#         )
+#         r['Cache-Control'] = 'no-cache'
+#         r['Expires'] = "Thu, 24 Jan 1980 00:00:00 GMT"
+#     except:
+#         raise
+#     return r
+
+def show_fingerprint_page_read_only(request, q_id, qs_id, SouMesmoReadOnly=False, errors={}, template_name='advanced_sedataarch.html'):
 
     """
     Return the QuestionSet template
