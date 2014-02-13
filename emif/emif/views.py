@@ -1979,7 +1979,7 @@ def check_database_add_conditions(request, questionnaire_id, sortid,
 #         raise
 #     return r
 
-def show_fingerprint_page_read_only(request, q_id, qs_id, SouMesmoReadOnly=False, errors={}, template_name='advanced_sedataarch.html'):
+def show_fingerprint_page_read_only(request, q_id, qs_id, SouMesmoReadOnly=False, errors={}, template_name='advanced_search.html'):
 
     """
     Return the QuestionSet template
