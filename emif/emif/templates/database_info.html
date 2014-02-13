@@ -295,7 +295,7 @@
 
                 <div class="tab-pane" id="apiinfo">
                     <div>
-                        <a id="btn_pivot_table" class="btn pull-right" href="">Pivot table</a>
+                        <a id="btn_pivot_table" class="btn pull-right hidden" href="">Pivot table</a>
                     </div>
                     <div class="span12">
                         <div id="chart" class="span4" style="display:none;"></div>
@@ -393,8 +393,10 @@ console.log("ayx" + json_aux.length);
 console.log("ayx" + json_aux);
     
     if (json_aux == '' || json_aux == null || json_aux.length == 2) {
-        $("#pivot_table_extra_information").html('No information available. You can add information from external applications with API web services.');
+        $("#pivot_table_extra_information").html('No information available. You can add information from external applications with <a href="api-info">API web services.</a>');
     } else {
+        $("#btn_pivot_table").removeClass("hidden");
+        $("#btn_pivot_table").addClass("show");
         json_aux = json_aux.replace("/&quot;/g", "\"");
         alert(json_aux);
         json = JSON.parse(json_aux);
