@@ -172,6 +172,20 @@ function PCAPI ()
         return result;
     };
 
+
+    this.getFilter = function(Var, Row, fingerprintID){
+        var result = {}
+          
+        $.ajax({
+          dataType: "json",
+          url: "population/jerboalistvalues/"+Var+"/"+Row+"/" + fingerprintID,
+          async: false,
+          data: result,
+          success: function (data){result=data;},
+        });
+        return result;
+    };
+
 };
 
 /********************************************************************
@@ -186,9 +200,9 @@ function PCAPI ()
         init : function( options ) {
 
             
+            /** Get a list of filters */
             values = options.getGender();
-            console.log("Gender values");
-            console.log(values);
+            
             if (values===undefined)
             {
                 return;
@@ -204,28 +218,7 @@ function PCAPI ()
                 tmpUl.append('<li><a class="filterBar" href="#" onclick="return false;"><i id="iproximity" class="icon-ok icon-black active"></i> '+values.values[data]+'</a></li>')
             });
             
-            self.append("Name1: ");
-            tmpUl = $('<ul class="nav nav-pills nav-stacked">');
-            values = options.getName1();
-            self.append(tmpUl);
-            $.each(values.values, function (data){
-                if (values.values[data]==="")
-                    return;
-                
-                tmpUl.append('<li> <a  class="filterBar" href="#" onclick="return false;"><i id="iproximity" class="icon-ok icon-black active"></i> '+values.values[data]+'</a></li>')
-            });
             
-
-            self.append("Name2:");
-            tmpUl = $('<ul class="nav nav-pills nav-stacked">');
-            values = options.getName2();
-            self.append(tmpUl);
-            $.each(values.values, function (data){
-                if (values.values[data]==="")
-                    return;
-                
-                tmpUl.append('<li><a class="filterBar" href="#" onclick="return false;"><i id="iproximity" class="icon-ok icon-black active"></i> '+values.values[data]+'</a></li>')
-            });
             
             $(".filterBar").bind('click',function(e)
                     { 

@@ -19,11 +19,21 @@
 #
 
 
+from population_characteristics.conf_charts import *
+
+
 class RuleMatcher(object):
 
-    def __init__(self, template):
+    def __init__(self):
         
         pass
 
-
+    def get_filter(self, var):
+        charts = conf.get_main_settings().charts
+        filters = None 
+        for c in charts:
+            if c.title.var == var:
+                filters = c.filters
+                break 
+        return filters
 

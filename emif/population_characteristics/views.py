@@ -33,6 +33,18 @@ def jerboa_list_values(request, var, row, fingerprint_id, template_name='documen
     return response
 
 
+def filters(request, var, fingerprint_id, template_name='documents_upload_form.html'):
+
+    pc = PopulationCharacteristic(None)
+    values = pc.filters(var, fingerprint_id)
+    _values = []
+    for v in values:
+        _values.append(v.to_JSON())
+    data = {'values': _values}
+    response = JSONResponse(data, mimetype=response_mimetype(request))
+    response['Content-Disposition'] = 'inline; filename=files.json'
+    return response
+
 def generic_filter(request, param, template_name='documents_upload_form.html'):
 
     pc = PopulationCharacteristic(None)

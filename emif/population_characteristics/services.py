@@ -25,6 +25,8 @@ import json
 from .jerboa import *
 
 from .conf_charts import *
+from .charts.rule_matcher import * 
+
 
 class PopulationCharacteristic(JerboaFormat):
     """PopulationCharacteristic: This class controls the Jerboa File
@@ -116,18 +118,35 @@ class PopulationCharacteristic(JerboaFormat):
 
         return r
 
+    def filters(self, var, fingerprint_id):
 
+        # Go to the rule matcher and ask for the filter for that particular case
+        mrules = RuleMatcher()
+        filters = mrules.get_filter(var)
+        #_filter = charts_conf.
+        
+        # Should check if any special operation, for now, let's assume: NO!
+
+        for _filter in filters:
+
+            # Generate query
+            dict_query = {'fingerprint_id':fingerprint_id, 
+                'values.Var': var,
+                
+                }
+            if _filter.key != None:
+                dict_query['values.' + _filter.key]  = _filter.value
+            
+            values =  jerboa_collection.find( dict_query ).distinct('values.' + _filter.value )
+            _filter.values = values
+        return filters
 
     def get_var(self):
-        #db.jerboa_files.distinct( 'values.Var' )
         values =  jerboa_collection.distinct( 'values.Var' )
         
         return values
 
     def get_x_y(self):
-        # 
-        # 
-        # db.jerboa_files.find({"values.Name1": "YEAR", "values.Var":"Active patients"})
         pass
     
     def get_settings(self):

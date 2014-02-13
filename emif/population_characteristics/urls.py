@@ -24,7 +24,11 @@ urlpatterns = patterns('',
    
     url(r'^upload$', 'population_characteristics.documents.document_form_view_upload'),
     url(r'^jerboaupload$', 'population_characteristics.documents.jerboa_form_view_upload'),
-    url(r'^jerboalistvalues/(?P<var>[^/]+)/(?P<row>[^/]+)/(?P<fingerprint_id>[^/]+)$', 'population_characteristics.views.jerboa_list_values'),
+    url(r'^jerboalistvalues/(?P<var>[^/]+)/(?P<row>[^/]+)/(?P<fingerprint_id>[^/]+)$', 
+        'population_characteristics.views.jerboa_list_values'),
+
+    url(r'^filters/(?P<var>[^/]+)/(?P<fingerprint_id>[^/]+)$', 
+        'population_characteristics.views.filters'),
 
     url(r'^genericfilter/(?P<param>[^/]+)$', 'population_characteristics.views.generic_filter'),
 

@@ -44,13 +44,15 @@ class ConfCharts(object):
         c.y_axis.var = "Min"
         f1 = Filter()
         f1.name = 'Year'
-        f1.var = 'Name1'
+        f1.key = 'Name1'
+        f1.value = 'Value1'
 
-        f1 = Filter()
-        f1.name = 'Gender'
-        f1.var = 'Gender'
+        f2 = Filter()
+        f2.name = 'Gender'
+        f2.key = 'Gender'
+        f2.value = 'Gender'
 
-        c.filters = [f1]
+        c.filters = [f2]
 
         c1 = Chart()
         c1.title = Title()
@@ -183,3 +185,4 @@ class ConfCharts(object):
 
         return sc
 
+conf = ConfCharts()
