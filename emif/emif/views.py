@@ -790,7 +790,7 @@ def extract_answers(request2, questionnaire_id, question_set, qs_list):
         if type in Processors:
             answer = Processors[type](question, answer_dict) or ''
         else:
-            raise AnswerException("No Processor defined for question type %s" % type)
+            print AnswerException("No Processor defined for question type %s" % type)
 
         return True
 
@@ -810,6 +810,7 @@ def extract_answers(request2, questionnaire_id, question_set, qs_list):
             
         except AnswerException, e:
             errors[question.number] = e
+            print e
 
             if (str(question.questionset.id) == question_set):
                 #print "active enable"
@@ -1771,8 +1772,6 @@ def check_database_add_conditions(request, questionnaire_id, sortid,
     # -------------------------------------
     # --- Process POST with QuestionSet ---
     # -------------------------------------
-
-    print "check_database_add_conditions"
     try:
         if request.FILES:
             print "file upload:"
@@ -1801,7 +1800,7 @@ def check_database_add_conditions(request, questionnaire_id, sortid,
     fingerprint_id = request.POST['fingerprint_id']
 
     request2 = RequestMonkeyPatch()
-    print question_set
+   
     if request.POST:
         (qlist_general, qlist, jstriggers, qvalues, jsinclude, cssinclude, extra_fields, hasErrors) = extract_answers(request, questionnaire_id, question_set2, qsobjs)
     else:
