@@ -1,4 +1,8 @@
 
+import os
+
+from django.conf import settings
+
 class HandleFile(object):
     """This class handle with the file upload for multiple backends
     """
@@ -12,7 +16,6 @@ class HandleFile(object):
         self._handler_wrapper.handle_uploaded_file(f)
 
         # Store the metadata   
-
 
 class FileSystemHandleFile(object):
     """Store the file in file system

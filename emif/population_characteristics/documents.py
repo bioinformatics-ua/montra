@@ -69,9 +69,6 @@ def jerboa_form_view_upload(request, template_name='documents_upload_form.html')
     # TODO: for now it is only calling the documents 
     return document_form_view_upload(request, template_name='documents_upload_form.html')
 
-
-
-
 def parsejerboa(request, template_name='documents_upload_form.html'):
     """ Parse files from Jerboa
     """
@@ -87,7 +84,6 @@ def parsejerboa(request, template_name='documents_upload_form.html'):
     response = JSONResponse(data, mimetype=response_mimetype(request))
     response['Content-Disposition'] = 'inline; filename=files.json'
     return response
-
 
 def document_form_view(request, runcode, qs, template_name='documents_upload_form.html'):
     

@@ -66,9 +66,6 @@ function PopulationCharacteristics (type)
 
 
 
-
-
-
 /********************************************************
 **************** Document Manager - Uploads, etc 
 *********************************************************/
@@ -160,7 +157,7 @@ $(function () {
         },
         dataType: 'json',
         autoUpload: false,
-        acceptFileTypes: /(\.|\/)(gif|jpe?g|png)$/i,
+        acceptFileTypes: /(\.|\/)(gif|jpe?g|png|pdf|docx|xls|doc|docx|tsv|txt)$/i,
         maxFileSize: 5000000, // 5 MB
         // Enable image resizing, except for Android and Opera,
         // which actually support image resizing, but fail to
@@ -171,7 +168,7 @@ $(function () {
         previewMaxHeight: 100,
         previewCrop: true
     }).on('fileuploadadd', function (e, data) {
-        data.context = $('<div class="span6"/>').appendTo('#files');
+        data.context = $('<tr><td><div class="span3"/>').appendTo('#files');
         $.each(data.files, function (index, file) {
             var node = $('<p/>')
                     .append($('<span/>').text(file.name));
