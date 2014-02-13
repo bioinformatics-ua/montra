@@ -16,28 +16,16 @@ function GraphicChartD3(divArg, dataArg)
     
     console.log(objects);
     /*** Lets translate our data model to the d3 support data model */ 
-    
-    dataset = [[{'xvalue':'2000', 'yvalue':200}, 
-                  {'xvalue':'2001', 'yvalue':300},
-                  {'xvalue':'2002', 'yvalue':356}], 
-                 
-                 ];
 
     var i = 1;
     dataset = [[], 
                  
                  ];
     objects.values.forEach(function(row){
-      
-      
-      console.log(row.Min);
-      console.log(row.Value1);  
       dataset[0].push({'xvalue':row.Value1, 'yvalue':parseInt(row.Min)});
   
     });
     
-    console.log("Final dataset is: "  );
-    console.log(dataset  );
 
   };
 
@@ -57,12 +45,18 @@ function GraphicChartD3(divArg, dataArg)
 
       var xAxis = d3.svg.axis()
           .scale(x)
-          .orient("bottom");
+
+          .orient("bottom")
+          .ticks(d3.time.years, 10)
+          .tickValues(["This is long", "That is long", "Other is long"])
+          .tickPadding(8);
+
 
       var yAxis = d3.svg.axis()
           .scale(y)
-          .orient("left")
-          .tickFormat(formatPercent);
+          .orient("left");
+          //.ticks(d3.time.years, 10)
+          //.tickFormat(formatPercent);
 
       var svg = d3.select(div).append("svg")
           .attr("width", width + margin.left + margin.right)
@@ -74,7 +68,7 @@ function GraphicChartD3(divArg, dataArg)
         console.log(data);
         
 
-        x.domain(data.map(function(d) { if (d.xvalue%10==0 ) return d.xvalue; else return ''}));
+        x.domain(data.map(function(d) {  return d.xvalue; }));
         y.domain([0, d3.max(data, function(d) { return d.yvalue; })]);
 
         svg.append("g")
