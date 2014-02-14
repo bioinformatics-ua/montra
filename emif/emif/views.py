@@ -144,7 +144,7 @@ def results_comp(request, template_name='results_comp.html'):
 
     list_qsets = []
     for db_id in list_fingerprint_to_compare:
-        qsets, name = createqsets(db_id)
+        qsets, name, db_owners, fingerprint_ttype = createqsets(db_id)
         list_qsets.append((name, qsets))
     first_name = None
     if len(list_qsets) > 0:
@@ -790,7 +790,7 @@ def extract_answers(request2, questionnaire_id, question_set, qs_list):
         if type in Processors:
             answer = Processors[type](question, answer_dict) or ''
         else:
-            raise AnswerException("No Processor defined for question type %s" % type)
+            print AnswerException("No Processor defined for question type %s" % type)
 
         return True
 
@@ -810,6 +810,7 @@ def extract_answers(request2, questionnaire_id, question_set, qs_list):
             
         except AnswerException, e:
             errors[question.number] = e
+            print e
 
             if (str(question.questionset.id) == question_set):
                 #print "active enable"
@@ -848,7 +849,7 @@ def extract_answers(request2, questionnaire_id, question_set, qs_list):
                     'qtype': Type,
                     'qnum_class': (_qnum % 2 == 0) and " qeven" or " qodd",
                     'qalpha_class': _qalpha and (ord(_qalpha[-1]) % 2 \
-                                                     and ' alodd' or ' aleven') or '',
+                                                     and ' alodd' or ' aleven') or '',                    
                 }
 
                 # add javascript dependency checks
@@ -878,6 +879,9 @@ def extract_answers(request2, questionnaire_id, question_set, qs_list):
                     except KeyError:
                         pass
 
+                    if question.number in errors:
+                        qdict["qprocessor_errors"] = errors[question.number].message
+
                     if 'jsinclude' in qdict:
                         if qdict['jsinclude'] not in jsinclude:
                             jsinclude.extend(qdict['jsinclude'])
@@ -886,7 +890,7 @@ def extract_answers(request2, questionnaire_id, question_set, qs_list):
                             cssinclude.extend(qdict['jsinclude'])
                     if 'jstriggers' in qdict:
                         jstriggers.extend(qdict['jstriggers'])
-                        
+                    
                 qlist.append((question, qdict))
                 
             if qs_aux == None:
@@ -894,7 +898,7 @@ def extract_answers(request2, questionnaire_id, question_set, qs_list):
             qlist_general.append((qs_aux, qlist))
     except:
         raise
-    return (qlist_general, qlist, jstriggers, qvalues, jsinclude, cssinclude, extra_fields)
+    return (qlist_general, qlist, jstriggers, qvalues, jsinclude, cssinclude, extra_fields, len(errors)!=0)
     
 
 def database_edit(request, fingerprint_id, questionnaire_id, template_name="database_edit.html"):
@@ -914,7 +918,7 @@ def database_edit(request, fingerprint_id, questionnaire_id, template_name="data
     try:
         fingerprint_name = r['database_name_t']
     except:
-        fingerprint_name = 'unnamed'
+        fingerprint_name = 'unnamed'        
 
     extra = {} 
     # Render page first time.
@@ -964,16 +968,18 @@ def database_edit(request, fingerprint_id, questionnaire_id, template_name="data
 
     question_set = qs_list[int(qs_id)]
     if request.POST:
-        (qlist_general, qlist, jstriggers, qvalues, jsinclude, cssinclude, extra_fields) = extract_answers(request, questionnaire_id, question_set, qs_list)
+        (qlist_general, qlist, jstriggers, qvalues, jsinclude, cssinclude, extra_fields, hasErrors) = extract_answers(request, questionnaire_id, question_set, qs_list)
     else:
-        (qlist_general, qlist, jstriggers, qvalues, jsinclude, cssinclude, extra_fields) = extract_answers(request2, questionnaire_id, question_set, qs_list)
+        (qlist_general, qlist, jstriggers, qvalues, jsinclude, cssinclude, extra_fields, hasErrors) = extract_answers(request2, questionnaire_id, question_set, qs_list)
+
+    print hasErrors
 
     if (question_set.sortid == 99 or request.POST):
         # Index on Solr
         try:
-            add_city(qlist_general)
-
-            index_answeres_from_qvalues(qlist_general, question_set.questionnaire, users_db,
+            if not hasErrors:
+                add_city(qlist_general)
+                index_answeres_from_qvalues(qlist_general, question_set.questionnaire, users_db,
                                         fingerprint_id, extra_fields=extra_fields, created_date=created_date)
         except:
             raise
@@ -1118,12 +1124,24 @@ def get_databases_from_solr(request, query="*:*"):
 
 def delete_fingerprint(request, id):
     user = request.user
-    #su = Subject.objects.filter(user=user)
-
-    #email = su[0].email
 
     c = CoreEngine()
     results = c.search_fingerprint('user_t:' + user.username)
+    
+    for result in results:
+        if (id == result['id']):
+            c.delete(id)
+            break
+
+    return databases(request)
+
+def force_delete_fingerprint(request, id):
+    if not request.user.is_superuser:
+        return HttpResponse('Permission denied. Contact administrator of EMIF Catalogue Team', status=403)
+    user = request.user
+    c = CoreEngine()
+    results = c.search_fingerprint('id:' + id)
+    
     for result in results:
         if (id == result['id']):
             c.delete(id)
@@ -1138,7 +1156,7 @@ def databases(request, page=1, template_name='databases.html'):
     user = request.user
     #list_databases = get_databases_from_db(request)
     _filter = "user_t:" + user.username
-    if user. is_superuser:
+    if user.is_superuser:
         _filter = "user_t:*" 
     list_databases = get_databases_from_solr(request, _filter)
 
@@ -1154,7 +1172,10 @@ def databases(request, page=1, template_name='databases.html'):
 
     return render(request, template_name, {'request': request, 'export_my_answers': True,
                                            'list_databases': list_databases, 'breadcrumb': True, 'collapseall': False,
-                                           'api_token': True, 'page_obj': pager})
+                                           'page_obj': pager,
+                                           'api_token': True, 
+                                           'owner_fingerprint': False,
+                                           'add_databases': True})
 
 
 def all_databases(request, page=1, template_name='alldatabases.html'):
@@ -1178,7 +1199,11 @@ def all_databases(request, page=1, template_name='alldatabases.html'):
     ## End Paginator ##
     
     return render(request, template_name, {'request': request, 'export_all_answers': True, 'data_table': True,
-                                           'list_databases': list_databases, 'breadcrumb': True, 'collapseall': False, 'geo': True, 'page_obj': pager})
+                                           'list_databases': list_databases,
+                                            'breadcrumb': True, 'collapseall': False, 
+                                            'geo': True,
+                                            'page_obj': pager,
+                                            'add_databases': True})
 
 def qs_data_table(request, template_name='qs_data_table.html'):
     db_type = request.POST.get("db_type")
@@ -1192,7 +1217,7 @@ def qs_data_table(request, template_name='qs_data_table.html'):
     for t in list_databases:
 
         if t.type_name == db_type:
-            qsets, name = createqsets(t.id)
+            qsets, name, _d, _c = createqsets(t.id)
             
             q_list = []
             a_list = []            
@@ -1226,13 +1251,13 @@ def all_databases_data_table(request, template_name='alldatabases_data_table.htm
         # Creating list of database types
         for t in list_databases:
             if not t.type_name in databases_types:
-                qsets, name = createqsets(t.id)
+                qsets, name, _d, _e,  = createqsets(t.id)
                 
                 databases_types[t.type_name] = qsets.ordered_items()  
             
             '''    this code was loading all the qsets of all the dbs etc etctera
             id = t.id
-            qsets, name = createqsets(id)
+            qsets, name, db_owners, fingerprint_ttype = createqsets(id)
             q_list = []
             for group in qsets.ordered_items():
                 (k, qs) = group
@@ -1277,11 +1302,31 @@ def createqsets(runcode, qsets=None, clean=True):
     list_values = []
     blacklist = ['created_t', 'type_t', '_version_', 'date_last_modification_t']
     name = "Not defined."
+    users = ""
+    fingerprint_ttype = ""
+
+    db_owners = "" 
+
+
+    questionnaires_ids = {}
+    qqs = Questionnaire.objects.all()
+    for q in qqs:
+        questionnaires_ids[q.slug] = (q.pk, q.name)
+
 
     for result in results:
 
+
+        (fingerprint_ttype, type_name) = questionnaires_ids[result['type_t']]
+
         # Get the slug of fingerprint type
         q_aux = Questionnaire.objects.filter(slug=result['type_t'])
+
+        try:
+            users = result['user_t']
+            db_owners = result['user_t']
+        except:
+            pass
 
         list_qsets = QuestionSet.objects.filter(questionnaire=q_aux[0]).order_by('sortid')
 
@@ -1367,24 +1412,45 @@ def createqsets(runcode, qsets=None, clean=True):
                 except:
                     pass
         break
+    # What should I do with this code?
+    # I know that it actually do nothing    
+    if (users!=""):
+        users.split(" \\ ")
+
+    return (qsets, name, db_owners, fingerprint_ttype)
+
+   
+# TODO: move to another place, maybe API? 
+def get_api_info(fingerprint_id):
+    """This is an auxiliar method to get the API Info
+    """
+    result = {}
+
     
-    return (qsets, name)
+    results = FingerprintAPI.objects.filter(fingerprintID=fingerprint_id)
+    result = {}
+    for r in results:
+        result[r.field] = r.value
+    return result
+
 
 def fingerprint(request, runcode, qs, template_name='database_info.html'):
-    qsets, name = createqsets(runcode)
-
-    def get_api_info(fingerprint_id):
-
-        result = {}
     
-        
-        results = FingerprintAPI.objects.filter(fingerprintID=fingerprint_id)
-        result = {}
-        for r in results:
-            result[r.field] = r.value
-        return result
+    
+    qsets, name, db_owners, fingerprint_ttype = createqsets(runcode)
+
+    if fingerprint_ttype == "":
+        raise "There is missing ttype of questionarie, something is really wrong"
 
     apiinfo = json.dumps(get_api_info(runcode));
+
+    owner_fingerprint = False
+    for owner in db_owners.split(" "):
+        print owner
+        print request.user.username
+        if (owner == request.user.username):
+            owner_fingerprint = True
+    
     name_bc = name
     try:
         name_bc = name.encode('utf-8')
@@ -1392,8 +1458,15 @@ def fingerprint(request, runcode, qs, template_name='database_info.html'):
         pass
 
     return render(request, template_name, 
-        {'request': request, 'qsets': qsets, 'export_bd_answers': True, 'apiinfo': apiinfo, 'fingerprint_id': runcode,
-                   'breadcrumb': True, 'breadcrumb_name': name_bc, 'style': qs, 'collapseall': False})
+        {'request': request, 'qsets': qsets, 'export_bd_answers': True, 
+        'apiinfo': apiinfo, 'fingerprint_id': runcode,
+                   'breadcrumb': True, 'breadcrumb_name':name_bc,
+                    'style': qs, 'collapseall': False, 
+                    'owner_fingerprint':owner_fingerprint,
+                    'fingerprint_dump': True,
+                    'fingerprint_ttype': fingerprint_ttype,
+                    })
+
 
 
 def get_questionsets_list(runinfo):
@@ -1766,8 +1839,6 @@ def check_database_add_conditions(request, questionnaire_id, sortid,
     # -------------------------------------
     # --- Process POST with QuestionSet ---
     # -------------------------------------
-
-    print "check_database_add_conditions"
     try:
         if request.FILES:
             print "file upload:"
@@ -1788,126 +1859,34 @@ def check_database_add_conditions(request, questionnaire_id, sortid,
             if qs.sortid == int(sortid):
                 question_set = qs.pk
                 break
+    if (int(sortid) == 99):
+            sortid = len(qs_list) - 1
+    
+    question_set2 = qsobjs[int(sortid)]
 
     fingerprint_id = request.POST['fingerprint_id']
-    
-    return show_fingerprint_page_errors(request, questionnaire_id, question_set,
-                                        errors={}, template_name='database_add.html', next=True, sortid=sortid,
-                                        fingerprint_id=fingerprint_id, users_db=users_db, created_date=created_date)
 
+    request2 = RequestMonkeyPatch()
+   
+    if request.POST:
+        (qlist_general, qlist, jstriggers, qvalues, jsinclude, cssinclude, extra_fields, hasErrors) = extract_answers(request, questionnaire_id, question_set2, qsobjs)
+    else:
+        (qlist_general, qlist, jstriggers, qvalues, jsinclude, cssinclude, extra_fields, hasErrors) = extract_answers(request2, questionnaire_id, question_set2, qsobjs)
 
-def show_fingerprint_page_errors(request, q_id, qs_id, errors={}, template_name='database_add.html',
-                                 next=False, sortid=0, fingerprint_id=None, users_db=None, created_date=None):
-    """
-    Return the QuestionSet template
+    if fingerprint_id != None:
+        if users_db==None:
+            users_db = request.user.username
 
-    Also add the javascript dependency code.
-    """
-    try:
-
-        qs_list = QuestionSet.objects.filter(questionnaire=q_id).order_by('sortid')
-        
-        initial_sort = sortid
-
-        if (int(sortid) == 99):
-            sortid = len(qs_list) - 1
-        question_set = qs_list[int(sortid)]
-        
-        questions = question_set.questions()
-        
-        questions_list = {}
-        for qset_aux in qs_list:
-            questions_list[qset_aux.id] = qset_aux.questions()
-        
-        qlist = []
-        jsinclude = []      # js files to include
-        cssinclude = []     # css files to include
-        jstriggers = []
-        qvalues = {}
-
-        qlist_general = []
-        extra_fields = {}
-        for k in qs_list:
-            qlist = []
-            qs_aux = None
-            
-            for question in questions_list[k.id]:
-                
-                qs_aux = question.questionset
-                
-                Type = question.get_type()
-                _qnum, _qalpha = split_numal(question.number)
-
-                qdict = {
-                    'template': 'questionnaire/%s.html' % (Type),
-                    'qnum': _qnum,
-                    'qalpha': _qalpha,
-                    'qtype': Type,
-                    'qnum_class': (_qnum % 2 == 0) and " qeven" or " qodd",
-                    'qalpha_class': _qalpha and (ord(_qalpha[-1]) % 2 \
-                                                     and ' alodd' or ' aleven') or '',
-                }
-
-                # add javascript dependency checks
-                cd = question.getcheckdict()
-                depon = cd.get('requiredif', None) or cd.get('dependent', None)
-                if depon:
-                    # extra args to BooleanParser are not required for toString
-                    parser = BooleanParser(dep_check)
-                    # qdict['checkstring'] = ' checks="%s"' % parser.toString(depon)
-
-                    #It allows only 1 dependency
-                    #The line above allows multiple dependencies but it has a bug when is parsing white spaces
-                    qdict['checkstring'] = ' checks="dep_check(\'question_%s\')"' % depon
-
-                    qdict['depon_class'] = ' depon_class'
-                    jstriggers.append('qc_%s' % question.number)
-                    if question.text[:2] == 'h1':
-                        jstriggers.append('acc_qc_%s' % question.number)
-                if 'default' in cd and not question.number in cookiedict:
-                    qvalues[question.number] = cd['default']
-                if Type in QuestionProcessors:
-                    qdict.update(QuestionProcessors[Type](request, question))
-                    if 'jsinclude' in qdict:
-                        if qdict['jsinclude'] not in jsinclude:
-                            jsinclude.extend(qdict['jsinclude'])
-                    if 'cssinclude' in qdict:
-                        if qdict['cssinclude'] not in cssinclude:
-                            cssinclude.extend(qdict['jsinclude'])
-                    if 'jstriggers' in qdict:
-                        jstriggers.extend(qdict['jstriggers'])
-                        #if 'qvalue' in qdict and not question.number in cookiedict:
-                        #    qvalues[question.number] = qdict['qvalue']
-
-                qlist.append((question, qdict))
-                comment_id = "comment_question_"+question.number#.replace(".", "")
-                if request.POST and request.POST[comment_id]!='':
-                    comment_id_index = "comment_question_"+question.slug
-                    extra_fields[comment_id_index+'_t'] = request.POST[comment_id]
-                    qdict['comment'] = request.POST[comment_id]
-
-            
-            if qs_aux == None:
-                qs_aux = k
-            qlist_general.append((qs_aux, qlist))
-        
-        #print "Extra fields : " + str(extra_fields)
-        if (fingerprint_id != None):
-
-            if users_db==None:
-                users_db = request.user.username
-
-            # adding city to cities database (if doesnt exist)
+        if not hasErrors:
             add_city(qlist_general)
-
-            index_answeres_from_qvalues(qlist_general, question_set.questionnaire, users_db,
+            index_answeres_from_qvalues(qlist_general, question_set2.questionnaire, users_db,
                                         fingerprint_id, extra_fields=extra_fields, created_date=created_date)
 
-        r = r2r(template_name, request,
-                questionset=question_set,
-                questionsets=question_set.questionnaire.questionsets,
+    r = r2r(template_name, request,
+                questionset=question_set2,
+                questionsets=question_set2.questionnaire.questionsets,
                 runinfo=None,
-                errors=errors,
+                errors={},
                 qlist=qlist,
                 progress=None,
                 triggers=jstriggers,
@@ -1916,21 +1895,156 @@ def show_fingerprint_page_errors(request, q_id, qs_id, errors={}, template_name=
                 cssinclude=cssinclude,
                 async_progress=None,
                 async_url=None,
-                qs_list=qs_list,
+                qs_list=qsobjs,
                 questions_list=qlist_general,
                 fingerprint_id=fingerprint_id,
                 breadcrumb=True,
                 extra_fields=extra_fields
         )
-        r['Cache-Control'] = 'no-cache'
-        r['Expires'] = "Thu, 24 Jan 1980 00:00:00 GMT"
-    except:
-        raise
+    r['Cache-Control'] = 'no-cache'
+    r['Expires'] = "Thu, 24 Jan 1980 00:00:00 GMT"
+
     return r
+## ###############
+##  STIL MIGHT BE USEFULL FOR DEBUG PORPOSES
+## #######################
+
+    #return show_fingerprint_page_errors(request, questionnaire_id, question_set,
+    #                                    errors={}, template_name='database_add.html', next=True, sortid=sortid,
+    #                                    fingerprint_id=fingerprint_id, users_db=users_db, created_date=created_date)
 
 
+# def show_fingerprint_page_errors(request, q_id, qs_id, errors={}, template_name='database_add.html',
+#                                  next=False, sortid=0, fingerprint_id=None, users_db=None, created_date=None):
+#     """
+#     Return the QuestionSet template
 
+#     Also add the javascript dependency code.
+#     """
+#     try:
 
+#         qs_list = QuestionSet.objects.filter(questionnaire=q_id).order_by('sortid')
+        
+#         initial_sort = sortid
+
+#         if (int(sortid) == 99):
+#             sortid = len(qs_list) - 1
+#         question_set = qs_list[int(sortid)]
+        
+#         questions = question_set.questions()
+        
+#         questions_list = {}
+#         for qset_aux in qs_list:
+#             questions_list[qset_aux.id] = qset_aux.questions()
+        
+#         qlist = []
+#         jsinclude = []      # js files to include
+#         cssinclude = []     # css files to include
+#         jstriggers = []
+#         qvalues = {}
+
+#         qlist_general = []
+#         extra_fields = {}
+#         for k in qs_list:
+#             qlist = []
+#             qs_aux = None
+            
+#             for question in questions_list[k.id]:
+                
+#                 qs_aux = question.questionset
+                
+#                 Type = question.get_type()
+#                 _qnum, _qalpha = split_numal(question.number)
+
+#                 qdict = {
+#                     'template': 'questionnaire/%s.html' % (Type),
+#                     'qnum': _qnum,
+#                     'qalpha': _qalpha,
+#                     'qtype': Type,
+#                     'qnum_class': (_qnum % 2 == 0) and " qeven" or " qodd",
+#                     'qalpha_class': _qalpha and (ord(_qalpha[-1]) % 2 \
+#                                                      and ' alodd' or ' aleven') or '',
+#                 }
+
+#                 # add javascript dependency checks
+#                 cd = question.getcheckdict()
+#                 depon = cd.get('requiredif', None) or cd.get('dependent', None)
+#                 if depon:
+#                     # extra args to BooleanParser are not required for toString
+#                     parser = BooleanParser(dep_check)
+#                     # qdict['checkstring'] = ' checks="%s"' % parser.toString(depon)
+
+#                     #It allows only 1 dependency
+#                     #The line above allows multiple dependencies but it has a bug when is parsing white spaces
+#                     qdict['checkstring'] = ' checks="dep_check(\'question_%s\')"' % depon
+
+#                     qdict['depon_class'] = ' depon_class'
+#                     jstriggers.append('qc_%s' % question.number)
+#                     if question.text[:2] == 'h1':
+#                         jstriggers.append('acc_qc_%s' % question.number)
+#                 if 'default' in cd and not question.number in cookiedict:
+#                     qvalues[question.number] = cd['default']
+#                 if Type in QuestionProcessors:
+#                     qdict.update(QuestionProcessors[Type](request, question))
+#                     if 'jsinclude' in qdict:
+#                         if qdict['jsinclude'] not in jsinclude:
+#                             jsinclude.extend(qdict['jsinclude'])
+#                     if 'cssinclude' in qdict:
+#                         if qdict['cssinclude'] not in cssinclude:
+#                             cssinclude.extend(qdict['jsinclude'])
+#                     if 'jstriggers' in qdict:
+#                         jstriggers.extend(qdict['jstriggers'])
+#                         #if 'qvalue' in qdict and not question.number in cookiedict:
+#                         #    qvalues[question.number] = qdict['qvalue']
+
+#                 qlist.append((question, qdict))
+#                 comment_id = "comment_question_"+question.number#.replace(".", "")
+#                 if request.POST and request.POST[comment_id]!='':
+#                     comment_id_index = "comment_question_"+question.slug
+#                     extra_fields[comment_id_index+'_t'] = request.POST[comment_id]
+#                     qdict['comment'] = request.POST[comment_id]
+
+            
+#             if qs_aux == None:
+#                 qs_aux = k
+#             qlist_general.append((qs_aux, qlist))
+        
+#         #print "Extra fields : " + str(extra_fields)
+#         if (fingerprint_id != None):
+
+#             if users_db==None:
+#                 users_db = request.user.username
+
+#             # adding city to cities database (if doesnt exist)
+#             add_city(qlist_general)
+
+#             index_answeres_from_qvalues(qlist_general, question_set.questionnaire, users_db,
+#                                         fingerprint_id, extra_fields=extra_fields, created_date=created_date)
+
+#         r = r2r(template_name, request,
+#                 questionset=question_set,
+#                 questionsets=question_set.questionnaire.questionsets,
+#                 runinfo=None,
+#                 errors=errors,
+#                 qlist=qlist,
+#                 progress=None,
+#                 triggers=jstriggers,
+#                 qvalues=qvalues,
+#                 jsinclude=jsinclude,
+#                 cssinclude=cssinclude,
+#                 async_progress=None,
+#                 async_url=None,
+#                 qs_list=qs_list,
+#                 questions_list=qlist_general,
+#                 fingerprint_id=fingerprint_id,
+#                 breadcrumb=True,
+#                 extra_fields=extra_fields
+#         )
+#         r['Cache-Control'] = 'no-cache'
+#         r['Expires'] = "Thu, 24 Jan 1980 00:00:00 GMT"
+#     except:
+#         raise
+#     return r
 
 def show_fingerprint_page_read_only(request, q_id, qs_id, SouMesmoReadOnly=False, errors={}, template_name='advanced_search.html'):
 
@@ -2444,7 +2558,8 @@ def save_answers_to_csv(list_databases, filename):
         writer.writerow(['DB_ID', 'DB_name', 'Questionset', 'Question', 'QuestioNumber', 'Answer'])
         for t in list_databases:
             id = t.id
-            qsets, name = createqsets(id, clean=False)
+
+            qsets, name, db_owners, fingerprint_ttype = createqsets(id, clean=False)
 
             for group in qsets.ordered_items():
                 (k, qs) = group
@@ -2654,7 +2769,7 @@ def import_questionnaire(request, template_name='import_questionnaire.html'):
     # wb = load_workbook(filename = r'/Volumes/EXT1/Dropbox/MAPi-Dropbox/EMIF/Code/emif/emif/questionnaire_ad_v2.xlsx')
     # wb = load_workbook(filename = r'/Volumes/EXT1/Dropbox/MAPi-Dropbox/EMIF/Observational_Data_Sources_Template_v5.xlsx')
     # wb = load_workbook(filename = r'C:/Questionnaire_template_v3.4.xlsx')
-    wb = load_workbook(filename =r'/Users/ribeiro/Downloads/Questionnaire_template_v3.5.3.xlsx')
+    wb = load_workbook(filename =r'/Volumes/EXT1/trash/Questionnaire_template_v3.5.3xlsx')
     ws = wb.get_active_sheet()
     log = ''
 

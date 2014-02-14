@@ -170,7 +170,6 @@ div .tooltip {
     font-size: 14px;
     /*margin-left: 0px;*/
 
-
 }
 
 .qnumber_h2 {
@@ -236,6 +235,7 @@ clear: both;
 list-style-type: none !important;
     
 }
+
 .gt-ie7 #li_advanced_search{
     margin: 10px 0px !important;
 }
@@ -255,6 +255,44 @@ background-color: #e5e5e5;
 -moz-box-shadow: inset 0 3px 8px rgba(0,0,0,0.125);
 box-shadow: inset 0 3px 8px rgba(0,0,0,0.125);
 }
+
+
+/**********************************************************************
+****** Documents ******************************************************
+**********************************************************************/
+
+#documents  {
+  font-weight: bold;
+  padding-left: 30px;
+}
+
+
+#documents .nodocs {
+  font-weight: bold;
+}
+
+/**********************************************************************
+****** Population charactetistics *************************************
+**********************************************************************/
+
+#populationcharacteristics
+{
+  height: 600px;
+  padding-left: 30px;
+}
+
+.populationcharacteristicsbar {
+  padding-right: 70px;
+
+}
+
+#pcBarContent ul li {
+  margin-bottom: 0px;
+}
+
+
+
+
 .not-supported{
     display: none;
     margin: 50px;
