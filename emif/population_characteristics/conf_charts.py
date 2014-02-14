@@ -49,7 +49,7 @@ class ConfCharts(object):
 
         f2 = Filter()
         f2.name = 'Gender'
-        f2.key = 'Gender'
+        f2.key = None
         f2.value = 'Gender'
 
         c.filters = [f2]
