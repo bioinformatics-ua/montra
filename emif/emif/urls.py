@@ -93,8 +93,9 @@ urlpatterns = patterns('',
 
     url(r'^resultsdiff/(?P<page>[-]{0,1}\d+)?$', 'emif.views.results_diff'),
     url(r'^resultscomp', 'emif.views.results_comp'),
-    url(r'^fingerprint/(?P<runcode>[^/]+)/(?P<qs>[-]{0,1}\d+)/$', 'emif.views.fingerprint'),
-
+    #url(r'^fingerprint/(?P<runcode>[^/]+)/(?P<qs>[-]{0,1}\d+)/$', 'emif.views.fingerprint'),
+    url(r'^fingerprint/(?P<runcode>[^/]+)/(?P<qs>[-]{0,1}\d+)/$', 'population_characteristics.documents.document_form_view'),
+    
     # List Databases
     url(r'^databases/(?P<page>[-]{0,1}\d+)?$', 'emif.views.databases', name="databases"),
     url(r'^alldatabases/(?P<page>[-]{0,1}\d+)?$', 'emif.views.all_databases'),
