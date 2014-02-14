@@ -8,6 +8,7 @@
                         $('.qsets').each(function(){
                             $(this).addClass('depon_class');
                         });
+                        $('#tabular_container').html('<div class="well pull-center">To see a tabular view of all databases, please choose a database type and a questionset.</div>'); 
                     } else {
                         $('.qsets').each(function(){
                             if($(this).attr('id') == 'q_select_'+value_selected){
@@ -21,12 +22,15 @@
                 $('.qsets').change(function(){
                     var db_selected = $('#db_type').val();
                     var qset_selected = $(this).val();
-                    //alert(qset_selected);
+                    if(qset_selected=='0'){
+                        $('#tabular_container').html('<div class="well pull-center">To see a tabular view of all databases, please choose a database type and a questionset.</div>'); 
+                    } else {
                     $('#tabular_container').html('<div class="well pull-center">Loading...</div>');
                     $.post( "qs_data_table", {db_type: db_selected, qset: qset_selected })
                       .done(function( data ) {
                         $('#tabular_container').html(data);
                       });
+                    }
                 });
             });
             
