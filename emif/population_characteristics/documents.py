@@ -107,7 +107,7 @@ def document_form_view(request, runcode, qs, template_name='documents_upload_for
                     'style': qs, 'collapseall': False, 
                     'owner_fingerprint':True,
                     'fingerprint_dump': True,
-                    'contains_population': False,
+                    'contains_population': False, 'hide_add': True,
                     'fingerprint_ttype': fingerprint_ttype,
                     })
 

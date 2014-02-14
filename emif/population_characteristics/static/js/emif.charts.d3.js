@@ -48,7 +48,7 @@ function GraphicChartD3(divArg, dataArg)
 
           .orient("bottom")
           .ticks(d3.time.years, 10)
-          .tickValues(["This is long", "That is long", "Other is long"])
+          .tickValues(["", "", ""])
           .tickPadding(8);
 
 

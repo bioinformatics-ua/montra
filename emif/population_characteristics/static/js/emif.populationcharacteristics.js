@@ -120,7 +120,6 @@ function PCAPI ()
         return result;
     };
 
-
     this.getValueN = function(valueN){
           var result = {}
           
@@ -172,13 +171,12 @@ function PCAPI ()
         return result;
     };
 
-
     this.getFilter = function(Var, Row, fingerprintID){
         var result = {}
-          
+        fingerprintID = 'abcd';  
         $.ajax({
           dataType: "json",
-          url: "population/jerboalistvalues/"+Var+"/"+Row+"/" + fingerprintID,
+          url: "population/filters/"+Var+"/"+Row+"/" + fingerprintID,
           async: false,
           data: result,
           success: function (data){result=data;},
@@ -201,7 +199,7 @@ function PCAPI ()
 
             
             /** Get a list of filters */
-            values = options.getGender();
+            values = options.getFilter();
             
             if (values===undefined)
             {
@@ -296,6 +294,13 @@ function PCAPI ()
                       $("#d3test").graphicChart('init');
                       $("#d3test").graphicChart('drawBarChart', valuesFromGraph,valuesFromGraph,valuesFromGraph);
 
+
+                      var pc = new PCAPI();
+                      $("#pcBarContentRoot").removeClass("hidden");
+                      $("#pcBarContentRoot").addClass("show");
+                      $("#pcBarContent").populationChartsBar(pc);
+                      $("#pcBarContent").populationChartsBar('draw', pc);
+
                       
                       if ($(e.toElement.firstChild).hasClass('icon-ok')) 
                       {
@@ -358,16 +363,16 @@ function PCAPI ()
 $(document).ready(
     function(){
 
-        var pc = new PCAPI();
-
-        $("#pcBarContent").populationChartsBar(pc);
-        $("#pcBarContent").populationChartsBar('draw', pc);
 
         var chartLayout = new ChartLayout();
 
         $("#pc_list").populationChartsTypes(chartLayout, PCAPI);
         $("#pc_list").populationChartsTypes('draw', chartLayout); 
-
-    }
+        $(".graphTypes").each(function(d,a){
+          console.log(a);
+          if (d==0) $(this)[0].click()
+        });
+        }
+    
 );
 
