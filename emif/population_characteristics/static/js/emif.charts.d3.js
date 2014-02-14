@@ -92,7 +92,7 @@ function GraphicChartD3(divArg, dataArg)
             .attr("y", 6)
             .attr("dy", ".71em")
             .style("text-anchor", "end")
-            .text("Active patients");
+            .text("");
 
         svg.selectAll(".bar")
             .data(data)

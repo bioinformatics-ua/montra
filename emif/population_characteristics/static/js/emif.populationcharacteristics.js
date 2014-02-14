@@ -176,7 +176,7 @@ function PCAPI ()
         fingerprintID = 'abcd';  
         $.ajax({
           dataType: "json",
-          url: "population/filters/"+Var+"/"+Row+"/" + fingerprintID,
+          url: "population/filters/"+Var+"/" + fingerprintID,
           async: false,
           data: result,
           success: function (data){result=data;},
@@ -195,17 +195,21 @@ function PCAPI ()
  {
 
     var methods = {
-        init : function( options ) {
+        init : function( options, name, fingerprintId ) {
 
             
             /** Get a list of filters */
-            values = options.getFilter();
-            
+            values = options.getFilter(name.text,fingerprintId);
+            console.log("parsing:");
+            console.log(JSON.parse(values.values));
             if (values===undefined)
             {
                 return;
             };
+
+            console.log(values);
             var self = this;
+            self.html('');
             self.append("Gender: ");
             var tmpUl = $('<ul class="nav nav-pills nav-stacked">');
 
@@ -296,9 +300,9 @@ function PCAPI ()
 
 
                       var pc = new PCAPI();
-                      $("#pcBarContentRoot").removeClass("hidden");
-                      $("#pcBarContentRoot").addClass("show");
-                      $("#pcBarContent").populationChartsBar(pc);
+                      //$("#pcBarContentRoot").removeClass("hidden");
+                      //$("#pcBarContentRoot").addClass("show");
+                      $("#pcBarContent").populationChartsBar(pc,this,fingerprintID);
                       $("#pcBarContent").populationChartsBar('draw', pc);
 
                       
