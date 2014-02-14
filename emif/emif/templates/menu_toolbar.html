@@ -6,7 +6,7 @@
 
         {% if  request.user|safe in users_db %}
         <button type="button" class="btn btn" onclick="edit_db_option();" title="Enable/Disabled edit option" data-toggle="button">
-			<i class="fa fa-pencil-square-o"></i> Edit
+			<i class="fa fa-pencil-square-o"></i> Make editable
 		</button>
          {% endif %}
 
@@ -93,9 +93,6 @@
             {% endif %}
       {% endif %}
 
-		<button type="button" class="btn btn" onclick="window.print();" title="Print">
-      <i class="icon-print"></i>
-    </button>
 		
 
 	</div>
