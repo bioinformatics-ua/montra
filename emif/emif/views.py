@@ -1211,7 +1211,7 @@ def qs_data_table(request, template_name='qs_data_table.html'):
     for t in list_databases:
 
         if t.type_name == db_type:
-            qsets, name = createqsets(t.id)
+            qsets, name, _d, _c = createqsets(t.id)
             
             q_list = []
             a_list = []            
@@ -1245,7 +1245,7 @@ def all_databases_data_table(request, template_name='alldatabases_data_table.htm
         # Creating list of database types
         for t in list_databases:
             if not t.type_name in databases_types:
-                qsets, name = createqsets(t.id)
+                qsets, name, _d, _e,  = createqsets(t.id)
                 
                 databases_types[t.type_name] = qsets.ordered_items()  
             
