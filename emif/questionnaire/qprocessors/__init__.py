@@ -8,3 +8,5 @@ import range        # range of numbers
 import timeperiod   # time periods
 import custom       # backwards compatibility support
 import publications
+
+import numeric
