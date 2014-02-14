@@ -89,10 +89,10 @@ NumericValidator.prototype ={
     }
 }
 
-function Fingerprint_Validator(){
+function Fingerprint_Validator(searchMode){
     this.validators = [];
-    this.validators["open-button"] = { n: "open-button_validator", v: new OpenButtonValidator(this)};
 
+    this.validators["open-button"] = { n: "open-button_validator", v: new OpenButtonValidator(this)};
     this.validators["numeric"] = { n: "numeric_validator", v: new NumericValidator(this)};
 }
 Fingerprint_Validator.prototype ={
@@ -149,6 +149,15 @@ Fingerprint_Validator.prototype ={
                 }
 
             });    
+        }
+    },
+    searchMode: function(searchMode){
+        if(searchMode == undefined || !searchMode){
+            this.validators["open-button"] = { n: "open-button_validator", v: new OpenButtonValidator(this)};
+            console.log("Fingerprint_Validator: SearchMode disabled");
+        }else{
+            delete this.validators["open-button"];        
+            console.log("Fingerprint_Validator: SearchMode disabled");
         }
     }
 }

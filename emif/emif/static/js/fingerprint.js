@@ -66,11 +66,11 @@ function validate1(element, id_answered) {
         }
 }
 
+//Creates an advanced validator for question fields.
 var classNamePatternAUX = /type_(\S+)/i;
-var advValidator;
+var advValidator = new Fingerprint_Validator();
 
 $(document).ready(function () {
-    advValidator = new Fingerprint_Validator();
     advValidator.onInit();
     $(document).on('change', '.answer input,.answer select,.answer textarea, button', function (e) {
         e.preventDefault();
@@ -78,6 +78,7 @@ $(document).ready(function () {
         var id_answered = el.id.split("_")[1];
         var id_answered_aux = el.id.split("_")[1].replace(/\./g,'');
 
+        //Detects widget class and sends it to the advanced validator.
         var className = $('[id="qc_'+id_answered+'"]').attr("class");
         className = classNamePatternAUX.exec(className)[1];
         if(className != undefined)
