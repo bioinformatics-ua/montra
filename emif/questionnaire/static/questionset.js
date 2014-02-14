@@ -60,16 +60,31 @@ function statusChanged(obj, res) {
 
 function valchanged(qnum, value) {
     if (!(typeof bool_container === 'undefined')) {
+        var just_number = qnum.split('_')[1];
         var clean = qnum.replace('question_','').replace(/(\\)/g, '');
         // We have to get the question
         var the_question = $('#question_'+clean.split('_')[0].replace(/(\.)/g,'')).text().trim(); 
+        
         if(value==true){
-
-            bool_container.push(clean.replace('_','. ')+' ('+the_question+')');
+            //console.log(qnum);
+            //console.log(clean.replace('_','. ')+' ('+the_question+')');
+            //console.log(value);
+            
+            //var optional = $('#question_'+clean.split('_')[0].replace(/(\.)/g,'')).closest('input[type="text"]');
+            //console.log(optional.attr('id'));
+            
+            //var optional = $('#question_'+just_number.replace(/(\.)/g,'\\.')+"_1_opt").val();
+            bool_container.push(qnum,
+                                clean.replace('_','. ')+' ('+the_question+')'
+                               , ''+value);
         } else if(value==false){
-            bool_container.splice(clean.replace('_','. ')+' ('+the_question+')');
+            var optional = $('#question_'+just_number.replace(/(\.)/g,'')+"_opt").val();
+            bool_container.splice(qnum,
+                                clean.replace('_','. ')+' ('+the_question+')'
+                               , ''+value);
         } else {
-            bool_container.push(clean.replace('_','')+'. '+the_question+'');        }
+            bool_container.push(qnum, clean.replace('_','')+'. '+the_question+'', value);        
+        }
     }    
 
     qvalues[qnum] = value;
@@ -97,7 +112,7 @@ function clear_selection(question_name, response){
     $(":radio[name='" + question_name + "']").prop('checked', false);
     if (!(typeof bool_container === 'undefined')) {
             console.log(response);
-            bool_container.splice(response);
+            bool_container.splice(question_name, response, '');
     
     }        
     

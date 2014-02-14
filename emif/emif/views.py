@@ -2003,7 +2003,7 @@ def show_fingerprint_page_read_only(request, q_id, qs_id, SouMesmoReadOnly=False
                             #print qvalues
                 elif k == "boolrelwidget-boolean-representation":            
                     qexpression = v[1:-1]
-                        
+            print qexpression            
             query = convert_qvalues_to_query(qvalues, q_id, qexpression)
             print "Query: " + query
             request.session['query'] = query

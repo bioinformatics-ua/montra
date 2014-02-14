@@ -53,7 +53,7 @@ $(document).ready(function () {
 
 /***************** BEGIN - CHECK IF ANSWER IS FILLED IN *****************/
 /* Function to validate for fields of type 1 (see comments below)*/
-function validate1(element, id_answered) {
+function validate1(element, id_answered, dirty_id_answered) {
                 /* Tip from: http://viralpatel.net/blogs/jquery-get-text-element-without-child-element/ */
             var just_question = $('#question_'+id_answered)
         .clone()    //clone the element
@@ -67,15 +67,22 @@ function validate1(element, id_answered) {
             $('[id="answered_'+id_answered+'"]').show();
         
             if (!(typeof bool_container === 'undefined')) {
+                console.log('question_nr_'+id_answered);
+                console.log( $('#question_nr_'+id_answered).text().trim()+" "+just_question);
+                console.log($('#question_'+dirty_id_answered.replace('.','\\.')).val());
                 
-                bool_container.push($('#question_nr_'+id_answered).text().trim()+" "+just_question);
+                bool_container.push('question_nr_'+id_answered,
+                    $('#question_nr_'+id_answered).text().trim()+" "+just_question,
+                                   $('#question_'+dirty_id_answered.replace('.','\\.')).val());
             }
         
         } else {
             //console.log('2 - #answered_'+id_answered);
             $('[id="answered_'+id_answered+'"]').hide();
             if (!(typeof bool_container === 'undefined')) {
-                bool_container.splice($('#question_nr_'+id_answered).text().trim()+" "+just_question);
+                bool_container.splice('question_nr_'+id_answered,
+                    $('#question_nr_'+id_answered).text().trim()+" "+just_question,
+                                   $('#question_'+dirty_id_answered.replace('.','\\.')).val());
             }
         }
             // If we have a boolean container, maker
@@ -89,7 +96,6 @@ $(document).ready(function () {
         var el = e.target;
         var id_answered = el.id.split("_")[1];
         var id_answered_aux = el.id.split("_")[1].replace(/\./g,'');
-        
         /*
             - verify the type to each question and create a respective processment for each one
             TYPES:
@@ -105,7 +111,7 @@ $(document).ready(function () {
             || $('[id="qc_'+id_answered+'"]').hasClass('type_open-textfield')
             || $('[id="qc_'+id_answered+'"]').hasClass('type_publication')) {
 
-            validate1(this, id_answered_aux);
+            validate1(this, id_answered_aux, id_answered);
         }
 
         if($('[id="qc_'+id_answered+'"]').hasClass('type_datepicker') || $('[id="qc_'+id_answered+'"]').hasClass('type_range')
@@ -114,7 +120,7 @@ $(document).ready(function () {
             || $('[id="qc_'+id_answered+'"]').hasClass('type_choice-yesnocomment')
             || $('[id="qc_'+id_answered+'"]').hasClass('type_choice-yesno')) {
 
-            validate1(this, id_answered_aux);
+            validate1(this, id_answered_aux, id_answered);
         }
 
          if($('[id="qc_'+id_answered+'"]').hasClass('type_choice')

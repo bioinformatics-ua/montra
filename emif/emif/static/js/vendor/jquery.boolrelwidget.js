@@ -34,12 +34,16 @@
         basic_blocks.push(new BooleanGroup('outro nome grande, mas mesmo bue grande para ficar aqui para eu depois arranjar isto com ...'));
         */
         var funcs = {
-            push: function (str) {
+            push: function (ident, rep, answer) {
+                var bt = new BooleanTerminal(ident, rep, answer);
                 
-                var block = this.pushWithoutDraw(str);
+                if (bt.isNull())
+                    return null;
+                
+                var block = this.pushWithoutDraw(bt);
                 /* Only auto-add in case auto-add is on */
 
-                if(settings.auto_add && block != 'null'){
+                if((settings.auto_add == true ) && (block != null)){
                     var sliced = this.spliceById(block.id);
                     
                     used_blocks.push(sliced);
@@ -52,18 +56,19 @@
                 
                 return block;
             },
-            pushWithoutDraw: function(str) {      
-            if(this.getBooleanIndex(str)!= -1){
-                console.warn('Variable ' + str + ' already on basic blocks pool.');  
-                return null;
-            }
-            if(this.getUsedIndex(str)!= -1){
-                console.warn('Variable ' + str + ' already on used basic blocks pool.');  
-                return null;
-            }
-                var block = new BooleanGroup(str);
+            pushWithoutDraw: function(bt) {      
+                if(this.getBooleanIndex(bt)!= -1){
+                    console.warn('Variable ' + bt + ' already on basic blocks pool.');  
+                    return null;
+                }
+                if(this.getUsedIndex(bt)!= -1){
+                    console.warn('Variable ' + bt + ' already on used basic blocks pool.');  
+                    return null;
+                }
+                var block = new BooleanGroup(bt);
+                
                 basic_blocks.push(block);
-                console.warn('Pushed new variable ' + str + ' to basic blocks pool.');
+                console.warn('Pushed new variable ' + bt + ' to basic blocks pool.');
                 
                 return block;
             },
@@ -72,7 +77,7 @@
                     console.warn('When adding, a valid simple BooleanGroup child must be found.');
                     return false;
                 }
-                if(!((typeof obj.variables[0] == 'string' || obj.variables[0] instanceof String)
+                if(!(obj.variables[0] instanceof BooleanTerminal
                    && this.getBooleanIndex(obj.variables[0])== -1)){
                     console.warn('Variable ' + obj + ' already on basic blocks pool.');  
                     return false;
@@ -85,15 +90,19 @@
                 
                 return true
             },
-            splice: function (str) {
+            splice: function (ident, rep, answer) {
+                var bt = new BooleanTerminal(ident, rep, answer);
+                if (bt.isNull())
+                    return null;
+                
                 var block;
-                var id = this.getBooleanIndex(str);
+                var id = this.getBooleanIndex(bt);
                 if(id < 0){
                     
                     // If it fails, lets check if its being used
-                    var other_id = this.getUsedIndex(str);
+                    var other_id = this.getUsedIndex(bt);
                     if(other_id <0){
-                        console.warn('No basic block ' + str + ' from basic blocks pool to slice out.');
+                        console.warn('No basic block ' + bt + ' from basic blocks pool to slice out.');
                         return null;
                     }
                     
@@ -106,7 +115,7 @@
                     return block;
                 }
                 block = basic_blocks.splice(id,1)[0];
-                console.log('Sliced out variable ' + str + ' from basic blocks pool.');
+                console.log('Sliced out variable ' + bt + ' from basic blocks pool.');
                                 
                 this.draw();
                 
@@ -132,7 +141,8 @@
                 var i = 0;
                 for(i=0;i<list.length;i++){
                     // We must check this is a "empty" container with only one element (the one we want).
-                    return i;
+                    if(list[i].containsOnly(element))
+                        return i;
                 }
                 return -1;
             },            
@@ -146,7 +156,7 @@
                 return -1;
             },
             spliceById: function (number) {
-                var id = this.getIndexById(number)
+                var id = this.getIndexById(number);
                 if(id < 0){
                    console.warn('No basic block with id ' + number + ' from basic blocks pool to slice out.');
                    return null; 
@@ -182,10 +192,10 @@
                     little_boxes.push(basic_blocks[i].id);
                     little_boxes.push('" class="btn boolrelwidget-block-inner">');
                     little_boxes.push('<div class="boolrelwidget-simple" data-toggle="tooltip" title="');
-                    little_boxes.push(basic_blocks[i].variables[0]);
+                    little_boxes.push(basic_blocks[i].variables[0].toString());
                     little_boxes.push('">');
                     
-                    little_boxes.push(basic_blocks[i].variables[0]);
+                    little_boxes.push(basic_blocks[i].variables[0].toString());
                     little_boxes.push('</div>');
                     little_boxes.push('</span>');
                     //little_boxes.push('<span class="btn btn-danger boolrelwidget-delete">');
@@ -196,7 +206,7 @@
                 }
                 
                 if(little_boxes.length == 0){
-                    $('#boolrelwidget-basicblocks').html("You must add concepts before manipulating their logic.");             
+                    $('#boolrelwidget-basicblocks').html("This box shows unused terms that have a value filled but are not being used on the query (when any).");             
                 } else{
                     $('#boolrelwidget-basicblocks').html(little_boxes.join(''));
                                     // Make them draggable
@@ -367,11 +377,11 @@
             // This recursive functions runs down in the BooleanGroups and puts everything on the big box.
             // I pass a counter to be able to style differently (so i know the recursion level couldnt find a better way to style it different
             harvest: function(something, big_box, counter){
-                if(typeof something == 'string' || something instanceof String){
+                if(something instanceof BooleanTerminal){
                         big_box.push('<div class="boolrelwidget-simple" data-toggle="tooltip" title="'+
-                                     something+'">');
+                                     something.toString()+' '+something.val+'">');
                     
-                    big_box.push(something);
+                    big_box.push(something.toString());
                     big_box.push('</div>');
                 }
                 else if(something instanceof BooleanGroup){
@@ -478,7 +488,7 @@
                 return select.join('');
             },
             reset: function(){
-                if(mastergroup != null){
+                if(mastergroup != 'null'){
                     var simples = mastergroup.extractAllSimple();
                     mastergroup=null;
                     used_blocks=[];
@@ -601,7 +611,7 @@
         self = self.html('');
         
         // Now lets add the toolbar
-        var toolbar_content = '<ul id="boolrelwidget-expand" class="boolrelwidget-menu-container"><li class="boolrelwidget-menu"><div class="boolrelwidget-arrow-l"><div class="boolrelwidget-arrow-up"></div></div></li><li class="boolrelwidget-menu">'+settings.expand_text+'</li><li class="boolrelwidget-menu"><div class="boolrelwidget-arrow-r"><div class="boolrelwidget-arrow-up"></div></div></li></ul><ul id="boolrelwidget-collapse" class="boolrelwidget-menu-container-panel"><li class="boolrelwidget-menu"><div class="boolrelwidget-arrow-l"><div class="boolrelwidget-arrow-down"></div></div></li><li class="boolrelwidget-menu">'+settings.collapse_text+'</li><li class="boolrelwidget-menu"><div class="boolrelwidget-arrow-r"><div class="boolrelwidget-arrow-down"></div></div></li></ul><div id="boolrelwidget-panel"><div id="boolrelwidget-basicblocks-out"><strong>Concepts</strong><div id="boolrelwidget-basicblocks" class="well well-small">Loading...</div></div><div class="clearfix"><div class="boolrelwidget-menu pull-left"><strong>Boolean Query</strong></div><div class="pull-right boolrelwidget-menu btn-group">';
+        var toolbar_content = '<ul id="boolrelwidget-expand" class="boolrelwidget-menu-container"><li class="boolrelwidget-menu"><div class="boolrelwidget-arrow-l"><div class="boolrelwidget-arrow-up"></div></div></li><li class="boolrelwidget-menu">'+settings.expand_text+'</li><li class="boolrelwidget-menu"><div class="boolrelwidget-arrow-r"><div class="boolrelwidget-arrow-up"></div></div></li></ul><ul id="boolrelwidget-collapse" class="boolrelwidget-menu-container-panel"><li class="boolrelwidget-menu"><div class="boolrelwidget-arrow-l"><div class="boolrelwidget-arrow-down"></div></div></li><li class="boolrelwidget-menu">'+settings.collapse_text+'</li><li class="boolrelwidget-menu"><div class="boolrelwidget-arrow-r"><div class="boolrelwidget-arrow-down"></div></div></li></ul><div id="boolrelwidget-panel"><div id="boolrelwidget-basicblocks-out"><strong>Unused Terms</strong><div id="boolrelwidget-basicblocks" class="well well-small">Loading...</div></div><div class="clearfix"><div class="boolrelwidget-menu pull-left"><strong>Boolean Query</strong></div><div class="pull-right boolrelwidget-menu btn-group">';
         
         if( settings.form_anchor ){
             toolbar_content+='<button id="boolrelwidget-search" class="btn">Search</button>';
@@ -625,8 +635,8 @@
             funcs.expandPanel();
         }
         $( '#boolrelwidget-search' ).click(function() {
-            if(mastergroup != null)
-                $('#boolrelwidget-boolean-representation').val('x'+mastergroup.toString());
+            if(mastergroup != 'null')
+                $('#boolrelwidget-boolean-representation').val(mastergroup.toQuery());
             else
                 $('#boolrelwidget-boolean-representation').val('');
             
@@ -663,8 +673,11 @@
 var BOOL = {
   NOP   : { value: -1, name: "NOP"}, // No operation, means its a edge branch 
   AND   : { value: 0, name: "AND"}, 
-  OR    : { value: 1, name: "OR"}, 
-  XOR   : { value: 2, name: "XOR"}
+  OR    : { value: 1, name: "OR"}/*,
+  XOR   : { value: 2, name: "XOR"},
+  NOR   : { value: 3, name: "NOR"},
+  NAND  : { value: 4, name: "NOR"},  
+*/
 };
 
 function isBool(op){
@@ -681,16 +694,61 @@ function isBool(op){
  * (this is used to facilitate encountering nested references */
 
 var boolrelwidgetuniqueidcounter=10000;
-/* Defining BooleanVariable class 
- *  A BooleanVariable object has:
- *      -   a id to facilitate encountering the element when nested
- *      -   two operators of type either string or BooleanVariable
- *      -   a relation of enum type BOOL
- */
+
+
+function BooleanTerminal(identificator, representation, value){
+    if(!(typeof identificator == 'string' || identificator instanceof String)){
+        console.warn('Identificator on BooleanTerminal must be a string');
+        return null;
+    }
+    if(!(typeof representation == 'string' || representation instanceof String)){
+        console.warn('Representation on BooleanTerminal must be a string');
+        return null;
+    } 
+    if(!(typeof value == 'string' || value instanceof String)){
+        console.warn('Value on BooleanTerminal must be a string');
+        return null;
+    } 
+    if (identificator == '' || representation == ''){
+        console.warn('Tried to add a BooleanTerminal with empty identificator or representation, that is impossible, the only possible empty variable is value.');
+        return null;    
+    }
+    this.id=identificator;
+    this.text = representation;
+    this.val = value;
+}
+BooleanTerminal.prototype = {
+    toString    :   function(){
+        return this.text;
+    },
+    toQuery   :   function(){
+        if(this.id && this.val)
+            return this.id+": '"+escape(this.val)+"'";
+        else return '';
+    },    
+    equals      :   function(other_bt){
+        if(!(other_bt instanceof BooleanTerminal))
+            return false;
+        
+        if(this.id!=other_bt.id)
+            return false;
+    
+        return true;
+    },
+    /* Since this language is prototype based, i cant just return null on a constructor (since there's none)
+        i have to make a method to acertain nullity then
+    */
+    isNull  :   function() {
+        if (!(this.id && this.text))
+            return true;
+        
+        return false;
+    }
+}
 
 function BooleanGroup(obj1){
-    if(!(obj1 instanceof BooleanGroup || typeof obj1 == 'string' || obj1 instanceof String)){
-        console.warn('First operator of Boolean Group object must be a BooleanGroup or a string');
+    if(!(obj1 instanceof BooleanGroup || obj1 instanceof BooleanTerminal)){
+        console.warn('First operator of Boolean Group object must be a BooleanGroup or a BooleanTerminal');
         return null;
     }
     this.id = boolrelwidgetuniqueidcounter++;
@@ -702,8 +760,8 @@ function BooleanGroup(obj1){
 BooleanGroup.prototype = { 
     addBoolean  :   function(op, obj1){
     
-        if(!(obj1 instanceof BooleanGroup || typeof obj1 == 'string' || obj1 instanceof String)){
-            console.warn('Operator of Boolean Group object must be a BooleanGroup or a string.');
+        if(!(obj1 instanceof BooleanGroup || obj1 instanceof BooleanTerminal)){
+            console.warn('Operator of Boolean Group object must be a BooleanGroup or a booleanterminal.');
             return null;
         }        
         if(!isBool(op)){
@@ -715,16 +773,28 @@ BooleanGroup.prototype = {
     },
         /* This returns a string representation of this object in boole's arithmetic format */
     toString : function(){
-        var output=this.variables[0]
+        var output=this.variables[0].toString();
         var i=0;
         for(i=1;i<this.variables.length;i++){
-            output+=" __"+this.relations[i-1].name+"__ "+this.variables[i].toString();
+            output+=" "+this.relations[i-1].name+" "+this.variables[i].toString();
         }
         if(this.variables.length>1)
-            output="{"+output+"}";
+            output="("+output+")";
         
         return output;
     },
+        /* This returns a string representation of this object in query format */
+    toQuery : function(){
+        var output=this.variables[0].toQuery();
+        var i=0;
+        for(i=1;i<this.variables.length;i++){
+            output+=" "+this.relations[i-1].name+" "+this.variables[i].toQuery();
+        }
+        if(this.variables.length>1)
+            output="("+output+")";
+        
+        return output;
+    },    
     /* While i realize this approach isnt the best, i was having problems with the recursivity and this worked
      * Maybe to review with more time at a later time
     */
@@ -785,9 +855,9 @@ BooleanGroup.prototype = {
                         // If this has only 1 element and is complexe, theres no need for this, we can revert back to
                         //only one level
                         if(this.variables.length == 1 && 
-                           !(typeof this.variables[0] == 'string' || this.variables[0] instanceof String)){
+                           !(this.variables[0] instanceof BooleanTerminal)){
                             parent.variables[branch] = this.variables[0];
-                        }
+                        } 
                 }                
             }
             var k = 0;
@@ -845,7 +915,7 @@ BooleanGroup.prototype = {
             console.warn('When changing a relation the new value must be a valid BOOL enum.');
             
         } else {
-            console.log("IDs: "+this.id+'=='+ container_id);
+            //console.log("IDs: "+this.id+'=='+ container_id);
 
             if(this.id == container_id){
             
@@ -862,19 +932,22 @@ BooleanGroup.prototype = {
             }            
         }
     },
-    containsOnly : function(str){
+    containsOnly : function(bt){
         if(this.variables.length>1)
             return false;
         if(this.variables[0] instanceof BooleanGroup)
             return false;
         
-        if(this.variables[0] == str)
+        // If it equals, lets update the answer
+        if(this.variables[0].equals(bt)){
+            this.variables[0].val=bt.val;
             return true;
+        }
         
         return false;
     },
     isSimple : function(){
-        if(this.variables.length == 1 && (typeof this.variables[0] == 'string' || this.variables[0] instanceof String))
+        if(this.variables.length == 1 && this.variables[0] instanceof BooleanTerminal)
             return true;
         
         return false;
