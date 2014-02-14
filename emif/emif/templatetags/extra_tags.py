@@ -26,6 +26,11 @@ from questionnaire.models import Questionnaire
 
 register = template.Library()
 
+
+from django.conf import settings
+
+
+
 @register.filter(name='removeh1')
 @stringfilter
 def removeh1(value):
@@ -56,6 +61,14 @@ def removehs(value):
     value = value.replace('h6. ','')
     value = value.replace('h7. ','')
 
+    return value
+
+@register.filter(name='datehhmm')
+@stringfilter
+def datehhmm(value):
+    
+    value = value[:-10]
+    
     return value
 
 @register.filter(name='trim')
@@ -116,6 +129,7 @@ def fingerprints_list():
     
 
     return results
+
 
 
 def show_fingerprints():
@@ -215,4 +229,21 @@ def incrementglobal( parser, token ):
   except ValueError:
     raise template.TemplateSyntaxError("%r tag requires arguments" % token.contents.split()[0])
   return GlobalVariableIncrementNode(varname)
+
 register.tag( 'incrementglobal', incrementglobal )
+
+class VersionNode( template.Node ):
+  def __init__( self, varname ):
+    self.varname = varname
+  def render( self, context ):
+    return get_version()
+
+def get_version():
+    return settings.VERSION + " " + settings.VERSION_DATE
+
+def get_version_tag(parser, token):
+    return VersionNode('')
+register.tag( 'get_version', get_version_tag )
+
+
+

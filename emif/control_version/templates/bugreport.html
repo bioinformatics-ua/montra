@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+{% load url from future %}
+{% load django_bootstrap_breadcrumbs %}
+
+{% block breadcrumbs %}
+
+        {% breadcrumb "Home" "home" %}
+        {% breadcrumb "Bug Report" "" %}
+
+{% endblock %}
+
+{% block content%}
+
+<div class="row">
+       <div id="contact_wrap" class="rows">
+             <div class="span6 center">
+       <h2>Bug Report</h2>
+Your feedback is highly appreciated. Please report the bug that you found.
+
+        <div id="contact" class="clearfix" style="">
+            <div id="c_form">
+                <br /><br />
+                <form name="theform" action="bugreport" method="post" id="theform">
+                  {% csrf_token %}
+                    <div id="name_email">
+                        {{ form.title.errors }}
+
+                        <label id="id_title">Title:</label>
+                        {{ form.title }}
+                        <!--<input type="text" name="name" value="" id="name" />-->
+                        
+                        <!--<input type="text" name="email" value="" id="Email" />-->
+                    </div><!-- end name_email -->
+                    <div id="description">
+                        {{ form.description.errors }}
+                        <label id="id_description">Description:</label>
+                        <!--<textarea  class="span6" name="message" cols="30" rows="10" ></textarea>-->
+                        {{ form.description }}
+                    </div><!-- end message -->
+                    <div id="submit">
+                        <button class="btn btn-primary" name="submit" type="submit">Send</button>
+                    </div><!-- end submit -->
+                    
+                </form>
+
+            </div><!-- end c_form -->
+        </div><!-- end contact -->
+
+    </div><!-- end contact_wrap -->
+</div>
+</div>
+
+{% endblock %}
+
+ {% block scriptextra %}
+    {% comment %}
+    <script>
+        {% endcomment %}
+
+        $('#li_feedback').addClass("active");
+
+        {% comment %}
+    </script>
+    {% endcomment %}
+
+    {% endblock %}
+
+

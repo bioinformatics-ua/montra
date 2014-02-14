@@ -30,7 +30,8 @@ SITE_NAME = "EMIF Catalogue"
 # for this files we must change it manually (or serve them as dinamic files), this problem only ocurrs on IE
 # so if changing to something that not /, we should also change on file /static/css/bootstrap_ie_compatibility.css all relative # paths. This is necessary because i cant use django template variables inside a considered static file.
 BASE_URL = '/'
-
+VERSION = '0.3.1'
+VERSION_DATE = '2014.Feb.08'
 PROJECT_DIR_ROOT = '/projects/emif-dev/'
 
 if DEBUG:
@@ -135,13 +136,16 @@ else:
 # Example: "http://media.lawrence.com/static/"
 STATIC_URL = BASE_URL+'static/'
 
+
 # Additional locations of static files
 STATICFILES_DIRS = (
     # Put strings here, like "/home/html/static" or "C:/www/django/static".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
     os.path.abspath(PROJECT_DIR_ROOT + MIDDLE_DIR + 'emif/static'),
-    os.path.abspath(PROJECT_DIR_ROOT + MIDDLE_DIR + 'apps/seantis-questionnaire/questionnaire/static/')
+    os.path.abspath(PROJECT_DIR_ROOT + MIDDLE_DIR + 'questionnaire/static/'),
+    os.path.abspath(PROJECT_DIR_ROOT + MIDDLE_DIR + 'population_characteristics/static'),
+    os.path.abspath(PROJECT_DIR_ROOT + MIDDLE_DIR + 'docs_manager/static'),
 )
 
 # List of finder classes that know how to find static files in
@@ -150,6 +154,7 @@ STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
     #    'django.contrib.staticfiles.finders.DefaultStorageFinder',
+    #'djangobower.finders.BowerFinder',
 )
 
 # Make this unique, and don't share it with anybody.
@@ -186,6 +191,9 @@ TEMPLATE_DIRS = (
     # Don't forget to use absolute paths, not relative paths.
     os.path.abspath(PROJECT_DIR_ROOT + MIDDLE_DIR + 'apps/seantis-questionnaire/questionnaire/templates'),
     os.path.abspath(PROJECT_DIR_ROOT + MIDDLE_DIR + 'emif/templates'),
+    os.path.abspath(PROJECT_DIR_ROOT + MIDDLE_DIR + 'population_characteristics/templates'),
+    os.path.abspath(PROJECT_DIR_ROOT + MIDDLE_DIR + 'control_version/templates'),
+    os.path.abspath(PROJECT_DIR_ROOT + MIDDLE_DIR + 'docs_manager/templates'),
 )
 
 INSTALLED_APPS = (
@@ -206,7 +214,7 @@ INSTALLED_APPS = (
     'transmeta',
     'questionnaire',
     'questionnaire.page',
-
+    
     # User signup/signin/management
     'userena',
     'guardian',
@@ -226,11 +234,15 @@ INSTALLED_APPS = (
 
     'searchengine',
     'api',
+    'control_version',
 
     'django_bootstrap_breadcrumbs',
     'bootstrap-pagination',
     'django_jenkins',
 
+    # Django NVD3
+    'django_nvd3',
+    #'djangobower',
 
 )
 
@@ -267,6 +279,7 @@ USERENA_MODERATE_REGISTRATION = True                    #True - need admin appro
 USERENA_ACTIVATION_REJECTED = 'ACTIVATION_REJECTED'
 USERENA_PENDING_MODERATION = 'PENDING_MODERATION'
 USERENA_ACTIVATED = 'ALREADY_ACTIVATED'
+USERENA_REMEMBER_ME_DAYS = ('a day', 1)
 
 
 
@@ -329,6 +342,35 @@ LANGUAGES = (
 #   questionnaire is so huge that even the ajax request takes too long.
 QUESTIONNAIRE_PROGRESS = 'async'
 
+#DEBUG_TOOLBAR
+if not DEBUG:
+    INTERNAL_IPS = ('127.0.0.1',)
+    MIDDLEWARE_CLASSES += (
+        'debug_toolbar.middleware.DebugToolbarMiddleware',
+    )
+
+    INSTALLED_APPS += (
+    'debug_toolbar',
+    )
+
+    DEBUG_TOOLBAR_PANELS = (
+    'debug_toolbar.panels.version.VersionDebugPanel',
+    'debug_toolbar.panels.timer.TimerDebugPanel',
+    'debug_toolbar.panels.settings_vars.SettingsVarsDebugPanel',
+    'debug_toolbar.panels.headers.HeaderDebugPanel',
+    'debug_toolbar.panels.profiling.ProfilingDebugPanel',
+    'debug_toolbar.panels.request_vars.RequestVarsDebugPanel',
+    'debug_toolbar.panels.sql.SQLDebugPanel',
+    'debug_toolbar.panels.template.TemplateDebugPanel',
+    'debug_toolbar.panels.cache.CacheDebugPanel',
+    'debug_toolbar.panels.signals.SignalDebugPanel',
+    'debug_toolbar.panels.logger.LoggingPanel',
+    )
+
+    DEBUG_TOOLBAR_CONFIG = {
+    # 'INTERCEPT_REDIRECTS': False,
+    }
+
 
 JENKINS_TASKS = (
     'django_jenkins.tasks.run_pylint',
@@ -375,3 +417,40 @@ REST_FRAMEWORK = {
     )
 
 }
+
+#MONGODB
+#=======
+#Settings of EMIF MongoDB server, this is used to store the analytic data of population characteristics
+MONGO_EMIF = {
+    'DB_NAME': 'emif_mongo',
+    'HOST': 'localhost',
+    'PORT': 27017,
+    'COLLECTION': 'jerboa_files'
+}
+
+#CONNECT MONGODB
+#===============
+
+# Connect on MongoDB Database
+# from pymongo.connection import Connection
+from pymongo.errors import ConnectionFailure
+import sys
+# try:
+#     connection = Connection(MONGO_EMIF['HOST'], MONGO_EMIF['PORT'])
+#     DBCON = connection[MONGO_EMIF['DB_NAME']]
+# except ConnectionFailure, e:
+#     sys.stderr.write("Could not connect to MongoDB: %s" % e)
+#     sys.exit(1)
+
+
+from pymongo import MongoClient
+try:
+    client = MongoClient(MONGO_EMIF['HOST'], MONGO_EMIF['PORT'])
+    # db_name_mongo = MONGO_EMIF['DB_NAME']
+    # db_mongo = client.db_name_mongo
+    db_mongo = client.emif_mongo
+    # jerboa_collection = db_mongo.MONGO_EMIF['COLLECTION']
+    jerboa_collection = db_mongo.jerboa_files
+except ConnectionFailure, e:
+    sys.stderr.write("Could not connect to MongoDB: %s" % e)
+    sys.exit(1)

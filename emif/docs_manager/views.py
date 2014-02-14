@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
-
-# Copyright (C) 2013 Luís A. Bastião Silva and Universidade de Aveiro
+# Copyright (C) 2014 Luís A. Bastião Silva and Universidade de Aveiro
 #
 # Authors: Luís A. Bastião Silva <bastiao@ua.pt>
 #
@@ -19,17 +18,7 @@
 #
 
 
+# Create a view to list the documents?
 
-from github3 import login
-
-
-class Issue(object):
-	def __init__(self, user, pw):
-		
-		self.gh = login(user, pw)
-
-	def create(self, title, body ):
-		r = self.gh.repository("bioinformatics-ua", "emif-fb")
-		i = r.create_issue(title, body)
-
-
+# Create a view to upload the documents? 
+# Already in other place, might be moved to this place.

@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load url from future %}
+{% load extra_tags %}
 {% load django_bootstrap_breadcrumbs %}
 
 {% block breadcrumbs %}
@@ -14,6 +15,11 @@
 {% block content%}
 
 <div id="contact_wrap">
+
+
+<h2>Version</h2>
+
+EMIF Catalogue - v{% get_version %}
 
 <h2>Disclaimer</h2>
 

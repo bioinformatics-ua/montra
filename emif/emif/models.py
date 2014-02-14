@@ -47,7 +47,12 @@ class SharePending(models.Model):
     activation_code = models.TextField()
     pending = models.BooleanField()
 
-
+class City(models.Model):
+    id = AutoField(primary_key=True)
+    name = models.TextField()
+    lat = models.FloatField()
+    long = models.FloatField()
+    
 class ContactForm(forms.Form):
     name = forms.CharField(label='Name')
     email = forms.EmailField(label='Email')

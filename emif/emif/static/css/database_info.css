@@ -56,3 +56,17 @@ path.link {
     stroke: #9ecae1;
     stroke-width: 1.5px;
 }
+
+
+
+svg {
+  display: block;
+}
+
+#chart svg{
+  height: 500px;
+  width: 500px;
+  min-width: 400px;
+  min-height: 400px;
+
+}

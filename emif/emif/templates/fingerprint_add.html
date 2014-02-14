@@ -20,9 +20,6 @@
     {% if k.sortid != 0 and k.sortid != 99 %}
         <div><a id="collapseall_qs_{{ k.sortid }}"  class="btn pull-right" href="#">Collapse all </a></div>
     {% endif %}
-
-
-
     
     <div class="questionset-title" style="font-size:6px">
     <h3>
@@ -122,8 +119,8 @@
                                 {% endif %}
                                 </div>
                                 {% if question.text|geths == 'h1' %}
-
                                     </a>
+
                             </div>
                                     <div id="div_{{ iteratorQ.value }}" class="accordion-body in collapse">
                                         <div class="accordion-inner">
@@ -190,7 +187,7 @@
             </div>
             <div class="span2 text-right">
                 {% if k.sortid != 0 %}
-                    <input class="btn large btn-primary" name="submit" type="submit" value="{% trans 'Save' %}" />
+                    <input class="btn large btn-primary" name="submit" type="submit" value="{% trans 'Save' %}"/>
                 {% endif %}
                 {% if k.sortid == 0 %}
                 {% endif %}
@@ -210,6 +207,7 @@
 <script src="static/js/vendor/bootstrap-tooltip.js"></script>
 <script src="static/js/vendor/bootstrap-popover.js"></script>
 <script src="static/js/fingerprint.js"></script>
+<script src="static/js/fingerprint_validation.js"></script>
 
 <script type="text/javascript">
 
@@ -221,34 +219,6 @@ function toggle_comments(question_number)
     $("#comments_"+question_number).toggle();
 }
 
-function validate(question_number)
-{
-    //console.log($('#'+question_number).val());
-    question_number = question_number + "";
-    question_number = question_number.replace(".","\\.");
-    $.getJSON('api/validate?name='+$('#'+question_number).val(), function(data) {
-      var items = [];
-      console.log(data['contains'])
-      if (data['contains'] == true)
-      {
-        $('#warning_'+question_number).addClass("show");
-        $('#warning_'+question_number).removeClass("hide");
-        $('#success_'+question_number).addClass("hide");
-        $('#success_'+question_number).removeClass("show");
-
-
-      } else {
-        $('#warning_'+question_number).addClass("hide");
-        $('#warning_'+question_number).removeClass("show");
-        $('#success_'+question_number).addClass("show");
-        $('#success_'+question_number).removeClass("hide");
-      }
-      
-    });
-    
-
-
-};
 
     help_text_popover();
 

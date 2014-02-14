@@ -60,6 +60,7 @@ urlpatterns = patterns('',
     # Database Add
 
     url(r'^add/(?P<questionnaire_id>[0-9]+)/(?P<sortid>[0-9]+)/$', 'emif.views.database_add'),
+    url(r'^searchqs/(?P<questionnaire_id>[0-9]+)/(?P<sortid>[0-9]+)/$', 'emif.views.database_search_qs'),
     url(r'^addPost/(?P<questionnaire_id>[0-9]+)/(?P<sortid>[0-9]+)$', 'emif.views.check_database_add_conditions'),
     
 
@@ -74,6 +75,7 @@ urlpatterns = patterns('',
 
     url(r'^feedback/thankyou/', 'emif.views.feedback_thankyou'),
     url(r'^feedback$', 'emif.views.feedback', name="feedback"),
+    url(r'^bugreport$', 'control_version.views.bug_report', name="bug_report"),
 
 
     (r'^contact/thankyou/', 'searchengine.views.thankyou'),
@@ -91,12 +93,14 @@ urlpatterns = patterns('',
 
     url(r'^resultsdiff/(?P<page>[-]{0,1}\d+)?$', 'emif.views.results_diff'),
     url(r'^resultscomp', 'emif.views.results_comp'),
-    url(r'^fingerprint/(?P<runcode>[^/]+)/(?P<qs>[-]{0,1}\d+)/$', 'emif.views.fingerprint'),
-
+    #url(r'^fingerprint/(?P<runcode>[^/]+)/(?P<qs>[-]{0,1}\d+)/$', 'emif.views.fingerprint'),
+    url(r'^fingerprint/(?P<runcode>[^/]+)/(?P<qs>[-]{0,1}\d+)/$', 'population_characteristics.documents.document_form_view'),
+    
     # List Databases
     url(r'^databases/(?P<page>[-]{0,1}\d+)?$', 'emif.views.databases', name="databases"),
     url(r'^alldatabases/(?P<page>[-]{0,1}\d+)?$', 'emif.views.all_databases'),
     url(r'^alldatabases/data-table$', 'emif.views.all_databases_data_table'),
+    url(r'^qs_data_table$', 'emif.views.qs_data_table'),    
     url(r'^export_all_answers$', 'emif.views.export_all_answers'),
     url(r'^export_my_answers$', 'emif.views.export_my_answers'),
     url(r'^export_bd_answers/(?P<runcode>[^/]+)/$', 'emif.views.export_bd_answers'),
@@ -107,12 +111,16 @@ urlpatterns = patterns('',
 
 
     url(r'^rm/(?P<id>[^/]+)', 'emif.views.delete_fingerprint'),
-
+    url(r'^force-rm/(?P<id>[^/]+)', 'emif.views.force_delete_fingerprint'),
+    
     url(r'^share/activation/(?P<activation_code>[^/]+)', 'emif.views.sharedb_activation'),
     url(r'^share/(?P<db_id>[^/]+)', 'emif.views.sharedb'),
 
     # API
     url(r'^api/', include('api.urls')),
+
+    # Control version
+    url(r'^controlversion/', include('control_version.urls')),
 
     # Questionnaire URLs
     url(r'q/', include('questionnaire.urls')),
@@ -224,6 +232,7 @@ urlpatterns = patterns('',
     # url(r'^api-upload-info/', 'rest_framework.authtoken.views.obtain_auth_token'),
     url(r'^api-info/(?P<page>[-]{0,1}\d+)?', 'emif.views.create_auth_token', name="api-info"),
     url(r'^docs/api', 'emif.views.docs_api'),
-    
 
+    # Population Characteristics URLs
+    url(r'population/', include('population_characteristics.urls')),
 )
