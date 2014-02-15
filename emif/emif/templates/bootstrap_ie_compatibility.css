@@ -287,7 +287,16 @@ padding: 2px;
 .gt-ie7 #li_workspace {
     margin-top: -8px !important;
 }
-
+.gt-ie7 #li_advanced_search{
+    margin-top: 1px !important;
+}
+.gt-ie7 #li_history{
+    margin-top: -5px !important;
+}
+.search-query{
+    width: 190px !important;
+    margin-top:4px !important;
+}
 .lt-ie8 #row_loading {
     clear: both;
 }

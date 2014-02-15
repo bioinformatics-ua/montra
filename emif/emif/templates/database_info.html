@@ -26,15 +26,17 @@
 
 
 {% endblock %} 
-
 {% block breadcrumbs %} 
 {{ block.super }} 
-    {% if style == '1' %} 
+    {% if search_old %}
+        {% breadcrumb "Search" "resultsdiff/1" %} 
+        {% breadcrumb breadcrumb_name "databases" %} 
+    {% elif style == '1' %} 
         {% breadcrumb "Databases" "databases" %} 
-        {% breadcrumb "List" "databases" %} 
+        {% breadcrumb breadcrumb_name "databases" %} 
     {% else %} 
         {% breadcrumb "Databases" "alldatabases" %} 
-        {% breadcrumb "List" "alldatabases" %} 
+        {% breadcrumb breadcrumb_name "databases" %} 
     {% endif %}
 
     {% comment %}
