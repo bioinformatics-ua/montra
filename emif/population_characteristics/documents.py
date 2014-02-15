@@ -106,12 +106,18 @@ def document_form_view(request, runcode, qs, template_name='documents_upload_for
     except:
         query_old = None
     
-    print query_old    
+
+
+    name_bc = name
+    try:
+        name_bc = name.encode('utf-8')
+    except:
+        pass
     
     return render(request, template_name, 
         {'request': request, 'qsets': qsets, 'export_bd_answers': True, 
         'apiinfo': apiinfo, 'fingerprint_id': runcode,
-                   'breadcrumb': True, 'breadcrumb_name': name.decode('ascii', 'ignore'),
+                   'breadcrumb': True, 'breadcrumb_name': name_bc,
                     'style': qs, 'collapseall': False, 
                     'owner_fingerprint':True,
                     'fingerprint_dump': True,
