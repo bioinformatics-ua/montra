@@ -8,7 +8,6 @@
                         $('.qsets').each(function(){
                             $(this).addClass('depon_class');
                         });
-                        $('#tabular_container').html('<div class="well pull-center">To see a tabular view of all databases, please choose a database type and a questionset.</div>'); 
                     } else {
                         $('.qsets').each(function(){
                             if($(this).attr('id') == 'q_select_'+value_selected){
@@ -18,6 +17,7 @@
                                 $(this).addClass('depon_class');
                         });
                     }
+                                            $('#tabular_container').html('<div class="well pull-center">To see a tabular view of all databases, please choose a database type and a questionset.</div>'); 
                 });
                 $('.qsets').change(function(){
                     var db_selected = $('#db_type').val();
