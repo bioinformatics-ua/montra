@@ -18,6 +18,10 @@
   display: none;
 }
 
+#pctitle{
+    text-align: center;
+}
+
 </style>
 
 {% if owner_fingerprint %}
@@ -33,7 +37,7 @@
     {% endblock%}
 
     You have already population characteristics. Your last activied is dated from: {{pc_last_activity}}
-    <div class="span12 populationcharacteristicsbar">
+    <div class="span9 populationcharacteristicsbar">
     <div class="pull-right hidden ">
         <div class="btn-group">
             <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
@@ -111,7 +115,7 @@
 
 
         <div class='row'>
-            <div id='title'>
+            <div id='pctitle'>
             </div>
             <div id='d3test'>
             </div>

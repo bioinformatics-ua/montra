@@ -305,6 +305,8 @@ function PCAPI ()
                       $("#pcBarContent").populationChartsBar(pc,this,fingerprintID);
                       $("#pcBarContent").populationChartsBar('draw', pc);
 
+
+                      $("#pctitle").html("<h2>"+ e.toElement.innerHTML +"</h2>");
                       
                       if ($(e.toElement.firstChild).hasClass('icon-ok')) 
                       {
