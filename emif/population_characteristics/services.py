@@ -47,7 +47,7 @@ class PopulationCharacteristic(JerboaFormat):
 
     def submit_new_revision(self):
         path_file = "C:/Users/lbastiao/Projects/TEST_DataProfile_v1.5.6b.txt"
-        #path_file = "/Volumes/EXT1/Dropbox/MAPi-Dropbox/EMIF/Jerboa/TEST_DataProfile_v1.5.6b.txt"        
+        path_file = "/Volumes/EXT1/Dropbox/MAPi-Dropbox/EMIF/Jerboa/TEST_DataProfile_v1.5.6b.txt"        
         self._json = import_population_characteristics_data(filename=path_file)
         #print self._json
         #f = open('jerboaTmp', 'w')

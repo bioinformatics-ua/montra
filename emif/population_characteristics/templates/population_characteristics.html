@@ -1,4 +1,6 @@
 {% load url from future %}
+
+
 <style type="text/css">
 
 .axis path,
@@ -18,10 +20,126 @@
 
 </style>
 
+{% if owner_fingerprint %}
 
 
-<div id='d3test'>
-</div>
+    {% if contains_population %}
+
+    This database does not still aggregated data. Submit the Population Characteristics file (Jerboa)
+
+    {% else %}
+
+    {% block jerboaformupload %} 
+    {% endblock%}
+
+    You have already population characteristics. Your last activied is dated from: {{pc_last_activity}}
+    <div class="span12 populationcharacteristicsbar">
+    <div class="pull-right hidden ">
+        <div class="btn-group">
+            <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
+                Show/Hide
+                <span class="caret"></span>
+            </a>
+
+            <ul class="dropdown-menu">
+                <!-- dropdown menu links -->                
+                <li>
+                    <a id="chkpercentile1" href="#"> <i id="imatch" class="icon-ok icon-black active"></i>
+                        1st Percentile
+                    </a>
+                </li>
+                <li>
+                    <a id="chkpercentile2" href="#"> <i id="iunmatch" class="icon-ok icon-black active"></i>
+                        2nd Percentile
+                    </a>
+                </li>
+                <li>
+                    <a id="chkpercentil3" href="#">
+                        <i id="iproximity" class="icon-ok icon-black active"></i>
+                        3rd Percentile
+                    </a>
+                </li>
+                <li>
+                    <a id="chkMin" href="#">
+                        <i id="iproximity" class="icon-ok icon-black active"></i>
+                        Min
+                    </a>
+                </li>
+                <li>
+                    <a id="chkMax" href="#">
+                        <i id="iproximity" class="icon-ok icon-black active"></i>
+                        Max
+                    </a>
+                </li>
+                <li>
+                    <a id="proximity" href="#">
+                        <i id="iproximity" class="icon-ok icon-black active"></i>
+                        Count
+                    </a>
+                </li>
+                <li>
+                    <a id="proximity" href="#">
+                        <i id="iproximity" class="icon-ok icon-black active"></i>
+                        Mean
+                    </a>
+                </li>
+                <li>
+                    <a id="emptyrows" href="#">
+                        <i id="iemptyrows" class="icon-ok icon-black disabled"></i>
+                        Empty rows
+                    </a>
+                </li>
+            </ul>
+
+        </div>
+    </div>
+    </div>
+    
+    <div class="row">
+    
+    </div>
+    
+    <div class="row">
+
+    <div class="well span3" id="pc_list">
+
+
+    </div>
+    
+    <div class="span6" id="chart2">
+    
+
+
+        <div class='row'>
+            <div id='title'>
+            </div>
+            <div id='d3test'>
+            </div>
+        </div>
+    </div>
+    
+
+    <div class="span3 hidden" id="pcBarContentRoot">
+        <div > Filter: </div>
+
+        <div id="pcBarContent" class="well">
+
+        </div>
+
+
+    </div>
+
+  
+
+    </div>
+
+    
+    
+    {% endif %}
+
+{% endif %}
+
+
 
 
 
