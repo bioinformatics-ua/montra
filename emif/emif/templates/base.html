@@ -47,6 +47,8 @@
     <script src="{{ STATIC_URL }}js/vendor/jquery-1.9.1.min.js"></script>
     <script src="{{ STATIC_URL }}js/vendor/bootstrap.min.js"></script>
     <script src="{{ STATIC_URL }}js/vendor/jquery.cookie.js"></script>
+    <script src="{{ STATIC_URL }}js/vendor/jquery.canclear.js"></script>
+    
     <script type="application/javascript">
         // We need to configure this to be able to send requests by json with the csrftoken
         var csrftoken = $.cookie('csrftoken');
@@ -310,7 +312,9 @@
         var _gaq = _gaq || [];
         _gaq.push(['_setAccount', 'UA-38876251-1']);
         _gaq.push(['_trackPageview']);
-
+        $(function(){
+            $('.search-query').canclear();
+        });
         (function() {
             var ga = document.createElement('script');
             ga.type = 'text/javascript';

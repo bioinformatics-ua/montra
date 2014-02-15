@@ -1151,6 +1151,10 @@ def force_delete_fingerprint(request, id):
 
 
 def databases(request, page=1, template_name='databases.html'):
+    #first lets clean the query session log
+    if 'query' in request.session:
+        del request.session['query']
+    
     # Get the list of databases for a specific user
 
     user = request.user
@@ -1436,7 +1440,6 @@ def get_api_info(fingerprint_id):
 
 def fingerprint(request, runcode, qs, template_name='database_info.html'):
     
-    
     qsets, name, db_owners, fingerprint_ttype = createqsets(runcode)
 
     if fingerprint_ttype == "":
@@ -1464,7 +1467,7 @@ def fingerprint(request, runcode, qs, template_name='database_info.html'):
                     'style': qs, 'collapseall': False, 
                     'owner_fingerprint':owner_fingerprint,
                     'fingerprint_dump': True,
-                    'fingerprint_ttype': fingerprint_ttype,
+                    'fingerprint_ttype': fingerprint_ttype
                     })
 
 

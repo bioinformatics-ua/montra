@@ -300,12 +300,12 @@ box-shadow: inset 0 3px 8px rgba(0,0,0,0.125);
 .supported {
     display: block;
 }
-/* Block access to browsers with ns class */
+
 .ns .not-supported{
-    display: block !important;
+    display: none !important;
 }
 .ns .supported {
-    display: none !important;
+    display: block !important;
 }
 
 .navbar .nav>li>a{

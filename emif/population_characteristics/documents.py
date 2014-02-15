@@ -100,6 +100,14 @@ def document_form_view(request, runcode, qs, template_name='documents_upload_for
         if (owner == request.user.username):
             owner_fingerprint = True
     
+    query_old = None
+    try:
+        query_old = request.session.get('query', "")
+    except:
+        query_old = None
+    
+    print query_old    
+    
     return render(request, template_name, 
         {'request': request, 'qsets': qsets, 'export_bd_answers': True, 
         'apiinfo': apiinfo, 'fingerprint_id': runcode,
@@ -109,6 +117,7 @@ def document_form_view(request, runcode, qs, template_name='documents_upload_for
                     'fingerprint_dump': True,
                     'contains_population': False, 'hide_add': True,
                     'fingerprint_ttype': fingerprint_ttype,
+                    'search_old': query_old
                     })
 
 
