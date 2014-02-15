@@ -308,6 +308,13 @@ box-shadow: inset 0 3px 8px rgba(0,0,0,0.125);
     display: block !important;
 }
 
+.ns #supportability{
+    background-color: orange;
+    color: white;
+    padding: 5px;
+    font-weight: bold; 
+}
+
 .navbar .nav>li>a{
     /* Overriding default bootstrap behaviour*/
     padding: 10px 10px 10px !important;
