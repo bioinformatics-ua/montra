@@ -235,7 +235,8 @@ INSTALLED_APPS = (
     'searchengine',
     'api',
     'control_version',
-
+    'docs_manager',
+    'population_characteristics',
     'django_bootstrap_breadcrumbs',
     'bootstrap-pagination',
     'django_jenkins',
