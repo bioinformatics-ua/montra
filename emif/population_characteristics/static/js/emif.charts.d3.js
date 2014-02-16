@@ -40,16 +40,10 @@ function GraphicChartD3(divArg, dataArg)
       var x = d3.scale.ordinal()
           .rangeRoundBands([0, width], .1);
 
+
       var y = d3.scale.linear()
           .range([height, 0]);
 
-      var xAxis = d3.svg.axis()
-          .scale(x)
-
-          .orient("bottom")
-          .ticks(d3.time.years, 10)
-          .tickValues(["", "", ""])
-          .tickPadding(8);
 
 
       var yAxis = d3.svg.axis()
@@ -65,11 +59,18 @@ function GraphicChartD3(divArg, dataArg)
           .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
       
       dataset.forEach(function (data) {
+        console.log("THIS IS MY DATA: " + data);
         console.log(data);
-        
 
         x.domain(data.map(function(d) {  return d.xvalue; }));
         y.domain([0, d3.max(data, function(d) { return d.yvalue; })]);
+
+      var xAxis = d3.svg.axis()
+          .scale(x)
+          .orient("bottom")
+          .tickValues(x.domain().filter(function(d, i) {return !(i % 10); }))
+
+          .tickPadding(8);
 
         svg.append("g")
             .attr("class", "x axis")
@@ -98,9 +99,9 @@ function GraphicChartD3(divArg, dataArg)
             .data(data)
           .enter().append("rect")
             .attr("class", "bar")
-            .attr("x", function(d) { console.log(d); return x(d.xvalue); })
+            .attr("x", function(d) { return x(d.xvalue); })
             .attr("width", x.rangeBand())
-            .attr("y", function(d) { console.log(d); return y(d.yvalue); })
+            .attr("y", function(d) { return y(d.yvalue); })
             .attr("height", function(d) { return height - y(d.yvalue); });
 
       });

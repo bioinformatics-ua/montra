@@ -220,8 +220,6 @@ function PCAPI ()
                 tmpUl.append('<li><a class="filterBar" href="#" onclick="return false;"><i id="iproximity" class="icon-ok icon-black active"></i> '+values.values[data]+'</a></li>')
             });
             
-            
-            
             $(".filterBar").bind('click',function(e)
                     { 
                       e.preventDefault(); 
@@ -304,7 +302,6 @@ function PCAPI ()
                       //$("#pcBarContentRoot").addClass("show");
                       $("#pcBarContent").populationChartsBar(pc,this,fingerprintID);
                       $("#pcBarContent").populationChartsBar('draw', pc);
-
 
                       $("#pctitle").html("<h2>"+ e.toElement.innerHTML +"</h2>");
                       

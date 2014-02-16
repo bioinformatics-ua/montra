@@ -14,6 +14,7 @@
 <!-- CSS to style the file input field as button and adjust the Bootstrap progress bars -->
 <link rel="stylesheet" href="{{ STATIC_URL }}css/vendor/jquery.fileupload-ui.css">
 <link href="{{ STATIC_URL }}nvd3/src/nv.d3.css" rel="stylesheet" type="text/css">
+<!--
 <script src="{{ STATIC_URL }}nvd3/lib/d3.v3.js"></script>
 <script src="{{ STATIC_URL }}nvd3/nv.d3.js"></script>
 <script src="{{ STATIC_URL }}nvd3/src/models/axis.js"></script>
@@ -24,11 +25,7 @@
 <script src="{{ STATIC_URL }}nvd3/src/models/discreteBar.js"></script>
 <script src="{{ STATIC_URL }}nvd3/src/models/discreteBarChart.js"></script>
 
-<script src="{{ STATIC_URL}}js/emif.populationcharacteristics.charts.js"></script>
-
-<script src="{{ STATIC_URL}}js/emif.populationcharacteristics.js"></script>
-<script src="{{ STATIC_URL}}js/emif.documents.js"></script>
-
+-->
 {% endblock %} 
 {% block breadcrumbs %} 
 {{ block.super }} 
@@ -249,6 +246,10 @@
 <script src="{{ STATIC_URL}}js/database_info.js"></script>
 <script src="{{ STATIC_URL }}js/emif.database.delete.js"></script>
 
+<script src="{{ STATIC_URL}}js/emif.populationcharacteristics.charts.js"></script>
+
+<script src="{{ STATIC_URL}}js/emif.populationcharacteristics.js"></script>
+<script src="{{ STATIC_URL}}js/emif.documents.js"></script>
 
 
 <!-- The jQuery UI widget factory, can be omitted if jQuery UI is already included -->
