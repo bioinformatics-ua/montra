@@ -41,7 +41,7 @@ function getFingerprintID(){
 function PCAPI () 
 {
     this.getGender = function(){
-          var result = {}
+        var result = {}
           
         $.ajax({
           dataType: "json",

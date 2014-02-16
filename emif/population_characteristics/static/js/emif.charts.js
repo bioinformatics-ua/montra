@@ -7,6 +7,20 @@
  * should decorate other class
 */ 
 
+function Scale()
+{
+    this.getBins = function(){
+    };
+
+}
+
+function Filters()
+{
+    this.getBins = function(){
+    };
+}
+
+
  (function( $ )
  {
 

@@ -38,9 +38,9 @@ from django.conf import settings
 from .parseJerboaFile import * 
 from .services import * 
 from docs_manager.storage_handler import *
+from population_characteristics.models import *
 
-
-def document_form_view_upload(request, template_name='documents_upload_form.html'):
+def document_form_view_upload(request, fingerprint_id, template_name='documents_upload_form.html'):
     """Store the files at the backend 
     """
 
@@ -50,24 +50,48 @@ def document_form_view_upload(request, template_name='documents_upload_form.html
 
     files = []
     # Run it for all the sent files (apply the persistence storage)
+    path_file = None
+    file_name = None
     if request.FILES:
         for name, f in request.FILES.items():
             # Handle file 
-            g_fh.handle_file(f)
-            
+            path_file = g_fh.handle_file(f)
+            file_name = f.name 
             # Serialize the response 
             files.append(serialize(f))
+
     
     data = {'files': files}
+
+    # Store the metadata in the database
+    chracteristic = Characteristic()
+    chracteristic.user = request.user
+    chracteristic.fingerprint_id = fingerprint_id
+    chracteristic.revision = ''
+    chracteristic.path = path_file
+    chracteristic.file_name = file_name
+    chracteristic.name = request.POST['pc_name']
+    chracteristic.description = request.POST['pc_comments']
+    chracteristic.save()
+
+    # Parse the Jerboa and insert it in MongoDB
+    # The best option will be use django-celery
+
+    _json = import_population_characteristics_data(filename=path_file)
+
+    pc = PopulationCharacteristic()
+    pc.submit_new_revision()
+
+
     response = JSONResponse(data, mimetype=response_mimetype(request))
     response['Content-Disposition'] = 'inline; filename=files.json'
     return response
 
-def jerboa_form_view_upload(request, template_name='documents_upload_form.html'):
+def jerboa_form_view_upload(request, fingerprint_id, template_name='documents_upload_form.html'):
     """ Upload files from Jerboa
     """
     # TODO: for now it is only calling the documents 
-    return document_form_view_upload(request, template_name='documents_upload_form.html')
+    return document_form_view_upload(request, fingerprint_id, template_name='documents_upload_form.html')
 
 def parsejerboa(request, template_name='documents_upload_form.html'):
     """ Parse files from Jerboa
@@ -106,22 +130,23 @@ def document_form_view(request, runcode, qs, template_name='documents_upload_for
     except:
         query_old = None
     
-
-
     name_bc = name
     try:
         name_bc = name.encode('utf-8')
     except:
         pass
-    
+
+    jerboa_files = Characteristic.objects.filter(fingerprint_id=runcode)
+    contains_population = len(jerboa_files)!=0
     return render(request, template_name, 
         {'request': request, 'qsets': qsets, 'export_bd_answers': True, 
         'apiinfo': apiinfo, 'fingerprint_id': runcode,
                    'breadcrumb': True, 'breadcrumb_name': name_bc,
                     'style': qs, 'collapseall': False, 
-                    'owner_fingerprint':True,
+                    'owner_fingerprint':owner_fingerprint,
                     'fingerprint_dump': True,
-                    'contains_population': False, 'hide_add': True,
+                    'contains_population': contains_population, 
+                    'hide_add': True,
                     'fingerprint_ttype': fingerprint_ttype,
                     'search_old': query_old
                     })

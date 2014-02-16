@@ -30,7 +30,7 @@ class HandleFile(object):
         """
         Handle File
         """
-        self._handler_wrapper.handle_uploaded_file(f)
+        return self._handler_wrapper.handle_uploaded_file(f)
 
         # Store the metadata   
 
@@ -48,6 +48,7 @@ class FileSystemHandleFile(object):
                   'wb+') as destination:
             for chunk in f.chunks():
                 destination.write(chunk)
+        return os.path.join(os.path.abspath(settings.PROJECT_DIR_ROOT + 'emif/static/files/'), f.name)
 
 class MongoDBHandleFile(object):
     """Store the file in MongoDB
