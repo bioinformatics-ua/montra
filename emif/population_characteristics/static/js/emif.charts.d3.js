@@ -94,7 +94,7 @@ function GraphicChartD3(divArg, dataArg)
             .attr("dy", ".71em")
             .style("text-anchor", "end")
             .text("");
-
+            
         svg.selectAll(".bar")
             .data(data)
           .enter().append("rect")

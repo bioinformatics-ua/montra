@@ -41,6 +41,7 @@ class Operation:
     PERC25 = 'Perc25'
     PERC75 = 'Perc75'
     SD = 'SD'
+    CONCAT = 'concat'
 
 class Scale(object):
     def __init__(self):

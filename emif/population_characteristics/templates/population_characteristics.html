@@ -92,10 +92,8 @@
 
     {% else %}
 
-    {% block jerboaformupload %} 
-    {% endblock%}
 
-    You have already population characteristics. Your last activied is dated from: {{pc_last_activity}}
+    You have already population characteristics. Last update on: {{pc_last_activity}}
     <div class="span9 populationcharacteristicsbar">
     <div class="pull-right hidden ">
         <div class="btn-group">
@@ -182,7 +180,7 @@
     </div>
     
 
-    <div class="span3 hidden" id="pcBarContentRoot">
+    <div class="span3" id="pcBarContentRoot">
         <div > Filter: </div>
 
         <div id="pcBarContent" class="well">

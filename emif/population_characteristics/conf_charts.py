@@ -65,7 +65,7 @@ class ConfCharts(object):
         c1.y_axis.operation = "unique"
         c1.y_axis.var = "Count"
         
-        c1.filters = [f1]
+        c1.filters = [f2]
 
 
         c2 = Chart()

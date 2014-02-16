@@ -143,8 +143,6 @@ $(document).ready(
     }
 );
 
-
-
 /*jslint unparam: true, regexp: true */
 /*global window, $ */
 function csrfSafeMethod(method) {
