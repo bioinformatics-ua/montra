@@ -23,20 +23,19 @@
 **************** Population Characteristics API 
 *********************************************************/
 
-
 function getFingerprintID(){
   var url = document.URL;
   var fingerprint_id='abcd';
+  console.log(url)
   try{
-    fingerprint_id = url.split("population/new/")[1].split("/1")[0];
+    fingerprint_id = url.split("fingerprint/")[1].split("/1")[0];
   }
   catch(err){
-    fingerprint_id='abcd'
+    fingerprint_id='abcde'
   };
   return fingerprint_id;
 
 };
-
 
 function PCAPI () 
 {
@@ -289,7 +288,7 @@ function PCAPI ()
                       fingerprintID = getFingerprintID();
                       console.log(fingerprintID);
                       var valuesFromGraph = PC.getValuesRow(e.toElement.innerHTML, 
-                        'Count', 'abcd');
+                        'Count',fingerprintID );
                       console.log('valuesFromGraph: '+valuesFromGraph);
                       console.log(valuesFromGraph);
                       $("#d3test").html('');

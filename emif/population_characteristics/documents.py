@@ -77,10 +77,10 @@ def document_form_view_upload(request, fingerprint_id, template_name='documents_
     # Parse the Jerboa and insert it in MongoDB
     # The best option will be use django-celery
 
-    _json = import_population_characteristics_data(filename=path_file)
+    #_json = import_population_characteristics_data(fingerprint_id,filename=path_file)
 
     pc = PopulationCharacteristic()
-    pc.submit_new_revision()
+    pc.submit_new_revision(fingerprint_id)
 
 
     response = JSONResponse(data, mimetype=response_mimetype(request))
