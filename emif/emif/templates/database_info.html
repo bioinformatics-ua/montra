@@ -157,7 +157,7 @@
 
                 <div class="tab-pane" id="populationcharacteristics" >
 
-                              {% include "population_characteristics.html" %}
+                  {% include "population_characteristics.html" %}
 
             </div>
 
@@ -165,25 +165,8 @@
 
 
               <div class="tab-pane" id="documents">
-                  {% if documents_available %}
-                    <div class="docs_available"> 
-                        <p >
-                          The documents that are available will be listed below. 
-                        </p>
-                    </div>
-
-                  {% else %}
-                    <div class="docs_not_available"> 
-                        <p class="nodocs">There is no documents for this fingerprint.</p>
-                    </div>
-                    <p class="nodocs">You can upload documents to associate them to the fingerprint browser</p>
-
-                    {% block documentsformupload %} 
-                    {% endblock%}
-
-                  {% endif %}
                 
-
+                    {% include "documents.html" %}
             </div>
 
 

@@ -30,7 +30,7 @@ class Document(models.Model):
     name = models.CharField(max_length=255)
     file_name = models.CharField(max_length=255)
     description = models.TextField()
-
+    removed = models.BooleanField()
 
     def get_name(self):
         pass
@@ -43,4 +43,7 @@ class Document(models.Model):
 
     def load(self):
         pass
+
+class FingerprintDocuments(Document):
+    pass
 

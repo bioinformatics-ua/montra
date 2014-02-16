@@ -1,117 +1,43 @@
-/**********************************************************************
-# Copyright (C) 2013 Luís A. Bastião Silva and Universidade de Aveiro
-#
-# Authors: Luís A. Bastião Silva <bastiao@ua.pt>
-#
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-#
-***********************************************************************/
-
-var eventToCatch = 'click';
-
-/* Population Characteristics */
 
 
-function FingerprintPCAPI()
-{
-
-    this.getGenericFilter = function()
-    {
-
-        var result = {}
-          
-        $.ajax({
-          dataType: "json",
-          url: "population/genericfilter/Var",
-          async: false,
-          data: result,
-          success: function (data){result=data;},
-        });
-        return result;
-
-    };
-};
-
-
-function PopulationCharacteristics (type) 
-{
-    this.handle_type_chart = function(e)     {
-        e.preventDefault();
-        e.stopPropagation();
-        console.log("Type of graph is: "); 
-
-    };
-
-
-    this.handle_data = function(data){
-                    
-
-
-    };
-
+function getFingerprintID_new(){
+  var url = document.URL;
+  var fingerprint_id='abcd';
+  console.log(url)
+  try{
+    fingerprint_id = url.split("fingerprint/")[1].split("/1")[0];
+  }
+  catch(err){
+    fingerprint_id='abcde'
+  };
+  return fingerprint_id;
 
 };
-
-
-
-
-/********************************************************
-**************** Document Manager - Uploads, etc 
-*********************************************************/
-
-
-/* JQuery Plugin for Population Characteristics */
- 
- 
- (function( $ )
- {
-
-
-
-    var methods = {
-        init : function( options ) { 
-            console.log("init");
-            console.log(options);
-            $(".chart_pc" ).on(eventToCatch, options.handle_type_chart);
-        },
-        draw : function( options ) {
-            
-           
-        },
-        
-    };
-
-    $.fn.populationCharts = function(method) {
-        // Method calling logic
-        if ( methods[method] ) {
-        return methods[ method ].apply( this, Array.prototype.slice.call( arguments, 1 ));
-        } else if ( typeof method === 'object' || ! method ) {
-        return methods.init.apply( this, arguments );
-        } else {
-        $.error( 'Method ' + method + ' does not exist on jQuery.populationCharts' );
-        }
-        return this;
-    };
-}( jQuery ));
 
 $(document).ready(
     function(){
 
-        var pc = new PopulationCharacteristics("pc");
+        var result = {}
 
-        $("#populationcharacteristics").populationCharts(pc);
-        $("#populationcharacteristics").populationCharts('draw', pc);    
+        $.ajax({
+          dataType: "json",
+          url: "population/jerboafiles/"+getFingerprintID_new()+"/",
+          async: false,
+          data: result,
+          success: function (data){result=data;},
+        });
+        console.log(result);
+        result.conf.forEach(function(d){
+            var context = $('<tr>').appendTo('#jerboafiles');
+            var node = $('<td/>')
+                        .append($('<span/>').html("<p>File name: " + d.file_name
+                            + "</p><p>Description: " + d.comments 
+                            + "</p><p>Last update: " + d.latest_date ));
+            context.append(node);
+            //node.appendTo(context);    
+        });
+        
+
     }
 );
 
@@ -126,9 +52,9 @@ function csrfSafeMethod(method) {
 $(function () {
   
     'use strict';
-    var csrftoken = $.cookie('csrftoken');
+    var csrftoken = $.cookie('cssrftoken');
     // Change this to the location of your server-side upload handler:
-    var url = '/population/upload',
+    var url = 'population/jerboaupload/'+getFingerprintID_new()+"/",
         uploadButton = $('<button/>')
             .addClass('btn btn-primary')
             .prop('disabled', true)
@@ -147,7 +73,7 @@ $(function () {
                     $this.remove();
                 });
             });
-    $('#fileupload').fileupload({
+    $('#jerboaupload').fileupload({
         url: url,
         crossDomain: true,
         beforeSend: function(xhr, settings) {
@@ -157,7 +83,7 @@ $(function () {
         },
         dataType: 'json',
         autoUpload: false,
-        acceptFileTypes: /(\.|\/)(gif|jpe?g|png|pdf|docx|xls|doc|docx|tsv|txt)$/i,
+        acceptFileTypes: /(\.|\/)(tsv|txt)$/i,
         maxFileSize: 5000000, // 5 MB
         // Enable image resizing, except for Android and Opera,
         // which actually support image resizing, but fail to
@@ -168,7 +94,7 @@ $(function () {
         previewMaxHeight: 100,
         previewCrop: true
     }).on('fileuploadadd', function (e, data) {
-        data.context = $('<tr><td><div class="span3"/>').appendTo('#files');
+        data.context = $('<tr><td>').appendTo('#jerboafiles');
         $.each(data.files, function (index, file) {
             var node = $('<p/>')
                     .append($('<span/>').text(file.name));
@@ -212,7 +138,7 @@ $(function () {
             $(data.context.children()[index])
                 .wrap(link);
         });
-    }).on('fileuploadfail', function (e, data) {
+    }).on('fiçeuploadfail', function (e, data) {
         $.each(data.result.files, function (index, file) {
             var error = $('<span/>').text(file.error);
             $(data.context.children()[index])

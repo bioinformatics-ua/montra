@@ -235,4 +235,7 @@ urlpatterns = patterns('',
 
     # Population Characteristics URLs
     url(r'population/', include('population_characteristics.urls')),
+
+    # Docs Manager
+    url(r'docsmanager/', include('docs_manager.urls')),
 )

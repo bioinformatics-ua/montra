@@ -66,6 +66,34 @@ function PopulationCharacteristics (type)
 
 
 
+$(document).ready(
+    function(){
+
+        var result = {}
+
+        $.ajax({
+          dataType: "json",
+          url: "docsmanager/docfiles/"+getFingerprintID_new()+"/",
+          async: false,
+          data: result,
+          success: function (data){result=data;},
+        });
+        console.log(result);
+        result.conf.forEach(function(d){
+            var context = $('<tr>').appendTo('#files');
+            var node = $('<td/>')
+                        .append($('<span/>').html("<p>File name: " + d.file_name
+                            + "</p><p>Description: " + d.comments 
+                            + "</p><p>Last update: " + d.latest_date ));
+            context.append(node);
+            //node.appendTo(context);    
+        });
+        
+
+    }
+);
+
+
 /********************************************************
 **************** Document Manager - Uploads, etc 
 *********************************************************/
@@ -128,7 +156,7 @@ $(function () {
     'use strict';
     var csrftoken = $.cookie('csrftoken');
     // Change this to the location of your server-side upload handler:
-    var url = '/population/upload',
+    var url2 = 'docsmanager/uploadfile/'+getFingerprintID_new()+"/",
         uploadButton = $('<button/>')
             .addClass('btn btn-primary')
             .prop('disabled', true)
@@ -148,7 +176,7 @@ $(function () {
                 });
             });
     $('#fileupload').fileupload({
-        url: url,
+        url: url2,
         crossDomain: true,
         beforeSend: function(xhr, settings) {
             if (!csrfSafeMethod(settings.type)) {

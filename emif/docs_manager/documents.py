@@ -23,8 +23,8 @@ import json
 from django.http import HttpResponse
 from django.views.generic import CreateView, DeleteView, ListView
 
-from .response import JSONResponse, response_mimetype
-from .serialize import serialize
+from population_characteristics.response import JSONResponse, response_mimetype
+from population_characteristics.serialize import serialize
 from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import user_passes_test, login_required
 
