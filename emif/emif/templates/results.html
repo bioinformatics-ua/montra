@@ -81,10 +81,8 @@
 <table class="table table-hover tablesorter" id="table_databases" data-provides="rowlink">
     <thead>
         <tr>
-            <th class="sorter-false filter-false"></th>
             <th>Name</th>
-            <th>Creation Date</th>
-            <th>Modification Date</th>
+            <th>Last Update</th>
             <th>Type</th>
             <th class="sorter-false filter-false">Select</th>
 
@@ -95,9 +93,7 @@
 
   {% for t in list_results.list_results %}
 
-   <tr>
-            <td><img class="db_logo" src="static/upload_images/{{t.logo}}" width="50px" height="50px"/></td>
-          
+   <tr>          
           <td>
             <a href="fingerprint/{{ t.id }}/1">{{ t.name }}</a>
 
@@ -112,10 +108,6 @@
              Number of patients: {{t.number_patients}}
             </div> 
         </td>
-          <td style="min-width: 120px;">            
-                 {{ t.date }}
-
-          </td>
           <td style="min-width: 120px;">            
                 {% if t.last_activity %}
                     {{t.last_activity|datehhmm}}
@@ -213,9 +205,22 @@ $(function() {
   });
 
 });
+var counter = 0;
 
 // URL Hack to make paginator work with base
 $(document).ready(function(){
+    if($('input:checkbox:checked', table_databases).length >= 2){
+        $("#comparabtn").removeAttr('disabled');
+        counter = $('input:checkbox:checked', table_databases).length;
+        $("#comparabtn").bind('click',function(e)
+        { 
+          
+          $('#result_form').submit();
+
+          return false;
+        });
+    }
+    
     $('a[href="#"]').attr('href', function(i, val){
         return window.location + val;
     });
@@ -223,7 +228,6 @@ $(document).ready(function(){
 {% endif %}
 
 
-var counter = 0;
 function hidecheckbox()
 {
   $('.checkbox').toggle();

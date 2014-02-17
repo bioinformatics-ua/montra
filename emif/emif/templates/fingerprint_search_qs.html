@@ -5,6 +5,37 @@
                     <!-- Set variable h1 to accordion -->
                     {% setglobal h1_already 1 %}
                     {% setglobal h1_last 1 %}
+        <div class="well">
+            <!-- Previous | Next buttons -->
+            <div class="span5 text-center">
+            <!-- If Questionset is not the first (Introduction) or the final (Thank you) -->
+
+                {% if questions_list.0.0.prev %}
+                    <a href="add/{{ questionset.questionnaire.pk }}/{{ questions_list.0.0.prev.sortid }}" class="btn large primary" onclick="questionsets_handle(qs_{{ questions_list.0.0.prev.sortid }});  return false;">{% trans "Previous" %}</a>
+                {% endif %}
+                {% if questions_list.0.0.prev and questions_list.0.0.next %}
+
+                {% endif %}
+                {% if questions_list.0.0.next %}
+                    <a href="advancedSearch/{{ questionset.questionnaire.pk }}/{{ questions_list.0.0.next.sortid }}" class="btn large primary" onclick="questionsets_handle(qs_{{ questions_list.0.0.next.sortid }});  return false;">{% trans "Next" %}</a>
+                {% endif %}
+
+
+                <!-- First Questionset - Introduction -->
+
+            </div>
+            <div class="span2 text-right">
+                {% if questions_list.0.0.sortid != 0 %}
+                    <input type="submit" class="search_button btn btn-inverse" value="Search" >
+                {% endif %}
+                {% if questions_list.0.0.sortid == 0 %}
+                {% endif %}
+                    <!-- Last Questionset - Thank You -->
+                {% if questions_list.0.0.sortid == 99 %}
+                    <!--<input class="btn large btn-primary" name="submit" type="submit" value="{% trans 'Save' %}" />-->
+                {% endif %}
+            </div>    
+        </div>    
 
     {% if questions_list.0.0.sortid != 0 and questions_list.0.0.sortid != 99 %}
         <div><a id="collapseall_qs_{{ questions_list.0.0.sortid }}"  class="btn pull-right" href="">Collapse all </a></div>
