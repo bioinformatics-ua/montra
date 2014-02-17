@@ -23,7 +23,7 @@ fl=''
 field1 = 'institution_name_t'
 field2 = 'Contact_organisation_t'  
 
-databases_problem_swap = ['IPCI', 'THIN', 'AUH', 'ARS', 'SCTS', 'SDR', 'EGCUT', 'PEDIANET', 'GePaRD']
+databases_problem_swap = ['IPCI', 'THIN', 'AUH', 'ARS', 'SCTS', 'SDR', 'EGCUT', 'PEDIANET', 'GePaRD', 'MAAS']
 query="*:*"
 results = solr.search(query,**{
                 'rows': rows,
