@@ -171,7 +171,7 @@ def results_fulltext(request, page=1, full_text=True, template_name='results.htm
     return results_fulltext_aux(request, "text_t:" + query, page, template_name)
 
 
-def results_fulltext_aux(request, query, page=1, template_name='results.html'):
+def results_fulltext_aux(request, query, page=1, isAdvanced=False, template_name='results.html'):
     rows = 5
     if query == "":
         return render(request, "results.html", {'request': request, 'breadcrumb': True,
@@ -197,10 +197,12 @@ def results_fulltext_aux(request, query, page=1, template_name='results.html'):
     list_databases = []
     if error_searching or len(results) == 0 :
         query_old = request.session.get('query', "")
-        serialization_query = request.session.get('serialization_query','')
-        
-        return render(request, "results.html", {'request': request, 'breadcrumb': True,
-                                                'list_results': [], 'page_obj': None, 'search_old': '', 'serialization_query': serialization_query})
+        if isAdvanced == True:
+            return render(request, "results.html", {'request': request, 'breadcrumb': True,
+                                                'list_results': [], 'page_obj': None, 'isAdvanced': True})
+        else:
+            return render(request, "results.html", {'request': request, 'breadcrumb': True,
+                                                'list_results': [], 'page_obj': None, 'search_old': query_old, 'isAdvanced': False})
     for r in results:
         try:
             database_aux = Database()
@@ -258,9 +260,14 @@ def results_fulltext_aux(request, query, page=1, template_name='results.html'):
     list_results.list_results = pp.page(page)
     list_results.paginator = pp
     query_old = request.session.get('query', "")
-    return render(request, template_name, {'request': request,
+        
+    if isAdvanced == True:
+        return render(request, template_name, {'request': request,
                                            'list_results': list_results, 'page_obj': pp.page(page),
-                                           'search_old': query_old, 'breadcrumb': True})
+                                            'breadcrumb': True, 'isAdvanced': True})
+    else :
+        return render(request, template_name, {'request': request,
+                                           'list_results': list_results, 'page_obj': pp.page(page), 'breadcrumb': True, 'search_old': query_old, 'isAdvanced': False})
 
 
 def store_query(user_request, query_executed):
@@ -2098,7 +2105,11 @@ def show_fingerprint_page_read_only(request, q_id, qs_id, SouMesmoReadOnly=False
             query = convert_query_from_boolean_widget(qexpression, q_id)
             print "Query: " + query
             request.session['query'] = query
-            return results_fulltext_aux(request, query)
+            if template_name=='advanced_search.html':
+                return results_fulltext_aux(request, query, isAdvanced=True)
+            else:
+                return results_fulltext_aux(request, query)
+
 
         qlist_general = []
 
