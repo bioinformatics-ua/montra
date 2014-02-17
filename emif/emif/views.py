@@ -2242,14 +2242,14 @@ def show_fingerprint_page(request, runinfo, errors={}, template_name='database_e
     """
     questions = runinfo.questionset.questions()
 
-    questions = runinfo.questionset.questions()
-
     qlist = []
     jsinclude = []      # js files to include
     cssinclude = []     # css files to include
     jstriggers = []
     qvalues = {}
 
+    print questions
+    
     # initialize qvalues        
     cookiedict = runinfo.get_cookiedict()
     for k, v in cookiedict.items():

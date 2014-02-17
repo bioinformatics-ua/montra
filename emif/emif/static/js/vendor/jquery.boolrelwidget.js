@@ -16,6 +16,7 @@
             expand_text:'To define the relations between the terms click here.',
             expand_text_read:'To see the relations defined in this search click here.',
             collapse_text:'Click here to close this panel.',
+            query_text: 'Drag and Drop concepts here to start building a query...',
             form_anchor: null,
             auto_add: true, 
             default_relation: BOOL['AND'],
@@ -343,7 +344,7 @@
                 } else {
                     var master = this;
                     mastergroup=null;
-                    $('#boolrelwidget-query').html('<div class="boolrelwidget-first-droppable">Drag and Drop concepts here to start building a query...</div>');
+                    $('#boolrelwidget-query').html('<div class="boolrelwidget-first-droppable">'+settings.query_text+'</div>');
                      if(!settings.view_only){                    
                       $( ".boolrelwidget-first-droppable" ).droppable({
                           drop: function( event, ui ) {
@@ -457,23 +458,23 @@
                     }
                     // Cant delete mastergroup, other can be deleted
                     if(!settings.view_only){
-                    if(counter!=0){
-                        if(counter%2 == 0)
-                            big_box.push('<div class="btn boolrelwidget-query-delete');
-                        else
-                            big_box.push('<div class="btn btn-inverse boolrelwidget-query-delete');
-                        
-                        if(!something.isSimple())
-                            big_box.push(' boolrelwidget-expandable');
-                        
-                        big_box.push('" id="boolrelwidget-dl-');                        
-                        big_box.push(something.id);
-                        
-                        if(counter%2 == 0)
-                            big_box.push('"><div class="boolrelwidget-query-delete-odd"></div></div>');
-                        else 
-                            big_box.push('"><div class="boolrelwidget-query-delete-even"></div></div>');
-                    }
+                        if(counter!=0){
+                            if(counter%2 == 0)
+                                big_box.push('<div class="btn boolrelwidget-query-delete');
+                            else
+                                big_box.push('<div class="btn btn-inverse boolrelwidget-query-delete');
+                            
+                            if(!something.isSimple())
+                                big_box.push(' boolrelwidget-expandable');
+                            
+                            big_box.push('" id="boolrelwidget-dl-');                        
+                            big_box.push(something.id);
+                            
+                            if(counter%2 == 0)
+                                big_box.push('"><div class="boolrelwidget-query-delete-odd"></div></div>');
+                            else 
+                                big_box.push('"><div class="boolrelwidget-query-delete-even"></div></div>');
+                        }
                     }
                     big_box.push('</span>');
                 } else {
@@ -650,13 +651,13 @@
             toolbar_content+='<button id="boolrelwidget-search" class="btn">Search</button>';
             
             // Also add the hidden input to the form
-            $(settings.form_anchor).append('<input type="hidden" id="boolrelwidget-boolean-representation" name="boolrelwidget-boolean-representation" value="" />');
-            $(settings.form_anchor).append('<input type="hidden" id="boolrelwidget-boolean-serialization" name="boolrelwidget-boolean-serialization" value="" />');
+            $(settings.form_anchor).append('<input type="hidden" id="boolrelwidget-boolean-representation" name="boolrelwidget-boolean-representation" value=" " />');
+            $(settings.form_anchor).append('<input type="hidden" id="boolrelwidget-boolean-serialization" name="boolrelwidget-boolean-serialization" value=" " />');
         }
         
-        toolbar_content+='<button id="boolrelwidget-collapseall" class="btn">Expand All</button><button class="btn" id="boolrelwidget-orall">Or All Concepts</button><button class="btn" id="boolrelwidget-andall">And All Concepts</button><button class="btn" id="boolrelwidget-clear">Reset</button>>';
+        toolbar_content+='<button id="boolrelwidget-collapseall" class="btn">Expand All</button><button class="btn" id="boolrelwidget-orall">Or All Concepts</button><button class="btn" id="boolrelwidget-andall">And All Concepts</button><button class="btn" id="boolrelwidget-clear">Reset</button></div>';
         }
-        toolbar_content+='</div></div><div id="boolrelwidget-query" class="well well-small">Loading...</div></div';
+        toolbar_content+='</div><div id="boolrelwidget-query" class="well well-small">Loading...</div></div>';
         self = self.append(toolbar_content);
         
         // Lets add the event handlersx

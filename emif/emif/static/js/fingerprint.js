@@ -99,15 +99,7 @@ var classNamePatternAUX = /type_(\S+)/i;
 var advValidator = new Fingerprint_Validator();
 
 $(document).ready(function () {
-    if (!(typeof bool_container === 'undefined')) {
-        $('#qform').submit(
-                     
-                    function(e) {
-                        // Update hidden inputs (in case they are not updated because we are using the other buttons not in control by the plugin)
-                        bool_container.readyToSubmit(); 
-                    }     
-        );
-    }
+    
     advValidator.onInit();
     $(document).on('change', '.answer input,.answer select,.answer textarea, button', function (e) {
         e.preventDefault();
