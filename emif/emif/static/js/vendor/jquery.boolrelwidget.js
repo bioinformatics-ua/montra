@@ -1078,12 +1078,12 @@ BooleanGroup.prototype = {
             
             
             for(var i = 0;i<variables_to_parse.length-1;i++){
-                this.variables.push(new BooleanGroup(null).deserialize(variables_to_parse[i]));        
+                if(variables_to_parse[i].indexOf('T__') == 0)
+                    this.variables.push(new BooleanTerminal(null,null,null).deserialize(variables_to_parse[i]));
+                else 
+                    this.variables.push(new BooleanGroup(null).deserialize(variables_to_parse[i]));        
             }
-        } else if(str.indexOf('T__') == 0){
-           this.variables.push(new BooleanTerminal(null,null,null).deserialize(str));
-            
-        } else {
+        }else {
             console.error('Impossible to parse BooleanGroup object');
         }
         

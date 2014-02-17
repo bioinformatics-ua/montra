@@ -2184,6 +2184,7 @@ def show_fingerprint_page_read_only(request, q_id, qs_id, SouMesmoReadOnly=False
                 fingerprint_id=fingerprint_id,
                 breadcrumb=True,
                 hide_add = hide_add,
+                
         )
         r['Cache-Control'] = 'no-cache'
         r['Expires'] = "Thu, 24 Jan 1980 00:00:00 GMT"
