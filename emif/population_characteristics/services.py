@@ -22,8 +22,6 @@ from pymongo.errors import OperationFailure
 from .parseJerboaFile import * 
 import json 
 
-from .jerboa import *
-
 from .conf_charts import *
 from .charts.rule_matcher import * 
 
