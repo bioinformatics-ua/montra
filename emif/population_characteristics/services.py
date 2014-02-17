@@ -26,7 +26,7 @@ from .conf_charts import *
 from .charts.rule_matcher import * 
 
 
-class PopulationCharacteristic(JerboaFormat):
+class PopulationCharacteristic(object):
     """PopulationCharacteristic: This class controls the Jerboa File
     """
     def __init__(self, arg=None):
