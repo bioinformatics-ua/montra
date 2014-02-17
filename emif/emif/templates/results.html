@@ -213,9 +213,22 @@ $(function() {
   });
 
 });
+var counter = 0;
 
 // URL Hack to make paginator work with base
 $(document).ready(function(){
+    if($('input:checkbox:checked', table_databases).length >= 2){
+        $("#comparabtn").removeAttr('disabled');
+        counter = $('input:checkbox:checked', table_databases).length;
+        $("#comparabtn").bind('click',function(e)
+        { 
+          
+          $('#result_form').submit();
+
+          return false;
+        });
+    }
+    
     $('a[href="#"]').attr('href', function(i, val){
         return window.location + val;
     });
@@ -223,7 +236,6 @@ $(document).ready(function(){
 {% endif %}
 
 
-var counter = 0;
 function hidecheckbox()
 {
   $('.checkbox').toggle();
