@@ -43,7 +43,9 @@ else:
 ADMINS = (
     ('Luis A. Bastiao Silva', 'bastiao@ua.pt'),
     ('José Luis Oliveira', 'jlo@ua.pt'),
-    ('Rui Mendes', 'ruidamendes@ua.pt'),
+    ('Tiago Godinho', 'tmgodinh@ua.pt'),
+    ('Jose Melo', 'melojms@gmail.com'),
+    
 )
 
 SOLR_HOST = "localhost"
