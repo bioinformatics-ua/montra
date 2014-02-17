@@ -169,13 +169,13 @@
             <!-- If Questionset is not the first (Introduction) or the final (Thank you) -->
 
                 {% if k.prev %}
-                    <a href="add/{{ questionset.questionnaire.pk }}/{{ k.prev.sortid }}" class="btn large primary" onclick="questionsets_handle(qs_{{ k.prev.sortid }});  return false;">{% trans "Previous" %}</a>
+                    <a href="dbEdit/{{ fingerprint_id }}/{{ k.prev.sortid }}" class="btn large primary" onclick="questionsets_handle(qs_{{ k.prev.sortid }});  return false;">{% trans "Previous" %}</a>
                 {% endif %}
                 {% if k.prev and k.next %}
 
                 {% endif %}
                 {% if k.next %}
-                    <a href="add/{{ questionset.questionnaire.pk }}/{{ k.next.sortid }}" class="btn large primary" onclick="questionsets_handle(qs_{{ k.next.sortid }});  return false;">{% trans "Next" %}</a>
+                    <a href="dbEdit/{{ fingerprint_id }}/{{ k.next.sortid }}" class="btn large primary" onclick="questionsets_handle(qs_{{ k.next.sortid }});  return false;">{% trans "Next" %}</a>
                 {% endif %}
 
 
