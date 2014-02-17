@@ -15,6 +15,9 @@ from userena.utils import get_user_model
 from django_countries.countries import COUNTRIES
 
 from django.conf import settings
+from django.contrib.auth.models import User
+from accounts.models import Profile
+
 
 
 class SignupFormExtra(SignupForm):
@@ -31,6 +34,12 @@ class SignupFormExtra(SignupForm):
     organization = forms.CharField(label=_('Organization'),
                                    max_length=255,
                                    required=True)
+    if (Profile.objects.all().count()):
+        profiles = forms.ModelMultipleChoiceField(label=_('Profiles'),
+                                                    required=False,
+                                                    queryset=Profile.objects.all(),
+                                                    widget=forms.CheckboxSelectMultiple())
+
 
     def __init__(self, *args, **kw):
         """
@@ -43,11 +52,19 @@ class SignupFormExtra(SignupForm):
         del self.fields['username']
 
         # Put the new fields at the top
-        new_order = self.fields.keyOrder[:-4]
+        if (Profile.objects.all().count()):
+            new_order = self.fields.keyOrder[:-5]
+        else:
+            new_order = self.fields.keyOrder[:-4]
+
         new_order.insert(0, 'first_name')
         new_order.insert(1, 'last_name')
         new_order.insert(2, 'country')
         new_order.insert(3, 'organization')
+
+        if (Profile.objects.all().count()):
+            new_order.insert(4, 'profiles')
+            
         self.fields.keyOrder = new_order
 
     def save(self):
@@ -72,6 +89,7 @@ class SignupFormExtra(SignupForm):
 
         self.cleaned_data['username'] = username
 
+
         # First save the parent form and get the user.
         new_user = super(SignupFormExtra, self).save()
 
@@ -82,6 +100,13 @@ class SignupFormExtra(SignupForm):
         user_profile.country = self.cleaned_data['country']
         user_profile.organization = self.cleaned_data['organization']
         user_profile.save()
+
+        # Add selected profiles
+        if (Profile.objects.all().count()):
+            selected_profiles = self.cleaned_data['profiles']
+            for sp in selected_profiles:
+                prof = Profile.objects.get(name__iexact=sp)
+                prof.users.add(new_user)
 
         # Userena expects to get the new user from this form, so return the new
         # user.
