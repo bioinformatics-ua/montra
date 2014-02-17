@@ -68,10 +68,13 @@ function validate1(element, id_answered, dirty_id_answered) {
         
             if (!(typeof bool_container === 'undefined')) {
                 console.log('question_nr_'+id_answered);
+                var number_correct = $('#question_nr_'+id_answered).text().trim();
+                number_correct = number_correct.substring(0, number_correct.length-1);
+                console.log( number_correct);
                 console.log( $('#question_nr_'+id_answered).text().trim()+" "+just_question);
                 console.log($('#question_'+dirty_id_answered.replace('.','\\.')).val());
                 
-                bool_container.push('question_nr_'+id_answered,
+                bool_container.push('question_nr_'+number_correct,
                     $('#question_nr_'+id_answered).text().trim()+" "+just_question,
                                    $('#question_'+dirty_id_answered.replace('.','\\.')).val());
             }
@@ -79,8 +82,10 @@ function validate1(element, id_answered, dirty_id_answered) {
         } else {
             //console.log('2 - #answered_'+id_answered);
             $('[id="answered_'+id_answered+'"]').hide();
+            var number_correct = $('#question_nr_'+id_answered).text().trim();
+            number_correct = number_correct.substring(0, number_correct.length-1);
             if (!(typeof bool_container === 'undefined')) {
-                bool_container.splice('question_nr_'+id_answered,
+                bool_container.splice('question_nr_'+number_correct,
                     $('#question_nr_'+id_answered).text().trim()+" "+just_question,
                                    $('#question_'+dirty_id_answered.replace('.','\\.')).val());
             }

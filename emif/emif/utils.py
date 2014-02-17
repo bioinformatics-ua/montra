@@ -32,6 +32,7 @@ import random
 
 from django.conf import settings
 
+import re
 
 def generate_hash():
     hash = md5.new()
@@ -298,9 +299,33 @@ def convert_qvalues_to_query(qvalues, questionnaire_id, qexpression):
     
     return convert_dict_to_query(query_parameters)
 
+# Example to test the funcion: 
 
+#a = "question_nr_1.01: 'sadsa' AND question_nr_1.02: 'dsadsadsa' AND question_nr_1.04: 'asdsaa'"
+#print convert_query_from_boolean_widget(a, 49)
+def convert_query_from_boolean_widget(query, q_id):
+    # Example of input
+    #question_nr_1.01: 'sadsa' AND question_nr_1.02: 'dsadsadsa' AND question_nr_1.04: 'asdsaa'
+    # Example of output
+    # ..
 
-
+    questionsets = QuestionSet.objects.filter(questionnaire=q_id)
+    print "convert_query_from_boolean_widget"
+    print query
+    def check(m):
+        try:
+            print m
+            question_id = m.group(0)
+            question_id = question_id.replace('question_nr_', '')
+            q = Question.objects.filter(number=question_id, questionset__in=questionsets)
+            print q
+        except:
+            raise
+            return 'null'
+        return q[0].slug + '_t'
+    
+    r = re.sub('question_nr_[10-9\\.]+', check, query)
+    return r
 
 
     

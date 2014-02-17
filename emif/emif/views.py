@@ -327,6 +327,8 @@ def results_diff(request, page=1, template_name='results_diff.html'):
             return results_fulltext(request, page, full_text=True)
     except:
         raise
+    print "Printing the qexpression"
+    print request.POST['qexpression']
     return results_fulltext(request, page, full_text=False)
 
 
@@ -2084,9 +2086,10 @@ def show_fingerprint_page_read_only(request, q_id, qs_id, SouMesmoReadOnly=False
                             qvalues[s[1]] = v
                             #print qvalues
                 elif k == "boolrelwidget-boolean-representation":            
-                    qexpression = v[1:-1]
-            print qexpression            
+                    qexpression = v
+            print qexpression 
             query = convert_qvalues_to_query(qvalues, q_id, qexpression)
+            query = convert_query_from_boolean_widget(qexpression, q_id)
             print "Query: " + query
             request.session['query'] = query
             return results_fulltext_aux(request, query)
