@@ -197,8 +197,10 @@ def results_fulltext_aux(request, query, page=1, template_name='results.html'):
     list_databases = []
     if error_searching or len(results) == 0 :
         query_old = request.session.get('query', "")
+        serialization_query = request.session.get('serialization_query','')
+        
         return render(request, "results.html", {'request': request, 'breadcrumb': True,
-                                                'list_results': [], 'page_obj': None, 'search_old': query_old})
+                                                'list_results': [], 'page_obj': None, 'search_old': '', 'serialization_query': serialization_query})
     for r in results:
         try:
             database_aux = Database()
@@ -2056,7 +2058,7 @@ def show_fingerprint_page_read_only(request, q_id, qs_id, SouMesmoReadOnly=False
         jstriggers = []
         qvalues = {}
         qexpression = None  # boolean expression
-        
+        qserialization = None   # boolean expression serialization to show on results
         if not request.POST:
             
             if 'query' in request.session:
@@ -2087,7 +2089,10 @@ def show_fingerprint_page_read_only(request, q_id, qs_id, SouMesmoReadOnly=False
                             #print qvalues
                 elif k == "boolrelwidget-boolean-representation":            
                     qexpression = v
-            print qexpression 
+                elif k == "boolrelwidget-boolean-serialization":     
+                    # we add the serialization to the session
+                    request.session['serialization_query'] = v
+
             query = convert_qvalues_to_query(qvalues, q_id, qexpression)
             query = convert_query_from_boolean_widget(qexpression, q_id)
             print "Query: " + query

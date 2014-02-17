@@ -69,32 +69,7 @@ text-decoration: none;
 {% block content %}
 
 <div class="container">
-  <div class="jumbotron">
-
-   <div class="span12" style="text-align:center">
- 
-    <h2>Advanced Search</h2>
-       <div id="bool_container"></div>
-       {% comment %}
-    <div>
-  <em>Filter: </em>
-          <select data-placeholder="Your Favorite Football Team" style="width:600px;" class="chosen-select" multiple tabindex="6">
-            <option value=""></option>
-            <optgroup label="NFC EAST">
-              <option>MCI - definition: Neuropsychological Test, Functional impairment (eg CDR)</option>
-              <option>Medication use: Collected</option>
-              <option>Urine: Routine</option>  
-
-            </optgroup>
-            
-          </select>
-        
-    </div>
-       {% endcomment  %}
-
-  </div>
-
-  </div>
+    <h2 class="pull-center" >Advanced Search</h2>
 </div>
 <hr>
 <div class="row">
@@ -142,6 +117,8 @@ text-decoration: none;
         </div>
     
 </div>
+       <div id="bool_container"></div>
+
 <script type="text/javascript" src="{{ STATIC_URL }}js/vendor/chosen.jquery.js"></script>
 <script type="text/javascript" src="{{ STATIC_URL }}js/emif.advanced_search.js"></script>
 <script type="text/javascript">

@@ -74,7 +74,7 @@ function valchanged(qnum, value) {
             //console.log(optional.attr('id'));
             
             //var optional = $('#question_'+just_number.replace(/(\.)/g,'\\.')+"_1_opt").val();
-            bool_container.push(qnum,
+            bool_container.push(qnum.replace('question_','question_nr_'),
                                 clean.replace('_','. ')+' ('+the_question+')'
                                , ''+value);
         } else if(value==false){
