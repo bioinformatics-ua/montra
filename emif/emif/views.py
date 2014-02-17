@@ -1151,6 +1151,10 @@ def force_delete_fingerprint(request, id):
 
 
 def databases(request, page=1, template_name='databases.html'):
+    #first lets clean the query session log
+    if 'query' in request.session:
+        del request.session['query']
+    
     # Get the list of databases for a specific user
 
     user = request.user
@@ -1432,42 +1436,6 @@ def get_api_info(fingerprint_id):
     for r in results:
         result[r.field] = r.value
     return result
-
-
-def fingerprint(request, runcode, qs, template_name='database_info.html'):
-    
-    
-    qsets, name, db_owners, fingerprint_ttype = createqsets(runcode)
-
-    if fingerprint_ttype == "":
-        raise "There is missing ttype of questionarie, something is really wrong"
-
-    apiinfo = json.dumps(get_api_info(runcode));
-
-    owner_fingerprint = False
-    for owner in db_owners.split(" "):
-        print owner
-        print request.user.username
-        if (owner == request.user.username):
-            owner_fingerprint = True
-    
-    name_bc = name
-    try:
-        name_bc = name.encode('utf-8')
-    except:
-        pass
-
-    return render(request, template_name, 
-        {'request': request, 'qsets': qsets, 'export_bd_answers': True, 
-        'apiinfo': apiinfo, 'fingerprint_id': runcode,
-                   'breadcrumb': True, 'breadcrumb_name':name_bc,
-                    'style': qs, 'collapseall': False, 
-                    'owner_fingerprint':owner_fingerprint,
-                    'fingerprint_dump': True,
-                    'fingerprint_ttype': fingerprint_ttype,
-                    })
-
-
 
 def get_questionsets_list(runinfo):
     # Get questionnaire

@@ -48,6 +48,8 @@
     <script src="{{ STATIC_URL }}js/vendor/jquery-ui-1.10.4.custom.min.js"></script>
     <script src="{{ STATIC_URL }}js/vendor/bootstrap.min.js"></script>
     <script src="{{ STATIC_URL }}js/vendor/jquery.cookie.js"></script>
+    <script src="{{ STATIC_URL }}js/vendor/jquery.canclear.js"></script>
+    
     <script type="application/javascript">
         // We need to configure this to be able to send requests by json with the csrftoken
         var csrftoken = $.cookie('csrftoken');
@@ -88,8 +90,8 @@
 </div>
             </div>
             </div>
-               You seem to be using a old version of Internet Explorer.<br /><br />
-                The Internet browser you're currently using is not supported by the EMIF Catalogue. We currently only support I9-IE11, Chrome, Safari, Firefox and Opera. To be able to use our webpage we recommend you to update your Internet Explorer, or use another modern browser from the supported list.
+                You seem to be using a old version of Internet Explorer.<br /><br />
+                The Internet browser you're currently using is not supported by the EMIF Catalogue. We currently only support I7-IE11, Chrome, Safari, Firefox and Opera. To be able to use our webpage we recommend you to update your Internet Explorer, or use another modern browser from the supported list.
         </div>
         <div class="supported">
     <div class="navbar navbar-fixed-top">
@@ -286,7 +288,7 @@
                </div>     
         <div class="row" style="text-align:center">
             <footer>
-                <p>&copy; EMIF Catalogue v{% get_version %} </p>
+                <p>&copy; EMIF Catalogue v{% get_version %} <br/><small id="supportability">This website is optimised to Safari, Chrome, Firefox, Opera and IE9+. It runs in IE7-IE8, but it has low performance and no enhanced features.</small></p>
 
             </footer>
         </div>
@@ -311,7 +313,9 @@
         var _gaq = _gaq || [];
         _gaq.push(['_setAccount', 'UA-38876251-1']);
         _gaq.push(['_trackPageview']);
-
+        $(function(){
+            $('.search-query').canclear();
+        });
         (function() {
             var ga = document.createElement('script');
             ga.type = 'text/javascript';

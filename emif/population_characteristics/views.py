@@ -21,7 +21,13 @@ from django.shortcuts import render, render_to_response
 from .services import *
 from .response import JSONResponse, response_mimetype
 from .serialize import serialize
-    
+
+from population_characteristics.models import *
+
+from django.core import serializers
+
+from django.conf import settings
+
 
 def jerboa_list_values(request, var, row, fingerprint_id, template_name='documents_upload_form.html'):
 
@@ -63,6 +69,46 @@ def get_settings(request, runcode):
     response['Content-Disposition'] = 'inline; filename=files.json'
     return response
 
+
+from dateutil.tz import tzutc
+
+UTC = tzutc()
+
+def serialize_date(dt):
+    """
+    Serialize a date/time value into an ISO8601 text representation
+    adjusted (if needed) to UTC timezone.
+
+    For instance:
+    >>> serialize_date(datetime(2012, 4, 10, 22, 38, 20, 604391))
+    '2012-04-10T22:38:20.604391Z'
+    """
+    if dt.tzinfo:
+        dt = dt.astimezone(UTC).replace(tzinfo=None)
+    return dt.isoformat() + 'Z'
+
+def list_jerboa_files(request, fingerprint):
+
+    # List the Jerboa files for a particular fingerprint
+    jerboa_files = Characteristic.objects.filter(fingerprint_id=fingerprint)
+    _data = []    
+    for f in jerboa_files:
+        _doc = {'name': f.name, 
+                'comments': f.description,
+                'revision': f.revision,
+                'file_name': f.file_name,
+                'path': f.path.replace(settings.PROJECT_DIR_ROOT, ''),
+                'fingerprint_id': f.fingerprint_id  ,
+                'latest_date': serialize_date(f.latest_date),
+                }
+        _data.append(_doc)
+
+    data = {'conf': _data}
+    response = JSONResponse(data, mimetype=response_mimetype(request))
+    response['Content-Disposition'] = 'inline; filename=files.json'
+    return response
+
+
 def get_pde_types(self):
     """This function returns the Primary Data Extract type of graphs
     """
@@ -73,4 +119,7 @@ def upload_jerboa_request(request, template_name='uploadjerboa.html'):
     This functions is responsabible to handle the upload files of jerboa 
     """
     pass
+
+
+
 

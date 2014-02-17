@@ -22,18 +22,28 @@ from documents import *
 
 urlpatterns = patterns('',
    
+    # Upload Documents to Jerboa
     url(r'^upload$', 'population_characteristics.documents.document_form_view_upload'),
-    url(r'^jerboaupload$', 'population_characteristics.documents.jerboa_form_view_upload'),
+    url(r'^jerboaupload/(?P<fingerprint_id>[^/]+)/$', 'population_characteristics.documents.jerboa_form_view_upload'),
+    
+    # List Jerboa Files
+    url(r'^jerboafiles/(?P<fingerprint>[^/]+)/$', 'population_characteristics.views.list_jerboa_files'),
+
+    # List staff to the charts
     url(r'^jerboalistvalues/(?P<var>[^/]+)/(?P<row>[^/]+)/(?P<fingerprint_id>[^/]+)$', 
         'population_characteristics.views.jerboa_list_values'),
-
     url(r'^filters/(?P<var>[^/]+)/(?P<fingerprint_id>[^/]+)$', 
         'population_characteristics.views.filters'),
-
     url(r'^genericfilter/(?P<param>[^/]+)$', 'population_characteristics.views.generic_filter'),
 
-    url(r'^new/(?P<runcode>[^/]+)/(?P<qs>[-]{0,1}\d+)/$', 'population_characteristics.documents.document_form_view'),
-    url(r'^parsejerboa$', 'population_characteristics.documents.parsejerboa'),
+    # Settings
     url(r'^settings/(?P<runcode>[^/]+)/$', 'population_characteristics.views.get_settings'),
+
+    # Parsing Jerboa 
+    url(r'^parsejerboa$', 'population_characteristics.documents.parsejerboa'),
+
+    # Just testing URLs:
+    url(r'^new/(?P<runcode>[^/]+)/(?P<qs>[-]{0,1}\d+)/$', 'population_characteristics.documents.document_form_view'),
+    
     
 )

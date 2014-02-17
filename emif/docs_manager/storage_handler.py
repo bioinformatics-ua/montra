@@ -19,6 +19,10 @@
 import os
 
 from django.conf import settings
+if settings.DEBUG:
+    PATH_STORE_FILES = settings.PROJECT_DIR_ROOT  + 'emif/static/files/'
+else:
+    PATH_STORE_FILES = settings.PROJECT_DIR_ROOT  + settings.MIDDLE_DIR +'static/files/'
 
 class HandleFile(object):
     """This class handle with the file upload for multiple backends
@@ -30,7 +34,7 @@ class HandleFile(object):
         """
         Handle File
         """
-        self._handler_wrapper.handle_uploaded_file(f)
+        return self._handler_wrapper.handle_uploaded_file(f)
 
         # Store the metadata   
 
@@ -44,10 +48,11 @@ class FileSystemHandleFile(object):
         """Store the files in file disk 
         """
 
-        with open(os.path.join(os.path.abspath(settings.PROJECT_DIR_ROOT + 'emif/static/files/'), f.name),
+        with open(os.path.join(os.path.abspath(PATH_STORE_FILES), f.name),
                   'wb+') as destination:
             for chunk in f.chunks():
                 destination.write(chunk)
+        return os.path.join(os.path.abspath(PATH_STORE_FILES), f.name)
 
 class MongoDBHandleFile(object):
     """Store the file in MongoDB

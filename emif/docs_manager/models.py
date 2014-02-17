@@ -19,17 +19,17 @@
 #
 
 from django.db import models
-
+from django.contrib.auth.models import User
 class Document(models.Model):
-    id = AutoField(primary_key=True)
     user = models.ForeignKey(User, unique=False, blank=True, null=True)
-    fingerprint_id = models.CharField()
+    fingerprint_id = models.CharField(max_length=255)
     created_date = models.DateTimeField(auto_now_add=True)
     latest_date = models.DateTimeField(auto_now=True)
-    revision = models.CharField()
-    path = models.CharField()
-    name = models.CharField()
-    descriptoin = models.TextField()
+    revision = models.CharField(max_length=255)
+    path = models.CharField(max_length=255)
+    name = models.CharField(max_length=255)
+    file_name = models.CharField(max_length=255)
+    description = models.TextField()
 
 
     def get_name(self):

@@ -23,25 +23,24 @@
 **************** Population Characteristics API 
 *********************************************************/
 
-
 function getFingerprintID(){
   var url = document.URL;
   var fingerprint_id='abcd';
+  console.log(url)
   try{
-    fingerprint_id = url.split("population/new/")[1].split("/1")[0];
+    fingerprint_id = url.split("fingerprint/")[1].split("/1")[0];
   }
   catch(err){
-    fingerprint_id='abcd'
+    fingerprint_id='abcde'
   };
   return fingerprint_id;
 
 };
 
-
 function PCAPI () 
 {
     this.getGender = function(){
-          var result = {}
+        var result = {}
           
         $.ajax({
           dataType: "json",
@@ -220,8 +219,6 @@ function PCAPI ()
                 tmpUl.append('<li><a class="filterBar" href="#" onclick="return false;"><i id="iproximity" class="icon-ok icon-black active"></i> '+values.values[data]+'</a></li>')
             });
             
-            
-            
             $(".filterBar").bind('click',function(e)
                     { 
                       e.preventDefault(); 
@@ -291,7 +288,7 @@ function PCAPI ()
                       fingerprintID = getFingerprintID();
                       console.log(fingerprintID);
                       var valuesFromGraph = PC.getValuesRow(e.toElement.innerHTML, 
-                        'Count', 'abcd');
+                        'Count',fingerprintID );
                       console.log('valuesFromGraph: '+valuesFromGraph);
                       console.log(valuesFromGraph);
                       $("#d3test").html('');
@@ -305,6 +302,7 @@ function PCAPI ()
                       $("#pcBarContent").populationChartsBar(pc,this,fingerprintID);
                       $("#pcBarContent").populationChartsBar('draw', pc);
 
+                      $("#pctitle").html("<h2>"+ e.toElement.innerHTML +"</h2>");
                       
                       if ($(e.toElement.firstChild).hasClass('icon-ok')) 
                       {

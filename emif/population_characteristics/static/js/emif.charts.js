@@ -7,6 +7,20 @@
  * should decorate other class
 */ 
 
+function Scale()
+{
+    this.getBins = function(){
+    };
+
+}
+
+function Filters()
+{
+    this.getBins = function(){
+    };
+}
+
+
  (function( $ )
  {
 
@@ -37,9 +51,7 @@
 
             console.log('This is the data that we got: ' +  _data);
 
-            dataset = [[{'xvalue':'2000', 'yvalue':200}, 
-                  {'xvalue':'2001', 'yvalue':300},
-                  {'xvalue':'2002', 'yvalue':.356}], 
+            dataset = [[], 
                  
                  ];
 

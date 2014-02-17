@@ -14,6 +14,7 @@
 <!-- CSS to style the file input field as button and adjust the Bootstrap progress bars -->
 <link rel="stylesheet" href="{{ STATIC_URL }}css/vendor/jquery.fileupload-ui.css">
 <link href="{{ STATIC_URL }}nvd3/src/nv.d3.css" rel="stylesheet" type="text/css">
+<!--
 <script src="{{ STATIC_URL }}nvd3/lib/d3.v3.js"></script>
 <script src="{{ STATIC_URL }}nvd3/nv.d3.js"></script>
 <script src="{{ STATIC_URL }}nvd3/src/models/axis.js"></script>
@@ -24,17 +25,51 @@
 <script src="{{ STATIC_URL }}nvd3/src/models/discreteBar.js"></script>
 <script src="{{ STATIC_URL }}nvd3/src/models/discreteBarChart.js"></script>
 
+-->
+
+
+<script src="{{ STATIC_URL}}js/emif.documents.js"></script>
+
+
+<script src="{{ STATIC_URL}}js/emif.jerboa.upload.js"></script>
+
+<!-- The jQuery UI widget factory, can be omitted if jQuery UI is already included -->
+<script src="{{ STATIC_URL }}js/vendor/jquery.ui.widget.js"></script>
+<!-- The Load Image plugin is included for the preview images and image resizing functionality -->
+<script src="{{ STATIC_URL }}js/vendor/load-image.min.js"></script>
+<!-- The Canvas to Blob plugin is included for image resizing functionality -->
+<script src="{{ STATIC_URL }}js/vendor/canvas-to-blob.min.js"></script>
+
+<!-- The Iframe Transport is required for browsers without support for XHR file uploads -->
+<script src="{{ STATIC_URL }}js/vendor/jquery.iframe-transport.js"></script>
+<!-- The basic File Upload plugin -->
+<script src="{{ STATIC_URL }}js/vendor/jquery.fileupload.js"></script>
+<!-- The File Upload processing plugin -->
+<script src="{{ STATIC_URL }}js/vendor/jquery.fileupload-process.js"></script>
+<!-- The File Upload image preview & resize plugin -->
+<script src="{{ STATIC_URL }}js/vendor/jquery.fileupload-image.js"></script>
+<!-- The File Upload audio preview plugin -->
+<script src="{{ STATIC_URL }}js/vendor/jquery.fileupload-audio.js"></script>
+<!-- The File Upload video preview plugin -->
+<script src="{{ STATIC_URL }}js/vendor/jquery.fileupload-video.js"></script>
+<!-- The File Upload validation plugin -->
+<script src="{{ STATIC_URL }}js/vendor/jquery.fileupload-validate.js"></script>
+<script src="{{ STATIC_URL }}js/vendor/jquery.cookie.js"></script>
+
+
 
 {% endblock %} 
-
 {% block breadcrumbs %} 
 {{ block.super }} 
-    {% if style == '1' %} 
+    {% if search_old %}
+        {% breadcrumb "Search" "resultsdiff/1" %} 
+        {% breadcrumb breadcrumb_name "databases" %} 
+    {% elif style == '1' %} 
         {% breadcrumb "Databases" "databases" %} 
-        {% breadcrumb "List" "databases" %} 
+        {% breadcrumb breadcrumb_name "databases" %} 
     {% else %} 
         {% breadcrumb "Databases" "alldatabases" %} 
-        {% breadcrumb "List" "alldatabases" %} 
+        {% breadcrumb breadcrumb_name "databases" %} 
     {% endif %}
 
     {% comment %}
@@ -122,117 +157,7 @@
 
                 <div class="tab-pane" id="populationcharacteristics" >
 
-              {% if owner_fingerprint %}
-
-
-                {% if contains_population %}
-
-                This database does not still aggregated data. Submit the Population Characteristics file (Jerboa)
-
-                {% else %}
-
-                {% block jerboaformupload %} 
-                {% endblock%}
-
-                You have already population characteristics. Your last activied is dated from: {{pc_last_activity}}
-                <div class="span12 populationcharacteristicsbar">
-                <div class="pull-right hidden ">
-                    <div class="btn-group">
-                        <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
-                            Show/Hide
-                            <span class="caret"></span>
-                        </a>
-
-                        <ul class="dropdown-menu">
-                            <!-- dropdown menu links -->                
-                            <li>
-                                <a id="chkpercentile1" href="#"> <i id="imatch" class="icon-ok icon-black active"></i>
-                                    1st Percentile
-                                </a>
-                            </li>
-                            <li>
-                                <a id="chkpercentile2" href="#"> <i id="iunmatch" class="icon-ok icon-black active"></i>
-                                    2nd Percentile
-                                </a>
-                            </li>
-                            <li>
-                                <a id="chkpercentil3" href="#">
-                                    <i id="iproximity" class="icon-ok icon-black active"></i>
-                                    3rd Percentile
-                                </a>
-                            </li>
-                            <li>
-                                <a id="chkMin" href="#">
-                                    <i id="iproximity" class="icon-ok icon-black active"></i>
-                                    Min
-                                </a>
-                            </li>
-                            <li>
-                                <a id="chkMax" href="#">
-                                    <i id="iproximity" class="icon-ok icon-black active"></i>
-                                    Max
-                                </a>
-                            </li>
-                            <li>
-                                <a id="proximity" href="#">
-                                    <i id="iproximity" class="icon-ok icon-black active"></i>
-                                    Count
-                                </a>
-                            </li>
-                            <li>
-                                <a id="proximity" href="#">
-                                    <i id="iproximity" class="icon-ok icon-black active"></i>
-                                    Mean
-                                </a>
-                            </li>
-                            <li>
-                                <a id="emptyrows" href="#">
-                                    <i id="iemptyrows" class="icon-ok icon-black disabled"></i>
-                                    Empty rows
-                                </a>
-                            </li>
-                        </ul>
-
-                    </div>
-                </div>
-                </div>
-                
-                <div class="row">
-                
-                </div>
-                
-                <div class="row">
-
-                <div class="well span3" id="pc_list">
-
-
-                </div>
-                
-                <div class="span6" id="chart2">
-                
-                {% include "population_characteristics.html" %}
-                </div>
-                
-
-                <div class="span3 hidden" id="pcBarContentRoot">
-                    <div > Filter: </div>
-
-                    <div id="pcBarContent" class="well">
-
-                    </div>
-
-
-                </div>
-
-              
-
-                </div>
-
-                
-                
-                {% endif %}
-
-              {% endif %}
+                              {% include "population_characteristics.html" %}
 
             </div>
 
@@ -356,32 +281,6 @@
 <script src="{{ STATIC_URL}}js/emif.populationcharacteristics.charts.js"></script>
 
 <script src="{{ STATIC_URL}}js/emif.populationcharacteristics.js"></script>
-<script src="{{ STATIC_URL}}js/emif.documents.js"></script>
-
-
-<!-- The jQuery UI widget factory, can be omitted if jQuery UI is already included -->
-<script src="{{ STATIC_URL }}js/vendor/jquery.ui.widget.js"></script>
-<!-- The Load Image plugin is included for the preview images and image resizing functionality -->
-<script src="{{ STATIC_URL }}js/vendor/load-image.min.js"></script>
-<!-- The Canvas to Blob plugin is included for image resizing functionality -->
-<script src="{{ STATIC_URL }}js/vendor/canvas-to-blob.min.js"></script>
-
-<!-- The Iframe Transport is required for browsers without support for XHR file uploads -->
-<script src="{{ STATIC_URL }}js/vendor/jquery.iframe-transport.js"></script>
-<!-- The basic File Upload plugin -->
-<script src="{{ STATIC_URL }}js/vendor/jquery.fileupload.js"></script>
-<!-- The File Upload processing plugin -->
-<script src="{{ STATIC_URL }}js/vendor/jquery.fileupload-process.js"></script>
-<!-- The File Upload image preview & resize plugin -->
-<script src="{{ STATIC_URL }}js/vendor/jquery.fileupload-image.js"></script>
-<!-- The File Upload audio preview plugin -->
-<script src="{{ STATIC_URL }}js/vendor/jquery.fileupload-audio.js"></script>
-<!-- The File Upload video preview plugin -->
-<script src="{{ STATIC_URL }}js/vendor/jquery.fileupload-video.js"></script>
-<!-- The File Upload validation plugin -->
-<script src="{{ STATIC_URL }}js/vendor/jquery.fileupload-validate.js"></script>
-<script src="{{ STATIC_URL }}js/vendor/jquery.cookie.js"></script>
-
 
 
 
