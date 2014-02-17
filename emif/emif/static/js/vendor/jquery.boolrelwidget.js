@@ -14,11 +14,14 @@
         // Default Options
         var settings = $.extend({
             expand_text:'To define the relations between the terms click here.',
+            expand_text_read:'To see the relations defined in this search click here.',
             collapse_text:'Click here to close this panel.',
             form_anchor: null,
             auto_add: true, 
             default_relation: BOOL['AND'],
-            hide_concepts: true
+            hide_concepts: true,
+            view_only: false,
+            view_serialized_string: null
         }, options);
         /*
         var bg1 = new BooleanGroup('teste de nome muito grande mesmo');
@@ -211,12 +214,13 @@
                     $('#boolrelwidget-basicblocks').html(little_boxes.join(''));
                                     // Make them draggable
                     
+                     if(!settings.view_only){
                     // Clone makes ie7 crash and burn
                 $(".boolrelwidget-block-inner").draggable({containment: "#boolrelwidget-panel", 
                                                            revert: true, opacity: 0.9, /*helper: "clone",*/ cursor: "move", cursorAt: { top: 10, left: 50 }
                                                           }); 
                 }                
-                
+                }
             } else {
                 $('#boolrelwidget-basicblocks-out').fadeOut('fast');
             }
@@ -230,6 +234,7 @@
                     $('#boolrelwidget-query').html(big_box.join(''));
                     
                     var master = this;
+                     if(!settings.view_only){
                     $( ".boolrelwidget-query-dropper" ).droppable({
                       drop: function( event, ui ) {
                         var drag = ui.draggable.attr('id');
@@ -268,12 +273,15 @@
                             
                       }
                     });
+                     }
                     /* Firefox has a problem with the container if its not cloned ... */
+                     if(!settings.view_only){
                     if(navigator.userAgent.indexOf("Firefox")!=-1){
                         $(".boolrelwidget-query-box > .boolrelwidget-simple").parent().draggable({containment: "#boolrelwidget-panel",revert: true, opacity: 0.9, cursor: "move", cursorAt: { top: 10, left: 50 }, helper: 'clone'}); 
                     }else {
                         $(".boolrelwidget-query-box > .boolrelwidget-simple").parent().draggable({containment: "#boolrelwidget-panel",revert: true, opacity: 0.9, cursor: "move", cursorAt: { top: 10, left: 50 } }); 
                     }
+                     }
                     
                                          
                         // Add 
@@ -336,26 +344,27 @@
                     var master = this;
                     mastergroup=null;
                     $('#boolrelwidget-query').html('<div class="boolrelwidget-first-droppable">Drag and Drop concepts here to start building a query...</div>');
-                                        
-                  $( ".boolrelwidget-first-droppable" ).droppable({
-                      drop: function( event, ui ) {
-                          
-                        var droper = Number(ui.draggable.attr('id').replace('boolrelwidget-bb-',''));
-                        console.log("Event drop0: "+droper+" on empty space, creating new booleangroup.");
-                        
-                          var sliced = master.spliceById(droper);
-                        
-                        // Try to add this to the master group
-                        // If we cant, we insert the basic block back into the basic_blocks list
-                        mastergroup = new BooleanGroup(sliced);
-                        
-                        // Put in used blocks
-                        $(".tooltip").fadeOut('fast');
-   
-                        master.draw();
-                        
-                      }
-                    });  
+                     if(!settings.view_only){                    
+                      $( ".boolrelwidget-first-droppable" ).droppable({
+                          drop: function( event, ui ) {
+                              
+                            var droper = Number(ui.draggable.attr('id').replace('boolrelwidget-bb-',''));
+                            console.log("Event drop0: "+droper+" on empty space, creating new booleangroup.");
+                            
+                              var sliced = master.spliceById(droper);
+                            
+                            // Try to add this to the master group
+                            // If we cant, we insert the basic block back into the basic_blocks list
+                            mastergroup = new BooleanGroup(sliced);
+                            
+                            // Put in used blocks
+                            $(".tooltip").fadeOut('fast');
+       
+                            master.draw();
+                            
+                          }
+                        });  
+                     }
                 }
                 $(".boolrelwidget-simple").tooltip({container: 'body', delay: { show: 500, hide: 0 }});
 
@@ -381,7 +390,12 @@
                         big_box.push('<div class="boolrelwidget-simple" data-toggle="tooltip" title="'+
                                      something.toString()+' '+something.val+'">');
                     
+                    if(settings.view_only)
+                        big_box.push('<strong>');
                     big_box.push(something.toString());
+                    if(settings.view_only)
+                        big_box.push(':</strong><br />'+something.val);
+                        
                     big_box.push('</div>');
                 }
                 else if(something instanceof BooleanGroup){
@@ -426,7 +440,7 @@
                         this.harvest(something.variables[k], big_box, counter+1);
                     }
                     big_box.push("</div>");
-                    
+                    if(!settings.view_only){
                         big_box.push('<div id="boolrelwidget-dp-');
                         big_box.push(something.id);
                         if(counter%2 == 0){
@@ -440,8 +454,9 @@
                                 big_box.push(' boolrelwidget-expandable');
                             big_box.push('"><div class="boolrelwidget-query-dropper-even">&nbsp;&nbsp;</div></div>');
                         }
-                    
+                    }
                     // Cant delete mastergroup, other can be deleted
+                    if(!settings.view_only){
                     if(counter!=0){
                         if(counter%2 == 0)
                             big_box.push('<div class="btn boolrelwidget-query-delete');
@@ -459,7 +474,7 @@
                         else 
                             big_box.push('"><div class="boolrelwidget-query-delete-even"></div></div>');
                     }
-                    
+                    }
                     big_box.push('</span>');
                 } else {
                     console.error(something+' cant be put in the big_box, because its not of type string nor BooleanGroup.');
@@ -595,6 +610,15 @@
                     return true;
                 
                 return false;
+            },
+            readyToSubmit: function(){
+                if(mastergroup != 'null'){
+                    $('#boolrelwidget-boolean-representation').val(mastergroup.toQuery());
+                    $('#boolrelwidget-boolean-serialization').val(mastergroup.serialize());
+                } else{
+                    $('#boolrelwidget-boolean-representation').val('');
+                    $('#boolrelwidget-boolean-serialization').val('');
+                }
             }
         };
 
@@ -611,16 +635,28 @@
         self = self.html('');
         
         // Now lets add the toolbar
-        var toolbar_content = '<ul id="boolrelwidget-expand" class="boolrelwidget-menu-container"><li class="boolrelwidget-menu"><div class="boolrelwidget-arrow-l"><div class="boolrelwidget-arrow-up"></div></div></li><li class="boolrelwidget-menu">'+settings.expand_text+'</li><li class="boolrelwidget-menu"><div class="boolrelwidget-arrow-r"><div class="boolrelwidget-arrow-up"></div></div></li></ul><ul id="boolrelwidget-collapse" class="boolrelwidget-menu-container-panel"><li class="boolrelwidget-menu"><div class="boolrelwidget-arrow-l"><div class="boolrelwidget-arrow-down"></div></div></li><li class="boolrelwidget-menu">'+settings.collapse_text+'</li><li class="boolrelwidget-menu"><div class="boolrelwidget-arrow-r"><div class="boolrelwidget-arrow-down"></div></div></li></ul><div id="boolrelwidget-panel"><div id="boolrelwidget-basicblocks-out"><strong>Unused Terms</strong><div id="boolrelwidget-basicblocks" class="well well-small">Loading...</div></div><div class="clearfix"><div class="boolrelwidget-menu pull-left"><strong>Boolean Query</strong></div><div class="pull-right boolrelwidget-menu btn-group">';
+        var toolbar_content = '<ul id="boolrelwidget-expand" class="boolrelwidget-menu-container"><li class="boolrelwidget-menu"><div class="boolrelwidget-arrow-l"><div class="boolrelwidget-arrow-up"></div></div></li><li class="boolrelwidget-menu">';
         
+        if(settings.view_only)
+            toolbar_content += settings.expand_text_read;
+        else toolbar_content += settings.expand_text;
+        
+        toolbar_content += '</li><li class="boolrelwidget-menu"><div class="boolrelwidget-arrow-r"><div class="boolrelwidget-arrow-up"></div></div></li></ul><ul id="boolrelwidget-collapse" class="boolrelwidget-menu-container-panel"><li class="boolrelwidget-menu"><div class="boolrelwidget-arrow-l"><div class="boolrelwidget-arrow-down"></div></div></li><li class="boolrelwidget-menu">'+settings.collapse_text+'</li><li class="boolrelwidget-menu"><div class="boolrelwidget-arrow-r"><div class="boolrelwidget-arrow-down"></div></div></li></ul><div id="boolrelwidget-panel"><div id="boolrelwidget-basicblocks-out"><strong>Unused Terms</strong><div id="boolrelwidget-basicblocks" class="well well-small">Loading...</div></div><div class="clearfix">';
+        
+        
+        if(!settings.view_only){
+            toolbar_content+='<div class="boolrelwidget-menu pull-left"><strong>Boolean Query</strong></div><div class="pull-right boolrelwidget-menu btn-group">';
         if( settings.form_anchor ){
             toolbar_content+='<button id="boolrelwidget-search" class="btn">Search</button>';
             
             // Also add the hidden input to the form
             $(settings.form_anchor).append('<input type="hidden" id="boolrelwidget-boolean-representation" name="boolrelwidget-boolean-representation" value="" />');
+            $(settings.form_anchor).append('<input type="hidden" id="boolrelwidget-boolean-serialization" name="boolrelwidget-boolean-serialization" value="" />');
         }
         
-        toolbar_content+='<button id="boolrelwidget-collapseall" class="btn">Expand All</button><button class="btn" id="boolrelwidget-orall">Or All Concepts</button><button class="btn" id="boolrelwidget-andall">And All Concepts</button><button class="btn" id="boolrelwidget-clear">Reset</button></div></div><div id="boolrelwidget-query" class="well well-small">Loading...</div></div>';
+        toolbar_content+='<button id="boolrelwidget-collapseall" class="btn">Expand All</button><button class="btn" id="boolrelwidget-orall">Or All Concepts</button><button class="btn" id="boolrelwidget-andall">And All Concepts</button><button class="btn" id="boolrelwidget-clear">Reset</button>>';
+        }
+        toolbar_content+='</div></div><div id="boolrelwidget-query" class="well well-small">Loading...</div></div';
         self = self.append(toolbar_content);
         
         // Lets add the event handlersx
@@ -635,10 +671,7 @@
             funcs.expandPanel();
         }
         $( '#boolrelwidget-search' ).click(function() {
-            if(mastergroup != 'null')
-                $('#boolrelwidget-boolean-representation').val(mastergroup.toQuery());
-            else
-                $('#boolrelwidget-boolean-representation').val('');
+            funcs.readyToSubmit();
             
             $(settings.form_anchor).submit();
         });
@@ -657,6 +690,11 @@
         $( '#boolrelwidget-clear' ).click(function() {
             funcs.reset();
         }); 
+        
+        if(settings.view_only && settings.view_serialized_string){
+            mastergroup = new BooleanGroup(null).deserialize(settings.view_serialized_string);
+        }
+        
         // Draw things up
         funcs.draw();
         
@@ -697,25 +735,33 @@ var boolrelwidgetuniqueidcounter=10000;
 
 
 function BooleanTerminal(identificator, representation, value){
-    if(!(typeof identificator == 'string' || identificator instanceof String)){
-        console.warn('Identificator on BooleanTerminal must be a string');
-        return null;
+    this.id = null;
+    this.text = null;
+    this.val = null;   
+    if(identificator == null && representation == null && value == null){
+        // nothing    
     }
-    if(!(typeof representation == 'string' || representation instanceof String)){
-        console.warn('Representation on BooleanTerminal must be a string');
-        return null;
-    } 
-    if(!(typeof value == 'string' || value instanceof String)){
-        console.warn('Value on BooleanTerminal must be a string');
-        return null;
-    } 
-    if (identificator == '' || representation == ''){
-        console.warn('Tried to add a BooleanTerminal with empty identificator or representation, that is impossible, the only possible empty variable is value.');
-        return null;    
+    else {
+        if(!(typeof identificator == 'string' || identificator instanceof String)){
+            console.warn('Identificator on BooleanTerminal must be a string');
+            return null;
+        }
+        if(!(typeof representation == 'string' || representation instanceof String)){
+            console.warn('Representation on BooleanTerminal must be a string');
+            return null;
+        } 
+        if(!(typeof value == 'string' || value instanceof String)){
+            console.warn('Value on BooleanTerminal must be a string');
+            return null;
+        } 
+        if (identificator == '' || representation == ''){
+            console.warn('Tried to add a BooleanTerminal with empty identificator or representation, that is impossible, the only possible empty variable is value.');
+            return null;    
+        }
+        this.id=identificator;
+        this.text = representation;
+        this.val = value;
     }
-    this.id=identificator;
-    this.text = representation;
-    this.val = value;
 }
 BooleanTerminal.prototype = {
     toString    :   function(){
@@ -726,6 +772,20 @@ BooleanTerminal.prototype = {
             return this.id+": '"+escape(this.val)+"'";
         else return '';
     },    
+    serialize   :   function(){
+        return 'T__'+encodeURI(this.id) + '__'+ encodeURI(this.text) + '__' + encodeURI(this.val);
+    }, 
+    deserialize : function(str){
+        str = str.split('__');
+        if(str.length != 4)
+            console.error("Couldn't parse Bolean Terminal prototype");
+        else {
+            this.id=decodeURI(str[1]);
+            this.text=decodeURI(str[2]);
+            this.val=decodeURI(str[3]);
+        }        
+        return this;
+    },
     equals      :   function(other_bt){
         if(!(other_bt instanceof BooleanTerminal))
             return false;
@@ -747,7 +807,7 @@ BooleanTerminal.prototype = {
 }
 
 function BooleanGroup(obj1){
-    if(!(obj1 instanceof BooleanGroup || obj1 instanceof BooleanTerminal)){
+    if(!(obj1 instanceof BooleanGroup || obj1 instanceof BooleanTerminal || obj1 == null)){
         console.warn('First operator of Boolean Group object must be a BooleanGroup or a BooleanTerminal');
         return null;
     }
@@ -755,7 +815,8 @@ function BooleanGroup(obj1){
     this.variables = [];
     this.relations = [];
     
-    this.variables.push(obj1);
+    if(obj1 != null)
+        this.variables.push(obj1);
 }
 BooleanGroup.prototype = { 
     addBoolean  :   function(op, obj1){
@@ -976,5 +1037,55 @@ BooleanGroup.prototype = {
     destroy : function() {
         this.variables=null;
         this.relations=null;
+    },
+    serialize : function(){
+        var serialized_string = "BEGIN_BG_"+this.id+"BEGIN_VAR_"+this.id;
+        
+        for(var i=0;i<this.variables.length;i++){
+           serialized_string = serialized_string + this.variables[i].serialize()+"OTHER_"+this.id; 
+        }
+        serialized_string = serialized_string + "END_VAR_" +this.id+"BEGIN_REL_"+this.id;
+        for(var i=0;i<this.relations.length;i++){
+           serialized_string = serialized_string + this.relations[i].name+","; 
+        }
+        serialized_string = serialized_string + "END_REL_"+this.id+"END_BG_"+this.id;
+        
+        return serialized_string;
+    },
+    deserialize : function(str){
+        // id, variables, rel
+        
+        if(str.indexOf('BEGIN_BG_') == 0){
+            // get id
+            var identification = str.substring(9, 14);
+            this.id=Number(identification);
+            
+            // get relations
+            var init_relations = str.indexOf('BEGIN_REL_'+this.id)+15;
+            var end_relations = str.indexOf('END_REL_'+this.id);
+            
+            var relations_to_parse = str.substring(init_relations, end_relations).split(',');
+            for(var i = 0;i<relations_to_parse.length-1;i++)
+                this.relations.push(BOOL[relations_to_parse[i]]);
+        
+            // get variables (that can be nested)
+            var init_variables = str.indexOf('BEGIN_VAR_'+this.id)+15;
+            var end_variables = str.indexOf('END_VAR_'+this.id);            
+            
+            var variables_to_parse = str.substring(init_variables, end_variables).split('OTHER_'+this.id);
+            
+            
+            
+            for(var i = 0;i<variables_to_parse.length-1;i++){
+                this.variables.push(new BooleanGroup(null).deserialize(variables_to_parse[i]));        
+            }
+        } else if(str.indexOf('T__') == 0){
+           this.variables.push(new BooleanTerminal(null,null,null).deserialize(str));
+            
+        } else {
+            console.error('Impossible to parse BooleanGroup object');
+        }
+        
+        return this;
     }
 };
