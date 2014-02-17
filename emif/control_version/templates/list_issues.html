@@ -16,16 +16,15 @@
         <div class="span6 center">
             
 
-            <h2>Milestones</h2>
-
+            <h2>Releases</h2>
 
             <ul>
             {% for milestone in milestones %}
-                <li>{{milestone.title}}, - {{milestone.description}}  
+                <li>{{milestone.title}}, - {{milestone.description|safe}}  
                 </li>
             {% endfor %}
             </ul>
-
+            {% if request.user.is_staff %}
             <h2>List Issues</h2>
 
 
@@ -49,6 +48,7 @@
                 </li>
             {% endfor %}
             </ul>
+            {%endif%}
 
         </div>
         <!-- end contact_wrap --> </div>
