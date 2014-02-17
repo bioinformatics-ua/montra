@@ -80,7 +80,7 @@ def document_form_view_upload(request, fingerprint_id, template_name='documents_
     #_json = import_population_characteristics_data(fingerprint_id,filename=path_file)
 
     pc = PopulationCharacteristic()
-    pc.submit_new_revision(fingerprint_id)
+    pc.submit_new_revision(fingerprint_id, path_file)
 
 
     response = JSONResponse(data, mimetype=response_mimetype(request))

@@ -30,7 +30,7 @@ class PopulationCharacteristic(object):
     """PopulationCharacteristic: This class controls the Jerboa File
     """
     def __init__(self, arg=None):
-        super(PopulationCharacteristic, self).__init__(arg)
+        
         self.arg = arg
 
 
@@ -43,9 +43,10 @@ class PopulationCharacteristic(object):
     def revisions(self):
         pass
 
-    def submit_new_revision(self, fingerprint_id):
-        path_file = "C:/Users/lbastiao/Projects/TEST_DataProfile_v1.5.6b.txt"
-        path_file = "/Volumes/EXT1/Dropbox/MAPi-Dropbox/EMIF/Jerboa/TEST_DataProfile_v1.5.6b.txt"        
+    def submit_new_revision(self, fingerprint_id, path_file=None):
+        
+        #path_file = "C:/Users/lbastiao/Projects/TEST_DataProfile_v1.5.6b.txt"
+        #path_file = "/Volumes/EXT1/Dropbox/MAPi-Dropbox/EMIF/Jerboa/TEST_DataProfile_v1.5.6b.txt"        
         self._json = import_population_characteristics_data(fingerprint_id, filename=path_file)
         #print self._json
         #f = open('jerboaTmp', 'w')
