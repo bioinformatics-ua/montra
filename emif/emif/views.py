@@ -1207,7 +1207,8 @@ def all_databases(request, page=1, template_name='alldatabases.html'):
                                             'breadcrumb': True, 'collapseall': False, 
                                             'geo': True,
                                             'page_obj': pager,
-                                            'add_databases': True})
+                                            'add_databases': False,
+                                            'hide_add': True})
 
 def qs_data_table(request, template_name='qs_data_table.html'):
     db_type = request.POST.get("db_type")
