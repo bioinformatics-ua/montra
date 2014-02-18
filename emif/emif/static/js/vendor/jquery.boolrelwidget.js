@@ -13,10 +13,11 @@
         var mastergroup=null;
         // Default Options
         var settings = $.extend({
-            expand_text:'To define the relations between the terms click here.',
-            expand_text_read:'To see the relations defined in this search click here.',
-            collapse_text:'Click here to close this panel.',
-            query_text: 'Drag and Drop concepts here to start building a query...',
+            expand_text:'To define the relations between the terms click here',
+            expand_text_read:'To see the relations defined in this search click here',
+            collapse_text:'Click here to close this panel',
+            collapse_text_read:'Query in effect (Click here to close this panel)',
+            query_text: 'Start filling the questionnary to start building a query...',
             form_anchor: null,
             auto_add: true, 
             default_relation: BOOL['AND'],
@@ -489,8 +490,11 @@
                 select.push(something.id);
                 select.push('-');
                 select.push(selected);
-                select.push('" class="boolrelwidget-select">');
-
+                if(settings.view_only)
+                    select.push('" class="boolrelwidget-select" disabled="disabled">');
+                else
+                    select.push('" class="boolrelwidget-select">');
+                    
                 for(var index in BOOL) {
                     if(BOOL[index].name == relation)
                         select.push('<option selected="selected">');
@@ -642,7 +646,14 @@
             toolbar_content += settings.expand_text_read;
         else toolbar_content += settings.expand_text;
         
-        toolbar_content += '</li><li class="boolrelwidget-menu"><div class="boolrelwidget-arrow-r"><div class="boolrelwidget-arrow-up"></div></div></li></ul><ul id="boolrelwidget-collapse" class="boolrelwidget-menu-container-panel"><li class="boolrelwidget-menu"><div class="boolrelwidget-arrow-l"><div class="boolrelwidget-arrow-down"></div></div></li><li class="boolrelwidget-menu">'+settings.collapse_text+'</li><li class="boolrelwidget-menu"><div class="boolrelwidget-arrow-r"><div class="boolrelwidget-arrow-down"></div></div></li></ul><div id="boolrelwidget-panel"><div id="boolrelwidget-basicblocks-out"><strong>Unused Terms</strong><div id="boolrelwidget-basicblocks" class="well well-small">Loading...</div></div><div class="clearfix">';
+        toolbar_content += '</li><li class="boolrelwidget-menu"><div class="boolrelwidget-arrow-r"><div class="boolrelwidget-arrow-up"></div></div></li></ul><ul id="boolrelwidget-collapse" class="boolrelwidget-menu-container-panel"><li class="boolrelwidget-menu"><div class="boolrelwidget-arrow-l"><div class="boolrelwidget-arrow-down"></div></div></li><li class="boolrelwidget-menu">';
+        
+        if(settings.view_only)
+            toolbar_content+=settings.collapse_text_read;
+        else
+            toolbar_content+=settings.collapse_text;
+        
+        toolbar_content += '</li><li class="boolrelwidget-menu"><div class="boolrelwidget-arrow-r"><div class="boolrelwidget-arrow-down"></div></div></li></ul><div id="boolrelwidget-panel"><div id="boolrelwidget-basicblocks-out"><strong>Unused Terms</strong><div id="boolrelwidget-basicblocks" class="well well-small">Loading...</div></div><div class="clearfix">';
         
         
         if(!settings.view_only){
@@ -656,6 +667,8 @@
         }
         
         toolbar_content+='<button id="boolrelwidget-collapseall" class="btn">Expand All</button><button class="btn" id="boolrelwidget-orall">Or All Concepts</button><button class="btn" id="boolrelwidget-andall">And All Concepts</button><button class="btn" id="boolrelwidget-clear">Reset</button></div>';
+        } else {
+            toolbar_content+='<button onclick="parent.history.go(-1); return false;" class="pull-right btn">Refine Search</button></div>';
         }
         toolbar_content+='</div><div id="boolrelwidget-query" class="well well-small">Loading...</div></div>';
         self = self.append(toolbar_content);

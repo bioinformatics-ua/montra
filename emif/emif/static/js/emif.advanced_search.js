@@ -5,6 +5,7 @@ advValidator.searchMode(true);
 $(".chosen-select").chosen({max_selected_options: 5});
 
 $(function(){
+    
     bool_container = $('#bool_container').boolrelwidget({form_anchor: '#qform'});
 
     if (!(typeof bool_container === 'undefined')) {

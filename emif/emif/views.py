@@ -1216,6 +1216,9 @@ def databases(request, page=1, template_name='databases.html'):
     #first lets clean the query session log
     if 'query' in request.session:
         del request.session['query']
+        
+    if 'isAdvanced' in request.session:
+        del request.session['isAdvanced'] 
     
     # Get the list of databases for a specific user
 
@@ -1249,6 +1252,7 @@ def all_databases(request, page=1, template_name='alldatabases.html'):
     # lets clear the geolocation session search filter (if any)
     try:
         del request.session['query']
+        del request.session['isAdvanced']         
     except:
         pass
     
