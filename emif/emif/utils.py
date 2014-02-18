@@ -309,6 +309,9 @@ def convert_query_from_boolean_widget(query, q_id):
     # Example of output
     # ..
 
+    questionnarie = Questionnaire.objects.filter(id=q_id)[0]
+    ttype = questionnarie.slug
+
     questionsets = QuestionSet.objects.filter(questionnaire=q_id)
     print "convert_query_from_boolean_widget"
     print query
@@ -325,6 +328,7 @@ def convert_query_from_boolean_widget(query, q_id):
         return q[0].slug + '_t'
     
     r = re.sub('question_nr_[10-9\\.]+', check, query)
+    r = r + " AND type_t:"+ttype
     return r
 
 
