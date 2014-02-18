@@ -255,7 +255,7 @@ def results_fulltext_aux(request, query, page=1, template_name='results.html', i
         except:
             raise
 
-    pp = Paginator(list_databases, 1)
+    pp = Paginator(list_databases, rows)
     list_results = Results()
     list_results.num_results = results.hits
     list_results.list_results = pp.page(page)
