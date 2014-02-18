@@ -38,13 +38,14 @@
             }
     </style>
     <link rel="stylesheet" href="{{ STATIC_URL }}css/bootstrap-responsive.min.css">
-    <link rel="stylesheet" href="{{ STATIC_URL }}css/main.css">
+    <link rel="stylesheet" href="{{ STATIC_URL }}css/main.css" />
     <style type="text/css">
         {% block styleextra %}
         {% endblock %}
     </style>
     <script src="{{ STATIC_URL }}js/vendor/modernizr-2.6.2.min.js"></script>
     <script src="{{ STATIC_URL }}js/vendor/jquery-1.9.1.min.js"></script>
+    <script src="{{ STATIC_URL }}js/vendor/jquery-ui-1.10.4.custom.min.js"></script>
     <script src="{{ STATIC_URL }}js/vendor/bootstrap.min.js"></script>
     <script src="{{ STATIC_URL }}js/vendor/jquery.cookie.js"></script>
     <script src="{{ STATIC_URL }}js/vendor/jquery.canclear.js"></script>
@@ -67,9 +68,9 @@
             });
     </script>
     <!--[if lt IE 9]>
-            <link rel="stylesheet" href="bootstrap_ie_compatibility">
 
             <script src="{{ STATIC_URL }}js/vendor/respond.min.js"></script>
+            <link rel="stylesheet" href="bootstrap_ie_compatibility" />
 
 
         <![endif]-->
@@ -101,7 +102,7 @@
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </a>
-                <a class="brand" href="#">EMIF Catalogue</a>
+                <a class="brand" href="/">EMIF Catalogue</a>
                 <div class="nav-collapse collapse">
                             {% if request.user.is_authenticated %}
                             <ul class="nav">

@@ -2,6 +2,10 @@
 {% load extra_tags %}
 
 <div class="clearfix">
+    <div class="pull-right">
+        <br />
+    <button onclick="clear_selection('question_{{ question.number }}', '{{ question.number }}. {{ question.text|removehs }}');" class="btn btn-small" type="button">Clear Selection</button>
+    </div>
     <div class="input">
         <ul class="inputs-list unstyled">
         {% for sel, choice in qdict.choices %}

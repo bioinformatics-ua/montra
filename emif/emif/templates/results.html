@@ -18,6 +18,8 @@
 
 {% block headextra %}
 <link rel="stylesheet" href="static/css/theme.blue.css">
+<link rel="stylesheet" href="{{ STATIC_URL }}css/vendor/jquery.boolrelwidget.css"></script>
+
 {% endblock %}
 
 
@@ -25,6 +27,8 @@
 
 <script src="static/js/vendor/jquery.tablesorter.min.js"></script>
 <script src="static/js/vendor/jquery.tablesorter.widgets.js"></script>
+<script src="{{ STATIC_URL}}js/vendor/jquery.boolrelwidget.js"></script>
+
 
 {% endblock %}
 
@@ -37,7 +41,6 @@
 {% endblock %}
 
 {% block toolbar %}
-
 {% if page_obj != None %}
   <div class="span6">
     <div class="btn-group pull-right">
@@ -57,6 +60,10 @@
 
 {% block content %}
 
+
+{% if isAdvanced %}
+<div id="bool_container"></div>
+{% endif %}
   <div id="row_loading" class="row">
 
 
@@ -195,20 +202,20 @@
 {% if page_obj != None %}
 $(function() {
 
-  // call the tablesorter plugin
-  $("table").tablesorter({
-    theme : 'blue',
-
-    // sort on the first column and third column in ascending order
-    sortList: [[0,0],[2,0]],
-
-    // hidden filter input/selects will resize the columns, so try to minimize the change
-    widthFixed : true,
-
-    // initialize zebra striping and filter widgets
-    widgets: ["zebra", "filter"]
-  });
-
+      // call the tablesorter plugin
+    $("table").tablesorter({
+        theme : 'blue',
+    
+        // sort on the first column and third column in ascending order
+        sortList: [[0,0],[2,0]],
+    
+        // hidden filter input/selects will resize the columns, so try to minimize the change
+        widthFixed : true,
+    
+        // initialize zebra striping and filter widgets
+        widgets: ["zebra", "filter"]
+    });
+    
 });
 var counter = 0;
 
@@ -229,10 +236,17 @@ $(document).ready(function(){
     $('a[href="#"]').attr('href', function(i, val){
         return window.location + val;
     });
+    
 });
 {% endif %}
 
-
+ {% if isAdvanced %}
+ var bool_container;
+$(function(){
+    bool_container = $('#bool_container').boolrelwidget({view_only: true, view_serialized_string: '{{request.session.serialization_query}}'});
+});
+  {% endif %}
+  
 function hidecheckbox()
 {
   $('.checkbox').toggle();
@@ -316,8 +330,6 @@ function () {
 $(this).css('overflow','hidden');
 }
 );
-
-
 {% endblock %}
 
 {% comment %}

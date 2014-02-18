@@ -86,7 +86,7 @@
                                 </a></span>
                             {% endif %}
                             <span class="pull-right">
-                                <a href="" onclick="toggle_comments({{question.number|removedots}}); return false;"><i class="{% if qdict.comment %} icon-comment {% else %} icon-comment-alt {% endif %}">&nbsp;</i></a>
+                                <a href="" onclick="toggle_comments('{{question.number|removedots}}'); return false;"><i class="{% if qdict.comment %} icon-comment {% else %} icon-comment-alt {% endif %}">&nbsp;</i></a>
                             </span>
                             <span class="pull-right answered hide" id="answered_{{ question.number|removedots }}">
                                 <i class="icon-check green">&nbsp;</i>
@@ -109,8 +109,8 @@
 
                             {% else %}
                                 <div class="question-text {% if qdict.required %}required{% endif %} {% if error %}text-error{% endif %} qtext_{{question.text|geths}}">
-                                    <span class="qnumber_{{question.text|geths}}">{{ question.display_number }}.</span>
-                                    <span class="qtext">{{ question.text|removehs|safe }}
+                                    <span id="question_nr_{{question.number|removedots}}" class="qnumber_{{question.text|geths}}">{{ question.display_number }}.</span>
+                                    <span id="question_{{question.number|removedots}}" class="qtext">{{ question.text|removehs|safe}}
                                     {% if question.help_text %}
                                     <div class="question-help-text" style="display: none;">
                                         <span>{{ question.help_text|safe }}</span>
@@ -127,7 +127,7 @@
                                     </span>
                                     {% endif %}
                                     <span class="pull-right">
-                                        <a href="" onclick="toggle_comments({{question.number|removedots}}); return false;"><i class="fa {% if qdict.comment %} icon-comment {% else %} icon-comment-alt {% endif %}">&nbsp;</i></a>
+                                        <a href="" onclick="toggle_comments('{{question.number|removedots}}'); return false;"><i class="fa {% if qdict.comment %} icon-comment {% else %} icon-comment-alt {% endif %}">&nbsp;</i></a>
                                     </span>
                                     <span class="pull-right answered hide" id="answered_{{ question.number|removedots }}">
                                         <i class="icon-check green">&nbsp;</i>
@@ -147,7 +147,7 @@
                                     {% endif %}
                                     {% include qdict.template %}
                                     <div id="comments_{{question.number|removedots}}" style="display:none;margin-left:40px;">
-                                     <a href="" class="span6" onclick="toggle_comments({{question.number|removedots}}); return false;"><i class="icon-comment-alt">&nbsp;</i> Comments</a>
+                                     <a href="" class="span6" onclick="toggle_comments('{{question.number|removedots}}'); return false;"><i class="icon-comment-alt">&nbsp;</i> Comments</a>
                                     <textarea style=" background-color:#EEE;color: #000;" class="span6" name="comment_question_{{ question.number }}" cols="50" rows="5">{{qdict.comment}}</textarea>
                                     </div>
                                 </div>
@@ -185,7 +185,7 @@
             </div>
             <div class="span2 text-right">
                 {% if questions_list.0.0.sortid != 0 %}
-                    <input type="submit" class="btn btn-inverse" value="Search" >
+                    <input type="submit" class="search_button btn btn-inverse" value="Search" >
                 {% endif %}
                 {% if questions_list.0.0.sortid == 0 %}
                 {% endif %}
@@ -223,7 +223,7 @@ function validate(question_number)
     question_number = question_number.replace(".","\\.");
     $.getJSON('api/validate?name='+$('#'+question_number).val(), function(data) {
       var items = [];
-      console.log(data['contains'])
+      //console.log(data['contains']);
       if (data['contains'] == true)
       {
         $('#warning_'+question_number).addClass("show");
@@ -243,7 +243,7 @@ function validate(question_number)
     
 
 
-};
+}
 
     help_text_popover();
 
