@@ -72,11 +72,11 @@ function validate1(element, id_answered, dirty_id_answered) {
                 number_correct = number_correct.substring(0, number_correct.length-1);
                 console.log( number_correct);
                 console.log( $('#question_nr_'+id_answered).text().trim()+" "+just_question);
-                console.dir('input[name="question_'+dirty_id_answered.replace('.','\\.')+'"]');
+                console.dir(':input[name="question_'+dirty_id_answered.replace('.','\\.')+'"]');
                 
                 bool_container.push('question_nr_'+number_correct,
                     $('#question_nr_'+id_answered).text().trim()+" "+just_question,
-                                   $('input[name="question_'+dirty_id_answered.replace('.','\\.')+'"]').val());
+                                   $(':input[name="question_'+dirty_id_answered.replace('.','\\.')+'"]').val());
             }
         
         } else {
