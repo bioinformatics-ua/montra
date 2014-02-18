@@ -710,7 +710,7 @@
  *  This must be because if we try a BOOL.TYPE that doesn't exist on ie 7 everything crashes (oh my life...)
  */
 var BOOL = {
-  NOP   : { value: -1, name: "NOP"}, // No operation, means its a edge branch 
+ // NOP   : { value: -1, name: "NOP"}, // No operation, means its a edge branch 
   AND   : { value: 0, name: "AND"}, 
   OR    : { value: 1, name: "OR"}/*,
   XOR   : { value: 2, name: "XOR"},
