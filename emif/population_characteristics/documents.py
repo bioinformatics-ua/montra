@@ -141,7 +141,7 @@ def document_form_view(request, runcode, qs, template_name='documents_upload_for
     return render(request, template_name, 
         {'request': request, 'qsets': qsets, 'export_bd_answers': True, 
         'apiinfo': apiinfo, 'fingerprint_id': runcode,
-                   'breadcrumb': True, 'breadcrumb_name': name_bc,
+                   'breadcrumb': True, 'breadcrumb_name': name_bc.decode('utf-8'),
                     'style': qs, 'collapseall': False, 
                     'owner_fingerprint':owner_fingerprint,
                     'fingerprint_dump': True,

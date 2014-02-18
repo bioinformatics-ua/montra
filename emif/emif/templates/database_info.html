@@ -65,17 +65,13 @@
         {% breadcrumb "Search" "resultsdiff/1" %} 
         {% breadcrumb breadcrumb_name "databases" %} 
     {% elif style == '1' %} 
-        {% breadcrumb "Databases" "databases" %} 
+        {% breadcrumb "My Databases" "databases" %} 
         {% breadcrumb breadcrumb_name "databases" %} 
     {% else %} 
-        {% breadcrumb "Databases" "alldatabases" %} 
+        {% breadcrumb "All Databases" "alldatabases" %} 
         {% breadcrumb breadcrumb_name "databases" %} 
     {% endif %}
 
-    {% comment %}
-        <!-- this gives a error ?? -->
-        {% <breadcrumb></breadcrumb> breadcrumb_name "" %}
-    {% endcomment %}
 {% endblock %}
 
 {% block toolbar %} 

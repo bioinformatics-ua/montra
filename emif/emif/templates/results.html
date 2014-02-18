@@ -6,16 +6,20 @@
 {% block breadcrumbs %}
     {{ block.super }}
     {% breadcrumb "Search" "resultsdiff/1" %}
+{% if not isAdvanced %}
     {% if search_old == None %}
         {% breadcrumb "None" "" %}
     {% else %}
         {% breadcrumb search_old "" %}
     {% endif %}
+{% endif %}
 {% endblock %}
 
 
 {% block headextra %}
 <link rel="stylesheet" href="static/css/theme.blue.css">
+<link rel="stylesheet" href="{{ STATIC_URL }}css/vendor/jquery.boolrelwidget.css"></script>
+
 {% endblock %}
 
 
@@ -23,6 +27,8 @@
 
 <script src="static/js/vendor/jquery.tablesorter.min.js"></script>
 <script src="static/js/vendor/jquery.tablesorter.widgets.js"></script>
+<script src="{{ STATIC_URL}}js/vendor/jquery.boolrelwidget.js"></script>
+
 
 {% endblock %}
 
@@ -35,7 +41,6 @@
 {% endblock %}
 
 {% block toolbar %}
-
 {% if page_obj != None %}
   <div class="span6">
     <div class="btn-group pull-right">
@@ -55,6 +60,10 @@
 
 {% block content %}
 
+
+{% if isAdvanced %}
+<div id="bool_container"></div>
+{% endif %}
   <div id="row_loading" class="row">
 
 
@@ -65,7 +74,10 @@
           <h4>
               <span id="results_size"></span>
             {% if page_obj != None %}
-            total results for {{search_old}}
+            Total results 
+              {%if not isAdvanced %}
+                for {{search_old}}
+              {% endif %}
             <span class="label label-inverse"> {{list_results.num_results}}</span>
             {% else %}
             No results found 
@@ -81,10 +93,8 @@
 <table class="table table-hover tablesorter" id="table_databases" data-provides="rowlink">
     <thead>
         <tr>
-            <th class="sorter-false filter-false"></th>
             <th>Name</th>
-            <th>Creation Date</th>
-            <th>Modification Date</th>
+            <th>Last Update</th>
             <th>Type</th>
             <th class="sorter-false filter-false">Select</th>
 
@@ -95,9 +105,7 @@
 
   {% for t in list_results.list_results %}
 
-   <tr>
-            <td><img class="db_logo" src="static/upload_images/{{t.logo}}" width="50px" height="50px"/></td>
-          
+   <tr>          
           <td>
             <a href="fingerprint/{{ t.id }}/1">{{ t.name }}</a>
 
@@ -112,10 +120,6 @@
              Number of patients: {{t.number_patients}}
             </div> 
         </td>
-          <td style="min-width: 120px;">            
-                 {{ t.date }}
-
-          </td>
           <td style="min-width: 120px;">            
                 {% if t.last_activity %}
                     {{t.last_activity|datehhmm}}
@@ -198,32 +202,51 @@
 {% if page_obj != None %}
 $(function() {
 
-  // call the tablesorter plugin
-  $("table").tablesorter({
-    theme : 'blue',
-
-    // sort on the first column and third column in ascending order
-    sortList: [[0,0],[2,0]],
-
-    // hidden filter input/selects will resize the columns, so try to minimize the change
-    widthFixed : true,
-
-    // initialize zebra striping and filter widgets
-    widgets: ["zebra", "filter"]
-  });
-
+      // call the tablesorter plugin
+    $("table").tablesorter({
+        theme : 'blue',
+    
+        // sort on the first column and third column in ascending order
+        sortList: [[0,0],[2,0]],
+    
+        // hidden filter input/selects will resize the columns, so try to minimize the change
+        widthFixed : true,
+    
+        // initialize zebra striping and filter widgets
+        widgets: ["zebra", "filter"]
+    });
+    
 });
+var counter = 0;
 
 // URL Hack to make paginator work with base
 $(document).ready(function(){
+    if($('input:checkbox:checked', table_databases).length >= 2){
+        $("#comparabtn").removeAttr('disabled');
+        counter = $('input:checkbox:checked', table_databases).length;
+        $("#comparabtn").bind('click',function(e)
+        { 
+          
+          $('#result_form').submit();
+
+          return false;
+        });
+    }
+    
     $('a[href="#"]').attr('href', function(i, val){
         return window.location + val;
     });
+    
 });
 {% endif %}
 
-
-var counter = 0;
+ {% if isAdvanced %}
+ var bool_container;
+$(function(){
+    bool_container = $('#bool_container').boolrelwidget({view_only: true, view_serialized_string: '{{request.session.serialization_query}}'});
+});
+  {% endif %}
+  
 function hidecheckbox()
 {
   $('.checkbox').toggle();
@@ -307,8 +330,6 @@ function () {
 $(this).css('overflow','hidden');
 }
 );
-
-
 {% endblock %}
 
 {% comment %}
