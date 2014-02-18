@@ -62,6 +62,8 @@ function valchanged(qnum, value) {
     if (!(typeof bool_container === 'undefined')) {
         var just_number = qnum.split('_')[1];
         var clean = qnum.replace('question_','').replace(/(\\)/g, '');
+        var dirty = qnum.replace('question_','').replace('_',':');
+        console.log(dirty);
         // We have to get the question
         var the_question = $('#question_'+clean.split('_')[0].replace(/(\.)/g,'')).text().trim(); 
         
@@ -74,16 +76,16 @@ function valchanged(qnum, value) {
             //console.log(optional.attr('id'));
             
             //var optional = $('#question_'+just_number.replace(/(\.)/g,'\\.')+"_1_opt").val();
-            bool_container.push(qnum.replace('question_','question_nr_'),
+            bool_container.push('question_nr_'+dirty,
                                 clean.replace('_','. ')+' ('+the_question+')'
                                , ''+value);
         } else if(value==false){
             var optional = $('#question_'+just_number.replace(/(\.)/g,'')+"_opt").val();
-            bool_container.splice(qnum,
+            bool_container.splice('question_nr_'+dirty,
                                 clean.replace('_','. ')+' ('+the_question+')'
                                , ''+value);
         } else {
-            bool_container.push(qnum, clean.replace('_','')+'. '+the_question+'', value);        
+            bool_container.push('question_nr_'+dirty, clean.replace('_','')+'. '+the_question+'', value);        
         }
     }    
 
