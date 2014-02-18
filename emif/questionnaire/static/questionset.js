@@ -64,7 +64,7 @@ function valchanged(qnum, value) {
         var clean = qnum.replace('question_','').replace(/(\\)/g, '');
         var dirty = qnum.replace('question_','').replace('_',':');
         var index = dirty.indexOf(':');
-        console.error(dirty.substring(index+1,dirty.length));
+        console.log(value);
         // We have to get the question
         var the_question = $('#question_'+clean.split('_')[0].replace(/(\.)/g,'')).text().trim(); 
         
@@ -86,8 +86,8 @@ function valchanged(qnum, value) {
                                 clean.replace('_','. ')+' ('+the_question+')'
                                , dirty.substring(index+1,dirty.length));
         } else {
-            /*
-            bool_container.push('question_nr_'+dirty.substring(0,index), clean.replace('_','')+'. '+the_question+'', value);   */     
+            if( value != 'yes' && value != 'no' && value != 'dontknow ')
+            bool_container.push('question_nr_'+dirty.substring(0,index), clean.replace('_','')+'. '+the_question+'', value);        
         }
     }    
 
@@ -113,7 +113,7 @@ function addtrigger(elemid) {
 }
 
 function clear_selection(question_name, response){
-    $(":radio[name='" + question_name + "']").prop('checked', false);
+    $(":radio[name='" + question_name.replace('question_nr_','question_') + "']").prop('checked', false);
     if (!(typeof bool_container === 'undefined')) {
             console.log(response);
             bool_container.splice(question_name, response, '');
