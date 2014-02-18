@@ -64,7 +64,7 @@ function valchanged(qnum, value) {
         var clean = qnum.replace('question_','').replace(/(\\)/g, '');
         var dirty = qnum.replace('question_','').replace('_',':');
         var index = dirty.indexOf(':');
-        console.log(dirty.substring(index+1,dirty.length));
+        console.error(dirty.substring(index+1,dirty.length));
         // We have to get the question
         var the_question = $('#question_'+clean.split('_')[0].replace(/(\.)/g,'')).text().trim(); 
         
@@ -86,7 +86,8 @@ function valchanged(qnum, value) {
                                 clean.replace('_','. ')+' ('+the_question+')'
                                , dirty.substring(index+1,dirty.length));
         } else {
-            bool_container.push('question_nr_'+dirty.substring(0,index), clean.replace('_','')+'. '+the_question+'', dirty.substring(index+1,dirty.length));        
+            /*
+            bool_container.push('question_nr_'+dirty.substring(0,index), clean.replace('_','')+'. '+the_question+'', value);   */     
         }
     }    
 
