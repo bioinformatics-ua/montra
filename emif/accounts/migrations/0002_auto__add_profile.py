@@ -16,21 +16,32 @@ class Migration(SchemaMigration):
         ))
         db.send_create_signal('accounts', ['Profile'])
 
-        # Adding M2M table for field users on 'Profile'
-        db.create_table('accounts_profile_users', (
+        # Adding M2M table for field profiles on 'EmifProfile'
+        db.create_table('accounts_emifprofile_profiles', (
             ('id', models.AutoField(verbose_name='ID', primary_key=True, auto_created=True)),
-            ('profile', models.ForeignKey(orm['accounts.profile'], null=False)),
-            ('user', models.ForeignKey(orm['auth.user'], null=False))
+            ('emifprofile', models.ForeignKey(orm['accounts.emifprofile'], null=False)),
+            ('profile', models.ForeignKey(orm['accounts.profile'], null=False))
         ))
-        db.create_unique('accounts_profile_users', ['profile_id', 'user_id'])
+        db.create_unique('accounts_emifprofile_profiles', ['emifprofile_id', 'profile_id'])
+
+        # Adding M2M table for field interests on 'EmifProfile'
+        db.create_table('accounts_emifprofile_interests', (
+            ('id', models.AutoField(verbose_name='ID', primary_key=True, auto_created=True)),
+            ('emifprofile', models.ForeignKey(orm['accounts.emifprofile'], null=False)),
+            ('questionnaire', models.ForeignKey(orm['questionnaire.questionnaire'], null=False))
+        ))
+        db.create_unique('accounts_emifprofile_interests', ['emifprofile_id', 'questionnaire_id'])
 
 
     def backwards(self, orm):
         # Deleting model 'Profile'
         db.delete_table('accounts_profile')
 
-        # Removing M2M table for field users on 'Profile'
-        db.delete_table('accounts_profile_users')
+        # Removing M2M table for field profiles on 'EmifProfile'
+        db.delete_table('accounts_emifprofile_profiles')
+
+        # Removing M2M table for field interests on 'EmifProfile'
+        db.delete_table('accounts_emifprofile_interests')
 
 
     models = {
@@ -38,17 +49,18 @@ class Migration(SchemaMigration):
             'Meta': {'object_name': 'EmifProfile'},
             'country': ('django_countries.fields.CountryField', [], {'max_length': '2'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'interests': ('django.db.models.fields.related.ManyToManyField', [], {'related_name': "'emif_profile'", 'symmetrical': 'False', 'to': "orm['questionnaire.Questionnaire']"}),
             'mugshot': ('django.db.models.fields.files.ImageField', [], {'max_length': '100', 'blank': 'True'}),
             'organization': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
             'privacy': ('django.db.models.fields.CharField', [], {'default': "'registered'", 'max_length': '15'}),
+            'profiles': ('django.db.models.fields.related.ManyToManyField', [], {'related_name': "'emif_profile'", 'symmetrical': 'False', 'to': "orm['accounts.Profile']"}),
             'user': ('django.db.models.fields.related.OneToOneField', [], {'related_name': "'emif_profile'", 'unique': 'True', 'to': "orm['auth.User']"})
         },
         'accounts.profile': {
             'Meta': {'object_name': 'Profile'},
             'description': ('django.db.models.fields.TextField', [], {'null': 'True', 'blank': 'True'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'name': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '60'}),
-            'users': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['auth.User']", 'symmetrical': 'False', 'blank': 'True'})
+            'name': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '60'})
         },
         'auth.group': {
             'Meta': {'object_name': 'Group'},
@@ -85,6 +97,14 @@ class Migration(SchemaMigration):
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'model': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
             'name': ('django.db.models.fields.CharField', [], {'max_length': '100'})
+        },
+        'questionnaire.questionnaire': {
+            'Meta': {'object_name': 'Questionnaire'},
+            'disable': ('django.db.models.fields.CharField', [], {'max_length': '128'}),
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'name': ('django.db.models.fields.CharField', [], {'max_length': '128'}),
+            'redirect_url': ('django.db.models.fields.CharField', [], {'default': "'/static/complete.html'", 'max_length': '128'}),
+            'slug': ('django.db.models.fields.CharField', [], {'max_length': '128'})
         }
     }
 

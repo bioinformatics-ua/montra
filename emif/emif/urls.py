@@ -29,7 +29,7 @@ from django.views.generic.simple import direct_to_template
 admin.autodiscover()
 
 from userena import views as userena_views
-from accounts.views import SignupFormExtra, signup, signin
+from accounts.views import SignupFormExtra, EditProfileFormExtra, profile_edit, signup, signin
 from views import *
 
 from django.conf import settings
@@ -158,6 +158,9 @@ urlpatterns = patterns('',
         userena_views.signout,
         name='userena_signout'),
 
+    # Edit Profile
+    url(r'^accounts/profile_edit/$', 'accounts.views.profile_edit'),
+
     # Reset password
     url(r'^accounts/password/reset/$',
         auth_views.password_reset,
@@ -214,9 +217,10 @@ urlpatterns = patterns('',
         name='userena_password_change_complete'),
 
     # Edit profile
-    url(r'^accounts/(?P<username>[^/]+)/edit/$',
-        userena_views.profile_edit,
-        name='userena_profile_edit'),
+    # url(r'^accounts/(?P<username>[^/]+)/edit/$',
+    #     userena_views.profile_edit,
+    #     {'edit_profile_form': EditProfileForm},
+    #     name='userena_profile_edit'),
 
     # View profiles
     url(r'^accounts/(?P<username>(?!signout|signup|signin)[^/]+)/$',
