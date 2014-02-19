@@ -376,14 +376,13 @@ def results_diff(request, page=1, template_name='results_diff.html'):
                     this_query = AdvancedQuery(user=this_user,name=("Query on "+time.strftime("%c")),serialized_query=qserialization, qid=qid)
                     this_query.save()   
                     # and we all so insert the answers in a specific table exactly as they were on the post request to be able to put it back at a later time
-                    print this_query.id
                     for k, v in request.POST.items():
                         if k.startswith("question_") and len(v) > 0:                        
                             aqa = AdvancedQueryAnswer(refquery=this_query,question=k, answer=v)
                             aqa.save()
 
-                print qserialization
-                            
+                request.session['query_id'] = this_query.id
+                request.session['query_type'] = this_query.qid            
                 
             except User.DoesNotExist:
                 return HttpResponse("Invalid username")
@@ -397,6 +396,8 @@ def results_diff(request, page=1, template_name='results_diff.html'):
         query = request.POST['query']
         request.session['query'] = query
         request.session['isAdvanced'] = False
+        request.session['query_id'] = -1
+        request.session['query_type'] = -1
     except:
         in_post = False
         #raise
@@ -1269,6 +1270,11 @@ def databases(request, page=1, template_name='databases.html'):
     if 'isAdvanced' in request.session:
         del request.session['isAdvanced'] 
     
+    if 'query_id' in request.session:
+        del request.session['query_id']
+    if 'query_type' in request.session:
+        del request.session['query_type']
+        
     # Get the list of databases for a specific user
 
     user = request.user
@@ -1301,7 +1307,9 @@ def all_databases(request, page=1, template_name='alldatabases.html'):
     # lets clear the geolocation session search filter (if any)
     try:
         del request.session['query']
-        del request.session['isAdvanced']         
+        del request.session['isAdvanced']   
+        del request.session['query_id']
+        del request.session['query_type']
     except:
         pass
     
@@ -2141,6 +2149,12 @@ def show_fingerprint_page_read_only(request, q_id, qs_id, SouMesmoReadOnly=False
         hide_add = True
     else:
         hide_add = False
+    
+    serialized_query = None;
+    
+    if template_name == 'advanced_search.html' and aqid != None:
+        this_query = AdvancedQuery.objects.get(id=aqid)  
+        serialized_query = this_query.serialized_query
         
     try:
 
@@ -2303,7 +2317,8 @@ def show_fingerprint_page_read_only(request, q_id, qs_id, SouMesmoReadOnly=False
                 breadcrumb=True,
                 hide_add = hide_add,
                 q_id = q_id,
-                aqid = aqid
+                aqid = aqid,
+                serialized_query=serialized_query
                 
         )
         r['Cache-Control'] = 'no-cache'
