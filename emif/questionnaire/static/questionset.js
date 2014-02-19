@@ -67,7 +67,6 @@ function valchanged(qnum, value) {
         console.log(value);
         // We have to get the question
         var the_question = $('#question_'+clean.split('_')[0].replace(/(\.)/g,'')).text().trim(); 
-        
         if(value==true){
             //console.log(qnum);
             //console.log(clean.replace('_','. ')+' ('+the_question+')');
@@ -77,12 +76,12 @@ function valchanged(qnum, value) {
             //console.log(optional.attr('id'));
             
             //var optional = $('#question_'+just_number.replace(/(\.)/g,'\\.')+"_1_opt").val();
-            bool_container.push('question_nr_'+dirty.substring(0,index),
+            bool_container.push('question_nr_'+dirty.substring(0,index)+"_____"+clean+"_____",
                                 clean.replace('_','. ')+' ('+the_question+')'
                                , dirty.substring(index+1,dirty.length));
         } else if(value==false){
             var optional = $('#question_'+just_number.replace(/(\.)/g,'')+"_opt").val();
-            bool_container.splice('question_nr_'+dirty.substring(0,index),
+            bool_container.splice('question_nr_'+dirty.substring(0,index)+"__"+clean+"__",
                                 clean.replace('_','. ')+' ('+the_question+')'
                                , dirty.substring(index+1,dirty.length));
         } else {

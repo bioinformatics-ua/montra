@@ -136,6 +136,14 @@ def document_form_view(request, runcode, qs, template_name='documents_upload_for
     except:
         pass
 
+    isAdvanced = None
+    
+    if(request.session.get('isAdvanced') == True):
+        isAdvanced = True
+    else:
+        isAdvanced = False    
+        
+
     jerboa_files = Characteristic.objects.filter(fingerprint_id=runcode)
     contains_population = len(jerboa_files)!=0
     return render(request, template_name, 
@@ -148,7 +156,8 @@ def document_form_view(request, runcode, qs, template_name='documents_upload_for
                     'contains_population': contains_population, 
                     'hide_add': True,
                     'fingerprint_ttype': fingerprint_ttype,
-                    'search_old': query_old
+                    'search_old': query_old,
+                    'isAdvanced': isAdvanced
                     })
 
 

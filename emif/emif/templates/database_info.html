@@ -8,6 +8,7 @@
 <script src="{{ STATIC_URL}}js/vendor/threadpool.js"></script>
 
 <link rel="stylesheet" href="{{ STATIC_URL}}css/database_info.css" />
+<link rel="stylesheet" href="{{ STATIC_URL }}css/vendor/jquery.boolrelwidget.css"></script>
 
 <!-- Generic page styles -->
 <link rel="stylesheet" href="{{ STATIC_URL }}css/vendor/style.css">
@@ -55,8 +56,7 @@
 <!-- The File Upload validation plugin -->
 <script src="{{ STATIC_URL }}js/vendor/jquery.fileupload-validate.js"></script>
 <script src="{{ STATIC_URL }}js/vendor/jquery.cookie.js"></script>
-
-
+<script src="{{ STATIC_URL}}js/vendor/jquery.boolrelwidget.js"></script>
 
 {% endblock %} 
 {% block breadcrumbs %} 
@@ -242,7 +242,9 @@
             <a href="http://www.enable-javascript.com/" target="_blank">enable JavaScript in your web browser</a>.</h2>
     </div>
 </noscript>
-
+{% if isAdvanced %}
+<div id="bool_container"></div>
+{% endif %}
 
 {% endblock %} 
 
@@ -292,6 +294,12 @@ console.log("ayx" + json_aux);
         $("#pivot_table_extra_information").html(json_to_table(json2));
     }
 });
+ {% if isAdvanced %}
+ var bool_container;
+$(function(){
+    bool_container = $('#bool_container').boolrelwidget({view_only: true, view_serialized_string: '{{request.session.serialization_query}}', level_back:-2});
+});
+  {% endif %}
 
 {% endblock %}
 
