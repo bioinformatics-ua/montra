@@ -105,8 +105,9 @@ text-decoration: none;
     <div class="span8">
 
 
-        <form name="qform" id="qform" action="{{ request.path }}" method="POST">
+        <form name="qform" id="qform" action="resultsdiff/1" method="POST">
             {% csrf_token %}
+            <input type="hidden" name="qid" value="{{q_id}}" />
                     <div id="set_container">
                     </div>
                     
@@ -128,7 +129,6 @@ text-decoration: none;
 {% endblock %}
 
 {% block scriptextra %}
-
 function add_triggers() {
             
             console.log("adding triggers");

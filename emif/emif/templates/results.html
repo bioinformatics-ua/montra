@@ -187,10 +187,9 @@
   {% endif %}
 
   {% if page_obj != None %}
+    {% bootstrap_paginate page_obj range=10 url_view_name="views.results_diff" show_prev_next="false" show_first_last="true" %}
 
-{% bootstrap_paginate page_obj range=10 url_view_name="views.results_diff" show_prev_next="false" show_first_last="true"%}
 {% endif %}
-
 {% endblock %}
 
 {% comment %}
