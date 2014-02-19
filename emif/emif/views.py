@@ -155,7 +155,7 @@ def results_comp(request, template_name='results_comp.html'):
                                            'results': list_qsets, 'database_to_compare': first_name})
 
 
-def results_fulltext(request, page=1, full_text=True, template_name='results.html'):
+def results_fulltext(request, page=1, full_text=True,template_name='results.html', isAdvanced=False):
     query = ""
     in_post = True
     try:
@@ -163,15 +163,16 @@ def results_fulltext(request, page=1, full_text=True, template_name='results.htm
         request.session['query'] = query
     except:
         in_post = False
-
+        
     if not in_post:
         query = request.session.get('query', "")
     if not full_text:
-        return results_fulltext_aux(request, query, page, template_name)
-    return results_fulltext_aux(request, "text_t:" + query, page, template_name)
+        return results_fulltext_aux(request, query, page, template_name, isAdvanced)
+    return results_fulltext_aux(request, "text_t:" + query, page, template_name, isAdvanced)
 
 
-def results_fulltext_aux(request, query, page=1, template_name='results.html'):
+def results_fulltext_aux(request, query, page=1, template_name='results.html', isAdvanced=False):
+
     rows = 5
     if query == "":
         return render(request, "results.html", {'request': request, 'breadcrumb': True,
@@ -197,8 +198,12 @@ def results_fulltext_aux(request, query, page=1, template_name='results.html'):
     list_databases = []
     if error_searching or len(results) == 0 :
         query_old = request.session.get('query', "")
-        return render(request, "results.html", {'request': request, 'breadcrumb': True,
-                                                'list_results': [], 'page_obj': None, 'search_old': query_old})
+        if isAdvanced == True:
+            return render(request, "results.html", {'request': request, 'breadcrumb': True,
+                                                'list_results': [], 'page_obj': None, 'isAdvanced': True})
+        else:
+            return render(request, "results.html", {'request': request, 'breadcrumb': True,
+                                                'list_results': [], 'page_obj': None, 'search_old': query_old, 'isAdvanced': False})
     for r in results:
         try:
             database_aux = Database()
@@ -256,9 +261,14 @@ def results_fulltext_aux(request, query, page=1, template_name='results.html'):
     list_results.list_results = pp.page(page)
     list_results.paginator = pp
     query_old = request.session.get('query', "")
-    return render(request, template_name, {'request': request,
+        
+    if isAdvanced == True:
+        return render(request, template_name, {'request': request,
                                            'list_results': list_results, 'page_obj': pp.page(page),
-                                           'search_old': query_old, 'breadcrumb': True})
+                                            'breadcrumb': True, 'isAdvanced': True})
+    else :
+        return render(request, template_name, {'request': request,
+                                           'list_results': list_results, 'page_obj': pp.page(page), 'breadcrumb': True, 'search_old': query_old, 'isAdvanced': False})
 
 
 def store_query(user_request, query_executed):
@@ -298,16 +308,66 @@ def store_query(user_request, query_executed):
 
 
 def results_diff(request, page=1, template_name='results_diff.html'):
+        
+    # in case the request come's from a advanced search
+
+    if request.POST.get("qid") != None:
+        request.session['isAdvanced'] = True
+        qlist = []
+        jsinclude = []      # js files to include
+        cssinclude = []     # css files to include
+        jstriggers = []
+        qvalues = {}
+        qexpression = None  # boolean expression
+        qserialization = None   # boolean expression serialization to show on results
+        qid = None  #questionary id
+        if request.POST:
+            for k, v in request.POST.items():
+                
+                if (len(v)==0):
+                    continue
+                if k.startswith("question_"):
+                    s = k.split("_")
+                    if len(s) == 4:
+                        #qvalues[s[1]+'_'+v] = '1' # evaluates true in JS
+                        if (qvalues.has_key(s[1])):
+                            qvalues[s[1]] += " " + v # evaluates true in JS
+                        else:
+                            qvalues[s[1]] = v # evaluates true in JS
+                    elif len(s) == 3 and s[2] == 'comment':
+                        qvalues[s[1] + '_' + s[2]] = v
+                    else:
+                        if (qvalues.has_key(s[1])):
+                            qvalues[s[1]] += " " + v
+                        else:
+                            qvalues[s[1]] = v
+                            #print qvalues
+                elif k == "boolrelwidget-boolean-representation":            
+                    qexpression = v
+                elif k == "boolrelwidget-boolean-serialization":     
+                    # we add the serialization to the session
+                    request.session['serialization_query'] = v
+                elif k == "qid":
+                    qid = v
+
+            query = convert_qvalues_to_query(qvalues, qid, qexpression)
+            query = convert_query_from_boolean_widget(qexpression, qid)
+            print "Query: " + query
+            request.session['query'] = query
+            return results_fulltext_aux(request, query, isAdvanced=True) 
+     
     query = ""
     in_post = True
     try:
         query = request.POST['query']
         request.session['query'] = query
+        request.session['isAdvanced'] = False
     except:
         in_post = False
         #raise
     if not in_post:
         query = request.session.get('query', "")
+        
     import pdb
     #pdb.set_trace()
     print "query_@" + query
@@ -324,10 +384,12 @@ def results_diff(request, page=1, template_name='results_diff.html'):
             print "try to get in session"
             search_full = request.session.get('search_full', "")
         if search_full == "search_full":
-            return results_fulltext(request, page, full_text=True)
+            return results_fulltext(request, page, full_text=True, isAdvanced=request.session['isAdvanced'])
     except:
         raise
-    return results_fulltext(request, page, full_text=False)
+    #print "Printing the qexpression"
+    #print request.POST['qexpression']
+    return results_fulltext(request, page, full_text=False, isAdvanced=request.session['isAdvanced'])
 
 
     class Results:
@@ -411,7 +473,7 @@ def results_diff(request, page=1, template_name='results_diff.html'):
     list_results.d3 = list_databases_final[2]
     list_results.num_results = len(list_databases)
     return render(request, template_name, {'request': request, 'query': query,
-                                           'results': list_results, 'search_old': query, 'breadcrumb': True})
+                                           'results': list_results, 'search_old': query, 'breadcrumb': True, isAdvanced: request.session['isAdvanced']})
 
 
 def geo(request, template_name='geo.html'):
@@ -1154,6 +1216,9 @@ def databases(request, page=1, template_name='databases.html'):
     #first lets clean the query session log
     if 'query' in request.session:
         del request.session['query']
+        
+    if 'isAdvanced' in request.session:
+        del request.session['isAdvanced'] 
     
     # Get the list of databases for a specific user
 
@@ -1187,6 +1252,7 @@ def all_databases(request, page=1, template_name='alldatabases.html'):
     # lets clear the geolocation session search filter (if any)
     try:
         del request.session['query']
+        del request.session['isAdvanced']         
     except:
         pass
     
@@ -1207,7 +1273,8 @@ def all_databases(request, page=1, template_name='alldatabases.html'):
                                             'breadcrumb': True, 'collapseall': False, 
                                             'geo': True,
                                             'page_obj': pager,
-                                            'add_databases': True})
+                                            'add_databases': False,
+                                            'hide_add': True})
 
 def qs_data_table(request, template_name='qs_data_table.html'):
     db_type = request.POST.get("db_type")
@@ -2053,6 +2120,8 @@ def show_fingerprint_page_read_only(request, q_id, qs_id, SouMesmoReadOnly=False
         cssinclude = []     # css files to include
         jstriggers = []
         qvalues = {}
+        qexpression = None  # boolean expression
+        qserialization = None   # boolean expression serialization to show on results
         if not request.POST:
             
             if 'query' in request.session:
@@ -2081,10 +2150,21 @@ def show_fingerprint_page_read_only(request, q_id, qs_id, SouMesmoReadOnly=False
                         else:
                             qvalues[s[1]] = v
                             #print qvalues
-            query = convert_qvalues_to_query(qvalues, q_id)
+                elif k == "boolrelwidget-boolean-representation":            
+                    qexpression = v
+                elif k == "boolrelwidget-boolean-serialization":     
+                    # we add the serialization to the session
+                    request.session['serialization_query'] = v
+
+            query = convert_qvalues_to_query(qvalues, q_id, qexpression)
+            query = convert_query_from_boolean_widget(qexpression, q_id)
             print "Query: " + query
             request.session['query'] = query
-            return results_fulltext_aux(request, query)
+            if template_name=='advanced_search.html':
+                return results_fulltext_aux(request, query, isAdvanced=True)
+            else:
+                return results_fulltext_aux(request, query)
+
 
         qlist_general = []
 
@@ -2170,6 +2250,8 @@ def show_fingerprint_page_read_only(request, q_id, qs_id, SouMesmoReadOnly=False
                 fingerprint_id=fingerprint_id,
                 breadcrumb=True,
                 hide_add = hide_add,
+                q_id = q_id
+                
         )
         r['Cache-Control'] = 'no-cache'
         r['Expires'] = "Thu, 24 Jan 1980 00:00:00 GMT"
@@ -2229,14 +2311,14 @@ def show_fingerprint_page(request, runinfo, errors={}, template_name='database_e
     """
     questions = runinfo.questionset.questions()
 
-    questions = runinfo.questionset.questions()
-
     qlist = []
     jsinclude = []      # js files to include
     cssinclude = []     # css files to include
     jstriggers = []
     qvalues = {}
 
+    print questions
+    
     # initialize qvalues        
     cookiedict = runinfo.get_cookiedict()
     for k, v in cookiedict.items():

@@ -38,13 +38,14 @@
             }
     </style>
     <link rel="stylesheet" href="{{ STATIC_URL }}css/bootstrap-responsive.min.css">
-    <link rel="stylesheet" href="{{ STATIC_URL }}css/main.css">
+    <link rel="stylesheet" href="{{ STATIC_URL }}css/main.css" />
     <style type="text/css">
         {% block styleextra %}
         {% endblock %}
     </style>
     <script src="{{ STATIC_URL }}js/vendor/modernizr-2.6.2.min.js"></script>
     <script src="{{ STATIC_URL }}js/vendor/jquery-1.9.1.min.js"></script>
+    <script src="{{ STATIC_URL }}js/vendor/jquery-ui-1.10.4.custom.min.js"></script>
     <script src="{{ STATIC_URL }}js/vendor/bootstrap.min.js"></script>
     <script src="{{ STATIC_URL }}js/vendor/jquery.cookie.js"></script>
     <script src="{{ STATIC_URL }}js/vendor/jquery.canclear.js"></script>
@@ -67,9 +68,9 @@
             });
     </script>
     <!--[if lt IE 9]>
-            <link rel="stylesheet" href="bootstrap_ie_compatibility">
 
             <script src="{{ STATIC_URL }}js/vendor/respond.min.js"></script>
+            <link rel="stylesheet" href="bootstrap_ie_compatibility" />
 
 
         <![endif]-->
@@ -85,7 +86,7 @@
                 <div class="navbar navbar-fixed-top">
         <div class="navbar-inner">
             <div class="container">
-                            <a class="brand" href="#">EMIF Catalogue</a>
+                            <a class="brand" href="">EMIF Catalogue</a>
 </div>
             </div>
             </div>
@@ -101,7 +102,7 @@
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </a>
-                <a class="brand" href="#">EMIF Catalogue</a>
+                <a class="brand" href="">EMIF Catalogue</a>
                 <div class="nav-collapse collapse">
                             {% if request.user.is_authenticated %}
                             <ul class="nav">
@@ -188,7 +189,11 @@
 
                     <li id="search_li" class="pull-left">
                             <form class="navbar-search pull-left" method="POST" action="resultsdiff/1">{% csrf_token %}
+                                {% if isAdvanced %}
+                                                                <input title="Enter the terms you wish to search for." class="search-query span3 form-text" placeholder="" type="text" id="edit-search-block-form--3" name="query" value="" size="25" maxlength="256">
+                                {% else %}
                                 <input title="Enter the terms you wish to search for." class="search-query span3 form-text" placeholder="" type="text" id="edit-search-block-form--3" name="query" value="{{search_old}}" size="25" maxlength="256">
+                                {% endif %}
                                 <input name='search_full' value='search_full' type='hidden'>
                             </form>
                           </li>
@@ -208,7 +213,7 @@
                                     <li class="divider"></li>
                                     <li id="li_reset_password">
                                         <a href="accounts/password/reset/">Forgot the password?</a>
-                                    ss</li>
+                                    </li>
                                 </ul>
                                
                             </li>

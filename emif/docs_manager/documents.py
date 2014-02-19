@@ -86,7 +86,7 @@ def parsejerboa(request, template_name='documents_upload_form.html'):
     return response
 
 def document_form_view(request, runcode, qs, template_name='documents_upload_form.html'):
-    
+
     qsets, name, db_owners, fingerprint_ttype = createqsets(runcode)
 
     if fingerprint_ttype == "":

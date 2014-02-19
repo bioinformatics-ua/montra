@@ -31,15 +31,19 @@ text-decoration: none;
 
 
 {% block headextra %}
-<script type="text/javascript" src="{{ STATIC_URL }}questionset.js"></script>
+<link rel="stylesheet" href="{{ STATIC_URL }}css/vendor/chosen.css"></script>
+<link rel="stylesheet" href="{{ STATIC_URL }}progressbar.css"></script>
+<link rel="stylesheet" href="{{ STATIC_URL }}css/vendor/jquery.boolrelwidget.css"></script>
+
+<script src="{{ STATIC_URL}}questionset.js"></script>
 <script src="{{ STATIC_URL}}js/vendor/threadpool.js"></script>
 <script src="{{ STATIC_URL}}js/vendor/bootstrap-tooltip.js"></script>
 <script src="{{ STATIC_URL}}js/vendor/bootstrap-popover.js"></script>
 <script src="{{ STATIC_URL}}js/fingerprint_validation.js"></script>
 <script src="{{ STATIC_URL}}js/fingerprint.js"></script>
+<script src="{{ STATIC_URL}}js/vendor/jquery.boolrelwidget.js"></script>
 
-<link rel="stylesheet" href="{{ STATIC_URL }}css/vendor/chosen.css"></script>
-<link rel="stylesheet" href="{{ STATIC_URL }}progressbar.css"></script>
+
 {% for x in jsinclude %}
 <script type="text/javascript" src="{{ x }}"></script>
 {% endfor %}
@@ -65,30 +69,7 @@ text-decoration: none;
 {% block content %}
 
 <div class="container">
-  <div class="jumbotron">
-
-   <div class="span12" style="text-align:center">
-    <h2>Advanced Search</h2>
-       {% comment %}
-    <div>
-  <em>Filter: </em>
-          <select data-placeholder="Your Favorite Football Team" style="width:600px;" class="chosen-select" multiple tabindex="6">
-            <option value=""></option>
-            <optgroup label="NFC EAST">
-              <option>MCI - definition: Neuropsychological Test, Functional impairment (eg CDR)</option>
-              <option>Medication use: Collected</option>
-              <option>Urine: Routine</option>  
-
-            </optgroup>
-            
-          </select>
-        
-    </div>
-       {% endcomment  %}
-
-  </div>
-
-  </div>
+    <h2 class="pull-center" >Advanced Search</h2>
 </div>
 <hr>
 <div class="row">
@@ -124,10 +105,12 @@ text-decoration: none;
     <div class="span8">
 
 
-        <form name="qform" id="qform" action="{{ request.path }}" method="POST">
+        <form name="qform" id="qform" action="resultsdiff/1" method="POST">
             {% csrf_token %}
-                    <div style="overflow-y:scroll;height:800px;" id="set_container">
+            <input type="hidden" name="qid" value="{{q_id}}" />
+                    <div id="set_container">
                     </div>
+                    
         </form>
             {% comment %}
 {% include "fingerprint_search.html" %}
@@ -135,6 +118,7 @@ text-decoration: none;
         </div>
     
 </div>
+       <div id="bool_container"></div>
 
 <script type="text/javascript" src="{{ STATIC_URL }}js/vendor/chosen.jquery.js"></script>
 <script type="text/javascript" src="{{ STATIC_URL }}js/emif.advanced_search.js"></script>
@@ -145,7 +129,6 @@ text-decoration: none;
 {% endblock %}
 
 {% block scriptextra %}
-
 function add_triggers() {
             
             console.log("adding triggers");
@@ -164,9 +147,10 @@ function add_triggers() {
 }
 
 $('#li_advanced_search').addClass("active");
-
+var bool_container;
 $( document ).ready(function() {
     load_questionnary();
+
 });
 var threads = {};
 function load_questionnary(){
@@ -178,7 +162,7 @@ function load_questionnary(){
         // We build the qs containers in memory and just do dom op, on the end, for speed
         // on ie joins are significantly faster than concatenation
         {% for qs in questionset.questionnaire.questionsets %}
-            containers.push('<div id="qs_{{ qs.sortid }}" class="{% if qs.sortid == questionset.sortid %} {% else %} hide {% endif %} questionset"><div class="pull-center">Loading...</div></div>\n')
+            containers.push('<div id="qs_{{ qs.sortid }}" class="{% if qs.sortid == questionset.sortid %} {% else %} hide {% endif %} questionset"><div class="pull-center">Loading...</div></div>\n');
         {% endfor %}
 
         $('#set_container').append(containers.join(''));
@@ -203,7 +187,6 @@ function load_questionnary(){
         threadpool.run(new Runnable(add_triggers, priority+2));
         threadpool.destroy();
 }
-
 function loadqspart(sortid, pk){
     
     //console.log("getting part from searchqs/"+pk+"/"+sortid+"/");
@@ -243,7 +226,7 @@ function next_questionset(id_questionset)
 function questionsets_handle(id_questionset)
 {
 
-    var idString = id_questionset.id
+    var idString = id_questionset.id;
     var id = idString.split('_');
 
     $('#active_qs').val(id_questionset.id);
@@ -277,7 +260,7 @@ function questionsets_handle(id_questionset)
   );
     document.body.scrollTop = document.documentElement.scrollTop = 0;
 };
-
+    
     function collapseAll(element, div_id){
         if (element.text().indexOf('Collapse') !== -1) {
            console.log('Collapse all');

@@ -80,7 +80,7 @@ def document_form_view_upload(request, fingerprint_id, template_name='documents_
     #_json = import_population_characteristics_data(fingerprint_id,filename=path_file)
 
     pc = PopulationCharacteristic()
-    pc.submit_new_revision(fingerprint_id)
+    pc.submit_new_revision(fingerprint_id, path_file)
 
 
     response = JSONResponse(data, mimetype=response_mimetype(request))
@@ -136,19 +136,28 @@ def document_form_view(request, runcode, qs, template_name='documents_upload_for
     except:
         pass
 
+    isAdvanced = None
+    
+    if(request.session.get('isAdvanced') == True):
+        isAdvanced = True
+    else:
+        isAdvanced = False    
+        
+
     jerboa_files = Characteristic.objects.filter(fingerprint_id=runcode)
     contains_population = len(jerboa_files)!=0
     return render(request, template_name, 
         {'request': request, 'qsets': qsets, 'export_bd_answers': True, 
         'apiinfo': apiinfo, 'fingerprint_id': runcode,
-                   'breadcrumb': True, 'breadcrumb_name': name_bc,
+                   'breadcrumb': True, 'breadcrumb_name': name_bc.decode('utf-8'),
                     'style': qs, 'collapseall': False, 
                     'owner_fingerprint':owner_fingerprint,
                     'fingerprint_dump': True,
                     'contains_population': contains_population, 
                     'hide_add': True,
                     'fingerprint_ttype': fingerprint_ttype,
-                    'search_old': query_old
+                    'search_old': query_old,
+                    'isAdvanced': isAdvanced
                     })
 
 
