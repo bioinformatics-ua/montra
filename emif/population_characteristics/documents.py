@@ -103,7 +103,7 @@ def parsejerboa(request, template_name='documents_upload_form.html'):
     _json = import_population_characteristics_data(filename=path_file)
 
     pc = PopulationCharacteristic()
-    pc.submit_new_revision()
+    pc.submit_new_revision(fingerprint_id)
     data = {'data': _json}
     response = JSONResponse(data, mimetype=response_mimetype(request))
     response['Content-Disposition'] = 'inline; filename=files.json'
