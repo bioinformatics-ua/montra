@@ -56,14 +56,16 @@ class City(models.Model):
 class AdvancedQuery(models.Model):
     id = AutoField(primary_key=True)
     user = models.ForeignKey(User, unique=False, blank=False, null=False)
-    name = models.TextField()
-    serialized_query = models.TextField()
+    name = models.TextField(unique=True)
+    serialized_query = models.TextField(unique=True)
+    date = models.DateTimeField(auto_now=True)
+    qid = models.IntegerField(unique=False, blank=False, null=False)
     
 class AdvancedQueryAnswer(models.Model):
     id = AutoField(primary_key=True)
-    refquery = models.ForeignKey(AdvancedQuery.id)
-    question_id = models.TextField()
-    answer = models.TextField()
+    refquery = models.ForeignKey('AdvancedQuery')
+    question = models.TextField(unique=False)
+    answer = models.TextField(unique=False)
     
 class ContactForm(forms.Form):
     name = forms.CharField(label='Name')

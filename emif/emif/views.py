@@ -57,7 +57,7 @@ import random
 
 import os
 import os.path
-
+import time
 
 def list_questions():
     print "list_questions"
@@ -312,6 +312,7 @@ def results_diff(request, page=1, template_name='results_diff.html'):
     # in case the request come's from a advanced search
 
     if request.POST.get("qid") != None:
+        
         request.session['isAdvanced'] = True
         qlist = []
         jsinclude = []      # js files to include
@@ -347,6 +348,7 @@ def results_diff(request, page=1, template_name='results_diff.html'):
                 elif k == "boolrelwidget-boolean-serialization":     
                     # we add the serialization to the session
                     request.session['serialization_query'] = v
+                    qserialization = v
                 elif k == "qid":
                     qid = v
 
@@ -354,6 +356,38 @@ def results_diff(request, page=1, template_name='results_diff.html'):
             query = convert_query_from_boolean_widget(qexpression, qid)
             print "Query: " + query
             request.session['query'] = query
+            
+            # We will be saving the query on to the serverside to be able to pull it all together at a later date
+            try:
+                # we get the current user
+                this_user = User.objects.get(username = request.user)
+                this_query = None
+                # we check if this query was already made before
+                try:
+                    # in case the query exists we just get the reference
+                    this_query =  AdvancedQuery.objects.get(user=this_user, serialized_query=qserialization, qid=qid)  
+                    
+                    print "This query is already on historic, just updating use time..."
+                    this_query.save()
+                except AdvancedQuery.DoesNotExist:
+                    # otherwise, we create it
+                    print "This query is new, adding it and answers to it..."
+                    this_query = AdvancedQuery(user=this_user,name=("Query on "+time.strftime("%c")),serialized_query=qserialization, qid=qid)
+                    this_query.save()   
+                    # and we all so insert the answers in a specific table exactly as they were on the post request to be able to put it back at a later time
+                    print this_query.id
+                    for k, v in request.POST.items():
+                        if k.startswith("question_") and len(v) > 0:                        
+                            aqa = AdvancedQueryAnswer(refquery=this_query,question=k, answer=v)
+                            aqa.save()
+
+                print qserialization
+                            
+                
+            except User.DoesNotExist:
+                return HttpResponse("Invalid username")
+
+            
             return results_fulltext_aux(request, query, isAdvanced=True) 
      
     query = ""
@@ -2814,7 +2848,7 @@ def import_questionnaire(request, template_name='import_questionnaire.html'):
     # wb = load_workbook(filename = r'/Volumes/EXT1/Dropbox/MAPi-Dropbox/EMIF/Code/emif/emif/questionnaire_ad_v2.xlsx')
     # wb = load_workbook(filename = r'/Volumes/EXT1/Dropbox/MAPi-Dropbox/EMIF/Observational_Data_Sources_Template_v5.xlsx')
     # wb = load_workbook(filename = r'C:/Questionnaire_template_v3.4.xlsx')
-    wb = load_workbook(filename =r'/Volumes/EXT1/trash/Questionnaire_template_v3.5.3xlsx')
+    wb = load_workbook(filename =r'/Users/ribeiro/Downloads/Questionnaire_template_v3.5.3.xlsx')
     ws = wb.get_active_sheet()
     log = ''
 
