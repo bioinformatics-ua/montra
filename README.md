@@ -14,10 +14,18 @@ EMIF Platform - Fingerprint Browser
     EMAIL_USE_TLS = True
 
 
-#### Author
+#### Developers
 
  * Luís A. Bastião Silva <bastiao@ua.pt>
  * Rui Mendes <ruidamendes@ua.pt>
+ * Tiago Godinho <tmgodinho@ua.pt>
+ * Ricardo Ribeiro <ribeiro.r@ua.pt>
+ * José Melo <melojms@gmail.com>
+
+ 
+#### Project Leader
+
+ * José Luis Oliveira <jlo@ua.pt>
 
 
 #### Installation steps
