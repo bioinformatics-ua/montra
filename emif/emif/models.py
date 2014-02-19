@@ -53,6 +53,18 @@ class City(models.Model):
     lat = models.FloatField()
     long = models.FloatField()
     
+class AdvancedQuery(models.Model):
+    id = AutoField(primary_key=True)
+    user = models.ForeignKey(User, unique=False, blank=False, null=False)
+    name = models.TextField()
+    serialized_query = models.TextField()
+    
+class AdvancedQueryAnswer(models.Model):
+    id = AutoField(primary_key=True)
+    refquery = models.ForeignKey(AdvancedQuery.id)
+    question_id = models.TextField()
+    answer = models.TextField()
+    
 class ContactForm(forms.Form):
     name = forms.CharField(label='Name')
     email = forms.EmailField(label='Email')
