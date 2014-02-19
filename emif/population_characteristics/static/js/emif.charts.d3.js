@@ -22,7 +22,7 @@ function GraphicChartD3(divArg, dataArg)
                  
                  ];
     objects.values.forEach(function(row){
-      dataset[0].push({'xvalue':row.Value1, 'yvalue':parseInt(row.Min)});
+      dataset[0].push({'xvalue':row.Value1, 'yvalue':parseInt(row.Count)});
   
     });
     
