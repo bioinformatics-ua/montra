@@ -23,7 +23,8 @@
             default_relation: BOOL['AND'],
             hide_concepts: true,
             view_only: false,
-            view_serialized_string: null
+            view_serialized_string: null,
+            level_back: -1
         }, options);
         /*
         var bg1 = new BooleanGroup('teste de nome muito grande mesmo');
@@ -668,7 +669,7 @@
         
         toolbar_content+='<button id="boolrelwidget-collapseall" class="btn">Expand All</button><button class="btn" id="boolrelwidget-orall">Or All Concepts</button><button class="btn" id="boolrelwidget-andall">And All Concepts</button><button class="btn" id="boolrelwidget-clear">Reset</button></div>';
         } else {
-            toolbar_content+='<button onclick="parent.history.go(-1); return false;" class="pull-right btn">Refine Search</button></div>';
+            toolbar_content+='<button onclick="parent.history.go('+settings.level_back+'); return false;" class="pull-right btn">Refine Search</button>';
         }
         toolbar_content+='</div><div id="boolrelwidget-query" class="well well-small">Loading...</div></div>';
         self = self.append(toolbar_content);

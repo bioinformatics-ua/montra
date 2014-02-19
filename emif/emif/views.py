@@ -173,7 +173,7 @@ def results_fulltext(request, page=1, full_text=True,template_name='results.html
 
 def results_fulltext_aux(request, query, page=1, template_name='results.html', isAdvanced=False):
 
-    rows = 15
+    rows = 5
     if query == "":
         return render(request, "results.html", {'request': request, 'breadcrumb': True,
                                                 'list_results': [], 'page_obj': None})
