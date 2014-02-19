@@ -67,7 +67,6 @@ text-decoration: none;
 {% endblock %}
 
 {% block content %}
-
 <div class="container">
     <h2 class="pull-center" >Advanced Search</h2>
 </div>
@@ -178,7 +177,11 @@ function load_questionnary(){
 
         var priority=1;
         {% for qs in questionset.questionnaire.questionsets %}
-            var thread = new Runnable(loadqspart, priority++, {{ qs.sortid }}, {{qs.questionnaire.pk}});
+            {% if not aqid %}
+                var thread = new Runnable(loadqspart, priority++, {{ qs.sortid }}, {{qs.questionnaire.pk}}, null);
+            {% else %}
+                var thread = new Runnable(loadqspart, priority++, {{ qs.sortid }}, {{qs.questionnaire.pk}}, {{aqid}});
+            {% endif %}
             threadpool.run(thread);
             threads['qs_{{ qs.sortid }}'] = thread;
         {% endfor %}
@@ -187,14 +190,18 @@ function load_questionnary(){
         threadpool.run(new Runnable(add_triggers, priority+2));
         threadpool.destroy();
 }
-function loadqspart(sortid, pk){
+function loadqspart(sortid, pk, aqid){
     
     //console.log("getting part from searchqs/"+pk+"/"+sortid+"/");
-    
-    $.get( "searchqs/"+pk+"/"+sortid+"/", function( data ) {
-      $( "#qs_"+sortid ).html( data );
-    });
-
+    if(aqid == null){
+        $.get( "searchqs/"+pk+"/"+sortid+"/", function( data ) {
+          $( "#qs_"+sortid ).html( data );
+        });
+    } else {
+        $.get( "searchqs/"+pk+"/"+sortid+"/"+aqid, function( data ) {
+          $( "#qs_"+sortid ).html( data );
+        });    
+    }
     threads['qs_'+sortid] = null;
     parts_missing--;
     this.complete();

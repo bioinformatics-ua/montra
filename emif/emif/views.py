@@ -40,6 +40,7 @@ from searchengine.search_indexes import index_answeres_from_qvalues
 from searchengine.search_indexes import convert_text_to_slug
 from emif.utils import *
 from emif.models import *
+from questionnaire.models import Answer
 from api.models import *
 
 from geopy import geocoders 
@@ -618,10 +619,10 @@ def calculate_databases_per_location():
             contries[u.contry.name] = number_of_dbs
 
 
-def advanced_search(request, questionnaire_id, question_set):
+def advanced_search(request, questionnaire_id, question_set, aqid):
 
 
-    return show_fingerprint_page_read_only(request, questionnaire_id, question_set, True)
+    return show_fingerprint_page_read_only(request, questionnaire_id, question_set, True, aqid)
 
 
 def database_add(request, questionnaire_id, sortid):
@@ -631,19 +632,23 @@ def database_add(request, questionnaire_id, sortid):
 
     return response
 
-def database_search_qs(request, questionnaire_id, sortid):
+def database_search_qs(request, questionnaire_id, sortid, aqid):
 
-    response = render_one_questionset(request, questionnaire_id, sortid,
+    response = render_one_questionset(request, questionnaire_id, sortid,aqid=aqid,
                                                template_name='fingerprint_search_qs.html')
 
     return response
 
-def render_one_questionset(request, q_id, qs_id, errors={}, template_name='fingerprint_add_qs.html'):
+def render_one_questionset(request, q_id, qs_id, errors={}, aqid=None, template_name='fingerprint_add_qs.html'):
     """
     Return the QuestionSet template
 
     Also add the javascript dependency code.
     """
+    if aqid != None:
+        this_query = AdvancedQuery.objects.get(id=aqid)
+        this_answers = AdvancedQueryAnswer.objects.filter(refquery=this_query)
+    
     try:
 
         qs_list = QuestionSet.objects.filter(questionnaire=q_id, sortid=qs_id).order_by('sortid')
@@ -693,7 +698,7 @@ def render_one_questionset(request, q_id, qs_id, errors={}, template_name='finge
             return results_fulltext_aux(request, query)
 
         qlist_general = []
-
+        
         for k in qs_list:
             qlist = []
             qs_aux = None
@@ -746,6 +751,16 @@ def render_one_questionset(request, q_id, qs_id, errors={}, template_name='finge
                         #    qvalues[question.number] = qdict['qvalue']
                         #
 
+                if(aqid != None):
+                    print this_query
+                    print 'question_'+question.number
+                    try:
+                        result = AdvancedQueryAnswer.objects.get(refquery=this_query, question='question_'+question.number)  
+                        qdict['value']= result.answer
+                    except:
+                        print 'Failed to find result'
+                        pass
+                        
                 qlist.append((question, qdict))
             if qs_aux == None:
                 #print "$$$$$$ NONE"
@@ -779,8 +794,7 @@ def render_one_questionset(request, q_id, qs_id, errors={}, template_name='finge
 
         raise
     return r
-
-
+    
 
 class RequestMonkeyPatch(object):
     POST = {}
@@ -1003,6 +1017,7 @@ def database_edit(request, fingerprint_id, questionnaire_id, template_name="data
     results = c.search_fingerprint("id:" + fingerprint_id)
     items = None
     for r in results:
+       
         items = r
         break
     fingerprint_id = r['id']
@@ -1108,7 +1123,7 @@ def database_edit(request, fingerprint_id, questionnaire_id, template_name="data
     )
     r['Cache-Control'] = 'no-cache'
     r['Expires'] = "Thu, 24 Jan 1980 00:00:00 GMT"
-    
+        
     return r
 
 class Database:
@@ -2115,7 +2130,7 @@ def check_database_add_conditions(request, questionnaire_id, sortid,
 #         raise
 #     return r
 
-def show_fingerprint_page_read_only(request, q_id, qs_id, SouMesmoReadOnly=False, errors={}, template_name='advanced_search.html'):
+def show_fingerprint_page_read_only(request, q_id, qs_id, SouMesmoReadOnly=False, aqid=None, errors={}, template_name='advanced_search.html'):
 
     """
     Return the QuestionSet template
@@ -2126,11 +2141,11 @@ def show_fingerprint_page_read_only(request, q_id, qs_id, SouMesmoReadOnly=False
         hide_add = True
     else:
         hide_add = False
-    
+        
     try:
 
         qs_list = QuestionSet.objects.filter(questionnaire=q_id).order_by('sortid')
-
+        
         #print "Q_id: " + q_id
         #print "Qs_id: " + qs_id
         #print "QS List: " + str(qs_list)
@@ -2148,7 +2163,7 @@ def show_fingerprint_page_read_only(request, q_id, qs_id, SouMesmoReadOnly=False
             #questions_aux = Question.objects.filter(questionset=qset_aux)
             questions_list[qset_aux.id] = qset_aux.questions()
             #print "here"
-
+        
         qlist = []
         jsinclude = []      # js files to include
         cssinclude = []     # css files to include
@@ -2156,6 +2171,7 @@ def show_fingerprint_page_read_only(request, q_id, qs_id, SouMesmoReadOnly=False
         qvalues = {}
         qexpression = None  # boolean expression
         qserialization = None   # boolean expression serialization to show on results
+                
         if not request.POST:
             
             if 'query' in request.session:
@@ -2192,7 +2208,7 @@ def show_fingerprint_page_read_only(request, q_id, qs_id, SouMesmoReadOnly=False
 
             query = convert_qvalues_to_query(qvalues, q_id, qexpression)
             query = convert_query_from_boolean_widget(qexpression, q_id)
-            print "Query: " + query
+            #print "Query: " + query
             request.session['query'] = query
             if template_name=='advanced_search.html':
                 return results_fulltext_aux(request, query, isAdvanced=True)
@@ -2207,7 +2223,8 @@ def show_fingerprint_page_read_only(request, q_id, qs_id, SouMesmoReadOnly=False
             qs_aux = None
             for question in questions_list[k.id]:
                 qs_aux = question.questionset
-                #print "Question: " + str(question)
+                #print "Question: " + str(question.number)
+                
                 Type = question.get_type()
                 if SouMesmoReadOnly and Type == 'open-button':
                    Type = "open"
@@ -2223,19 +2240,19 @@ def show_fingerprint_page_read_only(request, q_id, qs_id, SouMesmoReadOnly=False
                     'qalpha_class': _qalpha and (ord(_qalpha[-1]) % 2 \
                                                      and ' alodd' or ' aleven') or '',
                 }
-
                 # add javascript dependency checks
                 cd = question.getcheckdict()
+                
                 depon = cd.get('requiredif', None) or cd.get('dependent', None)
                 if depon:
                     # extra args to BooleanParser are not required for toString
                     parser = BooleanParser(dep_check)
-
                     # qdict['checkstring'] = ' checks="%s"' % parser.toString(depon)
 
                     #It allows only 1 dependency
                     #The line above allows multiple dependencies but it has a bug when is parsing white spaces
                     qdict['checkstring'] = ' checks="dep_check(\'question_%s\')"' % depon
+                    
 
                     qdict['depon_class'] = ' depon_class'
                     jstriggers.append('qc_%s' % question.number)
@@ -2245,6 +2262,7 @@ def show_fingerprint_page_read_only(request, q_id, qs_id, SouMesmoReadOnly=False
                     qvalues[question.number] = cd['default']
                 if Type in QuestionProcessors:
                     qdict.update(QuestionProcessors[Type](request, question))
+                    
                     if 'jsinclude' in qdict:
                         if qdict['jsinclude'] not in jsinclude:
                             jsinclude.extend(qdict['jsinclude'])
@@ -2253,17 +2271,17 @@ def show_fingerprint_page_read_only(request, q_id, qs_id, SouMesmoReadOnly=False
                             cssinclude.extend(qdict['jsinclude'])
                     if 'jstriggers' in qdict:
                         jstriggers.extend(qdict['jstriggers'])
-                        #if 'qvalue' in qdict and not question.number in cookiedict:
-                        #    qvalues[question.number] = qdict['qvalue']
-                        #
-
+                        
                 qlist.append((question, qdict))
-                
+               
             if qs_aux == None:
                 #print "$$$$$$ NONE"
                 qs_aux = k
             qlist_general.append((qs_aux, qlist))
-
+            
+            
+        # qvalues = {'1a': 'teste'}   
+            
         errors = {}
         fingerprint_id = generate_hash()
         r = r2r(template_name, request,
@@ -2284,7 +2302,8 @@ def show_fingerprint_page_read_only(request, q_id, qs_id, SouMesmoReadOnly=False
                 fingerprint_id=fingerprint_id,
                 breadcrumb=True,
                 hide_add = hide_add,
-                q_id = q_id
+                q_id = q_id,
+                aqid = aqid
                 
         )
         r['Cache-Control'] = 'no-cache'
@@ -2292,7 +2311,8 @@ def show_fingerprint_page_read_only(request, q_id, qs_id, SouMesmoReadOnly=False
 
     except:
 
-        raise
+        raise   
+        
     return r
 
 
@@ -2350,14 +2370,12 @@ def show_fingerprint_page(request, runinfo, errors={}, template_name='database_e
     cssinclude = []     # css files to include
     jstriggers = []
     qvalues = {}
-
-    print questions
     
     # initialize qvalues        
     cookiedict = runinfo.get_cookiedict()
     for k, v in cookiedict.items():
         qvalues[k] = v
-
+            
     substitute_answer(qvalues, runinfo.questionset)
 
     for question in questions:
