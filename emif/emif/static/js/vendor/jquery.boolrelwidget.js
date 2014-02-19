@@ -23,7 +23,8 @@
             default_relation: BOOL['AND'],
             hide_concepts: true,
             view_only: false,
-            view_serialized_string: null
+            view_serialized_string: null,
+            level_back: -1
         }, options);
         /*
         var bg1 = new BooleanGroup('teste de nome muito grande mesmo');
@@ -668,7 +669,7 @@
         
         toolbar_content+='<button id="boolrelwidget-collapseall" class="btn">Expand All</button><button class="btn" id="boolrelwidget-orall">Or All Concepts</button><button class="btn" id="boolrelwidget-andall">And All Concepts</button><button class="btn" id="boolrelwidget-clear">Reset</button></div>';
         } else {
-            toolbar_content+='<button onclick="parent.history.go(-1); return false;" class="pull-right btn">Refine Search</button></div>';
+            toolbar_content+='<button onclick="parent.history.go('+settings.level_back+'); return false;" class="pull-right btn">Refine Search</button>';
         }
         toolbar_content+='</div><div id="boolrelwidget-query" class="well well-small">Loading...</div></div>';
         self = self.append(toolbar_content);
@@ -787,10 +788,10 @@ BooleanTerminal.prototype = {
         else return '';
     },    
     serialize   :   function(){
-        return 'T__'+encodeURI(this.id) + '__'+ encodeURI(this.text) + '__' + encodeURI(this.val);
+        return 'T;;;;;'+encodeURI(this.id) + ';;;;;'+ encodeURI(this.text) + ';;;;;' + encodeURI(this.val);
     }, 
     deserialize : function(str){
-        str = str.split('__');
+        str = str.split(';;;;;');
         if(str.length != 4)
             console.error("Couldn't parse Bolean Terminal prototype");
         else {
@@ -1091,7 +1092,7 @@ BooleanGroup.prototype = {
             
             
             for(var i = 0;i<variables_to_parse.length-1;i++){
-                if(variables_to_parse[i].indexOf('T__') == 0)
+                if(variables_to_parse[i].indexOf('T;;;;;') == 0)
                     this.variables.push(new BooleanTerminal(null,null,null).deserialize(variables_to_parse[i]));
                 else 
                     this.variables.push(new BooleanGroup(null).deserialize(variables_to_parse[i]));        

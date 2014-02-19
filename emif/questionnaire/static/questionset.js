@@ -76,7 +76,7 @@ function valchanged(qnum, value) {
             //console.log(optional.attr('id'));
             
             //var optional = $('#question_'+just_number.replace(/(\.)/g,'\\.')+"_1_opt").val();
-            bool_container.push('question_nr_'+dirty.substring(0,index)+"__"+clean+"__",
+            bool_container.push('question_nr_'+dirty.substring(0,index)+"_____"+clean+"_____",
                                 clean.replace('_','. ')+' ('+the_question+')'
                                , dirty.substring(index+1,dirty.length));
         } else if(value==false){
