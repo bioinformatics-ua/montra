@@ -787,10 +787,10 @@ BooleanTerminal.prototype = {
         else return '';
     },    
     serialize   :   function(){
-        return 'T__'+encodeURI(this.id) + '__'+ encodeURI(this.text) + '__' + encodeURI(this.val);
+        return 'T;;;;;'+encodeURI(this.id) + ';;;;;'+ encodeURI(this.text) + ';;;;;' + encodeURI(this.val);
     }, 
     deserialize : function(str){
-        str = str.split('__');
+        str = str.split(';;;;;');
         if(str.length != 4)
             console.error("Couldn't parse Bolean Terminal prototype");
         else {
@@ -1091,7 +1091,7 @@ BooleanGroup.prototype = {
             
             
             for(var i = 0;i<variables_to_parse.length-1;i++){
-                if(variables_to_parse[i].indexOf('T__') == 0)
+                if(variables_to_parse[i].indexOf('T;;;;;') == 0)
                     this.variables.push(new BooleanTerminal(null,null,null).deserialize(variables_to_parse[i]));
                 else 
                     this.variables.push(new BooleanGroup(null).deserialize(variables_to_parse[i]));        
