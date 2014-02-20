@@ -38,15 +38,18 @@
             }
     </style>
     <link rel="stylesheet" href="{{ STATIC_URL }}css/bootstrap-responsive.min.css">
-    <link rel="stylesheet" href="{{ STATIC_URL }}css/main.css">
+    <link rel="stylesheet" href="{{ STATIC_URL }}css/main.css" />
     <style type="text/css">
         {% block styleextra %}
         {% endblock %}
     </style>
     <script src="{{ STATIC_URL }}js/vendor/modernizr-2.6.2.min.js"></script>
     <script src="{{ STATIC_URL }}js/vendor/jquery-1.9.1.min.js"></script>
+    <script src="{{ STATIC_URL }}js/vendor/jquery-ui-1.10.4.custom.min.js"></script>
     <script src="{{ STATIC_URL }}js/vendor/bootstrap.min.js"></script>
     <script src="{{ STATIC_URL }}js/vendor/jquery.cookie.js"></script>
+    <script src="{{ STATIC_URL }}js/vendor/jquery.canclear.js"></script>
+    
     <script type="application/javascript">
         // We need to configure this to be able to send requests by json with the csrftoken
         var csrftoken = $.cookie('csrftoken');
@@ -65,9 +68,9 @@
             });
     </script>
     <!--[if lt IE 9]>
-            <link rel="stylesheet" href="bootstrap_ie_compatibility">
 
             <script src="{{ STATIC_URL }}js/vendor/respond.min.js"></script>
+            <link rel="stylesheet" href="bootstrap_ie_compatibility" />
 
 
         <![endif]-->
@@ -83,12 +86,12 @@
                 <div class="navbar navbar-fixed-top">
         <div class="navbar-inner">
             <div class="container">
-                            <a class="brand" href="#">EMIF Catalogue</a>
+                            <a class="brand" href="">EMIF Catalogue</a>
 </div>
             </div>
             </div>
-            <!--    You seem to be using a old version of Internet Explorer.<br /><br />
-                The Internet browser you're currently using is not supported by the EMIF Catalogue. We currently only support I9-IE11, Chrome, Safari, Firefox and Opera. To be able to use our webpage we recommend you to update your Internet Explorer, or use another modern browser from the supported list.-->
+                You seem to be using a old version of Internet Explorer.<br /><br />
+                The Internet browser you're currently using is not supported by the EMIF Catalogue. We currently only support I7-IE11, Chrome, Safari, Firefox and Opera. To be able to use our webpage we recommend you to update your Internet Explorer, or use another modern browser from the supported list.
         </div>
         <div class="supported">
     <div class="navbar navbar-fixed-top">
@@ -99,7 +102,7 @@
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </a>
-                <a class="brand" href="#">EMIF Catalogue</a>
+                <a class="brand" href="">EMIF Catalogue</a>
                 <div class="nav-collapse collapse">
                             {% if request.user.is_authenticated %}
                             <ul class="nav">
@@ -186,7 +189,11 @@
 
                     <li id="search_li" class="pull-left">
                             <form class="navbar-search pull-left" method="POST" action="resultsdiff/1">{% csrf_token %}
+                                {% if isAdvanced %}
+                                                                <input title="Enter the terms you wish to search for." class="search-query span3 form-text" placeholder="" type="text" id="edit-search-block-form--3" name="query" value="" size="25" maxlength="256">
+                                {% else %}
                                 <input title="Enter the terms you wish to search for." class="search-query span3 form-text" placeholder="" type="text" id="edit-search-block-form--3" name="query" value="{{search_old}}" size="25" maxlength="256">
+                                {% endif %}
                                 <input name='search_full' value='search_full' type='hidden'>
                             </form>
                           </li>
@@ -211,10 +218,11 @@
                                
                             </li>
                              {% endif %}
-                            
+                            {% if request.user.is_authenticated %}
                             <li id="li_history">
                                 <a href="controlversion/history">History</a>
                             </li>
+                            {%endif%}
 
                             <li id="li_feedback">
                                 <a href="feedback">Feedback</a>
@@ -284,7 +292,7 @@
                </div>     
         <div class="row" style="text-align:center">
             <footer>
-                <p>&copy; EMIF Catalogue v{% get_version %} </p>
+                <p>&copy; EMIF Catalogue v{% get_version %} <br/><small id="supportability">This website is optimised to Safari, Chrome, Firefox, Opera and IE9+. It runs in IE7-IE8, but it has low performance and no enhanced features.</small></p>
 
             </footer>
         </div>
@@ -309,7 +317,9 @@
         var _gaq = _gaq || [];
         _gaq.push(['_setAccount', 'UA-38876251-1']);
         _gaq.push(['_trackPageview']);
-
+        $(function(){
+            $('.search-query').canclear();
+        });
         (function() {
             var ga = document.createElement('script');
             ga.type = 'text/javascript';

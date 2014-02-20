@@ -1,14 +1,16 @@
-
+{% load url from future %}
 {% load extra_tags %}
 {% load markup questionnaire i18n %}
 
 <div class="span8">
     <form name="qform" id="qform" action="dbEdit/{{fingerprint_id}}/{{questionset.questionnaire.pk}}" method="POST" enctype="multipart/form-data">
-        <input type="hidden" name="active_qs" id="active_qs" value="0" />
-        <input type="hidden" name="active_qs_sortid" id="active_qs_sortid" value="0" />
-        <input type="hidden" name="fingerprint_id" value="{{ fingerprint_id }}" />
-        <input type="hidden" name="users_db" value="{{ users_db }}" />
-        <input type="hidden" name="created_date" value="{{ created_date }}" />
+
+        <input type="hidden" id="edit_db_inputs" value="1">
+        <input type="hidden" name="active_qs" id="active_qs" value="0">
+        <input type="hidden" name="active_qs_sortid" id="active_qs_sortid" value="0">
+        <input type="hidden" name="fingerprint_id" value="{{ fingerprint_id }}">
+        <input type="hidden" name="users_db" value="{{ users_db }}">
+        <input type="hidden" name="created_date" value="{{ created_date }}">
 
     {% setglobal iteratorQ 0 %}
     {% for k, qlist in questions_list %}
@@ -167,13 +169,13 @@
             <!-- If Questionset is not the first (Introduction) or the final (Thank you) -->
 
                 {% if k.prev %}
-                    <a href="add/{{ questionset.questionnaire.pk }}/{{ k.prev.sortid }}" class="btn large primary" onclick="questionsets_handle(qs_{{ k.prev.sortid }});  return false;">{% trans "Previous" %}</a>
+                    <a href="dbEdit/{{ fingerprint_id }}/{{ k.prev.sortid }}" class="btn large primary" onclick="questionsets_handle(qs_{{ k.prev.sortid }});  return false;">{% trans "Previous" %}</a>
                 {% endif %}
                 {% if k.prev and k.next %}
 
                 {% endif %}
                 {% if k.next %}
-                    <a href="add/{{ questionset.questionnaire.pk }}/{{ k.next.sortid }}" class="btn large primary" onclick="questionsets_handle(qs_{{ k.next.sortid }});  return false;">{% trans "Next" %}</a>
+                    <a href="dbEdit/{{ fingerprint_id }}/{{ k.next.sortid }}" class="btn large primary" onclick="questionsets_handle(qs_{{ k.next.sortid }});  return false;">{% trans "Next" %}</a>
                 {% endif %}
 
 
@@ -203,8 +205,12 @@
 <!-- Fix later -->
 <script src="static/js/vendor/bootstrap-tooltip.js"></script>
 <script src="static/js/vendor/bootstrap-popover.js"></script>
-<script src="static/js/fingerprint.js"></script>
 <script src="static/js/fingerprint_validation.js"></script>
+<script src="static/js/fingerprint.js"></script>
+
+{% block scriptextraincludes %}
+        <script type="text/javascript" src="static/js/fingerprint_edit.js"></script>
+{% endblock %}
 
 <script type="text/javascript">
     {% block scriptextra %}
@@ -264,3 +270,4 @@ function toggle_comments(question_number)
 
 {% endblock %}
 </script>
+

@@ -144,7 +144,7 @@ def results_comp(request, template_name='results_comp.html'):
 
     list_qsets = []
     for db_id in list_fingerprint_to_compare:
-        qsets, name = createqsets(db_id)
+        qsets, name, db_owners, fingerprint_ttype = createqsets(db_id)
         list_qsets.append((name, qsets))
     first_name = None
     if len(list_qsets) > 0:
@@ -155,7 +155,7 @@ def results_comp(request, template_name='results_comp.html'):
                                            'results': list_qsets, 'database_to_compare': first_name})
 
 
-def results_fulltext(request, page=1, full_text=True, template_name='results.html'):
+def results_fulltext(request, page=1, full_text=True,template_name='results.html', isAdvanced=False):
     query = ""
     in_post = True
     try:
@@ -163,15 +163,16 @@ def results_fulltext(request, page=1, full_text=True, template_name='results.htm
         request.session['query'] = query
     except:
         in_post = False
-
+        
     if not in_post:
         query = request.session.get('query', "")
     if not full_text:
-        return results_fulltext_aux(request, query, page, template_name)
-    return results_fulltext_aux(request, "text_t:" + query, page, template_name)
+        return results_fulltext_aux(request, query, page, template_name, isAdvanced)
+    return results_fulltext_aux(request, "text_t:" + query, page, template_name, isAdvanced)
 
 
-def results_fulltext_aux(request, query, page=1, template_name='results.html'):
+def results_fulltext_aux(request, query, page=1, template_name='results.html', isAdvanced=False):
+
     rows = 5
     if query == "":
         return render(request, "results.html", {'request': request, 'breadcrumb': True,
@@ -197,8 +198,12 @@ def results_fulltext_aux(request, query, page=1, template_name='results.html'):
     list_databases = []
     if error_searching or len(results) == 0 :
         query_old = request.session.get('query', "")
-        return render(request, "results.html", {'request': request, 'breadcrumb': True,
-                                                'list_results': [], 'page_obj': None, 'search_old': query_old})
+        if isAdvanced == True:
+            return render(request, "results.html", {'request': request, 'breadcrumb': True,
+                                                'list_results': [], 'page_obj': None, 'isAdvanced': True})
+        else:
+            return render(request, "results.html", {'request': request, 'breadcrumb': True,
+                                                'list_results': [], 'page_obj': None, 'search_old': query_old, 'isAdvanced': False})
     for r in results:
         try:
             database_aux = Database()
@@ -256,9 +261,14 @@ def results_fulltext_aux(request, query, page=1, template_name='results.html'):
     list_results.list_results = pp.page(page)
     list_results.paginator = pp
     query_old = request.session.get('query', "")
-    return render(request, template_name, {'request': request,
+        
+    if isAdvanced == True:
+        return render(request, template_name, {'request': request,
                                            'list_results': list_results, 'page_obj': pp.page(page),
-                                           'search_old': query_old, 'breadcrumb': True})
+                                            'breadcrumb': True, 'isAdvanced': True})
+    else :
+        return render(request, template_name, {'request': request,
+                                           'list_results': list_results, 'page_obj': pp.page(page), 'breadcrumb': True, 'search_old': query_old, 'isAdvanced': False})
 
 
 def store_query(user_request, query_executed):
@@ -298,16 +308,66 @@ def store_query(user_request, query_executed):
 
 
 def results_diff(request, page=1, template_name='results_diff.html'):
+        
+    # in case the request come's from a advanced search
+
+    if request.POST.get("qid") != None:
+        request.session['isAdvanced'] = True
+        qlist = []
+        jsinclude = []      # js files to include
+        cssinclude = []     # css files to include
+        jstriggers = []
+        qvalues = {}
+        qexpression = None  # boolean expression
+        qserialization = None   # boolean expression serialization to show on results
+        qid = None  #questionary id
+        if request.POST:
+            for k, v in request.POST.items():
+                
+                if (len(v)==0):
+                    continue
+                if k.startswith("question_"):
+                    s = k.split("_")
+                    if len(s) == 4:
+                        #qvalues[s[1]+'_'+v] = '1' # evaluates true in JS
+                        if (qvalues.has_key(s[1])):
+                            qvalues[s[1]] += " " + v # evaluates true in JS
+                        else:
+                            qvalues[s[1]] = v # evaluates true in JS
+                    elif len(s) == 3 and s[2] == 'comment':
+                        qvalues[s[1] + '_' + s[2]] = v
+                    else:
+                        if (qvalues.has_key(s[1])):
+                            qvalues[s[1]] += " " + v
+                        else:
+                            qvalues[s[1]] = v
+                            #print qvalues
+                elif k == "boolrelwidget-boolean-representation":            
+                    qexpression = v
+                elif k == "boolrelwidget-boolean-serialization":     
+                    # we add the serialization to the session
+                    request.session['serialization_query'] = v
+                elif k == "qid":
+                    qid = v
+
+            query = convert_qvalues_to_query(qvalues, qid, qexpression)
+            query = convert_query_from_boolean_widget(qexpression, qid)
+            print "Query: " + query
+            request.session['query'] = query
+            return results_fulltext_aux(request, query, isAdvanced=True) 
+     
     query = ""
     in_post = True
     try:
         query = request.POST['query']
         request.session['query'] = query
+        request.session['isAdvanced'] = False
     except:
         in_post = False
         #raise
     if not in_post:
         query = request.session.get('query', "")
+        
     import pdb
     #pdb.set_trace()
     print "query_@" + query
@@ -324,10 +384,12 @@ def results_diff(request, page=1, template_name='results_diff.html'):
             print "try to get in session"
             search_full = request.session.get('search_full', "")
         if search_full == "search_full":
-            return results_fulltext(request, page, full_text=True)
+            return results_fulltext(request, page, full_text=True, isAdvanced=request.session['isAdvanced'])
     except:
         raise
-    return results_fulltext(request, page, full_text=False)
+    #print "Printing the qexpression"
+    #print request.POST['qexpression']
+    return results_fulltext(request, page, full_text=False, isAdvanced=request.session['isAdvanced'])
 
 
     class Results:
@@ -411,7 +473,7 @@ def results_diff(request, page=1, template_name='results_diff.html'):
     list_results.d3 = list_databases_final[2]
     list_results.num_results = len(list_databases)
     return render(request, template_name, {'request': request, 'query': query,
-                                           'results': list_results, 'search_old': query, 'breadcrumb': True})
+                                           'results': list_results, 'search_old': query, 'breadcrumb': True, isAdvanced: request.session['isAdvanced']})
 
 
 def geo(request, template_name='geo.html'):
@@ -1124,12 +1186,24 @@ def get_databases_from_solr(request, query="*:*"):
 
 def delete_fingerprint(request, id):
     user = request.user
-    #su = Subject.objects.filter(user=user)
-
-    #email = su[0].email
 
     c = CoreEngine()
     results = c.search_fingerprint('user_t:' + user.username)
+    
+    for result in results:
+        if (id == result['id']):
+            c.delete(id)
+            break
+
+    return databases(request)
+
+def force_delete_fingerprint(request, id):
+    if not request.user.is_superuser:
+        return HttpResponse('Permission denied. Contact administrator of EMIF Catalogue Team', status=403)
+    user = request.user
+    c = CoreEngine()
+    results = c.search_fingerprint('id:' + id)
+    
     for result in results:
         if (id == result['id']):
             c.delete(id)
@@ -1139,12 +1213,19 @@ def delete_fingerprint(request, id):
 
 
 def databases(request, page=1, template_name='databases.html'):
+    #first lets clean the query session log
+    if 'query' in request.session:
+        del request.session['query']
+        
+    if 'isAdvanced' in request.session:
+        del request.session['isAdvanced'] 
+    
     # Get the list of databases for a specific user
 
     user = request.user
     #list_databases = get_databases_from_db(request)
     _filter = "user_t:" + user.username
-    if user. is_superuser:
+    if user.is_superuser:
         _filter = "user_t:*" 
     list_databases = get_databases_from_solr(request, _filter)
 
@@ -1160,7 +1241,10 @@ def databases(request, page=1, template_name='databases.html'):
 
     return render(request, template_name, {'request': request, 'export_my_answers': True,
                                            'list_databases': list_databases, 'breadcrumb': True, 'collapseall': False,
-                                           'api_token': True, 'page_obj': pager})
+                                           'page_obj': pager,
+                                           'api_token': True, 
+                                           'owner_fingerprint': False,
+                                           'add_databases': True})
 
 
 def all_databases(request, page=1, template_name='alldatabases.html'):
@@ -1168,6 +1252,7 @@ def all_databases(request, page=1, template_name='alldatabases.html'):
     # lets clear the geolocation session search filter (if any)
     try:
         del request.session['query']
+        del request.session['isAdvanced']         
     except:
         pass
     
@@ -1184,7 +1269,12 @@ def all_databases(request, page=1, template_name='alldatabases.html'):
     ## End Paginator ##
     
     return render(request, template_name, {'request': request, 'export_all_answers': True, 'data_table': True,
-                                           'list_databases': list_databases, 'breadcrumb': True, 'collapseall': False, 'geo': True, 'page_obj': pager})
+                                           'list_databases': list_databases,
+                                            'breadcrumb': True, 'collapseall': False, 
+                                            'geo': True,
+                                            'page_obj': pager,
+                                            'add_databases': False,
+                                            'hide_add': True})
 
 def qs_data_table(request, template_name='qs_data_table.html'):
     db_type = request.POST.get("db_type")
@@ -1198,7 +1288,7 @@ def qs_data_table(request, template_name='qs_data_table.html'):
     for t in list_databases:
 
         if t.type_name == db_type:
-            qsets, name = createqsets(t.id)
+            qsets, name, _d, _c = createqsets(t.id)
             
             q_list = []
             a_list = []            
@@ -1232,13 +1322,13 @@ def all_databases_data_table(request, template_name='alldatabases_data_table.htm
         # Creating list of database types
         for t in list_databases:
             if not t.type_name in databases_types:
-                qsets, name = createqsets(t.id)
+                qsets, name, _d, _e,  = createqsets(t.id)
                 
                 databases_types[t.type_name] = qsets.ordered_items()  
             
             '''    this code was loading all the qsets of all the dbs etc etctera
             id = t.id
-            qsets, name = createqsets(id)
+            qsets, name, db_owners, fingerprint_ttype = createqsets(id)
             q_list = []
             for group in qsets.ordered_items():
                 (k, qs) = group
@@ -1283,11 +1373,31 @@ def createqsets(runcode, qsets=None, clean=True):
     list_values = []
     blacklist = ['created_t', 'type_t', '_version_', 'date_last_modification_t']
     name = "Not defined."
+    users = ""
+    fingerprint_ttype = ""
+
+    db_owners = "" 
+
+
+    questionnaires_ids = {}
+    qqs = Questionnaire.objects.all()
+    for q in qqs:
+        questionnaires_ids[q.slug] = (q.pk, q.name)
+
 
     for result in results:
 
+
+        (fingerprint_ttype, type_name) = questionnaires_ids[result['type_t']]
+
         # Get the slug of fingerprint type
         q_aux = Questionnaire.objects.filter(slug=result['type_t'])
+
+        try:
+            users = result['user_t']
+            db_owners = result['user_t']
+        except:
+            pass
 
         list_qsets = QuestionSet.objects.filter(questionnaire=q_aux[0]).order_by('sortid')
 
@@ -1373,34 +1483,26 @@ def createqsets(runcode, qsets=None, clean=True):
                 except:
                     pass
         break
+    # What should I do with this code?
+    # I know that it actually do nothing    
+    if (users!=""):
+        users.split(" \\ ")
+
+    return (qsets, name, db_owners, fingerprint_ttype)
+
+   
+# TODO: move to another place, maybe API? 
+def get_api_info(fingerprint_id):
+    """This is an auxiliar method to get the API Info
+    """
+    result = {}
+
     
-    return (qsets, name)
-
-def fingerprint(request, runcode, qs, template_name='database_info.html'):
-    qsets, name = createqsets(runcode)
-
-    def get_api_info(fingerprint_id):
-
-        result = {}
-    
-        
-        results = FingerprintAPI.objects.filter(fingerprintID=fingerprint_id)
-        result = {}
-        for r in results:
-            result[r.field] = r.value
-        return result
-
-    apiinfo = json.dumps(get_api_info(runcode));
-    name_bc = name
-    try:
-        name_bc = name.encode('utf-8')
-    except:
-        pass
-
-    return render(request, template_name, 
-        {'request': request, 'qsets': qsets, 'export_bd_answers': True, 'apiinfo': apiinfo, 'fingerprint_id': runcode,
-                   'breadcrumb': True, 'breadcrumb_name': name_bc, 'style': qs, 'collapseall': False})
-
+    results = FingerprintAPI.objects.filter(fingerprintID=fingerprint_id)
+    result = {}
+    for r in results:
+        result[r.field] = r.value
+    return result
 
 def get_questionsets_list(runinfo):
     # Get questionnaire
@@ -2018,6 +2120,8 @@ def show_fingerprint_page_read_only(request, q_id, qs_id, SouMesmoReadOnly=False
         cssinclude = []     # css files to include
         jstriggers = []
         qvalues = {}
+        qexpression = None  # boolean expression
+        qserialization = None   # boolean expression serialization to show on results
         if not request.POST:
             
             if 'query' in request.session:
@@ -2046,10 +2150,21 @@ def show_fingerprint_page_read_only(request, q_id, qs_id, SouMesmoReadOnly=False
                         else:
                             qvalues[s[1]] = v
                             #print qvalues
-            query = convert_qvalues_to_query(qvalues, q_id)
+                elif k == "boolrelwidget-boolean-representation":            
+                    qexpression = v
+                elif k == "boolrelwidget-boolean-serialization":     
+                    # we add the serialization to the session
+                    request.session['serialization_query'] = v
+
+            query = convert_qvalues_to_query(qvalues, q_id, qexpression)
+            query = convert_query_from_boolean_widget(qexpression, q_id)
             print "Query: " + query
             request.session['query'] = query
-            return results_fulltext_aux(request, query)
+            if template_name=='advanced_search.html':
+                return results_fulltext_aux(request, query, isAdvanced=True)
+            else:
+                return results_fulltext_aux(request, query)
+
 
         qlist_general = []
 
@@ -2135,6 +2250,8 @@ def show_fingerprint_page_read_only(request, q_id, qs_id, SouMesmoReadOnly=False
                 fingerprint_id=fingerprint_id,
                 breadcrumb=True,
                 hide_add = hide_add,
+                q_id = q_id
+                
         )
         r['Cache-Control'] = 'no-cache'
         r['Expires'] = "Thu, 24 Jan 1980 00:00:00 GMT"
@@ -2194,14 +2311,14 @@ def show_fingerprint_page(request, runinfo, errors={}, template_name='database_e
     """
     questions = runinfo.questionset.questions()
 
-    questions = runinfo.questionset.questions()
-
     qlist = []
     jsinclude = []      # js files to include
     cssinclude = []     # css files to include
     jstriggers = []
     qvalues = {}
 
+    print questions
+    
     # initialize qvalues        
     cookiedict = runinfo.get_cookiedict()
     for k, v in cookiedict.items():
@@ -2486,7 +2603,8 @@ def save_answers_to_csv(list_databases, filename):
         writer.writerow(['DB_ID', 'DB_name', 'Questionset', 'Question', 'QuestioNumber', 'Answer'])
         for t in list_databases:
             id = t.id
-            qsets, name = createqsets(id, clean=False)
+
+            qsets, name, db_owners, fingerprint_ttype = createqsets(id, clean=False)
 
             for group in qsets.ordered_items():
                 (k, qs) = group
@@ -2696,7 +2814,7 @@ def import_questionnaire(request, template_name='import_questionnaire.html'):
     # wb = load_workbook(filename = r'/Volumes/EXT1/Dropbox/MAPi-Dropbox/EMIF/Code/emif/emif/questionnaire_ad_v2.xlsx')
     # wb = load_workbook(filename = r'/Volumes/EXT1/Dropbox/MAPi-Dropbox/EMIF/Observational_Data_Sources_Template_v5.xlsx')
     # wb = load_workbook(filename = r'C:/Questionnaire_template_v3.4.xlsx')
-    wb = load_workbook(filename =r'/Users/ribeiro/Downloads/Questionnaire_template_v3.5.3.xlsx')
+    wb = load_workbook(filename =r'/Volumes/EXT1/trash/Questionnaire_template_v3.5.3xlsx')
     ws = wb.get_active_sheet()
     log = ''
 

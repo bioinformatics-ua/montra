@@ -56,9 +56,6 @@ function ThreadPool(size, timeout) {
     };
     this.timeout = timeout;
     this._init();
-
-
-
 };
 
 ThreadPool.prototype = { 

@@ -25,8 +25,6 @@ function help_text_popover() {
         });
     });
 }
-
-
     /* Begin -- Check if user has unsaved changes */
  var formHasChanged = false;
  var submitted = true;
@@ -55,22 +53,53 @@ $(document).ready(function () {
 
 /***************** BEGIN - CHECK IF ANSWER IS FILLED IN *****************/
 /* Function to validate for fields of type 1 (see comments below)*/
-function validate1(element, id_answered) {
-    console.log("VAL: " + $(element).val());
+function validate1(element, id_answered, dirty_id_answered) {
+                /* Tip from: http://viralpatel.net/blogs/jquery-get-text-element-without-child-element/ */
+            var just_question = $('#question_'+id_answered)
+        .clone()    //clone the element
+        .children() //select all the children
+        .remove()   //remove all the children
+        .end()  //again go back to selected element
+        .text().trim();    //get the text of element
+    
     if($(element).val() != "") {
             //console.log('1 - #answered_'+id_answered);
             $('[id="answered_'+id_answered+'"]').show();
+        
+            if (!(typeof bool_container === 'undefined')) {
+                console.log('question_nr_'+id_answered);
+                var number_correct = $('#question_nr_'+id_answered).text().trim();
+                number_correct = number_correct.substring(0, number_correct.length-1);
+                console.log( number_correct);
+                console.log( $('#question_nr_'+id_answered).text().trim()+" "+just_question);
+                console.dir(':input[name="question_'+dirty_id_answered.replace('.','\\.')+'"]');
+                
+                bool_container.push('question_nr_'+number_correct,
+                    $('#question_nr_'+id_answered).text().trim()+" "+just_question,
+                                   $(':input[name="question_'+dirty_id_answered.replace('.','\\.')+'"]').val());
+            }
+        
         } else {
             //console.log('2 - #answered_'+id_answered);
             $('[id="answered_'+id_answered+'"]').hide();
+            var number_correct = $('#question_nr_'+id_answered).text().trim();
+            number_correct = number_correct.substring(0, number_correct.length-1);
+            if (!(typeof bool_container === 'undefined')) {
+                bool_container.splice('question_nr_'+number_correct,
+                    $('#question_nr_'+id_answered).text().trim()+" "+just_question,
+                                   $('#question_'+dirty_id_answered.replace('.','\\.')).val());
+            }
         }
+            // If we have a boolean container, maker
+
 }
 
+//Creates an advanced validator for question fields.
 var classNamePatternAUX = /type_(\S+)/i;
-var advValidator;
+var advValidator = new Fingerprint_Validator();
 
 $(document).ready(function () {
-    advValidator = new Fingerprint_Validator();
+    
     advValidator.onInit();
     $(document).on('change', '.answer input,.answer select,.answer textarea, button', function (e) {
         e.preventDefault();
@@ -78,6 +107,7 @@ $(document).ready(function () {
         var id_answered = el.id.split("_")[1];
         var id_answered_aux = el.id.split("_")[1].replace(/\./g,'');
 
+        //Detects widget class and sends it to the advanced validator.
         var className = $('[id="qc_'+id_answered+'"]').attr("class");
         className = classNamePatternAUX.exec(className)[1];
         if(className != undefined)
@@ -98,7 +128,7 @@ $(document).ready(function () {
             || $('[id="qc_'+id_answered+'"]').hasClass('type_open-textfield')
             || $('[id="qc_'+id_answered+'"]').hasClass('type_publication')) {
 
-            validate1(this, id_answered_aux);
+            validate1(this, id_answered_aux, id_answered);
         }
 
         if($('[id="qc_'+id_answered+'"]').hasClass('type_datepicker') || $('[id="qc_'+id_answered+'"]').hasClass('type_range')
@@ -107,7 +137,7 @@ $(document).ready(function () {
             || $('[id="qc_'+id_answered+'"]').hasClass('type_choice-yesnocomment')
             || $('[id="qc_'+id_answered+'"]').hasClass('type_choice-yesno')) {
 
-            validate1(this, id_answered_aux);
+            validate1(this, id_answered_aux, id_answered);
         }
 
          if($('[id="qc_'+id_answered+'"]').hasClass('type_choice')
@@ -115,8 +145,10 @@ $(document).ready(function () {
 
              if ($('[name="question_'+id_answered+'"]').is(':checked')) {
                  $('[id="answered_'+id_answered_aux+'"]').show();
+  
              } else {
                  $('[id="answered_'+id_answered_aux+'"]').hide();
+    
              }
         }
 
@@ -126,8 +158,9 @@ $(document).ready(function () {
 
              if ($('[id="answer_'+id_answered+'"] input[type="checkbox"]').is(':checked')) {
                  $('[id="answered_'+id_answered_aux+'"]').show();
+
              } else {
-                    $('[id="answered_'+id_answered_aux+'"]').hide();
+
              }
         }
 

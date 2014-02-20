@@ -1,6 +1,28 @@
 /* Base Reference for transformation from https://gist.github.com/coliff/5618329 to add CSS3PIE to bootstrap
    Decided to also  fix the gradients to comply with default look (using pie defined manners)
 */
+/*.lt-ie8 .boolrelwidget-query-box,
+.lt-ie8 .boolrelwidget-query-dropper,
+.lt-ie8 .boolrelwidget-query-delete,
+.lt-ie8 .boolrelwidget-collapser*/
+
+.boolrelwidget-query-dropper-odd {
+        background-image: url({{ STATIC_URL }}/img/drop_black.png) !important;
+}
+.boolrelwidget-query-dropper-even {
+        background-image: url({{ STATIC_URL }}/img/drop_white.png) !important;
+}
+
+.boolrelwidget-query-delete-odd {
+        background-image: url({{ STATIC_URL }}/img/delete_inside_black.png) !important;
+}
+.boolrelwidget-query-delete-even {
+        background-image: url({{ STATIC_URL }}/img/delete_inside_white.png) !important;
+}
+
+.lt-ie8 .boolrelwidget-query-box-outer,
+{ 
+}
 
 .img-rounded{behavior:url({{ STATIC_URL }}js/vendor/PIE.htc)}
 .img-circle{behavior:url({{ STATIC_URL }}js/vendor/PIE.htc)}
@@ -18,8 +40,8 @@ select,textarea, /*input*/,code,pre{behavior:url({{ STATIC_URL }}js/vendor/PIE.h
 
 .panel{behavior:url({{ STATIC_URL }}js/vendor/PIE.htc)}
 .well{behavior:url({{ STATIC_URL }}js/vendor/PIE.htc)}
-.nav-tabs > li > a{behavior:url({{ STATIC_URL }}js/vendor/PIE.htc)}
-.nav-pills > li > a{behavior:url({{ STATIC_URL }}js/vendor/PIE.htc)}
+/*.nav-tabs > li > a{behavior:url({{ STATIC_URL }}js/vendor/PIE.htc)} 
+.nav-pills > li > a{behavior:url({{ STATIC_URL }}js/vendor/PIE.htc)}*/
 .navbar{behavior:url({{ STATIC_URL }}js/vendor/PIE.htc)}
 .navbar-nav > li > a{behavior:url({{ STATIC_URL }}js/vendor/PIE.htc)}
 .navbar-toggle{behavior:url({{ STATIC_URL }}js/vendor/PIE.htc)}
@@ -39,19 +61,25 @@ select,textarea, /*input*/,code,pre{behavior:url({{ STATIC_URL }}js/vendor/PIE.h
 .accordion-group{behavior:url({{ STATIC_URL }}js/vendor/PIE.htc)}
 .carousel-indicators li{behavior:url({{ STATIC_URL }}js/vendor/PIE.htc)}
 .jumbotron{behavior:url({{ STATIC_URL }}js/vendor/PIE.htc)}
-
+.gt-ie7 .boolrelwidget-query-box-outer{
+    border: 1px solid #999999;
+}
+.gt-ie7 .boolrelwidget-query-box{
+    border-right: 1px solid #999999;
+}
+/*
 .gt-ie7 .btn {
     position: relative !important;
     box-shadow: none;   
     -pie-background: linear-gradient(top, #FFFFFF, #e6e6e6); 
     behavior: url({{ STATIC_URL }}js/vendor/PIE.htc);
-}
+}*/
 .lt-ie8 .btn{
       filter: progid:dximagetransform.microsoft.gradient(startColorstr='#ffffffff', endColorstr='#ffe6e6e6', GradientType=0)
     progid:dximagetransform.microsoft.dropshadow(color='#ffd0d0d0', offX=1, offY=0) progid:dximagetransform.microsoft.dropshadow(color='#ffd0d0d0', offX=-1, offY=0) progid:dximagetransform.microsoft.dropshadow(color='#ffd0d0d0', offX=0, offY=-1) progid:dximagetransform.microsoft.dropshadow(color='#ffb8b8b8', offX=0, offY=1);
 
 }
-
+/* 
 .gt-ie7 .btn:hover,
 .gt-ie7 .btn:active,
 .gt-ie7 .btn.active,
@@ -69,7 +97,7 @@ select,textarea, /*input*/,code,pre{behavior:url({{ STATIC_URL }}js/vendor/PIE.h
   filter: progid:dximagetransform.microsoft.gradient(startColorstr='#ffe6e6e6', endColorstr='#ffe6e6e6', GradientType=0) progid:dximagetransform.microsoft.dropshadow(color='#ffd0d0d0', offX=1, offY=0) progid:dximagetransform.microsoft.dropshadow(color='#ffd0d0d0', offX=-1, offY=0) progid:dximagetransform.microsoft.dropshadow(color='#ffd0d0d0', offX=0, offY=-1) progid:dximagetransform.microsoft.dropshadow(color='#ffb8b8b8', offX=0, offY=1);
 }
 
-/* Primary button */
+/* Primary button
 .gt-ie7 .btn-primary {
   -pie-background: linear-gradient(top, #0088cc, #0044cc); 
   behavior: url({{ STATIC_URL }}js/vendor/PIE.htc);    
@@ -95,7 +123,7 @@ select,textarea, /*input*/,code,pre{behavior:url({{ STATIC_URL }}js/vendor/PIE.h
     filter: progid:dximagetransform.microsoft.gradient(startColorstr='#ff0044cc', endColorstr='#ff0044cc', GradientType=0) progid:dximagetransform.microsoft.dropshadow(color='#ff0062b8', offX=1, offY=0) progid:dximagetransform.microsoft.dropshadow(color='#ff0062b8', offX=-1, offY=0) progid:dximagetransform.microsoft.dropshadow(color='#ff0062b8', offX=0, offY=-1) progid:dximagetransform.microsoft.dropshadow(color='#ff01529A', offX=0, offY=1);
 }
 
-/* Warning button */
+/* Warning button
 .gt-ie7 .btn-warning {
   -pie-background: linear-gradient(top, #fbb450, #f89406); 
   behavior: url({{ STATIC_URL }}js/vendor/PIE.htc);    
@@ -120,7 +148,7 @@ select,textarea, /*input*/,code,pre{behavior:url({{ STATIC_URL }}js/vendor/PIE.h
   filter: progid:dximagetransform.microsoft.gradient(startColorstr='#fff89406', endColorstr='#fff89406', GradientType=0) progid:dximagetransform.microsoft.dropshadow(color='#ffe1962d', offX=1, offY=0) progid:dximagetransform.microsoft.dropshadow(color='#ffe1962d', offX=-1, offY=0) progid:dximagetransform.microsoft.dropshadow(color='#ffe1962d', offX=0, offY=-1) progid:dximagetransform.microsoft.dropshadow(color='#ffbc7e26', offX=0, offY=1);
 }
 
-/* Danger button */
+/* Danger button
 .gt-ie7 .btn-danger {
     -pie-background: linear-gradient(top, #ee5f5b, #bd362f); 
   behavior: url({{ STATIC_URL }}js/vendor/PIE.htc);
@@ -145,7 +173,7 @@ select,textarea, /*input*/,code,pre{behavior:url({{ STATIC_URL }}js/vendor/PIE.h
   filter: progid:dximagetransform.microsoft.gradient(startColorstr='#ffbd362f', endColorstr='#ffbd362f', GradientType=0) progid:dximagetransform.microsoft.dropshadow(color='#ffc44741', offX=1, offY=0) progid:dximagetransform.microsoft.dropshadow(color='#ffc44741', offX=-1, offY=0) progid:dximagetransform.microsoft.dropshadow(color='#ffc44741', offX=0, offY=-1) progid:dximagetransform.microsoft.dropshadow(color='#ffa43c37', offX=0, offY=1);
 }
 
-/* Success button */
+/* Success button
 .gt-ie7 .btn-success {
     -pie-background: linear-gradient(top, #62c462, #51a351);
     behavior: url({{ STATIC_URL }}js/vendor/PIE.htc);
@@ -170,7 +198,7 @@ select,textarea, /*input*/,code,pre{behavior:url({{ STATIC_URL }}js/vendor/PIE.h
   filter: progid:dximagetransform.microsoft.gradient(startColorstr='#ff51a351', endColorstr='#ff51a351', GradientType=0) progid:dximagetransform.microsoft.dropshadow(color='#ff52a552', offX=1, offY=0) progid:dximagetransform.microsoft.dropshadow(color='#ff52a552', offX=-1, offY=0) progid:dximagetransform.microsoft.dropshadow(color='#ff52a552', offX=0, offY=-1) progid:dximagetransform.microsoft.dropshadow(color='#ff458a45', offX=0, offY=1);
 }
 
-/* Info button */
+/* Info button
 .gt-ie7 .btn-info {
   -pie-background: linear-gradient(top, #5bc0de, #2f96b4); 
   behavior: url({{ STATIC_URL }}js/vendor/PIE.htc);    
@@ -195,7 +223,7 @@ select,textarea, /*input*/,code,pre{behavior:url({{ STATIC_URL }}js/vendor/PIE.h
   filter: progid:dximagetransform.microsoft.gradient(startColorstr='#ff2f96b4', endColorstr='#ff2f96b4', GradientType=0) progid:dximagetransform.microsoft.dropshadow(color='#ff419db8', offX=1, offY=0) progid:dximagetransform.microsoft.dropshadow(color='#ff419db8', offX=-1, offY=0) progid:dximagetransform.microsoft.dropshadow(color='#ff419db8', offX=0, offY=-1) progid:dximagetransform.microsoft.dropshadow(color='#ff37849a', offX=0, offY=1);
 }
 
-/* Inverse button */
+/* Inverse button
 .gt-ie7 .btn-inverse {
   -pie-background: linear-gradient(top, #444444, #222222); 
   behavior: url({{ STATIC_URL }}js/vendor/PIE.htc); 
@@ -208,7 +236,7 @@ select,textarea, /*input*/,code,pre{behavior:url({{ STATIC_URL }}js/vendor/PIE.h
   -pie-background: linear-gradient(top, #222222, #222222); 
   behavior: url({{ STATIC_URL }}js/vendor/PIE.htc); 
 }
-
+*/
 .lt-ie8 .btn-inverse {
   filter: progid:dximagetransform.microsoft.gradient(startColorstr='#ff444444', endColorstr='#ff222222', GradientType=0) progid:dximagetransform.microsoft.dropshadow(color='#ff303030', offX=1, offY=0) progid:dximagetransform.microsoft.dropshadow(color='#ff303030', offX=-1, offY=0) progid:dximagetransform.microsoft.dropshadow(color='#ff303030', offX=0, offY=-1) progid:dximagetransform.microsoft.dropshadow(color='#ff292929', offX=0, offY=1);
 }
@@ -276,9 +304,14 @@ padding: 2px;
 
 .gt-ie7 #li_feedback, 
 .gt-ie7 #li_about, 
-.gt-ie7 #auth-logged-in{
+.gt-ie7 #auth-logged-in,
+.gt-ie7 #li_history,
+{
     margin-top: -5px !important;
     
+}
+.gt-ie7 #li_advanced_search{
+    margin-top: 1px !important;    
 }
 .gt-ie7 #search_li {
     margin-top: -8px !important;
@@ -287,7 +320,16 @@ padding: 2px;
 .gt-ie7 #li_workspace {
     margin-top: -8px !important;
 }
-
+.gt-ie7 #li_advanced_search{
+    margin-top: 1px !important;
+}
+.gt-ie7 #li_history{
+    margin-top: -5px !important;
+}
+.search-query{
+    width: 190px !important;
+    margin-top:4px !important;
+}
 .lt-ie8 #row_loading {
     clear: both;
 }

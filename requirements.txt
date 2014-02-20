@@ -28,3 +28,5 @@ geopy==0.96.2
 openpyxl==1.6.2
 request==1.2.3
 biopython==1.63
+django_nvd3==0.6.0
+python-dateutil==2.2

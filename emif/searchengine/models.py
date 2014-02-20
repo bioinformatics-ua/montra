@@ -1,4 +1,3 @@
-
 # -*- coding: utf-8 -*-
 # Copyright (C) 2013 Luís A. Bastião Silva and Universidade de Aveiro
 #
@@ -22,7 +21,6 @@ from django.db import models
 
 from questionnaire.models import *
 from django import forms
-
 
 from django.core.mail import send_mail, BadHeaderError
 

@@ -1,0 +1,235 @@
+{% load url from future %}
+
+
+<style type="text/css">
+
+.axis path,
+.axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+
+.bar {
+  fill: steelblue;
+}
+
+.x.axis path {
+  display: none;
+}
+
+#pctitle{
+    text-align: center;
+}
+#d3test{
+    margin-left: 60px;
+}
+#jerboaupload{
+    margin-left: 60px;
+    margin-top: 30px;
+
+}
+</style>
+
+{% if owner_fingerprint %}
+
+    {% if not contains_population %}
+
+    This database fingerprint does not have population characteristics. Submit the Population Characteristics file that can be extracted using <a onclick="return false;" href="">Jerboa</a>.
+
+
+    <form id="jerboaupload" method="post" action="." enctype="multipart/form-data">
+{% csrf_token %}
+        <!-- Redirect browsers with JavaScript disabled to the origin page -->
+        <!--<noscript><input type="hidden" name="redirect" value="http://blueimp.github.io/jQuery-File-Upload/"></noscript>-->
+        <!-- The fileupload-buttonbar contains buttons to add/delete files and start/cancel the upload -->
+        <div class="row fileupload-buttonbar">
+            <div class="span7">
+                
+                <fieldset>
+
+                <label>Name:</label> <input size="255" type="text" cols="100" name="pc_name" >
+                <label>Description about extracted population characteristics: </label>
+                <textarea class="input-block-level" rows="4" name="pc_comments" ></textarea>
+
+                <!-- The fileinput-button span is used to style the file input field as button -->
+
+                <span class="btn btn-success fileinput-button">
+                    <i class="glyphicon glyphicon-plus"></i>
+                    <span>Add files...</span>
+                    <input type="file" name="file" multiple>
+                </span>
+                
+                
+                <!-- The loading indicator is shown during file processing -->
+                <span class="fileupload-loading"></span>
+                </fieldset>
+            </div>
+            <!-- The global progress information -->
+            <div class="span5 fileupload-progress fade">
+                <!-- The global progress bar -->
+                <div class="progress progress-striped active" role="progressbar" aria-valuemin="0" aria-valuemax="100">
+                    <div class="progress-bar progress-bar-success" style="width:0%;"></div>
+                </div>
+                <!-- The extended global progress information -->
+                <div class="progress-extended">&nbsp;</div>
+            </div>
+        </div>
+        <!-- The table listing the files available for upload/download -->
+        
+    </form> 
+
+
+    <br>
+    <br>
+    
+    <table class="table table-striped">
+    <tbody class="files" id="jerboafiles">
+
+
+    </tbody>
+    </table>
+
+    {% else %}
+
+    {% block jerboaformupload %} 
+    {% endblock%}
+
+    You have already population characteristics. Your last activied is dated from: {{pc_last_activity}}
+    <div class="span9 populationcharacteristicsbar">
+    <div class="pull-right hidden ">
+        <div class="btn-group">
+            <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
+                Show/Hide
+                <span class="caret"></span>
+            </a>
+
+            <ul class="dropdown-menu">
+                <!-- dropdown menu links -->                
+                <li>
+                    <a id="chkpercentile1" href="#"> <i id="imatch" class="icon-ok icon-black active"></i>
+                        1st Percentile
+                    </a>
+                </li>
+                <li>
+                    <a id="chkpercentile2" href="#"> <i id="iunmatch" class="icon-ok icon-black active"></i>
+                        2nd Percentile
+                    </a>
+                </li>
+                <li>
+                    <a id="chkpercentil3" href="#">
+                        <i id="iproximity" class="icon-ok icon-black active"></i>
+                        3rd Percentile
+                    </a>
+                </li>
+                <li>
+                    <a id="chkMin" href="#">
+                        <i id="iproximity" class="icon-ok icon-black active"></i>
+                        Min
+                    </a>
+                </li>
+                <li>
+                    <a id="chkMax" href="#">
+                        <i id="iproximity" class="icon-ok icon-black active"></i>
+                        Max
+                    </a>
+                </li>
+                <li>
+                    <a id="proximity" href="#">
+                        <i id="iproximity" class="icon-ok icon-black active"></i>
+                        Count
+                    </a>
+                </li>
+                <li>
+                    <a id="proximity" href="#">
+                        <i id="iproximity" class="icon-ok icon-black active"></i>
+                        Mean
+                    </a>
+                </li>
+                <li>
+                    <a id="emptyrows" href="#">
+                        <i id="iemptyrows" class="icon-ok icon-black disabled"></i>
+                        Empty rows
+                    </a>
+                </li>
+            </ul>
+
+        </div>
+    </div>
+    </div>
+    
+    <div class="row">
+    
+    </div>
+    
+    <div class="row">
+
+    <div class="well span3" id="pc_list">
+
+
+    </div>
+    
+    <div class="span6" id="chart2">
+    
+
+
+        <div class='row'>
+            <div id='pctitle'>
+            </div>
+            <div id='d3test'>
+            </div>
+        </div>
+    </div>
+    
+
+    <div class="span3 hidden" id="pcBarContentRoot">
+        <div > Filter: </div>
+
+        <div id="pcBarContent" class="well">
+
+        </div>
+
+
+    </div>
+
+  
+
+    </div>
+
+    
+    
+    {% endif %}
+
+{% else %}
+
+This database fingerprint does not have population characteristics yet. Please contact the database owner to get more information.
+
+{% endif %}
+
+
+
+
+
+
+<!--[if lte IE 8]><script src="{{ STATIC_URL}}js/d3/r2d3.min.js" charset="utf-8"></script><![endif]-->
+<!--[if gte IE 9]><!-->
+    <script src="{{ STATIC_URL}}js/d3/d3.v3.min.js"></script>
+    <script src="{{ STATIC_URL}}js/d3/d3.layout.cloud.js"></script>
+<!--<![endif]-->
+
+
+<!--
+<script src="{{ STATIC_URL}}js/emif.populationcharacteristics.charts.js"></script>
+
+<script src="{{ STATIC_URL}}js/emif.populationcharacteristics.js"></script>
+
+<script src="{{ STATIC_URL}}js/emif.documents.js"></script>
+-->
+<script src="{{ STATIC_URL}}js/emif.charts.d3.js"></script>
+
+<script src="{{ STATIC_URL}}js/emif.charts.js"></script>
+
+
+<script >
+
+</script>
