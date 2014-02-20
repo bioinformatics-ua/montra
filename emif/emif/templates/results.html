@@ -244,8 +244,6 @@ $(document).ready(function(){
 $(function(){
     bool_container = $('#bool_container').boolrelwidget({view_only: true, view_serialized_string: '{{request.session.serialization_query}}', link_back: "advancedSearch/{{request.session.query_type}}/1/{{request.session.query_id}}" });
    
-    
-    
     window.setTimeout(function(){window.location.hash = "#back";}, 100);
     window.setTimeout(function(){window.location.hash = "#search";}, 100);
 

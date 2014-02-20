@@ -96,6 +96,24 @@
                 
                 return true
             },
+            pushUsedBooleanGroup: function (obj) {
+                if(!(obj instanceof BooleanGroup && obj.variables.length == 1)){
+                    console.warn('When adding, a valid simple BooleanGroup child must be found.');
+                    return false;
+                }
+                if(!(obj.variables[0] instanceof BooleanTerminal
+                   && this.getUsedIndex(obj.variables[0])== -1)){
+                    console.warn('Variable ' + obj + ' already on used blocks pool.');  
+                    return false;
+                }
+                
+                used_blocks.push(obj);
+                console.log('Pushed new variable ' + obj + ' to used blocks pool.');
+
+                this.draw();
+                
+                return true
+            },            
             splice: function (ident, rep, answer) {
                 var bt = new BooleanTerminal(ident, rep, answer);
                 if (bt.isNull())
@@ -708,9 +726,13 @@
         }); 
         
         if(settings.view_serialized_string){
-            mastergroup = new BooleanGroup(null).deserialize(settings.view_serialized_string);
-        }
-        
+            var temp = new BooleanGroup(null).deserialize(settings.view_serialized_string);
+            var simple_ones = temp.extractAllSimple();
+            for(var i=0;i<simple_ones.length;i++)
+                        funcs.pushUsedBooleanGroup(simple_ones[i]);
+            
+            mastergroup=temp;
+            }
         // Draw things up
         funcs.draw();
         
