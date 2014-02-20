@@ -54,7 +54,7 @@ class ConfCharts(object):
 
         ss = Scale()
         ss.unit = "Year"
-        ss.steps = "1"
+        ss.bins = "10"
 
         c.filters = [f2]
 

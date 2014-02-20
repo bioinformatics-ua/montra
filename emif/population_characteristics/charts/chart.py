@@ -46,7 +46,7 @@ class Operation:
 class Scale(object):
     def __init__(self):
         self.unit = None
-        self.steps = None
+        self.bins = None
         self.start = 0
         
     def to_JSON(self):

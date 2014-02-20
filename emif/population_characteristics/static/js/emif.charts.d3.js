@@ -4,9 +4,9 @@ function GraphicChartD3(divArg, dataArg)
   /** Passes the initial arguments required to start and d3
   Also , this should be used to know if 
   */
-  var div = divArg; 
-  var dataValues = dataArg;
-  var self = this;
+  this.div = divArg; 
+  this.dataValues = dataArg;
+  this.self = this;
   this.init = function(){
     
     console.log('this in GraphCharD3'  + this);
