@@ -6,6 +6,8 @@ function GraphicChartD3(divArg, dataArg)
   */
   this.div = divArg; 
   this.dataValues = dataArg;
+  this.xscale = null ;
+  this.yscale = null ;
   this.self = this;
   this.init = function(){
     
@@ -16,7 +18,8 @@ function GraphicChartD3(divArg, dataArg)
     
     console.log(objects);
     /*** Lets translate our data model to the d3 support data model */ 
-
+    xscale = {'bins':5}
+    xscale.bins = 25;
     var i = 1;
     dataset = [[], 
                  
@@ -44,19 +47,30 @@ function GraphicChartD3(divArg, dataArg)
       var y = d3.scale.linear()
           .range([height, 0]);
 
-
-
       var yAxis = d3.svg.axis()
           .scale(y)
           .orient("left");
           //.ticks(d3.time.years, 10)
           //.tickFormat(formatPercent);
 
+    function zoom() {
+        svg.select(".xaxis").call(xAxis);
+        svg.select(".yaxis").call(yAxis);
+        svg.selectAll(".svg rect").attr("transform", "translate(" + d3.event.translate[0] + ",0)scale(" + d3.event.scale + ", 1)");
+    };
+
+
       var svg = d3.select(div).append("svg")
           .attr("width", width + margin.left + margin.right)
           .attr("height", height + margin.top + margin.bottom)
         .append("g")
           .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+        svg.call(d3.behavior.zoom().x(x).on("zoom",  function () {
+          console.log('zoom');
+        /*svg.select(".xaxis").call(xAxis);
+        svg.select(".yaxis").call(yAxis);
+        svg.selectAll(".svg rect").attr("transform", "translate(" + d3.event.translate[0] + ",0)scale(" + d3.event.scale + ", 1)");*/
+    }));
       
       dataset.forEach(function (data) {
         console.log("THIS IS MY DATA: " + data);
@@ -68,7 +82,7 @@ function GraphicChartD3(divArg, dataArg)
       var xAxis = d3.svg.axis()
           .scale(x)
           .orient("bottom")
-          .tickValues(x.domain().filter(function(d, i) {return !(i % 10); }))
+          .tickValues(x.domain().filter(function(d, i) {return !(i % this.xscale.bins); }))
 
           .tickPadding(8);
 
@@ -105,6 +119,8 @@ function GraphicChartD3(divArg, dataArg)
             .attr("height", function(d) { return height - y(d.yvalue); });
 
       });
+
+
 
    }; 
 };
