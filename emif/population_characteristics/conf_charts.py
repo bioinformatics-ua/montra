@@ -52,6 +52,10 @@ class ConfCharts(object):
         f2.key = None
         f2.value = 'Gender'
 
+        ss = Scale()
+        ss.unit = "Year"
+        ss.steps = "1"
+
         c.filters = [f2]
 
         c1 = Chart()
