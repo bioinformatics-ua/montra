@@ -85,27 +85,27 @@
     <div class="row-fluid">
         <div class="tabbable">
             <ul class="nav nav-tabs">
-                <li class="active">
+                <li class="{%if activetab == 'summary'%}active{%endif%}">
                     <a href="#metadata" data-toggle="tab">Fingerprint</a>
                 </li>
-                <li>
+                <li class="{%if activetab == 'pc'%}active{%endif%}">
                     <a href="#populationcharacteristics" data-toggle="tab">Population Characteristics</a>
                 </li>
-                <li>
+                <li  class="{%if activetab == 'docs'%}active{%endif%}">
                     <a href="#documents" data-toggle="tab">Documents</a>
                 </li>
                 <!--
-                <li>
+                <li  class="{%if activetab == 'literature'%}active{%endif%}">
                     <a href="#literature" data-toggle="tab">Literature</a>
                 </li>
                 -->
                 
-                <li>
+                <li  class="{%if activetab == 'extra'%}active{%endif%}">
                     <a href="#apiinfo" data-toggle="tab">Extra Information</a>
                 </li>
             </ul>
             <div class="tab-content">
-                <div class="tab-pane active" id="metadata">
+                <div class="tab-pane {%if activetab == 'summary'%}active{%endif%}" id="metadata">
                     <div>
                         <a id="collapseall_metadata" class="btn pull-right" href="">Expand all</a>
                     </div>
@@ -151,7 +151,7 @@
                 </div>
 
 
-                <div class="tab-pane" id="populationcharacteristics" >
+                <div class="tab-pane {%if activetab == 'pc'%}active{%endif%}" id="populationcharacteristics" >
 
                   {% include "population_characteristics.html" %}
 
@@ -160,14 +160,14 @@
 
 
 
-              <div class="tab-pane" id="documents">
+              <div class="tab-pane {%if activetab == 'docs'%}active{%endif%}" id="documents">
                 
                     {% include "documents.html" %}
             </div>
 
 
 
-                <div class="tab-pane" id="literature">
+                <div class="tab-pane {%if activetab == 'literature'%}active{%endif%}" id="literature">
                     <div>
                         <a id="collapseall_literature" class="btn pull-right" href="">Expand all</a>
                     </div>
@@ -201,7 +201,7 @@
                 </div>
 
 
-                <div class="tab-pane" id="apiinfo">
+                <div class="tab-pane {%if activetab == 'extra'%}active{%endif%}" id="apiinfo">
                     <div>
                         <a id="btn_pivot_table" class="btn pull-right hidden" href="">Pivot table</a>
                     </div>

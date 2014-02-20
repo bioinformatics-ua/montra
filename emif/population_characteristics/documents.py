@@ -109,7 +109,8 @@ def parsejerboa(request, template_name='documents_upload_form.html'):
     response['Content-Disposition'] = 'inline; filename=files.json'
     return response
 
-def document_form_view(request, runcode, qs, template_name='documents_upload_form.html'):
+def document_form_view(request, runcode, qs, activetab='summary',
+    template_name='documents_upload_form.html'):
     
     qsets, name, db_owners, fingerprint_ttype = createqsets(runcode)
 
@@ -157,7 +158,8 @@ def document_form_view(request, runcode, qs, template_name='documents_upload_for
                     'hide_add': True,
                     'fingerprint_ttype': fingerprint_ttype,
                     'search_old': query_old,
-                    'isAdvanced': isAdvanced
+                    'isAdvanced': isAdvanced,
+                    'activetab': activetab,
                     })
 
 
