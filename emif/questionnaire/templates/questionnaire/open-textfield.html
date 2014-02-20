@@ -7,10 +7,6 @@
             <span class="help-block">{{ question.extra }}</span>
         {% endif %}
 
-        {% if not question.tooltip %}
-            <div class="clearfix" style="padding-bottom:30px;">{{question.help_text|safe}}</div>
-        {% endif %}
-
         {% if qdict.value %}
             <script type="text/javascript">
                 $('[id="answered_'+{{ question.number|removedots }}+'"]').show();
