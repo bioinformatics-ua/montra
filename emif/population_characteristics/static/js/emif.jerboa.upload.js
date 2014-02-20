@@ -149,9 +149,6 @@ $(function () {
             window.location.assign(url);
             
 
-
-
-
         });
     }).on('fileuploadfail', function (e, data) {
         $.each(data.result.files, function (index, file) {

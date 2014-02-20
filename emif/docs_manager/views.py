@@ -29,6 +29,7 @@ from django.core import serializers
 from django.conf import settings
 from docs_manager.storage_handler import *
 
+import uuid
 
 from dateutil.tz import tzutc
 
@@ -47,10 +48,20 @@ def serialize_date(dt):
         dt = dt.astimezone(UTC).replace(tzinfo=None)
     return dt.isoformat() + 'Z'
 
+
+def get_revision():
+    r = uuid.uuid1()
+    r = str(r)
+    r.replace("-","")
+    return r
+
     
 def upload_document(request, fingerprint_id, template_name='documents_upload_form.html'):
     """Store the files at the backend 
     """
+
+    # compute revision
+    revision = get_revision()
 
     # Create the backend to store the file 
     fh = FileSystemHandleFile()
@@ -63,7 +74,7 @@ def upload_document(request, fingerprint_id, template_name='documents_upload_for
     if request.FILES:
         for name, f in request.FILES.items():
             # Handle file 
-            path_file = g_fh.handle_file(f)
+            path_file = g_fh.handle_file(f, revision=revision)
             file_name = f.name 
             # Serialize the response 
             files.append(serialize(f))
@@ -75,7 +86,7 @@ def upload_document(request, fingerprint_id, template_name='documents_upload_for
     fd = FingerprintDocuments()
     fd.user = request.user
     fd.fingerprint_id = fingerprint_id
-    fd.revision = ''
+    fd.revision = revision
     fd.path = path_file
     fd.file_name = file_name
     fd.name = request.POST['pc_name']

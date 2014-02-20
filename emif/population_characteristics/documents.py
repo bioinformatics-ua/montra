@@ -40,9 +40,14 @@ from .services import *
 from docs_manager.storage_handler import *
 from population_characteristics.models import *
 
+from docs_manager.views import get_revision
+
 def document_form_view_upload(request, fingerprint_id, template_name='documents_upload_form.html'):
     """Store the files at the backend 
     """
+
+    # compute revision
+    revision = get_revision()
 
     # Create the backend to store the file 
     fh = FileSystemHandleFile()
@@ -55,7 +60,7 @@ def document_form_view_upload(request, fingerprint_id, template_name='documents_
     if request.FILES:
         for name, f in request.FILES.items():
             # Handle file 
-            path_file = g_fh.handle_file(f)
+            path_file = g_fh.handle_file(f, revision=revision)
             file_name = f.name 
             # Serialize the response 
             files.append(serialize(f))
@@ -67,7 +72,7 @@ def document_form_view_upload(request, fingerprint_id, template_name='documents_
     chracteristic = Characteristic()
     chracteristic.user = request.user
     chracteristic.fingerprint_id = fingerprint_id
-    chracteristic.revision = ''
+    chracteristic.revision = revision
     chracteristic.path = path_file
     chracteristic.file_name = file_name
     chracteristic.name = request.POST['pc_name']
