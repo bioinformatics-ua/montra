@@ -23,12 +23,17 @@ function Filters()
 /** This class only works for documentation process
  ** Thus, you will know what kind of classes you have to implement.
  */ 
-function RepresentData(divArg, dataArg)
+function RepresentData(wrapper, divArg, dataArg)
 {
+
+    this.wrapper = wrapper;
+
     this.translateData = function(objects){
+        return this.wrapper.translateData(objects);
     };
 
     this.draw = function(div, dataset){
+        return this.wrapper.draw(div, dataset);
     };
 
 }
