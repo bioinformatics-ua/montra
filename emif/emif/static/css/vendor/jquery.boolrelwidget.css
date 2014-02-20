@@ -32,7 +32,7 @@ THE SOFTWARE.
     left            :   0; 
     background-color:   #eeeeee; 
     border-top      :   0.1em solid #999999;
-    z-index         :   1000;
+    z-index         :   1041;
     width           :   100%;
 }
 .boolrelwidget-arrow-l {
@@ -314,4 +314,21 @@ background-position:center;
 
 .boolrelwidget-menu{
 margin: 5px;
+}
+.boolrelwidgethelper {
+    text-align:justify;
+    text-justify:inter-word;
+}
+
+ .modal
+{
+   width:70%;
+   margin-left: -35%; 
+}
+@media (max-width: 768px) {
+    .modal
+   {
+        width:90%;
+        margin-left: 2%; 
+   }
 }
