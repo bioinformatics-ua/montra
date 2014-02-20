@@ -646,9 +646,18 @@ def render_one_questionset(request, q_id, qs_id, errors={}, aqid=None, template_
 
     Also add the javascript dependency code.
     """
+    request2 = None
+    
     if aqid != None:
         this_query = AdvancedQuery.objects.get(id=aqid)
         this_answers = AdvancedQueryAnswer.objects.filter(refquery=this_query)
+        
+        request2 = RequestMonkeyPatch()
+    
+        request2.method = request.method    
+        
+        for answer in this_answers:
+            request2.get_post()[answer.question] = answer.answer
     
     try:
 
@@ -675,30 +684,7 @@ def render_one_questionset(request, q_id, qs_id, errors={}, aqid=None, template_
         jstriggers = []
         qvalues = {}
 
-        if request.POST:
-
-            for k, v in request.POST.items():
-                if k.startswith("question_"):
-                    s = k.split("_")
-                    if len(s) == 4:
-                        #qvalues[s[1]+'_'+v] = '1' # evaluates true in JS
-                        if (qvalues.has_key(s[1])):
-                            qvalues[s[1]] += " " + v # evaluates true in JS
-                        else:
-                            qvalues[s[1]] = v # evaluates true in JS
-                    elif len(s) == 3 and s[2] == 'comment':
-                        qvalues[s[1] + '_' + s[2]] = v
-                    else:
-                        if (qvalues.has_key(s[1])):
-                            qvalues[s[1]] += " " + v
-                        else:
-                            qvalues[s[1]] = v
-                            #print qvalues
-            query = convert_qvalues_to_query(qvalues, q_id)
-            #print "Query: " + query
-            return results_fulltext_aux(request, query)
-
-        qlist_general = []
+        qlist_general = []    
         
         for k in qs_list:
             qlist = []
@@ -752,7 +738,7 @@ def render_one_questionset(request, q_id, qs_id, errors={}, aqid=None, template_
                         #    qvalues[question.number] = qdict['qvalue']
                         #
 
-                if(aqid != None):
+                '''if(aqid != None):
                     print this_query
                     print 'question_'+question.number
                     try:
@@ -761,7 +747,7 @@ def render_one_questionset(request, q_id, qs_id, errors={}, aqid=None, template_
                     except:
                         print 'Failed to find result'
                         pass
-                        
+                 '''       
                 qlist.append((question, qdict))
             if qs_aux == None:
                 #print "$$$$$$ NONE"
@@ -769,6 +755,13 @@ def render_one_questionset(request, q_id, qs_id, errors={}, aqid=None, template_
             qlist_general.append((qs_aux, qlist))
 
         errors = {}
+        
+            # extracting answers
+        if aqid != None:
+            (qlist_general, qlist, jstriggers, qvalues, jsinclude, cssinclude, extra_fields, hasErrors) = extract_answers(request2, q_id, question_set, qs_list)
+        
+        
+        
         fingerprint_id = generate_hash()
         r = r2r(template_name, request,
                 questionset=question_set,
@@ -1018,7 +1011,6 @@ def database_edit(request, fingerprint_id, questionnaire_id, template_name="data
     results = c.search_fingerprint("id:" + fingerprint_id)
     items = None
     for r in results:
-       
         items = r
         break
     fingerprint_id = r['id']
