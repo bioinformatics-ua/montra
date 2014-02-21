@@ -49,6 +49,8 @@ from modules.geo import *
 
 from rest_framework.authtoken.models import Token
 
+from django.contrib.auth.decorators import login_required
+
 import json
 import logging
 import re
@@ -1181,6 +1183,46 @@ def databases(request, page=1, template_name='databases.html'):
                                            'owner_fingerprint': False,
                                            'add_databases': True})
 
+# GET ALL DATABASES ACCORDING TO USER INTERESTS
+def all_databases_user(request, page=1, template_name='alldatabases.html'):
+    
+    # lets clear the geolocation session search filter (if any)
+    try:
+        del request.session['query']
+    except:
+        pass
+    
+    emifprofile = request.user.get_profile()
+    interests = emifprofile.interests.all()
+
+    type_t_list = ""
+    if interests:
+        for i in interests:
+            type_t = i.name.replace(" ", "").lower()
+            type_t_list+=(type_t + ",")
+
+        type_t_list = type_t_list[:-1]
+        print type_t_list
+        list_databases = get_databases_from_solr(request, "type_t:" + type_t_list)
+    else:
+        list_databases = []
+        #list_databases = get_databases_from_solr(request, "*:*")
+
+    ## Paginator ##
+    rows = 5
+    myPaginator = Paginator(list_databases, rows)
+    try:
+        pager =  myPaginator.page(page)
+    except PageNotAnInteger, e:
+        pager =  myPaginator.page(1)
+    ## End Paginator ##
+    
+    return render(request, template_name, {'request': request, 'export_all_answers': True, 'data_table': True,
+                                           'list_databases': list_databases,
+                                            'breadcrumb': True, 'collapseall': False, 
+                                            'geo': True,
+                                            'page_obj': pager,
+                                            'add_databases': True})
 
 def all_databases(request, page=1, template_name='alldatabases.html'):
     
@@ -3015,4 +3057,18 @@ def import_questionnaire(request, template_name='import_questionnaire.html'):
     return render_to_response(template_name, {'import_questionnaire': True,
                               'request': request, 'breadcrumb': True}, RequestContext(request))
 
+@login_required
+def wherenext(request):
+    emifprofile = request.user.get_profile()
+    if emifprofile.profiles.count():
+        for interest in emifprofile.profiles.all():
+            if interest.name.lower()=='data custodian':
+                return HttpResponseRedirect(reverse(settings.REDIRECT_DATACUSTODIAN))
+            elif interest.name.lower()=='researcher':
+                return HttpResponseRedirect(reverse(settings.REDIRECT_RESEARCHER))
 
+    interests = emifprofile.interests.all()
+    if interests:
+        return HttpResponseRedirect(reverse('emif.views.all_databases_user'))
+
+    return HttpResponseRedirect(reverse('emif.views.all_databases'))

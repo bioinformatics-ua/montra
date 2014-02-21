@@ -25,7 +25,6 @@ from guardian.decorators import permission_required_or_403
 from django.shortcuts import redirect, get_object_or_404
 
 
-
 class SignupFormExtra(SignupForm):
     """
     A form to add extra fields to the signup form.
@@ -43,13 +42,13 @@ class SignupFormExtra(SignupForm):
                                    required=True)
 
     profiles = forms.ModelMultipleChoiceField(label=_('Profiles'),
-                                                required=False,
+                                                required=True,
                                                 queryset=Profile.objects.all(),
                                                 widget=forms.CheckboxSelectMultiple())
 
 
     interests = forms.ModelMultipleChoiceField(label=_('Interests'),
-                                                required=False,
+                                                required=True,
                                                 queryset=Questionnaire.objects.all(),
                                                 widget=forms.CheckboxSelectMultiple())
 
@@ -131,13 +130,12 @@ class SignupFormExtra(SignupForm):
 class EditProfileFormExtra(EditProfileForm):
 
     profiles = forms.ModelMultipleChoiceField(label=_('Profiles'),
-                                                required=False,
+                                                required=True,
                                                 queryset=Profile.objects.all(),
                                                 widget=forms.CheckboxSelectMultiple())
 
-
     interests = forms.ModelMultipleChoiceField(label=_('Interests'),
-                                                required=False,
+                                                required=True,
                                                 queryset=Questionnaire.objects.all(),
                                                 widget=forms.CheckboxSelectMultiple())
 
@@ -161,7 +159,7 @@ class EditProfileFormExtra(EditProfileForm):
 def profile_edit(request,
                  edit_profile_form=EditProfileFormExtra,
                  template_name='userena/profile_form.html',
-                 success_url=settings.BASE_URL + 'databases',
+                 success_url=settings.BASE_URL + 'wherenext',
                  extra_context=None, **kwargs):
 
     if request.user.is_authenticated():
@@ -210,7 +208,6 @@ def signup(request, **kwargs):
 
 
 def signin(request, **kwargs):
-
     if request.user.is_authenticated():
         return redirect(settings.BASE_URL)
 

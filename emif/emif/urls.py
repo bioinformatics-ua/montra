@@ -29,13 +29,15 @@ from django.views.generic.simple import direct_to_template
 admin.autodiscover()
 
 from userena import views as userena_views
-from accounts.views import SignupFormExtra, EditProfileFormExtra, profile_edit, signup, signin
+from accounts.views import SignupFormExtra, signup, signin
 from views import *
 
 from django.conf import settings
 
 urlpatterns = patterns('',
 
+    # Where to go when loggedin (according to Profile)
+    url(r'^wherenext/$', 'emif.views.wherenext'),
 
     # Uncomment the admin/doc line below to enable admin documentation:
     url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
@@ -98,7 +100,8 @@ urlpatterns = patterns('',
     
     # List Databases
     url(r'^databases/(?P<page>[-]{0,1}\d+)?$', 'emif.views.databases', name="databases"),
-    url(r'^alldatabases/(?P<page>[-]{0,1}\d+)?$', 'emif.views.all_databases'),
+#    url(r'^alldatabases/(?P<page>[-]{0,1}\d+)?$', 'emif.views.all_databases'),
+    url(r'^alldatabases/(?P<page>[-]{0,1}\d+)?$', 'emif.views.all_databases_user'),
     url(r'^alldatabases/data-table$', 'emif.views.all_databases_data_table'),
     url(r'^qs_data_table$', 'emif.views.qs_data_table'),    
     url(r'^export_all_answers$', 'emif.views.export_all_answers'),
@@ -136,7 +139,7 @@ urlpatterns = patterns('',
     url(r'^accounts/signup/$',
         signup,
         {'signup_form': SignupFormExtra,
-         'success_url': settings.BASE_URL + 'databases'},
+         'success_url': settings.BASE_URL + 'wherenext'},
         name='userena_signup'),
 
     url(r'^accounts/signup/complete/$',
@@ -154,6 +157,7 @@ urlpatterns = patterns('',
     url(r'^accounts/signin/$',
         signin,
         name='userena_signin'),
+
     url(r'^accounts/signout/$',
         userena_views.signout,
         name='userena_signout'),
