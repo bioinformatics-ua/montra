@@ -128,11 +128,11 @@
                                     {% if error %}
                                         <div class="alert-message block-message text-error input">{{ error }}</div>
                                     {% endif %}
-                                    {% include qdict.template %}
-                                    {% if not question.tooltip %}
-                                        <div class="input" style="padding-bottom:30px;">{{question.help_text|safe}}</div>
+                                    {% if not question.tooltip and question.help_text %}
+                                        <div class="input">{{question.help_text|safe}}</div>
                                     {% endif %} 
-                                    
+                                    {% include qdict.template %}
+                                                                        
                                     <div id="comments_{{question.number|removedots}}" style="display:none;margin-left:40px;">
                                      <a href="#" class="span6" onclick="toggle_comments('{{question.number|removedots}}'); return false;"><i class="icon-comment">&nbsp;</i> Comments</a>
                                     <textarea style=" background-color:#EEE;color: #000;" class="span6" name="comment_question_{{ question.number }}" cols="50" rows="5">{{qdict.comment}}</textarea>
