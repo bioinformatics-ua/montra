@@ -37,7 +37,7 @@ from django.conf import settings
 
 from population_characteristics.parseJerboaFile import * 
 from population_characteristics.services import * 
-from population_characteristics.storage_handler import *
+from docs_manager.storage_handler import *
 
 
 def document_form_view_upload(request, template_name='documents_upload_form.html'):
