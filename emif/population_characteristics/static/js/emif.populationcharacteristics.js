@@ -37,6 +37,9 @@ function getFingerprintID(){
 
 };
 
+
+/** TODO: there are a lot of static and hardcore parameters in this function
+  * This need to be fixed */ 
 function PCAPI () 
 {
     this.getGender = function(){
@@ -199,26 +202,38 @@ function PCAPI ()
             
             /** Get a list of filters */
             values = options.getFilter(name.text,fingerprintId);
-            console.log("parsing:");
+            console.log("parsing2:");
             console.log(JSON.parse(values.values));
             if (values===undefined)
             {
                 return;
             };
 
-            console.log(values);
+            
             var self = this;
             self.html('');
-            self.append("Gender: ");
-            var tmpUl = $('<ul class="nav nav-pills nav-stacked">');
+            console.log("for each:");
+            values.values.forEach(function(_value){
+               console.log("_value:");
+              var xFilter = JSON.parse(_value);
 
-            self.append(tmpUl);
-            $.each(values.values, function (data){
-                if (values.values[data]==="")
-                    return;
-                tmpUl.append('<li><a class="filterBar" href="#" onclick="return false;"><i id="iproximity" class="icon-ok icon-black active"></i> '+values.values[data]+'</a></li>')
+              
+              self.append(xFilter.value+": ");
+              var tmpUl = $('<ul class="nav nav-pills nav-stacked">');
+
+              self.append(tmpUl);
+              $.each(xFilter.values, function (data){
+                console.log('data');
+                console.log(data);
+                  if (xFilter.values[data]==="")
+                      return;
+                  tmpUl.append('<li><a class="filterBar" href="#" onclick="return false;"><i id="iproximity" class="icon-ok icon-black active"></i> '+xFilter.values[data]+'</a></li>')
+              });
             });
+
+            console.log(values);
             
+            /** The magic of the filters will happen here */ 
             $(".filterBar").bind('click',function(e)
                     { 
                       e.preventDefault(); 
@@ -272,6 +287,9 @@ function PCAPI ()
       this.drawFilters = function(){
       };
       this.bindFilters = function(){
+
+            /*** The magic of the changing of the type of the graph happens here */
+
             $(".graphTypes").bind('click',function(e)
                     { 
                       e.preventDefault(); 
@@ -291,9 +309,9 @@ function PCAPI ()
                         'Count',fingerprintID );
                       console.log('valuesFromGraph: '+valuesFromGraph);
                       console.log(valuesFromGraph);
-                      $("#d3test").html('');
-                      $("#d3test").graphicChart('init');
-                      $("#d3test").graphicChart('drawBarChart', valuesFromGraph,valuesFromGraph,valuesFromGraph);
+                      $("#pc_chart_place").html('');
+                      $("#pc_chart_place").graphicChart('init');
+                      $("#pc_chart_place").graphicChart('drawBarChart', valuesFromGraph,valuesFromGraph,valuesFromGraph);
 
 
                       var pc = new PCAPI();

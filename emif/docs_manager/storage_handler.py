@@ -30,11 +30,11 @@ class HandleFile(object):
     def __init__(self, wrapper):
         self._handler_wrapper = wrapper
 
-    def handle_file(self, f):
+    def handle_file(self, f, revision=""):
         """
         Handle File
         """
-        return self._handler_wrapper.handle_uploaded_file(f)
+        return self._handler_wrapper.handle_uploaded_file(f, revision=revision)
 
         # Store the metadata   
 
@@ -44,15 +44,23 @@ class FileSystemHandleFile(object):
     def __init__(self):
         pass
 
-    def handle_uploaded_file(self, f):
+    def __get_path_abs(self, path):
+        # check if file exists 
+
+        # if the file exists...warning
+        pass
+
+
+
+    def handle_uploaded_file(self, f, revision=""):
         """Store the files in file disk 
         """
-
-        with open(os.path.join(os.path.abspath(PATH_STORE_FILES), f.name),
+        full_name = revision+f.name
+        with open(os.path.join(os.path.abspath(PATH_STORE_FILES), full_name),
                   'wb+') as destination:
             for chunk in f.chunks():
                 destination.write(chunk)
-        return os.path.join(os.path.abspath(PATH_STORE_FILES), f.name)
+        return os.path.join(os.path.abspath(PATH_STORE_FILES), full_name)
 
 class MongoDBHandleFile(object):
     """Store the file in MongoDB
@@ -60,7 +68,7 @@ class MongoDBHandleFile(object):
     def __init__(self):
         pass
 
-    def handle_uploaded_file(self, f):
+    def handle_uploaded_file(self, f,  revision=""):
         """Store the files in file disk 
         """
         pass

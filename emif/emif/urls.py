@@ -55,12 +55,12 @@ urlpatterns = patterns('',
     url(r'^search$', 'emif.views.quick_search'),
 
     # Advanced Search
-    url(r'^advancedSearch/(?P<questionnaire_id>[0-9]+)/(?P<question_set>[0-9]+)/$', 'emif.views.advanced_search'),
+    url(r'^advancedSearch/(?P<questionnaire_id>[0-9]+)/(?P<question_set>[0-9]+)/(?P<aqid>[0-9]+)?$', 'emif.views.advanced_search'),
     
     # Database Add
 
     url(r'^add/(?P<questionnaire_id>[0-9]+)/(?P<sortid>[0-9]+)/$', 'emif.views.database_add'),
-    url(r'^searchqs/(?P<questionnaire_id>[0-9]+)/(?P<sortid>[0-9]+)/$', 'emif.views.database_search_qs'),
+    url(r'^searchqs/(?P<questionnaire_id>[0-9]+)/(?P<sortid>[0-9]+)/(?P<aqid>[0-9]+)?$', 'emif.views.database_search_qs'),
     url(r'^addPost/(?P<questionnaire_id>[0-9]+)/(?P<sortid>[0-9]+)$', 'emif.views.check_database_add_conditions'),
     
 
@@ -95,6 +95,7 @@ urlpatterns = patterns('',
     url(r'^resultscomp', 'emif.views.results_comp'),
     #url(r'^fingerprint/(?P<runcode>[^/]+)/(?P<qs>[-]{0,1}\d+)/$', 'emif.views.fingerprint'),
     url(r'^fingerprint/(?P<runcode>[^/]+)/(?P<qs>[-]{0,1}\d+)/$', 'population_characteristics.documents.document_form_view'),
+    url(r'^fingerprint/(?P<runcode>[^/]+)/(?P<qs>[-]{0,1}\d+)/(?P<activetab>[^/]+)/$', 'population_characteristics.documents.document_form_view'),
     
     # List Databases
     url(r'^databases/(?P<page>[-]{0,1}\d+)?$', 'emif.views.databases', name="databases"),
@@ -235,4 +236,7 @@ urlpatterns = patterns('',
 
     # Population Characteristics URLs
     url(r'population/', include('population_characteristics.urls')),
+
+    # Docs Manager
+    url(r'docsmanager/', include('docs_manager.urls')),
 )

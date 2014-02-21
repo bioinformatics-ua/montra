@@ -94,6 +94,7 @@ $(function () {
         previewMaxHeight: 100,
         previewCrop: true
     }).on('fileuploadadd', function (e, data) {
+        console.log('File Upload - fileuploadadd');
         data.context = $('<tr><td>').appendTo('#jerboafiles');
         $.each(data.files, function (index, file) {
             var node = $('<p/>')
@@ -106,6 +107,7 @@ $(function () {
             node.appendTo(data.context);
         });
     }).on('fileuploadprocessalways', function (e, data) {
+        console.log('File Upload - fileuploadprocessalways');
         var index = data.index,
             file = data.files[index],
             node = $(data.context.children()[index]);
@@ -125,20 +127,30 @@ $(function () {
                 .prop('disabled', !!data.files.error);
         }
     }).on('fileuploadprogressall', function (e, data) {
+        console.log('File Upload - progress all');
         var progress = parseInt(data.loaded / data.total * 100, 10);
         $('#progress .progress-bar').css(
             'width',
             progress + '%'
         );
     }).on('fileuploaddone', function (e, data) {
+        console.log('File Upload - done');
         $.each(data.result.files, function (index, file) {
             var link = $('<a>')
                 .attr('target', '_blank')
                 .prop('href', file.url);
             $(data.context.children()[index])
                 .wrap(link);
+
+
+            // Trigger the charts 
+            var url = document.URL;
+            url = url + "pc/"
+            window.location.assign(url);
+            
+
         });
-    }).on('fiçeuploadfail', function (e, data) {
+    }).on('fileuploadfail', function (e, data) {
         $.each(data.result.files, function (index, file) {
             var error = $('<span/>').text(file.error);
             $(data.context.children()[index])

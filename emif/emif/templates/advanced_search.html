@@ -67,7 +67,6 @@ text-decoration: none;
 {% endblock %}
 
 {% block content %}
-
 <div class="container">
     <h2 class="pull-center" >Advanced Search</h2>
 </div>
@@ -150,7 +149,23 @@ $('#li_advanced_search').addClass("active");
 var bool_container;
 $( document ).ready(function() {
     load_questionnary();
+    {% if not serialized_query %}
+            bool_container = $('#bool_container').boolrelwidget({form_anchor: '#qform'});
+    {% else %}
+            bool_container = $('#bool_container').boolrelwidget({form_anchor: '#qform', view_serialized_string:'{{serialized_query}}'});
+    console.log('{{serialized_query}}');
+    {% endif %}
+    /* This must be after, boolrelwidget declaration */
+    if (!(typeof bool_container === 'undefined')) {
+        $('#qform').submit(
+                     
+                    function(e) {
 
+                        // Update hidden inputs (in case they are not updated because we are using the other buttons not in control by the plugin)
+                        bool_container.readyToSubmit(); 
+                    }     
+        );
+    }
 });
 var threads = {};
 function load_questionnary(){
@@ -178,7 +193,11 @@ function load_questionnary(){
 
         var priority=1;
         {% for qs in questionset.questionnaire.questionsets %}
-            var thread = new Runnable(loadqspart, priority++, {{ qs.sortid }}, {{qs.questionnaire.pk}});
+            {% if not aqid %}
+                var thread = new Runnable(loadqspart, priority++, {{ qs.sortid }}, {{qs.questionnaire.pk}}, null);
+            {% else %}
+                var thread = new Runnable(loadqspart, priority++, {{ qs.sortid }}, {{qs.questionnaire.pk}}, {{aqid}});
+            {% endif %}
             threadpool.run(thread);
             threads['qs_{{ qs.sortid }}'] = thread;
         {% endfor %}
@@ -187,14 +206,18 @@ function load_questionnary(){
         threadpool.run(new Runnable(add_triggers, priority+2));
         threadpool.destroy();
 }
-function loadqspart(sortid, pk){
+function loadqspart(sortid, pk, aqid){
     
     //console.log("getting part from searchqs/"+pk+"/"+sortid+"/");
-    
-    $.get( "searchqs/"+pk+"/"+sortid+"/", function( data ) {
-      $( "#qs_"+sortid ).html( data );
-    });
-
+    if(aqid == null){
+        $.get( "searchqs/"+pk+"/"+sortid+"/", function( data ) {
+          $( "#qs_"+sortid ).html( data );
+        });
+    } else {
+        $.get( "searchqs/"+pk+"/"+sortid+"/"+aqid, function( data ) {
+          $( "#qs_"+sortid ).html( data );
+        });    
+    }
     threads['qs_'+sortid] = null;
     parts_missing--;
     this.complete();

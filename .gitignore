@@ -21,3 +21,5 @@ emif/emif.db
 .idea/.name
 .idea/workspace.xml
 src/pip-delete-this-directory.txt
+emif/emif/local_settings.py
+fingerprints.pkl
