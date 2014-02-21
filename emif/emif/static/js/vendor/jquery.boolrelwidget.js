@@ -24,8 +24,7 @@
             hide_concepts: true,
             view_only: false,
             view_serialized_string: null,
-            level_back: -1,
-            help: '<div style="overflow:auto; height: 30em;"><h3>What it does</h3><p>This toolbar allows you to define the relationship between the concepts you are using on your search, in a visual and easy drag-and-drop-like manner. However, this involves understanding a few concepts.</p><h3>What is the "Boolean Query"</h3><p>A boolean query, is a query that has a relation between two or more concepts. This is better explained by use-case examples.</p><p>Lets imagine we want to search for books. This books are described by a myriad of concepts such as year of release, author and genre.</p><p>Lets now imagine we want to search for all the results that are from the genre \'medical\' or the genre \'informatics\' and have the author \'John\'.</p><p>The best way to do this, is by using a boolean query. And the boolean query would be something as follows:</p><blockquote><p class="lead">(genre = \'medical\' OR genre = \'informatics\') AND author = \'John\'</p></blockquote><p>As we can see, we clearly define what we want, just using the relations OR and AND, in conjunction with the concepts and using parentesis to separate the order of the relations (nested relation). This is the basics of a boolean query.</p><h3>Why the toolbar to define the "Boolean Query" ?</h3><p>Although the definition is clear, manually writing this queries can be tiresome, and slow. The objective of the toolbar is facilitate the process, by automatically detecting the concepts you want to search, and helping you build the query, allowing you to just drag the concepts were you want them to connect.</p><h3>How do I use it</h3><p>To use the toolbar, just fill in the fields you want to search as usual.</p><p> After you\'re done, you can go to the toolbar, and you will see you already have a default query constructed with the concepts you choose, with a default relationship between them. Each concept is represented by a box like the one we can see below:</p><image src="/static/img/help1.png" /><p>We can see three things: A label with the name relation (that if we hover will give us the full text if it is to big and the answer currently written in the search form), a area with a drop icon and a delete button.</p><p>Lets take a look at the big picture now:</p><image src="/static/img/help2.png" /><p>We can drag blocks by its label to the drop area of other blocks, and this will create a relation between them. This way, we can nest blocks inside each other. This can be seen in the image below</p><image src="/static/img/help3.png" /><br /><image src="/static/img/help4.png" /><p>As we can see the concept is now on a nested relation. And we have the ability to collapse/expand this relation.</p><p>We can now search with this boolean query, and obtain the results.</p><p>If we want to refine the search at any time, we can click on the refine search button from the toolbar on the results, or simply go back on the browser.</p></div>'
+            help: null,
             link_back: null
         }, options);
         /*
@@ -64,6 +63,28 @@
                 
                 return block;
             },
+            pushWithDelegate: function (ident, rep, answer, delegate) {
+                var bt = new BooleanTerminal(ident, rep, answer, delegate);
+                
+                if (bt.isNull())
+                    return null;
+                
+                var block = this.pushWithoutDraw(bt);
+                /* Only auto-add in case auto-add is on */
+
+                if((settings.auto_add == true ) && (block != null)){
+                    var sliced = this.spliceById(block.id);
+                    
+                    used_blocks.push(sliced);
+                    
+                    if(mastergroup==null)
+                        mastergroup= new BooleanGroup(sliced);
+                    else mastergroup.addById(mastergroup.id, sliced, settings.default_relation);
+                }
+                this.draw();
+                
+                return block;
+            },            
             pushWithoutDraw: function(bt) {      
                 if(this.getBooleanIndex(bt)!= -1){
                     console.warn('Variable ' + bt + ' already on basic blocks pool.');  
@@ -312,6 +333,7 @@
                             var removed = Number($(this).attr('id').replace('boolrelwidget-dl-',''));
                             
                             var removed_bool = mastergroup.removeById(removed);
+                            
                             var contained = removed_bool.extractAllSimple();
                             
                             for(var j=0;j<contained.length;j++){
@@ -319,12 +341,15 @@
                                     master.pushBooleanGroup(contained[j]);
                                 
                                 var other_id = master.getUsedIndex(contained[j].variables[0]);
-                                if(other_id >0){
-                                    console.log('Removing from used variables');
-                                    used_blocks.splice(other_id, 1);
+                                                                
+                                if(other_id > -1){
+                                    
+                                    var ub = used_blocks.splice(other_id, 1)[0];
+                                    if(settings.hide_concepts){
+                                        ub.callDelegate();
+                                    }
                                 }
-                            }
-
+                            }                            
                             master.draw();
                         });                    
                         $(".boolrelwidget-select").change(function(){
@@ -389,7 +414,7 @@
                         });  
                      }
                 }
-                $(".boolrelwidget-simple").tooltip({container: 'body', delay: { show: 500, hide: 0 }});
+                $(".boolrelwidget-simple").tooltip({container: 'body', delay: { show: 500, hide: 0 }}).css('z-index','2001');
 
                     // If we have collapsing preferences, apply them
                 if(this.getCookie('boolrelwidget-collapse-preferences')){
@@ -780,10 +805,12 @@ function isBool(op){
 var boolrelwidgetuniqueidcounter=10000;
 
 
-function BooleanTerminal(identificator, representation, value){
+function BooleanTerminal(identificator, representation, value, deldelegate){
     this.id = null;
     this.text = null;
     this.val = null;   
+    this.delete_delegate = null;
+    
     if(identificator == null && representation == null && value == null){
         // nothing    
     }
@@ -799,7 +826,7 @@ function BooleanTerminal(identificator, representation, value){
         if(!(typeof value == 'string' || value instanceof String)){
             console.warn('Value on BooleanTerminal must be a string');
             return null;
-        } 
+        }       
         if (identificator == '' || representation == ''){
             console.warn('Tried to add a BooleanTerminal with empty identificator or representation, that is impossible, the only possible empty variable is value.');
             return null;    
@@ -807,6 +834,7 @@ function BooleanTerminal(identificator, representation, value){
         this.id=identificator;
         this.text = representation;
         this.val = value;
+        this.delete_delegate=deldelegate;
     }
 }
 BooleanTerminal.prototype = {
@@ -929,11 +957,12 @@ BooleanGroup.prototype = {
                 
                 // If not on root remove reference
                 if(parent){
-                    parent.variables.splice(branch,1);
+                    parent.variables.splice(branch,1)[0].callDelegate();
+                    
                     if(branch=0)
                         parent.relations.splice(branch,1);
                     else 
-                        parent.relations.splice(branch-1,1);      
+                        parent.relations.splice(branch-1,1);    
                     
                     // I also return this, to be able to later remove unnecessary
                     returnable.push(parent.id);
@@ -1133,5 +1162,16 @@ BooleanGroup.prototype = {
         }
         
         return this;
+    },
+    /* Probability should think of a better way of doing this, but since i want to allow it to be used to pass complete calls with parameters, as usual, i didnt find any other better way. Other solutions would envolve also keeping an array of parameters, and isnt much safer than doing this directly. since i could simple pass evals in this array of parameters and it would execute as a function anyway...
+     */
+    callDelegate : function(){
+        if(this.isSimple() && this.variables[0].delete_delegate != null 
+           && (typeof this.variables[0].delete_delegate == 'string'                                     
+                   || this.variables[0].delete_delegate instanceof String)){
+        
+            eval(this.variables[0].delete_delegate);
+            
+        }
     }
 };
