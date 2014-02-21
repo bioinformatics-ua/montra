@@ -1,3 +1,23 @@
+/**********************************************************************
+# Copyright (C) 2014 Luís A. Bastião Silva and Universidade de Aveiro
+#
+# Authors: Luís A. Bastião Silva <bastiao@ua.pt>
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
+***********************************************************************/
+
 /***
 * This function will draw the graphs 
 * Should provide an abstractoin to the API's
@@ -23,10 +43,11 @@ function Filters()
 /** This class only works for documentation process
  ** Thus, you will know what kind of classes you have to implement.
  */ 
-function RepresentData(wrapper, divArg, dataArg)
+function RepresentData(wrapper)
 {
 
     this.wrapper = wrapper;
+
 
     this.translateData = function(objects){
         return this.wrapper.translateData(objects);
@@ -61,7 +82,8 @@ function RepresentData(wrapper, divArg, dataArg)
             console.log('who is this: ' + self);
             console.log(div);
             console.log(data);
-            g = new GraphicChartD3();
+            g = new GraphicChartC3D3();
+            w_g = new RepresentData(g);
 
             g.div = div;
             g.dataValues = data;
@@ -73,8 +95,8 @@ function RepresentData(wrapper, divArg, dataArg)
                  
                  ];
 
-            g.translateData(_data);
-            g.draw('#pc_chart_place', dataset);
+            w_g.translateData(_data);
+            w_g.draw('#pc_chart_place', dataset);
             
 
         },

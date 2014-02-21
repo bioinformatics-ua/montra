@@ -17,48 +17,77 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 ***********************************************************************/
-function GraphicChartD3(divArg, dataArg)
+
+
+
+function GraphicChartC3D3(divArg, dataArg)
 {
   /** Passes the initial arguments required to start and d3
   Also , this should be used to know if 
   */
-  var div = divArg; 
-  var dataValues = dataArg;
-  var self = this;
+  this.div = divArg; 
+  this.dataValues = dataArg;
+  this.xscale = null ;
+  this.yscale = null ;
+  this.self = this;
   this.init = function(){
     
-    console.log('this in GraphCharD3'  + this);
+    console.log('this in GraphicChartC3D3'  + this);
   };
 
-  this.translate_data = function(objects){
+  this.translateData = function(objects){
     
-
+    console.log(objects);
     /*** Lets translate our data model to the d3 support data model */ 
-
-
+    xscale = {'bins':5}
+    xscale.bins = 25;
+    var i = 1;
+    datasetY = ['data1'];
+    datasetX = ['x1'];
+    objects.values.forEach(function(row){
+      datasetX.push(parseInt(row.Value1));
+      datasetY.push(parseInt(row.Count));
+        
+    });
+    
   };
 
   this.draw = function(div, dataset){
-     nv.addGraph(function() {
-               var chart = nv.models.discreteBarChart()
-                   .x(function(d) { return d.label })
-                   .y(function(d) { return d.value })
-                   .staggerLabels(false)
-                   .tooltips(true)
-                   .showValues(true)
-             
-               d3.select('#chart svg')
-                   .datum(exampleData())
-                 .transition().duration(500)
-                   .call(chart);
-             
-               nv.utils.windowResize(chart.update);
-             
-               return chart;
-             });
-             
-            $("#chart h1").append("Number of patients yearly")
-      
+    console.log(this.div);
+    var chart2 = c3.generate({
+        bindto: '#pc_chart_place',
+         size: {
+        height: 500,
+        width: 500
+    },
+        data: {
+            xs: {
+            'data1': 'x1',
+        },
+          columns: [
+          datasetX,
+           datasetY,
+
+          ],
+          types: {
+            data1: 'bar',
+            
+          },
+          
+          
+        },
+        axis: {
+          x: {
+            type: 'categorized'
+          }
+        },
+        zoom: {
+          enabled: true
+        },
+        
+        
+      });
+    
    }; 
 };
 
