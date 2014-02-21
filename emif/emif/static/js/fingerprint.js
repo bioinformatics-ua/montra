@@ -103,7 +103,6 @@ function validate1(element, id_answered, dirty_id_answered) {
 
 // Clear a simple text field by his name
 function clearSimple(id){
-    console.error('id: '+id);
     $(':input[name="'+id.replace('.','\\.')+'"]').val('');
     // Simulate change
     $(':input[name="'+id.replace('.','\\.')+'"]').change();

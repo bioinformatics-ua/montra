@@ -59,6 +59,10 @@
                         mastergroup= new BooleanGroup(sliced);
                     else mastergroup.addById(mastergroup.id, sliced, settings.default_relation);
                 }
+                console.error("--dsd");
+                console.error(used_blocks);
+                                console.error("--dsd");
+
                 this.draw();
                 
                 return block;
@@ -194,12 +198,16 @@
                 return -1;
             },            
             getUsedIndex: function(element){
+                console.error(element);
                 var i = 0;
                 for(i=0;i<used_blocks.length;i++){
                     // We must check this is a "empty" container with only one element (the one we want).
+                    console.warn(used_blocks[i]);
                     if(used_blocks[i].containsOnly(element))
                         return i;
                 }
+                console.error('-');
+                
                 return -1;
             },
             spliceById: function (number) {
@@ -289,8 +297,8 @@
                             console.log("Event drop 1: "+droper+" on "+dropee);
                             
                             var sliced = master.spliceById(droper);
-                                
-                              used_blocks.push(sliced);
+
+                            used_blocks.push(sliced);
                             // Try to add this to the master group
                             // If we cant, we insert the basic block back into the basic_blocks list
                             if(!mastergroup.addById(dropee, sliced, settings.default_relation)){
@@ -298,18 +306,19 @@
                             }       
                         } 
                           // If comming from the query itself
-                        else {
+                        else {                            
                             var droper = Number(ui.draggable.attr('id').replace('boolrelwidget-ii-',''));
                             var dropee = Number($(this).attr('id').replace('boolrelwidget-dp-',''));
                             console.log("Event drop 1: "+droper+" on "+dropee);
                             
                             // Makes no sense to move self to self
                             if(droper != dropee){
-                                var sliced = mastergroup.removeById(droper);
-                            
+                                var sliced = mastergroup.removeById(droper);          
+                                
                                 mastergroup.addById(dropee, sliced, settings.default_relation);
                                 
                             }
+                            
                         }
                         $(".tooltip").remove();
                           
@@ -326,7 +335,7 @@
                         $(".boolrelwidget-query-box > .boolrelwidget-simple").parent().draggable({containment: "#boolrelwidget-panel",revert: true, opacity: 0.9, cursor: "move", cursorAt: { top: 10, left: 50 } }); 
                     }
                      }
-                    
+                        console.log(used_blocks);
                                          
                         // Add 
                         $(".boolrelwidget-query-delete").click(function(){
@@ -334,20 +343,21 @@
                             
                             var removed_bool = mastergroup.removeById(removed);
                             
-                            var contained = removed_bool.extractAllSimple();
+                            var contained = removed_bool.extractAllSimple();                            
                             
                             for(var j=0;j<contained.length;j++){
-                                if(!settings.hide_concepts)
+                                if(settings.hide_concepts){
+                                        contained[j].callDelegate();
+                                }
+                                else {
                                     master.pushBooleanGroup(contained[j]);
-                                
+                                }
                                 var other_id = master.getUsedIndex(contained[j].variables[0]);
-                                                                
+                                console.warn(other_id);
+                                
                                 if(other_id > -1){
-                                    
                                     var ub = used_blocks.splice(other_id, 1)[0];
-                                    if(settings.hide_concepts){
-                                        ub.callDelegate();
-                                    }
+                                    
                                 }
                             }                            
                             master.draw();
@@ -847,16 +857,17 @@ BooleanTerminal.prototype = {
         else return '';
     },    
     serialize   :   function(){
-        return 'T;;;;;'+encodeURI(this.id) + ';;;;;'+ encodeURI(this.text) + ';;;;;' + encodeURI(this.val);
+        return 'T;;;;;'+encodeURI(this.id) + ';;;;;'+ encodeURI(this.text) + ';;;;;' + encodeURI(this.val)+ ';;;;;' + encodeURI(this.delete_delegate);
     }, 
     deserialize : function(str){
         str = str.split(';;;;;');
-        if(str.length != 4)
+        if(str.length != 5)
             console.error("Couldn't parse Bolean Terminal prototype");
         else {
             this.id=decodeURI(str[1]);
             this.text=decodeURI(str[2]);
             this.val=decodeURI(str[3]);
+            this.delete_delegate = decodeURI(str[4]);
         }        
         return this;
     },
@@ -957,7 +968,7 @@ BooleanGroup.prototype = {
                 
                 // If not on root remove reference
                 if(parent){
-                    parent.variables.splice(branch,1)[0].callDelegate();
+                    parent.variables.splice(branch,1);
                     
                     if(branch=0)
                         parent.relations.splice(branch,1);
