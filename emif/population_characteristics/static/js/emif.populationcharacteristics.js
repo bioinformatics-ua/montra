@@ -195,6 +195,11 @@ function PCAPI ()
  (function( $ )
  {
 
+
+    function getFiltersSelected(){
+
+    };
+
     var methods = {
         init : function( options, name, fingerprintId ) {
 
@@ -236,7 +241,8 @@ function PCAPI ()
                     { 
                       e.preventDefault(); 
                       e.stopPropagation();
-                      
+
+                      console.log(e.toElement.innerHTML);
                       
                       if ($(e.toElement.firstChild).hasClass('icon-ok')) 
                       {
@@ -321,8 +327,9 @@ function PCAPI ()
 
                       console.log(e.toElement.innerHTML);
                        console.log(fingerprintID);
-                     
-                      $("#pcBarContent").populationChartsBar('init', pc,e.toElement.innerHTML,fingerprintID);
+
+                      $("#pcBarContent").populationChartsBar('init', pc,e.toElement.innerHTML,
+                        fingerprintID);
                       $("#pcBarContent").populationChartsBar('draw', pc);
 
                       $("#pctitle").html("<h2>"+ e.toElement.innerHTML +"</h2>");

@@ -31,6 +31,13 @@ from django.conf import settings
 
 def jerboa_list_values(request, var, row, fingerprint_id, template_name='documents_upload_form.html'):
 
+    filters = []
+
+    if request.POST:
+        # Get the filters to apply.
+        filters = request.POST['filters']
+    
+
     pc = PopulationCharacteristic(None)
     values = pc.get_variables(var, row, fingerprint_id)
     data = {'values': values}
