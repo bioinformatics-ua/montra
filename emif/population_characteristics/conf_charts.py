@@ -52,6 +52,10 @@ class ConfCharts(object):
         f2.key = None
         f2.value = 'Gender'
 
+        ss = Scale()
+        ss.unit = "Year"
+        ss.bins = "10"
+
         c.filters = [f2]
 
         c1 = Chart()
@@ -65,7 +69,7 @@ class ConfCharts(object):
         c1.y_axis.operation = "unique"
         c1.y_axis.var = "Count"
         
-        c1.filters = [f1]
+        c1.filters = [f2]
 
 
         c2 = Chart()

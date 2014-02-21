@@ -72,7 +72,7 @@ class PopulationCharacteristic(object):
 
         import pdb
         #pdb.set_trace() 
-        vars_that_should_exists = ['Min']
+        vars_that_should_exists = ['Count']
 
         dict_query = {'fingerprint_id':fingerprint_id, 
             'values.Gender':'M',
@@ -93,7 +93,7 @@ class PopulationCharacteristic(object):
             print v
             results.append(v[u'values'])
 
-        print results
+        #print results
         return results
 
     def get_variables_filter(self, gender=None, name1=None, value1=None, name2=None,

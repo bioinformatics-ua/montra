@@ -4,9 +4,9 @@ function GraphicChartD3(divArg, dataArg)
   /** Passes the initial arguments required to start and d3
   Also , this should be used to know if 
   */
-  var div = divArg; 
-  var dataValues = dataArg;
-  var self = this;
+  this.div = divArg; 
+  this.dataValues = dataArg;
+  this.self = this;
   this.init = function(){
     
     console.log('this in GraphCharD3'  + this);
@@ -22,7 +22,7 @@ function GraphicChartD3(divArg, dataArg)
                  
                  ];
     objects.values.forEach(function(row){
-      dataset[0].push({'xvalue':row.Value1, 'yvalue':parseInt(row.Min)});
+      dataset[0].push({'xvalue':row.Value1, 'yvalue':parseInt(row.Count)});
   
     });
     
@@ -94,7 +94,7 @@ function GraphicChartD3(divArg, dataArg)
             .attr("dy", ".71em")
             .style("text-anchor", "end")
             .text("");
-
+            
         svg.selectAll(".bar")
             .data(data)
           .enter().append("rect")
