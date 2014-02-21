@@ -55,12 +55,12 @@ urlpatterns = patterns('',
     url(r'^search$', 'emif.views.quick_search'),
 
     # Advanced Search
-    url(r'^advancedSearch/(?P<questionnaire_id>[0-9]+)/(?P<question_set>[0-9]+)/$', 'emif.views.advanced_search'),
+    url(r'^advancedSearch/(?P<questionnaire_id>[0-9]+)/(?P<question_set>[0-9]+)/(?P<aqid>[0-9]+)?$', 'emif.views.advanced_search'),
     
     # Database Add
 
     url(r'^add/(?P<questionnaire_id>[0-9]+)/(?P<sortid>[0-9]+)/$', 'emif.views.database_add'),
-    url(r'^searchqs/(?P<questionnaire_id>[0-9]+)/(?P<sortid>[0-9]+)/$', 'emif.views.database_search_qs'),
+    url(r'^searchqs/(?P<questionnaire_id>[0-9]+)/(?P<sortid>[0-9]+)/(?P<aqid>[0-9]+)?$', 'emif.views.database_search_qs'),
     url(r'^addPost/(?P<questionnaire_id>[0-9]+)/(?P<sortid>[0-9]+)$', 'emif.views.check_database_add_conditions'),
     
 

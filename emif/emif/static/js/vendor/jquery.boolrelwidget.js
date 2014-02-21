@@ -26,6 +26,7 @@
             view_serialized_string: null,
             level_back: -1,
             help: '<div style="overflow:auto; height: 30em;"><h3>What it does</h3><p>This toolbar allows you to define the relationship between the concepts you are using on your search, in a visual and easy drag-and-drop-like manner. However, this involves understanding a few concepts.</p><h3>What is the "Boolean Query"</h3><p>A boolean query, is a query that has a relation between two or more concepts. This is better explained by use-case examples.</p><p>Lets imagine we want to search for books. This books are described by a myriad of concepts such as year of release, author and genre.</p><p>Lets now imagine we want to search for all the results that are from the genre \'medical\' or the genre \'informatics\' and have the author \'John\'.</p><p>The best way to do this, is by using a boolean query. And the boolean query would be something as follows:</p><blockquote><p class="lead">(genre = \'medical\' OR genre = \'informatics\') AND author = \'John\'</p></blockquote><p>As we can see, we clearly define what we want, just using the relations OR and AND, in conjunction with the concepts and using parentesis to separate the order of the relations (nested relation). This is the basics of a boolean query.</p><h3>Why the toolbar to define the "Boolean Query" ?</h3><p>Although the definition is clear, manually writing this queries can be tiresome, and slow. The objective of the toolbar is facilitate the process, by automatically detecting the concepts you want to search, and helping you build the query, allowing you to just drag the concepts were you want them to connect.</p><h3>How do I use it</h3><p>To use the toolbar, just fill in the fields you want to search as usual.</p><p> After you\'re done, you can go to the toolbar, and you will see you already have a default query constructed with the concepts you choose, with a default relationship between them. Each concept is represented by a box like the one we can see below:</p><image src="/static/img/help1.png" /><p>We can see three things: A label with the name relation (that if we hover will give us the full text if it is to big and the answer currently written in the search form), a area with a drop icon and a delete button.</p><p>Lets take a look at the big picture now:</p><image src="/static/img/help2.png" /><p>We can drag blocks by its label to the drop area of other blocks, and this will create a relation between them. This way, we can nest blocks inside each other. This can be seen in the image below</p><image src="/static/img/help3.png" /><br /><image src="/static/img/help4.png" /><p>As we can see the concept is now on a nested relation. And we have the ability to collapse/expand this relation.</p><p>We can now search with this boolean query, and obtain the results.</p><p>If we want to refine the search at any time, we can click on the refine search button from the toolbar on the results, or simply go back on the browser.</p></div>'
+            link_back: null
         }, options);
         /*
         var bg1 = new BooleanGroup('teste de nome muito grande mesmo');
@@ -97,6 +98,24 @@
                 
                 return true
             },
+            pushUsedBooleanGroup: function (obj) {
+                if(!(obj instanceof BooleanGroup && obj.variables.length == 1)){
+                    console.warn('When adding, a valid simple BooleanGroup child must be found.');
+                    return false;
+                }
+                if(!(obj.variables[0] instanceof BooleanTerminal
+                   && this.getUsedIndex(obj.variables[0])== -1)){
+                    console.warn('Variable ' + obj + ' already on used blocks pool.');  
+                    return false;
+                }
+                
+                used_blocks.push(obj);
+                console.log('Pushed new variable ' + obj + ' to used blocks pool.');
+
+                this.draw();
+                
+                return true
+            },            
             splice: function (ident, rep, answer) {
                 var bt = new BooleanTerminal(ident, rep, answer);
                 if (bt.isNull())
@@ -673,7 +692,8 @@
         
         toolbar_content+='<button id="boolrelwidget-collapseall" class="btn">Expand All</button><button class="btn" id="boolrelwidget-orall">Or All Concepts</button><button class="btn" id="boolrelwidget-andall">And All Concepts</button><button class="btn" id="boolrelwidget-clear">Reset</button></div>';
         } else {
-            toolbar_content+='<button onclick="parent.history.go('+settings.level_back+'); return false;" class="pull-right btn">Refine Search</button>';
+
+            toolbar_content+='<button onclick="window.location.replace(\''+settings.link_back+'\'); return false;" class="pull-right btn">Refine Search</button>';
         }
         toolbar_content+='</div><div id="boolrelwidget-query" class="well well-small">Loading...</div></div>';
         
@@ -713,10 +733,14 @@
             funcs.reset();
         }); 
         
-        if(settings.view_only && settings.view_serialized_string){
-            mastergroup = new BooleanGroup(null).deserialize(settings.view_serialized_string);
-        }
-        
+        if(settings.view_serialized_string){
+            var temp = new BooleanGroup(null).deserialize(settings.view_serialized_string);
+            var simple_ones = temp.extractAllSimple();
+            for(var i=0;i<simple_ones.length;i++)
+                        funcs.pushUsedBooleanGroup(simple_ones[i]);
+            
+            mastergroup=temp;
+            }
         // Draw things up
         funcs.draw();
         
