@@ -55,11 +55,11 @@ function GraphicChartC3D3(divArg, dataArg)
   this.draw = function(div, dataset){
     console.log(this.div);
     var chart2 = c3.generate({
-        bindto: '#pc_chart_place',
-         size: {
-        height: 500,
-        width: 500
+         padding: {
+        left: 100,
     },
+        bindto: '#pc_chart_place',
+
         data: {
             xs: {
             'data1': 'x1',
@@ -74,7 +74,6 @@ function GraphicChartC3D3(divArg, dataArg)
             
           },
           
-          
         },
         axis: {
           x: {
@@ -82,7 +81,8 @@ function GraphicChartC3D3(divArg, dataArg)
           }
         },
         zoom: {
-          enabled: true
+          enabled: true,
+          privileged: false
         },
         
         

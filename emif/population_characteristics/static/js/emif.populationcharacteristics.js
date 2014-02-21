@@ -173,9 +173,8 @@ function PCAPI ()
         return result;
     };
 
-    this.getFilter = function(Var, Row, fingerprintID){
-        var result = {}
-        fingerprintID = 'abcd';  
+    this.getFilter = function(Var, fingerprintID){
+        var result = {} ;
         $.ajax({
           dataType: "json",
           url: "population/filters/"+Var+"/" + fingerprintID,
@@ -201,9 +200,8 @@ function PCAPI ()
 
             
             /** Get a list of filters */
-            values = options.getFilter(name.text,fingerprintId);
-            console.log("parsing2:");
-            console.log(JSON.parse(values.values));
+            values = options.getFilter(name,fingerprintId);
+            console.log(values)
             if (values===undefined)
             {
                 return;
@@ -314,10 +312,17 @@ function PCAPI ()
                       $("#pc_chart_place").graphicChart('drawBarChart', valuesFromGraph,valuesFromGraph,valuesFromGraph);
 
 
+                      console.log('Debug vars');
+
                       var pc = new PCAPI();
-                      //$("#pcBarContentRoot").removeClass("hidden");
-                      //$("#pcBarContentRoot").addClass("show");
-                      $("#pcBarContent").populationChartsBar(pc,this,fingerprintID);
+                      $("#pcBarContentRoot").removeClass("hidden");
+                      $("#pcBarContentRoot").addClass("show");
+                      
+
+                      console.log(e.toElement.innerHTML);
+                       console.log(fingerprintID);
+                     
+                      $("#pcBarContent").populationChartsBar('init', pc,e.toElement.innerHTML,fingerprintID);
                       $("#pcBarContent").populationChartsBar('draw', pc);
 
                       $("#pctitle").html("<h2>"+ e.toElement.innerHTML +"</h2>");
