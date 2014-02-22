@@ -97,8 +97,8 @@ function Fingerprint_Validator(searchMode){
 }
 Fingerprint_Validator.prototype ={
     onInit : function(){
-        self = this;
-
+        var self = this;
+        
         for( x in self.validators ){
             $("."+self.validators[x].n).each(function(i, v) {        
                 self.validators[x].v.onInit(v);
@@ -106,6 +106,7 @@ Fingerprint_Validator.prototype ={
         }
 
         $("#qform").submit(function(evnt){
+            console.log(self);
             self.validateForm(evnt);
         });
     },

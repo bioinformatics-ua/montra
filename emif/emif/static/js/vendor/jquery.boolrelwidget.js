@@ -198,15 +198,12 @@
                 return -1;
             },            
             getUsedIndex: function(element){
-                console.error(element);
                 var i = 0;
                 for(i=0;i<used_blocks.length;i++){
                     // We must check this is a "empty" container with only one element (the one we want).
-                    console.warn(used_blocks[i]);
                     if(used_blocks[i].containsOnly(element))
                         return i;
                 }
-                console.error('-');
                 
                 return -1;
             },
@@ -353,7 +350,6 @@
                                     master.pushBooleanGroup(contained[j]);
                                 }
                                 var other_id = master.getUsedIndex(contained[j].variables[0]);
-                                console.warn(other_id);
                                 
                                 if(other_id > -1){
                                     var ub = used_blocks.splice(other_id, 1)[0];
@@ -428,7 +424,6 @@
 
                     // If we have collapsing preferences, apply them
                 if(this.getCookie('boolrelwidget-collapse-preferences')){
-                    console.log(this.getCookie('boolrelwidget-collapse-preferences'));
                     if(this.getCookie('boolrelwidget-collapse-preferences') == 'expanded'){
                         var context = $('boolrelwidget-collapseall');
                         $('#boolrelwidget-collapseall').text('Collapse All');
