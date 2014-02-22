@@ -129,7 +129,7 @@ Fingerprint_Validator.prototype ={
         }   
     },
     validateForm: function(evnt){
-        self = this;
+        var self = this;
 
         for( x in self.validators ){
             $("."+self.validators[x].n).each(function(i, v) {

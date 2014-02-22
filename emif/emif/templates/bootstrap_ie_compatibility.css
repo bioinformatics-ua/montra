@@ -88,7 +88,7 @@ select,textarea, /*input*/,code,pre{behavior:url({{ STATIC_URL }}js/vendor/PIE.h
   -pie-background: linear-gradient(top, #e6e6e6, #e6e6e6); 
   behavior: url({{ STATIC_URL }}js/vendor/PIE.htc);
 }
-
+*/
 .lt-ie8 .btn:hover,
 .lt-ie8 .btn:active,
 .lt-ie8 .btn.active,
@@ -102,6 +102,7 @@ select,textarea, /*input*/,code,pre{behavior:url({{ STATIC_URL }}js/vendor/PIE.h
   -pie-background: linear-gradient(top, #0088cc, #0044cc); 
   behavior: url({{ STATIC_URL }}js/vendor/PIE.htc);    
 }
+
 .gt-ie7 .btn-primary:hover,
 .gt-ie7 .btn-primary:active,
 .gt-ie7 .btn-primary.active,
@@ -111,7 +112,7 @@ select,textarea, /*input*/,code,pre{behavior:url({{ STATIC_URL }}js/vendor/PIE.h
   behavior: url({{ STATIC_URL }}js/vendor/PIE.htc);  
 }
 
-
+*/
 .lt-ie8 .btn-primary {
   filter: progid:dximagetransform.microsoft.gradient(startColorstr='#ff0088cc', endColorstr='#ff0044cc', GradientType=0) progid:dximagetransform.microsoft.dropshadow(color='#ff0062b8', offX=1, offY=0) progid:dximagetransform.microsoft.dropshadow(color='#ff0062b8', offX=-1, offY=0) progid:dximagetransform.microsoft.dropshadow(color='#ff0062b8', offX=0, offY=-1) progid:dximagetransform.microsoft.dropshadow(color='#ff01529A', offX=0, offY=1);
 }
@@ -136,7 +137,7 @@ select,textarea, /*input*/,code,pre{behavior:url({{ STATIC_URL }}js/vendor/PIE.h
   -pie-background: linear-gradient(top, #f89406, #f89406); 
   behavior: url({{ STATIC_URL }}js/vendor/PIE.htc);    
 }
-
+*/
 .lt-ie8 .btn-warning {
   filter: progid:dximagetransform.microsoft.gradient(startColorstr='#fffbb450', endColorstr='#fff89406', GradientType=0) progid:dximagetransform.microsoft.dropshadow(color='#ffe1962d', offX=1, offY=0) progid:dximagetransform.microsoft.dropshadow(color='#ffe1962d', offX=-1, offY=0) progid:dximagetransform.microsoft.dropshadow(color='#ffe1962d', offX=0, offY=-1) progid:dximagetransform.microsoft.dropshadow(color='#ffbc7e26', offX=0, offY=1);
 }
@@ -161,7 +162,7 @@ select,textarea, /*input*/,code,pre{behavior:url({{ STATIC_URL }}js/vendor/PIE.h
     -pie-background: linear-gradient(top, #bd362f, #bd362f); 
   behavior: url({{ STATIC_URL }}js/vendor/PIE.htc);
 }
-
+*/
 .lt-ie8 .btn-danger {
   filter: progid:dximagetransform.microsoft.gradient(startColorstr='#ffee5f5b', endColorstr='#ffbd362f', GradientType=0) progid:dximagetransform.microsoft.dropshadow(color='#ffc44741', offX=1, offY=0) progid:dximagetransform.microsoft.dropshadow(color='#ffc44741', offX=-1, offY=0) progid:dximagetransform.microsoft.dropshadow(color='#ffc44741', offX=0, offY=-1) progid:dximagetransform.microsoft.dropshadow(color='#ffa43c37', offX=0, offY=1);
 }
@@ -186,7 +187,7 @@ select,textarea, /*input*/,code,pre{behavior:url({{ STATIC_URL }}js/vendor/PIE.h
   -pie-background: linear-gradient(top, #51a351, #51a351);
   behavior: url({{ STATIC_URL }}js/vendor/PIE.htc);
 }
-
+*/
 .lt-ie8 .btn-success {
   filter: progid:dximagetransform.microsoft.gradient(startColorstr='#ff62c462', endColorstr='#ff51a351', GradientType=0) progid:dximagetransform.microsoft.dropshadow(color='#ff52a552', offX=1, offY=0) progid:dximagetransform.microsoft.dropshadow(color='#ff52a552', offX=-1, offY=0) progid:dximagetransform.microsoft.dropshadow(color='#ff52a552', offX=0, offY=-1) progid:dximagetransform.microsoft.dropshadow(color='#ff458a45', offX=0, offY=1);
 }
@@ -211,7 +212,7 @@ select,textarea, /*input*/,code,pre{behavior:url({{ STATIC_URL }}js/vendor/PIE.h
   -pie-background: linear-gradient(top, #2f96b4, #2f96b4); 
   behavior: url({{ STATIC_URL }}js/vendor/PIE.htc);      
 }
-
+*/
 .lt-ie8 .btn-info {
   filter: progid:dximagetransform.microsoft.gradient(startColorstr='#ff5bc0de', endColorstr='#ff2f96b4', GradientType=0) progid:dximagetransform.microsoft.dropshadow(color='#ff419db8', offX=1, offY=0) progid:dximagetransform.microsoft.dropshadow(color='#ff419db8', offX=-1, offY=0) progid:dximagetransform.microsoft.dropshadow(color='#ff419db8', offX=0, offY=-1) progid:dximagetransform.microsoft.dropshadow(color='#ff37849a', offX=0, offY=1);
 }
@@ -305,7 +306,7 @@ padding: 2px;
 .gt-ie7 #li_feedback, 
 .gt-ie7 #li_about, 
 .gt-ie7 #auth-logged-in,
-.gt-ie7 #li_history,
+.gt-ie7 #li_history
 {
     margin-top: -5px !important;
     
@@ -328,8 +329,13 @@ padding: 2px;
 }
 .search-query{
     width: 190px !important;
-    margin-top:4px !important;
 }
 .lt-ie8 #row_loading {
     clear: both;
+}
+
+.lt-ie8 .boolrelwidget-arrow-r{
+  padding: 0px !important;
+  margin-top: -15px !important;
+  margin-left: -20px !important;
 }
