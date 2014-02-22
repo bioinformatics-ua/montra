@@ -7,7 +7,7 @@
          var self = this;
 
          var settings = $.extend({
-            delete_color: "#000000",
+            delete_color: "#000000"
         }, options );
 
         // You know its gonna happen

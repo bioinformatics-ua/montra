@@ -330,6 +330,9 @@ padding: 2px;
 .search-query{
     width: 190px !important;
 }
+.lt-ie8 .canclear_outer{
+  width: 250px !important;
+}
 .lt-ie8 #row_loading {
     clear: both;
 }

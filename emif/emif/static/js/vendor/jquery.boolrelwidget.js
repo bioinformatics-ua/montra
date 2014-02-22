@@ -75,7 +75,7 @@
                 
                 var block = this.pushWithoutDraw(bt);
                 /* Only auto-add in case auto-add is on */
-
+                
                 if((settings.auto_add == true ) && (block != null)){
                     var sliced = this.spliceById(block.id);
                     
