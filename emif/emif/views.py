@@ -99,12 +99,14 @@ def results_db(request, template_name='results.html'):
         num_results = 0
         list_results = []
 
+
     list_databases = []
+    
     for database in databases:
         database_aux = Database()
         database_aux.id = database.runid
         database_aux.date = database.completed
-        
+
         answers = Answer.objects.filter(runid=database.runid)
         text = clean_value(str(answers[1].answer))
         info = text[:75] + (text[75:] and '..')
@@ -173,7 +175,7 @@ def results_fulltext(request, page=1, full_text=True,template_name='results.html
 
 
 def results_fulltext_aux(request, query, page=1, template_name='results.html', isAdvanced=False):
-
+    
     rows = 5
     if query == "":
         return render(request, "results.html", {'request': request, 'breadcrumb': True,
@@ -760,7 +762,7 @@ def render_one_questionset(request, q_id, qs_id, errors={}, aqid=None, template_
         if aqid != None:
             (qlist_general, qlist, jstriggers, qvalues, jsinclude, cssinclude, extra_fields, hasErrors) = extract_answers(request2, q_id, question_set, qs_list)
         
-        
+        print jstriggers
         
         fingerprint_id = generate_hash()
         r = r2r(template_name, request,

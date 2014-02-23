@@ -140,7 +140,7 @@ function add_triggers() {
             {% endfor %}
             
             for(key in qvalues) {
-                valchanged(key, qvalues[key]);
+                valchanged(key, qvalues[key], this);
             }
     this.complete();
 }
@@ -148,12 +148,18 @@ function add_triggers() {
 $('#li_advanced_search').addClass("active");
 var bool_container;
 $( document ).ready(function() {
-    load_questionnary();
+    var help_text = '<div style="overflow:auto; height: 30em;"><h3>What it does?</h3><p>This toolbar allows you to define the a boolean query of the databases that you are intested in. It involves the relationship between the concepts you are using in your search, in a visual and easy way through the drag-and-drop of thse concepts.</p>'+
+    '<h3>What is a "Boolean Query"?</h3>'+
+    '<p>A boolean query, is a query that has a relation between two or more concepts. </p><p>For example, if you want to search for books. This books are described by a myriad of concepts such as year of release, author and genre.</p><p>Thus, if you want to search for all the results that are from the genre \'medical\' or the genre \'informatics\' and have the author \'John\'.</p><p>The best way to do this, is by using a boolean query. The boolean query for answering this kind of questions are:</p><blockquote><p class="lead">(genre = \'medical\' OR genre = \'informatics\') AND author = \'John\'</p></blockquote><p>It was clearly define what is required in the results only by using the relations OR and AND, in conjunction with the concepts and using parentesis to separate the order of the relations (nested relation). This is the basic idea of the boolean queries.</p>'+
+    '<h3>Why the toolbar to define the "Boolean Query" ?</h3>'+
+    '<p>Although the definition is clear, due to the large amounts of options that exists in the databases, manually writing this queries was not an option. The objective of the toolbar is facilitate the process, by automatically detecting the concepts you want to search, and helping you build the query, by dragging the concepts in the Boolean Query.</p>'+
+    '<h3>How can I use it?</h3>'+
+    '<p>To use the toolbar, just fill in the fields you intend to search.</p><p> After complete, go to the toolbar, and it is possible to see that there are already a default query built with the concepts chosen, with a default relationship between them. Each concept is represented by a box like the one below:</p><image src="/static/img/help1.png" /><p>It is possible to see three things: a label with the name relation (that if we hover will give us the full text if it is to big and the answer currently written in the search form), a area with a drop icon and a delete button.</p><p>Also, it is possible to see a big query:</p><image src="/static/img/help2.png" /><p>You can drag blocks by its label to the drop area of other blocks, and this will create a relation between them. It is possible to put the blocks inside each other. This can be seen in the image below:</p><image src="/static/img/help3.png" /><br /><image src="/static/img/help4.png" /><p>The concept is now on a nested relation. And there is an option to collapse/expand this relation.</p><p>After define the boolean query, you will be able to search and obtain the results.</p><p>If the results are not the expected, you can refine the query at any time by click oin the "refine search" button from the toolbar on the results, or simply go back on the browser.</p></div>';
+
     {% if not serialized_query %}
-            bool_container = $('#bool_container').boolrelwidget({form_anchor: '#qform'});
+            bool_container = $('#bool_container').boolrelwidget({form_anchor: '#qform', help: help_text});
     {% else %}
-            bool_container = $('#bool_container').boolrelwidget({form_anchor: '#qform', view_serialized_string:'{{serialized_query}}'});
-    console.log('{{serialized_query}}');
+            bool_container = $('#bool_container').boolrelwidget({form_anchor: '#qform', view_serialized_string:'{{serialized_query}}', help: help_text});
     {% endif %}
     /* This must be after, boolrelwidget declaration */
     if (!(typeof bool_container === 'undefined')) {
@@ -166,6 +172,8 @@ $( document ).ready(function() {
                     }     
         );
     }
+    load_questionnary();
+
 });
 var threads = {};
 function load_questionnary(){
@@ -203,7 +211,7 @@ function load_questionnary(){
         {% endfor %}
 
         //  we add the triggers thread
-        threadpool.run(new Runnable(add_triggers, priority+2));
+        //threadpool.run(new Runnable(add_triggers, priority+2));
         threadpool.destroy();
 }
 function loadqspart(sortid, pk, aqid){

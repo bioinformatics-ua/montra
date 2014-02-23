@@ -55,13 +55,14 @@ $(document).ready(function () {
 /* Function to validate for fields of type 1 (see comments below)*/
 function validate1(element, id_answered, dirty_id_answered) {
                 /* Tip from: http://viralpatel.net/blogs/jquery-get-text-element-without-child-element/ */
+ 
             var just_question = $('#question_'+id_answered)
-        .clone()    //clone the element
+        .clone().removeAttr('id')    //clone the element <- add to remove the id from the cloned element because ie7 crashes on duplicate ids
         .children() //select all the children
         .remove()   //remove all the children
         .end()  //again go back to selected element
         .text().trim();    //get the text of element
-    
+
     if($(element).val() != "") {
             //console.log('1 - #answered_'+id_answered);
             $('[id="answered_'+id_answered+'"]').show();
@@ -70,13 +71,20 @@ function validate1(element, id_answered, dirty_id_answered) {
                 console.log('question_nr_'+id_answered);
                 var number_correct = $('#question_nr_'+id_answered).text().trim();
                 number_correct = number_correct.substring(0, number_correct.length-1);
-                console.log( number_correct);
-                console.log( $('#question_nr_'+id_answered).text().trim()+" "+just_question);
-                console.dir(':input[name="question_'+dirty_id_answered.replace('.','\\.')+'"]');
+                //console.log( number_correct);
+                //console.log( $('#question_nr_'+id_answered).text().trim()+" "+just_question);
+                //console.dir(':input[name="question_'+dirty_id_answered.replace('.','\\.')+'"]');
                 
-                bool_container.push('question_nr_'+number_correct,
+                if($(':input[name="question_'+dirty_id_answered.replace('.','\\.')+'"]').is(':radio')){
+                    bool_container.pushWithDelegate('question_nr_'+number_correct,
                     $('#question_nr_'+id_answered).text().trim()+" "+just_question,
-                                   $(':input[name="question_'+dirty_id_answered.replace('.','\\.')+'"]').val());
+                                   $(':input[name="question_'+dirty_id_answered.replace('.','\\.')+'"]').val(), 'clear_selection("question_nr_'+dirty_id_answered.replace('.','\\.')+'", "");');   
+                } else {
+                  bool_container.pushWithDelegate('question_nr_'+number_correct,
+                    $('#question_nr_'+id_answered).text().trim()+" "+just_question,
+                                   $(':input[name="question_'+dirty_id_answered.replace('.','\\.')+'"]').val(), 'clearSimple("question_'+dirty_id_answered.replace('.','\\.')+'");');       
+                }
+                
             }
         
         } else {
@@ -92,6 +100,13 @@ function validate1(element, id_answered, dirty_id_answered) {
         }
             // If we have a boolean container, maker
 
+}
+
+// Clear a simple text field by his name
+function clearSimple(id){
+    $(':input[name="'+id.replace('.','\\.')+'"]').val('');
+    // Simulate change
+    $(':input[name="'+id.replace('.','\\.')+'"]').change();
 }
 
 //Creates an advanced validator for question fields.

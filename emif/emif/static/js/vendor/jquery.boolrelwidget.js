@@ -24,21 +24,10 @@
             hide_concepts: true,
             view_only: false,
             view_serialized_string: null,
+            help: null,
             link_back: null
         }, options);
-        /*
-        var bg1 = new BooleanGroup('teste de nome muito grande mesmo');
-        var bg2 = new BooleanGroup('outro name ainda maior que o anterior, mas nao muito');
-        var bg3 = new BooleanGroup('nome curto');
-        
-        var bg4 = new BooleanGroup(bg1);
-        bg4.addBoolean(BOOL['OR'], bg2);
-        
-        mastergroup = new BooleanGroup(bg4);
-        mastergroup.addBoolean(BOOL['AND'], bg3);
-        
-        basic_blocks.push(new BooleanGroup('outro nome grande, mas mesmo bue grande para ficar aqui para eu depois arranjar isto com ...'));
-        */
+
         var funcs = {
             push: function (ident, rep, answer) {
                 var bt = new BooleanTerminal(ident, rep, answer);
@@ -55,13 +44,39 @@
                     used_blocks.push(sliced);
                     
                     if(mastergroup==null)
-                        mastergroup= new BooleanGroup(sliced);
-                    else mastergroup.addById(mastergroup.id, sliced, settings.default_relation);
+                        mastergroup= new BooleanGroup(sliced.copy());
+                    else mastergroup.addById(mastergroup.id, sliced.copy(), settings.default_relation);
                 }
+                console.error("--dsd");
+                console.error(used_blocks);
+                                console.error("--dsd");
+
                 this.draw();
                 
                 return block;
             },
+            pushWithDelegate: function (ident, rep, answer, delegate) {
+                var bt = new BooleanTerminal(ident, rep, answer, delegate);
+                
+                if (bt.isNull())
+                    return null;
+                
+                var block = this.pushWithoutDraw(bt);
+                /* Only auto-add in case auto-add is on */
+                
+                if((settings.auto_add == true ) && (block != null)){
+                    var sliced = this.spliceById(block.id);
+                    
+                    used_blocks.push(sliced);
+                    
+                    if(mastergroup==null)
+                        mastergroup= new BooleanGroup(sliced.copy());
+                    else mastergroup.addById(mastergroup.id, sliced.copy(), settings.default_relation);
+                }
+                this.draw();
+                
+                return block;
+            },            
             pushWithoutDraw: function(bt) {      
                 if(this.getBooleanIndex(bt)!= -1){
                     console.warn('Variable ' + bt + ' already on basic blocks pool.');  
@@ -132,7 +147,10 @@
                     
                     console.log('Variable is being used, removing it from mastergroup and removing it from used variables');
                     block = used_blocks.splice(other_id, 1)[0];
-                    mastergroup.removeById(block.id);
+
+                    // Try to remove from mastergroup (if there is a mastergroup)
+                    if(mastergroup != null)
+                        mastergroup.removeById(block.id);
                     
                     this.draw();
                     
@@ -177,6 +195,7 @@
                     if(used_blocks[i].containsOnly(element))
                         return i;
                 }
+                
                 return -1;
             },
             spliceById: function (number) {
@@ -257,7 +276,9 @@
                     var master = this;
                      if(!settings.view_only){
                     $( ".boolrelwidget-query-dropper" ).droppable({
+                      hoverClass: "boolrelwidget-query-hover",
                       drop: function( event, ui ) {
+                        $( ".boolrelwidget-query-dropper" ).tooltip('disable');
                         var drag = ui.draggable.attr('id');
                           // If coming from basic blocks
                         if(typeof drag != 'undefined' && drag.lastIndexOf('boolrelwidget-bb-', 0) === 0){
@@ -266,27 +287,30 @@
                             console.log("Event drop 1: "+droper+" on "+dropee);
                             
                             var sliced = master.spliceById(droper);
-                                
-                              used_blocks.push(sliced);
+
+                            used_blocks.push(sliced);
                             // Try to add this to the master group
                             // If we cant, we insert the basic block back into the basic_blocks list
-                            if(!mastergroup.addById(dropee, sliced, settings.default_relation)){
+                            if(!mastergroup.addById(dropee, sliced.copy(), settings.default_relation)){
                                 master.pushBooleanGroup(sliced);
-                            }       
+                            } else {
+                                used_blocks.push(sliced);
+                            }    
                         } 
                           // If comming from the query itself
-                        else {
+                        else {                            
                             var droper = Number(ui.draggable.attr('id').replace('boolrelwidget-ii-',''));
                             var dropee = Number($(this).attr('id').replace('boolrelwidget-dp-',''));
-                            console.log("Event drop 1: "+droper+" on "+dropee);
+                            console.log("Event drop 2: "+droper+" on "+dropee);
                             
                             // Makes no sense to move self to self
                             if(droper != dropee){
-                                var sliced = mastergroup.removeById(droper);
-                            
+                                var sliced = mastergroup.removeById(droper);          
+                                
                                 mastergroup.addById(dropee, sliced, settings.default_relation);
                                 
                             }
+                            
                         }
                         $(".tooltip").remove();
                           
@@ -294,6 +318,8 @@
                             
                       }
                     });
+                        $( ".boolrelwidget-query-dropper").tooltip({container: 'body', delay: { show: 500, hide: 0 }});
+
                      }
                     /* Firefox has a problem with the container if its not cloned ... */
                      if(!settings.view_only){
@@ -303,26 +329,27 @@
                         $(".boolrelwidget-query-box > .boolrelwidget-simple").parent().draggable({containment: "#boolrelwidget-panel",revert: true, opacity: 0.9, cursor: "move", cursorAt: { top: 10, left: 50 } }); 
                     }
                      }
-                    
                                          
                         // Add 
                         $(".boolrelwidget-query-delete").click(function(){
                             var removed = Number($(this).attr('id').replace('boolrelwidget-dl-',''));
                             
                             var removed_bool = mastergroup.removeById(removed);
-                            var contained = removed_bool.extractAllSimple();
+                            
+                            var contained = removed_bool.extractAllSimple();                            
                             
                             for(var j=0;j<contained.length;j++){
-                                if(!settings.hide_concepts)
-                                    master.pushBooleanGroup(contained[j]);
+                                if(settings.hide_concepts)
+                                    contained[j].callDelegate();
+                                else
+                                    master.pushBooleanGroup(contained[j].copy());
                                 
                                 var other_id = master.getUsedIndex(contained[j].variables[0]);
-                                if(other_id >0){
-                                    console.log('Removing from used variables');
+                                if(other_id > -1){
                                     used_blocks.splice(other_id, 1);
-                                }
-                            }
 
+                                }
+                            }  
                             master.draw();
                         });                    
                         $(".boolrelwidget-select").change(function(){
@@ -367,6 +394,7 @@
                     $('#boolrelwidget-query').html('<div class="boolrelwidget-first-droppable">'+settings.query_text+'</div>');
                      if(!settings.view_only){                    
                       $( ".boolrelwidget-first-droppable" ).droppable({
+                          hoverClass: "boolrelwidget-query-hover",                        
                           drop: function( event, ui ) {
                               
                             var droper = Number(ui.draggable.attr('id').replace('boolrelwidget-bb-',''));
@@ -376,7 +404,7 @@
                             
                             // Try to add this to the master group
                             // If we cant, we insert the basic block back into the basic_blocks list
-                            mastergroup = new BooleanGroup(sliced);
+                            mastergroup = sliced.copy();
                             
                             // Put in used blocks
                             $(".tooltip").fadeOut('fast');
@@ -387,11 +415,10 @@
                         });  
                      }
                 }
-                $(".boolrelwidget-simple").tooltip({container: 'body', delay: { show: 500, hide: 0 }});
+                $(".boolrelwidget-simple").tooltip({container: 'body', delay: { show: 500, hide: 0 }}).css('z-index','2001');
 
                     // If we have collapsing preferences, apply them
                 if(this.getCookie('boolrelwidget-collapse-preferences')){
-                    console.log(this.getCookie('boolrelwidget-collapse-preferences'));
                     if(this.getCookie('boolrelwidget-collapse-preferences') == 'expanded'){
                         var context = $('boolrelwidget-collapseall');
                         $('#boolrelwidget-collapseall').text('Collapse All');
@@ -465,12 +492,13 @@
                         big_box.push('<div id="boolrelwidget-dp-');
                         big_box.push(something.id);
                         if(counter%2 == 0){
-                            big_box.push('" class="btn boolrelwidget-query-dropper');
+                            big_box.push('" title="Drag other concepts here, to nest a relation with this concept. See help for more details." data-toggle="tooltip" class="btn boolrelwidget-query-dropper');
+                            
                             if(!something.isSimple()  && counter >0)
                                 big_box.push(' boolrelwidget-expandable');
                             big_box.push('"><div class="boolrelwidget-query-dropper-odd">&nbsp;&nbsp;</div></div>');
                         } else {
-                            big_box.push('" class="btn btn-inverse boolrelwidget-query-dropper');
+                            big_box.push('" title="Drag other concepts here, to nest a relation with this concept. See help for more details." data-toggle="tooltip" class="btn btn-inverse boolrelwidget-query-dropper');
                             if(!something.isSimple() && counter >0)
                                 big_box.push(' boolrelwidget-expandable');
                             big_box.push('"><div class="boolrelwidget-query-dropper-even">&nbsp;&nbsp;</div></div>');
@@ -677,6 +705,9 @@
         
         if(!settings.view_only){
             toolbar_content+='<div class="boolrelwidget-menu pull-left"><strong>Boolean Query</strong></div><div class="pull-right boolrelwidget-menu btn-group">';
+            
+            toolbar_content+='<a href="#boolrelwidgethelper" role="button" class="btn" data-toggle="modal"><i class="icon-question-sign"></i> Help</a>';
+            
         if( settings.form_anchor ){
             toolbar_content+='<button id="boolrelwidget-search" class="btn">Search</button>';
             
@@ -691,6 +722,9 @@
             toolbar_content+='<button onclick="window.location.replace(\''+settings.link_back+'\'); return false;" class="pull-right btn">Refine Search</button>';
         }
         toolbar_content+='</div><div id="boolrelwidget-query" class="well well-small">Loading...</div></div>';
+        
+        toolbar_content+= '<!-- Modal --><div id="boolrelwidgethelper" class="boolrelwidgethelpercontainer modal hide fade" tabindex="-1" role="dialog" aria-labelledby="boolrelwidgethelperLabel" aria-hidden="true">  <div class="modal-header">    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>    <h3 id="boolrelwidgethelperLabel">Help</h3>  </div>  <div class="boolrelwidgethelper modal-body">'+settings.help+'</div>  <div class="modal-footer">    <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button></div></div>'
+        
         self = self.append(toolbar_content);
         
         // Lets add the event handlersx
@@ -700,7 +734,7 @@
         $( '#boolrelwidget-collapse' ).click(function() {
             funcs.collapsePanel();
         });
-        
+
         if(funcs.getCookie('boolrelwidget-panel-open') == 'true'){
             funcs.expandPanel();
         }
@@ -772,10 +806,12 @@ function isBool(op){
 var boolrelwidgetuniqueidcounter=10000;
 
 
-function BooleanTerminal(identificator, representation, value){
+function BooleanTerminal(identificator, representation, value, deldelegate){
     this.id = null;
     this.text = null;
     this.val = null;   
+    this.delete_delegate = null;
+    
     if(identificator == null && representation == null && value == null){
         // nothing    
     }
@@ -791,7 +827,7 @@ function BooleanTerminal(identificator, representation, value){
         if(!(typeof value == 'string' || value instanceof String)){
             console.warn('Value on BooleanTerminal must be a string');
             return null;
-        } 
+        }       
         if (identificator == '' || representation == ''){
             console.warn('Tried to add a BooleanTerminal with empty identificator or representation, that is impossible, the only possible empty variable is value.');
             return null;    
@@ -799,6 +835,7 @@ function BooleanTerminal(identificator, representation, value){
         this.id=identificator;
         this.text = representation;
         this.val = value;
+        this.delete_delegate=deldelegate;
     }
 }
 BooleanTerminal.prototype = {
@@ -811,16 +848,17 @@ BooleanTerminal.prototype = {
         else return '';
     },    
     serialize   :   function(){
-        return 'T;;;;;'+encodeURI(this.id) + ';;;;;'+ encodeURI(this.text) + ';;;;;' + encodeURI(this.val);
+        return 'T;;;;;'+encodeURI(this.id) + ';;;;;'+ encodeURI(this.text) + ';;;;;' + encodeURI(this.val)+ ';;;;;' + encodeURI(this.delete_delegate);
     }, 
     deserialize : function(str){
         str = str.split(';;;;;');
-        if(str.length != 4)
+        if(str.length != 5)
             console.error("Couldn't parse Bolean Terminal prototype");
         else {
             this.id=decodeURI(str[1]);
             this.text=decodeURI(str[2]);
             this.val=decodeURI(str[3]);
+            this.delete_delegate = decodeURI(str[4]);
         }        
         return this;
     },
@@ -922,10 +960,11 @@ BooleanGroup.prototype = {
                 // If not on root remove reference
                 if(parent){
                     parent.variables.splice(branch,1);
+                    
                     if(branch=0)
                         parent.relations.splice(branch,1);
                     else 
-                        parent.relations.splice(branch-1,1);      
+                        parent.relations.splice(branch-1,1);    
                     
                     // I also return this, to be able to later remove unnecessary
                     returnable.push(parent.id);
@@ -1125,5 +1164,30 @@ BooleanGroup.prototype = {
         }
         
         return this;
+    }, 
+    /* This only does shallow copies */
+    copy : function(){
+        var bg = new BooleanGroup(this.variables[0]);
+        bg.id = this.id;
+
+        for(var i=1;i<this.variables.length;i++){
+            bg.variables.push(this.variables[i]);
+        }
+        for(var i=1;i<this.relations.length; i++){
+            bg.relations.push(this.relations[i]);
+        }
+
+        return bg;
+    },
+    /* Probability should think of a better way of doing this, but since i want to allow it to be used to pass complete calls with parameters, as usual, i didnt find any other better way. Other solutions would envolve also keeping an array of parameters, and isnt much safer than doing this directly. since i could simple pass evals in this array of parameters and it would execute as a function anyway...
+     */
+    callDelegate : function(){
+        if(this.isSimple() && this.variables[0].delete_delegate != null 
+           && (typeof this.variables[0].delete_delegate == 'string'                                     
+                   || this.variables[0].delete_delegate instanceof String)){
+        
+            eval(this.variables[0].delete_delegate);
+            
+        }
     }
 };
