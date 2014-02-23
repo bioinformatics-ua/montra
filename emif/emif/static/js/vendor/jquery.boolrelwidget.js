@@ -26,19 +26,7 @@
             view_serialized_string: null,
             link_back: null
         }, options);
-        /*
-        var bg1 = new BooleanGroup('teste de nome muito grande mesmo');
-        var bg2 = new BooleanGroup('outro name ainda maior que o anterior, mas nao muito');
-        var bg3 = new BooleanGroup('nome curto');
-        
-        var bg4 = new BooleanGroup(bg1);
-        bg4.addBoolean(BOOL['OR'], bg2);
-        
-        mastergroup = new BooleanGroup(bg4);
-        mastergroup.addBoolean(BOOL['AND'], bg3);
-        
-        basic_blocks.push(new BooleanGroup('outro nome grande, mas mesmo bue grande para ficar aqui para eu depois arranjar isto com ...'));
-        */
+
         var funcs = {
             push: function (ident, rep, answer) {
                 var bt = new BooleanTerminal(ident, rep, answer);
@@ -55,8 +43,8 @@
                     used_blocks.push(sliced);
                     
                     if(mastergroup==null)
-                        mastergroup= new BooleanGroup(sliced);
-                    else mastergroup.addById(mastergroup.id, sliced, settings.default_relation);
+                        mastergroup= new BooleanGroup(sliced.copy());
+                    else mastergroup.addById(mastergroup.id, sliced.copy(), settings.default_relation);
                 }
                 this.draw();
                 
@@ -266,19 +254,20 @@
                             console.log("Event drop 1: "+droper+" on "+dropee);
                             
                             var sliced = master.spliceById(droper);
-                                
-                              used_blocks.push(sliced);
+
                             // Try to add this to the master group
                             // If we cant, we insert the basic block back into the basic_blocks list
-                            if(!mastergroup.addById(dropee, sliced, settings.default_relation)){
+                            if(!mastergroup.addById(dropee, sliced.copy(), settings.default_relation)){
                                 master.pushBooleanGroup(sliced);
-                            }       
+                            } else {
+                                used_blocks.push(sliced);
+                            }    
                         } 
                           // If comming from the query itself
                         else {
                             var droper = Number(ui.draggable.attr('id').replace('boolrelwidget-ii-',''));
                             var dropee = Number($(this).attr('id').replace('boolrelwidget-dp-',''));
-                            console.log("Event drop 1: "+droper+" on "+dropee);
+                            console.log("Event drop 2: "+droper+" on "+dropee);
                             
                             // Makes no sense to move self to self
                             if(droper != dropee){
@@ -314,9 +303,10 @@
                             
                             for(var j=0;j<contained.length;j++){
                                 if(!settings.hide_concepts)
-                                    master.pushBooleanGroup(contained[j]);
+                                    master.pushBooleanGroup(contained[j].copy());
                                 
                                 var other_id = master.getUsedIndex(contained[j].variables[0]);
+                                console.warn("found used id: "+other_id);
                                 if(other_id >0){
                                     console.log('Removing from used variables');
                                     used_blocks.splice(other_id, 1);
@@ -376,7 +366,7 @@
                             
                             // Try to add this to the master group
                             // If we cant, we insert the basic block back into the basic_blocks list
-                            mastergroup = new BooleanGroup(sliced);
+                            mastergroup = sliced.copy();
                             
                             // Put in used blocks
                             $(".tooltip").fadeOut('fast');
@@ -1125,5 +1115,19 @@ BooleanGroup.prototype = {
         }
         
         return this;
+    }, 
+    /* This only does shallow copies */
+    copy : function(){
+        var bg = new BooleanGroup(this.variables[0]);
+        bg.id = this.id;
+
+        for(var i=1;i<this.variables.length;i++){
+            bg.variables.push(this.variables[i]);
+        }
+        for(var i=1;i<this.relations.length; i++){
+            bg.relations.push(this.relations[i]);
+        }
+
+        return bg;
     }
 };
