@@ -79,11 +79,11 @@ text-decoration: none;
       <li class="nav-header">Step-by-Step</li>
       {% for qs in questionset.questionnaire.questionsets %}
 
-      {% if qs.sortid != 0 and qs.sortid != 99 %}
+      {% if qs.sortid != 0 and qs.sortid != 99 and qs.text != 'h1. Key Publications' %}
       <li{% if questionset.text == qs.text %} class="active" {% endif %} id="li_qs_{{qs.sortid}}">
         <!--<a href="q2/{{runinfo.random}}/{{ qs.sortid }}">-->
         <a href="advancedSearch/{{qs.questionnaire.pk}}/{{ qs.sortid }}" onclick="questionsets_handle(qs_{{ qs.sortid }}); return false;">
-          <table>
+            <table>
             <tr>
               <td width="80%">{{ qs.text|removeh1 }}</td>
               <td width="10%">

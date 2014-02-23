@@ -2236,7 +2236,7 @@ def show_fingerprint_page_read_only(request, q_id, qs_id, SouMesmoReadOnly=False
                 Type = question.get_type()
                 if SouMesmoReadOnly and Type == 'open-button':
                    Type = "open"
-               
+
                 _qnum, _qalpha = split_numal(question.number)
 
                 qdict = {
@@ -2289,7 +2289,9 @@ def show_fingerprint_page_read_only(request, q_id, qs_id, SouMesmoReadOnly=False
             
             
         # qvalues = {'1a': 'teste'}   
-            
+        print question_set.questionnaire.questionsets()
+
+
         errors = {}
         fingerprint_id = generate_hash()
         r = r2r(template_name, request,
@@ -2309,9 +2311,9 @@ def show_fingerprint_page_read_only(request, q_id, qs_id, SouMesmoReadOnly=False
                 questions_list=qlist_general,
                 fingerprint_id=fingerprint_id,
                 breadcrumb=True,
-                hide_add = hide_add,
-                q_id = q_id,
-                aqid = aqid,
+                hide_add=hide_add,
+                q_id=q_id,
+                aqid=aqid,
                 serialized_query=serialized_query
                 
         )
@@ -2319,9 +2321,8 @@ def show_fingerprint_page_read_only(request, q_id, qs_id, SouMesmoReadOnly=False
         r['Expires'] = "Thu, 24 Jan 1980 00:00:00 GMT"
 
     except:
+        raise
 
-        raise   
-        
     return r
 
 
