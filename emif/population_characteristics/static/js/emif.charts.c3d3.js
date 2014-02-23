@@ -54,7 +54,9 @@ function GraphicChartC3D3(divArg, dataArg)
 
   this.draw = function(div, dataset){
     console.log(this.div);
-    var chart2 = c3.generate({
+    
+
+    var chart = c3.generate({
          padding: {
         left: 100,
     },
@@ -82,7 +84,7 @@ function GraphicChartC3D3(divArg, dataArg)
         },
         zoom: {
           enabled: true,
-          privileged: false
+        
         },
         
         

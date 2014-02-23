@@ -89,7 +89,7 @@
             __axis_y_center = getConfig(['axis', 'y', 'center'], null),
             __axis_y_label = getConfig(['axis', 'y', 'label'], null),
             __axis_y_inner = getConfig(['axis', 'y', 'inner'], false),
-            __axis_y_tick_format = getConfig(['axis', 'y', 'tick', 'format'], function (d) { return d; }),
+            __axis_y_tick_format = getConfig(['axis', 'y', 'tick', 'format'], null),
             __axis_y_padding = getConfig(['axis', 'y', 'padding'], null),
             __axis_y_ticks = getConfig(['axis', 'y', 'ticks'], 10),
             __axis_y2_show = getConfig(['axis', 'y2', 'show'], false),
@@ -99,7 +99,7 @@
             // not used
             // __axis_y2_label = getConfig(['axis', 'y2', 'text'], null),
             __axis_y2_inner = getConfig(['axis', 'y2', 'inner'], false),
-            __axis_y2_tick_format = getConfig(['axis', 'y2', 'tick', 'format'], function (d) { return d; }),
+            __axis_y2_tick_format = getConfig(['axis', 'y2', 'tick', 'format'], null),
             __axis_y2_padding = getConfig(['axis', 'y2', 'padding'], null),
             __axis_y2_ticks = getConfig(['axis', 'y2', 'ticks'], 10),
             __axis_rotated = getConfig(['axis', 'rotated'], false);
@@ -135,10 +135,16 @@
         var __tooltip_enabled = getConfig(['tooltip', 'enabled'], true),
             __tooltip_contents = getConfig(['tooltip', 'contents'], function (d) {
             var title = getXAxisTickFormat()(d[0].x),
-                text = "<table class='-tooltip'><tr><th colspan='2'>" + title + "</th></tr>", i, value, name;
+                text = "<table class='-tooltip'><tr><th colspan='2'>" + title + "</th></tr>", i, value, name,
+                format = __axis_y_tick_format ? __axis_y_tick_format : function (v) { return +v; };
             for (i = 0; i < d.length; i++) {
-                if (! d[i] || !(d[i].value || d[i].value === 0)) { continue; }
-                value = isDefined(d[i].value) ? (Math.round(d[i].value * 100) / 100).toFixed(2) : '-';
+                if (! d[i] || ! isValue(d[i].value)) { continue; }
+
+                value = '-';
+                if (isValue(d[i].value)) {
+                    value = format(d[i].value);
+                }
+
                 name = d[i].name;
                 text += "<tr class='-tooltip-name-" + d[i].id + "'><td class='name'><span style='background-color:" + color(d[i].id) + "'></span>" + name + "</td><td class='value'>" + value + "</td></tr>";
             }
@@ -151,7 +157,7 @@
         /*-- Set Variables --*/
 
         var clipId = __bindto.replace('#', '') + '-clip',
-            clipPath = "url(#" + clipId + ")";
+            clipPath = "url("+document.URL+"#" + clipId + ")";
 
         var isTimeSeries = (__axis_x_type === 'timeseries'),
             isCategorized = (__axis_x_type === 'categorized'),
@@ -252,10 +258,10 @@
             innerRadius = hasDonutType(c3.data.targets) ? radius * 0.6 : 0;
         }
         function getCurrentWidth() {
-            return __size_width === null ? getParentWidth() : __size_width;
+            return __size_width ? __size_width : getParentWidth();
         }
         function getCurrentHeight() {
-            var h = __size_height === null ? getParentHeight() : __size_height;
+            var h = __size_height ? __size_height : getParentHeight();
             return h > 0 ? h : 320;
         }
         function getCurrentPaddingLeft() {
@@ -834,7 +840,7 @@
         function classEvent(d, i) { return "event-rect event-rect-" + i; }
 
         function opacityCircle(d) {
-            return d.value ? isScatterType(d) ? 0.5 : 1 : 0;
+            return isValue(d.value) ? isScatterType(d) ? 0.5 : 1 : 0;
         }
 
         function xx(d) {
@@ -923,7 +929,7 @@
             var svgLeft, tooltipLeft, tooltipRight, tooltipTop, chartRight;
             if (! __tooltip_enabled) { return; }
             // don't show tooltip when no data
-            if (selectedData.filter(function (d) { return d && d.value; }).length === 0) { return; }
+            if (selectedData.filter(function (d) { return d && isValue(d.value); }).length === 0) { return; }
             // Construct tooltip
             tooltip.html(__tooltip_contents(selectedData))
                 .style("visibility", "hidden")
@@ -1217,7 +1223,7 @@
         }
 
         function filterRemoveNull(data) {
-            return data.filter(function (d) { return d.value !== null; });
+            return data.filter(function (d) { return isValue(d.value); });
         }
 
         //-- Shape --//
@@ -1537,7 +1543,7 @@
             // Add Axis
             main.append("g")
                 .attr("class", "x axis")
-                .attr("clip-path", __axis_rotated ? "" : "url(#xaxis-clip)")
+                .attr("clip-path", __axis_rotated ? "" : "url("+document.URL+"#xaxis-clip)")
                 .attr("transform", translate.x)
                 .call(__axis_rotated ? yAxis : xAxis)
               .append("text")
@@ -1548,7 +1554,7 @@
                 .text(__axis_x_label);
             main.append("g")
                 .attr("class", "y axis")
-                .attr("clip-path", __axis_rotated ? "url(#yaxis-clip)" : "")
+                .attr("clip-path", __axis_rotated ? "url("+document.URL+"#yaxis-clip)" : "")
                 .call(__axis_rotated ? xAxis : yAxis)
               .append("text")
                 .attr("transform", "rotate(-90)")
@@ -1701,7 +1707,7 @@
                 context.append("g")
                     .attr("class", "x axis")
                     .attr("transform", translate.subx)
-                    .attr("clip-path", __axis_rotated ? "url(#yaxis-clip)" : "")
+                    .attr("clip-path", __axis_rotated ? "url("+document.URL+"#yaxis-clip)" : "")
                     .call(subXAxis);
             }
 
@@ -2866,6 +2872,12 @@
             return targets.length > 0 ? targets[0] : undefined;
         };
 
+        c3.resize = function (size) {
+            __size_width = size ? size.width : null;
+            __size_height = size ? size.height : null;
+            resize();
+        };
+
         c3.destroy = function () {
             c3.data.targets = undefined;
             c3.data.x = {};
@@ -3060,6 +3072,9 @@
         return axis;
     }
 
+    function isValue(v) {
+        return v || v === 0;
+    }
     function isUndefined(v) {
         return typeof v === 'undefined';
     }
