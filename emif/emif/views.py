@@ -760,7 +760,7 @@ def render_one_questionset(request, q_id, qs_id, errors={}, aqid=None, template_
         if aqid != None:
             (qlist_general, qlist, jstriggers, qvalues, jsinclude, cssinclude, extra_fields, hasErrors) = extract_answers(request2, q_id, question_set, qs_list)
         
-        
+        print jstriggers
         
         fingerprint_id = generate_hash()
         r = r2r(template_name, request,

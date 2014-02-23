@@ -70,13 +70,20 @@ function validate1(element, id_answered, dirty_id_answered) {
                 console.log('question_nr_'+id_answered);
                 var number_correct = $('#question_nr_'+id_answered).text().trim();
                 number_correct = number_correct.substring(0, number_correct.length-1);
-                console.log( number_correct);
-                console.log( $('#question_nr_'+id_answered).text().trim()+" "+just_question);
-                console.dir(':input[name="question_'+dirty_id_answered.replace('.','\\.')+'"]');
+                //console.log( number_correct);
+                //console.log( $('#question_nr_'+id_answered).text().trim()+" "+just_question);
+                //console.dir(':input[name="question_'+dirty_id_answered.replace('.','\\.')+'"]');
                 
-                bool_container.push('question_nr_'+number_correct,
+                if($(':input[name="question_'+dirty_id_answered.replace('.','\\.')+'"]').is(':radio')){
+                    bool_container.pushWithDelegate('question_nr_'+number_correct,
                     $('#question_nr_'+id_answered).text().trim()+" "+just_question,
-                                   $(':input[name="question_'+dirty_id_answered.replace('.','\\.')+'"]').val());
+                                   $(':input[name="question_'+dirty_id_answered.replace('.','\\.')+'"]').val(), 'clear_selection("question_nr_'+dirty_id_answered.replace('.','\\.')+'", "");');   
+                } else {
+                  bool_container.pushWithDelegate('question_nr_'+number_correct,
+                    $('#question_nr_'+id_answered).text().trim()+" "+just_question,
+                                   $(':input[name="question_'+dirty_id_answered.replace('.','\\.')+'"]').val(), 'clearSimple("question_'+dirty_id_answered.replace('.','\\.')+'");');       
+                }
+                
             }
         
         } else {
@@ -92,6 +99,13 @@ function validate1(element, id_answered, dirty_id_answered) {
         }
             // If we have a boolean container, maker
 
+}
+
+// Clear a simple text field by his name
+function clearSimple(id){
+    $(':input[name="'+id.replace('.','\\.')+'"]').val('');
+    // Simulate change
+    $(':input[name="'+id.replace('.','\\.')+'"]').change();
 }
 
 //Creates an advanced validator for question fields.

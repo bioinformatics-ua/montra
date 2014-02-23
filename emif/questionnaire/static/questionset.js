@@ -57,14 +57,20 @@ function statusChanged(obj, res) {
     //obj.style.backgroundColor = !res ? "#eee" : "#fff";
     obj.disabled = !res;
 }
-
-function valchanged(qnum, value) {
+function clearcheck(id){
+    console.warn('clearcheck ID: '+id);
+    $(':input[name="'+id+'"]').removeAttr('checked');
+    //$(':input[name="'+id+'"]').click();
+}
+function valchanged(qnum, value, self) {
     if (!(typeof bool_container === 'undefined')) {
+        var $self = $(self);
+        
         var just_number = qnum.split('_')[1];
         var clean = qnum.replace('question_','').replace(/(\\)/g, '');
         var dirty = qnum.replace('question_','').replace('_',':');
         var index = dirty.indexOf(':');
-        console.log(value);
+
         // We have to get the question
         var the_question = $('#question_'+clean.split('_')[0].replace(/(\.)/g,'')).text().trim(); 
         if(value==true){
@@ -76,17 +82,18 @@ function valchanged(qnum, value) {
             //console.log(optional.attr('id'));
             
             //var optional = $('#question_'+just_number.replace(/(\.)/g,'\\.')+"_1_opt").val();
-            bool_container.push('question_nr_'+dirty.substring(0,index)+"_____"+clean+"_____",
+            bool_container.pushWithDelegate('question_nr_'+dirty.substring(0,index)+"_____"+clean+"_____",
                                 clean.replace('_','. ')+' ('+the_question+')'
-                               , dirty.substring(index+1,dirty.length));
+                               , dirty.substring(index+1,dirty.length), 'clearcheck("'+$self.attr('id')+'");');
         } else if(value==false){
             var optional = $('#question_'+just_number.replace(/(\.)/g,'')+"_opt").val();
-            bool_container.splice('question_nr_'+dirty.substring(0,index)+"__"+clean+"__",
+            bool_container.splice('question_nr_'+dirty.substring(0,index)+"_____"+clean+"_____",
                                 clean.replace('_','. ')+' ('+the_question+')'
                                , dirty.substring(index+1,dirty.length));
-        } else {
+        } else {            
             if( value != 'yes' && value != 'no' && value != 'dontknow ')
-            bool_container.push('question_nr_'+dirty.substring(0,index), clean.replace('_','')+'. '+the_question+'', value);        
+            bool_container.pushWithDelegate('question_nr_'+clean, clean.replace('_','')+'. '+the_question+'', value, 'clear_selection("question_nr_'+clean+'", " ");');   
+                        
         }
     }    
 
@@ -114,9 +121,7 @@ function addtrigger(elemid) {
 function clear_selection(question_name, response){
     $(":radio[name='" + question_name.replace('question_nr_','question_') + "']").prop('checked', false);
     if (!(typeof bool_container === 'undefined')) {
-            console.log(response);
             bool_container.splice(question_name, response, '');
-    
     }        
     
 }
