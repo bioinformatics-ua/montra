@@ -7,7 +7,7 @@
          var self = this;
 
          var settings = $.extend({
-            delete_color: "#000000",
+            delete_color: "#000000"
         }, options );
 
         // You know its gonna happen
@@ -18,7 +18,7 @@
         else {
             var classes = this.attr('class');
             //this.attr('class', '');
-            this.attr('style','float: left; display:inline-block; border: 0px solid #ccc !important; box-shadow: none;-moz-box-shadow: none;-webkit-box-shadow: none;');
+            this.attr('style','float: left; padding-top: -3px; display:inline-block; border: 0px solid #ccc !important; box-shadow: none;-moz-box-shadow: none;-webkit-box-shadow: none;');
             this.wrap('<div style="height: 28px; background-color: white; border: 1px solid #ccc; -webkit-border-radius: 15px; -moz-border-radius: 15px; border-radius: 15px;" class="canclear_outer"></div>');
             this.parent().append('<span style="padding-right:8px; float: right; padding-top:3px; cursor: pointer;" class="canclear_button"><i class="icon-remove"></i></span>');
             if($(this).val() == ''){

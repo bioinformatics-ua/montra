@@ -55,13 +55,14 @@ $(document).ready(function () {
 /* Function to validate for fields of type 1 (see comments below)*/
 function validate1(element, id_answered, dirty_id_answered) {
                 /* Tip from: http://viralpatel.net/blogs/jquery-get-text-element-without-child-element/ */
+ 
             var just_question = $('#question_'+id_answered)
-        .clone()    //clone the element
+        .clone().removeAttr('id')    //clone the element <- add to remove the id from the cloned element because ie7 crashes on duplicate ids
         .children() //select all the children
         .remove()   //remove all the children
         .end()  //again go back to selected element
         .text().trim();    //get the text of element
-    
+
     if($(element).val() != "") {
             //console.log('1 - #answered_'+id_answered);
             $('[id="answered_'+id_answered+'"]').show();
