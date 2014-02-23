@@ -320,8 +320,12 @@ margin: 5px;
     text-align:justify;
     text-justify:inter-word;
 }
-
+.boolrelwidget-query-hover{
+    background-color: orange !important;
+    background-image: none !important;
+}
  .modal
+}
 {
    width:70%;
    margin-left: -35%; 

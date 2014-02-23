@@ -70,8 +70,8 @@
                     used_blocks.push(sliced);
                     
                     if(mastergroup==null)
-                        mastergroup= new BooleanGroup(sliced);
-                    else mastergroup.addById(mastergroup.id, sliced, settings.default_relation);
+                        mastergroup= new BooleanGroup(sliced.copy());
+                    else mastergroup.addById(mastergroup.id, sliced.copy(), settings.default_relation);
                 }
                 this.draw();
                 
@@ -147,7 +147,10 @@
                     
                     console.log('Variable is being used, removing it from mastergroup and removing it from used variables');
                     block = used_blocks.splice(other_id, 1)[0];
-                    mastergroup.removeById(block.id);
+
+                    // Try to remove from mastergroup (if there is a mastergroup)
+                    if(mastergroup != null)
+                        mastergroup.removeById(block.id);
                     
                     this.draw();
                     
@@ -273,7 +276,9 @@
                     var master = this;
                      if(!settings.view_only){
                     $( ".boolrelwidget-query-dropper" ).droppable({
+                      hoverClass: "boolrelwidget-query-hover",
                       drop: function( event, ui ) {
+                        $( ".boolrelwidget-query-dropper" ).tooltip('disable');
                         var drag = ui.draggable.attr('id');
                           // If coming from basic blocks
                         if(typeof drag != 'undefined' && drag.lastIndexOf('boolrelwidget-bb-', 0) === 0){
@@ -313,6 +318,8 @@
                             
                       }
                     });
+                        $( ".boolrelwidget-query-dropper").tooltip({container: 'body', delay: { show: 500, hide: 0 }});
+
                      }
                     /* Firefox has a problem with the container if its not cloned ... */
                      if(!settings.view_only){
@@ -322,7 +329,6 @@
                         $(".boolrelwidget-query-box > .boolrelwidget-simple").parent().draggable({containment: "#boolrelwidget-panel",revert: true, opacity: 0.9, cursor: "move", cursorAt: { top: 10, left: 50 } }); 
                     }
                      }
-                        console.log(used_blocks);
                                          
                         // Add 
                         $(".boolrelwidget-query-delete").click(function(){
@@ -333,19 +339,17 @@
                             var contained = removed_bool.extractAllSimple();                            
                             
                             for(var j=0;j<contained.length;j++){
-                                if(!settings.hide_concepts)
+                                if(settings.hide_concepts)
+                                    contained[j].callDelegate();
+                                else
                                     master.pushBooleanGroup(contained[j].copy());
                                 
                                 var other_id = master.getUsedIndex(contained[j].variables[0]);
-                                console.warn("found used id: "+other_id);
-                                if(other_id >0){
-                                    console.log('Removing from used variables');
-                                    used_blocks.splice(other_id, 1);
                                 if(other_id > -1){
-                                    var ub = used_blocks.splice(other_id, 1)[0];
-                                    
+                                    used_blocks.splice(other_id, 1);
+
                                 }
-                            }                            
+                            }  
                             master.draw();
                         });                    
                         $(".boolrelwidget-select").change(function(){
@@ -390,6 +394,7 @@
                     $('#boolrelwidget-query').html('<div class="boolrelwidget-first-droppable">'+settings.query_text+'</div>');
                      if(!settings.view_only){                    
                       $( ".boolrelwidget-first-droppable" ).droppable({
+                          hoverClass: "boolrelwidget-query-hover",                        
                           drop: function( event, ui ) {
                               
                             var droper = Number(ui.draggable.attr('id').replace('boolrelwidget-bb-',''));
@@ -487,12 +492,13 @@
                         big_box.push('<div id="boolrelwidget-dp-');
                         big_box.push(something.id);
                         if(counter%2 == 0){
-                            big_box.push('" class="btn boolrelwidget-query-dropper');
+                            big_box.push('" title="Drag other concepts here, to nest a relation with this concept. See help for more details." data-toggle="tooltip" class="btn boolrelwidget-query-dropper');
+                            
                             if(!something.isSimple()  && counter >0)
                                 big_box.push(' boolrelwidget-expandable');
                             big_box.push('"><div class="boolrelwidget-query-dropper-odd">&nbsp;&nbsp;</div></div>');
                         } else {
-                            big_box.push('" class="btn btn-inverse boolrelwidget-query-dropper');
+                            big_box.push('" title="Drag other concepts here, to nest a relation with this concept. See help for more details." data-toggle="tooltip" class="btn btn-inverse boolrelwidget-query-dropper');
                             if(!something.isSimple() && counter >0)
                                 big_box.push(' boolrelwidget-expandable');
                             big_box.push('"><div class="boolrelwidget-query-dropper-even">&nbsp;&nbsp;</div></div>');
