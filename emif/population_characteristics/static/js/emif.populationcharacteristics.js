@@ -196,9 +196,15 @@ function PCAPI ()
  {
 
 
+
+    /** Draft code */ 
     function getFiltersSelected(){
 
+      return filtersMap;
+
     };
+
+    var filtersMap = {}
 
     var methods = {
         init : function( options, name, fingerprintId ) {
@@ -230,6 +236,7 @@ function PCAPI ()
                 console.log(data);
                   if (xFilter.values[data]==="")
                       return;
+                  filtersMap[xFilter.name +'.'+ xFilter.values[data]] = true;
                   tmpUl.append('<li><a class="filterBar" href="#" onclick="return false;"><i id="iproximity" class="icon-ok icon-black active"></i> '+xFilter.values[data]+'</a></li>')
               });
             });
@@ -244,6 +251,9 @@ function PCAPI ()
 
                       console.log(e.toElement.innerHTML);
                       
+
+                      console.log(getFiltersSelected());
+
                       if ($(e.toElement.firstChild).hasClass('icon-ok')) 
                       {
                         $(e.toElement.firstChild).removeClass('icon-ok') 
