@@ -27,11 +27,27 @@ function PCDraw(chartType, e)
       console.log(filters);
       PC = new PCAPI();
       fingerprintID = getFingerprintID();
-      console.log(fingerprintID);
-      var valuesFromGraph = PC.getValuesRow(this.chartType, 
-        'Count',fingerprintID );
-      console.log('valuesFromGraph: '+this.chartType);
-      console.log(valuesFromGraph);
+      console.log('filters++');
+      console.log(filters);
+      
+      
+      var valuesFromGraph = null;
+      
+      if (filters!==null)
+      {
+
+        tfilter = new TransformFilter(filters);
+        filters = tfilter.transform();
+        
+        valuesFromGraph = PC.getValuesRowWithFilters(this.chartType, 
+          'Count',fingerprintID, filters );
+      
+
+      }
+      
+      /*valuesFromGraph = PC.getValuesRow(this.chartType, 
+        'Count',fingerprintID );*/
+    
       $("#pc_chart_place").html('');
       $("#pc_chart_place").graphicChart('init');
       $("#pc_chart_place").graphicChart('drawBarChart', valuesFromGraph,valuesFromGraph,valuesFromGraph);

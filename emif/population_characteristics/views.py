@@ -35,7 +35,12 @@ def jerboa_list_values(request, var, row, fingerprint_id, template_name='documen
 
     if request.POST:
         # Get the filters to apply.
-        filters = request.POST['filters']
+
+        filters = {}
+        for i in request.POST:
+            filters[i[0:-2]] = request.POST[i]
+
+        print "Filters" + str(filters)
     
 
     pc = PopulationCharacteristic(None)

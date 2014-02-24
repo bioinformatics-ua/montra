@@ -26,7 +26,7 @@
 function getFingerprintID(){
   var url = document.URL;
   var fingerprint_id='abcd';
-  console.log(url)
+
   try{
     fingerprint_id = url.split("fingerprint/")[1].split("/1")[0];
   }
@@ -180,7 +180,8 @@ function PCAPI ()
 
      this.getValuesRowWithFilters = function(Var, Row, fingerprintID, filters){
         var result = {}
-        
+        console.log('getValuesRowWithFilters');
+        console.log(filters);
         $.ajax({
           dataType: "json",
           url: "population/jerboalistvalues/"+Var+"/"+Row+"/" + fingerprintID,
@@ -231,7 +232,7 @@ function PCAPI ()
             
             /** Get a list of filters */
             values = options.getFilter(name,fingerprintId);
-            console.log(values)
+
             if (values===undefined)
             {
                 return;
@@ -240,9 +241,9 @@ function PCAPI ()
             
             var self = this;
             self.html('');
-            console.log("for each:");
+
             values.values.forEach(function(_value){
-               console.log("_value:");
+
               var xFilter = JSON.parse(_value);
 
               
@@ -251,34 +252,42 @@ function PCAPI ()
 
               self.append(tmpUl);
               $.each(xFilter.values, function (data){
-                console.log('data');
-                console.log(data);
+
                   if (xFilter.values[data]==="")
                       return;
-                  filtersMap['values.' + xFilter.name] = xFilter.values[data];
-                  tmpUl.append('<li><a class="filterBar" href="#" onclick="return false;"><i id="iproximity" class="icon-ok icon-black active"></i> '+xFilter.values[data]+'</a></li>')
+                    if ('values.' + xFilter.name in filtersMap)
+                    {
+                      console.log(xFilter.name);
+                      filtersMap['values.' + xFilter.name].push(xFilter.values[data]);
+                    }
+                    else
+                    {
+                      console.log(xFilter.name);
+                      filtersMap['values.' + xFilter.name] = [xFilter.values[data]];
+                    }
+                    
+                  tmpUl.append('<li><a class="filterBar" id=_'+xFilter.name+'_'+xFilter.values[data]+' href="#" onclick="return false;"> '+xFilter.values[data]+'</a></li>')
               });
             });
 
-            console.log(values);
+
             
             /** The magic of the filters will happen here */ 
             $(".filterBar").bind('click',function(e)
                     { 
                       e.preventDefault(); 
                       e.stopPropagation();
-
+                      console.log('Filters:')
+                      console.log(getFiltersSelected());
                       var charDraw = new PCDraw(activeChart, null);
+                      console.log(e);
+                      console.log(e.toElement.id);
+                      var str = e.toElement.id;
+                      var filterType =str.substring(str.indexOf("_")+1,str.lastIndexOf("_"));
+                      console.log(filterType);
+                      filtersMap['values.'+filterType] = [e.toElement.innerHTML.trim()];
                       charDraw.draw(getFiltersSelected());
 
-                      if ($(e.toElement.firstChild).hasClass('icon-ok')) 
-                      {
-                        $(e.toElement.firstChild).removeClass('icon-ok') 
-                      }
-                      else
-                      {
-                        $(e.toElement.firstChild).addClass('icon-ok') 
-                      }
                       return false;
                     });
 
@@ -325,7 +334,7 @@ function PCAPI ()
                     { 
                       e.preventDefault(); 
                       e.stopPropagation();
-                      console.log(this.parent);
+  
                       
                       // Anyone have a better suggestion to do it?
                       // I'm more focuses in other staff right now.
@@ -334,7 +343,8 @@ function PCAPI ()
                       $(this.parentNode).closest('li').addClass('active')
 
                       var charDraw = new PCDraw(e.toElement.innerHTML, e);
-                      charDraw.draw(null);
+                      var _filters = {};
+                      charDraw.draw(_filters);
                       activeChart = e.toElement.innerHTML;
                       return false;
                     });
@@ -356,10 +366,10 @@ function PCAPI ()
             $.each(values, function (data){
                 if (values[data]==="")
                     return;
-                console.log(values[data]);
+
                 tmpUl.append('<li class=""><a class="graphTypes" href="#" onclick="return false;">'+values[data]+'</a></li>')
             });
-            console.log(api);
+
             var myPC = options;
             
             filters = new Filters();
@@ -395,7 +405,7 @@ $(document).ready(
         $("#pc_list").populationChartsTypes(chartLayout, PCAPI);
         $("#pc_list").populationChartsTypes('draw', chartLayout); 
         $(".graphTypes").each(function(d,a){
-          console.log(a);
+
           if (d==0) $(this)[0].click()
         });
         }

@@ -91,7 +91,7 @@ class PopulationCharacteristic(object):
 
         results = []
         for v in values:
-            print v
+            #print v
             results.append(v[u'values'])
 
         #print results
