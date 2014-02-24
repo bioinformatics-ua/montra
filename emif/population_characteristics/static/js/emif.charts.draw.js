@@ -35,13 +35,11 @@ function PCDraw(chartType)
       $("#pc_chart_place").graphicChart('init');
       $("#pc_chart_place").graphicChart('drawBarChart', valuesFromGraph,valuesFromGraph,valuesFromGraph);
 
-      console.log('Debug vars');
-
       var pc = new PCAPI();
       $("#pcBarContentRoot").removeClass("hidden");
       $("#pcBarContentRoot").addClass("show");
 
-      $("#pcBarContent").populationChartsBar('init', pc,e.toElement.innerHTML,
+      $("#pcBarContent").populationChartsBar('init', pc,this.chartType,
         fingerprintID);
       $("#pcBarContent").populationChartsBar('draw', pc);
 
@@ -56,7 +54,7 @@ function PCDraw(chartType)
         $(e.toElement.firstChild).addClass('icon-ok') 
       }
 
-      
+
     };
 
     this.refresh = function() {
