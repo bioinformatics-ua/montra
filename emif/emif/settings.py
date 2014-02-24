@@ -277,7 +277,7 @@ USERENA_WITHOUT_USERNAMES = True
 USERENA_DISABLE_PROFILE_LIST = True
 USERENA_USE_MESSAGES = False
 USERENA_REDIRECT_ON_SIGNOUT = BASE_URL
-USERENA_SIGNIN_REDIRECT_URL = BASE_URL + 'databases'
+USERENA_SIGNIN_REDIRECT_URL = BASE_URL + 'wherenext'
 USERENA_MODERATE_REGISTRATION = True                    #True - need admin approval (activation)
 USERENA_ACTIVATION_REJECTED = 'ACTIVATION_REJECTED'
 USERENA_PENDING_MODERATION = 'PENDING_MODERATION'
@@ -457,3 +457,8 @@ try:
 except ConnectionFailure, e:
     sys.stderr.write("Could not connect to MongoDB: %s" % e)
     sys.exit(1)
+
+# REDIRECT USER ACCORDING TO PROFILE
+REDIRECT_DATACUSTODIAN = 'emif.views.databases'
+REDIRECT_RESEARCHER = 'emif.views.all_databases_user'
+
