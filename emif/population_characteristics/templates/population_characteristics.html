@@ -21,7 +21,7 @@
 #pctitle{
     text-align: center;
 }
-#d3test{
+#pc_chart_place{
     margin-left: 60px;
 }
 #jerboaupload{
@@ -39,7 +39,7 @@
 
 
     <form id="jerboaupload" method="post" action="." enctype="multipart/form-data">
-{% csrf_token %}
+        {% csrf_token %}
         <!-- Redirect browsers with JavaScript disabled to the origin page -->
         <!--<noscript><input type="hidden" name="redirect" value="http://blueimp.github.io/jQuery-File-Upload/"></noscript>-->
         <!-- The fileupload-buttonbar contains buttons to add/delete files and start/cancel the upload -->
@@ -92,10 +92,8 @@
 
     {% else %}
 
-    {% block jerboaformupload %} 
-    {% endblock%}
 
-    You have already population characteristics. Your last activied is dated from: {{pc_last_activity}}
+    You have already population characteristics. Last update on: {{pc_last_activity}}
     <div class="span9 populationcharacteristicsbar">
     <div class="pull-right hidden ">
         <div class="btn-group">
@@ -176,13 +174,13 @@
         <div class='row'>
             <div id='pctitle'>
             </div>
-            <div id='d3test'>
+            <div id='pc_chart_place'>
             </div>
         </div>
     </div>
     
 
-    <div class="span3 hidden" id="pcBarContentRoot">
+    <div class="span3" id="pcBarContentRoot">
         <div > Filter: </div>
 
         <div id="pcBarContent" class="well">

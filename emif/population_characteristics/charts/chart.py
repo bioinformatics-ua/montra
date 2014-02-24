@@ -41,11 +41,13 @@ class Operation:
     PERC25 = 'Perc25'
     PERC75 = 'Perc75'
     SD = 'SD'
+    CONCAT = 'concat'
 
 class Scale(object):
     def __init__(self):
         self.unit = None
-        self.steps = None
+        self.bins = None
+        self.start = 0
         
     def to_JSON(self):
         return json.dumps(self, default=lambda o: o.__dict__, sort_keys=True, indent=4)

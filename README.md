@@ -4,20 +4,6 @@ emif-fb
 EMIF Platform - Fingerprint Browser 
 
 
-#### Local settings
-
-    $ cat emif/emif/local_settings.py
-    EMAIL_HOST = 'address.mail.com'
-    EMAIL_HOST_PASSWORD = 'passwd'
-    EMAIL_HOST_USER = 'login'
-    EMAIL_PORT = 25
-    EMAIL_USE_TLS = True
-
-
-#### Author
-
- * Luís A. Bastião Silva <bastiao@ua.pt>
- * Rui Mendes <ruidamendes@ua.pt>
 
 
 #### Installation steps
@@ -59,10 +45,48 @@ EMIF Platform - Fingerprint Browser
         Go to solr folder and Run
         (path).../apache-solr-4.0.0/example>java -jar start.jar
 
+6. Run MongoDB as service
+
+
+        Install MongoDB or go to the bin directory of mongodb:
+        mongod --dbpath /your/path/that/you/want
+
 7. Open browser and write
 
 
         localhost:8000
 
+
+#### Local settings
+
+    $ cat emif/emif/local_settings.py
+    EMAIL_HOST = 'address.mail.com'
+    EMAIL_HOST_PASSWORD = 'passwd'
+    EMAIL_HOST_USER = 'login'
+    EMAIL_PORT = 25
+    EMAIL_USE_TLS = True
+
+
+#### Integration with github issues and releases
+
+
+
+    GITHUB_USERNAME='githubusername'
+    GITHUB_PASSWD='pass'
+    GITHUB_ACCOUNT='bioinformatics-ua'
+    GITHUB_REPO='emif-fb'
+
+#### Developers
+
+ * Luís A. Bastião Silva <bastiao@ua.pt>
+ * Rui Mendes <ruidamendes@ua.pt>
+ * Tiago Godinho <tmgodinho@ua.pt>
+ * Ricardo Ribeiro <ribeiro.r@ua.pt>
+ * José Melo <melojms@gmail.com>
+
+ 
+#### Project Leader
+
+ * José Luis Oliveira <jlo@ua.pt>
 
  Enjoy!

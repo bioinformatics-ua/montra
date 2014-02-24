@@ -1,12 +1,13 @@
 {% load i18n %}
 {% load extra_tags %}
 <div class="clearfix">
+    
     <div class="input">
         <ul class="inputs-list unstyled">
         {% for choice, key, checked in qdict.choices %}
             <li>
                 <label>
-                    <input onClick="valchanged('question_{{ question.number }}_{{ choice.value|trim|esc }}', this.checked);" type="checkbox" id="{{ key }}" name="{{ key }}" value="{{ choice.value }}" {{ checked }} />
+                    <input onClick="valchanged('question_{{ question.number }}_{{ choice.value|trim|esc }}', this.checked, this);" type="checkbox" id="{{ key }}" name="{{ key }}" value="{{ choice.value }}" {{ checked }} />
                     <span>{{ choice.text|trim }}</span>
                 </label>
             </li>

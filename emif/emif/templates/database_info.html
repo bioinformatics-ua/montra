@@ -8,6 +8,7 @@
 <script src="{{ STATIC_URL}}js/vendor/threadpool.js"></script>
 
 <link rel="stylesheet" href="{{ STATIC_URL}}css/database_info.css" />
+<link rel="stylesheet" href="{{ STATIC_URL }}css/vendor/jquery.boolrelwidget.css"></script>
 
 <!-- Generic page styles -->
 <link rel="stylesheet" href="{{ STATIC_URL }}css/vendor/style.css">
@@ -55,8 +56,7 @@
 <!-- The File Upload validation plugin -->
 <script src="{{ STATIC_URL }}js/vendor/jquery.fileupload-validate.js"></script>
 <script src="{{ STATIC_URL }}js/vendor/jquery.cookie.js"></script>
-
-
+<script src="{{ STATIC_URL}}js/vendor/jquery.boolrelwidget.js"></script>
 
 {% endblock %} 
 {% block breadcrumbs %} 
@@ -65,17 +65,13 @@
         {% breadcrumb "Search" "resultsdiff/1" %} 
         {% breadcrumb breadcrumb_name "databases" %} 
     {% elif style == '1' %} 
-        {% breadcrumb "Databases" "databases" %} 
+        {% breadcrumb "My Databases" "databases" %} 
         {% breadcrumb breadcrumb_name "databases" %} 
     {% else %} 
-        {% breadcrumb "Databases" "alldatabases" %} 
+        {% breadcrumb "All Databases" "alldatabases" %} 
         {% breadcrumb breadcrumb_name "databases" %} 
     {% endif %}
 
-    {% comment %}
-        <!-- this gives a error ?? -->
-        {% <breadcrumb></breadcrumb> breadcrumb_name "" %}
-    {% endcomment %}
 {% endblock %}
 
 {% block toolbar %} 
@@ -89,27 +85,27 @@
     <div class="row-fluid">
         <div class="tabbable">
             <ul class="nav nav-tabs">
-                <li class="active">
+                <li class="{%if activetab == 'summary'%}active{%endif%}">
                     <a href="#metadata" data-toggle="tab">Fingerprint</a>
                 </li>
-                <li>
+                <li class="{%if activetab == 'pc'%}active{%endif%}">
                     <a href="#populationcharacteristics" data-toggle="tab">Population Characteristics</a>
                 </li>
-                <li>
+                <li  class="{%if activetab == 'docs'%}active{%endif%}">
                     <a href="#documents" data-toggle="tab">Documents</a>
                 </li>
                 <!--
-                <li>
+                <li  class="{%if activetab == 'literature'%}active{%endif%}">
                     <a href="#literature" data-toggle="tab">Literature</a>
                 </li>
                 -->
                 
-                <li>
+                <li  class="{%if activetab == 'extra'%}active{%endif%}">
                     <a href="#apiinfo" data-toggle="tab">Extra Information</a>
                 </li>
             </ul>
             <div class="tab-content">
-                <div class="tab-pane active" id="metadata">
+                <div class="tab-pane {%if activetab == 'summary'%}active{%endif%}" id="metadata">
                     <div>
                         <a id="collapseall_metadata" class="btn pull-right" href="">Expand all</a>
                     </div>
@@ -155,40 +151,23 @@
                 </div>
 
 
-                <div class="tab-pane" id="populationcharacteristics" >
+                <div class="tab-pane {%if activetab == 'pc'%}active{%endif%}" id="populationcharacteristics" >
 
-                              {% include "population_characteristics.html" %}
+                  {% include "population_characteristics.html" %}
 
             </div>
 
 
 
 
-              <div class="tab-pane" id="documents">
-                  {% if documents_available %}
-                    <div class="docs_available"> 
-                        <p >
-                          The documents that are available will be listed below. 
-                        </p>
-                    </div>
-
-                  {% else %}
-                    <div class="docs_not_available"> 
-                        <p class="nodocs">There is no documents for this fingerprint.</p>
-                    </div>
-                    <p class="nodocs">You can upload documents to associate them to the fingerprint browser</p>
-
-                    {% block documentsformupload %} 
-                    {% endblock%}
-
-                  {% endif %}
+              <div class="tab-pane {%if activetab == 'docs'%}active{%endif%}" id="documents">
                 
-
+                    {% include "documents.html" %}
             </div>
 
 
 
-                <div class="tab-pane" id="literature">
+                <div class="tab-pane {%if activetab == 'literature'%}active{%endif%}" id="literature">
                     <div>
                         <a id="collapseall_literature" class="btn pull-right" href="">Expand all</a>
                     </div>
@@ -222,7 +201,7 @@
                 </div>
 
 
-                <div class="tab-pane" id="apiinfo">
+                <div class="tab-pane {%if activetab == 'extra'%}active{%endif%}" id="apiinfo">
                     <div>
                         <a id="btn_pivot_table" class="btn pull-right hidden" href="">Pivot table</a>
                     </div>
@@ -263,7 +242,9 @@
             <a href="http://www.enable-javascript.com/" target="_blank">enable JavaScript in your web browser</a>.</h2>
     </div>
 </noscript>
-
+{% if isAdvanced %}
+<div id="bool_container"></div>
+{% endif %}
 
 {% endblock %} 
 
@@ -313,6 +294,12 @@ console.log("ayx" + json_aux);
         $("#pivot_table_extra_information").html(json_to_table(json2));
     }
 });
+ {% if isAdvanced %}
+ var bool_container;
+$(function(){
+    bool_container = $('#bool_container').boolrelwidget({view_only: true, view_serialized_string: '{{request.session.serialization_query}}', link_back: "/advancedSearch/{{request.session.query_type}}/1/{{request.session.query_id}}"});
+});
+  {% endif %}
 
 {% endblock %}
 

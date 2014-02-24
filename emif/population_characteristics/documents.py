@@ -40,9 +40,14 @@ from .services import *
 from docs_manager.storage_handler import *
 from population_characteristics.models import *
 
+from docs_manager.views import get_revision
+
 def document_form_view_upload(request, fingerprint_id, template_name='documents_upload_form.html'):
     """Store the files at the backend 
     """
+
+    # compute revision
+    revision = get_revision()
 
     # Create the backend to store the file 
     fh = FileSystemHandleFile()
@@ -55,7 +60,7 @@ def document_form_view_upload(request, fingerprint_id, template_name='documents_
     if request.FILES:
         for name, f in request.FILES.items():
             # Handle file 
-            path_file = g_fh.handle_file(f)
+            path_file = g_fh.handle_file(f, revision=revision)
             file_name = f.name 
             # Serialize the response 
             files.append(serialize(f))
@@ -67,7 +72,7 @@ def document_form_view_upload(request, fingerprint_id, template_name='documents_
     chracteristic = Characteristic()
     chracteristic.user = request.user
     chracteristic.fingerprint_id = fingerprint_id
-    chracteristic.revision = ''
+    chracteristic.revision = revision
     chracteristic.path = path_file
     chracteristic.file_name = file_name
     chracteristic.name = request.POST['pc_name']
@@ -103,13 +108,14 @@ def parsejerboa(request, template_name='documents_upload_form.html'):
     _json = import_population_characteristics_data(filename=path_file)
 
     pc = PopulationCharacteristic()
-    pc.submit_new_revision()
+    pc.submit_new_revision(fingerprint_id)
     data = {'data': _json}
     response = JSONResponse(data, mimetype=response_mimetype(request))
     response['Content-Disposition'] = 'inline; filename=files.json'
     return response
 
-def document_form_view(request, runcode, qs, template_name='documents_upload_form.html'):
+def document_form_view(request, runcode, qs, activetab='summary',
+    template_name='documents_upload_form.html'):
     
     qsets, name, db_owners, fingerprint_ttype = createqsets(runcode)
 
@@ -136,19 +142,29 @@ def document_form_view(request, runcode, qs, template_name='documents_upload_for
     except:
         pass
 
+    isAdvanced = None
+    
+    if(request.session.get('isAdvanced') == True):
+        isAdvanced = True
+    else:
+        isAdvanced = False    
+        
+
     jerboa_files = Characteristic.objects.filter(fingerprint_id=runcode)
     contains_population = len(jerboa_files)!=0
     return render(request, template_name, 
         {'request': request, 'qsets': qsets, 'export_bd_answers': True, 
         'apiinfo': apiinfo, 'fingerprint_id': runcode,
-                   'breadcrumb': True, 'breadcrumb_name': name_bc,
+                   'breadcrumb': True, 'breadcrumb_name': name_bc.decode('utf-8'),
                     'style': qs, 'collapseall': False, 
                     'owner_fingerprint':owner_fingerprint,
                     'fingerprint_dump': True,
                     'contains_population': contains_population, 
                     'hide_add': True,
                     'fingerprint_ttype': fingerprint_ttype,
-                    'search_old': query_old
+                    'search_old': query_old,
+                    'isAdvanced': isAdvanced,
+                    'activetab': activetab,
                     })
 
 

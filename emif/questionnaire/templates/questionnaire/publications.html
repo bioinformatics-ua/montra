@@ -76,7 +76,9 @@
 
 
 <script type="text/javascript">
-
+function removePublication(id){
+    $('#'+id).remove();
+}
 
 function PublicationWidget () 
 {
@@ -234,11 +236,22 @@ function PublicationWidget ()
             return;
         }
 
-        $('#question_{{ question.number|removedots }}_table > tbody:last').append('<tr><td><a class="deleteLink" href="#" ><img src="static/img/glyphicons_192_circle_remove.png"/></a></td><td>'+_pubmedid+'</td><td>'+_pubtitle+'</td><td>'+_pubjournal+'</td><td>'+_pubyear+'</td><td>'+_pubvolume+'</td><td>'+_pubpages+'</td><td>'+_pubauthors+'</td></tr>');
+        $('#question_{{ question.number|removedots }}_table > tbody:last').append('<tr id="pub_'+_pubmedid+'"><td><a class="deleteLink" href="#" ><img src="static/img/glyphicons_192_circle_remove.png"/></a></td><td>'+_pubmedid+'</td><td>'+_pubtitle+'</td><td>'+_pubjournal+'</td><td>'+_pubyear+'</td><td>'+_pubvolume+'</td><td>'+_pubpages+'</td><td>'+_pubauthors+'</td></tr>');
 
+        // Add to boolean container if possible
+        if (!(typeof bool_container === 'undefined')) {
+            bool_container.pushWithDelegate('pub_'+_pubmedid, 'pub #'+_pubmedid+': '+_pubtitle,_pubtitle, 'removePublication("pub_'+_pubmedid+'");');
+        }
+        
+        
         $(".deleteLink").click(function(e) {
                 e.preventDefault();
-                $(this).closest('tr').remove()
+            
+                // Add to boolean container if possible
+                if(bool_container){
+                    bool_container.splice('pub_'+_pubmedid, 'pub #'+_pubmedid+': '+_pubtitle,_pubtitle);
+                }
+                $(this).closest('tr').remove();
                 
                 if(pw{{ question.number|removedots }}.stringfy().length == 0) {
                     $('[id="answered_'+{{ question.number|removedots }}+'"]').hide();
@@ -298,7 +311,7 @@ function PublicationWidget ()
 
             var _publink = _objs[i]['link'];
 
-            $('#question_{{ question.number|removedots }}_table > tbody:last').append('<tr><td><a class="deleteLink" href="#" ><img src="static/img/glyphicons_192_circle_remove.png"/></a></td><td>'+_pubmedid+'</td><td>'+_pubtitle+'</td><td>'+_pubjournal+'</td><td>'+_pubyear+'</td><td>'+_pubvolume+'</td><td>'+_pubpages+'</td><td>'+_pubauthors+'</td><td>'+_publink+'</td></tr>'); 
+            $('#question_{{ question.number|removedots }}_table > tbody:last').append('<tr id="pub_'+_pubmedid+'"><td><a class="deleteLink" href="#" ><img src="static/img/glyphicons_192_circle_remove.png"/></a></td><td>'+_pubmedid+'</td><td>'+_pubtitle+'</td><td>'+_pubjournal+'</td><td>'+_pubyear+'</td><td>'+_pubvolume+'</td><td>'+_pubpages+'</td><td>'+_pubauthors+'</td><td>'+_publink+'</td></tr>'); 
 
         }
         $(".deleteLink").click(function(e) {

@@ -5,6 +5,37 @@
                     <!-- Set variable h1 to accordion -->
                     {% setglobal h1_already 1 %}
                     {% setglobal h1_last 1 %}
+        <div class="well">
+            <!-- Previous | Next buttons -->
+            <div class="span5 text-center">
+            <!-- If Questionset is not the first (Introduction) or the final (Thank you) -->
+
+                {% if questions_list.0.0.prev %}
+                    <a href="add/{{ questionset.questionnaire.pk }}/{{ questions_list.0.0.prev.sortid }}" class="btn large primary" onclick="questionsets_handle(qs_{{ questions_list.0.0.prev.sortid }});  return false;">{% trans "Previous" %}</a>
+                {% endif %}
+                {% if questions_list.0.0.prev and questions_list.0.0.next %}
+
+                {% endif %}
+                {% if questions_list.0.0.next %}
+                    <a href="advancedSearch/{{ questionset.questionnaire.pk }}/{{ questions_list.0.0.next.sortid }}" class="btn large primary" onclick="questionsets_handle(qs_{{ questions_list.0.0.next.sortid }});  return false;">{% trans "Next" %}</a>
+                {% endif %}
+
+
+                <!-- First Questionset - Introduction -->
+
+            </div>
+            <div class="span2 text-right">
+                {% if questions_list.0.0.sortid != 0 %}
+                    <input type="submit" class="search_button btn btn-inverse" value="Search" >
+                {% endif %}
+                {% if questions_list.0.0.sortid == 0 %}
+                {% endif %}
+                    <!-- Last Questionset - Thank You -->
+                {% if questions_list.0.0.sortid == 99 %}
+                    <!--<input class="btn large btn-primary" name="submit" type="submit" value="{% trans 'Save' %}" />-->
+                {% endif %}
+            </div>    
+        </div>    
 
     {% if questions_list.0.0.sortid != 0 and questions_list.0.0.sortid != 99 %}
         <div><a id="collapseall_qs_{{ questions_list.0.0.sortid }}"  class="btn pull-right" href="">Collapse all </a></div>
@@ -55,7 +86,7 @@
                                 </a></span>
                             {% endif %}
                             <span class="pull-right">
-                                <a href="" onclick="toggle_comments({{question.number|removedots}}); return false;"><i class="{% if qdict.comment %} icon-comment {% else %} icon-comment-alt {% endif %}">&nbsp;</i></a>
+                                <a href="" onclick="toggle_comments('{{question.number|removedots}}'); return false;"><i class="{% if qdict.comment %} icon-comment {% else %} icon-comment-alt {% endif %}">&nbsp;</i></a>
                             </span>
                             <span class="pull-right answered hide" id="answered_{{ question.number|removedots }}">
                                 <i class="icon-check green">&nbsp;</i>
@@ -78,9 +109,9 @@
 
                             {% else %}
                                 <div class="question-text {% if qdict.required %}required{% endif %} {% if error %}text-error{% endif %} qtext_{{question.text|geths}}">
-                                    <span class="qnumber_{{question.text|geths}}">{{ question.display_number }}.</span>
-                                    <span class="qtext">{{ question.text|removehs|safe }}
-                                    {% if question.help_text %}
+                                    <span id="question_nr_{{question.number|removedots}}" class="qnumber_{{question.text|geths}}">{{ question.display_number }}.</span>
+                                    <span id="question_{{question.number|removedots}}" class="qtext">{{ question.text|removehs|safe}}
+                                    {% if question.tooltip and question.help_text %}
                                     <div class="question-help-text" style="display: none;">
                                         <span>{{ question.help_text|safe }}</span>
                                     </div>
@@ -96,7 +127,7 @@
                                     </span>
                                     {% endif %}
                                     <span class="pull-right">
-                                        <a href="" onclick="toggle_comments({{question.number|removedots}}); return false;"><i class="fa {% if qdict.comment %} icon-comment {% else %} icon-comment-alt {% endif %}">&nbsp;</i></a>
+                                        <a href="" onclick="toggle_comments('{{question.number|removedots}}'); return false;"><i class="fa {% if qdict.comment %} icon-comment {% else %} icon-comment-alt {% endif %}">&nbsp;</i></a>
                                     </span>
                                     <span class="pull-right answered hide" id="answered_{{ question.number|removedots }}">
                                         <i class="icon-check green">&nbsp;</i>
@@ -114,9 +145,13 @@
                                     {% if error %}
                                         <div class="alert-message block-message text-error input">{{ error }}</div>
                                     {% endif %}
-                                    {% include qdict.template %}
+                                    {% if not question.tooltip and question.help_text %}
+                                        <div class="input">{{question.help_text|safe}}</div>
+                                    {% endif %} 
+                                    {% include qdict.template %}                                      
+                                    
                                     <div id="comments_{{question.number|removedots}}" style="display:none;margin-left:40px;">
-                                     <a href="" class="span6" onclick="toggle_comments({{question.number|removedots}}); return false;"><i class="icon-comment-alt">&nbsp;</i> Comments</a>
+                                     <a href="" class="span6" onclick="toggle_comments('{{question.number|removedots}}'); return false;"><i class="icon-comment-alt">&nbsp;</i> Comments</a>
                                     <textarea style=" background-color:#EEE;color: #000;" class="span6" name="comment_question_{{ question.number }}" cols="50" rows="5">{{qdict.comment}}</textarea>
                                     </div>
                                 </div>
@@ -154,7 +189,7 @@
             </div>
             <div class="span2 text-right">
                 {% if questions_list.0.0.sortid != 0 %}
-                    <input type="submit" class="btn btn-inverse" value="Search" >
+                    <input type="submit" class="search_button btn btn-inverse" value="Search" >
                 {% endif %}
                 {% if questions_list.0.0.sortid == 0 %}
                 {% endif %}
@@ -167,7 +202,21 @@
 <script type="text/javascript">
 
     {% block scriptextra %}
-
+function add_triggers() {
+            
+            {% for trigger in triggers %}
+                addtrigger("{{trigger}}");
+            {% endfor %}
+            
+            {% for k,v in qvalues.items %}
+                qvalues['{{ k|escapejs }}'] = '{{ v|escapejs }}';
+            {% endfor %}
+            
+            for(key in qvalues) {
+                valchanged(key, qvalues[key], this);
+            }
+}
+             
 $(function(){
     tabindexer();
 });    
@@ -192,7 +241,7 @@ function validate(question_number)
     question_number = question_number.replace(".","\\.");
     $.getJSON('api/validate?name='+$('#'+question_number).val(), function(data) {
       var items = [];
-      console.log(data['contains'])
+      //console.log(data['contains']);
       if (data['contains'] == true)
       {
         $('#warning_'+question_number).addClass("show");
@@ -212,7 +261,7 @@ function validate(question_number)
     
 
 
-};
+}
 
     help_text_popover();
 
@@ -231,7 +280,7 @@ function validate(question_number)
         {% endif %}
         {% endfor %}
 
-
+add_triggers();
 
 {% endblock %}
 </script>

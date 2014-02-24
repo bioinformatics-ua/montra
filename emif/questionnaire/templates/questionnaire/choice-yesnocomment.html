@@ -1,13 +1,17 @@
 {% load i18n %}
 {% load extra_tags %}
 <div class="clearfix">
+    <div class="pull-right">
+        <br />
+    <button onclick="clear_selection('question_nr_{{ question.number }}', '{{ question.number }}. {{ question.text|removehs }}');" class="btn btn-small" type="button">Clear Selection</button>
+    </div>
     <div class="input">
         <ul class="inputs-list unstyled">
             
             <!-- yes -->
             <li>
                 <label>
-                    <input type="radio" id="question_{{ question.number }}_yes" name="question_{{ question.number }}" value="yes" onClick="valchanged('question_{{ question.number }}', this.value);" {% ifequal qdict.value "yes" %} checked{% endifequal %} />
+                    <input type="radio" id="question_{{ question.number }}_yes" name="question_{{ question.number }}" value="yes" onClick="valchanged('question_{{ question.number }}', this.value, this);" {% ifequal qdict.value "yes" %} checked{% endifequal %} />
                     <span>{% trans "Yes" %}</span>
                 </label>
             </li>
@@ -15,7 +19,7 @@
             <!-- no -->
             <li>
                 <label>
-                    <input type="radio" id="question_{{ question.number }}_no" name="question_{{ question.number }}" value="no" onClick="valchanged('question_{{ question.number }}', this.value);" {% ifequal qdict.value "no" %} checked {% endifequal %} />
+                    <input type="radio" id="question_{{ question.number }}_no" name="question_{{ question.number }}" value="no" onClick="valchanged('question_{{ question.number }}', this.value, this);" {% ifequal qdict.value "no" %} checked {% endifequal %} />
                     <span>{% trans "No" %}</span>
                 </label>
             </li>
@@ -24,7 +28,7 @@
             {% if qdict.hasdontknow %}        
             <li>
                 <label>
-                    <input type="radio" id="question_{{ question.number }}_dontknow" name="question_{{ question.number }}" value="dontknow" onClick="valchanged('question_{{ question.number }}', this.value);" {% ifequal qdict.value "dontknow" %} checked {% endifequal %} />
+                    <input type="radio" id="question_{{ question.number }}_dontknow" name="question_{{ question.number }}" value="dontknow" onClick="valchanged('question_{{ question.number }}', this.value, this);" {% ifequal qdict.value "dontknow" %} checked {% endifequal %} />
                     <span>{% trans "Don't Know" %}</span>
                 </label>
             </li>
@@ -42,7 +46,7 @@
             {% if qdict.value %}
                 <script type="text/javascript">
                     $('[id="answered_'+{{ question.number|removedots }}+'"]').show();
-                    valchanged('question_{{ question.number }}','{{ qdict.value }}');
+                    valchanged('question_{{ question.number }}','{{ qdict.value }}', this);
                 </script>
             {% endif %}
         </ul>

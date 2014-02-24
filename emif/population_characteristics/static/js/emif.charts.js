@@ -20,6 +20,19 @@ function Filters()
     };
 }
 
+/** This class only works for documentation process
+ ** Thus, you will know what kind of classes you have to implement.
+ */ 
+function RepresentData(divArg, dataArg)
+{
+    this.translateData = function(objects){
+    };
+
+    this.draw = function(div, dataset){
+    };
+
+}
+
 
  (function( $ )
  {
@@ -56,7 +69,7 @@ function Filters()
                  ];
 
             g.translateData(_data);
-            g.draw('#d3test', dataset);
+            g.draw('#pc_chart_place', dataset);
             
 
         },

@@ -57,8 +57,46 @@ function statusChanged(obj, res) {
     //obj.style.backgroundColor = !res ? "#eee" : "#fff";
     obj.disabled = !res;
 }
+function clearcheck(id){
+    console.warn('clearcheck ID: '+id);
+    $(':input[name="'+id+'"]').removeAttr('checked');
+    //$(':input[name="'+id+'"]').click();
+}
+function valchanged(qnum, value, self) {
+    if (!(typeof bool_container === 'undefined')) {
+        var $self = $(self);
+        
+        var just_number = qnum.split('_')[1];
+        var clean = qnum.replace('question_','').replace(/(\\)/g, '');
+        var dirty = qnum.replace('question_','').replace('_',':');
+        var index = dirty.indexOf(':');
 
-function valchanged(qnum, value) {
+        // We have to get the question
+        var the_question = $('#question_'+clean.split('_')[0].replace(/(\.)/g,'')).text().trim(); 
+        if(value==true){
+            //console.log(qnum);
+            //console.log(clean.replace('_','. ')+' ('+the_question+')');
+            //console.log(value);
+            
+            //var optional = $('#question_'+clean.split('_')[0].replace(/(\.)/g,'')).closest('input[type="text"]');
+            //console.log(optional.attr('id'));
+            
+            //var optional = $('#question_'+just_number.replace(/(\.)/g,'\\.')+"_1_opt").val();
+            bool_container.pushWithDelegate('question_nr_'+dirty.substring(0,index)+"_____"+clean+"_____",
+                                clean.replace('_','. ')+' ('+the_question+')'
+                               , dirty.substring(index+1,dirty.length), 'clearcheck("'+$self.attr('id')+'");');
+        } else if(value==false){
+            var optional = $('#question_'+just_number.replace(/(\.)/g,'')+"_opt").val();
+            bool_container.splice('question_nr_'+dirty.substring(0,index)+"_____"+clean+"_____",
+                                clean.replace('_','. ')+' ('+the_question+')'
+                               , dirty.substring(index+1,dirty.length));
+        } else {            
+            if( value != 'yes' && value != 'no' && value != 'dontknow ')
+            bool_container.pushWithDelegate('question_nr_'+clean, clean.replace('_','')+'. '+the_question+'', value, 'clear_selection("question_nr_'+clean+'", " ");');   
+                        
+        }
+    }    
+
     qvalues[qnum] = value;
     // qnum may be 'X_Y' for option Y of multiple choice question X
     qnum = qnum.split('_')[0];
@@ -74,10 +112,18 @@ function addtrigger(elemid) {
     var elem = document.getElementById(elemid);
     //console.log(elemid + " : " + elem + " : "+document.getElementById(elemid));
     if(!elem) {
-      alert("addtrigger: Element with id "+elemid+" not found.");
+      console.error("addtrigger: Element with id "+elemid+" not found.");
       return;
     }
     qtriggers[qtriggers.length] = elem;
+}
+
+function clear_selection(question_name, response){
+    $(":radio[name='" + question_name.replace('question_nr_','question_') + "']").prop('checked', false);
+    if (!(typeof bool_container === 'undefined')) {
+            bool_container.splice(question_name, response, '');
+    }        
+    
 }
 
 /* 
