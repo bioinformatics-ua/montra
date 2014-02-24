@@ -30,7 +30,6 @@ register = template.Library()
 from django.conf import settings
 
 
-
 @register.filter(name='removeh1')
 @stringfilter
 def removeh1(value):
@@ -130,7 +129,46 @@ def fingerprints_list():
 
     return results
 
+def fingerprints_list_user(user):
 
+    interests = user.get_profile().interests.all()
+    quests = []
+
+    try:
+        for inter in interests:
+            if inter.disable==False:
+                quests.append(inter)
+    except:
+        pass
+
+    results = {}
+    for q in quests:
+        results[q.id] = q.name
+
+    return results
+
+def profiles_list_user(user):
+    profiles = user.get_profile().profiles.all()
+    results = {}
+    for p in profiles:
+        results[p.id] = p.name
+
+    return results
+
+def show_profiles(user):
+
+    return {'profiles':profiles_list_user(user)}
+register.inclusion_tag('menu_ttags_profiles.html')(show_profiles)
+
+def show_fingerprints_interests_profile(user):
+
+    return {'fingerprints':fingerprints_list_user(user)}
+register.inclusion_tag('menu_ttags_interests.html')(show_fingerprints_interests_profile)
+
+def show_fingerprints_interests(user):
+
+    return {'fingerprints':fingerprints_list_user(user)}
+register.inclusion_tag('menu_ttags.html')(show_fingerprints_interests)
 
 def show_fingerprints():
     
