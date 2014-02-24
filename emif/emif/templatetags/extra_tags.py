@@ -147,6 +147,24 @@ def fingerprints_list_user(user):
 
     return results
 
+def profiles_list_user(user):
+    profiles = user.get_profile().profiles.all()
+    results = {}
+    for p in profiles:
+        results[p.id] = p.name
+
+    return results
+
+def show_profiles(user):
+
+    return {'profiles':profiles_list_user(user)}
+register.inclusion_tag('menu_ttags_profiles.html')(show_profiles)
+
+def show_fingerprints_interests_profile(user):
+
+    return {'fingerprints':fingerprints_list_user(user)}
+register.inclusion_tag('menu_ttags_interests.html')(show_fingerprints_interests_profile)
+
 def show_fingerprints_interests(user):
 
     return {'fingerprints':fingerprints_list_user(user)}

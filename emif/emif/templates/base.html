@@ -156,8 +156,11 @@
                                             <li class="dropdown-submenu">
                                                 <a href="" onclick="return false;">Add new databases</a>
                                                 <ul class="dropdown-menu">
-                                                    <!--{% show_fingerprints %}-->
-                                                    {% show_fingerprints_interests request.user %}
+                                                    {% if request.user.get_profile %}
+                                                        {% show_fingerprints_interests request.user %}
+                                                    {% else %}
+                                                        {% show_fingerprints %}
+                                                    {% endif %}
                                                 </ul>
                                             </li>
                                             
@@ -254,6 +257,9 @@
                             </button>
                             <ul class="dropdown-menu">
                                 <li><a href="accounts/profile_edit/" class="navbar-link"><i class="icon-edit"></i>&nbsp; Edit Profile &nbsp;</a></li>
+                                <li class="disabled">{% show_profiles request.user %}</li>
+                                <li class="disabled">{% show_fingerprints_interests_profile request.user %}</li>
+                                <li class="divider"></li>
                                 <li><a href="accounts/signout/" class="navbar-link"><i class="icon-signout"></i>&nbsp; Sign out &nbsp;</a></li>
                             </ul>
                         

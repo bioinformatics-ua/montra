@@ -3059,16 +3059,17 @@ def import_questionnaire(request, template_name='import_questionnaire.html'):
 
 @login_required
 def wherenext(request):
-    emifprofile = request.user.get_profile()
-    if emifprofile.profiles.count():
-        for interest in emifprofile.profiles.all():
-            if interest.name.lower()=='data custodian':
-                return HttpResponseRedirect(reverse(settings.REDIRECT_DATACUSTODIAN))
-            elif interest.name.lower()=='researcher':
-                return HttpResponseRedirect(reverse(settings.REDIRECT_RESEARCHER))
+    try:
+        emifprofile = request.user.get_profile()
+        if emifprofile.profiles.count():
+            for interest in emifprofile.profiles.all():
+                if interest.name.lower()=='data custodian':
+                    return HttpResponseRedirect(reverse(settings.REDIRECT_DATACUSTODIAN))
+                elif interest.name.lower()=='researcher':
+                    return HttpResponseRedirect(reverse(settings.REDIRECT_RESEARCHER))
 
-    interests = emifprofile.interests.all()
-    if interests:
-        return HttpResponseRedirect(reverse('emif.views.all_databases_user'))
-
-    return HttpResponseRedirect(reverse('emif.views.all_databases'))
+        interests = emifprofile.interests.all()
+        if interests:
+            return HttpResponseRedirect(reverse('emif.views.all_databases_user'))
+    except:
+        return HttpResponseRedirect(reverse('emif.views.all_databases'))
