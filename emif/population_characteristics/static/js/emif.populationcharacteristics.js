@@ -173,6 +173,20 @@ function PCAPI ()
         return result;
     };
 
+     this.getValuesRowWithFilters = function(Var, Row, fingerprintID, filters){
+        var result = {}
+        
+        $.ajax({
+          dataType: "json",
+          url: "population/jerboalistvalues/"+Var+"/"+Row+"/" + fingerprintID,
+          async: false,
+          type: "POST",
+          data: filters,
+          success: function (data){result=data;},
+        });
+        return result;
+    };
+
     this.getFilter = function(Var, fingerprintID){
         var result = {} ;
         $.ajax({
@@ -236,7 +250,7 @@ function PCAPI ()
                 console.log(data);
                   if (xFilter.values[data]==="")
                       return;
-                  filtersMap[xFilter.name +'.'+ xFilter.values[data]] = true;
+                  filtersMap[xFilter.name +'. '+ xFilter.values[data]] = true;
                   tmpUl.append('<li><a class="filterBar" href="#" onclick="return false;"><i id="iproximity" class="icon-ok icon-black active"></i> '+xFilter.values[data]+'</a></li>')
               });
             });
@@ -250,9 +264,11 @@ function PCAPI ()
                       e.stopPropagation();
 
                       console.log(e.toElement.innerHTML);
-                      
 
                       console.log(getFiltersSelected());
+
+                      var charDraw = new PCDraw(e.toElement.innerHTML);
+                      charDraw.draw(filters);
 
                       if ($(e.toElement.firstChild).hasClass('icon-ok')) 
                       {
@@ -316,42 +332,8 @@ function PCAPI ()
                       $('.graphTypes').closest('li').removeClass('active')
                       $(this.parentNode).closest('li').addClass('active')
 
-                      PC = new PCAPI();
-                      fingerprintID = getFingerprintID();
-                      console.log(fingerprintID);
-                      var valuesFromGraph = PC.getValuesRow(e.toElement.innerHTML, 
-                        'Count',fingerprintID );
-                      console.log('valuesFromGraph: '+valuesFromGraph);
-                      console.log(valuesFromGraph);
-                      $("#pc_chart_place").html('');
-                      $("#pc_chart_place").graphicChart('init');
-                      $("#pc_chart_place").graphicChart('drawBarChart', valuesFromGraph,valuesFromGraph,valuesFromGraph);
-
-
-                      console.log('Debug vars');
-
-                      var pc = new PCAPI();
-                      $("#pcBarContentRoot").removeClass("hidden");
-                      $("#pcBarContentRoot").addClass("show");
-                      
-
-                      console.log(e.toElement.innerHTML);
-                       console.log(fingerprintID);
-
-                      $("#pcBarContent").populationChartsBar('init', pc,e.toElement.innerHTML,
-                        fingerprintID);
-                      $("#pcBarContent").populationChartsBar('draw', pc);
-
-                      $("#pctitle").html("<h2>"+ e.toElement.innerHTML +"</h2>");
-                      
-                      if ($(e.toElement.firstChild).hasClass('icon-ok')) 
-                      {
-                        $(e.toElement.firstChild).removeClass('icon-ok') 
-                      }
-                      else
-                      {
-                        $(e.toElement.firstChild).addClass('icon-ok') 
-                      }
+                      var charDraw = new PCDraw(e.toElement.innerHTML);
+                      charDraw.draw(null);
                       return false;
                     });
       };
