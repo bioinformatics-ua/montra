@@ -18,9 +18,10 @@
 #
 ***********************************************************************/
 
-function PCDraw(chartType)
+function PCDraw(chartType, e)
 {
     this.chartType=chartType;
+    this.e = e;
     this.draw = function(filters) {
 
       console.log(filters);
@@ -43,18 +44,19 @@ function PCDraw(chartType)
         fingerprintID);
       $("#pcBarContent").populationChartsBar('draw', pc);
 
-      $("#pctitle").html("<h2>"+ e.toElement.innerHTML +"</h2>");
+      $("#pctitle").html("<h2>"+ this.chartType +"</h2>");
+      if (this.e != null ) 
+      {
+          if ($(this.e.toElement.firstChild).hasClass('icon-ok')) 
+          {
+            $(this.e.toElement.firstChild).removeClass('icon-ok') 
+          }
+          else
+          {
+            $(this.e.toElement.firstChild).addClass('icon-ok') 
+          }
+      }
       
-      if ($(e.toElement.firstChild).hasClass('icon-ok')) 
-      {
-        $(e.toElement.firstChild).removeClass('icon-ok') 
-      }
-      else
-      {
-        $(e.toElement.firstChild).addClass('icon-ok') 
-      }
-
-
     };
 
     this.refresh = function() {

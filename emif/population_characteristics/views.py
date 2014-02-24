@@ -39,7 +39,7 @@ def jerboa_list_values(request, var, row, fingerprint_id, template_name='documen
     
 
     pc = PopulationCharacteristic(None)
-    values = pc.get_variables(var, row, fingerprint_id)
+    values = pc.get_variables(var, row, fingerprint_id, filters=filters)
     data = {'values': values}
     response = JSONResponse(data, mimetype="application/json")
     response['Content-Disposition'] = 'inline; filename=files.json'

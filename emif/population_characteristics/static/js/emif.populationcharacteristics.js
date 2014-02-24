@@ -38,6 +38,11 @@ function getFingerprintID(){
 };
 
 
+
+var activeChart='';
+
+
+
 /** TODO: there are a lot of static and hardcore parameters in this function
   * This need to be fixed */ 
 function PCAPI () 
@@ -250,7 +255,7 @@ function PCAPI ()
                 console.log(data);
                   if (xFilter.values[data]==="")
                       return;
-                  filtersMap[xFilter.name +'. '+ xFilter.values[data]] = true;
+                  filtersMap['values.' + xFilter.name] = xFilter.values[data];
                   tmpUl.append('<li><a class="filterBar" href="#" onclick="return false;"><i id="iproximity" class="icon-ok icon-black active"></i> '+xFilter.values[data]+'</a></li>')
               });
             });
@@ -263,12 +268,8 @@ function PCAPI ()
                       e.preventDefault(); 
                       e.stopPropagation();
 
-                      console.log(e.toElement.innerHTML);
-
-                      console.log(getFiltersSelected());
-
-                      var charDraw = new PCDraw(e.toElement.innerHTML);
-                      charDraw.draw(filters);
+                      var charDraw = new PCDraw(activeChart, null);
+                      charDraw.draw(getFiltersSelected());
 
                       if ($(e.toElement.firstChild).hasClass('icon-ok')) 
                       {
@@ -332,8 +333,9 @@ function PCAPI ()
                       $('.graphTypes').closest('li').removeClass('active')
                       $(this.parentNode).closest('li').addClass('active')
 
-                      var charDraw = new PCDraw(e.toElement.innerHTML);
+                      var charDraw = new PCDraw(e.toElement.innerHTML, e);
                       charDraw.draw(null);
+                      activeChart = e.toElement.innerHTML;
                       return false;
                     });
       };

@@ -62,7 +62,8 @@ class PopulationCharacteristic(object):
         except OperationFailure:
             print "Failure"
 
-    def get_variables(self, var, row, fingerprint_id='abcd'):
+
+    def get_variables(self, var, row, fingerprint_id='abcd', filters=[], vars_that_should_exists=[]):
         #db.jerboa_files.distinct( 'values.Var' )
         # Need to filter by Fingerprint, otherwise, we're trapped.
         print "get_variables"
@@ -75,19 +76,19 @@ class PopulationCharacteristic(object):
         vars_that_should_exists = ['Count']
 
         dict_query = {'fingerprint_id':fingerprint_id, 
-            'values.Gender':'M',
             'values.Var': var}
         for ve in vars_that_should_exists:
             dict_query['values.'+ve] = { "$exists" : True }
+
+
+        # Apply filters in the query 
+        for ve in filters:
+            dict_query[ve] = filters[ve]
+        
         print dict_query
         values =  jerboa_collection.find(dict_query )
-        #print values 
-        #values =  jerboa_collection.find( {'fingerprint_id':'abcd', 
-        #    'values.Var': 'Active patients', 
-        #    'values.Count': { "$exists" : True }}  )
-
         
-        #values = jerboa_collection.find( {'fingerprint_id':'abcd', 'values.Var': 'Active patients', 'values.Count': { "$exists" : True  }}  )
+
         results = []
         for v in values:
             print v
