@@ -18,8 +18,9 @@
 #
 ***********************************************************************/
 
-function PCDraw(chartType, e)
+function PCDraw(actualChart,chartType, e)
 {
+  this.actualChart = actualChart;
     this.chartType=chartType;
     this.e = e;
     this.draw = function(filters) {
@@ -38,10 +39,8 @@ function PCDraw(chartType, e)
 
         tfilter = new TransformFilter(filters);
         filters = tfilter.transform();
-        
         valuesFromGraph = PC.getValuesRowWithFilters(this.chartType, 
-          'Count',fingerprintID, filters );
-      
+          this.actualChart.y_axis.var,fingerprintID, filters );
 
       }
       

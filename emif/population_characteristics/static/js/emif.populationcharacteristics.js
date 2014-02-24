@@ -41,6 +41,7 @@ function getFingerprintID(){
 
 var activeChart='';
 
+var actualChart = null; 
 
 
 /** TODO: there are a lot of static and hardcore parameters in this function
@@ -281,7 +282,7 @@ function PCAPI ()
                       e.stopPropagation();
                       console.log('Filters:')
                       console.log(getFiltersSelected());
-                      var charDraw = new PCDraw(activeChart, null);
+                      var charDraw = new PCDraw(actualChart, activeChart, null);
                       console.log(e);
                       console.log(e.toElement.id);
                       var str = e.toElement.id;
@@ -324,6 +325,7 @@ function PCAPI ()
  {
 
     var PC = null;
+    var chartTypes = null; 
     function Filters()
     {
       this.drawFilters = function(){
@@ -344,7 +346,25 @@ function PCAPI ()
                       $('.graphTypes').closest('li').removeClass('active')
                       $(this.parentNode).closest('li').addClass('active')
 
-                      var charDraw = new PCDraw(e.toElement.innerHTML, e);
+
+                      console.log(chartTypes);
+                      
+                      chartTypes.forEach(function(a){
+                          console.log(a.title.var);
+                          console.log(e.toElement.innerHTML);
+                          if (a.title.var==e.toElement.innerHTML) 
+                          {
+                              actualChart = a;
+                          }
+                          console.log(a)
+                          
+                      });
+                      if (actualChart==null)
+                      {
+                          // do something here like an abort or shit! 
+                      }
+
+                      var charDraw = new PCDraw(actualChart, e.toElement.innerHTML, e);
                       var _filters = {};
                       charDraw.draw(_filters);
                       activeChart = e.toElement.innerHTML;
@@ -364,6 +384,9 @@ function PCAPI ()
             self.append("Characteristic Type: ");
             tmpUl = $('<ul class="nav nav-list nav-pills nav-stacked">');
             values = options.getChartTitles();
+            var configs = new PCConfs();
+            var charts = configs.getSettings();
+            chartTypes = charts;
             self.append(tmpUl);
             $.each(values, function (data){
                 if (values[data]==="")

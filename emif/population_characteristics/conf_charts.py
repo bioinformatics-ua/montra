@@ -76,9 +76,17 @@ class ConfCharts(object):
         c2.title = Title()
         c2.title.operation = Operation.UNIQUE
         c2.title.var = "Age at patient start" 
+        
+        # X AXIS 
         c2.x_axis = Axis()
         c2.x_axis.operation = "unique"
-        c2.x_axis.var = "Name1"
+        c2.x_axis.var = "Name2"
+        c2_filters_x = Filter()
+        c2_filters_x.name = 'AGE'
+        c2_filters_x.key = 'Name2'
+        c2_filters_x.value = 'Value2'
+        c2.x_axis.filters = [c2_filters_x]
+
         c2.y_axis = Axis()
         c2.y_axis.operation = "unique"
         c2.y_axis.var = "Count"
@@ -86,7 +94,7 @@ class ConfCharts(object):
         f_year.name = 'YEAR'
         f_year.key = 'Name1'
         f_year.value = 'Value1'
-        f_year.values = [2000, 2001,2002]
+        f_year.values = []
         c2.filters = [f_year]
 
 
