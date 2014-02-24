@@ -125,36 +125,6 @@ $.fn.textWidth = function () {
     node.remove();
     return width;
 };
-var threadpool = new ThreadPool(2);
-
-$(function () {
-    threadpool.run(new Runnable(first_elipse, 1));
-    //    threadpool.run(new Runnable(elipsify, 2));
-
-});
-
-function first_elipse() {
-    $('td').each(function () {
-        if (isSafari()) {
-            $(this).removeAttr("title");
-        } else {
-            var content;
-            content = $(this).text().replace(/\s+/gi, ' ');
-
-
-            if ($(this).textWidth() > $(this).width()) {
-
-                return $(this).tooltip({
-                    container: "body",
-                    html: true
-                });
-            }
-        }
-    });
-
-
-    this.complete();
-}
 /* TODO: Toggle + Expand all
              $('.').on('click', function(e) {
              e.preventDefault();
@@ -420,7 +390,26 @@ function click(d) {
 function color(d) {
     return d._children ? "#3182bd" : d.children ? "#c6dbef" : "#fd8d3c";
 }
+function addTooltip(table_id){
+    if(isSafari()){
+    $('td', $(table_id)).each(function () {
+        $(this).removeAttr("title");
+    });               
+    } else {
+        /* I decided to change this as this is was a very intensive process, 
+            I instead tagged them, and add to the class the instance, this way i only have on instance per, table
+            declaring a tooltip instance every td...*/
+        $('td', $(table_id)).each(function () {
+            var content = $(this).text().replace(/\s+/gi, ' ');
+            if ($(this).textWidth() > $(this).width()) {
+                $(this).addClass('tooltipped');
+            }
+        });  
 
+        $('.tooltipped', $(table_id)).tooltip({container: "body",html: true});
+
+    }
+}    
 function isSafari() {
     if (navigator.userAgent.indexOf('Safari') != -1 && navigator.userAgent.indexOf('Chrome') == -1) {
         return true;

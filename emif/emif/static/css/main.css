@@ -326,3 +326,7 @@ box-shadow: inset 0 3px 8px rgba(0,0,0,0.125);
      /* Overriding default bootstrap behaviour*/
     padding: 10px 10px 10px !important;   
 }
+
+.fullwidth {
+  width: 100%;
+}

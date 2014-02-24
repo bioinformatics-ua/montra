@@ -111,9 +111,6 @@ text-decoration: none;
                     </div>
                     
         </form>
-            {% comment %}
-{% include "fingerprint_search.html" %}
-    {% endcomment  %}      
         </div>
     
 </div>
@@ -185,7 +182,7 @@ function load_questionnary(){
         // We build the qs containers in memory and just do dom op, on the end, for speed
         // on ie joins are significantly faster than concatenation
         {% for qs in questionset.questionnaire.questionsets %}
-            containers.push('<div id="qs_{{ qs.sortid }}" class="{% if qs.sortid == questionset.sortid %} {% else %} hide {% endif %} questionset"><div class="pull-center">Loading...</div></div>\n');
+            containers.push('<div id="qs_{{ qs.sortid }}" class="{% if qs.sortid == questionset.sortid %} {% else %} hide {% endif %} questionset"><h4 class="pull-center">Loading...</h4></div>\n');
         {% endfor %}
 
         $('#set_container').append(containers.join(''));
