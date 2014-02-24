@@ -238,7 +238,7 @@ function PCAPI ()
                 return;
             };
 
-            
+            filtersMap = {}
             var self = this;
             self.html('');
 
@@ -255,7 +255,7 @@ function PCAPI ()
 
                   if (xFilter.values[data]==="")
                       return;
-                    if ('values.' + xFilter.name in filtersMap)
+                    /*if ('values.' + xFilter.name in filtersMap)
                     {
                       console.log(xFilter.name);
                       filtersMap['values.' + xFilter.name].push(xFilter.values[data]);
@@ -264,9 +264,11 @@ function PCAPI ()
                     {
                       console.log(xFilter.name);
                       filtersMap['values.' + xFilter.name] = [xFilter.values[data]];
-                    }
-                    
-                  tmpUl.append('<li><a class="filterBar" id=_'+xFilter.name+'_'+xFilter.values[data]+' href="#" onclick="return false;"> '+xFilter.values[data]+'</a></li>')
+                    }*/
+                  var fType = xFilter.name;
+                  if (xFilter.key!= null)
+                    fType = xFilter.value;
+                  tmpUl.append('<li><a class="filterBar" id=_'+fType+'_'+xFilter.values[data]+' href="#" onclick="return false;"> '+xFilter.values[data]+'</a></li>')
               });
             });
 

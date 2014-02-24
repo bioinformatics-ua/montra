@@ -82,8 +82,12 @@ class ConfCharts(object):
         c2.y_axis = Axis()
         c2.y_axis.operation = "unique"
         c2.y_axis.var = "Count"
-        
-        c2.filters = [f1]
+        f_year = Filter()
+        f_year.name = 'YEAR'
+        f_year.key = 'Name1'
+        f_year.value = 'Value1'
+        f_year.values = [2000, 2001,2002]
+        c2.filters = [f_year]
 
 
         c3 = Chart()
@@ -181,10 +185,39 @@ class ConfCharts(object):
         c9.filters = [f1]
 
 
+
+        c10 = Chart()
+        c10.title = Title()
+        c10.title.operation = Operation.UNIQUE
+        c10.title.var = "Start date" 
+        c10.x_axis = Axis()
+        c10.x_axis.operation = "unique"
+        c10.x_axis.var = "Name1"
+        c10.y_axis = Axis()
+        c10.y_axis.operation = "unique"
+        c10.y_axis.var = "Count"
+        
+        c10.filters = [f1]
+
+
+        c11 = Chart()
+        c11.title = Title()
+        c11.title.operation = Operation.UNIQUE
+        c11.title.var = "End date" 
+        c11.x_axis = Axis()
+        c11.x_axis.operation = "unique"
+        c11.x_axis.var = "Name1"
+        c11.y_axis = Axis()
+        c11.y_axis.operation = "unique"
+        c11.y_axis.var = "Count"
+        
+        c11.filters = [f1]
+
+
         print c.to_JSON()
         sc = SetCharst()
 
-        sc.charts = [c,c1, c2, c3, c4, c5, c6, c7, c8, c9]
+        sc.charts = [c,c1, c2, c3, c4, c5, c6, c7, c8, c9, c10]
         #sc.charts = [c,c1]
 
         return sc

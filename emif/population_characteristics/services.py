@@ -135,9 +135,11 @@ class PopulationCharacteristic(object):
                 
                 }
             if _filter.key != None:
-                dict_query['values.' + _filter.key]  = _filter.value
-            
+                dict_query['values.' + _filter.key]  = _filter.name
+            print _filter
+            print _filter.value
             values =  jerboa_collection.find( dict_query ).distinct('values.' + _filter.value )
+            print values
             _filter.values = values
         return filters
 
