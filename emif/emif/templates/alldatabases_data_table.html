@@ -13,7 +13,8 @@
 
 
 {% block headextra %}
-<link rel="stylesheet" href="static/css/theme.blue.css">
+<link rel="stylesheet" href="{{STATIC_URL}}css/theme.blue.css">
+<link rel="stylesheet" href="{{STATIC_URL}}css/vendor/bootstrap-select.min.css">
 {% endblock %}
 
 
@@ -21,6 +22,7 @@
 <script src="{{STATIC_URL}}js/vendor/jquery.tablesorter.min.js"></script>
 <script src="{{STATIC_URL}}js/vendor/jquery.tablesorter.widgets.js"></script>
 <script src="{{STATIC_URL}}js/vendor/jquery.stickytableheaders.min.js"></script>
+<script src="{{STATIC_URL}}js/vendor/bootstrap-select.min.js"></script>
 
 <script src="{{STATIC_URL}}js/databases_datatable.js"></script>
 
@@ -49,23 +51,48 @@ button {
 {% if list_databases %}
 <div style="clear: both;"></div>
 
-<select id="db_type">
-<option value="0">-- Select a database type</option>
+<select class="pull-left" id="db_type">
+<option value="0">Select a database type</option>
 {% for k in databases_types  %}
  <option value="{{k}}">{{k}}</option>
 {% endfor %}
 </select>
 
 {% for k, qsets in databases_types.items  %}
-<select id="q_select_{{k}}" class="depon_class qsets">
+<!--select id="q_select_{{k}}" class="depon_class qsets1">
+
 <option value="0">-- Select a questionset</option>
     {% for text, ref in qsets  %}
      <option value="{{text}}">{{text|removeh1}}</option>
     {% endfor %}
-</select>
-{% endfor %}
+</select-->
+<!-- Very nice trick, to use dropdown with checkboxes from: http://www.rasmuslarsson.se/2013/07/how-to-put-checkboxes-in-bootstrap-dropdowns/-->
+<div id="q_select_{{k|removespaces}}" class="small-margin-left depon_class qsets pull-left dropdown">
+    <a class="dropdown-toggle btn" data-toggle="dropdown" href="#">
+        Questionsets to show
+        <b class="caret"></b>
+    </a>
+    <div class="dropdown-menu dropdown-menu-form" role="menu">
+          <button onclick="selectall('#q_select_{{k|removespaces}}');" class="btn pull-right btn-link" type="button">Select/Deselect all</button>
+          <ul class="select_checkbox_container">
+        {% for text, ref in qsets  %}
+        <li>
+            <label class="checkbox">
+                <input class="qset_option" value="{{text}}" type="checkbox">
+                {{text|removeh1}}
+            </label>
+        </li>
+        {% endfor %}
+    </ul>
+    </div>
 
-<div id="tabular_container">
+</div>
+
+{% endfor %}
+  <button id="update_table_button" class="small-margin-left btn depon_class" type="button">See Datatable</button>
+
+
+<div class="clearboth" id="tabular_container">
     <div class="well pull-center">
     To see a tabular view of all databases, please choose a database type and a questionset.
     </div>
@@ -99,7 +126,6 @@ button {
 
 
 $('#li_workspace').addClass("active");
-
 
 {% comment %}
 </script>

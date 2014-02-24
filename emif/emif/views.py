@@ -1329,8 +1329,8 @@ def all_databases(request, page=1, template_name='alldatabases.html'):
 
 def qs_data_table(request, template_name='qs_data_table.html'):
     db_type = request.POST.get("db_type")
-    qset = request.POST.get("qset")
-    
+    qset = request.POST.getlist("qsets[]")
+
     answers = []
     # get only databases with correct type
     list_databases = get_databases_from_solr(request, "type_t:"+re.sub(r'\s+', '', db_type.lower()))
@@ -1347,7 +1347,7 @@ def qs_data_table(request, template_name='qs_data_table.html'):
 
                 (k, qs) = group    
               
-                if k == qset:
+                if k in qset:
                     for q in qs.list_ordered_tags:
                         q_list.append(q)
                         a_list.append(q.value)
