@@ -83,6 +83,7 @@ class PopulationCharacteristic(object):
 
         # Apply filters in the query 
         for ve in filters:
+             
             dict_query[ve] = filters[ve]
         
         print dict_query

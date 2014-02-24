@@ -223,10 +223,36 @@ class ConfCharts(object):
         c11.filters = [f1]
 
 
+        c12 = Chart()
+        c12.title = Title()
+        c12.title.operation = Operation.UNIQUE
+        c12.title.var = "Age at patient start" 
+        c12.x_axis = Axis()
+        c12.x_axis.operation = "unique"
+        c12.x_axis.var = 'Value1'
+        
+
+        c12.y_axis = Axis()
+        c12.y_axis.multivalue = True
+        c12.y_axis.operation = "unique"
+        c12.y_axis.var = ["perc25", "Mean", "perc75"]
+        f1 = Filter()
+        f1.name = 'Year'
+        f1.key = 'Name1'
+        f1.value = 'Value1'
+
+        f2 = Filter()
+        f2.name = 'Gender'
+        f2.key = None
+        f2.value = 'Gender'
+
+        c12.filters = [f2]
+
+
         print c.to_JSON()
         sc = SetCharst()
 
-        sc.charts = [c,c1, c2, c3, c4, c5, c6, c7, c8, c9, c10]
+        sc.charts = [c,c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c12]
         #sc.charts = [c,c1]
 
         return sc

@@ -43,13 +43,23 @@ function GraphicChartC3D3(divArg, dataArg)
     xscale.bins = 25;
     var i = 1;
     datasetY = ['data1'];
-    datasetX = ['x1'];
-
+    datasetX = ['x'];
+    
+    datasetYs = [];
+    var i = 0;
+    
+    if (actualChart.y_axis.multivalue)
+      {
+        actualChart.y_axis.var.forEach(function(a){
+          i = i +1;
+          datasetYs.push(['data'+1]);
+        });
+        datasetX = ['x'];
+      }
     objects.values.forEach(function(row){
       /*datasetX.push(parseInt(row.Value1));
       datasetY.push(parseInt(row.Count));*/
-      console.log('actualChart');
-      console.log(actualChart);
+      
       if (actualChart.x_axis.categorized )
       {
         if ( row[actualChart.x_axis.var] != ""){
@@ -57,6 +67,22 @@ function GraphicChartC3D3(divArg, dataArg)
           datasetY.push(parseInt(row[actualChart.y_axis.var]));  
         }
         
+      }
+      
+      else if (actualChart.y_axis.multivalue)
+      {
+        
+        var k = 0;
+        datasetX.push(parseInt(row[actualChart.x_axis.var]));  
+        actualChart.y_axis.var.forEach(function(a){
+
+          
+
+          datasetYs[k].push(parseInt(row[a.trim()]));  
+          k = k +1 ;
+        });
+        
+          
       }
       else
       {
@@ -70,9 +96,6 @@ function GraphicChartC3D3(divArg, dataArg)
   };
 
   this.draw = function(div, dataset){
-    console.log(this.div);
-    console.log(datasetY.length);
-    console.log(datasetX.length);
     
     var chartConfigs = {
          padding: {
@@ -81,9 +104,8 @@ function GraphicChartC3D3(divArg, dataArg)
         bindto: '#pc_chart_place',
 
         data: {
-            xs: {
-            'data1': 'x1',
-            },
+          x : 'x',
+            
           columns: [
           datasetX,
            datasetY,
@@ -114,13 +136,40 @@ function GraphicChartC3D3(divArg, dataArg)
         chartConfigs.axis.x.categories = arr2;
         chartConfigs.data.columns = [datasetY];
         chartConfigs.data.xs = {};
-
-
-
-
+        chartConfigs.axis = {};
     }
-    var chart = c3.generate(chartConfigs);
-    
+    if (actualChart.y_axis.multivalue)
+    {
+      
+
+      chartConfigs = {
+         padding: {
+        left: 100,
+    },
+        bindto: '#pc_chart_place',
+
+        data: {
+          x : 'x',
+            
+          columns: 
+            datasetYs,
+          
+          
+        },
+        
+        zoom: {
+          enabled: true,
+        
+        },
+        
+        
+      };
+      
+    }
+    console.log(chartConfigs);
+    try{var chart = c3.generate(chartConfigs);}
+    catch(ex)
+    {}
    }; 
 };
 
