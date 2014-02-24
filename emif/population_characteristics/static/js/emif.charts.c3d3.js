@@ -44,19 +44,37 @@ function GraphicChartC3D3(divArg, dataArg)
     var i = 1;
     datasetY = ['data1'];
     datasetX = ['x1'];
+
     objects.values.forEach(function(row){
-      datasetX.push(parseInt(row.Value1));
-      datasetY.push(parseInt(row.Count));
+      /*datasetX.push(parseInt(row.Value1));
+      datasetY.push(parseInt(row.Count));*/
+      console.log('actualChart');
+      console.log(actualChart);
+      if (actualChart.x_axis.categorized )
+      {
+        if ( row[actualChart.x_axis.var] != ""){
+          datasetX.push(row[actualChart.x_axis.var]);  
+          datasetY.push(parseInt(row[actualChart.y_axis.var]));  
+        }
         
+      }
+      else
+      {
+        datasetX.push(parseInt(row[actualChart.x_axis.var]));
+        datasetY.push(parseInt(row[actualChart.y_axis.var]));  
+      }
+      
+      
     });
     
   };
 
   this.draw = function(div, dataset){
     console.log(this.div);
+    console.log(datasetY.length);
+    console.log(datasetX.length);
     
-
-    var chart = c3.generate({
+    var chartConfigs = {
          padding: {
         left: 100,
     },
@@ -65,7 +83,7 @@ function GraphicChartC3D3(divArg, dataArg)
         data: {
             xs: {
             'data1': 'x1',
-        },
+            },
           columns: [
           datasetX,
            datasetY,
@@ -88,7 +106,20 @@ function GraphicChartC3D3(divArg, dataArg)
         },
         
         
-      });
+      };
+    if (actualChart.x_axis.categorized)
+    {
+        var arr2 = datasetX.slice(0);
+        arr2.shift();
+        chartConfigs.axis.x.categories = arr2;
+        chartConfigs.data.columns = [datasetY];
+        chartConfigs.data.xs = {};
+
+
+
+
+    }
+    var chart = c3.generate(chartConfigs);
     
    }; 
 };

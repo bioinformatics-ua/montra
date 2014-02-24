@@ -289,7 +289,7 @@ function PCAPI ()
                       var filterType =str.substring(str.indexOf("_")+1,str.lastIndexOf("_"));
                       console.log(filterType);
                       filtersMap['values.'+filterType] = [e.toElement.innerHTML.trim()];
-                      charDraw.draw(getFiltersSelected());
+                      charDraw.refresh(getFiltersSelected());
 
                       return false;
                     });
@@ -367,6 +367,7 @@ function PCAPI ()
                       var charDraw = new PCDraw(actualChart, e.toElement.innerHTML, e);
                       var _filters = {};
                       charDraw.draw(_filters);
+                      charDraw.drawBar();
                       activeChart = e.toElement.innerHTML;
                       return false;
                     });

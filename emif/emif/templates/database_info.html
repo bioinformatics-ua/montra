@@ -14,8 +14,9 @@
 <link rel="stylesheet" href="{{ STATIC_URL }}css/vendor/style.css">
 <!-- CSS to style the file input field as button and adjust the Bootstrap progress bars -->
 <link rel="stylesheet" href="{{ STATIC_URL }}css/vendor/jquery.fileupload-ui.css">
-<link href="{{ STATIC_URL }}nvd3/src/nv.d3.css" rel="stylesheet" type="text/css">
+
 <!--
+<link href="{{ STATIC_URL }}nvd3/src/nv.d3.css" rel="stylesheet" type="text/css">
 <script src="{{ STATIC_URL }}nvd3/lib/d3.v3.js"></script>
 <script src="{{ STATIC_URL }}nvd3/nv.d3.js"></script>
 <script src="{{ STATIC_URL }}nvd3/src/models/axis.js"></script>
@@ -217,7 +218,7 @@
 {% block scriptextraincludes %}
 <!-- Include the widget embedding script -->
 <script src="//bioinformatics.ua.pt/becas/embed-widget.js"></script>
-<script src="{{ STATIC_URL}}js/database_info.js"></script>
+
 
 <!--[if lte IE 8]><script src="{{ STATIC_URL}}js/d3/r2d3.min.js" charset="utf-8"></script><![endif]-->
 <!--[if gte IE 9]><!-->
@@ -226,6 +227,7 @@
     <script src="{{ STATIC_URL}}js/d3/d3.layout.cloud.js"></script>
 <!--<![endif]-->
 <script src="{{ STATIC_URL}}js/c3.js"></script>
+
 <script src="{{ STATIC_URL}}js/database_info.js"></script>
 <script src="{{ STATIC_URL }}js/emif.database.delete.js"></script>
 

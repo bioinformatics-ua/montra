@@ -23,6 +23,13 @@ function PCDraw(actualChart,chartType, e)
   this.actualChart = actualChart;
     this.chartType=chartType;
     this.e = e;
+    this.drawBar = function() {
+      var pc = new PCAPI();
+      $("#pcBarContent").populationChartsBar('init', pc,this.chartType,
+        fingerprintID);
+      $("#pcBarContent").populationChartsBar('draw', pc);
+
+    };
     this.draw = function(filters) {
 
       console.log(filters);
@@ -51,13 +58,12 @@ function PCDraw(actualChart,chartType, e)
       $("#pc_chart_place").graphicChart('init');
       $("#pc_chart_place").graphicChart('drawBarChart', valuesFromGraph,valuesFromGraph,valuesFromGraph);
 
-      var pc = new PCAPI();
+      
       $("#pcBarContentRoot").removeClass("hidden");
       $("#pcBarContentRoot").addClass("show");
 
-      $("#pcBarContent").populationChartsBar('init', pc,this.chartType,
-        fingerprintID);
-      $("#pcBarContent").populationChartsBar('draw', pc);
+      
+      
 
       $("#pctitle").html("<h2>"+ this.chartType +"</h2>");
       if (this.e != null ) 
@@ -74,9 +80,9 @@ function PCDraw(actualChart,chartType, e)
       
     };
 
-    this.refresh = function() {
+    this.refresh = function(filters) {
 
-        this.draw();
+        this.draw(filters);
     };
 
 };
