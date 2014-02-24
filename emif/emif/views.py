@@ -50,6 +50,8 @@ from modules.geo import *
 
 from rest_framework.authtoken.models import Token
 
+from django.contrib.auth.decorators import login_required
+
 import json
 import logging
 import re
@@ -1295,6 +1297,46 @@ def databases(request, page=1, template_name='databases.html'):
                                            'owner_fingerprint': False,
                                            'add_databases': True})
 
+# GET ALL DATABASES ACCORDING TO USER INTERESTS
+def all_databases_user(request, page=1, template_name='alldatabases.html'):
+    
+    # lets clear the geolocation session search filter (if any)
+    try:
+        del request.session['query']
+    except:
+        pass
+    
+    emifprofile = request.user.get_profile()
+    interests = emifprofile.interests.all()
+
+    type_t_list = ""
+    if interests:
+        for i in interests:
+            type_t = i.name.replace(" ", "").lower()
+            type_t_list+=(type_t + ",")
+
+        type_t_list = type_t_list[:-1]
+        print type_t_list
+        list_databases = get_databases_from_solr(request, "type_t:" + type_t_list)
+    else:
+        list_databases = []
+        #list_databases = get_databases_from_solr(request, "*:*")
+
+    ## Paginator ##
+    rows = 5
+    myPaginator = Paginator(list_databases, rows)
+    try:
+        pager =  myPaginator.page(page)
+    except PageNotAnInteger, e:
+        pager =  myPaginator.page(1)
+    ## End Paginator ##
+    
+    return render(request, template_name, {'request': request, 'export_all_answers': True, 'data_table': True,
+                                           'list_databases': list_databases,
+                                            'breadcrumb': True, 'collapseall': False, 
+                                            'geo': True,
+                                            'page_obj': pager,
+                                            'add_databases': True})
 
 def all_databases(request, page=1, template_name='alldatabases.html'):
     
@@ -1329,8 +1371,8 @@ def all_databases(request, page=1, template_name='alldatabases.html'):
 
 def qs_data_table(request, template_name='qs_data_table.html'):
     db_type = request.POST.get("db_type")
-    qset = request.POST.get("qset")
-    
+    qset = request.POST.getlist("qsets[]")
+
     answers = []
     # get only databases with correct type
     list_databases = get_databases_from_solr(request, "type_t:"+re.sub(r'\s+', '', db_type.lower()))
@@ -1347,7 +1389,7 @@ def qs_data_table(request, template_name='qs_data_table.html'):
 
                 (k, qs) = group    
               
-                if k == qset:
+                if k in qset:
                     for q in qs.list_ordered_tags:
                         q_list.append(q)
                         a_list.append(q.value)
@@ -1499,6 +1541,137 @@ def createqsets(runcode, qsets=None, clean=True):
                     question_group = QuestionGroup()
                     qsets[aux_results[0].question.questionset.text] = question_group
                     
+            else:
+                text = k
+
+            info = text
+            t.tag = info
+            #print t.tag
+
+            if question_group != None and question_group.list_ordered_tags != None:
+                try:
+                    t = question_group.list_ordered_tags[question_group.list_ordered_tags.index(t)]
+                except:
+                    pass
+
+            value = clean_value(str(result[k].encode('utf-8')))
+            
+            try:
+
+               t.comment = result['comment_question_'+k]
+               #print t.comment
+            except KeyError:
+               pass
+            if clean:
+                t.value = value.replace("#", " ")
+            else:
+                t.value = value
+
+            if k == "database_name_t":
+                name = t.value
+            list_values.append(t)
+            if question_group != None:
+                try:
+                    question_group.list_ordered_tags[question_group.list_ordered_tags.index(t)] = t
+                except:
+                    pass
+        break
+    # What should I do with this code?
+    # I know that it actually do nothing    
+    if (users!=""):
+        users.split(" \\ ")
+
+    return (qsets, name, db_owners, fingerprint_ttype)
+
+def createqset(runcode, qsid, qsets=None, clean=True):
+    qsid = int(qsid) 
+    print "Got into createqset!!"
+    #print "createqsets"
+    c = CoreEngine()
+    results = c.search_fingerprint('id:' + runcode)
+
+    if qsets == None:
+        qsets = ordered_dict()
+    name = ""
+    list_values = []
+    blacklist = ['created_t', 'type_t', '_version_', 'date_last_modification_t']
+    name = "Not defined."
+    users = ""
+    fingerprint_ttype = ""
+
+    db_owners = "" 
+
+
+    questionnaires_ids = {}
+    qqs = Questionnaire.objects.all()
+    for q in qqs:
+        questionnaires_ids[q.slug] = (q.pk, q.name)
+
+
+    for result in results:
+
+
+        (fingerprint_ttype, type_name) = questionnaires_ids[result['type_t']]
+
+        # Get the slug of fingerprint type
+        q_aux = Questionnaire.objects.filter(slug=result['type_t'])
+
+        try:
+            users = result['user_t']
+            db_owners = result['user_t']
+        except:
+            pass
+
+        list_qsets = QuestionSet.objects.filter(questionnaire=q_aux[0]).order_by('sortid')
+
+        
+        for qset in list_qsets:
+            if (qset.sortid == qsid):
+                question_group = QuestionGroup()
+                question_group.sortid = qset.sortid
+                
+                qsets[qset.text] = question_group
+                qset.sortid
+                list_questions = Question.objects.filter(questionset=qset).order_by('number')
+                for question in list_questions:
+                    t = Tag()
+                    t.tag = question.text.encode('utf-8')
+                    t.value = ""
+                    t.number = question.number
+                    t.ttype = question.type
+                    question_group.list_ordered_tags.append(t)
+
+
+                qsets[qset.text] = question_group
+
+                break
+
+        for k in result:
+            #print k
+            if k in blacklist:
+                continue
+            if k.startswith("comment_question_"):
+                continue0
+
+            t = Tag()
+
+            aux_results = Slugs.objects.filter(slug1=k[:-2], question__questionset__questionnaire=q_aux[0].pk)
+            qs = None
+            question_group = None
+            q_number = None
+            if len(aux_results) > 0:
+                text = aux_results[0].description
+                qs = aux_results[0].question.questionset.text
+                q_number = qs = aux_results[0].question.number
+                if qsets.has_key(aux_results[0].question.questionset.text):
+                    # Add the Tag to the QuestionGroup
+                    question_group = qsets[aux_results[0].question.questionset.text]
+                '''else:
+                    # Add a new QuestionGroup
+                    question_group = QuestionGroup()
+                    qsets[aux_results[0].question.questionset.text] = question_group
+                    print aux_results[0].question.questionset.text
+                '''    
             else:
                 text = k
 
@@ -2236,7 +2409,7 @@ def show_fingerprint_page_read_only(request, q_id, qs_id, SouMesmoReadOnly=False
                 Type = question.get_type()
                 if SouMesmoReadOnly and Type == 'open-button':
                    Type = "open"
-               
+
                 _qnum, _qalpha = split_numal(question.number)
 
                 qdict = {
@@ -2289,7 +2462,9 @@ def show_fingerprint_page_read_only(request, q_id, qs_id, SouMesmoReadOnly=False
             
             
         # qvalues = {'1a': 'teste'}   
-            
+        print question_set.questionnaire.questionsets()
+
+
         errors = {}
         fingerprint_id = generate_hash()
         r = r2r(template_name, request,
@@ -2309,9 +2484,9 @@ def show_fingerprint_page_read_only(request, q_id, qs_id, SouMesmoReadOnly=False
                 questions_list=qlist_general,
                 fingerprint_id=fingerprint_id,
                 breadcrumb=True,
-                hide_add = hide_add,
-                q_id = q_id,
-                aqid = aqid,
+                hide_add=hide_add,
+                q_id=q_id,
+                aqid=aqid,
                 serialized_query=serialized_query
                 
         )
@@ -2319,9 +2494,8 @@ def show_fingerprint_page_read_only(request, q_id, qs_id, SouMesmoReadOnly=False
         r['Expires'] = "Thu, 24 Jan 1980 00:00:00 GMT"
 
     except:
+        raise
 
-        raise   
-        
     return r
 
 
@@ -3158,4 +3332,19 @@ def import_questionnaire(request, template_name='import_questionnaire.html'):
     return render_to_response(template_name, {'import_questionnaire': True,
                               'request': request, 'breadcrumb': True}, RequestContext(request))
 
+@login_required
+def wherenext(request):
+    try:
+        emifprofile = request.user.get_profile()
+        if emifprofile.profiles.count():
+            for interest in emifprofile.profiles.all():
+                if interest.name.lower()=='data custodian':
+                    return HttpResponseRedirect(reverse(settings.REDIRECT_DATACUSTODIAN))
+                elif interest.name.lower()=='researcher':
+                    return HttpResponseRedirect(reverse(settings.REDIRECT_RESEARCHER))
 
+        interests = emifprofile.interests.all()
+        if interests:
+            return HttpResponseRedirect(reverse('emif.views.all_databases_user'))
+    except:
+        return HttpResponseRedirect(reverse('emif.views.all_databases'))

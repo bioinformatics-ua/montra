@@ -10,11 +10,19 @@ from django.utils.translation import ugettext_lazy as _
 from django.shortcuts import redirect
 
 import userena.views
-from userena.forms import SignupForm
+from userena.forms import SignupForm, EditProfileForm
 from userena.utils import get_user_model
 from django_countries.countries import COUNTRIES
 
 from django.conf import settings
+from django.contrib.auth.models import User
+from accounts.models import Profile
+from questionnaire.models import Questionnaire
+
+from userena.utils import get_profile_model, get_user_model
+from userena.decorators import secure_required
+from guardian.decorators import permission_required_or_403
+from django.shortcuts import redirect, get_object_or_404
 
 
 class SignupFormExtra(SignupForm):
@@ -28,9 +36,21 @@ class SignupFormExtra(SignupForm):
                                 max_length=30,
                                 required=True)
     country = forms.ChoiceField(COUNTRIES, required=True)
+
     organization = forms.CharField(label=_('Organization'),
                                    max_length=255,
                                    required=True)
+
+    profiles = forms.ModelMultipleChoiceField(label=_('Profiles'),
+                                                required=True,
+                                                queryset=Profile.objects.all(),
+                                                widget=forms.CheckboxSelectMultiple())
+
+
+    interests = forms.ModelMultipleChoiceField(label=_('Interests'),
+                                                required=True,
+                                                queryset=Questionnaire.objects.all(),
+                                                widget=forms.CheckboxSelectMultiple())
 
     def __init__(self, *args, **kw):
         """
@@ -43,12 +63,15 @@ class SignupFormExtra(SignupForm):
         del self.fields['username']
 
         # Put the new fields at the top
-        new_order = self.fields.keyOrder[:-4]
-        new_order.insert(0, 'first_name')
-        new_order.insert(1, 'last_name')
-        new_order.insert(2, 'country')
-        new_order.insert(3, 'organization')
-        self.fields.keyOrder = new_order
+
+        if Profile.objects.all().count() and Questionnaire.objects.all().count():
+            self.fields.keyOrder = ['first_name', 'last_name', 'country', 'organization', 'email', 'password1', 'password2', 'profiles', 'interests']
+        elif Profile.objects.all().count():
+            self.fields.keyOrder = ['first_name', 'last_name', 'country', 'organization', 'email', 'password1', 'password2', 'profiles']
+        elif Questionnaire.objects.all().count():
+            self.fields.keyOrder = ['first_name', 'last_name', 'country', 'organization', 'email', 'password1', 'password2', 'interests']
+        else:
+            self.fields.keyOrder = ['first_name', 'last_name', 'country', 'organization', 'email', 'password1', 'password2']
 
     def save(self):
         """
@@ -72,6 +95,7 @@ class SignupFormExtra(SignupForm):
 
         self.cleaned_data['username'] = username
 
+
         # First save the parent form and get the user.
         new_user = super(SignupFormExtra, self).save()
 
@@ -81,12 +105,99 @@ class SignupFormExtra(SignupForm):
         user_profile = new_user.get_profile()
         user_profile.country = self.cleaned_data['country']
         user_profile.organization = self.cleaned_data['organization']
+        
+
+        # Add selected profiles
+        if (Profile.objects.all().count()):
+            selected_profiles = self.cleaned_data['profiles']
+            for sp in selected_profiles:
+                prof = Profile.objects.get(name__iexact=sp)
+                user_profile.profiles.add(prof)
+
+        # Add selected interests
+        if (Questionnaire.objects.all().count()):
+            selected_interests = self.cleaned_data['interests']
+            for inter in selected_interests:
+                i = Questionnaire.objects.get(name__iexact=inter)
+                user_profile.interests.add(i)
+
         user_profile.save()
 
         # Userena expects to get the new user from this form, so return the new
         # user.
         return new_user
 
+class EditProfileFormExtra(EditProfileForm):
+
+    profiles = forms.ModelMultipleChoiceField(label=_('Profiles'),
+                                                required=True,
+                                                queryset=Profile.objects.all(),
+                                                widget=forms.CheckboxSelectMultiple())
+
+    interests = forms.ModelMultipleChoiceField(label=_('Interests'),
+                                                required=True,
+                                                queryset=Questionnaire.objects.all(),
+                                                widget=forms.CheckboxSelectMultiple())
+
+    def __init__(self, *args, **kw):
+        super(EditProfileFormExtra, self).__init__(*args, **kw)
+        del self.fields['mugshot']
+        del self.fields['privacy']
+
+        if Profile.objects.all().count() and Questionnaire.objects.all().count():
+            self.fields.keyOrder = ['first_name', 'last_name', 'country', 'organization', 'profiles', 'interests']
+        elif Profile.objects.all().count():
+            self.fields.keyOrder = ['first_name', 'last_name', 'country', 'organization', 'profiles']
+        elif Questionnaire.objects.all().count():
+            self.fields.keyOrder = ['first_name', 'last_name', 'country', 'organization', 'interests']
+        else:
+            self.fields.keyOrder = ['first_name', 'last_name', 'country', 'organization']
+
+# Prevent access to edit by not logged in users
+
+@secure_required
+def profile_edit(request,
+                 edit_profile_form=EditProfileFormExtra,
+                 template_name='userena/profile_form.html',
+                 success_url=settings.BASE_URL + 'wherenext',
+                 extra_context=None, **kwargs):
+
+    if request.user.is_authenticated():
+        username = request.user.username
+        user = get_object_or_404(get_user_model(),
+                                 username__iexact=username)
+
+        profile = user.get_profile()
+
+        user_initial = {'first_name': user.first_name,
+                        'last_name': user.last_name}
+
+        form = edit_profile_form(instance=profile, initial=user_initial)
+
+        if request.method == 'POST':
+            form = edit_profile_form(request.POST, request.FILES, instance=profile,
+                                     initial=user_initial)
+
+            if form.is_valid():
+                profile = form.save()
+                return redirect(success_url)
+
+        if not extra_context: extra_context = dict()
+        extra_context['form'] = form
+        extra_context['profile'] = profile
+        extra_context['request'] = request
+        return userena.views.ExtraContextTemplateView.as_view(template_name=template_name,
+            extra_context=extra_context)(request)
+
+    return userena.views.signup(request, **kwargs)
+
+# def profile_edit(request, **kwargs):
+#     if request.user.is_authenticated():
+#         extra_content = dict()
+#         extra_content['request'] = request
+#         return userena.views.profile_edit(request, username=request.user.username, extra_content=extra_content, **kwargs)
+
+#     return userena.views.signup(request, **kwargs)
 
 # Prevent access to signup/signin pages by logged in users
 def signup(request, **kwargs):
@@ -97,7 +208,6 @@ def signup(request, **kwargs):
 
 
 def signin(request, **kwargs):
-
     if request.user.is_authenticated():
         return redirect(settings.BASE_URL)
 

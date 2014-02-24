@@ -158,7 +158,11 @@
                                             <li class="dropdown-submenu">
                                                 <a href="" onclick="return false;">Add new databases</a>
                                                 <ul class="dropdown-menu">
-                                                    {% show_fingerprints %}
+                                                    {% if request.user.get_profile %}
+                                                        {% show_fingerprints_interests request.user %}
+                                                    {% else %}
+                                                        {% show_fingerprints %}
+                                                    {% endif %}
                                                 </ul>
                                             </li>
                                             
@@ -237,25 +241,36 @@
                         {% block headerlogin %} 
                         {% if not request.user.is_authenticated %}
                             <li id="auth-logged-out">
-                        <form class="navbar-form pull-right" method="post" action="accounts/signin/">
-                            {% csrf_token %}
-                            <input name="identification" class="signin-header-form-email" type="text" placeholder="Email">
-                            <input name="password" class="signin-header-form-pass" type="password" placeholder="Password">
-                            <button type="submit" class="btn">Sign in</button>
-                        </form>
+                                <form class="navbar-form pull-right" method="post" action="accounts/signin/">
+                                    {% csrf_token %}
+                                    <input name="identification" class="signin-header-form-email" type="text" placeholder="Email">
+                                    <input name="password" class="signin-header-form-pass" type="password" placeholder="Password">
+                                    <button type="submit" class="btn">Sign in</button>
+                                </form> 
                             </li>
                         {% else %}
+                        <ul class="nav pull-right">
                             <li id="auth-logged-in">
-                                <p class="navbar-text pull-right">
-
-                            
                             {% comment %}
                                 <em>{{ request.user.get_full_name }}
-                            {% endcomment %}</em>[
-                            <a href="accounts/signout/" class="navbar-link">Sign out</a>]
-                        </p>
+                            {% endcomment %}</em>
+                            <button class="btn btn-success dropdown-toggle" data-toggle="dropdown" tabindex="-1">
+                                {% if not request.user.first_name and not request.user.last_name %}
+                                    <i class="icon-user"></i><small>&nbsp; {{request.user.username}} &nbsp;</small><i class="icon-angle-down"></i>
+                                {% else %}
+                                    <i class="icon-user"></i><small>&nbsp; {{request.user.first_name}} {{request.user.last_name}} &nbsp;</small><i class="icon-angle-down"></i>
+                                {% endif %}
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li class="disabled">{% show_profiles request.user %}</li>
+                                <li class="disabled">{% show_fingerprints_interests_profile request.user %}</li>
+                                <li class="divider"></li>
+                                <li><a href="accounts/profile_edit/" class="navbar-link"><i class="icon-edit"></i>&nbsp; Edit Profile &nbsp;</a></li>
+                                <li><a href="accounts/signout/" class="navbar-link"><i class="icon-signout"></i>&nbsp; Sign out &nbsp;</a></li>
+                            </ul>
                         
                             </li>
+                        </ul>
                     {% endif %} 
                     {% endblock %}
                         </ul>

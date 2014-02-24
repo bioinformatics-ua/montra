@@ -36,6 +36,8 @@ from django.conf import settings
 
 urlpatterns = patterns('',
 
+    # Where to go when loggedin (according to Profile)
+    url(r'^wherenext/$', 'emif.views.wherenext'),
 
     # Uncomment the admin/doc line below to enable admin documentation:
     url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
@@ -96,10 +98,13 @@ urlpatterns = patterns('',
     #url(r'^fingerprint/(?P<runcode>[^/]+)/(?P<qs>[-]{0,1}\d+)/$', 'emif.views.fingerprint'),
     url(r'^fingerprint/(?P<runcode>[^/]+)/(?P<qs>[-]{0,1}\d+)/$', 'population_characteristics.documents.document_form_view'),
     url(r'^fingerprint/(?P<runcode>[^/]+)/(?P<qs>[-]{0,1}\d+)/(?P<activetab>[^/]+)/$', 'population_characteristics.documents.document_form_view'),
-    
+    # Single qs for load by blocks
+    url(r'^fingerprintqs/(?P<runcode>[^/]+)/(?P<qsid>[0-9]+)/$', 'population_characteristics.documents.single_qset_view'),
+
     # List Databases
     url(r'^databases/(?P<page>[-]{0,1}\d+)?$', 'emif.views.databases', name="databases"),
-    url(r'^alldatabases/(?P<page>[-]{0,1}\d+)?$', 'emif.views.all_databases'),
+#    url(r'^alldatabases/(?P<page>[-]{0,1}\d+)?$', 'emif.views.all_databases'),
+    url(r'^alldatabases/(?P<page>[-]{0,1}\d+)?$', 'emif.views.all_databases_user'),
     url(r'^alldatabases/data-table$', 'emif.views.all_databases_data_table'),
     url(r'^qs_data_table$', 'emif.views.qs_data_table'),    
     url(r'^export_all_answers$', 'emif.views.export_all_answers'),
@@ -137,7 +142,7 @@ urlpatterns = patterns('',
     url(r'^accounts/signup/$',
         signup,
         {'signup_form': SignupFormExtra,
-         'success_url': settings.BASE_URL + 'databases'},
+         'success_url': settings.BASE_URL + 'wherenext'},
         name='userena_signup'),
 
     url(r'^accounts/signup/complete/$',
@@ -155,9 +160,13 @@ urlpatterns = patterns('',
     url(r'^accounts/signin/$',
         signin,
         name='userena_signin'),
+
     url(r'^accounts/signout/$',
         userena_views.signout,
         name='userena_signout'),
+
+    # Edit Profile
+    url(r'^accounts/profile_edit/$', 'accounts.views.profile_edit'),
 
     # Reset password
     url(r'^accounts/password/reset/$',
@@ -215,9 +224,10 @@ urlpatterns = patterns('',
         name='userena_password_change_complete'),
 
     # Edit profile
-    url(r'^accounts/(?P<username>[^/]+)/edit/$',
-        userena_views.profile_edit,
-        name='userena_profile_edit'),
+    # url(r'^accounts/(?P<username>[^/]+)/edit/$',
+    #     userena_views.profile_edit,
+    #     {'edit_profile_form': EditProfileForm},
+    #     name='userena_profile_edit'),
 
     # View profiles
     url(r'^accounts/(?P<username>(?!signout|signup|signin)[^/]+)/$',

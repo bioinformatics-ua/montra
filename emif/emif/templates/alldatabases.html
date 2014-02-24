@@ -63,7 +63,7 @@ button {
             <!--<td><img class="db_logo" src="static/upload_images/{{t.logo}}" width="50px" height="50px"/></td>-->
           
           <td>
-            <a href="fingerprint/{{ t.id }}/2">{{ t.name }}</a>
+            <a href="fingerprint/{{ t.id }}/1">{{ t.name }}</a>
 
             <div style="margin-left:20px">
              Institution Name: {{t.institution}}
@@ -98,7 +98,7 @@ button {
 
 {% load bootstrap_pagination %}
 
-{% bootstrap_paginate page_obj url_view_name="views.all_databases" range=10  show_prev_next="false" show_first_last="true"%}
+{% bootstrap_paginate page_obj url_view_name="views.all_databases_user" range=10  show_prev_next="false" show_first_last="true"%}
 
 {% else %}
 <div class="row">  

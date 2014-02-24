@@ -79,11 +79,11 @@ text-decoration: none;
       <li class="nav-header">Step-by-Step</li>
       {% for qs in questionset.questionnaire.questionsets %}
 
-      {% if qs.sortid != 0 and qs.sortid != 99 %}
+      {% if qs.sortid != 0 and qs.sortid != 99 and qs.text != 'h1. Key Publications' %}
       <li{% if questionset.text == qs.text %} class="active" {% endif %} id="li_qs_{{qs.sortid}}">
         <!--<a href="q2/{{runinfo.random}}/{{ qs.sortid }}">-->
         <a href="advancedSearch/{{qs.questionnaire.pk}}/{{ qs.sortid }}" onclick="questionsets_handle(qs_{{ qs.sortid }}); return false;">
-          <table>
+            <table>
             <tr>
               <td width="80%">{{ qs.text|removeh1 }}</td>
               <td width="10%">
@@ -111,9 +111,6 @@ text-decoration: none;
                     </div>
                     
         </form>
-            {% comment %}
-{% include "fingerprint_search.html" %}
-    {% endcomment  %}      
         </div>
     
 </div>
@@ -185,7 +182,7 @@ function load_questionnary(){
         // We build the qs containers in memory and just do dom op, on the end, for speed
         // on ie joins are significantly faster than concatenation
         {% for qs in questionset.questionnaire.questionsets %}
-            containers.push('<div id="qs_{{ qs.sortid }}" class="{% if qs.sortid == questionset.sortid %} {% else %} hide {% endif %} questionset"><div class="pull-center">Loading...</div></div>\n');
+            containers.push('<div id="qs_{{ qs.sortid }}" class="{% if qs.sortid == questionset.sortid %} {% else %} hide {% endif %} questionset"><h4 class="pull-center">Loading...</h4></div>\n');
         {% endfor %}
 
         $('#set_container').append(containers.join(''));
