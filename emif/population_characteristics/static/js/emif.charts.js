@@ -76,18 +76,13 @@ function RepresentData(wrapper)
         },
         drawBarChart : function( options, _div, _data ) {
 
-            console.log('who is this: ' + this);
-            console.log('who is this: ' + self);
-            console.log(_div);
-            console.log(_data);
+
             g = new GraphicChartC3D3();
             w_g = new RepresentData(g);
 
             g.div = div;
             g.dataValues = data;
             g.init(div, data);
-
-            console.log('This is the data that we got: ' +  _data);
 
             dataset = [[], 
                  

@@ -181,8 +181,7 @@ function PCAPI ()
 
      this.getValuesRowWithFilters = function(Var, Row, fingerprintID, filters){
         var result = {}
-        console.log('getValuesRowWithFilters');
-        console.log(filters);
+
         $.ajax({
           dataType: "json",
           url: "population/jerboalistvalues/"+Var+"/"+Row+"/" + fingerprintID,
@@ -280,14 +279,13 @@ function PCAPI ()
                     { 
                       e.preventDefault(); 
                       e.stopPropagation();
-                      console.log('Filters:')
-                      console.log(getFiltersSelected());
+
+
                       var charDraw = new PCDraw(actualChart, activeChart, null);
-                      console.log(e);
-                      console.log(e.toElement.id);
+
                       var str = e.toElement.id;
                       var filterType =str.substring(str.indexOf("_")+1,str.lastIndexOf("_"));
-                      console.log(filterType);
+
                       filtersMap['values.'+filterType] = [e.toElement.innerHTML.trim()];
                       charDraw.refresh(getFiltersSelected());
 
@@ -346,17 +344,13 @@ function PCAPI ()
                       $('.graphTypes').closest('li').removeClass('active')
                       $(this.parentNode).closest('li').addClass('active')
 
-
-                      console.log(chartTypes);
                       
                       chartTypes.forEach(function(a){
-                          console.log(a.title.var);
-                          console.log(e.toElement.innerHTML);
-                          if (a.title.var==e.toElement.innerHTML) 
+
+                          if (a.title.fixed_title==e.toElement.innerHTML) 
                           {
                               actualChart = a;
                           }
-                          console.log(a)
                           
                       });
                       if (actualChart==null)
@@ -364,11 +358,11 @@ function PCAPI ()
                           // do something here like an abort or shit! 
                       }
 
-                      var charDraw = new PCDraw(actualChart, e.toElement.innerHTML, e);
+                      var charDraw = new PCDraw(actualChart, actualChart.title.var, e);
                       var _filters = {};
                       charDraw.draw(_filters);
                       charDraw.drawBar();
-                      activeChart = e.toElement.innerHTML;
+                      
                       return false;
                     });
       };

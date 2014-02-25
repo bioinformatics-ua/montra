@@ -50,8 +50,10 @@ function ChartLayout ()
         var charts = configs.getSettings();
         var charts_titles = []
         charts.forEach(function(a){
-            console.log(a)
-            charts_titles.push(a.title.var)
+            if (a.title.fixed_title!= 'None')
+                charts_titles.push(a.title.fixed_title)
+            else
+                charts_titles.push(a.title.var)
         });
         return charts_titles;
     };

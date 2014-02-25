@@ -31,13 +31,12 @@ function GraphicChartC3D3(divArg, dataArg)
   this.yscale = null ;
   this.self = this;
   this.init = function(){
-    
-    console.log('this in GraphicChartC3D3'  + this);
+
   };
 
   this.translateData = function(objects){
     
-    console.log(objects);
+
     /*** Lets translate our data model to the d3 support data model */ 
     xscale = {'bins':5}
     xscale.bins = 25;
@@ -168,10 +167,11 @@ function GraphicChartC3D3(divArg, dataArg)
       };
       
     }
-    console.log(chartConfigs);
     try{var chart = c3.generate(chartConfigs);}
     catch(ex)
-    {}
+    {
+      // Handle the shit here!
+    }
    }; 
 };
 

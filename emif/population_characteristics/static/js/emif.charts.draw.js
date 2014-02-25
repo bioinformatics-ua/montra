@@ -32,11 +32,9 @@ function PCDraw(actualChart,chartType, e)
     };
     this.draw = function(filters) {
 
-      console.log(filters);
+
       PC = new PCAPI();
       fingerprintID = getFingerprintID();
-      console.log('filters++');
-      console.log(filters);
       
       
       var valuesFromGraph = null;
@@ -46,7 +44,7 @@ function PCDraw(actualChart,chartType, e)
 
         tfilter = new TransformFilter(filters);
         filters = tfilter.transform();
-        valuesFromGraph = PC.getValuesRowWithFilters(this.chartType, 
+        valuesFromGraph = PC.getValuesRowWithFilters(this.actualChart.title.var, 
           this.actualChart.y_axis.var,fingerprintID, filters );
 
       }
