@@ -247,7 +247,7 @@ class ConfCharts(object):
         f2.key = None
         f2.value = 'Gender'
 
-        c12.filters = [f2]
+        c12.filters = [f1,f2]
 
 
         print c.to_JSON()

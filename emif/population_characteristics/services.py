@@ -84,6 +84,7 @@ class PopulationCharacteristic(object):
 
         dict_query['values.Name2'] = ''
         dict_query['values.Value2'] = '' 
+        dict_query['values.Name1'] = 'YEAR' 
 
         for ve in vars_that_should_exists:
             dict_query['values.'+ve] = { "$exists" : True }

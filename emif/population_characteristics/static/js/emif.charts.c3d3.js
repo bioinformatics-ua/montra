@@ -141,6 +141,9 @@ function GraphicChartC3D3(divArg, dataArg)
     if (actualChart.y_axis.multivalue)
     {
       
+      var arrX = datasetX.slice(0);
+      var arrYs = datasetYs.slice(0);
+      arrYs.push(arrX);
 
       chartConfigs = {
          padding: {
@@ -152,7 +155,7 @@ function GraphicChartC3D3(divArg, dataArg)
           x : 'x',
             
           columns: 
-            datasetYs,
+            arrYs,
           
           
         },
