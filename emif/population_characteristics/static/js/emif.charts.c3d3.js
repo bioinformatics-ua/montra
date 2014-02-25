@@ -52,7 +52,7 @@ function GraphicChartC3D3(divArg, dataArg)
       {
         actualChart.y_axis.var.forEach(function(a){
           i = i +1;
-          datasetYs.push(['data'+1]);
+          datasetYs.push(['data'+i]);
         });
         datasetX = ['x'];
       }
@@ -161,7 +161,6 @@ function GraphicChartC3D3(divArg, dataArg)
           enabled: true,
         
         },
-        
         
       };
       

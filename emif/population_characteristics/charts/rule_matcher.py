@@ -32,7 +32,7 @@ class RuleMatcher(object):
         charts = conf.get_main_settings().charts
         filters = None 
         for c in charts:
-            if c.title.var == var:
+            if c.title.var == var or c.title.fixed_title==var:
                 filters = c.filters
                 break 
         return filters

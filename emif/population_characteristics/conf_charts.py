@@ -227,6 +227,7 @@ class ConfCharts(object):
         c12.title = Title()
         c12.title.operation = Operation.UNIQUE
         c12.title.var = "Age at patient start" 
+        c12.title.var = "Age at patient start" 
         c12.x_axis = Axis()
         c12.x_axis.operation = "unique"
         c12.x_axis.var = 'Value1'

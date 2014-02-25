@@ -73,17 +73,25 @@ class PopulationCharacteristic(object):
 
         import pdb
         #pdb.set_trace() 
-        vars_that_should_exists = ['Count']
+        vars_that_should_exists = ['perc25', 'perc75', 'Mean']
 
         dict_query = {'fingerprint_id':fingerprint_id, 
             'values.Var': var}
+
+
+        mrules = RuleMatcher()
+        __filters = mrules.get_filter(var)
+
+        dict_query['values.Name2'] = ''
+        dict_query['values.Value2'] = '' 
+
         for ve in vars_that_should_exists:
             dict_query['values.'+ve] = { "$exists" : True }
 
 
         # Apply filters in the query 
         for ve in filters:
-             
+
             dict_query[ve] = filters[ve]
         
         print dict_query
