@@ -25,7 +25,7 @@ function PCDraw(actualChart,chartType, e)
     this.e = e;
     this.drawBar = function() {
       var pc = new PCAPI();
-      $("#pcBarContent").populationChartsBar('init', pc,this.chartType,
+      $("#pcBarContent").populationChartsBar('init', pc,this.actualChart.title.fixed_title,
         fingerprintID);
       $("#pcBarContent").populationChartsBar('draw', pc);
 
@@ -44,7 +44,7 @@ function PCDraw(actualChart,chartType, e)
 
         tfilter = new TransformFilter(filters);
         filters = tfilter.transform();
-        valuesFromGraph = PC.getValuesRowWithFilters(this.actualChart.title.var, 
+        valuesFromGraph = PC.getValuesRowWithFilters(this.actualChart.title.fixed_title, 
           this.actualChart.y_axis.var,fingerprintID, filters );
 
       }

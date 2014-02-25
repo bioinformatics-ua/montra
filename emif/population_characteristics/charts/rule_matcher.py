@@ -32,8 +32,18 @@ class RuleMatcher(object):
         charts = conf.get_main_settings().charts
         filters = None 
         for c in charts:
-            if c.title.var == var or c.title.fixed_title==var:
+            if c.title.fixed_title==var:
                 filters = c.filters
                 break 
         return filters
+
+    def get_chart(self, var):
+        charts = conf.get_main_settings().charts
+        result = None 
+        for c in charts:
+            if c.title.fixed_title==var:
+                result= c
+                break 
+        return result
+
 

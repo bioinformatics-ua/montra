@@ -104,6 +104,7 @@ function GraphicChartC3D3(divArg, dataArg)
 
         data: {
           x : 'x',
+
             
           columns: [
           datasetX,
@@ -135,7 +136,7 @@ function GraphicChartC3D3(divArg, dataArg)
         chartConfigs.axis.x.categories = arr2;
         chartConfigs.data.columns = [datasetY];
         chartConfigs.data.xs = {};
-        chartConfigs.axis = {};
+        
     }
     if (actualChart.y_axis.multivalue)
     {
@@ -167,6 +168,8 @@ function GraphicChartC3D3(divArg, dataArg)
       };
       
     }
+    console.log('chartConfigs');
+    console.log(chartConfigs);
     try{var chart = c3.generate(chartConfigs);}
     catch(ex)
     {

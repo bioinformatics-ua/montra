@@ -73,21 +73,24 @@ class PopulationCharacteristic(object):
 
         import pdb
         #pdb.set_trace() 
-        vars_that_should_exists = ['perc25', 'perc75', 'Mean']
-
-        dict_query = {'fingerprint_id':fingerprint_id, 
-            'values.Var': var}
-
+        vars_that_should_exists = ['Count']
 
         mrules = RuleMatcher()
         __filters = mrules.get_filter(var)
+        c1 = mrules.get_chart(var)
 
-        dict_query['values.Name2'] = ''
-        dict_query['values.Value2'] = '' 
-        dict_query['values.Name1'] = 'YEAR' 
+        dict_query = {'fingerprint_id':fingerprint_id, 
+            'values.Var': c1.title.var}
+
+        #dict_query['values.Name2'] = ''
+        #dict_query['values.Value2'] = '' 
+        #dict_query['values.Name1'] = 'YEAR' 
 
         for ve in vars_that_should_exists:
             dict_query['values.'+ve] = { "$exists" : True }
+
+        for _f in c1.y_axis.static_filters:
+            dict_query['values.'+_f.key] = _f.value
 
 
         # Apply filters in the query 
@@ -100,8 +103,34 @@ class PopulationCharacteristic(object):
         
 
         results = []
+
+        def transform(v, transformation, values):
+            if not type(v) is list:
+
+                y = float(values[v])
+                new_y = eval(transformation)
+                values[v] = new_y
+            else:
+                for _v in v:
+                    y = float(values[_v])
+                    new_y = eval(transformation)
+                    values[_v] = new_y
+                    print values[_v]
+            return values
+        values_app = None
         for v in values:
-            #print v
+            if c1.y_axis.transformation != None:
+                try:
+                    print "transformation"
+                    values_app = transform(c1.y_axis.var, c1.y_axis.transformation,v[u'values'])
+                    #y = float(v[u'values'][c1.y_axis.var])
+                    #new_y = eval(c1.y_axis.transformation)
+                    #v[u'values'][c1.y_axis.var] = new_y
+                    v[u'values'] = values_app
+                    print values_app
+                except:
+                    #raise
+                    print "bastard x error %s, %s " % (c1.y_axis.var, str(v[u'values']))
             results.append(v[u'values'])
 
         #print results
@@ -133,6 +162,7 @@ class PopulationCharacteristic(object):
         # Go to the rule matcher and ask for the filter for that particular case
         mrules = RuleMatcher()
         filters = mrules.get_filter(var)
+        chart = mrules.get_chart(var)
         #_filter = charts_conf.
         
         # Should check if any special operation, for now, let's assume: NO!
@@ -141,13 +171,15 @@ class PopulationCharacteristic(object):
 
             # Generate query
             dict_query = {'fingerprint_id':fingerprint_id, 
-                'values.Var': var,
+                'values.Var': chart.title.var,
                 
                 }
+
             if _filter.key != None:
                 dict_query['values.' + _filter.key]  = _filter.name
             print _filter
             print _filter.value
+            print dict_query
             values =  jerboa_collection.find( dict_query ).distinct('values.' + _filter.value )
             print values
             _filter.values = values

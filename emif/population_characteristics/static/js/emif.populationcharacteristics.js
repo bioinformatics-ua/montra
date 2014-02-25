@@ -251,6 +251,7 @@ function PCAPI ()
               var tmpUl = $('<ul class="nav nav-pills nav-stacked">');
 
               self.append(tmpUl);
+              console.log(xFilter)
               $.each(xFilter.values, function (data){
 
                   if (xFilter.values[data]==="")
