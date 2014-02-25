@@ -763,7 +763,7 @@
             var temp = new BooleanGroup(null).deserialize(settings.view_serialized_string);
             var simple_ones = temp.extractAllSimple();
             for(var i=0;i<simple_ones.length;i++)
-                        funcs.pushUsedBooleanGroup(simple_ones[i]);
+                        funcs.pushUsedBooleanGroup(simple_ones[i].copy());
             
             mastergroup=temp;
             }
