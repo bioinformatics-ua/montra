@@ -1316,7 +1316,6 @@ def all_databases_user(request, page=1, template_name='alldatabases.html'):
             type_t_list+=(type_t + ",")
 
         type_t_list = type_t_list[:-1]
-        print type_t_list
         list_databases = get_databases_from_solr(request, "type_t:" + type_t_list)
     else:
         list_databases = []
@@ -3332,19 +3331,22 @@ def import_questionnaire(request, template_name='import_questionnaire.html'):
     return render_to_response(template_name, {'import_questionnaire': True,
                               'request': request, 'breadcrumb': True}, RequestContext(request))
 
+# Redirect user after login. Rules:
+# - settings value should be represented by "REDIRECT_" plus the profile.name in uppercase
+# and with out spaces. Ex: REDIRECT_DATACUSTODIAN - for profile.name="Data Custodian"
 @login_required
 def wherenext(request):
     try:
         emifprofile = request.user.get_profile()
         if emifprofile.profiles.count():
-            for interest in emifprofile.profiles.all():
-                if interest.name.lower()=='data custodian':
-                    return HttpResponseRedirect(reverse(settings.REDIRECT_DATACUSTODIAN))
-                elif interest.name.lower()=='researcher':
-                    return HttpResponseRedirect(reverse(settings.REDIRECT_RESEARCHER))
+            for profile in emifprofile.profiles.all():
+                redirect = getattr(settings, "REDIRECT_" + profile.name.upper().strip().replace(" ", ""), 
+                    'emif.views.all_databases_user')
+                return HttpResponseRedirect(reverse(redirect))
 
         interests = emifprofile.interests.all()
         if interests:
             return HttpResponseRedirect(reverse('emif.views.all_databases_user'))
     except:
+        logging.warn("User has no emifprofile nor interests")
         return HttpResponseRedirect(reverse('emif.views.all_databases'))
