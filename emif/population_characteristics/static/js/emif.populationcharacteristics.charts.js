@@ -28,11 +28,11 @@
 function PCConfs () 
 {
     this.getSettings = function(fingerprintId){
-        var result = {}
+        var result = {};
           
         $.ajax({
           dataType: "json",
-          url: "population/settings/+"+fingerprintId+"+/",
+          url: "population/settings/" + fingerprintId + "/",
           async: false,
           data: result,
           success: function (data){result=data;},
@@ -47,8 +47,8 @@ function ChartLayout ()
     var configs = null
     this.getChartTitles = function(fingerprintId){
         var configs = new PCConfs();
-        var charts = configs.getSettings();
-        var charts_titles = []
+        var charts = configs.getSettings(fingerprintId);
+        var charts_titles = [];
         charts.forEach(function(a){
             if (a.title.fixed_title!= 'None')
                 charts_titles.push(a.title.fixed_title)

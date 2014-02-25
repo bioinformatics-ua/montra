@@ -378,9 +378,9 @@ function PCAPI ()
             var self = this;
             self.append("Characteristic Type: ");
             tmpUl = $('<ul class="nav nav-list nav-pills nav-stacked">');
-            values = options.getChartTitles();
+            values = options.getChartTitles(getFingerprintID());
             var configs = new PCConfs();
-            var charts = configs.getSettings();
+            var charts = configs.getSettings(getFingerprintID());
             chartTypes = charts;
             self.append(tmpUl);
             $.each(values, function (data){

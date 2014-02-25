@@ -31,7 +31,17 @@ class ConfCharts(object):
         pass
 
     def get_main_settings(self):
-        # It's hardcoded now 
+        
+
+
+
+        sc = SetCharst()
+
+        sc.charts = []
+
+        #################################################
+        ### Active patients
+        #################################################
         c = Chart()
         c.title = Title()
         c.title.operation = Operation.UNIQUE
@@ -59,11 +69,18 @@ class ConfCharts(object):
 
         c.filters = [f2]
 
+        sc.charts.append(c)
+
+
+        #################################################
+        ### Birth date
+        #################################################
+
         c1 = Chart()
         c1.title = Title()
         c1.title.operation = Operation.UNIQUE
         c1.title.var = "Birth in year" 
-        c1.title.fixed_title = "Birth in year"
+        c1.title.fixed_title = "Birth date"
         
         c1.x_axis = Axis()
         c1.x_axis.operation = "unique"
@@ -264,13 +281,6 @@ class ConfCharts(object):
         f2.value = 'Gender'
 
         c12.filters = [f2]
-
-
-        print c.to_JSON()
-        sc = SetCharst()
-
-        sc.charts = [c,c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c12]
-        #sc.charts = [c,c1]
 
         return sc
 
