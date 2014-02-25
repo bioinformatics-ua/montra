@@ -236,7 +236,7 @@ class ConfCharts(object):
         c12.y_axis = Axis()
         c12.y_axis.multivalue = True
         c12.y_axis.operation = "unique"
-        c12.y_axis.var = ["perc25", "Mean", "perc75"]
+        c12.y_axis.var = ["perc25", "Mean", "perc75", "Median"]
         f1 = Filter()
         f1.name = 'Year'
         f1.key = 'Name1'
@@ -247,7 +247,7 @@ class ConfCharts(object):
         f2.key = None
         f2.value = 'Gender'
 
-        c12.filters = [f1,f2]
+        c12.filters = [f2]
 
 
         print c.to_JSON()

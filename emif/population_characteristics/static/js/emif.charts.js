@@ -78,8 +78,8 @@ function RepresentData(wrapper)
 
             console.log('who is this: ' + this);
             console.log('who is this: ' + self);
-            console.log(div);
-            console.log(data);
+            console.log(_div);
+            console.log(_data);
             g = new GraphicChartC3D3();
             w_g = new RepresentData(g);
 
