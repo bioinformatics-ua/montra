@@ -25,6 +25,7 @@
     <h3>
     
     {{ k.text|removeh1 }}
+    <label></label>
 
     </h3>
     </div>
@@ -72,7 +73,7 @@
                             <span class="pull-right">
                                 <a href="#" onclick="toggle_comments('{{question.number|removedots}}'); return false;"><i class="{% if qdict.comment %} icon-comment {% else %} icon-comment-alt {% endif %}">&nbsp;</i></a>
                             </span>
-                            <span class="pull-right answered hide" id="answered_{{ question.number|removedots }}">
+                            <span class="pull-right answered" id="answered_{{ question.number|removedots }}">
                                 <i class="icon-check green">&nbsp;</i>
                             </span>
 
@@ -206,12 +207,15 @@
     </form>
 
 </div>
+<script src="{{ STATIC_URL}}js/vendor/threadpool.js"></script>
+<script src="{{ STATIC_URL}}js/emif.fingerprint.counter.js"></script>
 
 <!-- Fix later -->
-<script src="static/js/vendor/bootstrap-tooltip.js"></script>
-<script src="static/js/vendor/bootstrap-popover.js"></script>
-<script src="static/js/fingerprint_validation.js"></script>
-<script src="static/js/fingerprint.js"></script>
+<script src="{{ STATIC_URL}}js/vendor/bootstrap-tooltip.js"></script>
+<script src="{{ STATIC_URL}}js/vendor/bootstrap-popover.js"></script>
+<script src="{{ STATIC_URL}}js/fingerprint_validation.js"></script>
+<script src="{{ STATIC_URL}}js/fingerprint.js"></script>
+
 
 <script type="text/javascript">
 

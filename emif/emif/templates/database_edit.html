@@ -96,8 +96,9 @@ text-decoration: none;
             <tr>
               <td width="80%">{% if qs.sortid != 0 and qs.sortid != 99 %}{{ qs.sortid }}. {% endif %}{{ qs.text|removeh1 }}</td>
               <td width="10%">
-                <!--<span style="float:right; vertical-align: middle " class="badge badge-warning">2</span>
-              -->
+                {% if qs.sortid != 0 and qs.sortid != 99 %}
+               <span id="counter_{{ qs.sortid }}" style="float:right; vertical-align: middle padding-left:0px;  font-size:10px;  " class="badge badge-inverse hidden"><label  style="padding-left:0px;  font-size:10px;  font-weight:bold;" ></label></span>
+               {%endif%}
             </td>
           </tr>
         </table>
@@ -123,7 +124,6 @@ console.log("trigger");
         {% endfor %}
 
         for(key in qvalues) {
-            console.log(key);
             valchanged(key, qvalues[key]);
         }
     </script>

@@ -12,14 +12,14 @@ def question_choice(request, question):
     cd = question.getcheckdict()
     key = "question_%s" % question.number
     key2 = "question_%s_comment" % question.number
-    val = None
+    val = ''
     if key in request.POST:
         val = request.POST[key]
     else:
         if 'default' in cd:
             val = cd['default']
 
-    if val != None and "#" in val:
+    if val != None and val != '' and "#" in val:
         val = val.split("#")[0]
     for choice in question.choices():
         choices.append( ( choice.value == val, choice, ) )
@@ -64,9 +64,9 @@ def question_multiple(request, question):
     choices = []
     counter = 0
     cd = question.getcheckdict()
-    val = None
+    val = ''
     try:
-        val = request.POST.get(key, None)
+        val = request.POST.get(key, '')
     except:
         pass
     defaults = cd.get('default','').split(',')
@@ -74,7 +74,7 @@ def question_multiple(request, question):
         counter += 1
         key = "question_%s_multiple_%d" % (question.number, choice.sortid)
         
-        if key in request.POST or (val!=None and (choice.value in val)) or \
+        if key in request.POST or (val!=None and val != '' and (choice.value in val)) or \
           (request.method == 'GET' and choice.value in defaults):
             choices.append( (choice, key, ' checked',) )
         else:
@@ -104,6 +104,7 @@ def question_multiple(request, question):
     return {
         "choices": choices,
         "extras": extras,
+        "qvalue" : val,
         "template"  : "questionnaire/choice-multiple-freeform.html",
         "required" : cd.get("required", False) and cd.get("required") != "0",
 
@@ -172,9 +173,9 @@ def question_multiple_options(request, question):
     choices = []
     counter = 0
     cd = question.getcheckdict()
-    val = None
+    val = ''
     try:
-        val = request.POST.get(key, None)
+        val = request.POST.get(key, '')
     except:
         pass
     defaults = cd.get('default','').split(',')
@@ -222,6 +223,7 @@ def question_multiple_options(request, question):
     return {
         "choices": choices,
         "extras": extras,
+        "qvalue" : val,
         "template"  : "questionnaire/choice-multiple-freeform-options.html",
         "required" : cd.get("required", False) and cd.get("required") != "0",
 
