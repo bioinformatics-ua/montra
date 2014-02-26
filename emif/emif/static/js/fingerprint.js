@@ -50,7 +50,27 @@ $(document).ready(function () {
      });
 });
 /* End -- Check if user has unsaved changes */
+function replaceall(str,replace,with_this)
+{
+    var str_hasil ="";
+    var temp;
 
+    for(var i=0;i<str.length;i++) // not need to be equal. it causes the last change: undefined..
+    {
+        if (str[i] == replace)
+        {
+            temp = with_this;
+        }
+        else
+        {
+                temp = str[i];
+        }
+
+        str_hasil += temp;
+    }
+
+    return str_hasil;
+};
 
 /***************** BEGIN - CHECK IF ANSWER IS FILLED IN *****************/
 /* Function to validate for fields of type 1 (see comments below)*/
@@ -68,6 +88,7 @@ function validate1(val, id_answered, dirty_id_answered) {
     if(val != "") {
             //console.log('1 - #answered_'+id_answered);
             $('[id="answered_'+id_answered+'"]').show();
+            $('[id="answered_'+id_answered+'"]').addClass("hasValue");
             result = true;
         
             if (!(typeof bool_container === 'undefined')) {
@@ -78,14 +99,14 @@ function validate1(val, id_answered, dirty_id_answered) {
                 //console.log( $('#question_nr_'+id_answered).text().trim()+" "+just_question);
                 //console.dir(':input[name="question_'+dirty_id_answered.replace('.','\\.')+'"]');
                 
-                if($(':input[name="question_'+dirty_id_answered.replace('.','\\.')+'"]').is(':radio')){
+                if($(':input[name="question_'+replaceall(dirty_id_answered, '.','\\.')+'"]').is(':radio')){
                     bool_container.pushWithDelegate('question_nr_'+number_correct,
                     $('#question_nr_'+id_answered).text().trim()+" "+just_question,
-                                   $(':input[name="question_'+dirty_id_answered.replace('.','\\.')+'"]').val(), 'clear_selection("question_nr_'+dirty_id_answered.replace('.','\\.')+'", "");');   
+                                   $(':input[name="question_'+replaceall(dirty_id_answered, '.','\\.')+'"]').val(), 'clear_selection("question_nr_'+replaceall(dirty_id_answered,'.','\\.')+'", "");');   
                 } else {
                   bool_container.pushWithDelegate('question_nr_'+number_correct,
                     $('#question_nr_'+id_answered).text().trim()+" "+just_question,
-                                   $(':input[name="question_'+dirty_id_answered.replace('.','\\.')+'"]').val(), 'clearSimple("question_'+dirty_id_answered.replace('.','\\.')+'");');       
+                                   $(':input[name="question_'+replaceall(dirty_id_answered,'.','\\.')+'"]').val(), 'clearSimple("question_'+replaceall(dirty_id_answered,'.','\\.')+'");');       
                 }
                 
             }
@@ -93,13 +114,14 @@ function validate1(val, id_answered, dirty_id_answered) {
         } else {
             //console.log('2 - #answered_'+id_answered);
             $('[id="answered_'+id_answered+'"]').hide();
+            $('[id="answered_'+id_answered+'"]').removeClass("hasValue");
             result = false;
             var number_correct = $('#question_nr_'+id_answered).text().trim();
             number_correct = number_correct.substring(0, number_correct.length-1);
             if (!(typeof bool_container === 'undefined')) {
                 bool_container.splice('question_nr_'+number_correct,
                     $('#question_nr_'+id_answered).text().trim()+" "+just_question,
-                                   $('#question_'+dirty_id_answered.replace('.','\\.')).val());
+                                   $('#question_'+replaceall(dirty_id_answered,'.','\\.')).val());
             }
         }
             // If we have a boolean container, maker
@@ -110,20 +132,22 @@ function validate1(val, id_answered, dirty_id_answered) {
 
 // Clear a simple text field by his name
 function clearSimple(id){
-    $(':input[name="'+id.replace('.','\\.')+'"]').val('');
+    $(':input[name="'+replaceall(id,'.','\\.')+'"]').val('');
     // Simulate change
-    $(':input[name="'+id.replace('.','\\.')+'"]').change();
+    $(':input[name="'+replaceall(id,'.','\\.')+'"]').change();
 }
 
 //Creates an advanced validator for question fields.
 var classNamePatternAUX = /type_(\S+)/i;
 var advValidator = new Fingerprint_Validator();
 
+
+
 function validateById(id_answered, id_answered_aux)
 {
 
     var valueCounter = 0;
-    var toSum = $('[id="answered_'+id_answered_aux+'"]').is(':visible');
+    
 
 
     /*
@@ -147,8 +171,9 @@ function validateById(id_answered, id_answered_aux)
         if (myValue!=undefined)
         {
         myValue = myValue.replace('acc_qc_', '');
+        myValue = myValue.replace('qc_', '');
 
-        var val = $('#question_' + myValue.replace('.','\\.')).val();
+        var val = $('#question_' + replaceall(myValue, '.','\\.')).val();
 
         var r = validate1(val, id_answered_aux, id_answered);
         if (r)
@@ -169,7 +194,7 @@ function validateById(id_answered, id_answered_aux)
         {
         myValue = myValue.replace('acc_qc_', '');
 
-        var val = $('#question_' + myValue.replace('.','\\.')).val();
+        var val = $('#question_' + replaceall(myValue, '.','\\.')).val();
 
         var r = validate1(val, id_answered_aux, id_answered);
 
@@ -188,10 +213,13 @@ function validateById(id_answered, id_answered_aux)
          if ($('[name="question_'+id_answered+'"]').is(':checked')) {
 
              $('[id="answered_'+id_answered_aux+'"]').show();
+             $('[id="answered_'+id_answered_aux+'"]').addClass("hasValue");
              valueCounter = 1;
 
          } else {
              $('[id="answered_'+id_answered_aux+'"]').hide();
+              $('[id="answered_'+id_answered_aux+'"]').removeClass("hasValue");
+
              valueCounter = -1;
 
          }
@@ -203,10 +231,13 @@ function validateById(id_answered, id_answered_aux)
 
          if ($('[id="answer_'+id_answered+'"] input[type="checkbox"]').is(':checked')) {
              $('[id="answered_'+id_answered_aux+'"]').show();
+              $('[id="answered_'+id_answered_aux+'"]').addClass("hasValue");
              valueCounter = 1;
 
          } else {
             valueCounter = -1;
+            $('[id="answered_'+id_answered_aux+'"]').hide();
+              $('[id="answered_'+id_answered_aux+'"]').removeClass("hasValue");
 
          }
     }
@@ -225,7 +256,9 @@ $(document).ready(function () {
 
         id_answered = id_answered.replace('acc_qc_', '');
 
-        id_answered = id_answered.replace('.','\\.');
+        //id_answered = id_answered.replace('.','\\.');
+        id_answered = replaceall(id_answered, '.','\\.')
+          
 
 
         var valueConter = validateById(id_answered, id_answered_aux);
@@ -242,7 +275,7 @@ $(document).ready(function () {
         var el = e.target;
         var id_answered = el.id.split("_")[1];
         var id_answered_aux = el.id.split("_")[1].replace(/\./g,'');
-
+        var toSum = $('[id="answered_'+id_answered_aux+'"]').hasClass('hasValue');
         var qId = parseInt(id_answered[0]);
 
 
@@ -255,14 +288,17 @@ $(document).ready(function () {
             
 
         var valueCounter = 0;
-        var toSum = $('[id="answered_'+id_answered_aux+'"]').is(':visible');
         
-        valueConter = validateById(id_answered, id_answered_aux);
+        //id_answered = id_answered.replace('.','\\.');
+        id_answered = replaceall(id_answered, '.','\\.')
 
-        if (toSum)
+        valueCounter = validateById(id_answered.trim(), id_answered_aux.trim());
+        var toSum2 = $('[id="answered_'+id_answered_aux+'"]').hasClass('hasValue');
+        if (toSum && toSum2)
         {
             valueCounter = 0;
         }
+        console.log('after'+valueCounter);
         /* Update Counter */ 
         questionSetsCounters[qId]['filledQuestions'] = questionSetsCounters[qId]['filledQuestions'] + valueCounter;
          var ui = new CounterUI();
