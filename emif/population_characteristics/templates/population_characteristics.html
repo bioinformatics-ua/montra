@@ -1,7 +1,9 @@
 {% load url from future %}
-
+<!--[if gte IE 9]><!-->
 <script src="{{ STATIC_URL}}js/emif.charts.filters.js"></script>
 <script src="{{ STATIC_URL}}js/emif.charts.draw.js"></script>
+<!--<![endif]-->
+
 
 <style type="text/css">
 
@@ -32,7 +34,10 @@
 
 }
 </style>
-
+<!--[if lte IE 8]>
+<div class="well">Currently IE 7 and 8 don't support this functionality. To use this functionality please update your browser to a modern browser, like IE 9 or better, Google Chrome, Firefox, Opera or Safari.</div>
+<![endif]-->
+<!--[if gte IE 9]><!-->
 {% if owner_fingerprint %}
 
     {% if not contains_population %}
@@ -177,7 +182,6 @@
             <div id='pctitle'>
             </div>
             <div id='pc_chart_place'>
-
             </div>
         </div>
     </div>
@@ -207,6 +211,7 @@ This database fingerprint does not have population characteristics yet. Please c
 
 {% endif %}
 
+<!--<![endif]-->
 
 
 <!--
@@ -216,11 +221,13 @@ This database fingerprint does not have population characteristics yet. Please c
 
 <script src="{{ STATIC_URL}}js/emif.documents.js"></script>
 -->
-
+<!--[if gte IE 9]><!-->
 <script src="{{ STATIC_URL}}js/emif.charts.c3d3.js"></script>
 <script src="{{ STATIC_URL}}js/emif.charts.d3.js"></script>
 
 <script src="{{ STATIC_URL}}js/emif.charts.js"></script>
+<!--<![endif]-->
+
 
 
 <script >

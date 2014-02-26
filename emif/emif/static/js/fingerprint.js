@@ -73,16 +73,16 @@ function validate1(element, id_answered, dirty_id_answered) {
                 number_correct = number_correct.substring(0, number_correct.length-1);
                 //console.log( number_correct);
                 //console.log( $('#question_nr_'+id_answered).text().trim()+" "+just_question);
-                //console.dir(':input[name="question_'+dirty_id_answered.replace('.','\\.')+'"]');
+                //console.dir(':input[name="question_'+dirty_id_answered.replace(/\./g,'\\.')+'"]');
                 
-                if($(':input[name="question_'+dirty_id_answered.replace('.','\\.')+'"]').is(':radio')){
+                if($(':input[name="question_'+dirty_id_answered.replace(/\./g,'\\.')+'"]').is(':radio')){
                     bool_container.pushWithDelegate('question_nr_'+number_correct,
                     $('#question_nr_'+id_answered).text().trim()+" "+just_question,
-                                   $(':input[name="question_'+dirty_id_answered.replace('.','\\.')+'"]').val(), 'clear_selection("question_nr_'+dirty_id_answered.replace('.','\\.')+'", "");');   
+                                   $(':input[name="question_'+dirty_id_answered.replace(/\./g,'\\.')+'"]').val(), 'clear_selection("question_nr_'+dirty_id_answered.replace(/\./g,'\\.')+'", "");');   
                 } else {
                   bool_container.pushWithDelegate('question_nr_'+number_correct,
                     $('#question_nr_'+id_answered).text().trim()+" "+just_question,
-                                   $(':input[name="question_'+dirty_id_answered.replace('.','\\.')+'"]').val(), 'clearSimple("question_'+dirty_id_answered.replace('.','\\.')+'");');       
+                                   $(':input[name="question_'+dirty_id_answered.replace(/\./g,'\\.')+'"]').val(), 'clearSimple("question_'+dirty_id_answered.replace(/\./g,'\\.')+'");');       
                 }
                 
             }
@@ -95,7 +95,7 @@ function validate1(element, id_answered, dirty_id_answered) {
             if (!(typeof bool_container === 'undefined')) {
                 bool_container.splice('question_nr_'+number_correct,
                     $('#question_nr_'+id_answered).text().trim()+" "+just_question,
-                                   $('#question_'+dirty_id_answered.replace('.','\\.')).val());
+                                   $('#question_'+dirty_id_answered.replace(/\./g,'\\.')).val());
             }
         }
             // If we have a boolean container, maker
@@ -104,9 +104,9 @@ function validate1(element, id_answered, dirty_id_answered) {
 
 // Clear a simple text field by his name
 function clearSimple(id){
-    $(':input[name="'+id.replace('.','\\.')+'"]').val('');
+    $(':input[name="'+id.replace(/\./g,'\\.')+'"]').val('');
     // Simulate change
-    $(':input[name="'+id.replace('.','\\.')+'"]').change();
+    $(':input[name="'+id.replace(/\./g,'\\.')+'"]').change();
 }
 
 //Creates an advanced validator for question fields.
