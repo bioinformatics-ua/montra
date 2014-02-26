@@ -6,7 +6,7 @@ from django.utils.simplejson import dumps
 def question_yesno(request, question):
     key = "question_%s" % question.number
     key2 = "question_%s_comment" % question.number
-    val = request.POST.get(key, '')
+    val = request.POST.get(key, None)
     cmt = request.POST.get(key2, '')
     qtype = question.get_type()
     cd = question.getcheckdict()
