@@ -115,6 +115,9 @@ def truncate(value):
 
     return result
 
+@register.filter
+def whitespacesplit(str):
+    return str.split()
 
 def fingerprints_list():
     
