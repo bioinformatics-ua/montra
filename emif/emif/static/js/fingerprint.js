@@ -50,32 +50,15 @@ $(document).ready(function () {
      });
 });
 /* End -- Check if user has unsaved changes */
+
+
 function replaceall(str,replace,with_this)
 {
-    var str_hasil ="";
-    var temp;
-
-    for(var i=0;i<str.length;i++) // not need to be equal. it causes the last change: undefined..
-    {
-        if (str[i] == replace)
-        {
-            temp = with_this;
-        }
-        else
-        {
-                temp = str[i];
-        }
-
-        str_hasil += temp;
-    }
-
-    return str_hasil;
+    return str.replace(/\./g,'\\.')
+    
 };
 
-function getValueOfRadioButtoms(idOfTheStaff){
 
-
-}
 
 
 /***************** BEGIN - CHECK IF ANSWER IS FILLED IN *****************/
@@ -256,7 +239,6 @@ function validateById(id_answered, id_answered_aux)
 
 $(document).ready(function () {
     
-
     $('.answered').each(function (ans){ 
         var myId = $('.answered')[ans]['id'];
         var id_answered = myId.split("_")[1];

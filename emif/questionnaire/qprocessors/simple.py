@@ -11,7 +11,7 @@ def question_yesno(request, question):
     qtype = question.get_type()
     cd = question.getcheckdict()
     jstriggers = []
-
+    hasValue = False
     if qtype == 'choice-yesnocomment':
         hascomment = True
     else:
@@ -39,6 +39,7 @@ def question_yesno(request, question):
         'required' : True,
         'checks' : checks,
         'value' : val,
+        'hasValue': val!="",
         'qvalue' : '',
         'hascomment' : hascomment,
         'hasdontknow' : hasdontknow,
@@ -55,6 +56,7 @@ def question_open(request, question):
         value = request.POST[key]
     return {
         'required' : question.getcheckdict().get('required', False),
+        'hasValue': value!="",
         'value' : value,
     }
 
@@ -67,6 +69,7 @@ def question_datepicker(request, question):
     return {
         'required' : question.getcheckdict().get('required', False),
         'value' : value,
+        'hasValue': value!="",
         'template' : 'questionnaire/datepicker.html',
     }
 
