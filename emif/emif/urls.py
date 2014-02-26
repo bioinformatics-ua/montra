@@ -223,12 +223,6 @@ urlpatterns = patterns('',
         {'template_name': 'userena/password_complete.html'},
         name='userena_password_change_complete'),
 
-    # Edit profile
-    # url(r'^accounts/(?P<username>[^/]+)/edit/$',
-    #     userena_views.profile_edit,
-    #     {'edit_profile_form': EditProfileForm},
-    #     name='userena_profile_edit'),
-
     # View profiles
     url(r'^accounts/(?P<username>(?!signout|signup|signin)[^/]+)/$',
         userena_views.profile_detail,

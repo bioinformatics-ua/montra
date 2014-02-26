@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% load crispy_forms_tags %}
+{% load url from future %}
+
+{% block title %}{% trans "Account not active" %}{% endblock %}
+
+{% block headerdisabled %}
+{% endblock %}
+{% block content %}
+<p class="lead" style="text-align:center;"><i class="fa fa-lock fa-5x"></i></p>
+<p class="lead" style="text-align:center;">{% trans "It seems your account is not active." %}</p>
+<p class="lead" style="text-align:center;">{% trans "Please, wait for an administrator to approve your registration." %}</p>
+{% endblock %} 
