@@ -1150,10 +1150,15 @@ def get_databases_from_db(request):
 
 
 def get_databases_from_solr(request, query="*:*"):
+
+    (list_databases, hits) = get_databases_from_solr_v2(request, query=query);
+
+    return list_databases
+
+def get_databases_from_solr_v2(request, query="*:*", sort="", rows=100, start=0):
     c = CoreEngine()
-    results = c.search_fingerprint(query)
+    results = c.search_fingerprint(query, sort=sort, rows=rows, start=start)
     print "Solr"
-    print results
     list_databases = []
     questionnaires_ids = {}
     qqs = Questionnaire.objects.all()
@@ -1227,7 +1232,7 @@ def get_databases_from_solr(request, query="*:*"):
         except:
             pass
             #raise
-    return list_databases
+    return (list_databases,results.hits)
 
 
 def delete_fingerprint(request, id):
@@ -1257,7 +1262,6 @@ def force_delete_fingerprint(request, id):
 
     return databases(request)
 
-
 def databases(request, page=1, template_name='databases.html'):
     #first lets clean the query session log
     if 'query' in request.session:
@@ -1272,30 +1276,116 @@ def databases(request, page=1, template_name='databases.html'):
         del request.session['query_type']
         
     # Get the list of databases for a specific user
+    sortFieldsLookup = {}
+    sortFieldsLookup["database_name"] = "database_name_sort"
+    sortFieldsLookup["last_update"] = "last_activity_sort"
+    sortFieldsLookup["type"] = "type_name_sort"
 
+    sortString = ""
+    sort_params= {}
+    print request.GET
+    if "s" in request.GET:
+        mode = json.loads(request.GET["s"])
+    else:
+        mode = {"database_name": "asc"}
+
+    for x in mode:
+        if sortFieldsLookup.has_key(x):
+            if mode[x] == "asc" or mode[x] == "desc":
+                sortString += sortFieldsLookup[x]+" "+mode[x]
+                sort_params[x] = {}
+                sort_params[x]["name"] = mode[x]
+
+    for x in ["database_name", "last_update", "type"]:
+        if x in sort_params:
+            if sort_params[x]["name"] == "asc":
+                sort_params[x]["click_url"]='?s={"'+x+'":"desc"}'
+                sort_params[x]["icon"]="icon-chevron-down"
+            elif sort_params[x]["name"] == "desc":
+                sort_params[x]["click_url"]='?s={"'+x+'":"asc"}'
+                sort_params[x]["icon"]="icon-chevron-up"
+        else:
+            sort_params[x] = {}
+            sort_params[x]["click_url"]='?s={"'+x+'":"asc"}'
+            sort_params[x]["icon"]="icon-minus"
+        
+    print sortString
+    
     user = request.user
     #list_databases = get_databases_from_db(request)
     _filter = "user_t:" + user.username
     if user.is_superuser:
         _filter = "user_t:*" 
-    list_databases = get_databases_from_solr(request, _filter)
 
-
-    ## Paginator ##
     rows = 5
+    if page == None:
+        page = 1
+    range = (int(page) - 1) * rows    
+    (list_databases,hits) = get_databases_from_solr_v2(request, _filter, sort=sortString, rows=rows, start=range)
+    nList = [];
+    
+
+    for x in xrange(0,range):
+        nList.append(None)
+    nList.extend(list_databases)
+    while len(nList)<hits:
+        nList.append(None)
+ 
+    list_databases = nList   
+    ## Paginator ##
     myPaginator = Paginator(list_databases, rows)
     try:
         pager =  myPaginator.page(page)
     except PageNotAnInteger, e:
-        pager =  myPaginator.page(1)
+        pager =  myPaginator.page(page)
     ## End Paginator ##
+    print list_databases
 
     return render(request, template_name, {'request': request, 'export_my_answers': True,
                                            'list_databases': list_databases, 'breadcrumb': True, 'collapseall': False,
                                            'page_obj': pager,
                                            'api_token': True, 
                                            'owner_fingerprint': False,
-                                           'add_databases': True})
+                                           'add_databases': True, "sort_params": sort_params})
+
+# def databases(request, page=1, template_name='databases.html'):
+#     #first lets clean the query session log
+#     if 'query' in request.session:
+#         del request.session['query']
+        
+#     if 'isAdvanced' in request.session:
+#         del request.session['isAdvanced'] 
+    
+#     if 'query_id' in request.session:
+#         del request.session['query_id']
+#     if 'query_type' in request.session:
+#         del request.session['query_type']
+        
+#     # Get the list of databases for a specific user
+
+#     user = request.user
+#     #list_databases = get_databases_from_db(request)
+#     _filter = "user_t:" + user.username
+#     if user.is_superuser:
+#         _filter = "user_t:*" 
+#     list_databases = get_databases_from_solr(request, _filter)
+
+
+#     ## Paginator ##
+#     rows = 5
+#     myPaginator = Paginator(list_databases, rows)
+#     try:
+#         pager =  myPaginator.page(page)
+#     except PageNotAnInteger, e:
+#         pager =  myPaginator.page(1)
+#     ## End Paginator ##
+
+#     return render(request, template_name, {'request': request, 'export_my_answers': True,
+#                                            'list_databases': list_databases, 'breadcrumb': True, 'collapseall': False,
+#                                            'page_obj': pager,
+#                                            'api_token': True, 
+#                                            'owner_fingerprint': False,
+#                                            'add_databases': True})
 
 # GET ALL DATABASES ACCORDING TO USER INTERESTS
 def all_databases_user(request, page=1, template_name='alldatabases.html'):
