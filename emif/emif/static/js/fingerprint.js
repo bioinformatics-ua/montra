@@ -85,7 +85,7 @@ function validate1(val, id_answered, dirty_id_answered) {
         .text().trim();    //get the text of element
     var result = true;
 
-    if(val != "") {
+    if(val != "" && val != undefined) {
             //console.log('1 - #answered_'+id_answered);
             $('[id="answered_'+id_answered+'"]').show();
             $('[id="answered_'+id_answered+'"]').addClass("hasValue");

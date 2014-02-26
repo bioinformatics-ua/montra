@@ -121,7 +121,7 @@ function CounterUI() {
     */
   this.updateCounters = function(qId, counters){
     
-    $('#qs_'+ qId + ' .questionset-title h3 label').html(counters['filledQuestions'] + ' of ' +
+    $('#qs_'+ qId + ' .questionset-title label').html(counters['filledQuestions'] + ' of ' +
       counters['count'] + ' - ' + 
       Math.round((counters['filledQuestions']/counters['count'])*100) + '%');
     $('#counter_'+ qId + ' label').html(Math.round((counters['filledQuestions']/counters['count'])*100) + '%');
