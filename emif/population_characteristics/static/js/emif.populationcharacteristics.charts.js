@@ -35,7 +35,7 @@ function PCConfs ()
           url: "population/settings/" + fingerprintId + "/",
           async: false,
           data: result,
-          success: function (data){result=data;},
+          success: function (data){result=data;}
         });
         return JSON.parse(result.conf).charts;
         

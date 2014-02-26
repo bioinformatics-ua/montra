@@ -44,7 +44,7 @@ $(document).ready(
           url: "population/jerboafiles/"+getFingerprintID_new()+"/",
           async: false,
           data: result,
-          success: function (data){result=data;},
+          success: function (data){result=data;}
         });
         console.log(result);
         result.conf.forEach(function(d){

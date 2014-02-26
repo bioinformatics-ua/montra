@@ -65,7 +65,7 @@ function PCAPI ()
           url: "population/jerboalistvalues/Active patients/Gender/abcd",
           async: false,
           data: result,
-          success: function (data){result=data;},
+          success: function (data){result=data;}
         });
         return result;
     };
@@ -78,7 +78,7 @@ function PCAPI ()
           url: "population/jerboalistvalues/Active patients/Name1/abcd",
           async: false,
           data: result,
-          success: function (data){result=data;},
+          success: function (data){result=data;}
         });
         return result;
     };
@@ -91,7 +91,7 @@ function PCAPI ()
           url: "population/jerboalistvalues/Active patients/Name2/abcd",
           async: false,
           data: result,
-          success: function (data){result=data;},
+          success: function (data){result=data;}
         });
         return result;
     };
@@ -105,7 +105,7 @@ function PCAPI ()
           url: "population/jerboalistvalues/Active patients/Value1/abcd",
           async: false,
           data: result,
-          success: function (data){result=data;},
+          success: function (data){result=data;}
         });
         return result;
     };
@@ -119,7 +119,7 @@ function PCAPI ()
           url: "population/jerboalistvalues/Active patients/Name2/abcd",
           async: false,
           data: result,
-          success: function (data){result=data;},
+          success: function (data){result=data;}
         });
         return result;
     };
@@ -132,7 +132,7 @@ function PCAPI ()
           url: "population/jerboalistvalues/" + nameN,
           async: false,
           data: result,
-          success: function (data){result=data;},
+          success: function (data){result=data;}
         });
         return result;
     };
@@ -145,7 +145,7 @@ function PCAPI ()
           url: "population/jerboalistvalues/" + valueN,
           async: false,
           data: result,
-          success: function (data){result=data;},
+          success: function (data){result=data;}
         });
         return result;
     };
@@ -158,7 +158,7 @@ function PCAPI ()
           url: "population/jerboalistvalues/Var",
           async: false,
           data: result,
-          success: function (data){result=data;},
+          success: function (data){result=data;}
         });
         return result;
     };
@@ -171,7 +171,7 @@ function PCAPI ()
           url: "population/jerboalistvalues/Var",
           async: false,
           data: result,
-          success: function (data){result=data;},
+          success: function (data){result=data;}
         });
         return result;
     };
@@ -183,7 +183,7 @@ function PCAPI ()
           url: "population/jerboalistvalues/"+Var+"/"+Row+"/" + fingerprintID,
           async: false,
           data: result,
-          success: function (data){result=data;},
+          success: function (data){result=data;}
         });
         return result;
     };
@@ -214,7 +214,7 @@ function PCAPI ()
           url: "population/filters/"+Var+"/" + fingerprintID,
           async: false,
           data: result,
-          success: function (data){result=data;},
+          success: function (data){result=data;}
         });
         return result;
     };
@@ -312,8 +312,7 @@ function PCAPI ()
         },
         draw : function( options ) {
             
-        },
-
+        }
     };
 
     $.fn.populationChartsBar = function(method) {
@@ -412,8 +411,7 @@ function PCAPI ()
         },
         draw : function( options ) {
             
-        },
-
+        }
     };
 
     $.fn.populationChartsTypes = function(method) {
@@ -438,11 +436,13 @@ $(document).ready(
 
         $("#pc_list").populationChartsTypes(chartLayout, PCAPI);
         $("#pc_list").populationChartsTypes('draw', chartLayout); 
-        $(".graphTypes").each(function(d,a){
 
-          if (d==0) $(this)[0].click()
-        });
+          $('.tabbable a[data-toggle="tab"]').on('shown', function (e) {
+            if(e.target.innerText == 'Population Characteristics'){
+              $(".graphTypes").first().click();  
+            }
+          })
+
         }
     
 );
-

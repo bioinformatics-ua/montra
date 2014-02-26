@@ -72,10 +72,8 @@ function RepresentData(wrapper)
             var self = this;
             var div = _div;
             var data = _data;
-
         },
         drawBarChart : function( options, _div, _data ) {
-
 
             g = new GraphicChartC3D3();
             w_g = new RepresentData(g);
@@ -87,8 +85,10 @@ function RepresentData(wrapper)
             dataset = [[], 
                  
                  ];
-
             w_g.translateData(_data);
+
+            console.log(dataset);
+
             w_g.draw('#pc_chart_place', dataset);
             
 

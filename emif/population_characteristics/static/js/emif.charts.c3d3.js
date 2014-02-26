@@ -31,7 +31,7 @@ function GraphicChartC3D3(divArg, dataArg)
   this.yscale = null ;
   this.self = this;
   this.init = function(){
-
+    console.log("--GRAPHICS C3D3");
   };
 
   this.translateData = function(objects){
@@ -126,8 +126,7 @@ function GraphicChartC3D3(divArg, dataArg)
         zoom: {
           enabled: true,
         
-        },
-        
+        }
         
       };
     if (actualChart.x_axis.categorized)
@@ -164,7 +163,7 @@ function GraphicChartC3D3(divArg, dataArg)
         zoom: {
           enabled: true,
         
-        },
+        }
         
       };
       

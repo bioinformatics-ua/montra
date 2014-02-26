@@ -8,7 +8,6 @@
      * Generate chart according to config
      */
     c3.generate = function (config) {
-
         var c3 = { data : {} },
             cache = {};
 
