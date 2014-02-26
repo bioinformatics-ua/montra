@@ -1,7 +1,3 @@
-/**
-  * 
-
-  */
 
 var getPlacement = function($el) {
     var offset = $el.offset(),
@@ -58,7 +54,7 @@ $(document).ready(function () {
 
 /***************** BEGIN - CHECK IF ANSWER IS FILLED IN *****************/
 /* Function to validate for fields of type 1 (see comments below)*/
-function validate1(element, id_answered, dirty_id_answered) {
+function validate1(val, id_answered, dirty_id_answered) {
                 /* Tip from: http://viralpatel.net/blogs/jquery-get-text-element-without-child-element/ */
  
             var just_question = $('#question_'+id_answered)
@@ -68,7 +64,8 @@ function validate1(element, id_answered, dirty_id_answered) {
         .end()  //again go back to selected element
         .text().trim();    //get the text of element
     var result = true;
-    if($(element).val() != "") {
+
+    if(val != "") {
             //console.log('1 - #answered_'+id_answered);
             $('[id="answered_'+id_answered+'"]').show();
             result = true;
@@ -122,10 +119,120 @@ function clearSimple(id){
 var classNamePatternAUX = /type_(\S+)/i;
 var advValidator = new Fingerprint_Validator();
 
+function validateById(id_answered, id_answered_aux)
+{
 
+    var valueCounter = 0;
+    var toSum = $('[id="answered_'+id_answered_aux+'"]').is(':visible');
+
+
+    /*
+        - verify the type to each question and create a respective processment for each one
+        TYPES:
+        1 - open | open-button | open-upload-image | open-textfield | datepicker | range | timeperiod | publication
+            choice-yesno | choice-yesnocomment | choice-yesnodontknow
+        2 - choice | choice-freeform
+        3 - choice-multiple-freeform | choice-multiple | choice-multiple-freeform-options
+        None - comment | sameas | custom
+
+    */
+    if($('[id="qc_'+id_answered+'"]').hasClass('type_open') || $('[id="qc_'+id_answered+'"]').hasClass('type_open-button')
+        || $('[id="qc_'+id_answered+'"]').hasClass('type_open-upload-image')
+        || $('[id="qc_'+id_answered+'"]').hasClass('type_open-textfield')
+        || $('[id="qc_'+id_answered+'"]').hasClass('type_publication')) {
+
+        var myValue = $('[id="answered_'+id_answered_aux+'"]').parent().parent()[0].id;
+
+
+        if (myValue!=undefined)
+        {
+        myValue = myValue.replace('acc_qc_', '');
+
+        var val = $('#question_' + myValue.replace('.','\\.')).val();
+
+        var r = validate1(val, id_answered_aux, id_answered);
+        if (r)
+            valueCounter = 1;
+        else
+            valueCounter = -1;
+        }
+
+    }
+    if($('[id="qc_'+id_answered+'"]').hasClass('type_datepicker') || $('[id="qc_'+id_answered+'"]').hasClass('type_range')
+        || $('[id="qc_'+id_answered+'"]').hasClass('type_timeperiod')
+        || $('[id="qc_'+id_answered+'"]').hasClass('type_choice-yesnodontknow')
+        || $('[id="qc_'+id_answered+'"]').hasClass('type_choice-yesnocomment')
+        || $('[id="qc_'+id_answered+'"]').hasClass('type_choice-yesno')) {
+        var myValue = $('[id="answered_'+id_answered_aux+'"]').parent().parent()[0].id;
+
+         if (myValue!=undefined)
+        {
+        myValue = myValue.replace('acc_qc_', '');
+
+        var val = $('#question_' + myValue.replace('.','\\.')).val();
+
+        var r = validate1(val, id_answered_aux, id_answered);
+
+        if (r)
+            valueCounter = 1;
+        else
+            valueCounter = -1;
+        
+        }
+
+    }
+
+     if($('[id="qc_'+id_answered+'"]').hasClass('type_choice')
+         || $('[id="qc_'+id_answered+'"]').hasClass('type_choice-freeform')) {
+
+         if ($('[name="question_'+id_answered+'"]').is(':checked')) {
+
+             $('[id="answered_'+id_answered_aux+'"]').show();
+             valueCounter = 1;
+
+         } else {
+             $('[id="answered_'+id_answered_aux+'"]').hide();
+             valueCounter = -1;
+
+         }
+    }
+
+    if($('[id="qc_'+id_answered+'"]').hasClass('type_choice-multiple-freeform')
+         || $('[id="qc_'+id_answered+'"]').hasClass('type_choice-multiple')
+         || $('[id="qc_'+id_answered+'"]').hasClass('type_choice-multiple-freeform-options')) {
+
+         if ($('[id="answer_'+id_answered+'"] input[type="checkbox"]').is(':checked')) {
+             $('[id="answered_'+id_answered_aux+'"]').show();
+             valueCounter = 1;
+
+         } else {
+            valueCounter = -1;
+
+         }
+    }
+    return valueCounter;
+}
 
 $(document).ready(function () {
     
+
+    $('.answered').each(function (ans){ 
+        var myId = $('.answered')[ans]['id'];
+        var id_answered = myId.split("_")[1];
+        var id_answered_aux = myId.split("_")[1].replace(/\./g,'');
+        var toSum = $('[id="answered_'+id_answered_aux+'"]').is(':visible');
+        id_answered = $('[id="answered_'+id_answered_aux+'"]').parent().parent()[0].id;
+
+        id_answered = id_answered.replace('acc_qc_', '');
+
+        id_answered = id_answered.replace('.','\\.');
+
+
+        var valueConter = validateById(id_answered, id_answered_aux);
+
+        
+    });
+
     advValidator.onInit();
     $(document).on('change', '.answer input,.answer select,.answer textarea, button', function (e) {
         e.preventDefault();
@@ -139,80 +246,18 @@ $(document).ready(function () {
         var qId = parseInt(id_answered[0]);
 
 
-        var valueCounter = 0;
-        var toSum = $('[id="answered_'+id_answered_aux+'"]').is(':visible');
         //Detects widget class and sends it to the advanced validator.
         var className = $('[id="qc_'+id_answered+'"]').attr("class");
         className = classNamePatternAUX.exec(className)[1];
-        if(className != undefined)
+        if(className != undefined){
             advValidator.validate(className, id_answered, el);
-
-        /*
-            - verify the type to each question and create a respective processment for each one
-            TYPES:
-            1 - open | open-button | open-upload-image | open-textfield | datepicker | range | timeperiod | publication
-                choice-yesno | choice-yesnocomment | choice-yesnodontknow
-            2 - choice | choice-freeform
-            3 - choice-multiple-freeform | choice-multiple | choice-multiple-freeform-options
-            None - comment | sameas | custom
-
-        */
-        if($('[id="qc_'+id_answered+'"]').hasClass('type_open') || $('[id="qc_'+id_answered+'"]').hasClass('type_open-button')
-            || $('[id="qc_'+id_answered+'"]').hasClass('type_open-upload-image')
-            || $('[id="qc_'+id_answered+'"]').hasClass('type_open-textfield')
-            || $('[id="qc_'+id_answered+'"]').hasClass('type_publication')) {
-
-            var r = validate1(this, id_answered_aux, id_answered);
-            if (r)
-                valueCounter = 1;
-            else
-                valueCounter = -1;
-
         }
-        if($('[id="qc_'+id_answered+'"]').hasClass('type_datepicker') || $('[id="qc_'+id_answered+'"]').hasClass('type_range')
-            || $('[id="qc_'+id_answered+'"]').hasClass('type_timeperiod')
-            || $('[id="qc_'+id_answered+'"]').hasClass('type_choice-yesnodontknow')
-            || $('[id="qc_'+id_answered+'"]').hasClass('type_choice-yesnocomment')
-            || $('[id="qc_'+id_answered+'"]').hasClass('type_choice-yesno')) {
-
-            var r = validate1(this, id_answered_aux, id_answered);
-            if (r)
-                valueCounter = 1;
-            else
-                valueCounter = -1;
             
-        }
 
-
-
-         if($('[id="qc_'+id_answered+'"]').hasClass('type_choice')
-             || $('[id="qc_'+id_answered+'"]').hasClass('type_choice-freeform')) {
-
-             if ($('[name="question_'+id_answered+'"]').is(':checked')) {
-
-                 $('[id="answered_'+id_answered_aux+'"]').show();
-                 valueCounter = 1;
-  
-             } else {
-                 $('[id="answered_'+id_answered_aux+'"]').hide();
-                 valueCounter = -1;
-    
-             }
-        }
-
-        if($('[id="qc_'+id_answered+'"]').hasClass('type_choice-multiple-freeform')
-             || $('[id="qc_'+id_answered+'"]').hasClass('type_choice-multiple')
-             || $('[id="qc_'+id_answered+'"]').hasClass('type_choice-multiple-freeform-options')) {
-
-             if ($('[id="answer_'+id_answered+'"] input[type="checkbox"]').is(':checked')) {
-                 $('[id="answered_'+id_answered_aux+'"]').show();
-                 valueCounter = 1;
-
-             } else {
-                valueCounter = -1;
-
-             }
-        }
+        var valueCounter = 0;
+        var toSum = $('[id="answered_'+id_answered_aux+'"]').is(':visible');
+        
+        valueConter = validateById(id_answered, id_answered_aux);
 
         if (toSum)
         {

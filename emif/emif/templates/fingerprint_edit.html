@@ -71,8 +71,8 @@
                             <span class="pull-right">
                                 <a href="#" onclick="toggle_comments('{{question.number|removedots}}'); return false;"><i class="{% if qdict.comment %} icon-comment {% else %} icon-comment-alt {% endif %}">&nbsp;</i></a>
                             </span>
-                            <span class="pull-right answered" id="answered_{{ question.number|removedots }}">
-                                <i class="icon-check green">&nbsp;</i>
+                            <span class="pull-right answered {% if qdict.value or qdict.qvalue != '' %} hasValue {%endif%}" id="answered_{{ question.number|removedots }}">
+                                <i class="icon-check green">&nbsp;</i>{{qdict.qvalue}},{{qdict.value}}
                             </span>
 
                 {% endif %}
@@ -112,8 +112,10 @@
                                     <span class="pull-right">
                                         <a href="#" onclick="toggle_comments('{{question.number|removedots}}'); return false;"><i class="{% if qdict.comment %} icon-comment {% else %} icon-comment-alt {% endif %}">&nbsp;</i></a>
                                     </span>
-                                    <span class="pull-right answered hide" id="answered_{{ question.number|removedots }}">
+                                    <span class="pull-right answered {% if qdict.value  != '' or qdict.qvalue != '' %} hasValue {%endif%}" id="answered_{{ question.number|removedots }}"> {{qdict.qvalue}},{{qdict.value}}
                                         <i class="icon-check green">&nbsp;</i>
+                                    }
+                                    }
                                     </span>
                                 {% endif %}
                                 </div>
@@ -206,14 +208,18 @@
 
 </div>
 
-<script src="{{ STATIC_URL}}js/vendor/threadpool.js"></script>
-<script src="{{ STATIC_URL}}js/emif.fingerprint.counter.js"></script>
 
 <!-- Fix later -->
 <script src="{{ STATIC_URL}}js/vendor/bootstrap-tooltip.js"></script>
 <script src="{{ STATIC_URL}}js/vendor/bootstrap-popover.js"></script>
 <script src="{{ STATIC_URL}}js/fingerprint_validation.js"></script>
 <script src="{{ STATIC_URL}}js/fingerprint.js"></script>
+
+<!--keep the order -->
+<script src="{{ STATIC_URL}}js/vendor/threadpool.js"></script>
+<script src="{{ STATIC_URL}}js/emif.fingerprint.counter.js"></script>
+
+
 
 {% block scriptextraincludes %}
         <script type="text/javascript" src="static/js/fingerprint_edit.js"></script>

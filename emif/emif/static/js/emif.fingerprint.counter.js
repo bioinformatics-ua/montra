@@ -73,7 +73,7 @@ function CounterCore(questionnaireId) {
     this.countFilledQuestionSet = function(qId){
       var counter = 0;
       // Go for each question set and counts the questions 
-      $('#qs_'+ qId + ' .answered:visible').each(function(question){
+      $('#qs_'+ qId + ' .hasValue').each(function(question){
 
           counter = counter + 1;
         });
@@ -125,7 +125,7 @@ function CounterUI() {
       counters['count'] + ' - ' + 
       Math.round((counters['filledQuestions']/counters['count'])*100) + '%');
     $('#counter_'+ qId + ' label').html(Math.round((counters['filledQuestions']/counters['count'])*100) + '%');
-  
+    $('#counter_'+ qId ).removeClass('hidden');
   };
 
 
@@ -158,7 +158,7 @@ function CounterUI() {
 */
 function CounterTasker(ui, questionnaireId) {
 
-  this.POLL_MAX = 4;
+  this.POLL_MAX = 1;
   this.questionnaireId = questionnaireId;
   this.ui = ui;
 
