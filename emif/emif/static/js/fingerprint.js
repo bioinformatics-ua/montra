@@ -104,15 +104,15 @@ function validate1(val, id_answered, dirty_id_answered) {
                 //console.log( number_correct);
                 //console.log( $('#question_nr_'+id_answered).text().trim()+" "+just_question);
                 //console.dir(':input[name="question_'+dirty_id_answered.replace('.','\\.')+'"]');
-                
-                if($(':input[name="question_'+replaceall(dirty_id_answered, '.','\\.')+'"]').is(':radio')){
+                var dirty = dirty_id_answered.replace(/\./g,'\\.');
+                if($(':input[name="question_'+dirty+'"]').is(':radio')){
                     bool_container.pushWithDelegate('question_nr_'+number_correct,
                     $('#question_nr_'+id_answered).text().trim()+" "+just_question,
-                                   $(':input[name="question_'+replaceall(dirty_id_answered, '.','\\.')+'"]').val(), 'clear_selection("question_nr_'+replaceall(dirty_id_answered,'.','\\.')+'", "");');   
+                                   $(':input[name="question_'+dirty+'"]').val(), 'clear_selection("question_nr_'+dirty+'", "");');   
                 } else {
                   bool_container.pushWithDelegate('question_nr_'+number_correct,
                     $('#question_nr_'+id_answered).text().trim()+" "+just_question,
-                                   $(':input[name="question_'+replaceall(dirty_id_answered,'.','\\.')+'"]').val(), 'clearSimple("question_'+replaceall(dirty_id_answered,'.','\\.')+'");');       
+                                   $(':input[name="question_'+dirty+'"]').val(), 'clearSimple("question_'+dirty+'");');       
                 }
                 
             }
@@ -125,9 +125,11 @@ function validate1(val, id_answered, dirty_id_answered) {
             var number_correct = $('#question_nr_'+id_answered).text().trim();
             number_correct = number_correct.substring(0, number_correct.length-1);
             if (!(typeof bool_container === 'undefined')) {
+                var dirty = dirty_id_answered.replace(/\./g,'\\.');
+    
                 bool_container.splice('question_nr_'+number_correct,
                     $('#question_nr_'+id_answered).text().trim()+" "+just_question,
-                                   $('#question_'+replaceall(dirty_id_answered,'.','\\.')).val());
+                                   $('#question_'+dirty).val());
             }
         }
             // If we have a boolean container, maker
@@ -138,9 +140,11 @@ function validate1(val, id_answered, dirty_id_answered) {
 
 // Clear a simple text field by his name
 function clearSimple(id){
-    $(':input[name="'+replaceall(id,'.','\\.')+'"]').val('');
+    id = id.replace(/\./g,'\\.');
+
+    $(':input[name="'+id+'"]').val('');
     // Simulate change
-    $(':input[name="'+replaceall(id,'.','\\.')+'"]').change();
+    $(':input[name="'+id+'"]').change();
 }
 
 //Creates an advanced validator for question fields.
@@ -166,10 +170,16 @@ function validateById(id_answered, id_answered_aux)
         None - comment | sameas | custom
 
     */
-    if($('[id="qc_'+id_answered+'"]').hasClass('type_open') || $('[id="qc_'+id_answered+'"]').hasClass('type_open-button')
-        || $('[id="qc_'+id_answered+'"]').hasClass('type_open-upload-image')
-        || $('[id="qc_'+id_answered+'"]').hasClass('type_open-textfield')
-        || $('[id="qc_'+id_answered+'"]').hasClass('type_publication')) {
+    var qc_id = $('[id="qc_'+id_answered+'"]');
+
+    console.log(qc_id);
+
+    if(qc_id.hasClass('type_open') 
+        || qc_id.hasClass('type_open-button')
+        || qc_id.hasClass('type_open-upload-image')
+        || qc_id.hasClass('type_open-textfield')
+        || qc_id.hasClass('type_publication')
+        ) {
 
         var myValue = $('[id="answered_'+id_answered_aux+'"]').parent().parent()[0].id;
 
@@ -179,7 +189,7 @@ function validateById(id_answered, id_answered_aux)
         myValue = myValue.replace('acc_qc_', '');
         myValue = myValue.replace('qc_', '');
 
-        var val = $('#question_' + replaceall(myValue, '.','\\.')).val();
+        var val = $('#question_' + myValue.replace(/\./g,'\\.')).val();
 
         var r = validate1(val, id_answered_aux, id_answered);
         if (r)
@@ -189,8 +199,8 @@ function validateById(id_answered, id_answered_aux)
         }
 
     }
-    if($('[id="qc_'+id_answered+'"]').hasClass('type_datepicker') || $('[id="qc_'+id_answered+'"]').hasClass('type_range')
-        || $('[id="qc_'+id_answered+'"]').hasClass('type_timeperiod')
+    if(qc_id.hasClass('type_datepicker') || qc_id.hasClass('type_range')
+        || qc_id.hasClass('type_timeperiod')
         ) {
         var myValue = $('[id="answered_'+id_answered_aux+'"]').parent().parent()[0].id;
 
@@ -198,7 +208,7 @@ function validateById(id_answered, id_answered_aux)
         {
         myValue = myValue.replace('acc_qc_', '');
 
-        var val = $('#question_' + replaceall(myValue, '.','\\.')).val();
+        var val = $('#question_' + myValue.replace(/\./g,'\\.')).val();
 
         var r = validate1(val, id_answered_aux, id_answered);
 
@@ -210,14 +220,11 @@ function validateById(id_answered, id_answered_aux)
         }
 
     }
-
-
-
-     if($('[id="qc_'+id_answered+'"]').hasClass('type_choice')
-         || $('[id="qc_'+id_answered+'"]').hasClass('type_choice-freeform')
-         || $('[id="qc_'+id_answered+'"]').hasClass('type_choice-yesnodontknow')
-        || $('[id="qc_'+id_answered+'"]').hasClass('type_choice-yesnocomment')
-        || $('[id="qc_'+id_answered+'"]').hasClass('type_choice-yesno')
+    if(qc_id.hasClass('type_choice')
+         || qc_id.hasClass('type_choice-freeform')
+         || qc_id.hasClass('type_choice-yesnodontknow')
+         || qc_id.hasClass('type_choice-yesnocomment')
+         || qc_id.hasClass('type_choice-yesno')
          ) {
 
          if ($('[name="question_'+id_answered+'"]').is(':checked')) {
@@ -234,10 +241,9 @@ function validateById(id_answered, id_answered_aux)
 
          }
     }
-
-    if($('[id="qc_'+id_answered+'"]').hasClass('type_choice-multiple-freeform')
-         || $('[id="qc_'+id_answered+'"]').hasClass('type_choice-multiple')
-         || $('[id="qc_'+id_answered+'"]').hasClass('type_choice-multiple-freeform-options')) {
+    if(qc_id.hasClass('type_choice-multiple-freeform')
+         || qc_id.hasClass('type_choice-multiple')
+         || qc_id.hasClass('type_choice-multiple-freeform-options')) {
 
          if ($('[id="answer_'+id_answered+'"] input[type="checkbox"]').is(':checked')) {
              $('[id="answered_'+id_answered_aux+'"]').show();
@@ -296,23 +302,25 @@ $(document).ready(function () {
             advValidator.validate(className, id_answered, el);
         }
             
+            if (!(typeof questionSetsCounters === 'undefined')) {
+                var valueCounter = 0;
+                
+                //id_answered = id_answered.replace('.','\\.');
+                id_answered = id_answered.replace(/\./g,'\\.');
+                            
+                valueCounter = validateById(id_answered.trim(), id_answered_aux.trim());
+                var toSum2 = $('[id="answered_'+id_answered_aux+'"]').hasClass('hasValue');
+                if (toSum && toSum2)
+                {
+                    valueCounter = 0;
+                }
+                console.log('after'+valueCounter);
+                /* Update Counter */ 
+                questionSetsCounters[qId]['filledQuestions'] = questionSetsCounters[qId]['filledQuestions'] + valueCounter;
+                 var ui = new CounterUI();
+                 ui.updateCountersClean(qId);  
+            }
 
-        var valueCounter = 0;
-        
-        //id_answered = id_answered.replace('.','\\.');
-        id_answered = replaceall(id_answered, '.','\\.')
-
-        valueCounter = validateById(id_answered.trim(), id_answered_aux.trim());
-        var toSum2 = $('[id="answered_'+id_answered_aux+'"]').hasClass('hasValue');
-        if (toSum && toSum2)
-        {
-            valueCounter = 0;
-        }
-        console.log('after'+valueCounter);
-        /* Update Counter */ 
-        questionSetsCounters[qId]['filledQuestions'] = questionSetsCounters[qId]['filledQuestions'] + valueCounter;
-         var ui = new CounterUI();
-         ui.updateCountersClean(qId);
 
     });
 

@@ -158,7 +158,7 @@ function CounterUI() {
 */
 function CounterTasker(ui, questionnaireId) {
 
-  this.POLL_MAX = 1;
+  this.POLL_MAX = 20;
   this.questionnaireId = questionnaireId;
   this.ui = ui;
 
