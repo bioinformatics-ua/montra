@@ -72,12 +72,6 @@ function replaceall(str,replace,with_this)
     return str_hasil;
 };
 
-function getValueOfRadioButtoms(idOfTheStaff){
-
-
-}
-
-
 /***************** BEGIN - CHECK IF ANSWER IS FILLED IN *****************/
 /* Function to validate for fields of type 1 (see comments below)*/
 function validate1(val, id_answered, dirty_id_answered) {
@@ -90,7 +84,7 @@ function validate1(val, id_answered, dirty_id_answered) {
         .end()  //again go back to selected element
         .text().trim();    //get the text of element
     var result = true;
-    console.log(val);
+
     if(val != "" && val != undefined) {
             //console.log('1 - #answered_'+id_answered);
             $('[id="answered_'+id_answered+'"]').show();
@@ -191,7 +185,9 @@ function validateById(id_answered, id_answered_aux)
     }
     if($('[id="qc_'+id_answered+'"]').hasClass('type_datepicker') || $('[id="qc_'+id_answered+'"]').hasClass('type_range')
         || $('[id="qc_'+id_answered+'"]').hasClass('type_timeperiod')
-        ) {
+        || $('[id="qc_'+id_answered+'"]').hasClass('type_choice-yesnodontknow')
+        || $('[id="qc_'+id_answered+'"]').hasClass('type_choice-yesnocomment')
+        || $('[id="qc_'+id_answered+'"]').hasClass('type_choice-yesno')) {
         var myValue = $('[id="answered_'+id_answered_aux+'"]').parent().parent()[0].id;
 
          if (myValue!=undefined)
@@ -211,14 +207,8 @@ function validateById(id_answered, id_answered_aux)
 
     }
 
-
-
      if($('[id="qc_'+id_answered+'"]').hasClass('type_choice')
-         || $('[id="qc_'+id_answered+'"]').hasClass('type_choice-freeform')
-         || $('[id="qc_'+id_answered+'"]').hasClass('type_choice-yesnodontknow')
-        || $('[id="qc_'+id_answered+'"]').hasClass('type_choice-yesnocomment')
-        || $('[id="qc_'+id_answered+'"]').hasClass('type_choice-yesno')
-         ) {
+         || $('[id="qc_'+id_answered+'"]').hasClass('type_choice-freeform')) {
 
          if ($('[name="question_'+id_answered+'"]').is(':checked')) {
 
