@@ -67,10 +67,11 @@ function validate1(element, id_answered, dirty_id_answered) {
         .remove()   //remove all the children
         .end()  //again go back to selected element
         .text().trim();    //get the text of element
-
+    var result = true;
     if($(element).val() != "") {
             //console.log('1 - #answered_'+id_answered);
             $('[id="answered_'+id_answered+'"]').show();
+            result = true;
         
             if (!(typeof bool_container === 'undefined')) {
                 console.log('question_nr_'+id_answered);
@@ -95,6 +96,7 @@ function validate1(element, id_answered, dirty_id_answered) {
         } else {
             //console.log('2 - #answered_'+id_answered);
             $('[id="answered_'+id_answered+'"]').hide();
+            result = false;
             var number_correct = $('#question_nr_'+id_answered).text().trim();
             number_correct = number_correct.substring(0, number_correct.length-1);
             if (!(typeof bool_container === 'undefined')) {
@@ -104,6 +106,8 @@ function validate1(element, id_answered, dirty_id_answered) {
             }
         }
             // If we have a boolean container, maker
+
+            return result;
 
 }
 
@@ -125,10 +129,18 @@ $(document).ready(function () {
     advValidator.onInit();
     $(document).on('change', '.answer input,.answer select,.answer textarea, button', function (e) {
         e.preventDefault();
+
+
+
         var el = e.target;
         var id_answered = el.id.split("_")[1];
         var id_answered_aux = el.id.split("_")[1].replace(/\./g,'');
 
+        var qId = parseInt(id_answered[0]);
+
+
+        var valueCounter = 0;
+        var toSum = $('[id="answered_'+id_answered_aux+'"]').is(':visible');
         //Detects widget class and sends it to the advanced validator.
         var className = $('[id="qc_'+id_answered+'"]').attr("class");
         className = classNamePatternAUX.exec(className)[1];
@@ -150,26 +162,40 @@ $(document).ready(function () {
             || $('[id="qc_'+id_answered+'"]').hasClass('type_open-textfield')
             || $('[id="qc_'+id_answered+'"]').hasClass('type_publication')) {
 
-            validate1(this, id_answered_aux, id_answered);
-        }
+            var r = validate1(this, id_answered_aux, id_answered);
+            if (r)
+                valueCounter = 1;
+            else
+                valueCounter = -1;
 
+        }
         if($('[id="qc_'+id_answered+'"]').hasClass('type_datepicker') || $('[id="qc_'+id_answered+'"]').hasClass('type_range')
             || $('[id="qc_'+id_answered+'"]').hasClass('type_timeperiod')
             || $('[id="qc_'+id_answered+'"]').hasClass('type_choice-yesnodontknow')
             || $('[id="qc_'+id_answered+'"]').hasClass('type_choice-yesnocomment')
             || $('[id="qc_'+id_answered+'"]').hasClass('type_choice-yesno')) {
 
-            validate1(this, id_answered_aux, id_answered);
+            var r = validate1(this, id_answered_aux, id_answered);
+            if (r)
+                valueCounter = 1;
+            else
+                valueCounter = -1;
+            
         }
+
+
 
          if($('[id="qc_'+id_answered+'"]').hasClass('type_choice')
              || $('[id="qc_'+id_answered+'"]').hasClass('type_choice-freeform')) {
 
              if ($('[name="question_'+id_answered+'"]').is(':checked')) {
+
                  $('[id="answered_'+id_answered_aux+'"]').show();
+                 valueCounter = 1;
   
              } else {
                  $('[id="answered_'+id_answered_aux+'"]').hide();
+                 valueCounter = -1;
     
              }
         }
@@ -180,11 +206,22 @@ $(document).ready(function () {
 
              if ($('[id="answer_'+id_answered+'"] input[type="checkbox"]').is(':checked')) {
                  $('[id="answered_'+id_answered_aux+'"]').show();
+                 valueCounter = 1;
 
              } else {
+                valueCounter = -1;
 
              }
         }
+
+        if (toSum)
+        {
+            valueCounter = 0;
+        }
+        /* Update Counter */ 
+        questionSetsCounters[qId]['filledQuestions'] = questionSetsCounters[qId]['filledQuestions'] + valueCounter;
+         var ui = new CounterUI();
+         ui.updateCountersClean(qId);
 
     });
 

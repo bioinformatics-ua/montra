@@ -56,7 +56,6 @@ function CounterCore(questionnaireId) {
       // Go for each question set and counts the questions 
       $('#qs_'+ qId + ' .question').each(function(question){
           counter = counter + 1;
-           console.log(question);
 
         });
       return counter;
@@ -74,8 +73,8 @@ function CounterCore(questionnaireId) {
     this.countFilledQuestionSet = function(qId){
       var counter = 0;
       // Go for each question set and counts the questions 
-      $('#qs_'+ qId + ' .icon-check').each(function(question){
-        console.log(question);
+      $('#qs_'+ qId + ' .answered:visible').each(function(question){
+
           counter = counter + 1;
         });
 
@@ -103,12 +102,12 @@ function CounterCore(questionnaireId) {
 /**
 * Calls the tasks for all qsets
 *
-* @class CounterTasker
+* @class CounterUI
 * @constructor
 * @param {Integer} questionnaireId The id of the questionnaire type. 
   It matches with the primary key of the template.
 */
-function CounterUI(core) {
+function CounterUI() {
 
   this.handlers = [];
 
@@ -121,10 +120,29 @@ function CounterUI(core) {
     * @param {Dictionary} counters dicionary with the values filledQuestions and count.
     */
   this.updateCounters = function(qId, counters){
-    console.debug(qId);
-    console.debug(counters);
-    console.debug(questionSetsCounters);
+    
+    $('#qs_'+ qId + ' .questionset-title h3 label').html(counters['filledQuestions'] + ' of ' +
+      counters['count'] + ' - ' + 
+      Math.round((counters['filledQuestions']/counters['count'])*100) + '%');
+    $('#counter_'+ qId + ' label').html(Math.round((counters['filledQuestions']/counters['count'])*100) + '%');
+  
   };
+
+
+  /**
+    * This class update the counts in the graphical interface 
+    *
+    * @method updateCounters
+    * @param {Integer} qId Identifier of Question Set (sort to keep the order )
+    * @param {Dictionary} counters dicionary with the values filledQuestions and count.
+    */
+  this.updateCountersClean = function(qId){
+    console.log(qId);
+    this.updateCounters(qId, questionSetsCounters[qId]);
+  };
+
+  
+
 
 }; 
 
@@ -179,7 +197,7 @@ function CounterTasker(ui, questionnaireId) {
 
 $(document).ready(function () {
   var core = new CounterCore();
-  var ui = new CounterUI(core);
+  var ui = new CounterUI();
   var tasker = new CounterTasker(ui, 0);
   tasker.run();
 
