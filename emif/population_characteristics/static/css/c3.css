@@ -148,3 +148,7 @@ text {
   stroke-width: 0;
   opacity: 0.2;
 }
+
+#pc_chart_place{
+  overflow:hidden;
+}

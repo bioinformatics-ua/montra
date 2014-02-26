@@ -49,21 +49,22 @@ function GraphicChartC3D3(divArg, dataArg)
     
     if (actualChart.y_axis.multivalue)
       {
-        actualChart.y_axis.var.forEach(function(a){
+        actualChart.y_axis['var'].forEach(function(a){
           i = i +1;
           datasetYs.push(['data'+i]);
         });
         datasetX = ['x'];
       }
+    
     objects.values.forEach(function(row){
       /*datasetX.push(parseInt(row.Value1));
       datasetY.push(parseInt(row.Count));*/
       
       if (actualChart.x_axis.categorized )
       {
-        if ( row[actualChart.x_axis.var] != ""){
-          datasetX.push(row[actualChart.x_axis.var]);  
-          datasetY.push(parseInt(row[actualChart.y_axis.var]));  
+        if ( row[actualChart.x_axis['var']] != ""){
+          datasetX.push(row[actualChart.x_axis['var']]);  
+          datasetY.push(parseInt(row[actualChart.y_axis['var']]));  
         }
         
       }
@@ -72,8 +73,8 @@ function GraphicChartC3D3(divArg, dataArg)
       {
         
         var k = 0;
-        datasetX.push(parseInt(row[actualChart.x_axis.var]));  
-        actualChart.y_axis.var.forEach(function(a){
+        datasetX.push(parseInt(row[actualChart.x_axis['var']]));  
+        actualChart.y_axis['var'].forEach(function(a){
 
           
 
@@ -85,8 +86,8 @@ function GraphicChartC3D3(divArg, dataArg)
       }
       else
       {
-        datasetX.push(parseInt(row[actualChart.x_axis.var]));
-        datasetY.push(parseInt(row[actualChart.y_axis.var]));  
+        datasetX.push(parseInt(row[actualChart.x_axis['var']]));
+        datasetY.push(parseInt(row[actualChart.y_axis['var']]));  
       }
       
       

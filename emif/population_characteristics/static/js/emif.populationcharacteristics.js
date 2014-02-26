@@ -48,6 +48,15 @@ var actualChart = null;
   * This need to be fixed */ 
 function PCAPI () 
 {
+    // This was already globally defined, but ie8, for some obscure reason cant find it...
+    $.ajaxSetup({
+                crossDomain: false, // obviates need for sameOrigin test
+                beforeSend: function(xhr, settings) {
+                    if (!csrfSafeMethod(settings.type)) {
+                        xhr.setRequestHeader("X-CSRFToken", $.cookie('csrftoken'));
+                    }
+                }
+    });
     this.getGender = function(){
         var result = {}
           
@@ -178,9 +187,9 @@ function PCAPI ()
         });
         return result;
     };
-
      this.getValuesRowWithFilters = function(Var, Row, fingerprintID, filters){
         var result = {}
+
 
         $.ajax({
           dataType: "json",
@@ -188,8 +197,13 @@ function PCAPI ()
           async: false,
           type: "POST",
           data: filters,
-          success: function (data){result=data;},
+          success: function (data){
+            result=data;
+          }
         });
+
+        
+
         return result;
     };
 
@@ -284,10 +298,10 @@ function PCAPI ()
 
                       var charDraw = new PCDraw(actualChart, activeChart, null);
 
-                      var str = e.toElement.id;
+                      var str = e.target.id;
                       var filterType =str.substring(str.indexOf("_")+1,str.lastIndexOf("_"));
 
-                      filtersMap['values.'+filterType] = [e.toElement.innerHTML.trim()];
+                      filtersMap['values.'+filterType] = [e.target.innerHTML.trim()];
                       charDraw.refresh(getFiltersSelected());
 
                       return false;
@@ -345,10 +359,9 @@ function PCAPI ()
                       $('.graphTypes').closest('li').removeClass('active')
                       $(this.parentNode).closest('li').addClass('active')
 
-                      
                       chartTypes.forEach(function(a){
-
-                          if (a.title.fixed_title==e.toElement.innerHTML) 
+                          console.log();
+                          if (a.title.fixed_title==e.target.innerHTML) 
                           {
                               actualChart = a;
                           }
@@ -359,7 +372,7 @@ function PCAPI ()
                           // do something here like an abort or shit! 
                       }
 
-                      var charDraw = new PCDraw(actualChart, actualChart.title.var, e);
+                      var charDraw = new PCDraw(actualChart, actualChart.title['var'], e);
                       var _filters = {};
                       charDraw.draw(_filters);
                       charDraw.drawBar();

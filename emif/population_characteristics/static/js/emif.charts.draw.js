@@ -45,8 +45,7 @@ function PCDraw(actualChart,chartType, e)
         tfilter = new TransformFilter(filters);
         filters = tfilter.transform();
         valuesFromGraph = PC.getValuesRowWithFilters(this.actualChart.title.fixed_title, 
-          this.actualChart.y_axis.var,fingerprintID, filters );
-
+          this.actualChart.y_axis['var'],fingerprintID, filters );
       }
       
       /*valuesFromGraph = PC.getValuesRow(this.chartType, 
@@ -66,13 +65,13 @@ function PCDraw(actualChart,chartType, e)
       $("#pctitle").html("<h2>"+ this.chartType +"</h2>");
       if (this.e != null ) 
       {
-          if ($(this.e.toElement.firstChild).hasClass('icon-ok')) 
+          if ($(this.e.target.firstChild).hasClass('icon-ok')) 
           {
-            $(this.e.toElement.firstChild).removeClass('icon-ok') 
+            $(this.e.target.firstChild).removeClass('icon-ok') 
           }
           else
           {
-            $(this.e.toElement.firstChild).addClass('icon-ok') 
+            $(this.e.target.firstChild).addClass('icon-ok') 
           }
       }
       

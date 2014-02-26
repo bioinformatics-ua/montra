@@ -53,7 +53,7 @@ function ChartLayout ()
             if (a.title.fixed_title!= 'None')
                 charts_titles.push(a.title.fixed_title)
             else
-                charts_titles.push(a.title.var)
+                charts_titles.push(a.title['var'])
         });
         return charts_titles;
     };
