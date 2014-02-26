@@ -393,6 +393,7 @@ LOGIN_EXEMPT_URLS = (
     r'^accounts/activate/(?P<activation_key>\w+)/$',
     r'^accounts/signup/complete',
     r'^accounts/password/reset/',
+    r'^accounts/(?P<username>[^/]+)/disabled/',
     r'^api/metadata',
     r'^api/search',
     r'^api-token-auth-create/',

@@ -254,7 +254,7 @@ function load_questionnary(){
         // We build the qs containers in memory and just do dom op, on the end, for speed
         // on ie joins are significantly faster than concatenation
         {% for k, qs in qsets.ordered_items %}
-            containers.push('<div class="accordion-group"><div class="accordion-heading"><a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion1" href="#collapse{{ k|removespaces|safe|clean }}">{{ k|removeh1 }}</a></div><div id="collapse{{ k|removespaces|safe|clean }}" class="accordion-body collapse"><div id="qs_{{ qs.sortid }}" class="accordion-inner"><h4 class="pull-center">Loading...</h4></div></div></div>');
+            containers.push('<div class="accordion-group"><div class="accordion-heading"><a style="display: inline-block; width: 90%;" class="accordion-toggle" data-toggle="collapse" data-parent="#accordion1" href="#collapse{{ k|removespaces|safe|clean }}">{{ k|removeh1 }} </a><span class="accordion-icon"></span></div><div id="collapse{{ k|removespaces|safe|clean }}" class="accordion-body collapse"><div id="qs_{{ qs.sortid }}" class="accordion-inner"><h4 class="pull-center">Loading...</h4></div></div></div>');
         
         {% endfor %}
 
@@ -283,7 +283,18 @@ function load_questionnary(){
 function loadqspart(sortid, pk){
     $.get( "fingerprintqs/"+pk+"/"+sortid+"/", function( data ) {
       $( "#qs_"+sortid ).html( data );
+        // Mark the tab as highlighted if there's any highlight inside it
+
+        
+        var highlights = $("#qs_"+sortid).find('.highlight');
+
+        console.dir(highlights);
+
+        if(highlights.length > 0){
+           $( "#qs_"+sortid ).parent().siblings().find('.accordion-icon').html('<i class="icon-eye-open"></i>');
+        }     
     });    
+
     threads['qs_'+sortid] = null;
     parts_missing--;
     this.complete();
