@@ -1,3 +1,8 @@
+/**
+  * 
+
+  */
+
 var getPlacement = function($el) {
     var offset = $el.offset(),
         top = offset.top,
@@ -112,6 +117,8 @@ function clearSimple(id){
 //Creates an advanced validator for question fields.
 var classNamePatternAUX = /type_(\S+)/i;
 var advValidator = new Fingerprint_Validator();
+
+
 
 $(document).ready(function () {
     
