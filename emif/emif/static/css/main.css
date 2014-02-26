@@ -340,3 +340,11 @@ box-shadow: inset 0 3px 8px rgba(0,0,0,0.125);
 .select_checkbox_container{
   width: 300px; max-height: 400px; overflow: scroll; list-style: none;
 }
+
+/* ==========================================================================
+   My databases table
+   ========================================================================== */
+.sorter:hover{
+    background-color: orange;
+    cursor: pointer;
+}
