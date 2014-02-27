@@ -1229,7 +1229,8 @@ def get_databases_from_solr_v2(request, query="*:*", sort="", rows=100, start=0)
             database_aux.ttype = ttype
             database_aux.type_name = type_name
             list_databases.append(database_aux)
-        except:
+        except Exception, e:
+            print e
             pass
             #raise
     return (list_databases,results.hits)
@@ -1325,13 +1326,20 @@ def databases(request, page=1, template_name='databases.html'):
     nList = [];
     
 
+    print "Range: "+str(range)
+
+    print "hits: "+str(hits)
+    print "len: "+str(len(list_databases))
+
     for x in xrange(0,range):
         nList.append(None)
     nList.extend(list_databases)
     while len(nList)<hits:
         nList.append(None)
- 
+
     list_databases = nList   
+
+    print "len: "+str(len(list_databases))
     ## Paginator ##
     myPaginator = Paginator(list_databases, rows)
     try:
