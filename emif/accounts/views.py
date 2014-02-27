@@ -49,7 +49,7 @@ class SignupFormExtra(SignupForm):
 
     interests = forms.ModelMultipleChoiceField(label=_('Interests'),
                                                 required=True,
-                                                queryset=Questionnaire.objects.all(),
+                                                queryset=Questionnaire.objects.filter(disable='False'),
                                                 widget=forms.CheckboxSelectMultiple())
 
     def __init__(self, *args, **kw):
@@ -136,7 +136,7 @@ class EditProfileFormExtra(EditProfileForm):
 
     interests = forms.ModelMultipleChoiceField(label=_('Interests'),
                                                 required=True,
-                                                queryset=Questionnaire.objects.all(),
+                                                queryset=Questionnaire.objects.filter(disable='False'),
                                                 widget=forms.CheckboxSelectMultiple())
 
     def __init__(self, *args, **kw):
