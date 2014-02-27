@@ -111,14 +111,14 @@ class SignupFormExtra(SignupForm):
         if (Profile.objects.all().count()):
             selected_profiles = self.cleaned_data['profiles']
             for sp in selected_profiles:
-                prof = Profile.objects.get(name__iexact=sp)
+                prof = Profile.objects.get(name=sp)
                 user_profile.profiles.add(prof)
 
         # Add selected interests
         if (Questionnaire.objects.all().count()):
             selected_interests = self.cleaned_data['interests']
             for inter in selected_interests:
-                i = Questionnaire.objects.get(name__iexact=inter)
+                i = Questionnaire.objects.get(name=inter)
                 user_profile.interests.add(i)
 
         user_profile.save()
