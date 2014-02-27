@@ -80,7 +80,7 @@ function getValueOfRadioButtoms(idOfTheStaff){
 
 /***************** BEGIN - CHECK IF ANSWER IS FILLED IN *****************/
 /* Function to validate for fields of type 1 (see comments below)*/
-function validate1(val, id_answered, dirty_id_answered) {
+function validate1(element, id_answered, dirty_id_answered) {
                 /* Tip from: http://viralpatel.net/blogs/jquery-get-text-element-without-child-element/ */
  
             var just_question = $('#question_'+id_answered)
@@ -90,21 +90,21 @@ function validate1(val, id_answered, dirty_id_answered) {
         .end()  //again go back to selected element
         .text().trim();    //get the text of element
     var result = true;
-    console.log(val);
-    if(val != "" && val != undefined) {
+    if($(element).val() != "") {
             //console.log('1 - #answered_'+id_answered);
             $('[id="answered_'+id_answered+'"]').show();
             $('[id="answered_'+id_answered+'"]').addClass("hasValue");
             result = true;
         
             if (!(typeof bool_container === 'undefined')) {
-                console.log('question_nr_'+id_answered);
                 var number_correct = $('#question_nr_'+id_answered).text().trim();
+
                 number_correct = number_correct.substring(0, number_correct.length-1);
                 //console.log( number_correct);
                 //console.log( $('#question_nr_'+id_answered).text().trim()+" "+just_question);
                 //console.dir(':input[name="question_'+dirty_id_answered.replace('.','\\.')+'"]');
-                var dirty = dirty_id_answered.replace(/\./g,'\\.');
+                var dirty = dirty_id_answered;
+
                 if($(':input[name="question_'+dirty+'"]').is(':radio')){
                     bool_container.pushWithDelegate('question_nr_'+number_correct,
                     $('#question_nr_'+id_answered).text().trim()+" "+just_question,
@@ -155,7 +155,6 @@ var advValidator = new Fingerprint_Validator();
 
 function validateById(id_answered, id_answered_aux)
 {
-
     var valueCounter = 0;
     
 
@@ -172,15 +171,12 @@ function validateById(id_answered, id_answered_aux)
     */
     var qc_id = $('[id="qc_'+id_answered+'"]');
 
-    console.log(qc_id);
-
     if(qc_id.hasClass('type_open') 
         || qc_id.hasClass('type_open-button')
         || qc_id.hasClass('type_open-upload-image')
         || qc_id.hasClass('type_open-textfield')
         || qc_id.hasClass('type_publication')
         ) {
-
         var myValue = $('[id="answered_'+id_answered_aux+'"]').parent().parent()[0].id;
 
 
@@ -189,8 +185,7 @@ function validateById(id_answered, id_answered_aux)
         myValue = myValue.replace('acc_qc_', '');
         myValue = myValue.replace('qc_', '');
 
-        var val = $('#question_' + myValue.replace(/\./g,'\\.')).val();
-
+        var val = $(':input[name="question_' + myValue.replace(/\./g,'\\.')+'"]');
         var r = validate1(val, id_answered_aux, id_answered);
         if (r)
             valueCounter = 1;
@@ -199,7 +194,7 @@ function validateById(id_answered, id_answered_aux)
         }
 
     }
-    if(qc_id.hasClass('type_datepicker') || qc_id.hasClass('type_range')
+    else if(qc_id.hasClass('type_datepicker') || qc_id.hasClass('type_range')
         || qc_id.hasClass('type_timeperiod')
         ) {
         var myValue = $('[id="answered_'+id_answered_aux+'"]').parent().parent()[0].id;
@@ -208,7 +203,7 @@ function validateById(id_answered, id_answered_aux)
         {
         myValue = myValue.replace('acc_qc_', '');
 
-        var val = $('#question_' + myValue.replace(/\./g,'\\.')).val();
+        var val = $(':input[name="question_' + myValue.replace(/\./g,'\\.')+'"]');
 
         var r = validate1(val, id_answered_aux, id_answered);
 
@@ -220,13 +215,12 @@ function validateById(id_answered, id_answered_aux)
         }
 
     }
-    if(qc_id.hasClass('type_choice')
+    else if(qc_id.hasClass('type_choice')
          || qc_id.hasClass('type_choice-freeform')
          || qc_id.hasClass('type_choice-yesnodontknow')
          || qc_id.hasClass('type_choice-yesnocomment')
          || qc_id.hasClass('type_choice-yesno')
          ) {
-
          if ($('[name="question_'+id_answered+'"]').is(':checked')) {
 
              $('[id="answered_'+id_answered_aux+'"]').show();
@@ -240,8 +234,12 @@ function validateById(id_answered, id_answered_aux)
              valueCounter = -1;
 
          }
+         // I need this call because i hookup the answer to the boolean plugin here.
+         if (!(typeof bool_container === 'undefined')) {
+            validate1($('[name="question_'+id_answered+'"]'),id_answered_aux,id_answered);
+        }
     }
-    if(qc_id.hasClass('type_choice-multiple-freeform')
+    else if(qc_id.hasClass('type_choice-multiple-freeform')
          || qc_id.hasClass('type_choice-multiple')
          || qc_id.hasClass('type_choice-multiple-freeform-options')) {
 
@@ -262,18 +260,20 @@ function validateById(id_answered, id_answered_aux)
 
 $(document).ready(function () {
     
+    $('.answered').each(function (ans){
 
-    $('.answered').each(function (ans){ 
-        var myId = $('.answered')[ans]['id'];
+        var myId = this.id;
         var id_answered = myId.split("_")[1];
         var id_answered_aux = myId.split("_")[1].replace(/\./g,'');
+
         var toSum = $('[id="answered_'+id_answered_aux+'"]').is(':visible');
         id_answered = $('[id="answered_'+id_answered_aux+'"]').parent().parent()[0].id;
 
         id_answered = id_answered.replace('acc_qc_', '');
 
+        // Since were using name="" as selector, we dont need to do the escaping 
         //id_answered = id_answered.replace('.','\\.');
-        id_answered = replaceall(id_answered, '.','\\.')
+        //id_answered = replaceall(id_answered, '.','\\.')
           
 
 
@@ -302,13 +302,16 @@ $(document).ready(function () {
             advValidator.validate(className, id_answered, el);
         }
             
-            if (!(typeof questionSetsCounters === 'undefined')) {
-                var valueCounter = 0;
-                
-                //id_answered = id_answered.replace('.','\\.');
-                id_answered = id_answered.replace(/\./g,'\\.');
+            
+            var valueCounter = 0;
+              
+            // Since were using name="" as selector, we dont need to do the escaping    
+            //id_answered = id_answered.replace('.','\\.');
+            //id_answered = id_answered.replace(/\./g,'\\.');
                             
-                valueCounter = validateById(id_answered.trim(), id_answered_aux.trim());
+            valueCounter = validateById(id_answered.trim(), id_answered_aux.trim());
+            
+            if (!(typeof questionSetsCounters === 'undefined')) {
                 var toSum2 = $('[id="answered_'+id_answered_aux+'"]').hasClass('hasValue');
                 if (toSum && toSum2)
                 {
