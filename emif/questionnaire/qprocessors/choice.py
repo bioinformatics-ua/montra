@@ -12,7 +12,7 @@ def question_choice(request, question):
     cd = question.getcheckdict()
     key = "question_%s" % question.number
     key2 = "question_%s_comment" % question.number
-    val = ''
+    val = None
     if key in request.POST:
         val = request.POST[key]
     else:
@@ -21,9 +21,12 @@ def question_choice(request, question):
 
     if val != None and val != '' and "#" in val:
         val = val.split("#")[0]
+
     for choice in question.choices():
         choices.append( ( choice.value == val, choice, ) )
         hasValue = hasValue or choice.value == val
+
+    print "hasValue: "+str(hasValue)
 
     if question.type == 'choice-freeform':
         jstriggers.append('question_%s_comment' % question.number)

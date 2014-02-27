@@ -2,6 +2,8 @@ from questionnaire import *
 from django.utils.translation import ugettext as _
 from django.utils.simplejson import dumps
 
+import re
+
 @question_proc('choice-yesno','choice-yesnocomment','choice-yesnodontknow')
 def question_yesno(request, question):
     key = "question_%s" % question.number
@@ -66,10 +68,18 @@ def question_datepicker(request, question):
     value = question.getcheckdict().get('default','')
     if key in request.POST:
         value = request.POST[key]
+
+    a = re.compile("([0-9]{4})$")
+    if a.match(value) != None:
+        print 'MATCH'
+        value = value+'-01-01'
+
+    print "VALOR:["+value+"]"
+
     return {
         'required' : question.getcheckdict().get('required', False),
         'value' : value,
-        'hasValue': value!="",
+        'hasValue': (value!="" and value !="dd/mm/yyyy"),
         'template' : 'questionnaire/datepicker.html',
     }
 

@@ -71,7 +71,7 @@
                             <span class="pull-right">
                                 <a href="#" onclick="toggle_comments('{{question.number|removedots}}'); return false;"><i class="{% if qdict.comment %} icon-comment {% else %} icon-comment-alt {% endif %}">&nbsp;</i></a>
                             </span>
-                            <span class="pull-right answered {% if qdict.hasValue  %} hasValue {%endif%}" id="answered_{{ question.number|removedots }}">
+                            <span class="pull-right answered hide {% if qdict.hasValue  %} hasValue {%endif%}" id="answered_{{ question.number|removedots }}">
                                 <i class="icon-check green">&nbsp;</i>
                             </span>
 
@@ -112,7 +112,7 @@
                                     <span class="pull-right">
                                         <a href="#" onclick="toggle_comments('{{question.number|removedots}}'); return false;"><i class="{% if qdict.comment %} icon-comment {% else %} icon-comment-alt {% endif %}">&nbsp;</i></a>
                                     </span>
-                                    <span class="pull-right answered {% if qdict.hasValue %} hasValue {%endif%}" id="answered_{{ question.number|removedots }}">
+                                    <span class="pull-right answered hide {% if qdict.hasValue %} hasValue {%endif%}" id="answered_{{ question.number|removedots }}">
                                         <i class="icon-check green">&nbsp;</i>
                                     </span>
                                 {% endif %}

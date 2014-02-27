@@ -10,8 +10,8 @@ var getPlacement = function($el) {
         horiz = 0.5 * width - left,
         horizPlacement = horiz > 0 ? 'right' : 'left',
         placement = Math.abs(horiz) > Math.abs(vert) ?  horizPlacement : vertPlacement;
-    return placement
-};
+    return placement;
+}
 
 function help_text_popover() {
     $('.qtext').each(function () {
@@ -49,13 +49,6 @@ $(document).ready(function () {
      formHasChanged = false;
      });
 });
-/* End -- Check if user has unsaved changes */
-function replaceall(str,replace,with_this)
-{
-    var str_hasil ="";
-    var temp;
-
-
 function replaceall(str,replace,with_this)
 {
     return str.replace(/\./g,'\\.')
