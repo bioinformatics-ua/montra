@@ -22,6 +22,7 @@ def question_pub(request, question):
     return {
         'required' : question.getcheckdict().get('required', False),
         'value' : value,
+        "hasValue": value!="",
         'template' : 'questionnaire/publications.html',
     }
 

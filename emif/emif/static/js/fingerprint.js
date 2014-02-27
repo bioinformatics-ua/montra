@@ -55,27 +55,14 @@ function replaceall(str,replace,with_this)
     var str_hasil ="";
     var temp;
 
-    for(var i=0;i<str.length;i++) // not need to be equal. it causes the last change: undefined..
-    {
-        if (str[i] == replace)
-        {
-            temp = with_this;
-        }
-        else
-        {
-                temp = str[i];
-        }
 
-        str_hasil += temp;
-    }
-
-    return str_hasil;
+function replaceall(str,replace,with_this)
+{
+    return str.replace(/\./g,'\\.')
+    
 };
 
-function getValueOfRadioButtoms(idOfTheStaff){
 
-
-}
 
 
 /***************** BEGIN - CHECK IF ANSWER IS FILLED IN *****************/

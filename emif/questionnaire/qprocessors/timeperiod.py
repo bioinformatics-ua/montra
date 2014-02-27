@@ -34,6 +34,7 @@ def question_timeperiod(request, question):
         "required" : "required" in cd,
         "timeperiods" : timeperiods,
         "value" : value,
+        'hasValue': value!="",
     }
 
 @answer_proc('timeperiod')
