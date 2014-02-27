@@ -40,9 +40,6 @@ var questionSetsCounters = {};
 */
 function CounterCore(questionnaireId) {
     this.questionnaireId = questionnaireId;
-    
-
-
 
     /**
     * This method counts the number of total questions of a question set
@@ -120,12 +117,17 @@ function CounterUI() {
     * @param {Dictionary} counters dicionary with the values filledQuestions and count.
     */
   this.updateCounters = function(qId, counters){
-    
-    $('#qs_'+ qId + ' .questionset-title label').html(counters['filledQuestions'] + ' of ' +
-      counters['count'] + ' - ' + 
-      Math.round((counters['filledQuestions']/counters['count'])*100) + '%');
-    $('#counter_'+ qId + ' label').html(Math.round((counters['filledQuestions']/counters['count'])*100) + '%');
-    $('#counter_'+ qId ).removeClass('hidden');
+    var filled = counters['filledQuestions'];
+    var total = counters['count'];
+
+    var percentage = Math.round((filled/total)*100);
+
+    $('#qs_'+ qId + ' .questionset-title label').html(filled + ' of ' + total
+       + ' - ' + percentage + '%');
+
+    var this_label = $('#counter_'+ qId);
+    this_label.html(filled+"/"+total+"<br />"+percentage + '%');
+    this_label.removeClass('hidden');
   };
 
 
