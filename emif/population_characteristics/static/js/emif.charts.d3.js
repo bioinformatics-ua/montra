@@ -1,3 +1,24 @@
+/**********************************************************************
+# Copyright (C) 2014 Luís A. Bastião Silva and Universidade de Aveiro
+#
+# Authors: Luís A. Bastião Silva <bastiao@ua.pt>
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
+***********************************************************************/
+
+
 
 function GraphicChartD3(divArg, dataArg)
 {
@@ -6,6 +27,8 @@ function GraphicChartD3(divArg, dataArg)
   */
   this.div = divArg; 
   this.dataValues = dataArg;
+  this.xscale = null ;
+  this.yscale = null ;
   this.self = this;
   this.init = function(){
     
@@ -16,7 +39,8 @@ function GraphicChartD3(divArg, dataArg)
     
     console.log(objects);
     /*** Lets translate our data model to the d3 support data model */ 
-
+    xscale = {'bins':5}
+    xscale.bins = 25;
     var i = 1;
     dataset = [[], 
                  
@@ -26,7 +50,6 @@ function GraphicChartD3(divArg, dataArg)
   
     });
     
-
   };
 
   this.draw = function(div, dataset){
@@ -41,22 +64,35 @@ function GraphicChartD3(divArg, dataArg)
           .rangeRoundBands([0, width], .1);
 
 
+
       var y = d3.scale.linear()
           .range([height, 0]);
-
-
 
       var yAxis = d3.svg.axis()
           .scale(y)
           .orient("left");
           //.ticks(d3.time.years, 10)
           //.tickFormat(formatPercent);
+           var xAxis = null;
+           var self = this;
+    function zoom() {
+       
+        svg.select(".xaxis").call(xAxis);
+        svg.select(".yaxis").call(yAxis);
+        svg.selectAll(".svg rect").attr("transform", "translate(" + d3.event.translate[0] + ",0)scale(" + d3.event.scale + ", 1)");
+        this.xscale.bins = this.xscale.bins +10;
+
+    };
 
       var svg = d3.select(div).append("svg")
           .attr("width", width + margin.left + margin.right)
           .attr("height", height + margin.top + margin.bottom)
         .append("g")
           .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+        svg.call(d3.behavior.zoom().on("zoom",  function () {
+          zoom();
+        
+    }));
       
       dataset.forEach(function (data) {
         console.log("THIS IS MY DATA: " + data);
@@ -65,11 +101,11 @@ function GraphicChartD3(divArg, dataArg)
         x.domain(data.map(function(d) {  return d.xvalue; }));
         y.domain([0, d3.max(data, function(d) { return d.yvalue; })]);
 
-      var xAxis = d3.svg.axis()
+      xAxis = d3.svg.axis()
           .scale(x)
           .orient("bottom")
-          .tickValues(x.domain().filter(function(d, i) {return !(i % 10); }))
-
+          .tickValues(x.domain().filter(function(d, i) {return !(i % this.xscale.bins); }))
+          .tickSize(-width)
           .tickPadding(8);
 
         svg.append("g")
@@ -105,6 +141,8 @@ function GraphicChartD3(divArg, dataArg)
             .attr("height", function(d) { return height - y(d.yvalue); });
 
       });
+
+
 
    }; 
 };

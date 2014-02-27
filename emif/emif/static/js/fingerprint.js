@@ -140,11 +140,9 @@ function validate1(element, id_answered, dirty_id_answered) {
 
 // Clear a simple text field by his name
 function clearSimple(id){
-    id = id.replace(/\./g,'\\.');
-
-    $(':input[name="'+id+'"]').val('');
+    $(':input[name="'+id.replace(/\./g,'\\.')+'"]').val('');
     // Simulate change
-    $(':input[name="'+id+'"]').change();
+    $(':input[name="'+id.replace(/\./g,'\\.')+'"]').change();
 }
 
 //Creates an advanced validator for question fields.

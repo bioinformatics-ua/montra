@@ -1,4 +1,8 @@
 {% load url from future %}
+<!--[if gte IE 9]><!-->
+<script src="{{ STATIC_URL}}js/emif.charts.filters.js"></script>
+<script src="{{ STATIC_URL}}js/emif.charts.draw.js"></script>
+<!--<![endif]-->
 
 
 <style type="text/css">
@@ -22,7 +26,7 @@
     text-align: center;
 }
 #pc_chart_place{
-    margin-left: 60px;
+    /*margin-left: 60px;*/
 }
 #jerboaupload{
     margin-left: 60px;
@@ -30,7 +34,10 @@
 
 }
 </style>
-
+<!--[if lte IE 8]>
+<div class="well">Currently IE 7 and 8 don't support this functionality. To use this functionality please update your browser to a modern browser, like IE 9 or better, Google Chrome, Firefox, Opera or Safari.</div>
+<![endif]-->
+<!--[if gte IE 9]><!-->
 {% if owner_fingerprint %}
 
     {% if not contains_population %}
@@ -204,15 +211,6 @@ This database fingerprint does not have population characteristics yet. Please c
 
 {% endif %}
 
-
-
-
-
-
-<!--[if lte IE 8]><script src="{{ STATIC_URL}}js/d3/r2d3.min.js" charset="utf-8"></script><![endif]-->
-<!--[if gte IE 9]><!-->
-    <script src="{{ STATIC_URL}}js/d3/d3.v3.min.js"></script>
-    <script src="{{ STATIC_URL}}js/d3/d3.layout.cloud.js"></script>
 <!--<![endif]-->
 
 
@@ -223,9 +221,13 @@ This database fingerprint does not have population characteristics yet. Please c
 
 <script src="{{ STATIC_URL}}js/emif.documents.js"></script>
 -->
+<!--[if gte IE 9]><!-->
+<script src="{{ STATIC_URL}}js/emif.charts.c3d3.js"></script>
 <script src="{{ STATIC_URL}}js/emif.charts.d3.js"></script>
 
 <script src="{{ STATIC_URL}}js/emif.charts.js"></script>
+<!--<![endif]-->
+
 
 
 <script >
