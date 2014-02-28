@@ -244,3 +244,9 @@ urlpatterns = patterns('',
     # Docs Manager
     url(r'docsmanager/', include('docs_manager.urls')),
 )
+
+if settings.DEBUG:
+    urlpatterns += patterns('',
+        (r'^500/$', 'django.views.generic.simple.direct_to_template', {'template': '500.html'}),
+        (r'^404/$', 'django.views.generic.simple.direct_to_template', {'template': '404.html'}),
+    )
