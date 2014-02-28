@@ -27,7 +27,7 @@
 
     <div class="questionset-title" style="font-size:6px">
     <h3>{{ k.text|removeh1 }}</h3>
-
+     <label></label>
     </div>
     {% if k.help_text != "" %}
     <div class="clearfix" style="padding-bottom:30px;">{{k.help_text|safe}}</div>
@@ -71,7 +71,7 @@
                             <span class="pull-right">
                                 <a href="#" onclick="toggle_comments('{{question.number|removedots}}'); return false;"><i class="{% if qdict.comment %} icon-comment {% else %} icon-comment-alt {% endif %}">&nbsp;</i></a>
                             </span>
-                            <span class="pull-right answered hide" id="answered_{{ question.number|removedots }}">
+                            <span class="pull-right answered hide {% if qdict.hasValue  %} hasValue {%endif%}" id="answered_{{ question.number|removedots }}">
                                 <i class="icon-check green">&nbsp;</i>
                             </span>
 
@@ -94,7 +94,7 @@
                                 <div class="question-text {% if qdict.required %}required{% endif %} {% if error %}text-error{% endif %} qtext_{{question.text|geths}}">
                                     <span class="qnumber_{{question.text|geths}}">{{ question.display_number }}.</span>
                                     <span class="qtext">{{ question.text|removehs|safe }}
-                                    {% if question.help_text %}
+                                    {% if question.tooltip and question.help_text %}
                                     <div class="question-help-text" style="display: none;">
                                         <span>{{ question.help_text|safe }}</span>
                                     </div>
@@ -112,7 +112,7 @@
                                     <span class="pull-right">
                                         <a href="#" onclick="toggle_comments('{{question.number|removedots}}'); return false;"><i class="{% if qdict.comment %} icon-comment {% else %} icon-comment-alt {% endif %}">&nbsp;</i></a>
                                     </span>
-                                    <span class="pull-right answered hide" id="answered_{{ question.number|removedots }}">
+                                    <span class="pull-right answered hide {% if qdict.hasValue %} hasValue {%endif%}" id="answered_{{ question.number|removedots }}">
                                         <i class="icon-check green">&nbsp;</i>
                                     </span>
                                 {% endif %}
@@ -128,7 +128,11 @@
                                     {% if error %}
                                         <div class="alert-message block-message text-error input">{{ error }}</div>
                                     {% endif %}
+                                    {% if not question.tooltip and question.help_text %}
+                                        <div class="input">{{question.help_text|safe}}</div>
+                                    {% endif %} 
                                     {% include qdict.template %}
+                                                                        
                                     <div id="comments_{{question.number|removedots}}" style="display:none;margin-left:40px;">
                                      <a href="#" class="span6" onclick="toggle_comments('{{question.number|removedots}}'); return false;"><i class="icon-comment">&nbsp;</i> Comments</a>
                                     <textarea style=" background-color:#EEE;color: #000;" class="span6" name="comment_question_{{ question.number }}" cols="50" rows="5">{{qdict.comment}}</textarea>
@@ -202,11 +206,18 @@
 
 </div>
 
+
 <!-- Fix later -->
-<script src="static/js/vendor/bootstrap-tooltip.js"></script>
-<script src="static/js/vendor/bootstrap-popover.js"></script>
-<script src="static/js/fingerprint_validation.js"></script>
-<script src="static/js/fingerprint.js"></script>
+<script src="{{ STATIC_URL}}js/vendor/bootstrap-tooltip.js"></script>
+<script src="{{ STATIC_URL}}js/vendor/bootstrap-popover.js"></script>
+<script src="{{ STATIC_URL}}js/fingerprint_validation.js"></script>
+<script src="{{ STATIC_URL}}js/fingerprint.js"></script>
+
+<!--keep the order -->
+<script src="{{ STATIC_URL}}js/vendor/threadpool.js"></script>
+<script src="{{ STATIC_URL}}js/emif.fingerprint.counter.js"></script>
+
+
 
 {% block scriptextraincludes %}
         <script type="text/javascript" src="static/js/fingerprint_edit.js"></script>

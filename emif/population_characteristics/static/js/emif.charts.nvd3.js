@@ -1,58 +1,22 @@
-
-    function exampleData() {
-      return  [ 
-         {
-           key: "Cumulative Return",
-           values: [
-             { 
-               "label" : "2000" ,
-               "value" : 30000,
-               "color" : "#0000ff",
-             } , 
-             { 
-               "label" : "2001" , 
-               "value" : 35000,
-               "color" : "#0000ff",
-             } , 
-             { 
-               "label" : "2002" , 
-               "value" : 25000,
-               "color" : "#0000ff",
-             } , 
-             { 
-               "label" : "2003" , 
-               "value" : 29000,
-               "color" : "#0000ff",
-             } , 
-             { 
-               "label" : "2004" ,
-               "value" : 31000,
-               "color" : "#0000ff",
-             } , 
-             { 
-               "label" : "2005" , 
-               "value" : 35000,
-               "color" : "#0000ff",
-             } , 
-             { 
-               "label" : "2006" , 
-               "value" : 40000,
-               "color" : "#0000ff",
-             } , 
-             { 
-               "label" : "2007" , 
-               "value" : 60000,
-               "color" : "#0000ff",
-
-             }
-           ]
-         }
-       ];
-     };
-
-
-
-
+/**********************************************************************
+# Copyright (C) 2014 Luís A. Bastião Silva and Universidade de Aveiro
+#
+# Authors: Luís A. Bastião Silva <bastiao@ua.pt>
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
+***********************************************************************/
 function GraphicChartD3(divArg, dataArg)
 {
   /** Passes the initial arguments required to start and d3
@@ -95,7 +59,6 @@ function GraphicChartD3(divArg, dataArg)
              
             $("#chart h1").append("Number of patients yearly")
       
-
    }; 
 };
 

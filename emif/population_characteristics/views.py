@@ -31,8 +31,20 @@ from django.conf import settings
 
 def jerboa_list_values(request, var, row, fingerprint_id, template_name='documents_upload_form.html'):
 
+    filters = []
+
+    if request.POST:
+        # Get the filters to apply.
+
+        filters = {}
+        for i in request.POST:
+            filters[i[0:-2]] = request.POST[i]
+
+        print "Filters" + str(filters)
+    
+
     pc = PopulationCharacteristic(None)
-    values = pc.get_variables(var, row, fingerprint_id)
+    values = pc.get_variables(var, row, fingerprint_id, filters=filters)
     data = {'values': values}
     response = JSONResponse(data, mimetype="application/json")
     response['Content-Disposition'] = 'inline; filename=files.json'

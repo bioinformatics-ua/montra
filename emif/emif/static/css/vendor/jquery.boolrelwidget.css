@@ -32,7 +32,7 @@ THE SOFTWARE.
     left            :   0; 
     background-color:   #eeeeee; 
     border-top      :   0.1em solid #999999;
-    z-index         :   1000;
+    z-index         :   1041;
     width           :   100%;
 }
 .boolrelwidget-arrow-l {
@@ -70,6 +70,7 @@ THE SOFTWARE.
     position: relative;
     color: #666666;
 }
+
 
 /* Nice trick to have arrows without images: http://css-tricks.com/snippets/css/css-triangle/
 Big thumbs up.
@@ -314,4 +315,25 @@ background-position:center;
 
 .boolrelwidget-menu{
 margin: 5px;
+}
+.boolrelwidgethelper {
+    text-align:justify;
+    text-justify:inter-word;
+}
+.boolrelwidget-query-hover{
+    background-color: orange !important;
+    background-image: none !important;
+}
+ .modal
+}
+{
+   width:70%;
+   margin-left: -35%; 
+}
+@media (max-width: 768px) {
+    .modal
+   {
+        width:90%;
+        margin-left: 2%; 
+   }
 }

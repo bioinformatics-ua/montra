@@ -2,16 +2,18 @@ from questionnaire import *
 from django.utils.translation import ugettext as _
 from django.utils.simplejson import dumps
 
+import re
+
 @question_proc('choice-yesno','choice-yesnocomment','choice-yesnodontknow')
 def question_yesno(request, question):
     key = "question_%s" % question.number
     key2 = "question_%s_comment" % question.number
-    val = request.POST.get(key, None)
+    val = request.POST.get(key, '')
     cmt = request.POST.get(key2, '')
     qtype = question.get_type()
     cd = question.getcheckdict()
     jstriggers = []
-
+    hasValue = False
     if qtype == 'choice-yesnocomment':
         hascomment = True
     else:
@@ -39,6 +41,7 @@ def question_yesno(request, question):
         'required' : True,
         'checks' : checks,
         'value' : val,
+        'hasValue': val!="",
         'qvalue' : '',
         'hascomment' : hascomment,
         'hasdontknow' : hasdontknow,
@@ -55,6 +58,7 @@ def question_open(request, question):
         value = request.POST[key]
     return {
         'required' : question.getcheckdict().get('required', False),
+        'hasValue': value!="",
         'value' : value,
     }
 
@@ -64,9 +68,18 @@ def question_datepicker(request, question):
     value = question.getcheckdict().get('default','')
     if key in request.POST:
         value = request.POST[key]
+
+    a = re.compile("([0-9]{4})$")
+    if a.match(value) != None:
+        print 'MATCH'
+        value = value+'-01-01'
+
+    print "VALOR:["+value+"]"
+
     return {
         'required' : question.getcheckdict().get('required', False),
         'value' : value,
+        'hasValue': (value!="" and value !="dd/mm/yyyy"),
         'template' : 'questionnaire/datepicker.html',
     }
 
