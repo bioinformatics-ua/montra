@@ -14,8 +14,9 @@
 <link rel="stylesheet" href="{{ STATIC_URL }}css/vendor/style.css">
 <!-- CSS to style the file input field as button and adjust the Bootstrap progress bars -->
 <link rel="stylesheet" href="{{ STATIC_URL }}css/vendor/jquery.fileupload-ui.css">
-<link href="{{ STATIC_URL }}nvd3/src/nv.d3.css" rel="stylesheet" type="text/css">
+
 <!--
+<link href="{{ STATIC_URL }}nvd3/src/nv.d3.css" rel="stylesheet" type="text/css">
 <script src="{{ STATIC_URL }}nvd3/lib/d3.v3.js"></script>
 <script src="{{ STATIC_URL }}nvd3/nv.d3.js"></script>
 <script src="{{ STATIC_URL }}nvd3/src/models/axis.js"></script>
@@ -27,6 +28,10 @@
 <script src="{{ STATIC_URL }}nvd3/src/models/discreteBarChart.js"></script>
 
 -->
+
+<link rel="stylesheet" href="{{ STATIC_URL }}css/c3.css">
+
+
 
 
 <script src="{{ STATIC_URL}}js/emif.documents.js"></script>
@@ -213,19 +218,27 @@
 {% block scriptextraincludes %}
 <!-- Include the widget embedding script -->
 <script src="//bioinformatics.ua.pt/becas/embed-widget.js"></script>
-<script src="{{ STATIC_URL}}js/database_info.js"></script>
 
-<!--[if lte IE 8]><script src="{{ STATIC_URL}}js/d3/r2d3.min.js" charset="utf-8"></script><![endif]-->
+
+<!--[if lte IE 8]>
+    <script src="{{ STATIC_URL}}js/d3/r2d3.min.js" charset="utf-8"></script>
+    <![endif]-->
 <!--[if gte IE 9]><!-->
-    <script src="{{ STATIC_URL}}js/d3/d3.v3.min.js"></script>
+
+    <script src="{{ STATIC_URL}}js/d3/d3.v3.min.js" charset="utf-8"></script>
     <script src="{{ STATIC_URL}}js/d3/d3.layout.cloud.js"></script>
+    <script src="{{ STATIC_URL}}js/c3.js"></script>   
 <!--<![endif]-->
+
+
+<script src="{{ STATIC_URL}}js/database_info.js"></script>
 <script src="{{ STATIC_URL }}js/emif.database.delete.js"></script>
 
+<!--[if gte IE 9]><!-->
 <script src="{{ STATIC_URL}}js/emif.populationcharacteristics.charts.js"></script>
 
 <script src="{{ STATIC_URL}}js/emif.populationcharacteristics.js"></script>
-
+<!--<![endif]-->
 
 
 {% endblock %}
@@ -241,7 +254,7 @@ function load_questionnary(){
         // We build the qs containers in memory and just do dom op, on the end, for speed
         // on ie joins are significantly faster than concatenation
         {% for k, qs in qsets.ordered_items %}
-            containers.push('<div class="accordion-group"><div class="accordion-heading"><a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion1" href="#collapse{{ k|removespaces|safe|clean }}">{{ k|removeh1 }}</a></div><div id="collapse{{ k|removespaces|safe|clean }}" class="accordion-body collapse"><div id="qs_{{ qs.sortid }}" class="accordion-inner"><h4 class="pull-center">Loading...</h4></div></div></div>');
+            containers.push('<div class="accordion-group"><div class="accordion-heading"><a style="display: inline-block; width: 90%;" class="accordion-toggle" data-toggle="collapse" data-parent="#accordion1" href="#collapse{{ k|removespaces|safe|clean }}">{{ k|removeh1 }} </a><span class="accordion-icon"></span></div><div id="collapse{{ k|removespaces|safe|clean }}" class="accordion-body collapse"><div id="qs_{{ qs.sortid }}" class="accordion-inner"><h4 class="pull-center">Loading...</h4></div></div></div>');
         
         {% endfor %}
 
@@ -270,13 +283,25 @@ function load_questionnary(){
 function loadqspart(sortid, pk){
     $.get( "fingerprintqs/"+pk+"/"+sortid+"/", function( data ) {
       $( "#qs_"+sortid ).html( data );
+        // Mark the tab as highlighted if there's any highlight inside it
+
+        
+        var highlights = $("#qs_"+sortid).find('.highlight');
+
+        console.dir(highlights);
+
+        if(highlights.length > 0){
+           $( "#qs_"+sortid ).parent().siblings().find('.accordion-icon').html('<i class="icon-eye-open"></i>');
+        }     
     });    
+
     threads['qs_'+sortid] = null;
     parts_missing--;
     this.complete();
 }
 <!-- This must be here because of dynamic code -->
 $(document).ready(function() {
+
     load_questionnary();
     // On expand event, we burst the priority of this thread to load before the others
     $('.accordion-heading').click(function(){

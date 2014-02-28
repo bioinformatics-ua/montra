@@ -22,5 +22,12 @@
 			</table>
 <script type="text/javascript">
 	addTooltip('#t2_{{qs.sortid}}');
+	// Add highlighting
+	{% if request.session.query and not isAdvanced %}
+		{% for word in request.session.query|whitespacesplit %}
+			$('#set_container, .tooltip').highlight('{{word}}');
+		{% endfor %}
+	{% endif %}
+	
 </script>
 {% endfor %}

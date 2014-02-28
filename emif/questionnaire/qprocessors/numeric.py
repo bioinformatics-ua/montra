@@ -19,6 +19,7 @@ def question_(request, question):
     return {
         'required' : question.getcheckdict().get('required', False),
         'value' : value,
+        "hasValue": value!= "",
         'template' : 'questionnaire/numeric.html',
     }
 
