@@ -362,6 +362,14 @@ box-shadow: inset 0 3px 8px rgba(0,0,0,0.125);
 /* ==========================================================================
    My databases table
    ========================================================================== */
+.fingerprint_table .date{
+  width: 200px;
+}
+.fingerprint_table .type{
+  width: 100px;
+
+}
+
 .sorter:hover{
     background-color: orange;
     cursor: pointer;
