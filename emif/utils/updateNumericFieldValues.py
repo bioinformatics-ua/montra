@@ -1,0 +1,97 @@
+import pysolr
+import sys
+import time
+from purgeSolr import export_results
+
+host1 = "localhost"
+port1 = str(8983)
+solr = pysolr.Solr('http://' +host1+ ':'+ port1+'/solr')
+
+ticks = time.time()
+fileAddr = "/tmp/solr-backup-"+str(ticks)+".pkl"
+
+export_results(solr, fileAddr)
+
+def query(solr, id):
+	query="id:"+id
+	results = solr.search(query,**{
+	                'rows': 10,
+	                'start': 0,
+	                'fl': ""
+	            })
+
+	return results
+
+updateList = [{
+        "number_active_patients_jan2012_t": "3600000",
+        "id": "768185357ce7e4e0aeae6d2e69f6d7e0"
+      },
+      {
+        "number_active_patients_jan2012_t": "1800000",
+        "id": "2b9291151f7b3f2fd1fed0d876e59b7a"
+      },
+      {
+        "number_active_patients_jan2012_t": "50000",
+        "id": "21d11ac0eb3f0bb30c094fb7caf5e28d"
+      },
+      {
+        "number_active_patients_jan2012_t": "",
+        "id": "45b7ccb3aca47bc37f9bd82504f09b3b"
+      },
+      {
+        "number_active_patients_jan2012_t": "900000",
+        "id": "52d4981701f0126d947014244744efea"
+      },
+      {
+        "number_active_patients_jan2012_t": "324234",
+        "id": "66a47f694ffb676bf7676dfde24900e6"
+      },
+      {
+        "number_active_patients_jan2012_t": "",
+        "id": "2151825ca52388e960d1ed0728dc38b2"
+      },
+      {
+        "number_active_patients_jan2012_t": "1800000",
+        "id": "54d8384917b21fb7928ba72a1e72326b"
+      },
+      {
+        "number_active_patients_jan2012_t": "1000",
+        "id": "7b128593480b53409ac83c9582badbb7"
+      },
+      {
+        "number_active_patients_jan2012_t": "150000",
+        "id": "5d8f88d91f1dc3e2806d825f61260b76"
+      },
+      {
+        "number_active_patients_jan2012_t": "5000000",
+        "id": "cc7f3a8f8af0f6c99f9385c7372c8fe3"
+      },
+      {
+        "number_active_patients_jan2012_t": "500",
+        "id": "a201c870db5c30a7371d0c0d4eb11f5f"
+      },
+      {
+        "number_active_patients_jan2012_t": "3828859",
+        "id": "7a205644571c31bc50965c68d7565622"
+      }]
+
+updateDocs = []
+
+for x in updateList:
+	print x["id"], x["number_active_patients_jan2012_t"]
+	results = query(solr, x["id"])
+	
+	for doc in results:
+		doc["number_active_patients_jan2012_t"] = x["number_active_patients_jan2012_t"]
+		updateDocs.append(doc)
+
+solr.add(updateDocs)
+solr.optimize()
+sys.exit()
+
+
+
+
+
+
+
