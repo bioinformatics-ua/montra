@@ -51,6 +51,18 @@ ADMINS = (
 SOLR_HOST = "localhost"
 SOLR_PORT = "8983"
 
+TEMPLATE_CONTEXT_PROCESSORS = (
+    "django.contrib.auth.context_processors.auth",
+    "django.core.context_processors.debug",
+    "django.core.context_processors.i18n",
+    "django.core.context_processors.media",
+    "django.core.context_processors.static",
+    "django.core.context_processors.tz",
+    "django.contrib.messages.context_processors.messages",
+    "emif.context_processors.debug",
+    "emif.context_processors.baseurl"
+)
+
 MANAGERS = ADMINS
 
 DATABASE_PATH_SQLITE3 = "emif.db"
