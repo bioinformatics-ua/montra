@@ -1405,7 +1405,9 @@ def paginator_process_list(list_databases, hits, start):
 
 # GET ALL DATABASES ACCORDING TO USER INTERESTS
 def all_databases_user(request, page=1, template_name='alldatabases.html'):
-    
+    rows = 5
+    if page == None:
+        page = 1
     # lets clear the geolocation session search filter (if any)
     try:
         del request.session['query']
@@ -1422,13 +1424,18 @@ def all_databases_user(request, page=1, template_name='alldatabases.html'):
             type_t_list+=(type_t + ",")
 
         type_t_list = type_t_list[:-1]
-        list_databases = get_databases_from_solr(request, "type_t:" + type_t_list)
+
+        (sortString, sort_params, start) = paginator_process_params(request, page, rows)    
+    
+        (list_databases,hits) = get_databases_from_solr_v2(request, "type_t:" + type_t_list, sort=sortString, rows=rows, start=start)
+
+        list_databases = paginator_process_list(list_databases, hits, start)   
     else:
         list_databases = []
         #list_databases = get_databases_from_solr(request, "*:*")
 
     ## Paginator ##
-    rows = 5
+    
     myPaginator = Paginator(list_databases, rows)
     try:
         pager =  myPaginator.page(page)
@@ -1441,7 +1448,7 @@ def all_databases_user(request, page=1, template_name='alldatabases.html'):
                                             'breadcrumb': True, 'collapseall': False, 
                                             'geo': True,
                                             'page_obj': pager,
-                                            'add_databases': True})
+                                            'add_databases': True, "sort_params": sort_params})
 
 def all_databases(request, page=1, template_name='alldatabases.html'):
     
