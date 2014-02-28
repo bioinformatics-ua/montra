@@ -249,6 +249,7 @@ $(document).ready(function () {
 
         id_answered = id_answered.replace('acc_qc_', '');
 
+        console.log("ID_ANSWERED: "+id_answered);
         // Since were using name="" as selector, we dont need to do the escaping 
         //id_answered = id_answered.replace('.','\\.');
         //id_answered = replaceall(id_answered, '.','\\.')
@@ -270,7 +271,8 @@ $(document).ready(function () {
         var id_answered = el.id.split("_")[1];
         var id_answered_aux = el.id.split("_")[1].replace(/\./g,'');
         var toSum = $('[id="answered_'+id_answered_aux+'"]').hasClass('hasValue');
-        var qId = parseInt(id_answered[0]);
+
+        var qId = parseInt(id_answered);
 
 
         //Detects widget class and sends it to the advanced validator.
