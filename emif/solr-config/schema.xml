@@ -243,7 +243,7 @@
    <!--dynamicField name="*" type="ignored" multiValued="true" /-->
 
 	<!--TIAGO!!!!-->
-	<field name="database_name_sort" type="string" indexed="true" stored="false"/>
+	<field name="database_name_sort" type="alphaOnlySort" indexed="true" stored="false"/>
 	<field name="last_activity_sort" type="long" indexed="true" stored="false"/>
 	<!--<field name="created_sort" type="string" indexed="true" stored="false"/>-->
 	<field name="type_name_sort" type="string" indexed="true" stored="false"/>   
