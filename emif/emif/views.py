@@ -178,101 +178,41 @@ def results_fulltext(request, page=1, full_text=True,template_name='results.html
 def results_fulltext_aux(request, query, page=1, template_name='results.html', isAdvanced=False):
     
     rows = 5
+    if page == None:
+        page = 1
+
     if query == "":
         return render(request, "results.html", {'request': request, 'breadcrumb': True,
-                                                'list_results': [], 'page_obj': None})
+                                                'num_results': 0, 'page_obj': None})
+    (sortString, sort_params, range) = paginator_process_params(request, page, rows)   
+    (list_databases, hits) = get_databases_from_solr_v2(request, query, sort=sortString, rows=rows, start=range)
 
-    class Results:
-        num_results = 0
-        list_results = []
-        paginator = None
-
-    c = CoreEngine()
-    error_searching = False
-    try:
-        results = c.search_fingerprint(query, str(0))
-    except: 
-        error_searching = True
-
-    questionnaires_ids = {}
-    qqs = Questionnaire.objects.all()
-    for q in qqs:
-        questionnaires_ids[q.slug] = (q.pk, q.name)
-
-    list_databases = []
-    if error_searching or len(results) == 0 :
+    if len(list_databases) == 0 :
         query_old = request.session.get('query', "")
         if isAdvanced == True:
             return render(request, "results.html", {'request': request, 'breadcrumb': True,
-                                                'list_results': [], 'page_obj': None, 'isAdvanced': True})
+                                                'num_results': 0, 'page_obj': None, 'isAdvanced': True})
         else:
             return render(request, "results.html", {'request': request, 'breadcrumb': True,
-                                                'list_results': [], 'page_obj': None, 'search_old': query_old, 'isAdvanced': False})
-    for r in results:
-        try:
-            database_aux = Database()
+                                                'num_results': 0, 'page_obj': None, 'search_old': query_old, 'isAdvanced': False})
+    
+    list_databases = paginator_process_list(list_databases, hits, range)   
 
-            if (not r.has_key('database_name_t')):
-                database_aux.name = '(Unnamed)'
-            else:
-                database_aux.name = r['database_name_t']
+    myPaginator = Paginator(list_databases, rows)
+    try:
+        pager =  myPaginator.page(page)
+    except PageNotAnInteger, e:
+        pager =  myPaginator.page(page)
 
-            if (not r.has_key('location_t')):
-                database_aux.location = ''
-            else:
-                database_aux.location = r['location_t']
-            if (not r.has_key('institution_name_t')):
-                database_aux.institution = ''
-            else:
-                database_aux.institution = r['institution_name_t']
-
-            if (not r.has_key('contact_administrative_t')):
-                database_aux.email_contact = ''
-            else:
-                database_aux.email_contact = r['contact_administrative_t']
-
-            if (not r.has_key('number_active_patients_jan2012_t')):
-                database_aux.number_patients = ''
-            else:
-                database_aux.number_patients = r['number_active_patients_jan2012_t']
-                
-            if (not r.has_key('date_last_modification_t')):
-                database_aux.last_activity = ''
-            else:
-                database_aux.last_activity = r['date_last_modification_t']                  
-                
-            if (not r.has_key('upload-image_t')):
-                database_aux.logo = 'nopic.gif'
-            else:
-                database_aux.logo = r['upload-image_t']
-            database_aux.id = r['id']
-            database_aux.date = convert_date(r['created_t'])
-            try:
-                database_aux.date_modification = convert_date(r['date_last_modification_t'])
-            except KeyError:
-                pass
-                
-            (ttype, type_name) = questionnaires_ids[r['type_t']]
-            database_aux.ttype = ttype
-            database_aux.type_name = type_name
-            list_databases.append(database_aux)
-        except:
-            raise
-
-    pp = Paginator(list_databases, rows)
-    list_results = Results()
-    list_results.num_results = results.hits
-    list_results.list_results = pp.page(page)
-    list_results.paginator = pp
     query_old = request.session.get('query', "")
         
     if isAdvanced == True:
         return render(request, template_name, {'request': request,
-                                           'list_results': list_results, 'page_obj': pp.page(page),
-                                            'breadcrumb': True, 'isAdvanced': True})
+                                           'num_results': hits, 'page_obj': pager,
+                                            'breadcrumb': True, 'isAdvanced': True, "sort_params": sort_params})
     else :
         return render(request, template_name, {'request': request,
-                                           'list_results': list_results, 'page_obj': pp.page(page), 'breadcrumb': True, 'search_old': query_old, 'isAdvanced': False})
+                                           'num_results': hits, 'page_obj': pager, 'breadcrumb': True, 'search_old': query_old, 'isAdvanced': False, "sort_params": sort_params})
 
 
 def store_query(user_request, query_executed):
@@ -407,12 +347,10 @@ def results_diff(request, page=1, template_name='results_diff.html'):
     if not in_post:
         query = request.session.get('query', "")
         
-    import pdb
-    #pdb.set_trace()
     print "query_@" + query
     if query == "":
         return render(request, "results.html", {'request': request,
-                                                'list_results': [], 'page_obj': None, 'breadcrumb': True})
+                                                'num_results': 0, 'page_obj': None, 'breadcrumb': True})
     store_query(request, query)
     try:
         # Store query by the user
@@ -429,91 +367,6 @@ def results_diff(request, page=1, template_name='results_diff.html'):
     #print "Printing the qexpression"
     #print request.POST['qexpression']
     return results_fulltext(request, page, full_text=False, isAdvanced=request.session['isAdvanced'])
-
-
-    class Results:
-        num_results = 0
-        list_results = []
-        d1 = None
-        d2 = None
-        d3 = None
-
-
-    class DatabaseFields:
-        id = ''
-        name = ''
-        date = ''
-        fields = None
-
-
-    c = CoreEngine()
-    results = c.search_fingerprint("text_t:" + query)
-    
-    list_databases = []
-
-    for r in results:
-        try:
-            database_aux = Database()
-            
-            database_aux.id = r['id']
-            database_aux.date = convert_date(r['created_t'])
-
-            database_aux.name = r['database_name_t']
-            database_aux.last_activity = r['date_last_modification_t']
-            
-            list_databases.append(database_aux)
-            if (len(list_databases) == 3):
-                break
-        except:
-            pass
-
-    c = CoreEngine()
-    list_databases_final = []
-    list_results = Results()
-
-    for db in list_databases:
-
-        results = c.search_fingerprint('id:' + db.id)
-
-        class Tag:
-            tag = ''
-            value = ''
-
-        list_values = []
-        blacklist = ['created_t', 'type_t', '_version_', 'date_last_modification_t']
-        name = "Not defined"
-        for result in results:
-            questionnaire_slug = result['type_t']
-            q_main = Questionnaire.objects.filter(slug=questionnaire_slug)[0]
-            for k in result:
-                if k in blacklist:
-                    continue
-                t = Tag()
-                results = Slugs.objects.filter(slug1=k[:-2], question__questionset__questionnaire=q_main.pk)
-                if len(results) > 0:
-                    text = results[0].description
-                else:
-                    text = k
-                info = text[:75] + (text[75:] and '..')
-
-                t.tag = info
-
-                value = clean_value(str(result[k].encode('utf-8')))
-                value = value[:75] + (value[75:] and '..')
-                t.value = value
-                if k == "database_name_t":
-                    name = t.value
-                list_values.append(t)
-        db.fields = list_values
-        list_databases_final.append(db)
-
-    list_results.d1 = list_databases_final[0]
-    list_results.d2 = list_databases_final[1]
-    list_results.d3 = list_databases_final[2]
-    list_results.num_results = len(list_databases)
-    return render(request, template_name, {'request': request, 'query': query,
-                                           'results': list_results, 'search_old': query, 'breadcrumb': True, isAdvanced: request.session['isAdvanced']})
-
 
 def geo(request, template_name='geo.html'):
     query = None
