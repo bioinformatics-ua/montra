@@ -1276,6 +1276,44 @@ def databases(request, page=1, template_name='databases.html'):
         del request.session['query_type']
         
     # Get the list of databases for a specific user
+    user = request.user
+    #list_databases = get_databases_from_db(request)
+    _filter = "user_t:" + user.username
+    if user.is_superuser:
+        _filter = "user_t:*" 
+
+    rows = 5
+    if page == None:
+        page = 1
+
+    (sortString, sort_params, range) = paginator_process_params(request, page, rows)    
+        
+    (list_databases,hits) = get_databases_from_solr_v2(request, _filter, sort=sortString, rows=rows, start=range)
+
+    print "Range: "+str(range)
+    print "hits: "+str(hits)
+    print "len: "+str(len(list_databases))
+
+    list_databases = paginator_process_list(list_databases, hits, range)   
+
+    print "len: "+str(len(list_databases))
+    ## Paginator ##
+    myPaginator = Paginator(list_databases, rows)
+    try:
+        pager =  myPaginator.page(page)
+    except PageNotAnInteger, e:
+        pager =  myPaginator.page(page)
+    ## End Paginator ##
+    print list_databases
+
+    return render(request, template_name, {'request': request, 'export_my_answers': True,
+                                           'list_databases': list_databases, 'breadcrumb': True, 'collapseall': False,
+                                           'page_obj': pager,
+                                           'api_token': True, 
+                                           'owner_fingerprint': False,
+                                           'add_databases': True, "sort_params": sort_params})
+
+def paginator_process_params(request, page, rows):
     sortFieldsLookup = {}
     sortFieldsLookup["database_name"] = "database_name_sort"
     sortFieldsLookup["last_update"] = "last_activity_sort"
@@ -1310,50 +1348,21 @@ def databases(request, page=1, template_name='databases.html'):
             sort_params[x]["icon"]="icon-minus"
         
     print sortString
+
+    start = (int(page) - 1) * rows
+
+    return (sortString, sort_params, start)
+
+def paginator_process_list(list_databases, hits, start):
+    nList = []
     
-    user = request.user
-    #list_databases = get_databases_from_db(request)
-    _filter = "user_t:" + user.username
-    if user.is_superuser:
-        _filter = "user_t:*" 
-
-    rows = 5
-    if page == None:
-        page = 1
-    range = (int(page) - 1) * rows    
-    (list_databases,hits) = get_databases_from_solr_v2(request, _filter, sort=sortString, rows=rows, start=range)
-    nList = [];
-    
-
-    print "Range: "+str(range)
-
-    print "hits: "+str(hits)
-    print "len: "+str(len(list_databases))
-
-    for x in xrange(0,range):
+    for x in xrange(0,start):
         nList.append(None)
     nList.extend(list_databases)
     while len(nList)<hits:
         nList.append(None)
 
-    list_databases = nList   
-
-    print "len: "+str(len(list_databases))
-    ## Paginator ##
-    myPaginator = Paginator(list_databases, rows)
-    try:
-        pager =  myPaginator.page(page)
-    except PageNotAnInteger, e:
-        pager =  myPaginator.page(page)
-    ## End Paginator ##
-    print list_databases
-
-    return render(request, template_name, {'request': request, 'export_my_answers': True,
-                                           'list_databases': list_databases, 'breadcrumb': True, 'collapseall': False,
-                                           'page_obj': pager,
-                                           'api_token': True, 
-                                           'owner_fingerprint': False,
-                                           'add_databases': True, "sort_params": sort_params})
+    return nList
 
 # def databases(request, page=1, template_name='databases.html'):
 #     #first lets clean the query session log
