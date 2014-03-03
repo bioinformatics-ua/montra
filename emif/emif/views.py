@@ -184,8 +184,9 @@ def results_fulltext_aux(request, query, page=1, template_name='results.html', i
     if query == "":
         return render(request, "results.html", {'request': request, 'breadcrumb': True,
                                                 'num_results': 0, 'page_obj': None})
-    (sortString, sort_params, range) = paginator_process_params(request, page, rows)   
-    (list_databases, hits) = get_databases_from_solr_v2(request, query, sort=sortString, rows=rows, start=range)
+    (sortString, filterString, sort_params, range) = paginator_process_params(request.GET, page, rows)   
+    (list_databases, hits) = get_databases_from_solr_v2(request, query, sort=sortString, rows=rows, start=range)    
+    sort_params["base_filter"] = query;
 
     if len(list_databases) == 0 :
         query_old = request.session.get('query', "")
@@ -1115,6 +1116,49 @@ def force_delete_fingerprint(request, id):
 
     return databases(request)
 
+def query_solr(request, page=1):
+    if not request.POST:
+        return
+
+    # Get the list of databases for a specific user
+    _filter = request.POST["filter"];
+    print _filter
+    rows = 5
+    if page == None:
+        page = 1
+
+    (sortString, filterString, sort_params, range) = paginator_process_params(request.POST, page, rows)    
+        
+    print filterString
+
+    if len(filterString) > 0:
+        _filter += " AND " + filterString
+
+    print _filter
+
+    (list_databases,hits) = get_databases_from_solr_v2(request, _filter, sort=sortString, rows=rows, start=range)
+
+    print "Range: "+str(range)
+    print "hits: "+str(hits)
+    print "len: "+str(len(list_databases))
+
+    list_databases = paginator_process_list(list_databases, hits, range) 
+
+    ret = {}
+    ret["Hits"] = hits    
+    ret["Start"] = range    
+    ret["Rows"] = rows
+    ret["Filter"] = filterString
+    if range > hits:
+        ret["Rec_Page"] = 1
+    else:
+        ret["Rec_Page"] = page
+
+    return HttpResponse(json.dumps(ret), mimetype='application/json')
+
+
+
+
 def databases(request, page=1, template_name='databases.html'):
     #first lets clean the query session log
     if 'query' in request.session:
@@ -1139,15 +1183,26 @@ def databases(request, page=1, template_name='databases.html'):
     if page == None:
         page = 1
 
-    (sortString, sort_params, range) = paginator_process_params(request, page, rows)    
+    (sortString, filterString, sort_params, range) = paginator_process_params(request.GET, page, rows)    
         
+    sort_params["base_filter"] = _filter;
+
+    print filterString
+
+    if len(filterString) > 0:
+        _filter += " AND " + filterString
+
+    print _filter
+
     (list_databases,hits) = get_databases_from_solr_v2(request, _filter, sort=sortString, rows=rows, start=range)
 
     print "Range: "+str(range)
     print "hits: "+str(hits)
     print "len: "+str(len(list_databases))
 
-    list_databases = paginator_process_list(list_databases, hits, range)   
+    list_databases = paginator_process_list(list_databases, hits, range) 
+    if range > hits:
+        return databases(request, 1)  
 
     print "len: "+str(len(list_databases))
     ## Paginator ##
@@ -1172,11 +1227,17 @@ def paginator_process_params(request, page, rows):
     sortFieldsLookup["last_update"] = "last_activity_sort"
     sortFieldsLookup["type"] = "type_name_sort"
 
+    filterFieldsLookup = {}
+    filterFieldsLookup["database_name_filter"] = "database_name_t"
+    filterFieldsLookup["last_update_filter"] = ""
+    filterFieldsLookup["type_filter"] = "type_t"
+
     sortString = ""
+    filterString = ""
     sort_params= {}
-    print request.GET
-    if "s" in request.GET:
-        mode = json.loads(request.GET["s"])
+    print request
+    if "s" in request:
+        mode = json.loads(request["s"])
     else:
         mode = {"database_name": "asc"}
 
@@ -1184,27 +1245,46 @@ def paginator_process_params(request, page, rows):
         if sortFieldsLookup.has_key(x):
             if mode[x] == "asc" or mode[x] == "desc":
                 sortString += sortFieldsLookup[x]+" "+mode[x]
-                sort_params[x] = {}
+                if x not in sort_params:
+                    sort_params[x] = {}
                 sort_params[x]["name"] = mode[x]
+        elif filterFieldsLookup.has_key(x):
+            if x == "last_update_filter":
+                filterString += "(created_t:\""+mode[x] + "\" OR date_last_modification_t:\""+mode[x] + "\") AND "
+            else:
+                filterString += filterFieldsLookup[x]+":'"+mode[x] +"' AND "
+            if x[:-7] not in sort_params:
+                sort_params[x[:-7]] = {}
+            sort_params[x[:-7]]["filter"] = mode[x]
+            print sort_params
+
+    if len(filterString) > 0:
+        filterString = filterString[:-4]
 
     for x in ["database_name", "last_update", "type"]:
-        if x in sort_params:
+        if (x in sort_params) and ( "name" in sort_params[x]):
+            sort_params["selected_name"] = x
+            sort_params["selected_value"] = sort_params[x]["name"]
             if sort_params[x]["name"] == "asc":
                 sort_params[x]["click_url"]='?s={"'+x+'":"desc"}'
-                sort_params[x]["icon"]="icon-chevron-down"
+                sort_params[x]["next"]='desc'
+                sort_params[x]["icon"]="icon-chevron-down"                
             elif sort_params[x]["name"] == "desc":
                 sort_params[x]["click_url"]='?s={"'+x+'":"asc"}'
+                sort_params[x]["next"]='asc'
                 sort_params[x]["icon"]="icon-chevron-up"
         else:
-            sort_params[x] = {}
+            if x not in sort_params:
+                sort_params[x] = {}
             sort_params[x]["click_url"]='?s={"'+x+'":"asc"}'
+            sort_params[x]["next"]='asc'
             sort_params[x]["icon"]="icon-minus"
         
     print sortString
 
     start = (int(page) - 1) * rows
 
-    return (sortString, sort_params, start)
+    return (sortString, filterString, sort_params, start)
 
 def paginator_process_list(list_databases, hits, start):
     nList = []
@@ -1278,11 +1358,20 @@ def all_databases_user(request, page=1, template_name='alldatabases.html'):
 
         type_t_list = type_t_list[:-1]
 
-        (sortString, sort_params, start) = paginator_process_params(request, page, rows)    
-    
-        (list_databases,hits) = get_databases_from_solr_v2(request, "type_t:" + type_t_list, sort=sortString, rows=rows, start=start)
+        query = "type_t:" + type_t_list
+        (sortString, filterString, sort_params, start) = paginator_process_params(request.GET, page, rows)    
+        sort_params["base_filter"] = query;
+        if len(filterString) > 0:
+            query += " AND " + filterString
 
-        list_databases = paginator_process_list(list_databases, hits, start)   
+        print query
+
+        (list_databases,hits) = get_databases_from_solr_v2(request, query, sort=sortString, rows=rows, start=start)
+
+        list_databases = paginator_process_list(list_databases, hits, start)
+        if start > hits:
+            return all_databases_user(request, 1)  
+  
     else:
         list_databases = []
         #list_databases = get_databases_from_solr(request, "*:*")
