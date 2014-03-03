@@ -178,13 +178,16 @@ def results_fulltext(request, page=1, full_text=True,template_name='results.html
 def results_fulltext_aux(request, query, page=1, template_name='results.html', isAdvanced=False):
     
     rows = 5
+    if request.POST and "page" in request.POST:
+        page = request.POST["page"]
+
     if page == None:
         page = 1
 
     if query == "":
         return render(request, "results.html", {'request': request, 'breadcrumb': True,
                                                 'num_results': 0, 'page_obj': None})
-    (sortString, filterString, sort_params, range) = paginator_process_params(request.GET, page, rows)   
+    (sortString, filterString, sort_params, range) = paginator_process_params(request.POST, page, rows)   
     sort_params["base_filter"] = query;
     if len(filterString) > 0:
         query += " AND " + filterString
@@ -194,7 +197,7 @@ def results_fulltext_aux(request, query, page=1, template_name='results.html', i
     (list_databases, hits) = get_databases_from_solr_v2(request, query, sort=sortString, rows=rows, start=range)    
     if range > hits:
         return databases(request, 1)  
-        
+
     if len(list_databases) == 0 :
         query_old = request.session.get('query', "")
         if isAdvanced == True:
@@ -217,10 +220,10 @@ def results_fulltext_aux(request, query, page=1, template_name='results.html', i
     if isAdvanced == True:
         return render(request, template_name, {'request': request,
                                            'num_results': hits, 'page_obj': pager,
-                                            'breadcrumb': True, 'isAdvanced': True, "sort_params": sort_params})
+                                            'breadcrumb': True, 'isAdvanced': True, "sort_params": sort_params, "page":page})
     else :
         return render(request, template_name, {'request': request,
-                                           'num_results': hits, 'page_obj': pager, 'breadcrumb': True, 'search_old': query_old, 'isAdvanced': False, "sort_params": sort_params})
+                                           'num_results': hits, 'page_obj': pager, 'breadcrumb': True, 'search_old': query_old, 'isAdvanced': False, "sort_params": sort_params, "page":page})
 
 
 def store_query(user_request, query_executed):
@@ -1167,7 +1170,8 @@ def query_solr(request, page=1):
 
 
 def databases(request, page=1, template_name='databases.html'):
-    #first lets clean the query session log
+
+     #first lets clean the query session log
     if 'query' in request.session:
         del request.session['query']
         
@@ -1187,10 +1191,17 @@ def databases(request, page=1, template_name='databases.html'):
         _filter = "user_t:*" 
 
     rows = 5
+    if request.POST:
+        page = request.POST["page"]
+
     if page == None:
         page = 1
 
-    (sortString, filterString, sort_params, range) = paginator_process_params(request.GET, page, rows)    
+    print "FUUUUUUUUUUU!!!!"
+    print request
+   
+
+    (sortString, filterString, sort_params, range) = paginator_process_params(request.POST, page, rows)    
         
     sort_params["base_filter"] = _filter;
 
@@ -1226,7 +1237,7 @@ def databases(request, page=1, template_name='databases.html'):
                                            'page_obj': pager,
                                            'api_token': True, 
                                            'owner_fingerprint': False,
-                                           'add_databases': True, "sort_params": sort_params})
+                                           'add_databases': True, "sort_params": sort_params, "page":page})
 
 def paginator_process_params(request, page, rows):
     sortFieldsLookup = {}
@@ -1346,6 +1357,9 @@ def paginator_process_list(list_databases, hits, start):
 # GET ALL DATABASES ACCORDING TO USER INTERESTS
 def all_databases_user(request, page=1, template_name='alldatabases.html'):
     rows = 5
+    if request.POST:
+        page = request.POST["page"]
+
     if page == None:
         page = 1
     # lets clear the geolocation session search filter (if any)
@@ -1366,7 +1380,7 @@ def all_databases_user(request, page=1, template_name='alldatabases.html'):
         type_t_list = type_t_list[:-1]
 
         query = "type_t:" + type_t_list
-        (sortString, filterString, sort_params, start) = paginator_process_params(request.GET, page, rows)    
+        (sortString, filterString, sort_params, start) = paginator_process_params(request.POST, page, rows)    
         sort_params["base_filter"] = query;
         if len(filterString) > 0:
             query += " AND " + filterString
@@ -1397,7 +1411,7 @@ def all_databases_user(request, page=1, template_name='alldatabases.html'):
                                             'breadcrumb': True, 'collapseall': False, 
                                             'geo': True,
                                             'page_obj': pager,
-                                            'add_databases': True, "sort_params": sort_params})
+                                            'add_databases': True, "sort_params": sort_params, "page":page})
 
 def all_databases(request, page=1, template_name='alldatabases.html'):
     

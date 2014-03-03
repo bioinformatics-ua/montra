@@ -214,10 +214,16 @@
 var a;
 $(document).ready(function(){
     a = new PaginatorSorter("table_databases", '{{sort_params.base_filter}}', '{{sort_params.selected_name}}', '{{sort_params.selected_value}}');
+    paginator_via_post();
 });
 </script>
 
   </form>
+  <form id="send2" method="POST" > 
+  <input id="page" type="hidden" name="page" value="{{page}}"></input>
+  <input id="s" type="hidden" name="s" value=""></input>  
+{% csrf_token %}
+</form>
     {% else %}
     <div style="margin-top: 60px;"></div>
   {% endif %}

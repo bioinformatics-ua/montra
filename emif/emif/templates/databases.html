@@ -64,19 +64,19 @@ button {
 
         </tr>
         <tr>
-          <td>
+          <th>
             <div class="input-append">
                 <input class="span2" id="database_name_filter" type="text" value="{{sort_params.database_name.filter}}">
                 <span class="add-on">Filter</span>
               </div>
-          </td>
-           <td>
+          </th>
+           <th>
             <div class="input-append">
                 <input class="span2" id="last_update_filter" type="text" value="{{sort_params.last_update.filter}}">
                 <span class="add-on">Filter</span>
               </div>
-          </td>
-           <td>
+          </th>
+           <th>
             <div class="input-append">
               <select id="type_filter" def_value="{{sort_params.type.filter}}">
                 <option value="">None</option>
@@ -85,7 +85,7 @@ button {
               </select>
                 <span class="add-on">Filter</span>
               </div>
-          </td>
+          </th>
         </tr>
     </thead>
     <tbody>
@@ -136,10 +136,13 @@ button {
 
     </tbody>
 </table>
+
 <script type="text/javascript">
 var a;
 $(document).ready(function(){
     a = new PaginatorSorter("table_databases", '{{sort_params.base_filter}}', '{{sort_params.selected_name}}', '{{sort_params.selected_value}}');
+
+    paginator_via_post();
 });
 </script>
 
@@ -162,9 +165,14 @@ $(document).ready(function(){
   <a class="btn btn-large btn-success" href="advancedSearch/1">Add new database</a>
 {% endcomment %}
 </div>
+<form id="send2" method="POST" > 
+  <input id="page" type="hidden" name="page" value="{{page}}"></input>
+  <input id="s" type="hidden" name="s" value=""></input>  
+{% csrf_token %}
+</form>
 
-
-<form id="send" method="POST" > {% csrf_token %}
+<form id="send" method="POST" > 
+ {% csrf_token %}
 </form>
 
 
