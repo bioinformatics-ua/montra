@@ -175,10 +175,10 @@ def results_fulltext(request, page=1, full_text=True,template_name='results.html
     return results_fulltext_aux(request, "text_t:" + query, page, template_name, isAdvanced)
 
 
-def results_fulltext_aux(request, query, page=1, template_name='results.html', isAdvanced=False):
+def results_fulltext_aux(request, query, page=1, template_name='results.html', isAdvanced=False, force=False):
     
     rows = 5
-    if request.POST and "page" in request.POST:
+    if request.POST and "page" in request.POST and not force:
         page = request.POST["page"]
 
     if page == None:
@@ -195,8 +195,8 @@ def results_fulltext_aux(request, query, page=1, template_name='results.html', i
     print query
 
     (list_databases, hits) = get_databases_from_solr_v2(request, query, sort=sortString, rows=rows, start=range)    
-    if range > hits:
-        return databases(request, 1)  
+    if range > hits and not force:
+        return results_fulltext_aux(request, query, 1, isAdvanced=isAdvanced, force=force)  
 
     if len(list_databases) == 0 :
         query_old = request.session.get('query', "")
@@ -1169,7 +1169,7 @@ def query_solr(request, page=1):
 
 
 
-def databases(request, page=1, template_name='databases.html'):
+def databases(request, page=1, template_name='databases.html', force=False):
 
      #first lets clean the query session log
     if 'query' in request.session:
@@ -1191,15 +1191,11 @@ def databases(request, page=1, template_name='databases.html'):
         _filter = "user_t:*" 
 
     rows = 5
-    if request.POST:
+    if request.POST and not force:
         page = request.POST["page"]
 
     if page == None:
-        page = 1
-
-    print "FUUUUUUUUUUU!!!!"
-    print request
-   
+        page = 1   
 
     (sortString, filterString, sort_params, range) = paginator_process_params(request.POST, page, rows)    
         
@@ -1213,8 +1209,8 @@ def databases(request, page=1, template_name='databases.html'):
     print _filter
 
     (list_databases,hits) = get_databases_from_solr_v2(request, _filter, sort=sortString, rows=rows, start=range)
-    if range > hits:
-        return databases(request, 1)  
+    if range > hits and force < 2:
+        return databases(request, page=1, force=True)  
 
     print "Range: "+str(range)
     print "hits: "+str(hits)
@@ -1355,9 +1351,9 @@ def paginator_process_list(list_databases, hits, start):
 #                                            'add_databases': True})
 
 # GET ALL DATABASES ACCORDING TO USER INTERESTS
-def all_databases_user(request, page=1, template_name='alldatabases.html'):
+def all_databases_user(request, page=1, template_name='alldatabases.html', force=False):
     rows = 5
-    if request.POST:
+    if request.POST and not force:
         page = request.POST["page"]
 
     if page == None:
@@ -1390,8 +1386,8 @@ def all_databases_user(request, page=1, template_name='alldatabases.html'):
         (list_databases,hits) = get_databases_from_solr_v2(request, query, sort=sortString, rows=rows, start=start)
 
         list_databases = paginator_process_list(list_databases, hits, start)
-        if start > hits:
-            return all_databases_user(request, 1)  
+        if start > hits and not force:
+            return all_databases_user(request, 1, force=True)  
   
     else:
         list_databases = []
