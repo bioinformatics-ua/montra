@@ -69,7 +69,23 @@ PaginatorSorter.prototype ={
   				//console.log(data);
   				if(data.Hits != undefined && data.Hits > 0){ 			
 			        context.updateForm(json);
-			        context.submit();
+			      
+			        for(filter in context.filters){ 	
+						if(context.filters[filter].val().length > 0 ){
+							var x = $("#"+filter+"_grp");
+							x.removeClass("error");
+						}
+					}
+
+				  context.submit();
+  				}else{
+  					for(filter in context.filters){ 	
+						if(context.filters[filter].val().length > 0 ){
+							var x = $("#"+filter+"_grp");
+							x.removeClass("success");
+            				x.addClass("error");
+						}
+					}
   				}
   			}
 		});
