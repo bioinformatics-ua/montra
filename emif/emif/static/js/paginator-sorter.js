@@ -48,7 +48,7 @@ PaginatorSorter.prototype ={
 		var context = this;
 		var data = [];
 
-		var json = this.getQueryString(fieldType, value);
+		var json = context.getQueryString(fieldType, value);
 
 		var patt=/\/(\d+)/g;
 		var page = patt.exec(window.location.href);
@@ -96,12 +96,16 @@ PaginatorSorter.prototype ={
 		$("option[value="+value+"]", this.filters["type_filter"]).attr("selected", "yes");
 
 		var context = this;
-		for(filter in context.filters){ 
-			context.filters[filter].change( 
-				function(){
-					context.onClick()
-				});
-		}
+
+		this.filters["database_name_filter"].keyup( $.debounce( 1000, function(){
+				context.onClick(context.selName, context.selValue);
+			}));
+    	this.filters["last_update_filter"].keyup( $.debounce( 1000, function(){
+				context.onClick(context.selName, context.selValue);
+			}));
+    	this.filters["type_filter"].change(function(){
+				context.onClick(context.selName, context.selValue);
+			});
 	}, 
 	updateForm : function(json){
 		$("#s", this.form).val(json);
