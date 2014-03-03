@@ -9,14 +9,17 @@ function PaginatorSorter(tableID, fString, selName, selValue){
     this.selName = selName;
     this.selValue = selValue;
 
+    this.form = $("#send2");
+    this.updateForm(this.getQueryString(selName, selValue));
+
     this.bind();
 
     this.fString = fString; 
 }
 PaginatorSorter.prototype ={
-	onClick : function(fieldType, value){
+	getQueryString : function(fieldType, value){
 		var data = [];
-
+		
 		if(fieldType == undefined)
 			data[this.selName] = this.selValue;
 		else 
@@ -39,6 +42,13 @@ PaginatorSorter.prototype ={
 		}
 		json += "}";
 		//console.log(json);
+		return json;
+	},
+	onClick : function(fieldType, value){
+		var context = this;
+		var data = [];
+
+		var json = this.getQueryString(fieldType, value);
 
 		var patt=/\/(\d+)/g;
 		var page = patt.exec(window.location.href);
@@ -57,8 +67,10 @@ PaginatorSorter.prototype ={
   			data: {"filter": f, "s":json},
   			success: function(data){	
   				//console.log(data);
-  				if(data.Hits != undefined && data.Hits > 0)
-  					window.location.search="?s="+json;
+  				if(data.Hits != undefined && data.Hits > 0){ 			
+			        context.updateForm(json);
+			        context.submit();
+  				}
   			}
 		});
 	} ,
@@ -74,6 +86,33 @@ PaginatorSorter.prototype ={
 					context.onClick()
 				});
 		}
-
+	}, 
+	updateForm : function(json){
+		$("#s", this.form).val(json);
+	}, 
+	submit : function(json){
+		this.form.submit();
 	}
+}
+
+function paginator_via_post(){
+	$("a",".pagination").each(function(){
+	      $(this).click(function(e){
+	       
+	        var href = $(this).attr("href");
+	         console.log(href);
+	        var patt=/\/(\d+)/g;
+	        var page = patt.exec(href);
+	        if( page){
+	          page = page[1];
+	          var form = $("#send2");
+	          $("#page", form).val(page);
+	          form.submit();
+	        }else{
+	          page = "NULL";
+	        }
+	        e.preventDefault();
+	      });
+
+	    });
 }
