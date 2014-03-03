@@ -26,6 +26,7 @@
 {% block scriptextraincludes %}
 
 <script src="{{ STATIC_URL}}js/vendor/jquery.boolrelwidget.js"></script>
+<script src="{{ STATIC_URL }}js/paginator-sorter.js"></script>
 
 
 {% endblock %}
@@ -91,18 +92,43 @@
 <table class="table table-hover fingerprint_table table-striped" id="table_databases" data-provides="rowlink">
     <thead>
         <tr>
-            <th class="sorter" onclick="window.location.search='{{sort_params.database_name.click_url}}'">Name
-                 <div class="pull-right"><i class="{{sort_params.database_name.icon}}"></i></div> 
+             <th class="sorter"  onclick="a.onClick('database_name', '{{sort_params.database_name.next}}');">Name
+                 <div class="pull-right"><i class="{{sort_params.database_name.icon}}"></i></div>
             </th>
             <!--<th>Creation Date</th>-->
-            <th class="sorter" onclick="window.location.search='{{sort_params.last_update.click_url}}'">Last update
+            <th class="sorter" onclick="a.onClick('last_update', '{{sort_params.last_update.next}}');">Last update
                 <div class="pull-right"><i class="{{sort_params.last_update.icon}}"></i></div> 
             </th>
-            <th class="sorter" onclick="window.location.search='{{sort_params.type.click_url}}'">Type
+            <th class="sorter" onclick="a.onClick('type', '{{sort_params.type.next}}');">Type
               <div class="pull-right"><i class="{{sort_params.type.icon}}"></i></div> 
             </th>
             <th class="sorter-false filter-false">Select</th>
 
+        </tr>
+        <tr>
+          <td>
+            <div class="input-append">
+                <input class="span2" id="database_name_filter" type="text" value="{{sort_params.database_name.filter}}">
+                <span class="add-on">Filter</span>
+              </div>
+          </td>
+           <td>
+            <div class="input-append">
+                <input class="span2" id="last_update_filter" type="text" value="{{sort_params.last_update.filter}}">
+                <span class="add-on">Filter</span>
+              </div>
+          </td>
+           <td>
+            <div class="input-append">
+              <select id="type_filter" def_value="{{sort_params.type.filter}}">
+                <option value="">None</option>
+                <option value="adcohort">AD Cohort</option>
+                <option value="observationaldatasources">Observational Data Sources</option>
+              </select>
+                <span class="add-on">Filter</span>
+              </div>
+          </td>
+          <td></td>
         </tr>
     </thead>
     <tbody>
@@ -184,6 +210,13 @@
 
     </tbody>
 </table>
+<script type="text/javascript">
+var a;
+$(document).ready(function(){
+    a = new PaginatorSorter("table_databases", '{{sort_params.base_filter}}', '{{sort_params.selected_name}}', '{{sort_params.selected_value}}');
+});
+</script>
+
   </form>
     {% else %}
     <div style="margin-top: 60px;"></div>

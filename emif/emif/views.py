@@ -185,9 +185,16 @@ def results_fulltext_aux(request, query, page=1, template_name='results.html', i
         return render(request, "results.html", {'request': request, 'breadcrumb': True,
                                                 'num_results': 0, 'page_obj': None})
     (sortString, filterString, sort_params, range) = paginator_process_params(request.GET, page, rows)   
-    (list_databases, hits) = get_databases_from_solr_v2(request, query, sort=sortString, rows=rows, start=range)    
     sort_params["base_filter"] = query;
+    if len(filterString) > 0:
+        query += " AND " + filterString
 
+    print query
+
+    (list_databases, hits) = get_databases_from_solr_v2(request, query, sort=sortString, rows=rows, start=range)    
+    if range > hits:
+        return databases(request, 1)  
+        
     if len(list_databases) == 0 :
         query_old = request.session.get('query', "")
         if isAdvanced == True:
@@ -1195,15 +1202,15 @@ def databases(request, page=1, template_name='databases.html'):
     print _filter
 
     (list_databases,hits) = get_databases_from_solr_v2(request, _filter, sort=sortString, rows=rows, start=range)
+    if range > hits:
+        return databases(request, 1)  
 
     print "Range: "+str(range)
     print "hits: "+str(hits)
     print "len: "+str(len(list_databases))
 
     list_databases = paginator_process_list(list_databases, hits, range) 
-    if range > hits:
-        return databases(request, 1)  
-
+    
     print "len: "+str(len(list_databases))
     ## Paginator ##
     myPaginator = Paginator(list_databases, rows)
