@@ -78,7 +78,7 @@ function GraphicChartC3D3(divArg, dataArg)
 
           
 
-          datasetYs[k].push(parseInt(row[a.trim()]));  
+          datasetYs[k].push(parseFloat(row[a.trim()]));  
           k = k +1 ;
         });
         
