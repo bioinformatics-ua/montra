@@ -406,6 +406,7 @@ function PCAPI ()
                       var _filters = {};
                       charDraw.draw(_filters);
                       charDraw.drawBar();
+                      $(".filterBar").first().click(); 
                       
                       return false;
                     });
@@ -471,6 +472,7 @@ $(document).ready(
           $('.tabbable a[data-toggle="tab"]').on('shown', function (e) {
             if(e.target.innerText == 'Population Characteristics'){
               $(".graphTypes").first().click();  
+              $(".filterBar").first().click(); 
             }
           })
 
