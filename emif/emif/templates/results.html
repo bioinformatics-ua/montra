@@ -269,10 +269,17 @@ $('.checkbox').click(function()
     {
         counter--;
     }
-    if (counter==2)
+    if (counter>=2)
     {
       $("#comparabtn").removeAttr('disabled');
-      
+      $("#comparabtn").bind('click',function(e)
+        { 
+          
+          $('#result_form').submit();
+
+          return false;
+        });      
+      /*
       $('.checkbox').each(function(cbox)
       {
         console.log(this);
@@ -288,7 +295,7 @@ $('.checkbox').click(function()
             $(this).prop('disabled', true);
         };
       });
-      
+      */
     }
     else
     {

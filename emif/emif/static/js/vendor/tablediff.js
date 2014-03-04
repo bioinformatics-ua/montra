@@ -138,13 +138,6 @@ comparetable = function(table1, table2){
 	  	}
 
 	);
-
-  	$('td').each(function()
-  	{
-  		
-  	}
-
-  		);
     var content;
     content = $(this).text().replace(/\s+/gi, ' ');
     //console.log(content)
@@ -163,9 +156,6 @@ comparetable = function(table1, table2){
 
 };
 
-
-
-
 paint_table2 = function(table2, tag, nameClass)
 {
 	$('#'+ table2).each(function() {
@@ -176,14 +166,14 @@ paint_table2 = function(table2, tag, nameClass)
 		  	{
 		  		if (this.tagName=="TR")
 		  		{
-		  			console.log($(this.childNodes[1].childNodes[0]).context.data );
-		  			console.log(tag);
+		  			//console.log($(this.childNodes[1].childNodes[0]).context.data );
+		  			//console.log(tag);
 		  			//if ($(this.childNodes[1].childNodes[0]).context.nodeValue.indexOf(tag)!==-1)
 		  			try
 		  			{
 		  			if (tag.indexOf($(this.childNodes[1].childNodes[0]).context.data)!==-1)
 		  			{
-		  					console.log("maasa");
+		  					//console.log("maasa");
 
 		  				$(this).addClass(nameClass);
 		  			}
@@ -210,16 +200,16 @@ comparetable_two = function(table1, table2){
 		  	{	
 		  			if (this.tagName=="TR")
 		  			{
-		  				console.log($(this.childNodes[1].childNodes[0]).context);
-		  				console.log($(this.childNodes[3]));
+		  				//console.log($(this.childNodes[1].childNodes[0]).context);
+		  				//console.log($(this.childNodes[3]));
 		  				
 		  				var result = compare_cell(table2, $(this.childNodes[1].childNodes[0]).context,$(this.childNodes[3].childNodes[0]).context);
-		  				console.log('Result: ' + result );
+		  				//console.log('Result: ' + result );
 		  				if (result==1)
 		  				{
 
-		  					console.log($('#' + table2));
-		  					console.log($('#' + table1));
+		  					//console.log($('#' + table2));
+		  					//console.log($('#' + table1));
 		  					paint_table2(table2,$(this.childNodes[1].childNodes[0]).context.data, "success" );
 
 		  					//$('#' + table2).childNodes[1].childNodes[0]).addClass("success")
@@ -238,7 +228,7 @@ comparetable_two = function(table1, table2){
 		  					
 		  					paint_table2(table2,$(this.childNodes[1].childNodes[0]).context.data, "error" );
 		  				}
-		  	}
+		  			}
 		  	}	  
 		  	);		
 	  		
@@ -318,7 +308,7 @@ cleantablediff = function(list_tables)
 		  	{	
 		  			if (this.tagName=="TR")
 		  			{
-		  				console.log(this);
+		  				//console.log(this);
 		  				$(this).removeClass("success");
 	  					$(this).removeClass("error");
 		  			}
@@ -347,11 +337,18 @@ function show_hide_match(list_tables, show)
 		
 	});
 };
-
+function hide_uncessary_qs(list_tables, table_tmp){
+	var visibles_left = $('#' + list_tables[table_tmp] + ' tr:visible').length;
+	if(visibles_left <= 0){
+		$('#' + list_tables[table_tmp]).parent().parent().parent().hide();
+	}
+}
 function show_hide_unmatch(list_tables, show)
 {
 	$(list_tables).each(function(table_tmp)
 	{
+		$('#' + list_tables[table_tmp]).parent().parent().parent().show();
+
 		if (show)
 		{
 			$('#' + list_tables[table_tmp] + ' .error').show();	
@@ -360,6 +357,9 @@ function show_hide_unmatch(list_tables, show)
 		{
 			$('#' + list_tables[table_tmp] + ' .error').hide();	
 		}
+
+		hide_uncessary_qs(list_tables, table_tmp);
+
 	});
 };
 
@@ -367,6 +367,8 @@ function show_hide_proximity(list_tables, show)
 {
 	$(list_tables).each(function(table_tmp)
 	{
+		$('#' + list_tables[table_tmp]).parent().parent().parent().show();
+
 		if (show)
 		{
 			$('#' + list_tables[table_tmp] + ' .warning').show();	
@@ -375,6 +377,9 @@ function show_hide_proximity(list_tables, show)
 		{
 			$('#' + list_tables[table_tmp] + ' .warning').hide();	
 		}
+
+		hide_uncessary_qs(list_tables, table_tmp);
+
 	});
 };
 
@@ -382,10 +387,12 @@ function show_hide_empty_rows(list_tables, show)
 {
 	$(list_tables).each(function(table_tmp)
 	{
-		console.log(list_tables[table_tmp]);
+		$('#' + list_tables[table_tmp]).parent().parent().parent().show();
+
+		//console.log(list_tables[table_tmp]);
 		$("#" + list_tables[table_tmp]+" tr").each(function() {        
 		    var cell = $.trim($($(this).find('td')[1]).text());
-		    console.log(cell);
+		    //console.log(cell);
 		    if (cell.length == 0){
 		        //console.log('empty');
 		        //$(this).addClass('nodisplay');
@@ -400,6 +407,9 @@ function show_hide_empty_rows(list_tables, show)
 		        
 		    }                   
 		});
+
+		hide_uncessary_qs(list_tables, table_tmp);
+
 	});
 };
 
