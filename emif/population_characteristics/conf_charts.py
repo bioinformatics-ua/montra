@@ -94,6 +94,7 @@ class ConfCharts(object):
         f2.name = 'Gender'
         f2.key = None
         f2.value = 'Gender'
+        f2.translation = {'M': 'Male', 'F': 'Female', 'T': 'Total'}
         
         c1.filters = [f2]
 
@@ -138,6 +139,7 @@ class ConfCharts(object):
         f2.name = 'Gender'
         f2.key = None
         f2.value = 'Gender'
+        f2.translation = {'M': 'Male', 'F': 'Female', 'T': 'Total'}
         c10.filters = [f2]
         sc.charts.append(c10)
 
@@ -150,6 +152,7 @@ class ConfCharts(object):
         f2.name = 'Gender'
         f2.key = None
         f2.value = 'Gender'
+        f2.translation = {'M': 'Male', 'F': 'Female', 'T': 'Total'}
 
         c11 = Chart()
         c11.title = Title()
@@ -239,6 +242,7 @@ class ConfCharts(object):
         f2.name = 'Gender'
         f2.key = None
         f2.value = 'Gender'
+        f2.translation = {'M': 'Male', 'F': 'Female', 'T': 'Total'}
         c2.filters = [f2, f_year]
 
         sc.charts.append(c2)
@@ -299,6 +303,7 @@ class ConfCharts(object):
         f2.name = 'Gender'
         f2.key = None
         f2.value = 'Gender'
+        f2.translation = {'M': 'Male', 'F': 'Female', 'T': 'Total'}
         c4.filters = [f2, f_year]
 
         sc.charts.append(c4)
@@ -359,6 +364,7 @@ class ConfCharts(object):
         f2.name = 'Gender'
         f2.key = None
         f2.value = 'Gender'
+        f2.translation = {'M': 'Male', 'F': 'Female', 'T': 'Total'}
         c3.filters = [f2, f_year]
 
         sc.charts.append(c3)
@@ -394,6 +400,7 @@ class ConfCharts(object):
         f2.name = 'Gender'
         f2.key = None
         f2.value = 'Gender'
+        f2.translation = {'M': 'Male', 'F': 'Female', 'T': 'Total'}
 
         ss = Scale()
         ss.unit = "Year"
@@ -453,6 +460,7 @@ class ConfCharts(object):
         f2.name = 'Gender'
         f2.key = None
         f2.value = 'Gender'
+        f2.translation = {'M': 'Male', 'F': 'Female', 'T': 'Total'}
 
         c12.filters = [f2]
         sc.charts.append(c12)
@@ -507,6 +515,7 @@ class ConfCharts(object):
         f2.name = 'Gender'
         f2.key = None
         f2.value = 'Gender'
+        f2.translation = {'M': 'Male', 'F': 'Female', 'T': 'Total'}
 
         c13.filters = [f2]
         sc.charts.append(c13)
@@ -562,6 +571,7 @@ class ConfCharts(object):
         f2.name = 'Gender'
         f2.key = None
         f2.value = 'Gender'
+        f2.translation = {'M': 'Male', 'F': 'Female', 'T': 'Total'}
 
         c14.filters = [f2]
         sc.charts.append(c14)
@@ -617,6 +627,7 @@ class ConfCharts(object):
         f2.name = 'Gender'
         f2.key = None
         f2.value = 'Gender'
+        f2.translation = {'M': 'Male', 'F': 'Female', 'T': 'Total'}
 
         c14.filters = [f2]
         sc.charts.append(c14)
@@ -671,6 +682,7 @@ class ConfCharts(object):
         f2.name = 'Gender'
         f2.key = None
         f2.value = 'Gender'
+        f2.translation = {'M': 'Male', 'F': 'Female', 'T': 'Total'}
 
         c14.filters = [f2]
         sc.charts.append(c14)
