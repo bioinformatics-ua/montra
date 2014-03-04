@@ -343,15 +343,17 @@ function hide_uncessary_qs(list_tables, table_tmp){
 		$('#' + list_tables[table_tmp]).parent().parent().parent().hide();
 	}
 }
-function show_hide_unmatch(list_tables, show)
+function show_hide_unmatch(list_tables, show, word)
 {
 	$(list_tables).each(function(table_tmp)
 	{
 		$('#' + list_tables[table_tmp]).parent().parent().parent().show();
+		
 
 		if (show)
 		{
 			$('#' + list_tables[table_tmp] + ' .error').show();	
+			hideTableCell(list_tables, table_tmp, word);
 		}
 		else
 		{
@@ -363,7 +365,7 @@ function show_hide_unmatch(list_tables, show)
 	});
 };
 
-function show_hide_proximity(list_tables, show)
+function show_hide_proximity(list_tables, show, word)
 {
 	$(list_tables).each(function(table_tmp)
 	{
@@ -372,6 +374,8 @@ function show_hide_proximity(list_tables, show)
 		if (show)
 		{
 			$('#' + list_tables[table_tmp] + ' .warning').show();	
+			hideTableCell(list_tables, table_tmp, word);
+
 		}
 		else
 		{
@@ -383,7 +387,7 @@ function show_hide_proximity(list_tables, show)
 	});
 };
 
-function show_hide_empty_rows(list_tables, show)
+function show_hide_empty_rows(list_tables, show, word)
 {
 	$(list_tables).each(function(table_tmp)
 	{
@@ -399,17 +403,41 @@ function show_hide_empty_rows(list_tables, show)
 		        if (show)
 		        {
 		        	$(this).closest('tr').show();
+		        	hideTableCell(list_tables, table_tmp, word);
+
 		        }
 		        else
 		        {
 		        	$(this).closest('tr').hide();	
 		        }
-		        
+
 		    }                   
 		});
 
 		hide_uncessary_qs(list_tables, table_tmp);
 
+	});
+};
+function hideTableCell(list_tables, table_tmp, word){
+	$("#" + list_tables[table_tmp]+" tr").each(function() {        
+		    var cell = $.trim($($(this).find('td')[0]).text());
+		    //console.log(cell + "==" + word +"?");
+		    if (cell.indexOf(word) != -1)
+		        $(this).closest('tr').show();    
+		    else
+		    	$(this).closest('tr').hide();	 
+		                       
+	});
+}
+function filter_word(list_tables, word)
+{
+	$(list_tables).each(function(table_tmp)
+	{
+		$('#' + list_tables[table_tmp]).parent().parent().parent().show();
+		
+			hideTableCell(list_tables, table_tmp, word);
+
+			hide_uncessary_qs(list_tables, table_tmp);
 	});
 };
 

@@ -79,7 +79,7 @@ th, td {
 
 {% block content %}
 <div class="clearboth">
-<input type="text" size="60" style="margin-left: 0px;" class="span12" id="filter_field" placeholder="To filter type here" tabindex="1">
+<input type="text" size="60" style="margin-left: 0px;" class="span12" id="searchfilter" placeholder="To filter type here" tabindex="1">
 </div>
 
 <div style="margin: 0px;" class="span12">
@@ -178,7 +178,37 @@ $("#match").bind('click',function(e)
           }
           return false;
 });
+/*
+ * delayKeyup
+ * http://code.azerti.net/javascript/jquery/delaykeyup.htm
+ * Inspired by CMS in this post : http://stackoverflow.com/questions/1909441/jquery-keyup-delay
+ * Written by Gaten
+ * Exemple : $("#input").delayKeyup(function(){ alert("5 secondes passed from the last event keyup."); }, 5000);
+ */
+(function ($) {
+    $.fn.delayKeyup = function(callback, ms){
+        var timer = 0;
+        $(this).keyup(function(e){
+            e.preventDefault(); 
+            e.stopPropagation();  
+                             
+            clearTimeout (timer);
+            timer = setTimeout(callback, ms);
+        });
+        return $(this);
+    };
+})(jQuery);
 
+$("#searchfilter").delayKeyup(
+    function(){ 
+        {% for name, qset in results %}
+          {% for k,v in qset.items %}
+            filter_word(['{{name|removespaces}}_{{k|removespaces}}'], $("#searchfilter").val());
+          {% endfor %}
+        {% endfor %}
+        return false;
+      }
+  , 200);
 
 var unmatch=false;
 $("#unmatch").bind('click',function(e)
@@ -189,7 +219,7 @@ $("#unmatch").bind('click',function(e)
           {% for name, qset in results %}
             {% for k,v in qset.items %}
 
-            show_hide_unmatch(['{{name|removespaces}}_{{k|removespaces}}'], unmatch);
+            show_hide_unmatch(['{{name|removespaces}}_{{k|removespaces}}'], unmatch, $("#searchfilter").val());
           {% endfor %}
           {% endfor %}
           unmatch = !unmatch ;
@@ -213,7 +243,7 @@ $("#emptyrows").bind('click',function(e)
           {% for name, qset in results %}
             {% for k,v in qset.items %}
 
-            show_hide_empty_rows(['{{name|removespaces}}_{{k|removespaces}}'], emptyrows);
+            show_hide_empty_rows(['{{name|removespaces}}_{{k|removespaces}}'], emptyrows, $("#searchfilter").val());
           {% endfor %}
           {% endfor %}
           emptyrows = !emptyrows ;
@@ -240,7 +270,7 @@ $("#proximity").bind('click',function(e)
           {% for name, qset in results %}
             {% for k,v in qset.items %}
 
-            show_hide_proximity(['{{name|removespaces}}_{{k|removespaces}}'], proximity);
+            show_hide_proximity(['{{name|removespaces}}_{{k|removespaces}}'], proximity, $("#searchfilter").val());
           {% endfor %}
           {% endfor %}
           proximity = !proximity ;
@@ -274,7 +304,7 @@ function change_name_collapse(value)
     return (this.id.match(regexp));
     }).each(function(){
     //this.innerHTML = this.id;
-    console.log(this.id);
+    //console.log(this.id);
     var current = "{{name|removespaces}}_{{k|removespaces}}";
     if (this.id.indexOf(current))
     {
@@ -370,8 +400,6 @@ $.fn.textWidth = function() {
   node.remove();
   return width;
 };
-
-
 
 $(function() {
   $('td').each(function() 
