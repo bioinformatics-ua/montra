@@ -82,6 +82,7 @@ class Axis(object):
         self.categorized = False
         self.multivalue = False
         self.transformation = None
+        self.sort_func = None
         
     def to_JSON(self):
         return json.dumps(self, default=lambda o: o.__dict__, sort_keys=True, indent=4)
