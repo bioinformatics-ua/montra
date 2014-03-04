@@ -50,9 +50,11 @@ class ConfCharts(object):
         c.x_axis = Axis()
         c.x_axis.operation = "unique"
         c.x_axis.var = "Value1"
+        c.x_axis.label = 'Years'
         c.y_axis = Axis()
         c.y_axis.operation = "unique"
         c.y_axis.var = "Count"
+        c.y_axis.label = 'Number of patients'
         f1 = Filter()
         f1.name = 'Year'
         f1.key = 'Name1'
@@ -86,9 +88,11 @@ class ConfCharts(object):
         c1.x_axis = Axis()
         c1.x_axis.operation = "unique"
         c1.x_axis.var = "Value1"
+        c1.x_axis.label = 'Years'
         c1.y_axis = Axis()
         c1.y_axis.operation = "unique"
         c1.y_axis.var = "Count"
+        c1.y_axis.label = 'Number of patients'
 
         f2 = Filter()
         f2.name = 'Gender'
@@ -113,9 +117,12 @@ class ConfCharts(object):
         c10.x_axis = Axis()
         c10.x_axis.operation = "unique"
         c10.x_axis.var = "Value1"
+        c10.x_axis.label = 'Years'
         c10.y_axis = Axis()
         c10.y_axis.operation = "unique"
         c10.y_axis.var = "Count"
+        c10.y_axis.label = 'Number of patients'
+
 
         fy1 = Filter()
         fy1.name = 'Name2'
@@ -162,9 +169,11 @@ class ConfCharts(object):
         c11.x_axis = Axis()
         c11.x_axis.operation = "unique"
         c11.x_axis.var = "Value1"
+        c11.x_axis.label = 'Years'
         c11.y_axis = Axis()
         c11.y_axis.operation = "unique"
         c11.y_axis.var = "Count"
+        c11.y_axis.label = 'Number of patients'
         fy1 = Filter()
         fy1.name = 'Name2'
         fy1.key = 'Name2'
@@ -203,6 +212,7 @@ class ConfCharts(object):
         c2.x_axis = Axis()
         c2.x_axis.operation = "unique"
         c2.x_axis.var = "Value2"
+        c2.x_axis.label = "Age (Years)"
         c2.x_axis.categorized = True
         c2.x_axis.sort_func = "int(k[c1.x_axis.var].split('-')[0])"
 
@@ -217,6 +227,7 @@ class ConfCharts(object):
         c2.y_axis = Axis()
         c2.y_axis.operation = "unique"
         c2.y_axis.var = "Count"
+        c2.y_axis.label = "Number of patients"
 
 
         fy2 = Filter()
@@ -264,6 +275,7 @@ class ConfCharts(object):
         c4.x_axis = Axis()
         c4.x_axis.operation = "unique"
         c4.x_axis.var = "Value2"
+        c4.x_axis.label = "Age (years)"
         c4.x_axis.categorized = True
         c4.x_axis.sort_func = "int(k[c1.x_axis.var].split('-')[0])"
 
@@ -278,6 +290,7 @@ class ConfCharts(object):
         c4.y_axis = Axis()
         c4.y_axis.operation = "unique"
         c4.y_axis.var = "Count"
+        c4.x_axis.label = "Number of patients"
 
 
         fy2 = Filter()
@@ -325,6 +338,7 @@ class ConfCharts(object):
         c3.x_axis = Axis()
         c3.x_axis.operation = "unique"
         c3.x_axis.var = "Value2"
+        c3.x_axis.label = "Age (years)"
         c3.x_axis.categorized = True
         c3.x_axis.sort_func = "int(k[c1.x_axis.var].split('-')[0])"
 
@@ -339,6 +353,7 @@ class ConfCharts(object):
         c3.y_axis = Axis()
         c3.y_axis.operation = "unique"
         c3.y_axis.var = "Count"
+        c3.y_axis.label = "Number of patients"
 
 
         fy2 = Filter()
@@ -387,10 +402,12 @@ class ConfCharts(object):
         c5.x_axis = Axis()
         c5.x_axis.operation = "unique"
         c5.x_axis.var = "Value1"
+        c5.x_axis.label = "Years"
         c5.y_axis = Axis()
         c5.y_axis.operation = "unique"
         c5.y_axis.var = "Count"
         c5.y_axis.transformation = "y / 12"
+        c5.y_axis.label = "Sum of the patients observation time (years)"
         f1 = Filter()
         f1.name = 'Year'
         f1.key = 'Name1'
@@ -422,7 +439,7 @@ class ConfCharts(object):
         c12.x_axis = Axis()
         c12.x_axis.operation = "unique"
         c12.x_axis.var = 'Value1'
-        
+        c12.x_axis.label = 'Years'
         
 
         c12.y_axis = Axis()
@@ -431,6 +448,7 @@ class ConfCharts(object):
         c12.y_axis.var = ["perc25", "Mean", "perc75", "Median"]
         c12.y_axis.static_filters = []
         c12.y_axis.transformation = "y / 12"
+        c12.y_axis.label = "Age (years)"
 
         fy1 = Filter()
         fy1.name = 'Name2'
@@ -467,7 +485,7 @@ class ConfCharts(object):
 
 
         #################################################
-        ### Age at patient start - percentiles
+        ### Age at patient end - percentiles
         #################################################
         c13 = Chart()
         c13.title = Title()
@@ -477,6 +495,7 @@ class ConfCharts(object):
         c13.x_axis = Axis()
         c13.x_axis.operation = "unique"
         c13.x_axis.var = 'Value1'
+        c13.x_axis.label = 'Years'
         
         
 
@@ -486,6 +505,7 @@ class ConfCharts(object):
         c13.y_axis.var = ["perc25", "Mean", "perc75", "Median"]
         c13.y_axis.static_filters = []
         c13.y_axis.transformation = "y / 12"
+        c13.y_axis.label = "Age (years)"
 
         fy1 = Filter()
         fy1.name = 'Name2'
@@ -533,6 +553,7 @@ class ConfCharts(object):
         c14.x_axis = Axis()
         c14.x_axis.operation = "unique"
         c14.x_axis.var = 'Value1'
+        c14.x_axis.var = 'Years'
         
         
 
@@ -542,6 +563,7 @@ class ConfCharts(object):
         c14.y_axis.var = ["perc25", "Mean", "perc75", "Median"]
         c14.y_axis.static_filters = []
         c14.y_axis.transformation = "y / 12"
+        c14.y_axis.label = "Age (years)"
 
         fy1 = Filter()
         fy1.name = 'Name2'
@@ -589,6 +611,7 @@ class ConfCharts(object):
         c14.x_axis = Axis()
         c14.x_axis.operation = "unique"
         c14.x_axis.var = 'Value1'
+        c14.x_axis.label = 'Years'
         
         
 
@@ -598,6 +621,7 @@ class ConfCharts(object):
         c14.y_axis.var = ["perc25", "Mean", "perc75", "Median"]
         c14.y_axis.static_filters = []
         c14.y_axis.transformation = "y / 12"
+        c14.y_axis.label = "Age (years)"
 
         fy1 = Filter()
         fy1.name = 'Name2'
@@ -644,6 +668,7 @@ class ConfCharts(object):
         c14.x_axis = Axis()
         c14.x_axis.operation = "unique"
         c14.x_axis.var = 'Value1'
+        c14.x_axis.label = 'Years'
         
         
 
@@ -653,6 +678,7 @@ class ConfCharts(object):
         c14.y_axis.var = ["perc25", "Mean", "perc75", "Median"]
         c14.y_axis.static_filters = []
         c14.y_axis.transformation = "y / 12"
+        c14.y_axis.label = "Age (years)"
 
         fy1 = Filter()
         fy1.name = 'Name2'
