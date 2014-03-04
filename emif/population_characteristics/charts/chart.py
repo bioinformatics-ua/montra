@@ -58,7 +58,7 @@ class Filter(object):
         self.key = None
         self.value = None
         self.values = None
-        self.translation = {}
+        self.translation = None
 
         
     def to_JSON(self):

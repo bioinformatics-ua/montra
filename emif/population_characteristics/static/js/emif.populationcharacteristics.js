@@ -240,6 +240,7 @@ function PCAPI ()
 
     var filtersMap = {};
     var translations = {};
+    var translationsBack = {};
 
     var methods = {
         init : function( options, name, fingerprintId ) {
@@ -266,7 +267,7 @@ function PCAPI ()
               var tmpUl = $('<ul class="nav nav-pills nav-stacked">');
 
               self.append(tmpUl);
-              console.log(xFilter)
+              console.log(xFilter);
               $.each(xFilter.values, function (data){
 
                   if (xFilter.values[data]==="")
@@ -282,17 +283,33 @@ function PCAPI ()
                       filtersMap['values.' + xFilter.name] = [xFilter.values[data]];
                     }*/
 
+
                   var fType = xFilter.name;
-                  if (xFilter['translations'] != {})
+                  if (xFilter.key!= null)
                   {
-                    translations[fType] = {};
-                    //$.each((xFilter['translations']
+                    fType = xFilter.value;
+
+                  }
+                  var originalValue = xFilter.values[data];
+
+                  if (xFilter['translation'] != null)
+                  {
+                    if (xFilter['translation'].hasOwnProperty(originalValue))
+                    {
+                        translations[originalValue] = xFilter['translation'][originalValue];
+                        translationsBack[xFilter['translation'][originalValue]] = originalValue;
+                        originalValue = xFilter['translation'][originalValue];
+                    }
+                    
+
                       
                   }
                   
-                  if (xFilter.key!= null)
-                    fType = xFilter.value;
-                  tmpUl.append('<li><a class="filterBar" id=_'+fType+'_'+xFilter.values[data]+' href="#" onclick="return false;"> '+xFilter.translation[xFilter.values[data]]+'</a></li>')
+                 
+                  tmpUl.append('<li><a class="filterBar" id=_'+fType+'_'+xFilter.values[data]+' href="#" onclick="return false;"> '+originalValue+'</a></li>')
+                    
+                  
+                    
               });
             });
 
@@ -308,11 +325,11 @@ function PCAPI ()
 
                       var str = e.target.id;
                       var filterType =str.substring(str.indexOf("_")+1,str.lastIndexOf("_"));
-                      trans= translations[filterType]['translations'];
+
                       var _value = e.target.innerHTML.trim();
-                      if (trans != {})
+                      if (translationsBack.hasOwnProperty(_value))
                       {
-                          _value = translations[filterType]['translations'][_value];
+                          _value = translationsBack[_value];
                       } 
                       filtersMap['values.'+filterType] = [_value];
                       charDraw.refresh(getFiltersSelected());
