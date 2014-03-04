@@ -31,7 +31,7 @@ function GraphicChartC3D3(divArg, dataArg)
   this.yscale = null ;
   this.self = this;
   this.init = function(){
-    console.log("--GRAPHICS C3D3");
+    // Just init the parameters, if it is really necessary.
   };
 
   this.translateData = function(objects){
@@ -51,7 +51,7 @@ function GraphicChartC3D3(divArg, dataArg)
       {
         actualChart.y_axis['var'].forEach(function(a){
           i = i +1;
-          datasetYs.push(['data'+i]);
+          datasetYs.push([a]);
         });
         datasetX = ['x'];
       }
