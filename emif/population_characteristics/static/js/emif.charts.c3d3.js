@@ -64,7 +64,7 @@ function GraphicChartC3D3(divArg, dataArg)
       {
         if ( row[actualChart.x_axis['var']] != ""){
           datasetX.push(row[actualChart.x_axis['var']]);  
-          datasetY.push(parseInt(row[actualChart.y_axis['var']]));  
+          datasetY.push(parseFloat(row[actualChart.y_axis['var']]));  
         }
         
       }
@@ -73,21 +73,17 @@ function GraphicChartC3D3(divArg, dataArg)
       {
         
         var k = 0;
-        datasetX.push(parseInt(row[actualChart.x_axis['var']]));  
+        datasetX.push(parseFloat(row[actualChart.x_axis['var']]));  
         actualChart.y_axis['var'].forEach(function(a){
-
-          
-
-          datasetYs[k].push(parseInt(row[a.trim()]));  
+          datasetYs[k].push(parseFloat(row[a.trim()]));  
           k = k +1 ;
         });
-        
           
       }
       else
       {
         datasetX.push(parseInt(row[actualChart.x_axis['var']]));
-        datasetY.push(parseInt(row[actualChart.y_axis['var']]));  
+        datasetY.push(parseFloat(row[actualChart.y_axis['var']]));  
       }
       
       

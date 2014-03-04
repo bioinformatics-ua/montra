@@ -201,6 +201,7 @@ class ConfCharts(object):
         c2.x_axis.operation = "unique"
         c2.x_axis.var = "Value2"
         c2.x_axis.categorized = True
+        c2.x_axis.sort_func = "int(k[c1.x_axis.var].split('-')[0])"
 
 
         c2_filters_x = Filter()
@@ -260,6 +261,7 @@ class ConfCharts(object):
         c4.x_axis.operation = "unique"
         c4.x_axis.var = "Value2"
         c4.x_axis.categorized = True
+        c4.x_axis.sort_func = "int(k[c1.x_axis.var].split('-')[0])"
 
 
         c4_filters_x = Filter()
@@ -319,6 +321,7 @@ class ConfCharts(object):
         c3.x_axis.operation = "unique"
         c3.x_axis.var = "Value2"
         c3.x_axis.categorized = True
+        c3.x_axis.sort_func = "int(k[c1.x_axis.var].split('-')[0])"
 
 
         c3_filters_x = Filter()
