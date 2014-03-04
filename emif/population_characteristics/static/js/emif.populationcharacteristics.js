@@ -238,7 +238,8 @@ function PCAPI ()
 
     };
 
-    var filtersMap = {}
+    var filtersMap = {};
+    var translations = {};
 
     var methods = {
         init : function( options, name, fingerprintId ) {
@@ -261,7 +262,7 @@ function PCAPI ()
               var xFilter = JSON.parse(_value);
 
               
-              self.append(xFilter.value+": ");
+              self.append(xFilter.name+": ");
               var tmpUl = $('<ul class="nav nav-pills nav-stacked">');
 
               self.append(tmpUl);
@@ -280,15 +281,22 @@ function PCAPI ()
                       console.log(xFilter.name);
                       filtersMap['values.' + xFilter.name] = [xFilter.values[data]];
                     }*/
+
                   var fType = xFilter.name;
+                  if (xFilter['translations'] != {})
+                  {
+                    translations[fType] = {};
+                    //$.each((xFilter['translations']
+                      
+                  }
+                  
                   if (xFilter.key!= null)
                     fType = xFilter.value;
-                  tmpUl.append('<li><a class="filterBar" id=_'+fType+'_'+xFilter.values[data]+' href="#" onclick="return false;"> '+xFilter.values[data]+'</a></li>')
+                  tmpUl.append('<li><a class="filterBar" id=_'+fType+'_'+xFilter.values[data]+' href="#" onclick="return false;"> '+xFilter.translation[xFilter.values[data]]+'</a></li>')
               });
             });
 
 
-            
             /** The magic of the filters will happen here */ 
             $(".filterBar").bind('click',function(e)
                     { 
@@ -300,9 +308,15 @@ function PCAPI ()
 
                       var str = e.target.id;
                       var filterType =str.substring(str.indexOf("_")+1,str.lastIndexOf("_"));
-
-                      filtersMap['values.'+filterType] = [e.target.innerHTML.trim()];
+                      trans= translations[filterType]['translations'];
+                      var _value = e.target.innerHTML.trim();
+                      if (trans != {})
+                      {
+                          _value = translations[filterType]['translations'][_value];
+                      } 
+                      filtersMap['values.'+filterType] = [_value];
                       charDraw.refresh(getFiltersSelected());
+
 
                       return false;
                     });

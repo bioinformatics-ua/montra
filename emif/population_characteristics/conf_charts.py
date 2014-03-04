@@ -62,6 +62,7 @@ class ConfCharts(object):
         f2.name = 'Gender'
         f2.key = None
         f2.value = 'Gender'
+        f2.translation = {'M': 'Male', 'F': 'Female', 'T': 'Total'}
 
         ss = Scale()
         ss.unit = "Year"
@@ -121,7 +122,7 @@ class ConfCharts(object):
         fy1.value = ''
 
         fy2 = Filter()
-        fy2.name = 'Value2'
+        fy2.name = 'Year'
         fy2.key = 'Value2'
         fy2.value = ''
 
