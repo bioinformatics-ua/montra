@@ -1,3 +1,21 @@
+/*
+ * delayKeyup
+ * http://code.azerti.net/javascript/jquery/delaykeyup.htm
+ * Inspired by CMS in this post : http://stackoverflow.com/questions/1909441/jquery-keyup-delay
+ * Written by Gaten
+ * Exemple : $("#input").delayKeyup(function(){ alert("5 secondes passed from the last event keyup."); }, 5000);
+ */
+(function ($) {
+    $.fn.delayKeyup = function(callback, ms){
+        var timer = 0;
+        $(this).keyup(function(){                   
+            clearTimeout (timer);
+            timer = setTimeout(callback, ms);
+        });
+        return $(this);
+    };
+})(jQuery);
+
 function PaginatorSorter(tableID, fString, selName, selValue){
     this.innerTable = $("#"+tableID);
 
@@ -26,10 +44,19 @@ PaginatorSorter.prototype ={
 			data[fieldType] = value;
 
 		for(filter in this.filters){ 
-			console.log(filter);
-			if(this.filters[filter].val().length >= 2 ){
-				data[filter] = this.filters[filter].val();
-			}
+			try
+			  {
+
+			  	var content = $("#"+filter,this.innerTable);
+					if(content.val().length >= 2 ){
+						data[filter] = content.val();
+					}
+			  }
+			catch(err)
+			 {
+			  	console.log("Found filter that doesnt exist, ignoring.");
+			 }
+
 		}
 
 		var json = "{"
@@ -70,15 +97,18 @@ PaginatorSorter.prototype ={
   				if(data.Hits != undefined && data.Hits > 0){ 			
 			        context.updateForm(json);
 			      
-			        for(filter in context.filters){ 	
+			        /*for(filter in context.filters){ 	
 						if(context.filters[filter].val().length > 0 ){
 							var x = $("#"+filter+"_grp");
 							x.removeClass("error");
 						}
-					}
+					}*/
 
 				  context.submit();
   				}else{
+  					$("#table_content").html('<td colspan="9999"><center>No results to show</center></td>');
+  					$(".pagination").html('<td colspan="9999"><center>No results to show</center></td>');
+/*
   					for(filter in context.filters){ 	
 						if(context.filters[filter].val().length > 0 ){
 							var x = $("#"+filter+"_grp");
@@ -86,6 +116,8 @@ PaginatorSorter.prototype ={
             				x.addClass("error");
 						}
 					}
+					*/
+
   				}
   			}
 		});
@@ -97,12 +129,11 @@ PaginatorSorter.prototype ={
 
 		var context = this;
 
-		this.filters["database_name_filter"].keyup( $.debounce( 1000, function(){
-				context.onClick(context.selName, context.selValue);
-			}));
-    	this.filters["last_update_filter"].keyup( $.debounce( 1000, function(){
-				context.onClick(context.selName, context.selValue);
-			}));
+		this.filters["database_name_filter"].delayKeyup(function(){ context.onClick(context.selName, context.selValue); }, 500);
+
+
+    	this.filters["last_update_filter"].delayKeyup(function(){ context.onClick(context.selName, context.selValue); }, 500);
+
     	this.filters["type_filter"].change(function(){
 				context.onClick(context.selName, context.selValue);
 			});

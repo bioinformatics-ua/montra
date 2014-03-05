@@ -60,7 +60,6 @@
 
 {% block content %}
 
-
 {% if isAdvanced %}
 <div id="bool_container"></div>
 {% endif %}
@@ -90,50 +89,40 @@
     {% if page_obj != None %}
     <form id="result_form" action="resultscomp" method="POST">
   {% csrf_token %}
-<table class="table table-hover fingerprint_table table-striped" id="table_databases" data-provides="rowlink">
+<table class="table table-bordered table-hover fingerprint_table table-striped" id="table_databases" data-provides="rowlink">
     <thead>
         <tr>
-             <th class="sorter"  onclick="a.onClick('database_name', '{{sort_params.database_name.next}}');">Name
+            <th class="sorter {%if "icon-minus" not in sort_params.database_name.icon %}selected-sorter{% endif %}"  onclick="a.onClick('database_name', '{{sort_params.database_name.next}}');">Name
                  <div class="pull-right"><i class="{{sort_params.database_name.icon}}"></i></div>
             </th>
-            <th class="sorter" onclick="a.onClick('last_update', '{{sort_params.last_update.next}}');">Last update
+            <!--<th>Creation Date</th>-->
+            <th class="sorter {%if "icon-minus" not in sort_params.last_update.icon %}selected-sorter{% endif %}" onclick="a.onClick('last_update', '{{sort_params.last_update.next}}');">Last update
                 <div class="pull-right"><i class="{{sort_params.last_update.icon}}"></i></div> 
             </th>
-            <th class="sorter" onclick="a.onClick('type', '{{sort_params.type.next}}');">Type
+            <th class="sorter {%if "icon-minus" not in sort_params.type.icon %}selected-sorter{% endif %}" style="width: 200px;" onclick="a.onClick('type', '{{sort_params.type.next}}');">Type
               <div class="pull-right"><i class="{{sort_params.type.icon}}"></i></div> 
             </th>
             <th class="sorter-false filter-false">Select</th>
 
         </tr>
-        <th>
-            <div id="database_name_filter_grp" class="control-group input-append">
-              <div class="controls">
-                <input class="span4" id="database_name_filter" type="text" value="{{sort_params.database_name.filter}}" placeholder="Filter">
-              </div>                
-            </div>
-          </th>
-           <th>
-            <div id="last_update_filter_grp" class="control-group input-append">
-              <div class="controls">
-                 <input class="span2" id="last_update_filter" type="text" value="{{sort_params.last_update.filter}}" placeholder="Filter">
-              </div>
-              </div>
-          </th>
-           <th>
-           <div id="type_filter_grp" class="control-group input-append">
-              <div class="controls">             
-              <select id="type_filter" def_value="{{sort_params.type.filter}}">
+        <tr>
+          <td class="table_filter">
+                <input class="filter_input" id="database_name_filter" type="text" value="{{sort_params.database_name.filter}}" placeholder="Filter">
+          </td>
+           <td class="table_filter">
+                 <input class="filter_input" id="last_update_filter" type="text" value="{{sort_params.last_update.filter}}" placeholder="Filter">
+          </td>
+           <td class="table_filter">
+              <select id="type_filter" class="selectpicker" def_value="{{sort_params.type.filter}}">
                 <option value="">None</option>
                 <option value="adcohort">AD Cohort</option>
                 <option value="observationaldatasources">Observational Data Sources</option>
               </select>
-              </div>
-              </div>
-          </th>
-          <th></th>
+          </td>
+          <td style="width:50px;" class="table_filter"></td>
         </tr>
     </thead>
-    <tbody>
+    <tbody id="table_content">
 
   {% for t in page_obj %}
    <tr>          
@@ -161,7 +150,7 @@
           <td class="type">{{ t.type_name }} </td>
           
         
-          <td> <input class="checkbox" type="checkbox" name="chk_{{ t.id }}"></td>
+          <td style="text-align:center"> <input class="checkbox" type="checkbox" name="chk_{{ t.id }}"></td>
 
           
         </tr>
