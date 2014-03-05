@@ -2734,10 +2734,16 @@ def show_fingerprint_page(request, runinfo, errors={}, template_name='database_e
     return r
 
 
-def create_auth_token(request, page=1, templateName='api-key.html'):
+def create_auth_token(request, page=1, templateName='api-key.html', force=False):
     """
     Method to create token to authenticate when calls REST API
     """
+    rows = 5
+    if request.POST and not force:
+        page = request.POST["page"]
+
+    if page == None:
+        page = 1   
 
     user = request.user
     if not Token.objects.filter(user=user).exists():
@@ -2745,14 +2751,21 @@ def create_auth_token(request, page=1, templateName='api-key.html'):
     else:
         token = Token.objects.get(user=user)
 
-    # print token
+    _filter = "user_t:" + user.username
 
-    list_databases = get_databases_from_solr(request, "user_t:" + user.username)
-    # for database in list_databases:
-    #     print database.id
+    (sortString, filterString, sort_params, range) = paginator_process_params(request.POST, page, rows)    
+        
+    sort_params["base_filter"] = _filter;
 
-     ## Paginator ##
-    rows = 5
+    if len(filterString) > 0:
+        _filter += " AND " + filterString
+
+    (list_databases,hits) = get_databases_from_solr_v2(request, _filter, sort=sortString, rows=rows, start=range)
+    if range > hits and force < 2:
+        return create_auth_token(request, page=1, force=True)  
+
+    list_databases = paginator_process_list(list_databases, hits, range) 
+    
     myPaginator = Paginator(list_databases, rows)
     try:
         pager =  myPaginator.page(page)
@@ -2761,7 +2774,7 @@ def create_auth_token(request, page=1, templateName='api-key.html'):
     ## End Paginator ##
 
     return render_to_response(templateName, {'list_databases': list_databases, 'token': token, 'user': user,
-                              'request': request, 'breadcrumb': True, 'page_obj': pager}, RequestContext(request))
+                              'request': request, 'breadcrumb': True, 'page_obj': pager, "sort_params": sort_params, "page":page}, RequestContext(request))
 
 
 def sharedb(request, db_id, template_name="sharedb.html"):
