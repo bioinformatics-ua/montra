@@ -1242,7 +1242,7 @@ def paginator_process_params(request, page, rows):
     sortFieldsLookup["type"] = "type_name_sort"
 
     filterFieldsLookup = {}
-    filterFieldsLookup["database_name_filter"] = "database_name_t"
+    filterFieldsLookup["database_name_filter"] = "database_name_sort"
     filterFieldsLookup["last_update_filter"] = ""
     filterFieldsLookup["type_filter"] = "type_t"
 
@@ -1266,7 +1266,9 @@ def paginator_process_params(request, page, rows):
             if x == "last_update_filter":
                 filterString += "(created_t:\""+mode[x] + "\" OR date_last_modification_t:\""+mode[x] + "\") AND "
             elif x== "database_name_filter":
-                filterString += "({!prefix f="+filterFieldsLookup[x]+"}"+mode[x].lower()+") AND "
+                p = re.compile("([^a-z])")
+                str2 = re.sub(p, "", mode[x].lower())
+                filterString += "({!prefix f="+filterFieldsLookup[x]+"}"+str2+") AND "
             else:
                 filterString += filterFieldsLookup[x]+":'"+mode[x] +"' AND "
             if x[:-7] not in sort_params:
