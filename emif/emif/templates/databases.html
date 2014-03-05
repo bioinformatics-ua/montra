@@ -35,8 +35,6 @@ button {
 
 
 {% block scriptextraincludes %}
-<script src="{{ STATIC_URL }}js/vendor/jquery.tablesorter.min.js"></script>
-<script src="{{ STATIC_URL }}js/vendor/jquery.tablesorter.widgets.min.js"></script>
 <script src="{{ STATIC_URL }}js/emif.databases.js"></script>
 {% endblock %}
 
@@ -45,14 +43,20 @@ button {
 {% block content %}
 
 {% if list_databases %}
-<table class="table table-hover tablesorter" id="table_databases" data-provides="rowlink">
+<table class="table table-hover fingerprint_table table-striped" id="table_databases" data-provides="rowlink">
     <thead>
         <tr>
             <!--<th class="sorter-false filter-false"></th>-->
-            <th>Name</th>
+            <th class="sorter" onclick="window.location.search='{{sort_params.database_name.click_url}}'">Name
+                 <div class="pull-right"><i class="{{sort_params.database_name.icon}}"></i></div> 
+            </th>
             <!--<th>Creation Date</th>-->
-            <th>Last update</th>
-            <th>Type</th>
+            <th class="sorter" onclick="window.location.search='{{sort_params.last_update.click_url}}'">Last update
+                <div class="pull-right"><i class="{{sort_params.last_update.icon}}"></i></div> 
+            </th>
+            <th class="sorter" onclick="window.location.search='{{sort_params.type.click_url}}'">Type
+              <div class="pull-right"><i class="{{sort_params.type.icon}}"></i></div> 
+            </th>
             {% comment %}
             <th class="sorter-false filter-false">Modify</th>
             {% endcomment %}
@@ -83,14 +87,14 @@ button {
                  {{ t.date }}
         -->
           </td>
-          <td style="min-width: 120px;">
+          <td class="date">
                 {% if t.last_activity %}
                     {{t.last_activity|datehhmm}}
                 {% else %}
                     {{ t.date }}
                 {% endif %}
           </td>
-          <td>{{ t.type_name }} </td>
+          <td class="type">{{ t.type_name }} </td>
           {% comment %}
           <td style="width:100px">
 

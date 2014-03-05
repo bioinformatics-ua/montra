@@ -74,6 +74,7 @@ function valchanged(qnum, value, self) {
         // We have to get the question
         var the_question = $('#question_'+clean.split('_')[0].replace(/(\.)/g,'')).text().trim(); 
         if(value==true){
+
             //console.log(qnum);
             //console.log(clean.replace('_','. ')+' ('+the_question+')');
             //console.log(value);
@@ -90,7 +91,7 @@ function valchanged(qnum, value, self) {
             bool_container.splice('question_nr_'+dirty.substring(0,index)+"_____"+clean+"_____",
                                 clean.replace('_','. ')+' ('+the_question+')'
                                , dirty.substring(index+1,dirty.length));
-        } else {            
+        } else {       
             if( value != 'yes' && value != 'no' && value != 'dontknow ')
             bool_container.pushWithDelegate('question_nr_'+clean, clean.replace('_','')+'. '+the_question+'', value, 'clear_selection("question_nr_'+clean+'", " ");');   
                         

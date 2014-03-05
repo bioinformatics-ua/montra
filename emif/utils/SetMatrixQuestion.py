@@ -16,8 +16,7 @@ def create_question(qset):
 	q = getQuestionObj(qset.id)
 	q.questionset = qset
 	q.number = desiredQN
-	# PLEASE HELP!!! CANT SET THE TEXT FIELD WHY!!	
-	#q.text = "h2. Specify any other scales"	
+	q.text_en = "h2. Specify any other scales"	
 	q.type = "open-textfield"
 	q.help_text = "Specify each scale in a separate line. Try to follow the above questions when possible.<br>Example.  Collected, Version Cummings et al., 1994, Subgroup, Items score available."
 	q.slug = "neuropsychiatric_scales_other"

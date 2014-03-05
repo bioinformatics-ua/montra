@@ -18,8 +18,6 @@
 
 {% block scriptextraincludes %}
 
-<script src="static/js/vendor/jquery.tablesorter.min.js"></script>
-<script src="static/js/vendor/jquery.tablesorter.widgets.js"></script>
 <script src="static/js/emif.paginator.js"></script>
 
 {% endblock %}
@@ -45,14 +43,23 @@ button {
 {% block content %}
 
 {% if list_databases %}
-<table class="table table-hover tablesorter" id="table_databases" data-provides="rowlink">
+<table class="table table-hover fingerprint_table table-striped" id="table_databases" data-provides="rowlink">
     <thead>
         <tr>
             <!--<th class="sorter-false filter-false"></th>-->
-            <th>Name</th>
+            <th class="sorter" onclick="window.location.search='{{sort_params.database_name.click_url}}'">Name
+                 <div class="pull-right"><i class="{{sort_params.database_name.icon}}"></i></div> 
+            </th>
             <!--<th>Creation Date</th>-->
-            <th>Last update</th>
-            <th>Type</th>
+            <th class="sorter" onclick="window.location.search='{{sort_params.last_update.click_url}}'">Last update
+                <div class="pull-right"><i class="{{sort_params.last_update.icon}}"></i></div> 
+            </th>
+            <th class="sorter" onclick="window.location.search='{{sort_params.type.click_url}}'">Type
+              <div class="pull-right"><i class="{{sort_params.type.icon}}"></i></div> 
+            </th>
+            {% comment %}
+            <th class="sorter-false filter-false">Modify</th>
+            {% endcomment %}
 
         </tr>
     </thead>
@@ -80,14 +87,14 @@ button {
                  {{ t.date }}
 
           </td>-->
-          <td style="min-width: 120px;">            
+          <td class="date">            
                 {% if t.last_activity %}
                     {{t.last_activity|datehhmm}}
                 {% else %}
                     {{ t.date }}
                 {% endif %}
           </td>
-          <td>{{ t.type_name }} </td>
+          <td class="type">{{ t.type_name }} </td>
           
         </tr>
 
@@ -141,25 +148,6 @@ button {
 {% comment %}
 <script>
 {% endcomment %}
-
-$(function() {
-
-  // call the tablesorter plugin
-  $("table").tablesorter({
-    theme : 'blue',
-
-    // sort on the first column and third column in ascending order
-    sortList: [[0,0],[2,0]],
-
-    // hidden filter input/selects will resize the columns, so try to minimize the change
-    widthFixed : true,
-
-    // initialize zebra striping and filter widgets
-    widgets: ["zebra", "filter"]
-
-  });
-
-});
 
 $(document).ready(function(){
     $('a[href="#"]').attr('href', function(i, val){

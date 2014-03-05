@@ -106,17 +106,18 @@ class CoreEngine:
         """
         self.solr.delete(id=id_doc)
 
-    def search_fingerprint(self, query, start=0, rows=100, fl=''):
+    def search_fingerprint(self, query, start=0, rows=100, fl='', sort=''):
         """search the fingerprint
         """
         # Later, searching is easy. In the simple case, just a plain Lucene-style
         # query is fine.
+
         results = self.solr.search(query,**{
                 'rows': rows,
                 'start': start,
-                'fl': fl
-            })
-
+                'fl': fl,
+                'sort': sort
+                })
         return results
 
     def more_like_this(self, id_doc):

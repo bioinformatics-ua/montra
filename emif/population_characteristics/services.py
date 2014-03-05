@@ -133,7 +133,10 @@ class PopulationCharacteristic(object):
                     print "bastard x error %s, %s " % (c1.y_axis.var, str(v[u'values']))
             results.append(v[u'values'])
 
-        #print results
+        vorder = c1.x_axis.var
+        if c1.x_axis.sort_func!=None:
+            vorder = c1.x_axis.var
+            results = sorted(results, key=lambda k: eval(c1.x_axis.sort_func))
         return results
 
     def get_variables_filter(self, gender=None, name1=None, value1=None, name2=None,

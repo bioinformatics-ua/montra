@@ -47,7 +47,10 @@ function PCDraw(actualChart,chartType, e)
         valuesFromGraph = PC.getValuesRowWithFilters(this.actualChart.title.fixed_title, 
           this.actualChart.y_axis['var'],fingerprintID, filters );
       }
-      
+      var valueFilters = "";
+      $.each(filters, function (data){
+        valueFilters += " , " +filters[data];
+      });
       /*valuesFromGraph = PC.getValuesRow(this.chartType, 
         'Count',fingerprintID );*/
     
@@ -62,7 +65,7 @@ function PCDraw(actualChart,chartType, e)
       
       
 
-      $("#pctitle").html("<h2>"+ this.chartType +"</h2>");
+      $("#pctitle").html("<h2>"+ this.actualChart.title.fixed_title + valueFilters +"</h2>");
       if (this.e != null ) 
       {
           if ($(this.e.target.firstChild).hasClass('icon-ok')) 
@@ -78,7 +81,7 @@ function PCDraw(actualChart,chartType, e)
     };
 
     this.refresh = function(filters) {
-
+        
         this.draw(filters);
     };
 

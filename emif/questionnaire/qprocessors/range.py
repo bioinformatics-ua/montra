@@ -20,6 +20,7 @@ def question_range(request, question):
         'rstep' : rstep,
         'runit' : runit,
         'current' : current,
+        'hasValue': current!="",
         'jsinclude' : [settings.STATIC_URL+'range.js']
     }
 
