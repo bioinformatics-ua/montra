@@ -137,33 +137,56 @@ th, td {
 
 $("#collapseall").bind('click',function(e)
         { 
-          e.preventDefault(); 
-          e.stopPropagation();
+          //e.preventDefault(); 
+          //e.stopPropagation();
           
-          if ($(this).text().indexOf('Collapse')!==-1)
-          {
-            $(this).text('Expand all');
-            change_name_collapse(false);
-          }
-          else
-          {
-              $(this).text('Collapse all');
-              change_name_collapse(true);
-          }
+          collapse_expand(this);
             
           return false;
         });
 
+function collapse_expand(context){
+          if ($(context).text().indexOf('Collapse')!==-1)
+          {
+            $(context).text('Expand all');
+            //change_name_collapse(false);
+
+            $(".collapse:visible").collapse("hide");
+
+          }
+          else
+          {
+              $(context).text('Collapse all');
+              //change_name_collapse(true);
+              $(".collapse:visible").collapse("show");
+          }  
+}
+function doublecheck_expansions(context){
+          /*context = $("#collapseall");
+
+          if ($(context).text().indexOf('Collapse')!==-1)
+          {
+              $(".collapse:visible").collapse("show"); 
+          }
+          else
+          {
+              $(".collapse:visible").collapse("hide");
+          }  */
+}
 var match=false;
 $("#match").bind('click',function(e)
 { 
 
           e.preventDefault(); 
           e.stopPropagation();
+
+      doublecheck_expansions();
+
+
           {% for name, qset in results %}
             {% for k,v in qset.items %}
 
-            show_hide_match(['{{name|removespaces}}_{{k|removespaces}}'], match);
+            show_hide_match(['{{name|removespaces}}_{{k|removespaces}}'], match, $("#searchfilter").val());
           {% endfor %}
           {% endfor %}
           match = !match ;
@@ -178,37 +201,6 @@ $("#match").bind('click',function(e)
           }
           return false;
 });
-/*
- * delayKeyup
- * http://code.azerti.net/javascript/jquery/delaykeyup.htm
- * Inspired by CMS in this post : http://stackoverflow.com/questions/1909441/jquery-keyup-delay
- * Written by Gaten
- * Exemple : $("#input").delayKeyup(function(){ alert("5 secondes passed from the last event keyup."); }, 5000);
- */
-(function ($) {
-    $.fn.delayKeyup = function(callback, ms){
-        var timer = 0;
-        $(this).keyup(function(e){
-            e.preventDefault(); 
-            e.stopPropagation();  
-                             
-            clearTimeout (timer);
-            timer = setTimeout(callback, ms);
-        });
-        return $(this);
-    };
-})(jQuery);
-
-$("#searchfilter").delayKeyup(
-    function(){ 
-        {% for name, qset in results %}
-          {% for k,v in qset.items %}
-            filter_word(['{{name|removespaces}}_{{k|removespaces}}'], $("#searchfilter").val());
-          {% endfor %}
-        {% endfor %}
-        return false;
-      }
-  , 200);
 
 var unmatch=false;
 $("#unmatch").bind('click',function(e)
@@ -216,6 +208,9 @@ $("#unmatch").bind('click',function(e)
 
           e.preventDefault(); 
           e.stopPropagation();
+
+      doublecheck_expansions();
+
           {% for name, qset in results %}
             {% for k,v in qset.items %}
 
@@ -240,6 +235,10 @@ $("#emptyrows").bind('click',function(e)
 
           e.preventDefault(); 
           e.stopPropagation();
+
+      doublecheck_expansions();
+
+
           {% for name, qset in results %}
             {% for k,v in qset.items %}
 
@@ -267,6 +266,9 @@ $("#proximity").bind('click',function(e)
 
           e.preventDefault(); 
           e.stopPropagation();
+
+      doublecheck_expansions();
+
           {% for name, qset in results %}
             {% for k,v in qset.items %}
 
@@ -286,15 +288,9 @@ $("#proximity").bind('click',function(e)
           return false;
 });
 
-
-
-
-
-
 function change_name_collapse(value)
 {
 
-  
     {% for name, qset in results %}
       {% for k,v in qset.items %}
 
@@ -325,6 +321,43 @@ function change_name_collapse(value)
       {% endfor %}
       return false;
 };
+
+/*
+ * delayKeyup
+ * http://code.azerti.net/javascript/jquery/delaykeyup.htm
+ * Inspired by CMS in this post : http://stackoverflow.com/questions/1909441/jquery-keyup-delay
+ * Written by Gaten
+ * Exemple : $("#input").delayKeyup(function(){ alert("5 secondes passed from the last event keyup."); }, 5000);
+ */
+(function ($) {
+    $.fn.delayKeyup = function(callback, ms){
+        var timer = 0;
+        $(this).keyup(function(e){
+            e.preventDefault(); 
+            e.stopPropagation();  
+
+            clearTimeout (timer);
+            timer = setTimeout(callback, ms);
+        });
+        return $(this);
+    };
+})(jQuery);
+
+$("#searchfilter").delayKeyup(
+    function(){
+      doublecheck_expansions();
+      var filter = $("#searchfilter").val();
+        {% for name, qset in results %}
+          {% for k,v in qset.items %}
+
+            filter_word(['{{name|removespaces}}_{{k|removespaces}}'], filter);
+
+          {% endfor %}
+        {% endfor %}
+        return false;
+      }
+  , 200);
+
 
 function hidecheckbox()
 {
