@@ -14,15 +14,15 @@
         });
         return $(this);
     };
-})(jQuery);
+})(jQuery);                   
 
 function PaginatorSorter(tableID, fString, selName, selValue){
     this.innerTable = $("#"+tableID);
 
     this.filters = [];
-    this.filters["database_name_filter"] = $("#database_name_filter",this.innerTable);
-    this.filters["last_update_filter"] = $("#last_update_filter",this.innerTable);
-    this.filters["type_filter"] = $("#type_filter",this.innerTable);
+    this.filters.push("database_name_filter");// = $("#database_name_filter",this.innerTable);
+    this.filters.push("last_update_filter");// = $("#last_update_filter",this.innerTable);
+    this.filters.push("type_filter");// = $("#type_filter",this.innerTable);
 
     this.selName = selName;
     this.selValue = selValue;
@@ -36,39 +36,30 @@ function PaginatorSorter(tableID, fString, selName, selValue){
 }
 PaginatorSorter.prototype ={
 	getQueryString : function(fieldType, value){
-		var data = [];
-		
-		if(fieldType == undefined)
-			data[this.selName] = this.selValue;
-		else 
-			data[fieldType] = value;
+		var json = "{";
 
-		for(filter in this.filters){ 
+		if(fieldType == undefined)
+			json += '"'+this.selName+'": "'+this.selValue+'"';
+		else 
+			json += '"'+fieldType+'": "'+value+'"';
+
+
+		for(var i=0;i<this.filters.length;i++){// in this.filters){ 
 			try
 			  {
-
-			  	var content = $("#"+filter,this.innerTable);
-					if(content.val().length >= 2 ){
-						data[filter] = content.val();
-					}
-			  }
+			  	var content = $("#"+this.filters[i],this.innerTable);
+					json += ',"'+this.filters[i]+'": "'+content.val()+'"';
+			}		 
 			catch(err)
 			 {
 			  	console.log("Found filter that doesnt exist, ignoring.");
 			 }
 
 		}
-
-		var json = "{"
-		first = true
-		for(v in data){
-			if(!first)
-				json += ", "
-			json += '"'+v+'": "'+data[v]+'"';
-			first = false;
-		}
 		json += "}";
-		//console.log(json);
+		
+		console.log(json);
+		
 		return json;
 	},
 	onClick : function(fieldType, value){
@@ -86,12 +77,11 @@ PaginatorSorter.prototype ={
 		}
 		
 		var f = this.fString;
-		
 		$.ajax({
 			type: "POST",
   			dataType: "json",
   			url: "query/"+page,
-  			data: {"filter": f, "s":json},
+  			data: {'csrfmiddlewaretoken': $.cookie('csrftoken'), "filter": f, "s":json},
   			success: function(data){	
   				//console.log(data);
   				if(data.Hits != undefined && data.Hits > 0){ 			
@@ -103,11 +93,12 @@ PaginatorSorter.prototype ={
 							x.removeClass("error");
 						}
 					}*/
-
-				  context.submit();
+				  console.log('SUCCESS');
+				  context.submitthis();
   				}else{
   					$("#table_content").html('<td colspan="9999"><center>No results to show</center></td>');
   					$(".pagination").html('<td colspan="9999"><center>No results to show</center></td>');
+  					console.log('NOTSUCCESS');
 /*
   					for(filter in context.filters){ 	
 						if(context.filters[filter].val().length > 0 ){
@@ -123,26 +114,32 @@ PaginatorSorter.prototype ={
 		});
 	} ,
 	bind : function(){
-		var value = this.filters["type_filter"].attr("def_value");
 
-		$("option[value="+value+"]", this.filters["type_filter"]).attr("selected", "yes");
+		var value = $("#type_filter",this.innerTable).attr("def_value");
+
+		$("option[value="+value+"]", $("#type_filter",this.innerTable)).attr("selected", "yes");
 
 		var context = this;
 
-		this.filters["database_name_filter"].delayKeyup(function(){ context.onClick(context.selName, context.selValue); }, 500);
+		$("#database_name_filter",this.innerTable).delayKeyup(function(){ context.onClick(context.selName, context.selValue); }, 500);
 
 
-    	this.filters["last_update_filter"].delayKeyup(function(){ context.onClick(context.selName, context.selValue); }, 500);
+    	$("#last_update_filter",this.innerTable).delayKeyup(function(){ context.onClick(context.selName, context.selValue); }, 500);
 
-    	this.filters["type_filter"].change(function(){
+    	$("#type_filter",this.innerTable).change(function(){
 				context.onClick(context.selName, context.selValue);
 			});
 	}, 
 	updateForm : function(json){
-		$("#s", this.form).val(json);
+		$("#s", $("#send2")).val(json);
 	}, 
-	submit : function(json){
-		this.form.submit();
+	submitthis : function(){
+
+		//this.form.submit();
+		//$("#send2").submit();
+		$("#send2").trigger('submit');
+		//$("#submit_simulate").click();
+		
 	}
 }
 
