@@ -39,19 +39,25 @@ EMIF Platform - Fingerprint Browser
         python manage.py loaddata emif\fixtures\emif_questionary_1.yaml
         python manage.py runserver
 
-6. Run Apache-solr as service
+6. Configure Apache-solr
+
+
+        Go to folder /conf/solr/ and copy all the files to the solr default core configuration
+        
+        
+7. Run Apache-solr as service
 
 
         Go to solr folder and Run
         (path).../apache-solr-4.0.0/example>java -jar start.jar
 
-6. Run MongoDB as service
+8. Run MongoDB as service
 
 
         Install MongoDB or go to the bin directory of mongodb:
         mongod --dbpath /your/path/that/you/want
 
-7. Open browser and write
+9. Open browser and write
 
 
         localhost:8000

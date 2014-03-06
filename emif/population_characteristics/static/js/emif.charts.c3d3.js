@@ -31,7 +31,7 @@ function GraphicChartC3D3(divArg, dataArg)
   this.yscale = null ;
   this.self = this;
   this.init = function(){
-    console.log("--GRAPHICS C3D3");
+    // Just init the parameters, if it is really necessary.
   };
 
   this.translateData = function(objects){
@@ -41,7 +41,7 @@ function GraphicChartC3D3(divArg, dataArg)
     xscale = {'bins':5}
     xscale.bins = 25;
     var i = 1;
-    datasetY = ['data1'];
+    datasetY = [actualChart.title['var']];
     datasetX = ['x'];
     
     datasetYs = [];
@@ -51,7 +51,7 @@ function GraphicChartC3D3(divArg, dataArg)
       {
         actualChart.y_axis['var'].forEach(function(a){
           i = i +1;
-          datasetYs.push(['data'+i]);
+          datasetYs.push([a]);
         });
         datasetX = ['x'];
       }
@@ -64,7 +64,7 @@ function GraphicChartC3D3(divArg, dataArg)
       {
         if ( row[actualChart.x_axis['var']] != ""){
           datasetX.push(row[actualChart.x_axis['var']]);  
-          datasetY.push(parseInt(row[actualChart.y_axis['var']]));  
+          datasetY.push(parseFloat(row[actualChart.y_axis['var']]));  
         }
         
       }
@@ -73,21 +73,17 @@ function GraphicChartC3D3(divArg, dataArg)
       {
         
         var k = 0;
-        datasetX.push(parseInt(row[actualChart.x_axis['var']]));  
+        datasetX.push(parseFloat(row[actualChart.x_axis['var']]));  
         actualChart.y_axis['var'].forEach(function(a){
-
-          
-
-          datasetYs[k].push(parseInt(row[a.trim()]));  
+          datasetYs[k].push(parseFloat(row[a.trim()]));  
           k = k +1 ;
         });
-        
           
       }
       else
       {
         datasetX.push(parseInt(row[actualChart.x_axis['var']]));
-        datasetY.push(parseInt(row[actualChart.y_axis['var']]));  
+        datasetY.push(parseFloat(row[actualChart.y_axis['var']]));  
       }
       
       
@@ -96,7 +92,7 @@ function GraphicChartC3D3(divArg, dataArg)
   };
 
   this.draw = function(div, dataset){
-    
+    var tmpValue = actualChart.title['var'];
     var chartConfigs = {
          padding: {
         left: 100,
@@ -113,7 +109,7 @@ function GraphicChartC3D3(divArg, dataArg)
 
           ],
           types: {
-            data1: 'bar',
+           // data1: 'bar',
             
           },
           
@@ -129,6 +125,7 @@ function GraphicChartC3D3(divArg, dataArg)
         }
         
       };
+    chartConfigs.data.types[tmpValue] = 'bar';
     if (actualChart.x_axis.categorized)
     {
         var arr2 = datasetX.slice(0);
