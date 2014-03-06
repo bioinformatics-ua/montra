@@ -90,7 +90,11 @@ th, td {
     <td class="database_listing" style="min-width: 500px;">
     <div {% if forloop.first%}style="margin-left: 0px;"{% endif %}>
       <span style="cursor: pointer;" class="pull-left label label-inverse">{{name}}</span>
-      <span onclick="alert('set reference to {{name}}');" class="set_reference pull-right label label-info">Set as reference table</span>
+      {%if database_to_compare|removespaces in name|removespaces %}
+      <span class="set_reference pull-right label label-info">Using as reference table</span>
+      {% else %}
+       <span class="set_reference pull-right label label-success">Set as reference</span>     
+      {% endif %}
       <br />
 
       {% for k,v in qset.items %}
@@ -190,7 +194,6 @@ function check_empties(){
 function reset_empties(){
   $('#database_listings').show();
   $('#no_results').hide();
-  
     
 }
 var match=true;
@@ -204,9 +207,7 @@ function applyFilters(){
   var filter_string = $("#searchfilter").val();
           {% for name, qset in results %}
             {% for k,v in qset.items %}
-
-            filter_results(['{{name|removespaces}}_{{k|removespaces}}'], 
-                            filter_string, match, unmatch, emptyrows, proximity);
+            filter_results(['{{name|removespaces}}_{{k|removespaces}}'],filter_string, match, unmatch, emptyrows, proximity);
           {% endfor %}
           {% endfor %}  
 
@@ -425,23 +426,27 @@ $(function() {
       return $(this).tooltip({container:"body"});
     }
   });
+  $('[id^="{{database_to_compare|removespaces}}"] td').addClass("basetable");
+
 });
+var databases = [];
+
+function compareDatabases(){
+  {% for name, qset in results %}
+
+  {% if not forloop.first %}
+  {% for k,v in qset.items %}
+
+  tablediffall_two('{{database_to_compare|removespaces}}_{{k|removespaces}}', ['{{name|removespaces}}_{{k|removespaces}}']);
+
+  {% endfor %}
+  {% endif %}
 
 
-{% for name, qset in results %}
+  {% endfor %}  
+}
 
-{% if not forloop.first %}
-{% for k,v in qset.items %}
-/*
-tablediffall_two('{{database_to_compare|removespaces}}_{{k|removespaces}}',['{{name|removespaces}}_{{k|removespaces}}'] )
-*/
-tablediffall_two('{{database_to_compare|removespaces}}_{{k|removespaces}}', ['{{name|removespaces}}_{{k|removespaces}}'])
-
-{% endfor %}
-{% endif %}
-
-
-{% endfor %}
+compareDatabases();
 
 {% comment %}
 </script>

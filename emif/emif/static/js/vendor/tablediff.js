@@ -315,28 +315,6 @@ cleantablediff = function(list_tables)
 
 };
 
-function show_hide_match(list_tables, show, word)
-{
-
-	$(list_tables).each(function(table_tmp)
-	{
-		$('#' + list_tables[table_tmp]).parent().parent().parent().show();
-
-		if (show)
-		{
-			$('#' + list_tables[table_tmp] + ' .success').show();	
-			hideTableCell(list_tables, table_tmp, word);
-
-		}
-		else
-		{
-			$('#' + list_tables[table_tmp] + ' .success').hide();	
-		}
-
-		hide_uncessary_qs(list_tables, table_tmp);
-
-	});
-};
 function hide_uncessary_qs(list_tables, table_tmp){
 	var visibles_left = $('#' + list_tables[table_tmp] + ' tr:visible').length;
 
@@ -345,81 +323,7 @@ function hide_uncessary_qs(list_tables, table_tmp){
 		$('#' + list_tables[table_tmp]).parent().parent().parent().hide();
 	}
 }
-function show_hide_unmatch(list_tables, show, word)
-{
-	$(list_tables).each(function(table_tmp)
-	{	
-		$('#' + list_tables[table_tmp]).parent().parent().parent().show();
-		
 
-		if (show)
-		{
-			$('#' + list_tables[table_tmp] + ' .error').show();	
-			hideTableCell(list_tables, table_tmp, word);
-		}
-		else
-		{
-			$('#' + list_tables[table_tmp] + ' .error').hide();	
-		}
-
-		hide_uncessary_qs(list_tables, table_tmp);
-
-	});
-};
-
-function show_hide_proximity(list_tables, show, word)
-{
-	$(list_tables).each(function(table_tmp)
-	{
-		$('#' + list_tables[table_tmp]).parent().parent().parent().show();
-
-		if (show)
-		{
-			$('#' + list_tables[table_tmp] + ' .warning').show();	
-			hideTableCell(list_tables, table_tmp, word);
-
-		}
-		else
-		{
-			$('#' + list_tables[table_tmp] + ' .warning').hide();	
-		}
-
-		hide_uncessary_qs(list_tables, table_tmp);
-
-	});
-};
-
-function show_hide_empty_rows(list_tables, show, word)
-{
-	$(list_tables).each(function(table_tmp)
-	{	
-		$('#' + list_tables[table_tmp]).parent().parent().parent().show();
-
-		//console.log(list_tables[table_tmp]);
-		$("#" + list_tables[table_tmp]+" tr").each(function() {        
-		    var cell = $.trim($($(this).find('td')[1]).text());
-		    //console.log(cell);
-		    if (cell.length == 0){
-		        //console.log('empty');
-		        //$(this).addClass('nodisplay');
-		        if (show)
-		        {
-		        	$(this).closest('tr').show();
-		        	hideTableCell(list_tables, table_tmp, word);
-
-		        }
-		        else
-		        {
-		        	$(this).closest('tr').hide();	
-		        }
-
-		    }                   
-		});
-
-		hide_uncessary_qs(list_tables, table_tmp);
-
-	});
-};
 function hideTableCell(list_tables, table_tmp, word){
 	$("#" + list_tables[table_tmp]+" tr").each(function() {        
 		    var cell = $.trim($($(this).find('td')[0]).text()).toLowerCase();
@@ -431,17 +335,6 @@ function hideTableCell(list_tables, table_tmp, word){
 		                       
 	});
 }
-function filter_word(list_tables, word)
-{
-	$(list_tables).each(function(table_tmp)
-	{		
-		$('#' + list_tables[table_tmp]).parent().parent().parent().show();
-
-			hideTableCell(list_tables, table_tmp, word);
-
-			hide_uncessary_qs(list_tables, table_tmp);
-	});
-};
 
 function hideEmptyCells(list_tables, table_tmp, show_emptyrows){
 		$("#" + list_tables[table_tmp]+" tr").each(function() {  
@@ -471,9 +364,7 @@ function hideEmptyCells(list_tables, table_tmp, show_emptyrows){
 			        	$("."+this_class).hide();	
 			        }
 			}
-
-
-                  
+ 
 		});
 }
 
@@ -517,10 +408,8 @@ function filter_results(list_tables, word, show_match, show_unmatch, show_emptyr
 		{
 			$('#' + list_tables[table_tmp] + ' .warning').hide();	
 		}
-
 		
 		// emptyrows
-		
 		hideEmptyCells(list_tables, table_tmp, show_emptyrows);
 		
 		

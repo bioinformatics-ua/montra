@@ -372,6 +372,12 @@ box-shadow: inset 0 3px 8px rgba(0,0,0,0.125);
 #no_results{
   display: none;
 }
+.basetable{
+  background-color: #ECF3FF !important;
+}
+.basetable:hover{
+  background-color: #d7e0f0 !important;
+}
 /* ==========================================================================
    My databases table
    ========================================================================== */
