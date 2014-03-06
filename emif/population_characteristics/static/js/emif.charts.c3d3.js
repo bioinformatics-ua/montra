@@ -117,6 +117,9 @@ function GraphicChartC3D3(divArg, dataArg)
         axis: {
           x: {
             type: 'categorized'
+          },
+          y: {
+            
           }
         },
         zoom: {
@@ -126,6 +129,7 @@ function GraphicChartC3D3(divArg, dataArg)
         
       };
     chartConfigs.data.types[tmpValue] = 'bar';
+
     if (actualChart.x_axis.categorized)
     {
         var arr2 = datasetX.slice(0);
@@ -156,7 +160,14 @@ function GraphicChartC3D3(divArg, dataArg)
           
           
         },
-        
+        axis: {
+          x: {
+
+          },
+          y: {
+            
+          }
+        },
         zoom: {
           enabled: true,
         
@@ -165,6 +176,8 @@ function GraphicChartC3D3(divArg, dataArg)
       };
       
     }
+    chartConfigs.axis.x['label'] = actualChart.x_axis['label'];
+    chartConfigs.axis.y['label'] =actualChart.y_axis['label'];
     console.log('chartConfigs');
     console.log(chartConfigs);
     try{var chart = c3.generate(chartConfigs);}
