@@ -378,6 +378,12 @@ box-shadow: inset 0 3px 8px rgba(0,0,0,0.125);
 .basetable:hover{
   background-color: #d7e0f0 !important;
 }
+
+.help_selectresults{
+  font-size: 150%;
+  cursor: pointer;
+}
+
 /* ==========================================================================
    My databases table
    ========================================================================== */
