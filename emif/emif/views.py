@@ -175,17 +175,28 @@ def results_fulltext(request, page=1, full_text=True,template_name='results.html
     return results_fulltext_aux(request, "text_t:" + query, page, template_name, isAdvanced)
 
 
-def results_fulltext_aux(request, query, page=1, template_name='results.html', isAdvanced=False):
+def results_fulltext_aux(request, query, page=1, template_name='results.html', isAdvanced=False, force=False):
     
     rows = 5
+    if request.POST and "page" in request.POST and not force:
+        page = request.POST["page"]
+
     if page == None:
         page = 1
 
     if query == "":
         return render(request, "results.html", {'request': request, 'breadcrumb': True,
                                                 'num_results': 0, 'page_obj': None})
-    (sortString, sort_params, range) = paginator_process_params(request, page, rows)   
-    (list_databases, hits) = get_databases_from_solr_v2(request, query, sort=sortString, rows=rows, start=range)
+    (sortString, filterString, sort_params, range) = paginator_process_params(request.POST, page, rows)   
+    sort_params["base_filter"] = query;
+    if len(filterString) > 0:
+        query += " AND " + filterString
+
+    print query
+
+    (list_databases, hits) = get_databases_from_solr_v2(request, query, sort=sortString, rows=rows, start=range)    
+    if range > hits and not force:
+        return results_fulltext_aux(request, query, 1, isAdvanced=isAdvanced, force=force)  
 
     if len(list_databases) == 0 :
         query_old = request.session.get('query', "")
@@ -209,10 +220,10 @@ def results_fulltext_aux(request, query, page=1, template_name='results.html', i
     if isAdvanced == True:
         return render(request, template_name, {'request': request,
                                            'num_results': hits, 'page_obj': pager,
-                                            'breadcrumb': True, 'isAdvanced': True, "sort_params": sort_params})
+                                            'breadcrumb': True, 'isAdvanced': True, "sort_params": sort_params, "page":page})
     else :
         return render(request, template_name, {'request': request,
-                                           'num_results': hits, 'page_obj': pager, 'breadcrumb': True, 'search_old': query_old, 'isAdvanced': False, "sort_params": sort_params})
+                                           'num_results': hits, 'page_obj': pager, 'breadcrumb': True, 'search_old': query_old, 'isAdvanced': False, "sort_params": sort_params, "page":page})
 
 
 def store_query(user_request, query_executed):
@@ -1115,8 +1126,52 @@ def force_delete_fingerprint(request, id):
 
     return databases(request)
 
-def databases(request, page=1, template_name='databases.html'):
-    #first lets clean the query session log
+def query_solr(request, page=1):
+    if not request.POST:
+        return
+
+    # Get the list of databases for a specific user
+    _filter = request.POST["filter"];
+    print _filter
+    rows = 5
+    if page == None:
+        page = 1
+
+    (sortString, filterString, sort_params, range) = paginator_process_params(request.POST, page, rows)    
+        
+    print filterString
+
+    if len(filterString) > 0:
+        _filter += " AND " + filterString
+
+    print _filter
+
+    (list_databases,hits) = get_databases_from_solr_v2(request, _filter, sort=sortString, rows=rows, start=range)
+
+    print "Range: "+str(range)
+    print "hits: "+str(hits)
+    print "len: "+str(len(list_databases))
+
+    list_databases = paginator_process_list(list_databases, hits, range) 
+
+    ret = {}
+    ret["Hits"] = hits    
+    ret["Start"] = range    
+    ret["Rows"] = rows
+    ret["Filter"] = filterString
+    if range > hits:
+        ret["Rec_Page"] = 1
+    else:
+        ret["Rec_Page"] = page
+
+    return HttpResponse(json.dumps(ret), mimetype='application/json')
+
+
+
+
+def databases(request, page=1, template_name='databases.html', force=False):
+
+     #first lets clean the query session log
     if 'query' in request.session:
         del request.session['query']
         
@@ -1136,19 +1191,33 @@ def databases(request, page=1, template_name='databases.html'):
         _filter = "user_t:*" 
 
     rows = 5
-    if page == None:
-        page = 1
+    if request.POST and not force:
+        page = request.POST["page"]
 
-    (sortString, sort_params, range) = paginator_process_params(request, page, rows)    
+    if page == None:
+        page = 1   
+
+    (sortString, filterString, sort_params, range) = paginator_process_params(request.POST, page, rows)    
         
+    sort_params["base_filter"] = _filter;
+
+    print filterString
+
+    if len(filterString) > 0:
+        _filter += " AND " + filterString
+
+    print _filter
+
     (list_databases,hits) = get_databases_from_solr_v2(request, _filter, sort=sortString, rows=rows, start=range)
+    if range > hits and force < 2:
+        return databases(request, page=1, force=True)  
 
     print "Range: "+str(range)
     print "hits: "+str(hits)
     print "len: "+str(len(list_databases))
 
-    list_databases = paginator_process_list(list_databases, hits, range)   
-
+    list_databases = paginator_process_list(list_databases, hits, range) 
+    
     print "len: "+str(len(list_databases))
     ## Paginator ##
     myPaginator = Paginator(list_databases, rows)
@@ -1164,7 +1233,7 @@ def databases(request, page=1, template_name='databases.html'):
                                            'page_obj': pager,
                                            'api_token': True, 
                                            'owner_fingerprint': False,
-                                           'add_databases': True, "sort_params": sort_params})
+                                           'add_databases': True, "sort_params": sort_params, "page":page})
 
 def paginator_process_params(request, page, rows):
     sortFieldsLookup = {}
@@ -1172,11 +1241,17 @@ def paginator_process_params(request, page, rows):
     sortFieldsLookup["last_update"] = "last_activity_sort"
     sortFieldsLookup["type"] = "type_name_sort"
 
+    filterFieldsLookup = {}
+    filterFieldsLookup["database_name_filter"] = "database_name_sort"
+    filterFieldsLookup["last_update_filter"] = ""
+    filterFieldsLookup["type_filter"] = "type_t"
+
     sortString = ""
+    filterString = ""
     sort_params= {}
-    print request.GET
-    if "s" in request.GET:
-        mode = json.loads(request.GET["s"])
+    print request
+    if "s" in request:
+        mode = json.loads(request["s"])
     else:
         mode = {"database_name": "asc"}
 
@@ -1184,27 +1259,50 @@ def paginator_process_params(request, page, rows):
         if sortFieldsLookup.has_key(x):
             if mode[x] == "asc" or mode[x] == "desc":
                 sortString += sortFieldsLookup[x]+" "+mode[x]
-                sort_params[x] = {}
+                if x not in sort_params:
+                    sort_params[x] = {}
                 sort_params[x]["name"] = mode[x]
+        elif filterFieldsLookup.has_key(x):
+            if x == "last_update_filter":
+                filterString += "(created_t:\""+mode[x] + "\" OR date_last_modification_t:\""+mode[x] + "\") AND "
+            elif x== "database_name_filter":
+                p = re.compile("([^a-z])")
+                str2 = re.sub(p, "", mode[x].lower())
+                filterString += "({!prefix f="+filterFieldsLookup[x]+"}"+str2+") AND "
+            else:
+                filterString += filterFieldsLookup[x]+":'"+mode[x] +"' AND "
+            if x[:-7] not in sort_params:
+                sort_params[x[:-7]] = {}
+            sort_params[x[:-7]]["filter"] = mode[x]
+            print sort_params
+
+    if len(filterString) > 0:
+        filterString = filterString[:-4]
 
     for x in ["database_name", "last_update", "type"]:
-        if x in sort_params:
+        if (x in sort_params) and ( "name" in sort_params[x]):
+            sort_params["selected_name"] = x
+            sort_params["selected_value"] = sort_params[x]["name"]
             if sort_params[x]["name"] == "asc":
                 sort_params[x]["click_url"]='?s={"'+x+'":"desc"}'
-                sort_params[x]["icon"]="icon-chevron-down"
+                sort_params[x]["next"]='desc'
+                sort_params[x]["icon"]="icon-chevron-down"                
             elif sort_params[x]["name"] == "desc":
                 sort_params[x]["click_url"]='?s={"'+x+'":"asc"}'
+                sort_params[x]["next"]='asc'
                 sort_params[x]["icon"]="icon-chevron-up"
         else:
-            sort_params[x] = {}
+            if x not in sort_params:
+                sort_params[x] = {}
             sort_params[x]["click_url"]='?s={"'+x+'":"asc"}'
+            sort_params[x]["next"]='asc'
             sort_params[x]["icon"]="icon-minus"
         
     print sortString
 
     start = (int(page) - 1) * rows
 
-    return (sortString, sort_params, start)
+    return (sortString, filterString, sort_params, start)
 
 def paginator_process_list(list_databases, hits, start):
     nList = []
@@ -1257,8 +1355,11 @@ def paginator_process_list(list_databases, hits, start):
 #                                            'add_databases': True})
 
 # GET ALL DATABASES ACCORDING TO USER INTERESTS
-def all_databases_user(request, page=1, template_name='alldatabases.html'):
+def all_databases_user(request, page=1, template_name='alldatabases.html', force=False):
     rows = 5
+    if request.POST and not force:
+        page = request.POST["page"]
+
     if page == None:
         page = 1
     # lets clear the geolocation session search filter (if any)
@@ -1278,11 +1379,20 @@ def all_databases_user(request, page=1, template_name='alldatabases.html'):
 
         type_t_list = type_t_list[:-1]
 
-        (sortString, sort_params, start) = paginator_process_params(request, page, rows)    
-    
-        (list_databases,hits) = get_databases_from_solr_v2(request, "type_t:" + type_t_list, sort=sortString, rows=rows, start=start)
+        query = "type_t:" + type_t_list
+        (sortString, filterString, sort_params, start) = paginator_process_params(request.POST, page, rows)    
+        sort_params["base_filter"] = query;
+        if len(filterString) > 0:
+            query += " AND " + filterString
 
-        list_databases = paginator_process_list(list_databases, hits, start)   
+        print query
+
+        (list_databases,hits) = get_databases_from_solr_v2(request, query, sort=sortString, rows=rows, start=start)
+
+        list_databases = paginator_process_list(list_databases, hits, start)
+        if start > hits and not force:
+            return all_databases_user(request, 1, force=True)  
+  
     else:
         list_databases = []
         #list_databases = get_databases_from_solr(request, "*:*")
@@ -1301,7 +1411,7 @@ def all_databases_user(request, page=1, template_name='alldatabases.html'):
                                             'breadcrumb': True, 'collapseall': False, 
                                             'geo': True,
                                             'page_obj': pager,
-                                            'add_databases': True, "sort_params": sort_params})
+                                            'add_databases': True, "sort_params": sort_params, "page":page})
 
 def all_databases(request, page=1, template_name='alldatabases.html'):
     
@@ -2628,10 +2738,16 @@ def show_fingerprint_page(request, runinfo, errors={}, template_name='database_e
     return r
 
 
-def create_auth_token(request, page=1, templateName='api-key.html'):
+def create_auth_token(request, page=1, templateName='api-key.html', force=False):
     """
     Method to create token to authenticate when calls REST API
     """
+    rows = 5
+    if request.POST and not force:
+        page = request.POST["page"]
+
+    if page == None:
+        page = 1   
 
     user = request.user
     if not Token.objects.filter(user=user).exists():
@@ -2639,14 +2755,21 @@ def create_auth_token(request, page=1, templateName='api-key.html'):
     else:
         token = Token.objects.get(user=user)
 
-    # print token
+    _filter = "user_t:" + user.username
 
-    list_databases = get_databases_from_solr(request, "user_t:" + user.username)
-    # for database in list_databases:
-    #     print database.id
+    (sortString, filterString, sort_params, range) = paginator_process_params(request.POST, page, rows)    
+        
+    sort_params["base_filter"] = _filter;
 
-     ## Paginator ##
-    rows = 5
+    if len(filterString) > 0:
+        _filter += " AND " + filterString
+
+    (list_databases,hits) = get_databases_from_solr_v2(request, _filter, sort=sortString, rows=rows, start=range)
+    if range > hits and force < 2:
+        return create_auth_token(request, page=1, force=True)  
+
+    list_databases = paginator_process_list(list_databases, hits, range) 
+    
     myPaginator = Paginator(list_databases, rows)
     try:
         pager =  myPaginator.page(page)
@@ -2655,7 +2778,7 @@ def create_auth_token(request, page=1, templateName='api-key.html'):
     ## End Paginator ##
 
     return render_to_response(templateName, {'list_databases': list_databases, 'token': token, 'user': user,
-                              'request': request, 'breadcrumb': True, 'page_obj': pager}, RequestContext(request))
+                              'request': request, 'breadcrumb': True, 'page_obj': pager, "sort_params": sort_params, "page":page}, RequestContext(request))
 
 
 def sharedb(request, db_id, template_name="sharedb.html"):
