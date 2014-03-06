@@ -342,3 +342,14 @@ padding: 2px;
   margin-top: -15px !important;
   margin-left: -20px !important;
 }
+
+.lt-ie8 .filter_input{
+  height: 20px !important;
+  width: 93% !important;
+}
+
+.lt-ie8 #type_filter{
+*zoom: 1.7 !important;
+*font-size: 9px !important;
+margin-bottom: -15px !important;
+}
