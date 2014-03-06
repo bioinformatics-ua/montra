@@ -106,7 +106,7 @@ th, td {
 
               <tbody>
                 {% for t in v.list_ordered_tags %}
-                <tr class="entry">
+                <tr class="entry rowid_{{forloop.parentloop.counter}}_{{forloop.counter}}">
                   <td data-original-title="{{ t.tag|removehs }}" title="">{{ t.tag|removehs }}</td> 
                    <td data-original-title="{{ t.value }}" title="">{{ t.value }}</td>
                 </tr>

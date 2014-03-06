@@ -442,6 +442,41 @@ function filter_word(list_tables, word)
 			hide_uncessary_qs(list_tables, table_tmp);
 	});
 };
+
+function hideEmptyCells(list_tables, table_tmp, show_emptyrows){
+		$("#" + list_tables[table_tmp]+" tr").each(function() {  
+
+			var classes = $(this).prop("class").split(' ');
+			var this_class;
+			for(var i=0;i<classes.length;i++){
+				if(classes[i].indexOf('rowid_') != -1)
+					this_class=classes[i];
+			}
+			console.log(this_class);
+			var no_value = true;
+			$("."+this_class).each(function() {
+			    var cell = $.trim($($(this).find('td')[1]).text());
+
+	 		    if (cell.length != 0){
+			    	no_value = false;
+			    } 
+			});
+			if(no_value){
+			        if (show_emptyrows)
+			        {
+			        	$("."+this_class).show();
+			        }
+			        else
+			        {
+			        	$("."+this_class).hide();	
+			        }
+			}
+
+
+                  
+		});
+}
+
 /* This function concatenates all previous functions of filtering in a unique function... 
    It was getting hard to synchronize everything when we only have the information on the 
    	dom and all was separated 
@@ -485,25 +520,9 @@ function filter_results(list_tables, word, show_match, show_unmatch, show_emptyr
 
 		
 		// emptyrows
-		/*
-		$("#" + list_tables[table_tmp]+" tr").each(function() {        
-		    var cell = $.trim($($(this).find('td')[1]).text());
-		    //console.log(cell);
-		    if (cell.length == 0){
-		        //console.log('empty');
-		        //$(this).addClass('nodisplay');
-		        if (show_emptyrows)
-		        {
-		        	$(this).closest('tr').show();
-		        }
-		        else
-		        {
-		        	$(this).closest('tr').hide();	
-		        }
-
-		    }                   
-		});
-*/
+		
+		hideEmptyCells(list_tables, table_tmp, show_emptyrows);
+		
 		
 		// filter
 		hideTableCell(list_tables, table_tmp, word);
