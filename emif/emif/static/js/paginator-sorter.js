@@ -52,8 +52,8 @@ PaginatorSorter.prototype ={
 
 			  	var content = $("#"+this.filters[i],this.innerTable);
 					json += ',"'+this.filters[i]+'": "'+content.val()+'"';
-					console.log(content.val());
-					console.log(content);
+					//console.log(content.val());
+					//console.log(content);
 			}		 
 			catch(err)
 			 {
@@ -103,7 +103,7 @@ PaginatorSorter.prototype ={
   				}else{
   					$("#table_content").html('<td colspan="9999"><center>No results to show</center></td>');
   					$(".pagination").html('<td colspan="9999"><center>No results to show</center></td>');
-  					console.log('NOTSUCCESS');
+  					//console.log('NOTSUCCESS');
 /*
   					for(filter in context.filters){ 	
 						if(context.filters[filter].val().length > 0 ){
