@@ -361,6 +361,29 @@ box-shadow: inset 0 3px 8px rgba(0,0,0,0.125);
   word-wrap:break-word;
 }
 
+.span2_5{
+  width: 168px;
+}
+@media all and (min-width: 1200px) {
+.span2_5{
+  width: 226px;
+}
+}
+#no_results{
+  display: none;
+}
+.basetable{
+  background-color: #ECF3FF !important;
+}
+.basetable:hover{
+  background-color: #d7e0f0 !important;
+}
+
+.help_selectresults{
+  font-size: 150%;
+  cursor: pointer;
+}
+
 /* ==========================================================================
    My databases table
    ========================================================================== */

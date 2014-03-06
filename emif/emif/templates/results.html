@@ -46,7 +46,7 @@
     <div class="btn-group pull-right">
 
       <div class="btn-group"></div>
-      <a id="comparabtn" class="btn "  href=""  rel="tooltip" data-container="body" data-placement="bottom" data-original-title="You only can select two databases for a comparison" disabled> <i  class=" icon"></i>
+      <a id="comparabtn" class="btn "  href=""  rel="tooltip" data-container="body" data-placement="bottom" data-original-title="This allows to compare databases.<br /> It is only possible to compare databases of the same type. <br /> When a database is selected, the type is defined automatically, and databases of other types can't be choosen. <br /> To be able to select other type, you must unselect all the databases." class="help_selectresults icon-question-sign" disabled> <i  class=" icon"></i>
         Compare</a>
 
       <a class="btn" href="geo" onclick="" > <i class=" icon"></i>Geolocation</a>
@@ -122,7 +122,11 @@
                 <option value="observationaldatasources">Observational Data Sources</option>
               </select>
           </td>
-          <td style="width:50px;" class="table_filter"></td>
+          <td style="width:50px;" class="table_filter">
+            <div style="text-align: center;">
+              <i data-toggle="tooltip" data-placement="bottom" title=" This row allows to compare databases.<br /> It is only possible to compare databases of the same type. <br /> When a database is selected, the type is defined automatically, and databases of other types can't be choosen. <br /> To be able to select other type, you must unselect all the databases." class="help_selectresults icon-question-sign"></i>
+            </div>
+          </td>
         </tr>
     </thead>
     <tbody id="table_content">
@@ -153,7 +157,7 @@
           <td class="type">{{ t.type_name }} </td>
           
         
-          <td style="text-align:center"> <input class="checkbox" type="checkbox" name="chk_{{ t.id }}"></td>
+          <td style="text-align:center"> <input class="checkbox dbtype_{{t.type_name|removespaces}}" type="checkbox" name="chk_{{ t.id }}"></td>
 
           
         </tr>
@@ -242,6 +246,22 @@ var counter = 0;
 
 // URL Hack to make paginator work with base
 $(document).ready(function(){
+
+    if($('input:checkbox:checked', table_databases).length >= 1){
+      var classes = $('input:checkbox:checked', table_databases).first().prop("class").split(' ');
+      var a_class = null;
+      for(var i=0;i<classes.length;i++){
+        if(classes[i].indexOf('dbtype_') != -1)
+          a_class=classes[i];
+      }
+      if(a_class){
+        console.log("["+a_class+"]");
+        $(".checkbox").prop( "disabled", true );
+
+        $("."+a_class).prop("disabled", false);
+      }
+    }
+    
     if($('input:checkbox:checked', table_databases).length >= 2){
         $("#comparabtn").removeAttr('disabled');
         counter = $('input:checkbox:checked', table_databases).length;
@@ -257,6 +277,8 @@ $(document).ready(function(){
     $('a[href="#"]').attr('href', function(i, val){
         return window.location + val;
     });
+
+    $('.help_selectresults').tooltip({container: 'body', 'html': true});
     
 });
 {% endif %}
@@ -297,39 +319,20 @@ $("#comparabtn").bind('click',function(e)
 
 $('.checkbox').click(function()
 {
-    console.log(counter);
+    //console.log(counter);
     if($(this).is(':checked')){
         counter++;
     } else 
     {
         counter--;
     }
-    if (counter==2)
-    {
-      $("#comparabtn").removeAttr('disabled');
-      
-      $('.checkbox').each(function(cbox)
-      {
-        console.log(this);
-        $("#comparabtn").bind('click',function(e)
-        { 
-          
-          $('#result_form').submit();
-
-          return false;
-        });
-
-        if(!$(this).is(':checked')){
-            $(this).prop('disabled', true);
-        };
-      });
-      
+    console.log(counter);
+    if(counter == 0){
+      $('.checkbox').prop( "disabled", false);
     }
-    else
-    {
-      $("#comparabtn").attr('disabled', true);
+    else if(counter == 1){
+     $("#comparabtn").attr('disabled', true);
       
-      console.log($("#comparabtn"))
       $("#comparabtn").unbind();
       $("#comparabtn").bind('click',function(e)
         { 
@@ -339,19 +342,35 @@ $('.checkbox').click(function()
           return false;
         });
 
-    
-      $('.checkbox').each(function(cbox)
-      {
-        
-        $(this).prop('disabled', false);
+      var classes = $(this).prop("class").split(' ');
+      var a_class = null;
+      for(var i=0;i<classes.length;i++){
+        if(classes[i].indexOf('dbtype_') != -1)
+          a_class=classes[i];
+      }
+      if(a_class){
+        console.log("["+a_class+"]");
+        $(".checkbox").prop( "disabled", true );
 
-        
-      });
+        $("."+a_class).prop("disabled", false);
+      }
+      
+    }
+    else if (counter>=2)
+    {
+      $("#comparabtn").removeAttr('disabled');
+      $("#comparabtn").bind('click',function(e)
+        { 
+          
+          $('#result_form').submit();
 
+          return false;
+        });      
     }
 
 });
-$('[rel=tooltip]').tooltip() 
+$('[rel=tooltip]').tooltip({container: 'body', 'html': true});
+
 $('.popover').popover({
     container: 'body'
 });
