@@ -395,14 +395,20 @@ def geo(request, template_name='geo.html'):
     _long_lats = []
     # since the geolocation is now adding the locations, we no longer need to look it up when showing,
     # we rather get it directly
-
+    db_list = [] 
+    questionnaires_ids = {}
+    qqs = Questionnaire.objects.all()
+    for q in qqs:
+        questionnaires_ids[q.slug] = (q.pk, q.name)
     for database in list_databases:
 
         if database.location.find(".")!= -1:
             _loc = database.location.split(".")[0]
         else:
             _loc = database.location
+        
 
+        
         city=None
         g = geocoders.GeoNames(username='bastiao')
 
@@ -431,11 +437,20 @@ def geo(request, template_name='geo.html'):
                     continue
 
             _long_lats.append(str(city.lat) + ", " + str(city.long))
-
-        #print _loc
+            db_list.append({'name': database.name,
+            'location': str(database.location).lstrip('\n\r'),
+            'institution': str(database.institution).strip(),
+            'contact': database.email_contact,
+            'number_patients': database.number_patients,
+            'ttype': database.type_name,
+            'id' : database.id,
+            'lat' : str(city.lat),
+            'long': str(city.long),
+            })
 
         list_locations.append(_loc)
-    return render(request, template_name, {'request': request,
+        
+    return render(request, template_name, {'request': request, 'db_list' : db_list,
                                            'list_cities': list_locations, 'lats_longs': _long_lats, 'breadcrumb': True})
 
 
