@@ -13,9 +13,9 @@
 					{% for t in qs.list_ordered_tags %}
 					<tr>
 						<!-- title="{{ t.tag|safe }}" -->
-						<td title="{{ t.tag|safe|removehs }}">{{ t.tag|removehs }}</td>
-						<td title="{{ t.value|safe }}">{{ t.value|safe }}</td>
-						<td title="{{ t.comment|safe }}">{{ t.comment|safe }}</td>
+						<td class="tooltippable" title="{{ t.tag|safe|removehs }}">{{ t.tag|removehs }}</td>
+						<td class="tooltippable" title="{{ t.value|safe }}">{{ t.value|safe }}</td>
+						<td class="tooltippable" title="{{ t.comment|safe }}">{{ t.comment|safe }}</td>
 					</tr>
 					{% endfor %}
 				</tbody>

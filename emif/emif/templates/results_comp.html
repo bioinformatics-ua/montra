@@ -10,7 +10,8 @@
 {% endblock %}
 
 {% block scriptextraincludes %}
-<script src="static/js/vendor/tablediff.js"></script>
+<script src="{{ STATIC_URL}}js/vendor/tablediff.js"></script>
+<script src="{{ STATIC_URL}}js/vendor/threadpool.js"></script>
 
 {% endblock %}
 
@@ -111,8 +112,8 @@ th, td {
               <tbody>
                 {% for t in v.list_ordered_tags %}
                 <tr class="entry rowid_{{forloop.parentloop.counter}}_{{forloop.counter}}">
-                  <td data-original-title="{{ t.tag|removehs }}" title="">{{ t.tag|removehs }}</td> 
-                   <td data-original-title="{{ t.value }}" title="">{{ t.value }}</td>
+                  <td class="tooltippable" data-original-title="{{ t.tag|removehs }}" title="">{{ t.tag|removehs }}</td> 
+                   <td class="tooltippable" data-original-title="{{ t.value }}" title="">{{ t.value }}</td>
                 </tr>
                 {% endfor %}
               </tbody>
@@ -414,36 +415,34 @@ $.fn.textWidth = function() {
 };
 
 $(function() {
-  $('td').each(function() 
-  {
-
-    var content;
-    content = $(this).text().replace(/\s+/gi, ' ');
-
-    
-    if ($(this).textWidth() > $(this).width()) {
-    
-      return $(this).tooltip({container:"body"});
-    }
-  });
   $('[id^="{{database_to_compare|removespaces}}"] td').addClass("basetable");
-
 });
 var databases = [];
 
 function compareDatabases(){
+  var threadpool = new ThreadPool(20);
+  var priority=1;
   {% for name, qset in results %}
 
   {% if not forloop.first %}
   {% for k,v in qset.items %}
-
-  tablediffall_two('{{database_to_compare|removespaces}}_{{k|removespaces}}', ['{{name|removespaces}}_{{k|removespaces}}']);
-
+    var thread = new Runnable(compareDatabase, priority++, '{{database_to_compare|removespaces}}_{{k|removespaces}}', '{{name|removespaces}}_{{k|removespaces}}');
+    threadpool.run(thread);
   {% endfor %}
   {% endif %}
+  {% endfor %}
 
+  threadpool.destroy(
+    function(){
+        $(".tooltippable").tooltip({container:"body"});
+    }
+  );
+}
 
-  {% endfor %}  
+function compareDatabase(base, other){
+  tablediffall_two(base, [other]);
+
+  this.complete();
 }
 
 compareDatabases();

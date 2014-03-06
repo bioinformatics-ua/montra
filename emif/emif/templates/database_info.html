@@ -262,7 +262,7 @@ function load_questionnary(){
 
         console.log( "Loading questionnary by parts, we have {{qsets|length}} sets");  
         
-        var threadpool = new ThreadPool(1);
+        var threadpool = new ThreadPool(20);
         parts_missing = {{qsets|length}};
         
 
@@ -287,8 +287,6 @@ function loadqspart(sortid, pk){
 
         
         var highlights = $("#qs_"+sortid).find('.highlight');
-
-        console.dir(highlights);
 
         if(highlights.length > 0){
            $( "#qs_"+sortid ).parent().siblings().find('.accordion-icon').html('<i class="icon-eye-open"></i>');
