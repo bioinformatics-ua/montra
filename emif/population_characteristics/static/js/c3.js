@@ -1548,7 +1548,7 @@
               .append("text")
                 .attr("class", "-axis-x-label")
                 .attr("x", width)
-                .attr("dy", "-.5em")
+                .attr("dy", "1.5em")
                 .style("text-anchor", "end")
                 .text(__axis_x_label);
             main.append("g")
@@ -1557,8 +1557,8 @@
                 .call(__axis_rotated ? xAxis : yAxis)
               .append("text")
                 .attr("transform", "rotate(-90)")
-                .attr("dy", "1.2em")
-                .attr("dx", "-.5em")
+                .attr("dy", "-5.2em")
+                .attr("dx", "-4.5em")
                 .style("text-anchor", "end")
                 .text(__axis_y_label);
 

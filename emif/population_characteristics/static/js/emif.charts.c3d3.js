@@ -96,6 +96,7 @@ function GraphicChartC3D3(divArg, dataArg)
     var chartConfigs = {
          padding: {
         left: 100,
+
     },
         bindto: '#pc_chart_place',
 
@@ -116,9 +117,11 @@ function GraphicChartC3D3(divArg, dataArg)
         },
         axis: {
           x: {
-            type: 'categorized'
+            type: 'categorized',
+            label_position : {}
           },
           y: {
+            label_position : {}
             
           }
         },
@@ -149,6 +152,7 @@ function GraphicChartC3D3(divArg, dataArg)
       chartConfigs = {
          padding: {
         left: 100,
+
     },
         bindto: '#pc_chart_place',
 
@@ -162,9 +166,11 @@ function GraphicChartC3D3(divArg, dataArg)
         },
         axis: {
           x: {
+            label_position : {}
 
           },
           y: {
+            label_position : {}
             
           }
         },
@@ -178,6 +184,9 @@ function GraphicChartC3D3(divArg, dataArg)
     }
     chartConfigs.axis.x['label'] = actualChart.x_axis['label'];
     chartConfigs.axis.y['label'] =actualChart.y_axis['label'];
+    /*chartConfigs.axis.x['label_position']['dy'] = "2em";
+    chartConfigs.axis.y['label_position']['dx'] = "-0.5em";
+    chartConfigs.axis.y['label_position']['dy'] = "1.2em";*/
     console.log('chartConfigs');
     console.log(chartConfigs);
     try{var chart = c3.generate(chartConfigs);}
