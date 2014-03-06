@@ -27,10 +27,12 @@ function PaginatorSorter(tableID, fString, selName, selValue){
     this.selName = selName;
     this.selValue = selValue;
 
+    this.bind();
+
     this.form = $("#send2");
     this.updateForm(this.getQueryString(selName, selValue));
 
-    this.bind();
+    
 
     this.fString = fString; 
 }
@@ -43,12 +45,15 @@ PaginatorSorter.prototype ={
 		else 
 			json += '"'+fieldType+'": "'+value+'"';
 
-
+		//console.log(json);
 		for(var i=0;i<this.filters.length;i++){// in this.filters){ 
 			try
 			  {
+
 			  	var content = $("#"+this.filters[i],this.innerTable);
 					json += ',"'+this.filters[i]+'": "'+content.val()+'"';
+					console.log(content.val());
+					console.log(content);
 			}		 
 			catch(err)
 			 {
@@ -58,7 +63,7 @@ PaginatorSorter.prototype ={
 		}
 		json += "}";
 		
-		console.log(json);
+		//console.log(json);
 		
 		return json;
 	},
@@ -131,6 +136,8 @@ PaginatorSorter.prototype ={
 			});
 	}, 
 	updateForm : function(json){
+		//console.log("Setting Value!!!");
+		//console.log(json);
 		$("#s", $("#send2")).val(json);
 	}, 
 	submitthis : function(){
