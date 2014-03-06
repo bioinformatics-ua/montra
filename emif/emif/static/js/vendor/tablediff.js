@@ -71,7 +71,7 @@ compare_cell = function(table, cell_name, value)
 		  				}
 		  				catch (err) 
 		  				{
-		  					console.log(err.message)
+		  					//console.log(err.message)
 
 		  				}
 		  				//console.log($(this));	
@@ -236,12 +236,7 @@ comparetable_two = function(table1, table2){
 
 	);
 
-  	$('td').each(function()
-  	{
-  		
-  	}
 
-  		);
     var content;
     content = $(this).text().replace(/\s+/gi, ' ');
     //console.log(content)
@@ -325,9 +320,6 @@ function show_hide_match(list_tables, show, word)
 
 	$(list_tables).each(function(table_tmp)
 	{
-		if(!$('#' + list_tables[table_tmp]).parent().parent().parent().is(":visible"))
-			$('#' + list_tables[table_tmp]).parent().parent().parent().prop("data-toggle","collapse");
-
 		$('#' + list_tables[table_tmp]).parent().parent().parent().show();
 
 		if (show)
@@ -430,11 +422,11 @@ function show_hide_empty_rows(list_tables, show, word)
 };
 function hideTableCell(list_tables, table_tmp, word){
 	$("#" + list_tables[table_tmp]+" tr").each(function() {        
-		    var cell = $.trim($($(this).find('td')[0]).text());
+		    var cell = $.trim($($(this).find('td')[0]).text()).toLowerCase();
 		    //console.log(cell + "==" + word +"?");
-		    if (cell.indexOf(word) != -1)
-		        $(this).closest('tr').show();    
-		    else
+		    if (cell.indexOf(word.toLowerCase()) == -1)
+		       // $(this).closest('tr').show();    
+		    //else
 		    	$(this).closest('tr').hide();	 
 		                       
 	});
@@ -450,6 +442,76 @@ function filter_word(list_tables, word)
 			hide_uncessary_qs(list_tables, table_tmp);
 	});
 };
+/* This function concatenates all previous functions of filtering in a unique function... 
+   It was getting hard to synchronize everything when we only have the information on the 
+   	dom and all was separated 
+*/
+function filter_results(list_tables, word, show_match, show_unmatch, show_emptyrows, show_proximity){
 
+	$(list_tables).each(function(table_tmp)
+	{
+		// First we reset
+		$('#' + list_tables[table_tmp]).parent().parent().parent().show();
+		$('#' + list_tables[table_tmp] + " entry").show();
+		// match
+		if (show_match)
+		{
+			$('#' + list_tables[table_tmp] + ' .success').show();	
+		}
+		else
+		{
+			$('#' + list_tables[table_tmp] + ' .success').hide();	
+		}
+
+		// unmatch
+		if (show_unmatch)
+		{
+			$('#' + list_tables[table_tmp] + ' .error').show();	
+		}
+		else
+		{
+			$('#' + list_tables[table_tmp] + ' .error').hide();	
+		}
+
+		// proximity
+		if (show_proximity)
+		{
+			$('#' + list_tables[table_tmp] + ' .warning').show();	
+		}
+		else
+		{
+			$('#' + list_tables[table_tmp] + ' .warning').hide();	
+		}
+
+		
+		// emptyrows
+		/*
+		$("#" + list_tables[table_tmp]+" tr").each(function() {        
+		    var cell = $.trim($($(this).find('td')[1]).text());
+		    //console.log(cell);
+		    if (cell.length == 0){
+		        //console.log('empty');
+		        //$(this).addClass('nodisplay');
+		        if (show_emptyrows)
+		        {
+		        	$(this).closest('tr').show();
+		        }
+		        else
+		        {
+		        	$(this).closest('tr').hide();	
+		        }
+
+		    }                   
+		});
+*/
+		
+		// filter
+		hideTableCell(list_tables, table_tmp, word);
+	
+		// remove unnecessary tables (empty)
+		hide_uncessary_qs(list_tables, table_tmp);
+
+	});
+}
 
 

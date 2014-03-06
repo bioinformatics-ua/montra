@@ -84,10 +84,10 @@ th, td {
 
 <div style="margin: 0px;" class="span12">
   <div style="overflow: auto;" class="well accordion" id="accordion2">
-  <table><tr>
+  <table id="database_listings"><tr>
     {% for name, qset in results %}
                       
-    <td style="min-width: 500px;">
+    <td class="database_listing" style="min-width: 500px;">
     <div {% if forloop.first%}style="margin-left: 0px;"{% endif %}>
       <span style="cursor: pointer;" class="pull-left label label-inverse">{{name}}</span>
       <span onclick="alert('set reference to {{name}}');" class="set_reference pull-right label label-info">Set as reference table</span>
@@ -101,12 +101,12 @@ th, td {
         <div id="collapse{{k|removespaces}}_{{name|removespaces}}" class="accordion-body collapse">
           <div class="accordion-inner">
 
-            <table id="{{name|removespaces}}_{{k|removespaces}}" class="table table-bordered  table-hover table-striped">
+            <table id="{{name|removespaces}}_{{k|removespaces}}" class="table table-bordered table-hover table-striped">
               <thead></thead>
 
               <tbody>
                 {% for t in v.list_ordered_tags %}
-                <tr>
+                <tr class="entry">
                   <td data-original-title="{{ t.tag|removehs }}" title="">{{ t.tag|removehs }}</td> 
                    <td data-original-title="{{ t.value }}" title="">{{ t.value }}</td>
                 </tr>
@@ -121,6 +121,7 @@ th, td {
     </td>
     {% endfor %}
     </tr></table>
+    <div id="no_results" class="pull-center">No results found, for this filtering parameters.</div>
   </div>
 </div>
 </div>  
@@ -161,36 +162,68 @@ function collapse_expand(context){
               $(".collapse:visible").collapse("show");
           }  
 }
-function doublecheck_expansions(context){
-          /*context = $("#collapseall");
+function doublecheck_expansions(){
+          context = $("#collapseall");
 
-          if ($(context).text().indexOf('Collapse')!==-1)
+          if ($(context).text().indexOf('Collapse')!=-1)
           {
               $(".collapse:visible").collapse("show"); 
           }
           else
           {
-              $(".collapse:visible").collapse("hide");
-          }  */
+              $(".collapse.in:visible").collapse("hide");
+          } 
 }
-var match=false;
+function check_empties(){
+  var dbs_visible = $('#database_listings .database_listing .accordion-group:visible').length;
+  
+  if(dbs_visible == 0){
+    $('#database_listings').hide();
+    $('#no_results').show();
+
+  } else {
+    $('#database_listings').show();
+    $('#no_results').hide();
+
+  }
+}
+function reset_empties(){
+  $('#database_listings').show();
+  $('#no_results').hide();
+  
+    
+}
+var match=true;
+var unmatch=true;
+var emptyrows=true;
+var proximity=true;
+
+function applyFilters(){
+  reset_empties();
+
+  var filter_string = $("#searchfilter").val();
+          {% for name, qset in results %}
+            {% for k,v in qset.items %}
+
+            filter_results(['{{name|removespaces}}_{{k|removespaces}}'], 
+                            filter_string, match, unmatch, emptyrows, proximity);
+          {% endfor %}
+          {% endfor %}  
+
+  doublecheck_expansions();
+  check_empties();  
+
+}
+
 $("#match").bind('click',function(e)
 { 
 
           e.preventDefault(); 
           e.stopPropagation();
 
-      doublecheck_expansions();
+          match = !match;
 
-
-          {% for name, qset in results %}
-            {% for k,v in qset.items %}
-
-            show_hide_match(['{{name|removespaces}}_{{k|removespaces}}'], match, $("#searchfilter").val());
-          {% endfor %}
-          {% endfor %}
-          match = !match ;
-          if (match)
+          if (!match)
           {
             $('#imatch').removeClass('icon-ok') 
 
@@ -199,26 +232,22 @@ $("#match").bind('click',function(e)
           {
             $('#imatch').addClass('icon-ok')
           }
+          applyFilters();
+
           return false;
 });
 
-var unmatch=false;
 $("#unmatch").bind('click',function(e)
 { 
 
           e.preventDefault(); 
           e.stopPropagation();
 
-      doublecheck_expansions();
+          
 
-          {% for name, qset in results %}
-            {% for k,v in qset.items %}
-
-            show_hide_unmatch(['{{name|removespaces}}_{{k|removespaces}}'], unmatch, $("#searchfilter").val());
-          {% endfor %}
-          {% endfor %}
           unmatch = !unmatch ;
-          if (unmatch)
+          applyFilters();
+          if (!unmatch)
           {
             $('#iunmatch').removeClass('icon-ok') 
           }
@@ -229,24 +258,18 @@ $("#unmatch").bind('click',function(e)
           return false;
 });
 
-var emptyrows=false;
+
 $("#emptyrows").bind('click',function(e)
 { 
 
           e.preventDefault(); 
           e.stopPropagation();
 
-      doublecheck_expansions();
+          
 
-
-          {% for name, qset in results %}
-            {% for k,v in qset.items %}
-
-            show_hide_empty_rows(['{{name|removespaces}}_{{k|removespaces}}'], emptyrows, $("#searchfilter").val());
-          {% endfor %}
-          {% endfor %}
           emptyrows = !emptyrows ;
-          if (emptyrows)
+          applyFilters();
+          if (!emptyrows)
           {
             $('#iemptyrows').removeClass('icon-ok') 
             
@@ -260,23 +283,18 @@ $("#emptyrows").bind('click',function(e)
 
 
 
-var proximity=false;
+
 $("#proximity").bind('click',function(e)
 { 
 
           e.preventDefault(); 
           e.stopPropagation();
 
-      doublecheck_expansions();
 
-          {% for name, qset in results %}
-            {% for k,v in qset.items %}
-
-            show_hide_proximity(['{{name|removespaces}}_{{k|removespaces}}'], proximity, $("#searchfilter").val());
-          {% endfor %}
-          {% endfor %}
           proximity = !proximity ;
-          if (proximity)
+          applyFilters();
+
+          if (!proximity)
           {
             $('#iproximity').removeClass('icon-ok') 
             
@@ -287,40 +305,6 @@ $("#proximity").bind('click',function(e)
           }
           return false;
 });
-
-function change_name_collapse(value)
-{
-
-    {% for name, qset in results %}
-      {% for k,v in qset.items %}
-
-
-    $("div[id^='collapse']").filter(function(){
-    var regexp = /^collapse(.*)$/;
-    return (this.id.match(regexp));
-    }).each(function(){
-    //this.innerHTML = this.id;
-    //console.log(this.id);
-    var current = "{{name|removespaces}}_{{k|removespaces}}";
-    if (this.id.indexOf(current))
-    {
-        if(value) { //expand
-//            console.log("expand");
-            $('#'+this.id).collapse('show');
-        }
-        else {  //collapse
-//            console.log("collapse");
-            $('#'+this.id).collapse('hide');
-        }
-
-    };
-    });
-
-      //show_hide_empty_rows(['{{name|removespaces}}_{{k|removespaces}}'], value);
-      {% endfor %}
-      {% endfor %}
-      return false;
-};
 
 /*
  * delayKeyup
@@ -345,18 +329,12 @@ function change_name_collapse(value)
 
 $("#searchfilter").delayKeyup(
     function(){
-      doublecheck_expansions();
-      var filter = $("#searchfilter").val();
-        {% for name, qset in results %}
-          {% for k,v in qset.items %}
 
-            filter_word(['{{name|removespaces}}_{{k|removespaces}}'], filter);
+      applyFilters();
 
-          {% endfor %}
-        {% endfor %}
-        return false;
-      }
-  , 200);
+      return false;
+    }
+  , 500);
 
 
 function hidecheckbox()
@@ -368,8 +346,8 @@ function hidecheckbox()
 
 myFunc = function(name)
 {
-  console.log(this);
-  console.log(name);
+  //console.log(this);
+  //console.log(name);
   var current = this.id;
   current = current.replace("a_", "");
   current = current.split("_")[0];
@@ -389,8 +367,8 @@ $("div[id^='collapse']").filter(function(){
     return (this.id.match(regexp));
 }).each(function(){
     //this.innerHTML = this.id;
-    console.log(this.id);
-    console.log(current);
+    //console.log(this.id);
+    //console.log(current);
     if (!this.id.indexOf(current))
     { 
       $('#'+this.id).collapse('toggle'); 

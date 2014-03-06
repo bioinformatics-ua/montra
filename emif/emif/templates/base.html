@@ -198,9 +198,9 @@
                     <li id="search_li" class="pull-left">
                             <form class="navbar-search pull-left" method="POST" action="resultsdiff/1">{% csrf_token %}
                                 {% if isAdvanced %}
-                                                                <input title="Enter the terms you wish to search for." class="search-query span3 form-text" placeholder="" type="text" id="edit-search-block-form--3" name="query" value="" size="25" maxlength="256">
+                                                                <input title="Enter the terms you wish to search for." class="search-query span2_5 form-text" placeholder="" type="text" id="edit-search-block-form--3" name="query" value="" size="25" maxlength="256">
                                 {% else %}
-                                <input title="Enter the terms you wish to search for." class="search-query span3 form-text" placeholder="" type="text" id="edit-search-block-form--3" name="query" value="{{search_old}}" size="25" maxlength="256">
+                                <input title="Enter the terms you wish to search for." class="search-query span2_5 form-text" placeholder="" type="text" id="edit-search-block-form--3" name="query" value="{{search_old}}" size="25" maxlength="256">
                                 {% endif %}
                                 <input name='search_full' value='search_full' type='hidden'>
                             </form>
