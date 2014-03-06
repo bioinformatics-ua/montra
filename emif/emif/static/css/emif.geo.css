@@ -3,8 +3,8 @@
 }
 
 #info-window {
-    width: 250px;
-    max-height: 290px !important;
+    width: 350px;
+    max-height: 400px !important;
     margin: 0px !important;
     padding: 0px !important;
     overflow-x: hidden !important;

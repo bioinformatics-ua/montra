@@ -1033,6 +1033,71 @@ def get_databases_from_solr(request, query="*:*"):
 
     return list_databases
 
+def __get_scientific_contact(db, db_solr, type_name):
+    print "type_name" + type_name
+    print "type_name"
+    if type_name == "Observational Data Sources":
+        if (db_solr.has_key('institution_name_t')):
+            db.admin_name = db_solr['institution_name_t']
+        if (db_solr.has_key('Administrative_contact_address_t')):
+            db.admin_address = db_solr['Administrative_contact_address_t']
+        if (db_solr.has_key('Administrative_contact_email_t')):
+            db.admin_email = db_solr['Administrative_contact_email_t']
+        if (db_solr.has_key('Administrative_contact_phone_t')):
+            db.admin_phone = db_solr['Administrative_contact_phone_t']
+
+
+        if (db_solr.has_key('Scientific_contact_name_t')):
+            db.scien_name = db_solr['Scientific_contact_name_t']
+        if (db_solr.has_key('Scientific_contact_address_t')):
+            db.scien_address = db_solr['Scientific_contact_address_t']
+
+        if (db_solr.has_key('Scientific_contact_email_t')):
+            db.scien_email = db_solr['Scientific_contact_email_t']
+        if (db_solr.has_key('Scientific_contact_phone_t')):
+            db.scien_phone = db_solr['Scientific_contact_phone_t']
+
+
+        if (db_solr.has_key('Technical_contact_/_data_manager_contact_name_t')):
+            db.tec_name = db_solr['Technical_contact_/_data_manager_contact_name_t']
+        if (db_solr.has_key('Technical_contact_/_data_manager_contact_address_t')):
+            db.tec_address = db_solr['Technical_contact_/_data_manager_contact_address_t']
+        if (db_solr.has_key('Technical_contact_/_data_manager_contact_email_t')):
+            db.tec_email = db_solr['Technical_contact_/_data_manager_contact_email_t']
+        if (db_solr.has_key('Technical_contact_/_data_manager_contact_phone_t')):
+            db.tec_phone = db_solr['Technical_contact_/_data_manager_contact_phone_t']
+
+    elif "AD Cohort" in type_name :
+
+        if (db_solr.has_key('Administrative_Contact__AC___Name_t')):
+            db.admin_name = db_solr['Administrative_Contact__AC___Name_t']
+        if (db_solr.has_key('AC__Address_t')):
+            db.admin_address = db_solr['AC__Address_t']
+        if (db_solr.has_key('AC__email_t')):
+            db.admin_email = db_solr['AC__email_t']
+        if (db_solr.has_key('AC__phone_t')):
+            db.admin_phone = db_solr['AC__phone_t']
+
+        if (db_solr.has_key('Scientific_Contact__SC___Name_t')):
+            db.scien_name = db_solr['Scientific_Contact__SC___Name_t']
+        if (db_solr.has_key('SC__Address_t')):
+            db.scien_address = db_solr['SC__Address_t']
+        if (db_solr.has_key('SC__email_t')):
+            db.scien_email = db_solr['SC__email_t']
+        if (db_solr.has_key('SC__phone_t')):
+            db.scien_phone = db_solr['SC__phone_t']
+
+        if (db_solr.has_key('Technical_Contact_Data_manager__TC___Name_t')):
+            db.tec_name = db_solr['Technical_Contact_Data_manager__TC___Name_t']
+        if (db_solr.has_key('TC__Address_t')):
+            db.tec_address = db_solr['TC__Address_t']
+        if (db_solr.has_key('TC__email_t')):
+            db.tec_email = db_solr['TC__email_t']
+        if (db_solr.has_key('TC__phone_t')):
+            db.tec_phone = db_solr['TC__phone_t']
+
+    return db
+
 def get_databases_from_solr_v2(request, query="*:*", sort="", rows=100, start=0):
     c = CoreEngine()
     results = c.search_fingerprint(query, sort=sort, rows=rows, start=start)
@@ -1106,6 +1171,7 @@ def get_databases_from_solr_v2(request, query="*:*", sort="", rows=100, start=0)
             (ttype, type_name) = questionnaires_ids[r['type_t']]
             database_aux.ttype = ttype
             database_aux.type_name = type_name
+            database_aux = __get_scientific_contact(database_aux, r, database_aux.type_name)
             list_databases.append(database_aux)
         except Exception, e:
             print e

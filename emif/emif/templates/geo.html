@@ -69,6 +69,38 @@ function initialize(list_db) {
                 
                 contentHTML += 'Number of patients: <b>' + clean(_db.number_patients) + '</b></br>';
 
+                //# Administrative
+                contentHTML += '<div class="well">';
+                contentHTML += '<div class="row">';
+                contentHTML += '<i class="fa fa-user icon"></i> Administrative contact: <b>' + clean(_db.admin_name) + '</b></br>';
+                contentHTML += '<i class="fa fa-home icon"></i> Address: <b>' + clean(_db.admin_address) + '</b></br>';
+                contentHTML += '<i class="fa fa-envelope icon"></i> Email: <b>' + clean(_db.admin_email) + '</b></br>';
+                contentHTML += '<i class="fa fa-phone icon"></i> Phone: <b>' + clean(_db.admin_phone) + '</b></br>';
+                contentHTML += '</div>';
+                contentHTML += '</div>';
+
+                contentHTML += '</br>';
+                //# Scentific
+                contentHTML += '<div class="well">';
+                contentHTML += '<div class="row">';
+                contentHTML += '<i class="fa fa-user icon"></i> Scientific contact: <b>' + clean(_db.scien_name) + '</b></br>';
+                contentHTML += '<i class="fa fa-home icon"></i> Address: <b>' + clean(_db.scien_address) + '</b></br>';
+                contentHTML += '<i class="fa fa-envelope icon"></i> Email: <b>' + clean(_db.scien_email) + '</b></br>';
+                contentHTML += '<i class="fa fa-phone icon"></i>  Phone: <b>' + clean(_db.scien_phone) + '</b></br>';
+                contentHTML += '</div>';
+                contentHTML += '</div>';
+                contentHTML += '</br>';
+                //# Tecnical
+
+                contentHTML += '<div class="well">';
+                contentHTML += '<div class="row">';
+                contentHTML += '<i class="fa fa-user icon"></i> Tecnical contact: <b>' + clean(_db.tec_name) + '</b></br>';
+                contentHTML += '<i class="fa fa-home icon"></i> Address: <b>' + clean(_db.tec_address) + '</b></br>';
+                contentHTML += '<i class="fa fa-envelope icon"></i> Email: <b>' + clean(_db.tec_email) + '</b></br>';
+                contentHTML += '<i class="fa fa-phone icon"></i> Phone: <b>' + clean(_db.tec_phone) + '</b></br>';
+                contentHTML += '</div>';
+                contentHTML += '</div>';
+
                 contentHTML += '</div>';
 
 
