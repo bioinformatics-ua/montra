@@ -877,7 +877,7 @@ def extract_answers(request2, questionnaire_id, question_set, qs_list):
             try:
                 if request.POST and request.POST[comment_id]!='':
                     #comment_id_index = "comment_question_"+question.slug
-                    comment_id_index = "comment_question_"+question.slug_fk
+                    comment_id_index = "comment_question_"+question.slug_fk.slug1
                     extra_comments[question] = request.POST[comment_id]
                     extra_fields[comment_id_index+'_t'] = request.POST[comment_id]
             except KeyError:
