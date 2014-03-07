@@ -1186,8 +1186,8 @@ def get_databases_from_solr_v2(request, query="*:*", sort="", rows=100, start=0)
             database_aux.ttype = ttype
             database_aux.type_name = type_name
             database_aux = __get_scientific_contact(database_aux, r, database_aux.type_name)
-            import pdb
-            pdb.set_trace()
+            #import pdb
+            #pdb.set_trace()
             list_databases.append(database_aux)
         except Exception, e:
             print e
