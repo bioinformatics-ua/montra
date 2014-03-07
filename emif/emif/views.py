@@ -437,6 +437,8 @@ def geo(request, template_name='geo.html'):
                     continue
 
             _long_lats.append(str(city.lat) + ", " + str(city.long))
+            import pdb
+            #pdb.set_trace()
             db_list.append({'name': database.name,
             'location': database.location.encode('ascii', 'ignore').strip(),
             'institution': database.institution.encode('ascii', 'ignore').strip(),
@@ -1013,11 +1015,11 @@ def database_edit(request, fingerprint_id, questionnaire_id, template_name="data
         
     return r
 
-class Database:
-    id = ''
-    name = ''
-    date = ''
-    last_activity = ''
+#class Database:
+#    id = ''
+#    name = ''
+#    date = ''
+#    last_activity = ''
     
 
 
@@ -1184,6 +1186,8 @@ def get_databases_from_solr_v2(request, query="*:*", sort="", rows=100, start=0)
             database_aux.ttype = ttype
             database_aux.type_name = type_name
             database_aux = __get_scientific_contact(database_aux, r, database_aux.type_name)
+            import pdb
+            pdb.set_trace()
             list_databases.append(database_aux)
         except Exception, e:
             print e
