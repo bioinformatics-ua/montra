@@ -440,7 +440,7 @@ def geo(request, template_name='geo.html'):
             import pdb
             #pdb.set_trace()
             def __cleanvalue(v):
-                return v.encode('ascii', 'ignore').strip().replace('\n', ' ')
+                return v.encode('ascii', 'ignore').strip().replace('\n', ' ').replace('\r', ' ')
             db_list.append({'name': database.name,
             'location': __cleanvalue(database.location),
             'institution': __cleanvalue(database.institution),
