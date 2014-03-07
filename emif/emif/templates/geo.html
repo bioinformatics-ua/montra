@@ -62,9 +62,9 @@ function initialize(list_db) {
 
                 contentHTML += '<div class="organization-address">';
                 
-                contentHTML += 'Institution name: <b>' + clean(_db.institution) + '</b></br>';
-                contentHTML += 'Location: <b>' + clean(_db.location) + '</b></br>';
-                contentHTML += 'Contact: <b>' + clean(_db.contact) + '</b></br>';
+                contentHTML += 'Institution name: <b>' + clean(_db.db.institution) + '</b></br>';
+                contentHTML += 'Location: <b>' + clean(_db.db.location) + '</b></br>';
+                contentHTML += 'Contact: <b>' + clean(_db.db.contact) + '</b></br>';
                 contentHTML += 'DB Type: <b>' + clean(_db.ttype) + '</b></br>';
                 
                 contentHTML += 'Number of patients: <b>' + clean(_db.number_patients) + '</b></br>';
@@ -72,10 +72,10 @@ function initialize(list_db) {
                 //# Administrative
                 contentHTML += '<div class="geo-well well">';
                 contentHTML += '<div class="row">';
-                contentHTML += '<i class="icon-user icon"></i> Administrative contact: <b>' + clean(_db.admin_name) + '</b><br />';
-                contentHTML += '<i class="icon-home icon"></i> Address: <b>' + clean(_db.admin_address) + '</b></br>';
-                contentHTML += '<i class="icon-envelope icon"></i> Email: <b>' + clean(_db.admin_email) + '</b></br>';
-                contentHTML += '<i class="icon-phone icon"></i> Phone: <b>' + clean(_db.admin_phone) + '</b></br>';
+                contentHTML += '<i class="icon-user icon"></i> Administrative contact: <b>' + clean(_db.db.admin_name) + '</b><br />';
+                contentHTML += '<i class="icon-home icon"></i> Address: <b>' + clean(_db.db.admin_address) + '</b></br>';
+                contentHTML += '<i class="icon-envelope icon"></i> Email: <b>' + clean(_db.db.admin_email) + '</b></br>';
+                contentHTML += '<i class="icon-phone icon"></i> Phone: <b>' + clean(_db.db.admin_phone) + '</b></br>';
                 contentHTML += '</div>';
                 contentHTML += '</div>';
 
@@ -83,10 +83,10 @@ function initialize(list_db) {
                 //# Scentific
                 contentHTML += '<div class="geo-well well">';
                 contentHTML += '<div class="row">';
-                contentHTML += '<i class="icon-user icon"></i> Scientific contact: <b>' + clean(_db.scien_name) + '</b></br>';
-                contentHTML += '<i class="icon-home icon"></i> Address: <b>' + clean(_db.scien_address) + '</b></br>';
-                contentHTML += '<i class="icon-envelope icon"></i> Email: <b>' + clean(_db.scien_email) + '</b></br>';
-                contentHTML += '<i class="icon-phone icon"></i>  Phone: <b>' + clean(_db.scien_phone) + '</b></br>';
+                contentHTML += '<i class="icon-user icon"></i> Scientific contact: <b>' + clean(_db.db.scien_name) + '</b></br>';
+                contentHTML += '<i class="icon-home icon"></i> Address: <b>' + clean(_db.db.scien_address) + '</b></br>';
+                contentHTML += '<i class="icon-envelope icon"></i> Email: <b>' + clean(_db.db.scien_email) + '</b></br>';
+                contentHTML += '<i class="icon-phone icon"></i>  Phone: <b>' + clean(_db.db.scien_phone) + '</b></br>';
                 contentHTML += '</div>';
                 contentHTML += '</div>';
                 contentHTML += '<br />';
@@ -94,10 +94,10 @@ function initialize(list_db) {
 
                 contentHTML += '<div class="geo-well well">';
                 contentHTML += '<div class="row">';
-                contentHTML += '<i class="icon-user icon"></i> Tecnical contact: <b>' + clean(_db.tec_name) + '</b></br>';
-                contentHTML += '<i class="icon-home icon"></i> Address: <b>' + clean(_db.tec_address) + '</b></br>';
-                contentHTML += '<i class="icon-envelope icon"></i> Email: <b>' + clean(_db.tec_email) + '</b></br>';
-                contentHTML += '<i class="icon-phone icon"></i> Phone: <b>' + clean(_db.tec_phone) + '</b></br>';
+                contentHTML += '<i class="icon-user icon"></i> Tecnical contact: <b>' + clean(_db.db.tec_name) + '</b></br>';
+                contentHTML += '<i class="icon-home icon"></i> Address: <b>' + clean(_db.db.tec_address) + '</b></br>';
+                contentHTML += '<i class="icon-envelope icon"></i> Email: <b>' + clean(_db.db.tec_email) + '</b></br>';
+                contentHTML += '<i class="icon-phone icon"></i> Phone: <b>' + clean(_db.db.tec_phone) + '</b></br>';
                 contentHTML += '</div>';
                 contentHTML += '</div>';
 

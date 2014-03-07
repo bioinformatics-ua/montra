@@ -438,12 +438,13 @@ def geo(request, template_name='geo.html'):
 
             _long_lats.append(str(city.lat) + ", " + str(city.long))
             db_list.append({'name': database.name,
-            'location': str(database.location).lstrip('\n\r'),
-            'institution': str(database.institution).strip(),
+            'location': database.location.encode('ascii', 'ignore').strip(),
+            'institution': database.institution.encode('ascii', 'ignore').strip(),
             'contact': database.email_contact,
             'number_patients': database.number_patients,
             'ttype': database.type_name,
             'id' : database.id,
+            'db': database,
             'lat' : str(city.lat),
             'long': str(city.long),
             })
