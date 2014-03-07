@@ -27,6 +27,7 @@
 
 <script src="{{ STATIC_URL}}js/vendor/jquery.boolrelwidget.js"></script>
 <script src="{{ STATIC_URL }}js/vendor/jquery.ba-throttle-debounce.min.js"></script>
+<script src="{{ STATIC_URL }}js/vendor/json2.js"></script>
 <script src="{{ STATIC_URL }}js/paginator-sorter.js"></script>
 
 
@@ -207,7 +208,12 @@
 <script type="text/javascript">
 var a;
 $(document).ready(function(){
-    a = new PaginatorSorter("table_databases", '{{sort_params.base_filter}}', '{{sort_params.selected_name}}', '{{sort_params.selected_value}}');
+    
+    a = new PaginatorSorter("table_databases", '{{sort_params.base_filter}}', '{{sort_params.selected_name}}', '{{sort_params.selected_value}}', '{{sort_params.extraObjects|safe}}');
+
+    //TO Be Applied in future releases.
+    //a.atachPlugin( new SelectPaginatorPlugin());
+
     paginator_via_post();
 });
 </script>
