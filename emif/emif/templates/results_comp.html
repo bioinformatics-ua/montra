@@ -80,21 +80,34 @@ th, td {
 
 {% block content %}
 <div class="clearboth">
-<input type="text" size="60" style="margin-left: 0px;" class="span12" id="searchfilter" placeholder="To filter type here" tabindex="1">
+
+<ul class="pager">
+  <li class="pull-left"><input type="text" size="60" style="margin-left: 0px;" class="span9" id="searchfilter" placeholder="To filter type here" tabindex="1"></li>
+  <li>
+    <div class="pull-right btn-group">
+      <button id="compare_previous" class="btn"><i class="icon-arrow-left"></i></button>
+      <span id="compare_id" class="btn disabled">1/{{results|length|add:-1}}</span>
+      <button id="compare_next" class="btn"><i class="icon-arrow-right"></i></button>
+    </div>
+  </li>
+
+</ul>
 </div>
 
 <div style="margin: 0px;" class="span12">
-  <div style="overflow: auto;" class="well accordion" id="accordion2">
-  <table id="database_listings"><tr>
+  <div style="overflow-x: auto;" class="well accordion" id="accordion2">
+  <div id="database_listings">
+  <div class="database_rows">
+
     {% for name, qset in results %}
                       
-    <td class="database_listing" style="min-width: 500px;">
+    <div class="database_listing {%if forloop.counter == 2 %}database_listing_pointer{% endif %} {%if forloop.counter > 2 %}database_listing_away{% endif %}">
     <div {% if forloop.first%}style="margin-left: 0px;"{% endif %}>
       <span style="cursor: pointer;" class="pull-left label label-inverse">{{name}}</span>
       {%if database_to_compare|removespaces in name|removespaces %}
-      <span class="set_reference pull-right label label-info">Using as reference table</span>
+      <span id="ref{{name|removespaces}}" class="set_reference pull-right label label-info">Using as reference table</span>
       {% else %}
-       <span class="set_reference pull-right label label-success">Set as reference</span>     
+       <span id="ref{{name|removespaces}}" class="set_reference pull-right label label-success">Set as reference</span>     
       {% endif %}
       <br />
 
@@ -123,9 +136,10 @@ th, td {
       </div>
       {% endfor %}
     </div>
-    </td>
+    </div>
     {% endfor %}
-    </tr></table>
+    </div>
+    </div>
     <div id="no_results" class="pull-center">No results found, for this filtering parameters.</div>
   </div>
 </div>
@@ -413,24 +427,94 @@ $.fn.textWidth = function() {
   node.remove();
   return width;
 };
-
-$(function() {
+var comparing_current=1;
+var max_comparing = {{results|length|add:-1}};
+$(function(){
   $('[id^="{{database_to_compare|removespaces}}"] td').addClass("basetable");
+
+  $('#compare_previous').click(function(){
+    $('#compare_next').prop('disabled', false);
+    
+    comparing_current--;
+    if(comparing_current == 1)
+      $(this).prop('disabled', true);
+
+    $('#compare_id').text(comparing_current+'/'+max_comparing);
+
+    $('.database_listing_pointer').first().removeClass("database_listing_pointer").addClass("database_listing_away");
+
+    $('.database_listing_away').eq(comparing_current-1).removeClass("database_listing_away").addClass("database_listing_pointer");
+
+  });
+
+  $('#compare_next').click(function(){
+    $('#compare_previous').prop('disabled', false);
+
+    comparing_current++;
+    if(comparing_current == max_comparing)
+      $(this).prop('disabled', true);
+    $('#compare_id').text(comparing_current+'/'+max_comparing);
+  
+    $('.database_listing_pointer').first().removeClass("database_listing_pointer").addClass("database_listing_away"); 
+
+    $('.database_listing_away').eq(comparing_current-1).removeClass("database_listing_away").addClass("database_listing_pointer");
+
+     });
+
+  $('.set_reference').click(function(){
+    var identity = $(this).prop('id').substring(3);
+    
+    console.log(identity);
+
+    // If not is reference
+    if(!$(this).hasClass('label-info')){
+      $('.database_listing_pointer').first().removeClass("database_listing_pointer"); 
+      
+      $('.set_reference').each(function(){
+        if($(this).hasClass('label-info')){
+          console.log('DOES THIS HAPPEN ?');
+          $(this).removeClass('label-info');
+          $(this).addClass('label-success');
+          $(this).text('Set as reference'); 
+
+          $(this).parent().parent().addClass('database_listing_pointer'); 
+
+        }
+
+        
+      });
+
+      $(this).addClass('label-info');
+      $(this).text('Using as reference table');
+
+      // Clean all status
+      $('.basetable').removeClass("basetable");
+      $('.success').removeClass("success");
+      $('.warning').removeClass("warning");
+      $('.error').removeClass("error");
+
+
+      $('[id^="'+identity+'"] td').addClass("basetable");
+      $('#database_listings .database_listing').sort(CustomSort).appendTo('#database_listings');
+
+      compareDatabases(identity);
+
+    } 
+
+  });
+
+  $('#compare_previous').prop('disabled', true);
+  if(comparing_current == max_comparing)
+     $('#compare_next').prop('disabled', true);
+   
 });
 var databases = [];
 
-function compareDatabases(){
+function compareDatabases(base){
   var threadpool = new ThreadPool(20);
   var priority=1;
-  {% for name, qset in results %}
 
-  {% if not forloop.first %}
-  {% for k,v in qset.items %}
-    var thread = new Runnable(compareDatabase, priority++, '{{database_to_compare|removespaces}}_{{k|removespaces}}', '{{name|removespaces}}_{{k|removespaces}}');
-    threadpool.run(thread);
-  {% endfor %}
-  {% endif %}
-  {% endfor %}
+  {% for name, qset in results %}{% for k,v in qset.items %}var thread = new Runnable(compareDatabase, priority++, base+'_{{k|removespaces}}', '{{name|removespaces}}_{{k|removespaces}}'); threadpool.run(thread); {% endfor %}{% endfor %}
 
   threadpool.destroy(
     function(){
@@ -444,8 +528,18 @@ function compareDatabase(base, other){
 
   this.complete();
 }
+function CustomSort( a ,b ){
 
-compareDatabases();
+     if($(a).find('.set_reference').first().hasClass('label-info'))
+      return -1;
+     if($(b).find('.set_reference').first().hasClass('label-info'))
+      return 1;  
+
+     else return 0;
+}
+$('#database_listings .database_listing').sort(CustomSort).appendTo('#database_listings');
+
+compareDatabases('{{database_to_compare|removespaces}}');
 
 {% comment %}
 </script>

@@ -244,6 +244,10 @@ class GlobalVariableGetNode( template.Node ):
         except AttributeError:
             return ''
 
+@register.simple_tag()
+def multiply(a, b, *args, **kwargs):
+    # you would need to do any localization of the result here
+    return a * b
 
 def getglobal( parser, token ):
     try:
@@ -285,6 +289,7 @@ def get_version():
 def get_version_tag(parser, token):
     return VersionNode('')
 register.tag( 'get_version', get_version_tag )
+
 
 
 

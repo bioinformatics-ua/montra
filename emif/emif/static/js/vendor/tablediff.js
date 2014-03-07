@@ -345,7 +345,7 @@ function hideEmptyCells(list_tables, table_tmp, show_emptyrows){
 				if(classes[i].indexOf('rowid_') != -1)
 					this_class=classes[i];
 			}
-			console.log(this_class);
+			
 			var no_value = true;
 			$("."+this_class).each(function() {
 			    var cell = $.trim($($(this).find('td')[1]).text());
@@ -354,6 +354,7 @@ function hideEmptyCells(list_tables, table_tmp, show_emptyrows){
 			    	no_value = false;
 			    } 
 			});
+
 			if(no_value){
 			        if (show_emptyrows)
 			        {
@@ -379,6 +380,7 @@ function filter_results(list_tables, word, show_match, show_unmatch, show_emptyr
 		// First we reset
 		$('#' + list_tables[table_tmp]).parent().parent().parent().show();
 		$('#' + list_tables[table_tmp] + " entry").show();
+
 		// match
 		if (show_match)
 		{
@@ -408,11 +410,10 @@ function filter_results(list_tables, word, show_match, show_unmatch, show_emptyr
 		{
 			$('#' + list_tables[table_tmp] + ' .warning').hide();	
 		}
-		
+
 		// emptyrows
-		hideEmptyCells(list_tables, table_tmp, show_emptyrows);
-		
-		
+		//hideEmptyCells(list_tables, table_tmp, show_emptyrows);	
+
 		// filter
 		hideTableCell(list_tables, table_tmp, word);
 	

@@ -383,7 +383,26 @@ box-shadow: inset 0 3px 8px rgba(0,0,0,0.125);
   font-size: 150%;
   cursor: pointer;
 }
-
+.set_reference{
+  cursor: pointer;
+}
+#database_listings{
+  display: table;
+}
+.database_rows{
+  display: table-row;
+}
+.database_listing{
+  padding:2px;
+  width: 450px; 
+  display: table-cell;
+}
+.database_listing_away{
+  position: absolute;
+  left: -19999px;
+  top: -19999px;
+  visibility: hidden;
+}
 /* ==========================================================================
    My databases table
    ========================================================================== */
