@@ -189,14 +189,15 @@ def results_fulltext_aux(request, query, page=1, template_name='results.html', i
                                                 'num_results': 0, 'page_obj': None})
     (sortString, filterString, sort_params, range) = paginator_process_params(request.POST, page, rows)   
     sort_params["base_filter"] = query;
+    query_filtered=query
     if len(filterString) > 0:
-        query += " AND " + filterString
+        query_filtered += " AND " + filterString
 
-    print query
+    print query_filtered
 
-    (list_databases, hits) = get_databases_from_solr_v2(request, query, sort=sortString, rows=rows, start=range)    
+    (list_databases, hits) = get_databases_from_solr_v2(request, query_filtered, sort=sortString, rows=rows, start=range)    
     if range > hits and not force:
-        return results_fulltext_aux(request, query, 1, isAdvanced=isAdvanced, force=force)  
+        return results_fulltext_aux(request, query, 1, isAdvanced=isAdvanced, force=True)  
 
     if len(list_databases) == 0 :
         query_old = request.session.get('query', "")
@@ -1302,6 +1303,13 @@ def paginator_process_params(request, page, rows):
 
     start = (int(page) - 1) * rows
 
+    #print mode
+    if "extraObjects" in mode:
+        extraObjects = mode["extraObjects"]
+    else:
+        extraObjects = {}
+    sort_params["extraObjects"] = json.dumps(extraObjects)
+    #print sort_params
     return (sortString, filterString, sort_params, start)
 
 def paginator_process_list(list_databases, hits, start):
