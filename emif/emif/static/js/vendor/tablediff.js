@@ -272,6 +272,8 @@ tablediffall = function(table_base, list_tables)
 
 tablediffall_two = function(table_base, list_tables)
 {
+	// If we are calling it a second time, we must reset this because of base
+
 	$(list_tables).each(function(table_tmp)
 	{
 		comparetable_two(table_base, list_tables[table_tmp]);		
@@ -288,8 +290,9 @@ tablediffall_two = function(table_base, list_tables)
  * @param  {[string]} list_tables List of tables
  * @return {[None]}             None
  */
-cleantablediff = function(list_tables)
+/*cleantablediff = function(list_tables)
 {
+
 	$(list_tables).each(function(table_tmp)
 	{
 		//console.log(list_tables[table_tmp]);
@@ -306,6 +309,7 @@ cleantablediff = function(list_tables)
 		  				//console.log(this);
 		  				$(this).removeClass("success");
 	  					$(this).removeClass("error");
+	  					$(this).removeClass("warning");
 		  			}
 		  	});		
 	  	});
@@ -313,7 +317,13 @@ cleantablediff = function(list_tables)
 	});
 	});
 
-};
+};*/
+/* Isnt this just faster ? */
+cleantablediff = function(){
+  $('.database_listing .error').removeClass('error');
+  $('.database_listing .success').removeClass('success');
+  $('.database_listing .warning').removeClass('warning');
+}
 
 function hide_uncessary_qs(list_tables, table_tmp){
 	var visibles_left = $('#' + list_tables[table_tmp] + ' tr:visible').length;

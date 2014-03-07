@@ -194,8 +194,8 @@ function doublecheck_expansions(){
           } 
 }
 function check_empties(){
-  var dbs_visible = $('#database_listings .database_listing .accordion-group:visible').length;
-  
+  var dbs_visible = $('#database_listings .database_listing:not(.database_listing_away) .accordion-group:visible').length;
+
   if(dbs_visible == 0){
     $('#database_listings').hide();
     $('#no_results').show();
@@ -218,13 +218,19 @@ var proximity=true;
 
 function applyFilters(){
   reset_empties();
+  var reference_table = $('.database_listing').eq(0).find('.set_reference').prop('id').substring(3);
+  var compared_table = $('.database_listing_pointer').find('.set_reference').prop('id').substring(3);
 
+  console.log('IDS TO COMPARE: '+reference_table +":"+compared_table);
   var filter_string = $("#searchfilter").val();
-          {% for name, qset in results %}
+
+          {%for name, qset in results|slice:":1" %}
             {% for k,v in qset.items %}
-            filter_results(['{{name|removespaces}}_{{k|removespaces}}'],filter_string, match, unmatch, emptyrows, proximity);
+            filter_results([reference_table+'_{{k|removespaces}}'],filter_string, match, unmatch, emptyrows, proximity);
+            filter_results([compared_table+'_{{k|removespaces}}'],filter_string, match, unmatch, emptyrows, proximity);
+
+            {% endfor %}
           {% endfor %}
-          {% endfor %}  
 
   doublecheck_expansions();
   check_empties();  
@@ -445,6 +451,8 @@ $(function(){
 
     $('.database_listing_away').eq(comparing_current-1).removeClass("database_listing_away").addClass("database_listing_pointer");
 
+      compareDatabases();
+      applyFilters();
   });
 
   $('#compare_next').click(function(){
@@ -459,6 +467,8 @@ $(function(){
 
     $('.database_listing_away').eq(comparing_current-1).removeClass("database_listing_away").addClass("database_listing_pointer");
 
+      compareDatabases();
+      applyFilters();
      });
 
   $('.set_reference').click(function(){
@@ -497,7 +507,7 @@ $(function(){
       $('[id^="'+identity+'"] td').addClass("basetable");
       $('#database_listings .database_listing').sort(CustomSort).appendTo('#database_listings');
 
-      compareDatabases(identity);
+      compareDatabases();
 
     } 
 
@@ -510,11 +520,22 @@ $(function(){
 });
 var databases = [];
 
-function compareDatabases(base){
+function compareDatabases(){
+
+
   var threadpool = new ThreadPool(20);
   var priority=1;
 
-  {% for name, qset in results %}{% for k,v in qset.items %}var thread = new Runnable(compareDatabase, priority++, base+'_{{k|removespaces}}', '{{name|removespaces}}_{{k|removespaces}}'); threadpool.run(thread); {% endfor %}{% endfor %}
+  var reference_table = $('.database_listing').eq(0).find('.set_reference').prop('id').substring(3);
+  var compared_table = $('.database_listing_pointer').find('.set_reference').prop('id').substring(3);  
+
+  console.log("compare:"+reference_table+" : "+compared_table);
+
+  {%for name, qset in results|slice:":1" %}
+    {% for k,v in qset.items %}
+      var thread = new Runnable(compareDatabase, priority++, reference_table+'_{{k|removespaces}}', compared_table+'_{{k|removespaces}}'); threadpool.run(thread);  
+    {% endfor %}
+  {% endfor %}
 
   threadpool.destroy(
     function(){
@@ -539,7 +560,7 @@ function CustomSort( a ,b ){
 }
 $('#database_listings .database_listing').sort(CustomSort).appendTo('#database_listings');
 
-compareDatabases('{{database_to_compare|removespaces}}');
+compareDatabases();
 
 {% comment %}
 </script>
