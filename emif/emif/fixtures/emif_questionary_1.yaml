@@ -183,7 +183,7 @@
 - pk: 0
   fields: {checks: '', extra_en: '', number: '0', questionset: 0,
  text_en: 'The purpose of this questionnaire is to get some initial information on the databases available for the EMIF Platform. In the first months of the project, we will start a process of “fingerprinting”. The first version of a deliverable (the so-called initial fingerprinting) is already due in march. The process of fingerprinting will be led by Miriam Sturkenboom. To have some information available on the databases in the platform and to identify the points of contact, we ask you to fill in this questionnaire. It will form the bases of a short presentation during the kick-off meeting in Barcelona. Please click "Continue" to procceed.',
-  type: comment, slug: 0, stats: False}
+  type: comment, slug_fk: 0, stats: False}
   model: questionnaire.question
 
 - pk: 1
