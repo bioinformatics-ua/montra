@@ -323,6 +323,7 @@ cleantablediff = function(){
   $('.database_listing .error').removeClass('error');
   $('.database_listing .success').removeClass('success');
   $('.database_listing .warning').removeClass('warning');
+  $('.database_listing .entry').show();
 }
 
 function hide_uncessary_qs(list_tables, table_tmp){
@@ -366,11 +367,7 @@ function hideEmptyCells(list_tables, table_tmp, show_emptyrows){
 			});
 
 			if(no_value){
-			        if (show_emptyrows)
-			        {
-			        	$("."+this_class).show();
-			        }
-			        else
+			        if (!show_emptyrows)
 			        {
 			        	$("."+this_class).hide();	
 			        }
@@ -422,7 +419,7 @@ function filter_results(list_tables, word, show_match, show_unmatch, show_emptyr
 		}
 
 		// emptyrows
-		//hideEmptyCells(list_tables, table_tmp, show_emptyrows);	
+		hideEmptyCells(list_tables, table_tmp, show_emptyrows);	
 
 		// filter
 		hideTableCell(list_tables, table_tmp, word);

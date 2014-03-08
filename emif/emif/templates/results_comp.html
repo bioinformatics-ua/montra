@@ -147,76 +147,13 @@ th, td {
 </div>
 </div>  
 
+<script type="text/javascript" src="{{ STATIC_URL }}js/emif.results_comp.js"></script>
+
 {% endblock %}
 
-
-
-{% comment %}
-<script type="text/javascript" >
-{% endcomment %}
 {% block scriptextra %}
 
 
-$("#collapseall").bind('click',function(e)
-        { 
-          //e.preventDefault(); 
-          //e.stopPropagation();
-          
-          collapse_expand(this);
-            
-          return false;
-        });
-
-function collapse_expand(context){
-          if ($(context).text().indexOf('Collapse')!==-1)
-          {
-            $(context).text('Expand all');
-            //change_name_collapse(false);
-
-            $(".collapse:visible").collapse("hide");
-
-          }
-          else
-          {
-              $(context).text('Collapse all');
-              //change_name_collapse(true);
-              $(".collapse:visible").collapse("show");
-          }  
-}
-function doublecheck_expansions(){
-          context = $("#collapseall");
-
-          if ($(context).text().indexOf('Collapse')!=-1)
-          {
-              $(".collapse:visible").collapse("show"); 
-          }
-          else
-          {
-              $(".collapse.in:visible").collapse("hide");
-          } 
-}
-function check_empties(){
-  var dbs_visible = $('#database_listings .database_listing:not(.database_listing_away) .accordion-group:visible').length;
-
-  if(dbs_visible == 0){
-    $('#database_listings').hide();
-    $('#no_results').show();
-
-  } else {
-    $('#database_listings').show();
-    $('#no_results').hide();
-
-  }
-}
-function reset_empties(){
-  $('#database_listings').show();
-  $('#no_results').hide();
-    
-}
-var match=true;
-var unmatch=true;
-var emptyrows=true;
-var proximity=true;
 
 function applyFilters(){
   reset_empties();
@@ -238,6 +175,7 @@ function applyFilters(){
   check_empties();  
 
 }
+
 
 $("#match").bind('click',function(e)
 { 
@@ -330,111 +268,6 @@ $("#proximity").bind('click',function(e)
           return false;
 });
 
-/*
- * delayKeyup
- * http://code.azerti.net/javascript/jquery/delaykeyup.htm
- * Inspired by CMS in this post : http://stackoverflow.com/questions/1909441/jquery-keyup-delay
- * Written by Gaten
- * Exemple : $("#input").delayKeyup(function(){ alert("5 secondes passed from the last event keyup."); }, 5000);
- */
-(function ($) {
-    $.fn.delayKeyup = function(callback, ms){
-        var timer = 0;
-        $(this).keyup(function(e){
-            e.preventDefault(); 
-            e.stopPropagation();  
-
-            clearTimeout (timer);
-            timer = setTimeout(callback, ms);
-        });
-        return $(this);
-    };
-})(jQuery);
-
-$("#searchfilter").delayKeyup(
-    function(){
-
-      applyFilters();
-
-      return false;
-    }
-  , 500);
-
-
-function hidecheckbox()
-{
-  console.log("togle");
-  $('.checkbox').toggle();
-}
-
-
-myFunc = function(name)
-{
-  //console.log(this);
-  //console.log(name);
-  var current = this.id;
-  current = current.replace("a_", "");
-  current = current.split("_")[0];
-  //console.log(this.parent);
-  
-   $('div[id]').filter(function () {
-    return /^collapse.*$/.test(this.id);
-}).each(function (name2) {
-    //console.log(name2);
-});
-
-
-
-
-$("div[id^='collapse']").filter(function(){
-    var regexp = /^collapse(.*)$/;
-    return (this.id.match(regexp));
-}).each(function(){
-    //this.innerHTML = this.id;
-    //console.log(this.id);
-    //console.log(current);
-    if (!this.id.indexOf(current))
-    { 
-      $('#'+this.id).collapse('toggle'); 
-    };
-});
-
-
-
-};
-$('body').on('click', '.accordion-toggle', myFunc);
-
-
-
-/*
-
-function highlight(text, text_to_highlight)
-{
-    inputText = document.getElementById("inputText")
-    var innerHTML = inputText.innerHTML
-    var index = innerHTML.indexOf(text);
-    if ( index >= 0 )
-    { 
-        innerHTML = innerHTML.substring(0,index) + "
-<span class='highlight'>" + innerHTML.substring(index,index+text.length) + "</span>
-" + innerHTML.substring(index + text.length);
-        inputText.innerHTML = innerHTML 
-    }
-
-}
-
-*/
-
-$.fn.textWidth = function() {
-  var node, original, width;
-  original = $(this).html();
-  node = $("<span style='position:absolute;width:auto;left:-9999px'>" + original + "</span>");
-  //node.css('font-family', $(this).css('font-family')).css('font-size', $(this).//css('font-size'));
-  $('body').append(node);
-  width = node.width();
-  node.remove();
-  return width;
-};
 var comparing_current=1;
 var max_comparing = {{results|length|add:-1}};
 $(function(){
@@ -457,8 +290,7 @@ $(function(){
     newreference.hide();
     newreference.fadeIn(1000);
 
-      compareDatabases();
-      applyFilters();
+      compareDatabases(true);
 
     newreference.css('display','table-cell');      
   });
@@ -479,8 +311,7 @@ $(function(){
     newreference.hide();
     newreference.fadeIn(1000);
 
-      compareDatabases();
-      applyFilters();
+      compareDatabases(true);
 
      newreference.css('display','table-cell');
      });
@@ -545,7 +376,7 @@ var isWebkit = (typeof window.webkitConvertPointFromNodeToPage === 'function');
 }
 
 
-      compareDatabases();
+      compareDatabases(false);
 
 
       self_parent.css('display','table-cell'); 
@@ -561,14 +392,20 @@ var isWebkit = (typeof window.webkitConvertPointFromNodeToPage === 'function');
 });
 var databases = [];
 
-function compareDatabases(){
+function compareDatabases(show_modal){
 
+  if(show_modal)
+    loading_modal.showPleaseWait();
+
+  if(show_modal)
+    cleantablediff();
 
   var threadpool = new ThreadPool(20);
   var priority=1;
 
   var reference_table = $('.database_listing').eq(0).find('.set_reference').prop('id').substring(3);
   var compared_table = $('.database_listing_pointer').find('.set_reference').prop('id').substring(3);  
+
 
   {%for name, qset in results|slice:":1" %}
     {% for k,v in qset.items %}
@@ -579,6 +416,11 @@ function compareDatabases(){
   threadpool.destroy(
     function(){
         $(".tooltippable").tooltip({container:"body"});
+
+        applyFilters();
+
+        if(show_modal)        
+          loading_modal.hidePleaseWait();
     }
   );
 }
@@ -588,18 +430,8 @@ function compareDatabase(base, other){
 
   this.complete();
 }
-function CustomSort( a ,b ){
 
-     if($(a).find('.set_reference').first().hasClass('btn-primary'))
-      return -1;
-     if($(b).find('.set_reference').first().hasClass('btn-primary'))
-      return 1;  
-
-     else return 0;
-}
-$('#database_listings .database_listing').sort(CustomSort).appendTo('#database_rows');
-
-compareDatabases();
+compareDatabases(false);
 
 {% comment %}
 </script>
