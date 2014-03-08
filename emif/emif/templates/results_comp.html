@@ -97,7 +97,7 @@ th, td {
 <div style="margin: 0px;" class="span12">
   <div style="overflow-x: auto;" class="well accordion" id="accordion2">
   <div id="database_listings">
-  <div class="database_rows">
+  <div id="database_rows">
 
     {% for name, qset in results %}
                       
@@ -453,12 +453,14 @@ $(function(){
 
     var newreference = $('.database_listing_away').eq(comparing_current-1);
 
-    newreference.hide();
     newreference.removeClass("database_listing_away").addClass("database_listing_pointer");
-    newreference.fadeIn(1000).css('display','table-cell');
+    newreference.hide();
+    newreference.fadeIn(1000);
 
       compareDatabases();
       applyFilters();
+
+    newreference.css('display','table-cell');      
   });
 
   $('#compare_next').click(function(){
@@ -473,15 +475,20 @@ $(function(){
 
     var newreference = $('.database_listing_away').eq(comparing_current-1);
 
-    newreference.hide();
     newreference.removeClass("database_listing_away").addClass("database_listing_pointer");
-    newreference.fadeIn(1000).css('display','table-cell');
+    newreference.hide();
+    newreference.fadeIn(1000);
 
       compareDatabases();
       applyFilters();
+
+     newreference.css('display','table-cell');
      });
 
   $('.set_reference').click(function(){
+    var self_parent = $(this).closest('.database_listing');
+
+
     var identity = $(this).prop('id').substring(3);
     
     console.log(identity);
@@ -497,7 +504,6 @@ $(function(){
           $(this).text('Set as reference'); 
 
           $(this).closest('.database_listing').addClass('database_listing_pointer'); 
-
         }
 
         
@@ -514,7 +520,7 @@ $(function(){
 
 
       $('[id^="'+identity+'"] td').addClass("basetable");
-      $('#database_listings .database_listing').sort(CustomSort).appendTo('#database_listings');
+      $('#database_listings .database_listing').sort(CustomSort).appendTo('#database_rows');
 
 
 // Ref from: http://stackoverflow.com/questions/18625321/detect-webkit-browser-in-javascript
@@ -522,28 +528,28 @@ $(function(){
 // so i do it only on webkit, on others i have a fallback
 var isWebkit = (typeof window.webkitConvertPointFromNodeToPage === 'function');
 
-  console.log('is webkit ?'+isWebkit);
   if(isWebkit){
 
-      $(this).closest('.database_listing').hide("drop", {direction: "right"}, 900);
-      $('.database_listing_pointer').closest('.database_listing').hide("drop", {direction: "left"}, 900);      
+      self_parent.hide("drop", {direction: "right"}, 900);
+      $('.database_listing_pointer').hide("drop", {direction: "left"}, 900);
 
-      $(this).closest('.database_listing').show("drop", {direction: "right"}, 900);
-      $('.database_listing_pointer').closest('.database_listing').show("drop", {direction: "left"}, 900);
+      self_parent.show("drop", {direction: "right"}, 900);
+      $('.database_listing_pointer').show("drop", {direction: "left"}, 900);
 
 } else {
-       $(this).closest('.database_listing').fadeOut(900);
-      $('.database_listing_pointer').closest('.database_listing').fadeOut(900);      
+      self_parent.fadeOut(900);
+      $('.database_listing_pointer').fadeOut(900);      
 
-      $(this).closest('.database_listing').fadeIn(900);
-      $('.database_listing_pointer').closest('.database_listing').fadeIn(900);     
+      self_parent.fadeIn(900);
+      $('.database_listing_pointer').fadeIn(900);    
 }
 
 
       compareDatabases();
 
 
-
+      self_parent.css('display','table-cell'); 
+      $('.database_listing_pointer').css('display','table-cell');  
     } 
 
   });
@@ -563,8 +569,6 @@ function compareDatabases(){
 
   var reference_table = $('.database_listing').eq(0).find('.set_reference').prop('id').substring(3);
   var compared_table = $('.database_listing_pointer').find('.set_reference').prop('id').substring(3);  
-
-  console.log("compare:"+reference_table+" : "+compared_table);
 
   {%for name, qset in results|slice:":1" %}
     {% for k,v in qset.items %}
@@ -593,7 +597,7 @@ function CustomSort( a ,b ){
 
      else return 0;
 }
-$('#database_listings .database_listing').sort(CustomSort).appendTo('#database_listings');
+$('#database_listings .database_listing').sort(CustomSort).appendTo('#database_rows');
 
 compareDatabases();
 
