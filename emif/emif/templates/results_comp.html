@@ -455,7 +455,7 @@ $(function(){
 
     newreference.hide();
     newreference.removeClass("database_listing_away").addClass("database_listing_pointer");
-    newreference.show("drop", {direction: "right"}, 500);
+    newreference.fadeIn(1000);
 
       compareDatabases();
       applyFilters();
@@ -475,7 +475,7 @@ $(function(){
 
     newreference.hide();
     newreference.removeClass("database_listing_away").addClass("database_listing_pointer");
-    newreference.show("drop", {direction: "left"}, 500);
+    newreference.fadeIn(1000);
 
       compareDatabases();
       applyFilters();
@@ -516,12 +516,33 @@ $(function(){
       $('[id^="'+identity+'"] td').addClass("basetable");
       $('#database_listings .database_listing').sort(CustomSort).appendTo('#database_listings');
 
+
+// Ref from: http://stackoverflow.com/questions/18625321/detect-webkit-browser-in-javascript
+// For some reason gecko and presto dont understand the animation i wanted correctly, only webkit browsers,
+// so i do it only on webkit, on others i have a fallback
+var isWebkit = (typeof window.webkitConvertPointFromNodeToPage === 'function');
+
+  console.log('is webkit ?'+isWebkit);
+  if(isWebkit){
+
+      $(this).closest('.database_listing').hide("drop", {direction: "right"}, 900);
+      $('.database_listing_pointer').closest('.database_listing').hide("drop", {direction: "left"}, 900);      
+
+      $(this).closest('.database_listing').show("drop", {direction: "right"}, 900);
+      $('.database_listing_pointer').closest('.database_listing').show("drop", {direction: "left"}, 900);
+
+} else {
+       $(this).closest('.database_listing').fadeOut(900);
+      $('.database_listing_pointer').closest('.database_listing').fadeOut(900);      
+
+      $(this).closest('.database_listing').fadeIn(900);
+      $('.database_listing_pointer').closest('.database_listing').fadeIn(900);     
+}
+
+
       compareDatabases();
-      
-      $(this).closest('.database_listing').hide("drop", {direction: "right"}, 400);
-      $('.database_listing_pointer').closest('.database_listing').hide("drop", {direction: "left"}, 400);      
-      $(this).closest('.database_listing').show("drop", {direction: "right"}, 400);
-      $('.database_listing_pointer').closest('.database_listing').show("drop", {direction: "left"}, 400);
+
+
 
     } 
 
