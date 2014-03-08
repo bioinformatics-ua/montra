@@ -13,12 +13,15 @@
 
 {% block scriptextraincludes %}
 <script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false"></script>
+<link rel="stylesheet"  href="{{STATIC_URL}}css/emif.geo.css">
 <script type="text/javascript">
 
 
+
 var map;
-function initialize(list_cities) {
-	var latlng = new google.maps.LatLng(40, -8);
+function initialize(list_db) {
+	
+    var latlng = new google.maps.LatLng(40, -8);
 	var myOptions = {
 		zoom: 3,
 		center: latlng,
@@ -27,31 +30,131 @@ function initialize(list_cities) {
 	map = new google.maps.Map(document.getElementById("map_canvas"),myOptions);
 	
 	
-	$(list_cities).each(function(city_tmp)
+	$(list_db).each(function(db_tmp)
 	{
+                        var _db = list_db[db_tmp];
                         var marker = new google.maps.Marker({
                                                 map: map,
-                                                position: new google.maps.LatLng(list_cities[city_tmp].split(", ")[0], list_cities[city_tmp].split(", ")[1]),
+                                                position: new google.maps.LatLng(_db.lat, _db.long),
                                                 title: ''
-                                        });	
+                                        });
+                        
+
+
+
+                        google.maps.event.addListener(marker, 'click', (function (marker) {
+            return function () {
+
+
+                function clean(x){
+                    if (x== undefined) {
+                        return 'not defined yet';
+                    } 
+                    return x;
+                }
+                
+                // Build content
+                var contentHTML = '<div id="info-window">';
+
+                contentHTML += '<h4>';
+                contentHTML += '<a href="fingerprint/'+_db.id + '/1">' + clean(_db.name) + '</a>';
+                contentHTML += '</h4>';
+
+                contentHTML += '<div class="organization-address">';
+                
+                contentHTML += 'Institution name: <b>' + clean(_db.institution) + '</b></br>';
+                contentHTML += 'Location: <b>' + clean(_db.location) + '</b></br>';
+                contentHTML += 'Contact: <b>' + clean(_db.contact) + '</b></br>';
+                contentHTML += 'DB Type: <b>' + clean(_db.ttype) + '</b></br>';
+                
+                contentHTML += 'Number of patients: <b>' + clean(_db.number_patients) + '</b></br>';
+
+                //# Administrative
+                contentHTML += '<div class="geo-well well">';
+                contentHTML += '<div class="row">';
+                contentHTML += '<i class="icon-user icon"></i> Administrative contact: <b>' + clean(_db.admin_name) + '</b><br />';
+                contentHTML += '<i class="icon-home icon"></i> Address: <b>' + clean(_db.admin_address) + '</b></br>';
+                contentHTML += '<i class="icon-envelope icon"></i> Email: <b>' + clean(_db.admin_email) + '</b></br>';
+                contentHTML += '<i class="icon-phone icon"></i> Phone: <b>' + clean(_db.admin_phone) + '</b></br>';
+                contentHTML += '</div>';
+                contentHTML += '</div>';
+
+                contentHTML += '<br />';
+                //# Scentific
+                contentHTML += '<div class="geo-well well">';
+                contentHTML += '<div class="row">';
+                contentHTML += '<i class="icon-user icon"></i> Scientific contact: <b>' + clean(_db.scien_name) + '</b></br>';
+                contentHTML += '<i class="icon-home icon"></i> Address: <b>' + clean(_db.scien_address) + '</b></br>';
+                contentHTML += '<i class="icon-envelope icon"></i> Email: <b>' + clean(_db.scien_email) + '</b></br>';
+                contentHTML += '<i class="icon-phone icon"></i>  Phone: <b>' + clean(_db.scien_phone) + '</b></br>';
+                contentHTML += '</div>';
+                contentHTML += '</div>';
+                contentHTML += '<br />';
+                //# Tecnical
+
+                contentHTML += '<div class="geo-well well">';
+                contentHTML += '<div class="row">';
+                contentHTML += '<i class="icon-user icon"></i> Tecnical contact: <b>' + clean(_db.tec_name) + '</b></br>';
+                contentHTML += '<i class="icon-home icon"></i> Address: <b>' + clean(_db.tec_address) + '</b></br>';
+                contentHTML += '<i class="icon-envelope icon"></i> Email: <b>' + clean(_db.tec_email) + '</b></br>';
+                contentHTML += '<i class="icon-phone icon"></i> Phone: <b>' + clean(_db.tec_phone) + '</b></br>';
+                contentHTML += '</div>';
+                contentHTML += '</div>';
+
+                contentHTML += '</div>';
+
+
+                contentHTML += '</br>';
+
+
+                contentHTML += '</div>';
+                var infowindow = new google.maps.InfoWindow();
+                infowindow.setContent(contentHTML);
+                infowindow.open(map, marker);
+            }
+        })(marker));	
+
+
 	});
 
 }
 
-var list_cities_aux = []
-{% for lat in lats_longs %}
+var list_db = []
 
-list_cities_aux.push('{{lat}}')
+{% for db in db_list %}
+
+list_db.push({name: '{{db.name}}',
+            {%comment%}location: '{{db.location}}',{%endcomment%}
+            institution: '{{db.institution}}',
+            contact: '{{db.email_contact}}',
+            number_patients: '{{db.number_patients}}',
+            ttype: '{{db.ttype}}',
+            id : '{{db.id}}',
+            admin_name: '{{db.admin_name}}',
+            admin_address: '{{db.admin_address}}',
+            admin_email: '{{db.admin_address}}',
+            admin_phone: '{{db.admin_phone}}',
+            scien_name: '{{db.scien_name}}',
+            scien_address: '{{db.scien_address}}',
+            scien_email: '{{db.scien_email}}',
+            scien_phone: '{{db.scien_phone}}',
+            tec_name: '{{db.tec_name}}',
+            tec_address: '{{db.tec_address}}',
+            tec_email: '{{db.tec_email}}',
+            tec_phone: '{{db.tec_phone}}',
+            lat : '{{db.lat}}',
+            long: '{{db.long}}'
+            });
 
 {% endfor %}
 
 
-load_map = function(list_cities)
+load_map = function(db_list)
 {
-	initialize(list_cities);
+	initialize(db_list);
 }
 
-$(document).ready(load_map.bind(window,list_cities_aux));
+$(document).ready(load_map.bind(window,list_db));
 
 
 

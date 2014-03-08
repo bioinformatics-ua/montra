@@ -353,3 +353,7 @@ padding: 2px;
 *font-size: 9px !important;
 margin-bottom: -15px !important;
 }
+
+.gt-ie7 .geo-well{
+  position:relative;
+}
