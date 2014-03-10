@@ -184,7 +184,7 @@ def results_fulltext_aux(request, query, page=1, template_name='results.html', i
     if page == None:
         page = 1
 
-    if query == "":
+    if query == "" or query.strip()=="text_t:*" :
         return render(request, "results.html", {'request': request, 'breadcrumb': True,
                                                 'num_results': 0, 'page_obj': None})
     (sortString, filterString, sort_params, range) = paginator_process_params(request.POST, page, rows)   
