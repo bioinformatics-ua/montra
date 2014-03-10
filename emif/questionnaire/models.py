@@ -2,6 +2,7 @@ from django.db import models
 from transmeta import TransMeta
 from django.utils.translation import ugettext_lazy as _
 from questionnaire import QuestionChoices
+from searchengine.models import Slugs
 import re
 from utils import split_numal
 from django.utils import simplejson as json
@@ -274,6 +275,7 @@ class Question(models.Model):
         'eg. <tt>requiredif="Q1,A or Q2,B"</tt>')
     footer = models.TextField(u"Footer", help_text="Footer rendered below the question interpreted as textile", blank=True)
     slug = models.CharField(max_length=128)
+    slug_fk = models.ForeignKey(Slugs, blank=True, null=True)
     help_text = models.CharField(max_length=2255, blank=True, null=True)
     stats = models.BooleanField(default=False)
     category = models.BooleanField(default=False)

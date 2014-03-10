@@ -934,21 +934,29 @@ def database_edit(request, fingerprint_id, questionnaire_id, template_name="data
         if item.startswith("comment_question_"):
             
             slug = item.split("comment_question_")[1]
-            results = Slugs.objects.filter(slug1=slug[:-2], question__questionset__questionnaire=questionnaire_id)
+            # results = Slugs.objects.filter(slug1=slug[:-2], question__questionset__questionnaire=questionnaire_id)
+            # if results == None or len(results) == 0:
+            #     continue
+            # question = results[0].question
+            results = Question.objects.filter(slug_fk__slug1=slug[:-2], questionset__questionnaire=questionnaire_id)
             if results == None or len(results) == 0:
                 continue
-            question = results[0].question
+            question = results[0]
             request2.get_post()['comment_question_%s' % question.number] = value
             continue
 
         if item == '_version_':
             continue
 
-        results = Slugs.objects.filter(slug1=str(item)[:-2],question__questionset__questionnaire=questionnaire_id )
-        print len(results)
+        # results = Slugs.objects.filter(slug1=str(item)[:-2],question__questionset__questionnaire=questionnaire_id )
+        # print len(results)
+        # if results == None or len(results) == 0:
+        #     continue
+        # question = results[0].question
+        results = Question.objects.filter(slug_fk__slug1=str(item)[:-2], questionset__questionnaire=questionnaire_id)
         if results == None or len(results) == 0:
             continue
-        question = results[0].question
+        question = results[0]
         answer = str(question.number)
 
         extra[question] = ans = extra.get(question, {})
@@ -1699,21 +1707,33 @@ def createqsets(runcode, qsets=None, clean=True):
 
             t = Tag()
 
-            aux_results = Slugs.objects.filter(slug1=k[:-2], question__questionset__questionnaire=q_aux[0].pk)
+            #aux_results = Slugs.objects.filter(slug1=k[:-2], question__questionset__questionnaire=q_aux[0].pk)
             qs = None
             question_group = None
             q_number = None
-            if len(aux_results) > 0:
-                text = aux_results[0].description
-                qs = aux_results[0].question.questionset.text
-                q_number = qs = aux_results[0].question.number
-                if qsets.has_key(aux_results[0].question.questionset.text):
+            # if len(aux_results) > 0:
+            #     text = aux_results[0].description
+            #     qs = aux_results[0].question.questionset.text
+            #     q_number = qs = aux_results[0].question.number
+            #     if qsets.has_key(aux_results[0].question.questionset.text):
+            #         # Add the Tag to the QuestionGroup
+            #         question_group = qsets[aux_results[0].question.questionset.text]
+            #     else:
+            #         # Add a new QuestionGroup
+            #         question_group = QuestionGroup()
+            #         qsets[aux_results[0].question.questionset.text] = question_group
+            question_ = Question.objects.filter(slug_fk__slug1=k[:-2], questionset__questionnaire=q_aux[0].pk)
+            if len(question_) > 0:
+                text = question_[0].slug_fk.description
+                qs = question_[0].questionset.text
+                q_number = qs = question_[0].number
+                if qsets.has_key(question_[0].questionset.text):
                     # Add the Tag to the QuestionGroup
-                    question_group = qsets[aux_results[0].question.questionset.text]
+                    question_group = qsets[question_[0].questionset.text]
                 else:
                     # Add a new QuestionGroup
                     question_group = QuestionGroup()
-                    qsets[aux_results[0].question.questionset.text] = question_group
+                    qsets[question_[0].questionset.text] = question_group
                     
             else:
                 text = k
@@ -1825,27 +1845,42 @@ def createqset(runcode, qsid, qsets=None, clean=True):
             if k in blacklist:
                 continue
             if k.startswith("comment_question_"):
-                continue0
+                continue
 
             t = Tag()
 
-            aux_results = Slugs.objects.filter(slug1=k[:-2], question__questionset__questionnaire=q_aux[0].pk)
+            #aux_results = Slugs.objects.filter(slug1=k[:-2], question__questionset__questionnaire=q_aux[0].pk)
             qs = None
             question_group = None
             q_number = None
-            if len(aux_results) > 0:
-                text = aux_results[0].description
-                qs = aux_results[0].question.questionset.text
-                q_number = qs = aux_results[0].question.number
-                if qsets.has_key(aux_results[0].question.questionset.text):
+            # if len(aux_results) > 0:
+            #     text = aux_results[0].description
+            #     qs = aux_results[0].question.questionset.text
+            #     q_number = qs = aux_results[0].question.number
+            #     if qsets.has_key(aux_results[0].question.questionset.text):
+            #         # Add the Tag to the QuestionGroup
+            #         question_group = qsets[aux_results[0].question.questionset.text]
+            #     '''else:
+            #         # Add a new QuestionGroup
+            #         question_group = QuestionGroup()
+            #         qsets[aux_results[0].question.questionset.text] = question_group
+            #         print aux_results[0].question.questionset.text
+            #     '''    
+            question_ = Question.objects.filter(slug_fk__slug1=k[:-2], questionset__questionnaire=q_aux[0].pk)
+            if len(question_) > 0:
+                text = question_[0].slug_fk.description
+                qs = question_[0].questionset.text
+                q_number = qs = question_[0].number
+                if qsets.has_key(question_[0].questionset.text):
                     # Add the Tag to the QuestionGroup
-                    question_group = qsets[aux_results[0].question.questionset.text]
+                    question_group = qsets[question_[0].questionset.text]
                 '''else:
                     # Add a new QuestionGroup
                     question_group = QuestionGroup()
-                    qsets[aux_results[0].question.questionset.text] = question_group
-                    print aux_results[0].question.questionset.text
-                '''    
+                    qsets[question_.questionset.text] = question_group
+                    print question_.questionset.text
+                 '''   
+
             else:
                 text = k
 
@@ -3190,8 +3225,30 @@ def writeLog(log):
         f.write(log)
         f.close()
 
-def get_slug(slug, q_id=None):
-    slugs_objs = Slugs.objects.filter(slug1=slug, question__questionset__questionnaire=q_id)
+# def get_slug(slug, q_id=None):
+#     slugs_objs = Slugs.objects.filter(slug1=slug, question__questionset__questionnaire=q_id)
+#     slug_aux = None
+#     if (len(slugs_objs)>0):
+#         slug_aux=slugs_objs[0]
+#     else:
+#         return slug
+#     slug_name_final = ""
+#     slug_arr = slug_aux.slug1.split("_")
+#     if len(slug_arr)>0:
+#         if (slug_arr[len(slug_arr)-1].isdigit()):
+#             slug_number = int(slug_arr[len(slug_arr)-1]) + 1
+#             slug_arr[len(slug_arr)-1] = str(slug_number)
+#             slug_name_final = "_".join(slug_arr)
+
+#         else:
+#             slug_name_final = slug_aux.slug1 + "_0"
+#     else:
+#         slug_name_final = slug_aux.slug1 + "_0"
+
+#     return slug_name_final
+
+def get_slug(slug):
+    slugs_objs = Slugs.objects.filter(slug1=slug)
     slug_aux = None
     if (len(slugs_objs)>0):
         slug_aux=slugs_objs[0]
@@ -3212,11 +3269,17 @@ def get_slug(slug, q_id=None):
 
     return slug_name_final
 
-def save_slug(slugName, desc, question):
+# def save_slug(slugName, desc, question):
+#     slugsAux = Slugs()
+#     slugsAux.slug1 = slugName
+#     slugsAux.description = desc
+#     slugsAux.question = question
+#     slugsAux.save()
+
+def save_slug(slugName, desc):
     slugsAux = Slugs()
     slugsAux.slug1 = slugName
     slugsAux.description = desc
-    slugsAux.question = question
     slugsAux.save()
 
 
@@ -3334,7 +3397,8 @@ def import_questionnaire(request, template_name='import_questionnaire.html'):
                             slug = row[7].value
                         else:
                             slug = convert_text_to_slug(str(row[1].value)[:50])
-                            slug = get_slug(slug, questionnaire.pk)
+                            #slug = get_slug(slug, questionnaire.pk)
+                            slug = get_slug(slug)
 
                         if row[5].value:
                             helpText = row[5].value
@@ -3373,8 +3437,18 @@ def import_questionnaire(request, template_name='import_questionnaire.html'):
                             log += "\n%s - Error to create Category number %s" % (type_Column.row, text_en)
                             writeLog(log)
                             raise
+
+                        #Create or load slug
+                        print slug
+                        slugs = Slugs.objects.filter(slug1=slug)
+                        if len(slugs) <= 0:
+                            slug_db = Slug(slug1=slug, description=text_en)
+                            slug_db.save()
+                        else:
+                            slug_db = slugs[0]
+
                         question = Question(questionset=questionset, text_en=text_en, number=str(questionNumber),
-                                            type='comment', help_text=helpText, slug=slug, stats=False, category=True,
+                                            type='comment', help_text=helpText, slug=slug, slug_fk=slug_db, stats=False, category=True,
                                             tooltip=_tooltip, checks=_checks)
 
                         if not _debug:
@@ -3383,8 +3457,8 @@ def import_questionnaire(request, template_name='import_questionnaire.html'):
 
                         _questions_rows[type_Column.row] = str(questionNumber)
 
-                        if not _debug:
-                            save_slug(question.slug,  question.text_en, question)
+                        #if not _debug:
+                            #save_slug(question.slug,  question.text_en, question)
 
                         # slugs.append((question.slug,  question.text_en, question))
                         log += '\n%s - Category saved %s ' % (type_Column.row, question)
@@ -3408,7 +3482,8 @@ def import_questionnaire(request, template_name='import_questionnaire.html'):
                             slug = row[7].value
                         else:
                             slug = convert_text_to_slug(str(row[1].value)[:50])
-                            slug = get_slug(slug, questionnaire.pk)
+                            #slug = get_slug(slug, questionnaire.pk)
+                            slug = get_slug(slug)
 
                         if row[5].value:
                             helpText = row[5].value
@@ -3450,8 +3525,17 @@ def import_questionnaire(request, template_name='import_questionnaire.html'):
                             writeLog(log)
                             raise
 
+                        print slug
+                        #Create or load slug
+                        slugs = Slugs.objects.filter(slug1=slug)
+                        if len(slugs) <= 0:
+                            slug_db = Slugs(slug1=slug, description=text_en)
+                            slug_db.save()
+                        else:
+                            slug_db = slugs[0]
+
                         question = Question(questionset=questionset, text_en=text_en, number=str(questionNumber),
-                                            type=dataType_column.value, help_text=helpText, slug=slug, stats=True,
+                                            type=dataType_column.value, help_text=helpText, slug=slug, slug_fk=slug_db, stats=True,
                                             category=False, tooltip=_tooltip, checks=_checks)
 
                         log += '\n%s - Question created %s ' % (type_Column.row, question)
@@ -3461,8 +3545,8 @@ def import_questionnaire(request, template_name='import_questionnaire.html'):
 
                         _questions_rows[type_Column.row] = str(questionNumber)
 
-                        if not _debug:
-                            save_slug(question.slug,  question.text_en, question)
+                        #if not _debug:
+                        #    save_slug(question.slug,  question.text_en, question)
 
                         # slugs.append((question.slug,  question.text_en, question))
                         log += '\n%s - Question saved %s ' % (type_Column.row, question)
