@@ -15,7 +15,7 @@
 <script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false"></script>
 <link rel="stylesheet"  href="{{STATIC_URL}}css/emif.geo.css">
 <script type="text/javascript">
-
+var infowindow = new google.maps.InfoWindow();
 
 
 var map;
@@ -61,20 +61,25 @@ function initialize(list_db) {
                 contentHTML += '</h4>';
 
                 contentHTML += '<div class="organization-address">';
-                
-                contentHTML += 'Institution name: <b>' + clean(_db.institution) + '</b></br>';
-                contentHTML += 'Location: <b>' + clean(_db.location) + '</b></br>';
-                contentHTML += 'Contact: <b>' + clean(_db.contact) + '</b></br>';
-                contentHTML += 'DB Type: <b>' + clean(_db.ttype) + '</b></br>';
-                
+                if (_db.institution !='')
+                    contentHTML += 'Institution name: <b>' + clean(_db.institution) + '</b></br>';
+                if (_db.contact !='')
+                    contentHTML += 'Contact: <b>' + clean(_db.contact) + '</b></br>';
+                if (_db.ttype !='')
+                    contentHTML += 'DB Type: <b>' + clean(_db.ttype) + '</b></br>';
+                if (_db.number_patients !='')
                 contentHTML += 'Number of patients: <b>' + clean(_db.number_patients) + '</b></br>';
 
                 //# Administrative
                 contentHTML += '<div class="geo-well well">';
                 contentHTML += '<div class="row">';
+                if (_db.admin_name !='')
                 contentHTML += '<i class="icon-user icon"></i> Administrative contact: <b>' + clean(_db.admin_name) + '</b><br />';
+                if (_db.admin_address !='')
                 contentHTML += '<i class="icon-home icon"></i> Address: <b>' + clean(_db.admin_address) + '</b></br>';
+                if (_db.admin_email !='')
                 contentHTML += '<i class="icon-envelope icon"></i> Email: <b>' + clean(_db.admin_email) + '</b></br>';
+                if (_db.admin_phone !='')
                 contentHTML += '<i class="icon-phone icon"></i> Phone: <b>' + clean(_db.admin_phone) + '</b></br>';
                 contentHTML += '</div>';
                 contentHTML += '</div>';
@@ -83,9 +88,13 @@ function initialize(list_db) {
                 //# Scentific
                 contentHTML += '<div class="geo-well well">';
                 contentHTML += '<div class="row">';
+                if (_db.scien_name !='')
                 contentHTML += '<i class="icon-user icon"></i> Scientific contact: <b>' + clean(_db.scien_name) + '</b></br>';
+                if (_db.scien_address !='')
                 contentHTML += '<i class="icon-home icon"></i> Address: <b>' + clean(_db.scien_address) + '</b></br>';
+                if (_db.scien_email !='')
                 contentHTML += '<i class="icon-envelope icon"></i> Email: <b>' + clean(_db.scien_email) + '</b></br>';
+                if (_db.scien_phone !='')
                 contentHTML += '<i class="icon-phone icon"></i>  Phone: <b>' + clean(_db.scien_phone) + '</b></br>';
                 contentHTML += '</div>';
                 contentHTML += '</div>';
@@ -94,9 +103,13 @@ function initialize(list_db) {
 
                 contentHTML += '<div class="geo-well well">';
                 contentHTML += '<div class="row">';
+                if (_db.tec_name !='')
                 contentHTML += '<i class="icon-user icon"></i> Tecnical contact: <b>' + clean(_db.tec_name) + '</b></br>';
+                if (_db.tec_address !='')
                 contentHTML += '<i class="icon-home icon"></i> Address: <b>' + clean(_db.tec_address) + '</b></br>';
+                if (_db.tec_email !='')
                 contentHTML += '<i class="icon-envelope icon"></i> Email: <b>' + clean(_db.tec_email) + '</b></br>';
+                if (_db.tec_phone !='')
                 contentHTML += '<i class="icon-phone icon"></i> Phone: <b>' + clean(_db.tec_phone) + '</b></br>';
                 contentHTML += '</div>';
                 contentHTML += '</div>';
@@ -108,7 +121,7 @@ function initialize(list_db) {
 
 
                 contentHTML += '</div>';
-                var infowindow = new google.maps.InfoWindow();
+                
                 infowindow.setContent(contentHTML);
                 infowindow.open(map, marker);
             }
@@ -132,7 +145,7 @@ list_db.push({name: '{{db.name}}',
             id : '{{db.id}}',
             admin_name: '{{db.admin_name}}',
             admin_address: '{{db.admin_address}}',
-            admin_email: '{{db.admin_address}}',
+            admin_email: '{{db.admin_email}}',
             admin_phone: '{{db.admin_phone}}',
             scien_name: '{{db.scien_name}}',
             scien_address: '{{db.scien_address}}',
