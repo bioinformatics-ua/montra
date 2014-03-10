@@ -5,6 +5,7 @@
  * Written by Gaten
  * Exemple : $("#input").delayKeyup(function(){ alert("5 secondes passed from the last event keyup."); }, 5000);
  */
+
 (function ($) {
     $.fn.delayKeyup = function(callback, ms){
         var timer = 0;
@@ -16,7 +17,7 @@
     };
 })(jQuery);                   
 
-function PaginatorSorter(tableID, fString, selName, selValue){
+function PaginatorSorter(tableID, fString, selName, selValue, xtraData){
     this.innerTable = $("#"+tableID);
 
     this.filters = [];
@@ -26,17 +27,27 @@ function PaginatorSorter(tableID, fString, selName, selValue){
 
     this.selName = selName;
     this.selValue = selValue;
+    if(xtraData != undefined){
+	    try{
+	    	this.extraData = $.parseJSON(xtraData);
+		}catch(err){
+			console.log(err);
+		}
+	}
+	this.plugin = undefined;
 
     this.bind();
 
     this.form = $("#send2");
     this.updateForm(this.getQueryString(selName, selValue));
-
-    
-
     this.fString = fString; 
 }
 PaginatorSorter.prototype ={
+	atachPlugin : function(plg){
+		this.plugin = plg;
+		console.log(this.extraData);
+		plg.setData(this.extraData);
+	}, 
 	getQueryString : function(fieldType, value){
 		var json = "{";
 
@@ -52,8 +63,8 @@ PaginatorSorter.prototype ={
 
 			  	var content = $("#"+this.filters[i],this.innerTable);
 					json += ',"'+this.filters[i]+'": "'+content.val()+'"';
-					console.log(content.val());
-					console.log(content);
+					//console.log(content.val());
+					//console.log(content);
 			}		 
 			catch(err)
 			 {
@@ -61,10 +72,15 @@ PaginatorSorter.prototype ={
 			 }
 
 		}
+
+		if(this.plugin != undefined){
+			var x = this.plugin.getExtraObjects();
+			if(x!= undefined)
+				json += ', "extraObjects":'+JSON.stringify(x);
+		}
+		
 		json += "}";
-		
-		//console.log(json);
-		
+		//console.log(json);		
 		return json;
 	},
 	onClick : function(fieldType, value){
@@ -89,8 +105,11 @@ PaginatorSorter.prototype ={
   			data: {'csrfmiddlewaretoken': $.cookie('csrftoken'), "filter": f, "s":json},
   			success: function(data){	
   				//console.log(data);
-  				if(data.Hits != undefined && data.Hits > 0){ 			
-			        context.updateForm(json);
+  				if(data.Hits != undefined && data.Hits > 0){
+  					context.selName = fieldType;
+  					context.selValue = value;			
+			        		
+			        //context.updateForm(json);
 			      
 			        /*for(filter in context.filters){ 	
 						if(context.filters[filter].val().length > 0 ){
@@ -103,7 +122,7 @@ PaginatorSorter.prototype ={
   				}else{
   					$("#table_content").html('<td colspan="9999"><center>No results to show</center></td>');
   					$(".pagination").html('<td colspan="9999"><center>No results to show</center></td>');
-  					console.log('NOTSUCCESS');
+  					//console.log('NOTSUCCESS');
 /*
   					for(filter in context.filters){ 	
 						if(context.filters[filter].val().length > 0 ){
@@ -121,9 +140,8 @@ PaginatorSorter.prototype ={
 	bind : function(){
 
 		var value = $("#type_filter",this.innerTable).attr("def_value");
-
 		$("option[value="+value+"]", $("#type_filter",this.innerTable)).attr("selected", "yes");
-
+		
 		var context = this;
 
 		$("#database_name_filter",this.innerTable).delayKeyup(function(){ context.onClick(context.selName, context.selValue); }, 500);
@@ -134,10 +152,18 @@ PaginatorSorter.prototype ={
     	$("#type_filter",this.innerTable).change(function(){
 				context.onClick(context.selName, context.selValue);
 			});
+
+
+		$("#send2").submit(function(){
+			context.updateForm();
+		});
 	}, 
 	updateForm : function(json){
 		//console.log("Setting Value!!!");
 		//console.log(json);
+		if(json == undefined)
+			json = this.getQueryString();
+
 		$("#s", $("#send2")).val(json);
 	}, 
 	submitthis : function(){
@@ -147,6 +173,63 @@ PaginatorSorter.prototype ={
 		$("#send2").trigger('submit');
 		//$("#submit_simulate").click();
 		
+	}
+}
+
+//This plugin handles the select boxes for the SearchResultsPage
+function SelectPaginatorPlugin(){
+	this.selectedList = undefined;
+}
+SelectPaginatorPlugin.prototype ={
+	getExtraObjects : function(){
+
+		var list = [];
+		if(this.selectedList != undefined)
+			list= list.concat(this.selectedList);
+
+		$("input.checkbox[name^=chk_]").each(function(x,y){
+			var name = $(y).attr("name");
+			name = name.substring(4, name.length);
+			//console.log(name);
+				
+			var index = list.indexOf(name);
+			if($(y).is(":checked")){
+				if(index ==-1)
+					list.push(name);			
+			}else{
+				if(index!=-1)
+					list.slice(index, 1);
+			}
+		});
+
+		if(list.length > 0)
+			return {selectedList:list};
+
+		return undefined;
+	},
+	setData : function(data){
+		//console.log(data);
+		if(data != undefined && data.selectedList != undefined){
+			this.selectedList = data.selectedList;
+			console.log("DEFINED SELECTED LIST: "+this.selectedList);
+			this.populateBoxes();
+		}
+	},
+	populateBoxes : function(){
+		if(this.selectedList != undefined){
+			var selects = this.selectedList;
+
+			for(var i = 0; i<selects.length;i++){ 
+				//console.log("input.checkbox[name=chk_"+selects[i]+"]");
+				$("input.checkbox[name=chk_"+selects[i]+"]").prop("checked", "true");
+			}
+		}
+	},
+	clearSelection : function(){
+		this.selectedList = [];
+		this.populateBoxes();
+
+		$("input.checkbox[name^=chk_]").removeProp("checked");		
 	}
 }
 
