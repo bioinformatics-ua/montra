@@ -31,6 +31,9 @@ class Slugs(models.Model):
 	description = models.TextField()
 	#question = models.ForeignKey(Question, help_text = u"The question that this is an answer to")
 
+	def __unicode__(self):
+         return self.slug1
+
 
 class Nomenclature(models.Model):
 	name = models.CharField(max_length=256)

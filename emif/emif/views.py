@@ -3225,8 +3225,30 @@ def writeLog(log):
         f.write(log)
         f.close()
 
-def get_slug(slug, q_id=None):
-    slugs_objs = Slugs.objects.filter(slug1=slug, question__questionset__questionnaire=q_id)
+# def get_slug(slug, q_id=None):
+#     slugs_objs = Slugs.objects.filter(slug1=slug, question__questionset__questionnaire=q_id)
+#     slug_aux = None
+#     if (len(slugs_objs)>0):
+#         slug_aux=slugs_objs[0]
+#     else:
+#         return slug
+#     slug_name_final = ""
+#     slug_arr = slug_aux.slug1.split("_")
+#     if len(slug_arr)>0:
+#         if (slug_arr[len(slug_arr)-1].isdigit()):
+#             slug_number = int(slug_arr[len(slug_arr)-1]) + 1
+#             slug_arr[len(slug_arr)-1] = str(slug_number)
+#             slug_name_final = "_".join(slug_arr)
+
+#         else:
+#             slug_name_final = slug_aux.slug1 + "_0"
+#     else:
+#         slug_name_final = slug_aux.slug1 + "_0"
+
+#     return slug_name_final
+
+def get_slug(slug):
+    slugs_objs = Slugs.objects.filter(slug1=slug)
     slug_aux = None
     if (len(slugs_objs)>0):
         slug_aux=slugs_objs[0]
@@ -3247,11 +3269,17 @@ def get_slug(slug, q_id=None):
 
     return slug_name_final
 
-def save_slug(slugName, desc, question):
+# def save_slug(slugName, desc, question):
+#     slugsAux = Slugs()
+#     slugsAux.slug1 = slugName
+#     slugsAux.description = desc
+#     slugsAux.question = question
+#     slugsAux.save()
+
+def save_slug(slugName, desc):
     slugsAux = Slugs()
     slugsAux.slug1 = slugName
     slugsAux.description = desc
-    slugsAux.question = question
     slugsAux.save()
 
 
@@ -3369,7 +3397,8 @@ def import_questionnaire(request, template_name='import_questionnaire.html'):
                             slug = row[7].value
                         else:
                             slug = convert_text_to_slug(str(row[1].value)[:50])
-                            slug = get_slug(slug, questionnaire.pk)
+                            #slug = get_slug(slug, questionnaire.pk)
+                            slug = get_slug(slug)
 
                         if row[5].value:
                             helpText = row[5].value
@@ -3408,8 +3437,18 @@ def import_questionnaire(request, template_name='import_questionnaire.html'):
                             log += "\n%s - Error to create Category number %s" % (type_Column.row, text_en)
                             writeLog(log)
                             raise
+
+                        #Create or load slug
+                        print slug
+                        slugs = Slugs.objects.filter(slug1=slug)
+                        if len(slugs) <= 0:
+                            slug_db = Slug(slug1=slug, description=text_en)
+                            slug_db.save()
+                        else:
+                            slug_db = slugs[0]
+
                         question = Question(questionset=questionset, text_en=text_en, number=str(questionNumber),
-                                            type='comment', help_text=helpText, slug=slug, stats=False, category=True,
+                                            type='comment', help_text=helpText, slug=slug, slug_fk=slug_db, stats=False, category=True,
                                             tooltip=_tooltip, checks=_checks)
 
                         if not _debug:
@@ -3418,8 +3457,8 @@ def import_questionnaire(request, template_name='import_questionnaire.html'):
 
                         _questions_rows[type_Column.row] = str(questionNumber)
 
-                        if not _debug:
-                            save_slug(question.slug,  question.text_en, question)
+                        #if not _debug:
+                            #save_slug(question.slug,  question.text_en, question)
 
                         # slugs.append((question.slug,  question.text_en, question))
                         log += '\n%s - Category saved %s ' % (type_Column.row, question)
@@ -3443,7 +3482,8 @@ def import_questionnaire(request, template_name='import_questionnaire.html'):
                             slug = row[7].value
                         else:
                             slug = convert_text_to_slug(str(row[1].value)[:50])
-                            slug = get_slug(slug, questionnaire.pk)
+                            #slug = get_slug(slug, questionnaire.pk)
+                            slug = get_slug(slug)
 
                         if row[5].value:
                             helpText = row[5].value
@@ -3485,8 +3525,17 @@ def import_questionnaire(request, template_name='import_questionnaire.html'):
                             writeLog(log)
                             raise
 
+                        print slug
+                        #Create or load slug
+                        slugs = Slugs.objects.filter(slug1=slug)
+                        if len(slugs) <= 0:
+                            slug_db = Slugs(slug1=slug, description=text_en)
+                            slug_db.save()
+                        else:
+                            slug_db = slugs[0]
+
                         question = Question(questionset=questionset, text_en=text_en, number=str(questionNumber),
-                                            type=dataType_column.value, help_text=helpText, slug=slug, stats=True,
+                                            type=dataType_column.value, help_text=helpText, slug=slug, slug_fk=slug_db, stats=True,
                                             category=False, tooltip=_tooltip, checks=_checks)
 
                         log += '\n%s - Question created %s ' % (type_Column.row, question)
@@ -3496,8 +3545,8 @@ def import_questionnaire(request, template_name='import_questionnaire.html'):
 
                         _questions_rows[type_Column.row] = str(questionNumber)
 
-                        if not _debug:
-                            save_slug(question.slug,  question.text_en, question)
+                        #if not _debug:
+                        #    save_slug(question.slug,  question.text_en, question)
 
                         # slugs.append((question.slug,  question.text_en, question))
                         log += '\n%s - Question saved %s ' % (type_Column.row, question)
