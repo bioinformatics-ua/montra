@@ -3451,7 +3451,7 @@ def import_questionnaire(request, template_name='import_questionnaire.html'):
                         print slug
                         slugs = Slugs.objects.filter(slug1=slug)
                         if len(slugs) <= 0:
-                            slug_db = Slug(slug1=slug, description=text_en)
+                            slug_db = Slugs(slug1=slug, description=text_en)
                             slug_db.save()
                         else:
                             slug_db = slugs[0]
