@@ -3466,9 +3466,9 @@ def import_questionnaire(request, template_name='import_questionnaire.html'):
 
                         _questions_rows[type_Column.row] = str(questionNumber)
 
-                        if not _debug:
+                        #if not _debug:
                             # TODO: I think we don't need this now, since question now has a slug foreign key
-                            save_slug(question.slug,  question.text_en, question)
+                            #save_slug(question.slug,  question.text_en, question)
 
                         # slugs.append((question.slug,  question.text_en, question))
                         log += '\n%s - Category saved %s ' % (type_Column.row, question)
@@ -3555,9 +3555,9 @@ def import_questionnaire(request, template_name='import_questionnaire.html'):
 
                         _questions_rows[type_Column.row] = str(questionNumber)
 
-                        if not _debug:
+                        #if not _debug:
                             # TODO: I think we don't need this now, since question now has a slug foreign key
-                            save_slug(question.slug,  question.text_en, question)
+                            # save_slug(question.slug,  question.text_en)
 
                         # slugs.append((question.slug,  question.text_en, question))
                         log += '\n%s - Question saved %s ' % (type_Column.row, question)
