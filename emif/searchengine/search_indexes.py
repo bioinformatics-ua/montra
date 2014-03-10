@@ -244,7 +244,8 @@ def index_answeres_from_qvalues(qvalues, questionnaire, subject, fingerprint_id,
 
 
                 # print(value)
-                slug = question.slug
+                slug = question.slug_fk.slug1
+                #slug = question.slug
                 # slug_aux = ""
                 # if len(slug)>2:
                 #     slug = question.slug
@@ -303,13 +304,16 @@ def convert_answers_to_solr(runinfo):
     for a in answers:
         print("Answer text: " + a.answer)
         print("Q: " + a.question.text)
-        print("Slug:" + a.question.slug)
+        print("Slug:" + a.question.slug_fk.slug1)
+        #print("Slug:" + a.question.slug)
 
-        slug = a.question.slug  
+        #slug = a.question.slug
+        slug = a.question.slug_fk.slug1 
         
         slug_aux = ""
         #if len(slug)>2:
-        slug = a.question.slug
+        slug = a.question.slug_fk.slug1
+        #slug = a.question.slug
         #else:
         #    slug = convert_text_to_slug(a.question.text)
         slug_final = slug+"_t"

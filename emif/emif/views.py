@@ -186,19 +186,20 @@ def results_fulltext_aux(request, query, page=1, template_name='results.html', i
     if page == None:
         page = 1
 
-    if query == "":
+    if query == "" or query.strip()=="text_t:*" :
         return render(request, "results.html", {'request': request, 'breadcrumb': True,
                                                 'num_results': 0, 'page_obj': None})
     (sortString, filterString, sort_params, range) = paginator_process_params(request.POST, page, rows)   
     sort_params["base_filter"] = query;
+    query_filtered=query
     if len(filterString) > 0:
-        query += " AND " + filterString
+        query_filtered += " AND " + filterString
 
-    print query
+    print query_filtered
 
-    (list_databases, hits) = get_databases_from_solr_v2(request, query, sort=sortString, rows=rows, start=range)    
+    (list_databases, hits) = get_databases_from_solr_v2(request, query_filtered, sort=sortString, rows=rows, start=range)    
     if range > hits and not force:
-        return results_fulltext_aux(request, query, 1, isAdvanced=isAdvanced, force=force)  
+        return results_fulltext_aux(request, query, 1, isAdvanced=isAdvanced, force=True)  
 
     if len(list_databases) == 0 :
         query_old = request.session.get('query', "")
@@ -773,7 +774,8 @@ def extract_answers(request2, questionnaire_id, question_set, qs_list):
             comment_id = "comment_question_"+question.number#.replace(".", "")
             try:
                 if request.POST and request.POST[comment_id]!='':
-                    comment_id_index = "comment_question_"+question.slug
+                    #comment_id_index = "comment_question_"+question.slug
+                    comment_id_index = "comment_question_"+question.slug_fk.slug1
                     extra_comments[question] = request.POST[comment_id]
                     extra_fields[comment_id_index+'_t'] = request.POST[comment_id]
             except KeyError:
@@ -1411,6 +1413,13 @@ def paginator_process_params(request, page, rows):
 
     start = (int(page) - 1) * rows
 
+    #print mode
+    if "extraObjects" in mode:
+        extraObjects = mode["extraObjects"]
+    else:
+        extraObjects = {}
+    sort_params["extraObjects"] = json.dumps(extraObjects)
+    #print sort_params
     return (sortString, filterString, sort_params, start)
 
 def paginator_process_list(list_databases, hits, start):
@@ -3460,7 +3469,8 @@ def import_questionnaire(request, template_name='import_questionnaire.html'):
                         _questions_rows[type_Column.row] = str(questionNumber)
 
                         #if not _debug:
-                            #save_slug(question.slug,  question.text_en, question)
+                            # TODO: I think we don't need this now, since question now has a slug foreign key
+                        #    save_slug(question.slug,  question.text_en, question)
 
                         # slugs.append((question.slug,  question.text_en, question))
                         log += '\n%s - Category saved %s ' % (type_Column.row, question)
@@ -3548,6 +3558,7 @@ def import_questionnaire(request, template_name='import_questionnaire.html'):
                         _questions_rows[type_Column.row] = str(questionNumber)
 
                         #if not _debug:
+                            # TODO: I think we don't need this now, since question now has a slug foreign key
                         #    save_slug(question.slug,  question.text_en, question)
 
                         # slugs.append((question.slug,  question.text_en, question))
