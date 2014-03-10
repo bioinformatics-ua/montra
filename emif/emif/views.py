@@ -934,21 +934,29 @@ def database_edit(request, fingerprint_id, questionnaire_id, template_name="data
         if item.startswith("comment_question_"):
             
             slug = item.split("comment_question_")[1]
-            results = Slugs.objects.filter(slug1=slug[:-2], question__questionset__questionnaire=questionnaire_id)
+            # results = Slugs.objects.filter(slug1=slug[:-2], question__questionset__questionnaire=questionnaire_id)
+            # if results == None or len(results) == 0:
+            #     continue
+            # question = results[0].question
+            results = Question.objects.filter(slug_fk__slug1=slug[:-2], questionset__questionnaire=questionnaire_id)
             if results == None or len(results) == 0:
                 continue
-            question = results[0].question
+            question = results[0]
             request2.get_post()['comment_question_%s' % question.number] = value
             continue
 
         if item == '_version_':
             continue
 
-        results = Slugs.objects.filter(slug1=str(item)[:-2],question__questionset__questionnaire=questionnaire_id )
-        print len(results)
+        # results = Slugs.objects.filter(slug1=str(item)[:-2],question__questionset__questionnaire=questionnaire_id )
+        # print len(results)
+        # if results == None or len(results) == 0:
+        #     continue
+        # question = results[0].question
+        results = Question.objects.filter(slug_fk__slug1=str(item)[:-2], questionset__questionnaire=questionnaire_id)
         if results == None or len(results) == 0:
             continue
-        question = results[0].question
+        question = results[0]
         answer = str(question.number)
 
         extra[question] = ans = extra.get(question, {})
@@ -1699,21 +1707,33 @@ def createqsets(runcode, qsets=None, clean=True):
 
             t = Tag()
 
-            aux_results = Slugs.objects.filter(slug1=k[:-2], question__questionset__questionnaire=q_aux[0].pk)
+            #aux_results = Slugs.objects.filter(slug1=k[:-2], question__questionset__questionnaire=q_aux[0].pk)
             qs = None
             question_group = None
             q_number = None
-            if len(aux_results) > 0:
-                text = aux_results[0].description
-                qs = aux_results[0].question.questionset.text
-                q_number = qs = aux_results[0].question.number
-                if qsets.has_key(aux_results[0].question.questionset.text):
+            # if len(aux_results) > 0:
+            #     text = aux_results[0].description
+            #     qs = aux_results[0].question.questionset.text
+            #     q_number = qs = aux_results[0].question.number
+            #     if qsets.has_key(aux_results[0].question.questionset.text):
+            #         # Add the Tag to the QuestionGroup
+            #         question_group = qsets[aux_results[0].question.questionset.text]
+            #     else:
+            #         # Add a new QuestionGroup
+            #         question_group = QuestionGroup()
+            #         qsets[aux_results[0].question.questionset.text] = question_group
+            question_ = Question.objects.filter(slug_fk__slug1=k[:-2], questionset__questionnaire=q_aux[0].pk)
+            if len(question_) > 0:
+                text = question_[0].slug_fk.description
+                qs = question_[0].questionset.text
+                q_number = qs = question_[0].number
+                if qsets.has_key(question_[0].questionset.text):
                     # Add the Tag to the QuestionGroup
-                    question_group = qsets[aux_results[0].question.questionset.text]
+                    question_group = qsets[question_[0].questionset.text]
                 else:
                     # Add a new QuestionGroup
                     question_group = QuestionGroup()
-                    qsets[aux_results[0].question.questionset.text] = question_group
+                    qsets[question_[0].questionset.text] = question_group
                     
             else:
                 text = k
@@ -1825,27 +1845,42 @@ def createqset(runcode, qsid, qsets=None, clean=True):
             if k in blacklist:
                 continue
             if k.startswith("comment_question_"):
-                continue0
+                continue
 
             t = Tag()
 
-            aux_results = Slugs.objects.filter(slug1=k[:-2], question__questionset__questionnaire=q_aux[0].pk)
+            #aux_results = Slugs.objects.filter(slug1=k[:-2], question__questionset__questionnaire=q_aux[0].pk)
             qs = None
             question_group = None
             q_number = None
-            if len(aux_results) > 0:
-                text = aux_results[0].description
-                qs = aux_results[0].question.questionset.text
-                q_number = qs = aux_results[0].question.number
-                if qsets.has_key(aux_results[0].question.questionset.text):
+            # if len(aux_results) > 0:
+            #     text = aux_results[0].description
+            #     qs = aux_results[0].question.questionset.text
+            #     q_number = qs = aux_results[0].question.number
+            #     if qsets.has_key(aux_results[0].question.questionset.text):
+            #         # Add the Tag to the QuestionGroup
+            #         question_group = qsets[aux_results[0].question.questionset.text]
+            #     '''else:
+            #         # Add a new QuestionGroup
+            #         question_group = QuestionGroup()
+            #         qsets[aux_results[0].question.questionset.text] = question_group
+            #         print aux_results[0].question.questionset.text
+            #     '''    
+            question_ = Question.objects.filter(slug_fk__slug1=k[:-2], questionset__questionnaire=q_aux[0].pk)
+            if len(question_) > 0:
+                text = question_[0].slug_fk.description
+                qs = question_[0].questionset.text
+                q_number = qs = question_[0].number
+                if qsets.has_key(question_[0].questionset.text):
                     # Add the Tag to the QuestionGroup
-                    question_group = qsets[aux_results[0].question.questionset.text]
+                    question_group = qsets[question_[0].questionset.text]
                 '''else:
                     # Add a new QuestionGroup
                     question_group = QuestionGroup()
-                    qsets[aux_results[0].question.questionset.text] = question_group
-                    print aux_results[0].question.questionset.text
-                '''    
+                    qsets[question_.questionset.text] = question_group
+                    print question_.questionset.text
+                 '''   
+
             else:
                 text = k
 
