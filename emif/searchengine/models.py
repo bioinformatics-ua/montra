@@ -19,7 +19,7 @@
 
 from django.db import models
 
-from questionnaire.models import *
+#from questionnaire.models import *
 from django import forms
 
 from django.core.mail import send_mail, BadHeaderError
@@ -29,7 +29,10 @@ class Slugs(models.Model):
 	slug1 = models.CharField(max_length=1256)
 	# TODO: delete 
 	description = models.TextField()
-	question = models.ForeignKey(Question, help_text = u"The question that this is an answer to")
+	#question = models.ForeignKey(Question, help_text = u"The question that this is an answer to")
+
+	def __unicode__(self):
+         return self.slug1
 
 
 class Nomenclature(models.Model):
