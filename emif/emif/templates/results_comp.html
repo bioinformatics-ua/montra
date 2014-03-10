@@ -80,6 +80,10 @@ th, td {
 
 {% block content %}
 <div class="clearboth">
+<!--[if lte IE 8]>
+<div class="well">Currently IE 7 and 8 don't support this functionality. To use this functionality please update your browser to a modern browser, like IE 9 or better, Google Chrome, Firefox, Opera or Safari.</div>
+<![endif]-->
+<!--[if gte IE 9]><!-->
 
 <ul class="pager">
   <li class="pull-left"><input type="text" size="60" style="margin-left: 0px;" class="span9" id="searchfilter" placeholder="To filter type here" tabindex="1"></li>
@@ -107,7 +111,7 @@ th, td {
       <div class="database_title_text pull-left">{{name}}</div>
       <div>
         {%if database_to_compare|removespaces in name|removespaces %}
-          <button type="button" id="ref{{name|removespaces}}" class="pull-right set_reference btn btn-small btn-primary">Using as reference table</button>
+          <button type="button" id="ref{{name|removespaces}}" class="pull-right set_reference btn btn-small btn-primary">Using as reference</button>
         {% else %}
           <button type="button" id="ref{{name|removespaces}}" class="pull-right set_reference btn btn-small btn-success">Set as reference</button>   
         {% endif %}
@@ -145,15 +149,17 @@ th, td {
     <div id="no_results" class="pull-center">No results found, for this filtering parameters.</div>
   </div>
 </div>
-</div>  
 
+<!--<![endif]-->
+
+</div>  
+<!--[if gte IE 9]><!-->
 <script type="text/javascript" src="{{ STATIC_URL }}js/emif.results_comp.js"></script>
+<!--<![endif]-->
 
 {% endblock %}
-
+<!--[if gte IE 9]><!-->
 {% block scriptextra %}
-
-
 
 function applyFilters(){
   reset_empties();
@@ -341,7 +347,7 @@ $(function(){
       });
       $(this).removeClass('btn-success');
       $(this).addClass('btn-primary');
-      $(this).text('Using as reference table');
+      $(this).text('Using as reference');
 
       // Clean all status
       $('.basetable').removeClass("basetable");
@@ -403,9 +409,12 @@ function compareDatabases(show_modal){
   var threadpool = new ThreadPool(20);
   var priority=1;
 
-  var reference_table = $('.database_listing').eq(0).find('.set_reference').prop('id').substring(3);
-  var compared_table = $('.database_listing_pointer').find('.set_reference').prop('id').substring(3);  
-
+  var reference_table;
+  var compared_table;
+  try{
+    reference_table = $('.database_listing').eq(0).find('.set_reference').prop('id').substring(3);
+    compared_table = $('.database_listing_pointer').find('.set_reference').prop('id').substring(3);  
+  }catch(err){}
 
   {%for name, qset in results|slice:":1" %}
     {% for k,v in qset.items %}
@@ -432,10 +441,5 @@ function compareDatabase(base, other){
 }
 
 compareDatabases(false);
-
-{% comment %}
-</script>
-{% endcomment %}
-
-
 {% endblock %}
+<!--<![endif]-->
