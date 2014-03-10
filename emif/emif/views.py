@@ -772,7 +772,8 @@ def extract_answers(request2, questionnaire_id, question_set, qs_list):
             comment_id = "comment_question_"+question.number#.replace(".", "")
             try:
                 if request.POST and request.POST[comment_id]!='':
-                    comment_id_index = "comment_question_"+question.slug
+                    #comment_id_index = "comment_question_"+question.slug
+                    comment_id_index = "comment_question_"+question.slug_fk.slug1
                     extra_comments[question] = request.POST[comment_id]
                     extra_fields[comment_id_index+'_t'] = request.POST[comment_id]
             except KeyError:
@@ -3465,8 +3466,9 @@ def import_questionnaire(request, template_name='import_questionnaire.html'):
 
                         _questions_rows[type_Column.row] = str(questionNumber)
 
-                        #if not _debug:
-                            #save_slug(question.slug,  question.text_en, question)
+                        if not _debug:
+                            # TODO: I think we don't need this now, since question now has a slug foreign key
+                            save_slug(question.slug,  question.text_en, question)
 
                         # slugs.append((question.slug,  question.text_en, question))
                         log += '\n%s - Category saved %s ' % (type_Column.row, question)
@@ -3553,8 +3555,9 @@ def import_questionnaire(request, template_name='import_questionnaire.html'):
 
                         _questions_rows[type_Column.row] = str(questionNumber)
 
-                        #if not _debug:
-                        #    save_slug(question.slug,  question.text_en, question)
+                        if not _debug:
+                            # TODO: I think we don't need this now, since question now has a slug foreign key
+                            save_slug(question.slug,  question.text_en, question)
 
                         # slugs.append((question.slug,  question.text_en, question))
                         log += '\n%s - Question saved %s ' % (type_Column.row, question)
