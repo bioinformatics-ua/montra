@@ -125,23 +125,23 @@
   model: searchengine.slugs
 
 - pk: 27
-  fields: {slug1: "name_administrative", description: ""}
+  fields: {slug1: "name_administrative", description: "Administrative contact (name)"}
   model: searchengine.slugs
 
 - pk: 28
-  fields: {slug1: "location", description: ""}
+  fields: {slug1: "location", description: "Location"}
   model: searchengine.slugs
 
 - pk: 29
-  fields: {slug1: "institution_name", description: ""}
+  fields: {slug1: "institution_name", description: "Institution Name"}
   model: searchengine.slugs
 
 - pk: 30
-  fields: {slug1: "contact", description: ""}
+  fields: {slug1: "contact", description: "Contact"}
   model: searchengine.slugs
 
 - pk: 31
-  fields: {slug1: "purpose", description: ""}
+  fields: {slug1: "purpose", description: "Purpose"}
   model: searchengine.slugs
 
 
