@@ -202,7 +202,21 @@
 <script type="text/javascript">
 
     {% block scriptextra %}
-
+function add_triggers() {
+            
+            {% for trigger in triggers %}
+                addtrigger("{{trigger}}");
+            {% endfor %}
+            
+            {% for k,v in qvalues.items %}
+                qvalues['{{ k|escapejs }}'] = '{{ v|escapejs }}';
+            {% endfor %}
+            
+            for(key in qvalues) {
+                valchanged(key, qvalues[key], this);
+            }
+}
+             
 $(function(){
     tabindexer();
 });    
@@ -266,7 +280,7 @@ function validate(question_number)
         {% endif %}
         {% endfor %}
 
-
+add_triggers();
 
 {% endblock %}
 </script>

@@ -50,6 +50,8 @@ from modules.geo import *
 
 from rest_framework.authtoken.models import Token
 
+from django.contrib.auth.decorators import login_required
+
 import json
 import logging
 import re
@@ -72,7 +74,6 @@ def list_questions():
 
 def index(request, template_name='index.html'):
     return render(request, template_name, {'request': request})
-
 
 def about(request, template_name='about.html'):
     return render(request, template_name, {'request': request, 'breadcrumb': True})
@@ -99,12 +100,14 @@ def results_db(request, template_name='results.html'):
         num_results = 0
         list_results = []
 
+
     list_databases = []
+    
     for database in databases:
         database_aux = Database()
         database_aux.id = database.runid
         database_aux.date = database.completed
-        
+
         answers = Answer.objects.filter(runid=database.runid)
         text = clean_value(str(answers[1].answer))
         info = text[:75] + (text[75:] and '..')
@@ -172,104 +175,56 @@ def results_fulltext(request, page=1, full_text=True,template_name='results.html
     return results_fulltext_aux(request, "text_t:" + query, page, template_name, isAdvanced)
 
 
-def results_fulltext_aux(request, query, page=1, template_name='results.html', isAdvanced=False):
-
+def results_fulltext_aux(request, query, page=1, template_name='results.html', isAdvanced=False, force=False):
+    
     rows = 5
-    if query == "":
+    if request.POST and "page" in request.POST and not force:
+        page = request.POST["page"]
+
+    if page == None:
+        page = 1
+
+    if query == "" or query.strip()=="text_t:*" :
         return render(request, "results.html", {'request': request, 'breadcrumb': True,
-                                                'list_results': [], 'page_obj': None})
+                                                'num_results': 0, 'page_obj': None})
+    (sortString, filterString, sort_params, range) = paginator_process_params(request.POST, page, rows)   
+    sort_params["base_filter"] = query;
+    query_filtered=query
+    if len(filterString) > 0:
+        query_filtered += " AND " + filterString
 
-    class Results:
-        num_results = 0
-        list_results = []
-        paginator = None
+    print query_filtered
 
-    c = CoreEngine()
-    error_searching = False
-    try:
-        results = c.search_fingerprint(query, str(0))
-    except: 
-        error_searching = True
+    (list_databases, hits) = get_databases_from_solr_v2(request, query_filtered, sort=sortString, rows=rows, start=range)    
+    if range > hits and not force:
+        return results_fulltext_aux(request, query, 1, isAdvanced=isAdvanced, force=True)  
 
-    questionnaires_ids = {}
-    qqs = Questionnaire.objects.all()
-    for q in qqs:
-        questionnaires_ids[q.slug] = (q.pk, q.name)
-
-    list_databases = []
-    if error_searching or len(results) == 0 :
+    if len(list_databases) == 0 :
         query_old = request.session.get('query', "")
         if isAdvanced == True:
             return render(request, "results.html", {'request': request, 'breadcrumb': True,
-                                                'list_results': [], 'page_obj': None, 'isAdvanced': True})
+                                                'num_results': 0, 'page_obj': None, 'isAdvanced': True})
         else:
             return render(request, "results.html", {'request': request, 'breadcrumb': True,
-                                                'list_results': [], 'page_obj': None, 'search_old': query_old, 'isAdvanced': False})
-    for r in results:
-        try:
-            database_aux = Database()
+                                                'num_results': 0, 'page_obj': None, 'search_old': query_old, 'isAdvanced': False})
+    
+    list_databases = paginator_process_list(list_databases, hits, range)   
 
-            if (not r.has_key('database_name_t')):
-                database_aux.name = '(Unnamed)'
-            else:
-                database_aux.name = r['database_name_t']
+    myPaginator = Paginator(list_databases, rows)
+    try:
+        pager =  myPaginator.page(page)
+    except PageNotAnInteger, e:
+        pager =  myPaginator.page(page)
 
-            if (not r.has_key('location_t')):
-                database_aux.location = ''
-            else:
-                database_aux.location = r['location_t']
-            if (not r.has_key('institution_name_t')):
-                database_aux.institution = ''
-            else:
-                database_aux.institution = r['institution_name_t']
-
-            if (not r.has_key('contact_administrative_t')):
-                database_aux.email_contact = ''
-            else:
-                database_aux.email_contact = r['contact_administrative_t']
-
-            if (not r.has_key('number_active_patients_jan2012_t')):
-                database_aux.number_patients = ''
-            else:
-                database_aux.number_patients = r['number_active_patients_jan2012_t']
-                
-            if (not r.has_key('date_last_modification_t')):
-                database_aux.last_activity = ''
-            else:
-                database_aux.last_activity = r['date_last_modification_t']                  
-                
-            if (not r.has_key('upload-image_t')):
-                database_aux.logo = 'nopic.gif'
-            else:
-                database_aux.logo = r['upload-image_t']
-            database_aux.id = r['id']
-            database_aux.date = convert_date(r['created_t'])
-            try:
-                database_aux.date_modification = convert_date(r['date_last_modification_t'])
-            except KeyError:
-                pass
-                
-            (ttype, type_name) = questionnaires_ids[r['type_t']]
-            database_aux.ttype = ttype
-            database_aux.type_name = type_name
-            list_databases.append(database_aux)
-        except:
-            raise
-
-    pp = Paginator(list_databases, rows)
-    list_results = Results()
-    list_results.num_results = results.hits
-    list_results.list_results = pp.page(page)
-    list_results.paginator = pp
     query_old = request.session.get('query', "")
         
     if isAdvanced == True:
         return render(request, template_name, {'request': request,
-                                           'list_results': list_results, 'page_obj': pp.page(page),
-                                            'breadcrumb': True, 'isAdvanced': True})
+                                           'num_results': hits, 'page_obj': pager,
+                                            'breadcrumb': True, 'isAdvanced': True, "sort_params": sort_params, "page":page})
     else :
         return render(request, template_name, {'request': request,
-                                           'list_results': list_results, 'page_obj': pp.page(page), 'breadcrumb': True, 'search_old': query_old, 'isAdvanced': False})
+                                           'num_results': hits, 'page_obj': pager, 'breadcrumb': True, 'search_old': query_old, 'isAdvanced': False, "sort_params": sort_params, "page":page})
 
 
 def store_query(user_request, query_executed):
@@ -404,12 +359,10 @@ def results_diff(request, page=1, template_name='results_diff.html'):
     if not in_post:
         query = request.session.get('query', "")
         
-    import pdb
-    #pdb.set_trace()
     print "query_@" + query
     if query == "":
         return render(request, "results.html", {'request': request,
-                                                'list_results': [], 'page_obj': None, 'breadcrumb': True})
+                                                'num_results': 0, 'page_obj': None, 'breadcrumb': True})
     store_query(request, query)
     try:
         # Store query by the user
@@ -427,91 +380,6 @@ def results_diff(request, page=1, template_name='results_diff.html'):
     #print request.POST['qexpression']
     return results_fulltext(request, page, full_text=False, isAdvanced=request.session['isAdvanced'])
 
-
-    class Results:
-        num_results = 0
-        list_results = []
-        d1 = None
-        d2 = None
-        d3 = None
-
-
-    class DatabaseFields:
-        id = ''
-        name = ''
-        date = ''
-        fields = None
-
-
-    c = CoreEngine()
-    results = c.search_fingerprint("text_t:" + query)
-    
-    list_databases = []
-
-    for r in results:
-        try:
-            database_aux = Database()
-            
-            database_aux.id = r['id']
-            database_aux.date = convert_date(r['created_t'])
-
-            database_aux.name = r['database_name_t']
-            database_aux.last_activity = r['date_last_modification_t']
-            
-            list_databases.append(database_aux)
-            if (len(list_databases) == 3):
-                break
-        except:
-            pass
-
-    c = CoreEngine()
-    list_databases_final = []
-    list_results = Results()
-
-    for db in list_databases:
-
-        results = c.search_fingerprint('id:' + db.id)
-
-        class Tag:
-            tag = ''
-            value = ''
-
-        list_values = []
-        blacklist = ['created_t', 'type_t', '_version_', 'date_last_modification_t']
-        name = "Not defined"
-        for result in results:
-            questionnaire_slug = result['type_t']
-            q_main = Questionnaire.objects.filter(slug=questionnaire_slug)[0]
-            for k in result:
-                if k in blacklist:
-                    continue
-                t = Tag()
-                results = Slugs.objects.filter(slug1=k[:-2], question__questionset__questionnaire=q_main.pk)
-                if len(results) > 0:
-                    text = results[0].description
-                else:
-                    text = k
-                info = text[:75] + (text[75:] and '..')
-
-                t.tag = info
-
-                value = clean_value(str(result[k].encode('utf-8')))
-                value = value[:75] + (value[75:] and '..')
-                t.value = value
-                if k == "database_name_t":
-                    name = t.value
-                list_values.append(t)
-        db.fields = list_values
-        list_databases_final.append(db)
-
-    list_results.d1 = list_databases_final[0]
-    list_results.d2 = list_databases_final[1]
-    list_results.d3 = list_databases_final[2]
-    list_results.num_results = len(list_databases)
-    return render(request, template_name, {'request': request, 'query': query,
-                                           'results': list_results, 'search_old': query, 'breadcrumb': True, isAdvanced: request.session['isAdvanced']})
-
-
 def geo(request, template_name='geo.html'):
     query = None
     try:
@@ -528,14 +396,20 @@ def geo(request, template_name='geo.html'):
     _long_lats = []
     # since the geolocation is now adding the locations, we no longer need to look it up when showing,
     # we rather get it directly
-
+    db_list = [] 
+    questionnaires_ids = {}
+    qqs = Questionnaire.objects.all()
+    for q in qqs:
+        questionnaires_ids[q.slug] = (q.pk, q.name)
     for database in list_databases:
 
         if database.location.find(".")!= -1:
             _loc = database.location.split(".")[0]
         else:
             _loc = database.location
+        
 
+        
         city=None
         g = geocoders.GeoNames(username='bastiao')
 
@@ -564,11 +438,36 @@ def geo(request, template_name='geo.html'):
                     continue
 
             _long_lats.append(str(city.lat) + ", " + str(city.long))
-
-        #print _loc
+            import pdb
+            #pdb.set_trace()
+            def __cleanvalue(v):
+                return v.encode('ascii', 'ignore').strip().replace('\n', ' ').replace('\r', ' ')
+            db_list.append({'name': database.name,
+            'location': __cleanvalue(database.location),
+            'institution': __cleanvalue(database.institution),
+            'contact': __cleanvalue(database.email_contact),
+            'number_patients': __cleanvalue(database.number_patients),
+            'ttype': __cleanvalue(database.type_name),
+            'id' : database.id,
+            'admin_name': __cleanvalue(database.admin_name),
+            'admin_address': __cleanvalue(database.admin_address),
+            'admin_email': __cleanvalue(database.admin_email),
+            'admin_phone': __cleanvalue(database.admin_phone),
+            'scien_name': __cleanvalue(database.scien_name),
+            'scien_address': __cleanvalue(database.scien_address),
+            'scien_email': __cleanvalue(database.scien_email),
+            'scien_phone': __cleanvalue(database.scien_phone),
+            'tec_name': __cleanvalue(database.tec_name),
+            'tec_address': __cleanvalue(database.tec_address),
+            'tec_email': __cleanvalue(database.tec_email),
+            'tec_phone': __cleanvalue(database.tec_phone),
+            'lat' : str(city.lat),
+            'long': str(city.long),
+            })
 
         list_locations.append(_loc)
-    return render(request, template_name, {'request': request,
+        
+    return render(request, template_name, {'request': request, 'db_list' : db_list,
                                            'list_cities': list_locations, 'lats_longs': _long_lats, 'breadcrumb': True})
 
 
@@ -760,7 +659,7 @@ def render_one_questionset(request, q_id, qs_id, errors={}, aqid=None, template_
         if aqid != None:
             (qlist_general, qlist, jstriggers, qvalues, jsinclude, cssinclude, extra_fields, hasErrors) = extract_answers(request2, q_id, question_set, qs_list)
         
-        
+        print jstriggers
         
         fingerprint_id = generate_hash()
         r = r2r(template_name, request,
@@ -1119,11 +1018,11 @@ def database_edit(request, fingerprint_id, questionnaire_id, template_name="data
         
     return r
 
-class Database:
-    id = ''
-    name = ''
-    date = ''
-    last_activity = ''
+#class Database:
+#    id = ''
+#    name = ''
+#    date = ''
+#    last_activity = ''
     
 
 
@@ -1146,10 +1045,80 @@ def get_databases_from_db(request):
 
 
 def get_databases_from_solr(request, query="*:*"):
+
+    (list_databases, hits) = get_databases_from_solr_v2(request, query=query);
+
+    return list_databases
+
+def __get_scientific_contact(db, db_solr, type_name):
+    print "type_name" + type_name
+    print "type_name"
+    if type_name == "Observational Data Sources":
+        if (db_solr.has_key('institution_name_t')):
+            db.admin_name = db_solr['institution_name_t']
+        if (db_solr.has_key('Administrative_contact_address_t')):
+            db.admin_address = db_solr['Administrative_contact_address_t']
+        if (db_solr.has_key('Administrative_contact_email_t')):
+            db.admin_email = db_solr['Administrative_contact_email_t']
+        if (db_solr.has_key('Administrative_contact_phone_t')):
+            db.admin_phone = db_solr['Administrative_contact_phone_t']
+
+
+        if (db_solr.has_key('Scientific_contact_name_t')):
+            db.scien_name = db_solr['Scientific_contact_name_t']
+        if (db_solr.has_key('Scientific_contact_address_t')):
+            db.scien_address = db_solr['Scientific_contact_address_t']
+
+        if (db_solr.has_key('Scientific_contact_email_t')):
+            db.scien_email = db_solr['Scientific_contact_email_t']
+        if (db_solr.has_key('Scientific_contact_phone_t')):
+            db.scien_phone = db_solr['Scientific_contact_phone_t']
+
+
+        if (db_solr.has_key('Technical_contact_/_data_manager_contact_name_t')):
+            db.tec_name = db_solr['Technical_contact_/_data_manager_contact_name_t']
+        if (db_solr.has_key('Technical_contact_/_data_manager_contact_address_t')):
+            db.tec_address = db_solr['Technical_contact_/_data_manager_contact_address_t']
+        if (db_solr.has_key('Technical_contact_/_data_manager_contact_email_t')):
+            db.tec_email = db_solr['Technical_contact_/_data_manager_contact_email_t']
+        if (db_solr.has_key('Technical_contact_/_data_manager_contact_phone_t')):
+            db.tec_phone = db_solr['Technical_contact_/_data_manager_contact_phone_t']
+
+    elif "AD Cohort" in type_name :
+
+        if (db_solr.has_key('Administrative_Contact__AC___Name_t')):
+            db.admin_name = db_solr['Administrative_Contact__AC___Name_t']
+        if (db_solr.has_key('AC__Address_t')):
+            db.admin_address = db_solr['AC__Address_t']
+        if (db_solr.has_key('AC__email_t')):
+            db.admin_email = db_solr['AC__email_t']
+        if (db_solr.has_key('AC__phone_t')):
+            db.admin_phone = db_solr['AC__phone_t']
+
+        if (db_solr.has_key('Scientific_Contact__SC___Name_t')):
+            db.scien_name = db_solr['Scientific_Contact__SC___Name_t']
+        if (db_solr.has_key('SC__Address_t')):
+            db.scien_address = db_solr['SC__Address_t']
+        if (db_solr.has_key('SC__email_t')):
+            db.scien_email = db_solr['SC__email_t']
+        if (db_solr.has_key('SC__phone_t')):
+            db.scien_phone = db_solr['SC__phone_t']
+
+        if (db_solr.has_key('Technical_Contact_Data_manager__TC___Name_t')):
+            db.tec_name = db_solr['Technical_Contact_Data_manager__TC___Name_t']
+        if (db_solr.has_key('TC__Address_t')):
+            db.tec_address = db_solr['TC__Address_t']
+        if (db_solr.has_key('TC__email_t')):
+            db.tec_email = db_solr['TC__email_t']
+        if (db_solr.has_key('TC__phone_t')):
+            db.tec_phone = db_solr['TC__phone_t']
+
+    return db
+
+def get_databases_from_solr_v2(request, query="*:*", sort="", rows=100, start=0):
     c = CoreEngine()
-    results = c.search_fingerprint(query)
+    results = c.search_fingerprint(query, sort=sort, rows=rows, start=start)
     print "Solr"
-    print results
     list_databases = []
     questionnaires_ids = {}
     qqs = Questionnaire.objects.all()
@@ -1219,11 +1188,15 @@ def get_databases_from_solr(request, query="*:*"):
             (ttype, type_name) = questionnaires_ids[r['type_t']]
             database_aux.ttype = ttype
             database_aux.type_name = type_name
+            database_aux = __get_scientific_contact(database_aux, r, database_aux.type_name)
+            #import pdb
+            #pdb.set_trace()
             list_databases.append(database_aux)
-        except:
+        except Exception, e:
+            print e
             pass
             #raise
-    return list_databases
+    return (list_databases,results.hits)
 
 
 def delete_fingerprint(request, id):
@@ -1253,9 +1226,52 @@ def force_delete_fingerprint(request, id):
 
     return databases(request)
 
+def query_solr(request, page=1):
+    if not request.POST:
+        return
 
-def databases(request, page=1, template_name='databases.html'):
-    #first lets clean the query session log
+    # Get the list of databases for a specific user
+    _filter = request.POST["filter"];
+    print _filter
+    rows = 5
+    if page == None:
+        page = 1
+
+    (sortString, filterString, sort_params, range) = paginator_process_params(request.POST, page, rows)    
+        
+    print filterString
+
+    if len(filterString) > 0:
+        _filter += " AND " + filterString
+
+    print _filter
+
+    (list_databases,hits) = get_databases_from_solr_v2(request, _filter, sort=sortString, rows=rows, start=range)
+
+    print "Range: "+str(range)
+    print "hits: "+str(hits)
+    print "len: "+str(len(list_databases))
+
+    list_databases = paginator_process_list(list_databases, hits, range) 
+
+    ret = {}
+    ret["Hits"] = hits    
+    ret["Start"] = range    
+    ret["Rows"] = rows
+    ret["Filter"] = filterString
+    if range > hits:
+        ret["Rec_Page"] = 1
+    else:
+        ret["Rec_Page"] = page
+
+    return HttpResponse(json.dumps(ret), mimetype='application/json')
+
+
+
+
+def databases(request, page=1, template_name='databases.html', force=False):
+
+     #first lets clean the query session log
     if 'query' in request.session:
         del request.session['query']
         
@@ -1268,31 +1284,241 @@ def databases(request, page=1, template_name='databases.html'):
         del request.session['query_type']
         
     # Get the list of databases for a specific user
-
     user = request.user
     #list_databases = get_databases_from_db(request)
     _filter = "user_t:" + user.username
     if user.is_superuser:
         _filter = "user_t:*" 
-    list_databases = get_databases_from_solr(request, _filter)
 
-
-    ## Paginator ##
     rows = 5
+    if request.POST and not force:
+        page = request.POST["page"]
+
+    if page == None:
+        page = 1   
+
+    (sortString, filterString, sort_params, range) = paginator_process_params(request.POST, page, rows)    
+        
+    sort_params["base_filter"] = _filter;
+
+    print filterString
+
+    if len(filterString) > 0:
+        _filter += " AND " + filterString
+
+    print _filter
+
+    (list_databases,hits) = get_databases_from_solr_v2(request, _filter, sort=sortString, rows=rows, start=range)
+    if range > hits and force < 2:
+        return databases(request, page=1, force=True)  
+
+    print "Range: "+str(range)
+    print "hits: "+str(hits)
+    print "len: "+str(len(list_databases))
+
+    list_databases = paginator_process_list(list_databases, hits, range) 
+    
+    print "len: "+str(len(list_databases))
+    ## Paginator ##
     myPaginator = Paginator(list_databases, rows)
     try:
         pager =  myPaginator.page(page)
     except PageNotAnInteger, e:
-        pager =  myPaginator.page(1)
+        pager =  myPaginator.page(page)
     ## End Paginator ##
+    print list_databases
 
     return render(request, template_name, {'request': request, 'export_my_answers': True,
                                            'list_databases': list_databases, 'breadcrumb': True, 'collapseall': False,
                                            'page_obj': pager,
                                            'api_token': True, 
                                            'owner_fingerprint': False,
-                                           'add_databases': True})
+                                           'add_databases': True, "sort_params": sort_params, "page":page})
 
+def paginator_process_params(request, page, rows):
+    sortFieldsLookup = {}
+    sortFieldsLookup["database_name"] = "database_name_sort"
+    sortFieldsLookup["last_update"] = "last_activity_sort"
+    sortFieldsLookup["type"] = "type_name_sort"
+
+    filterFieldsLookup = {}
+    filterFieldsLookup["database_name_filter"] = "database_name_sort"
+    filterFieldsLookup["last_update_filter"] = ""
+    filterFieldsLookup["type_filter"] = "type_t"
+
+    sortString = ""
+    filterString = ""
+    sort_params= {}
+    print request
+    if "s" in request:
+        mode = json.loads(request["s"])
+    else:
+        mode = {"database_name": "asc"}
+
+    for x in mode:
+        if sortFieldsLookup.has_key(x):
+            if mode[x] == "asc" or mode[x] == "desc":
+                sortString += sortFieldsLookup[x]+" "+mode[x]
+                if x not in sort_params:
+                    sort_params[x] = {}
+                sort_params[x]["name"] = mode[x]
+        elif filterFieldsLookup.has_key(x):
+            if x == "last_update_filter":
+                filterString += "(created_t:\""+mode[x] + "\" OR date_last_modification_t:\""+mode[x] + "\") AND "
+            elif x== "database_name_filter":
+                p = re.compile("([^a-z])")
+                str2 = re.sub(p, "", mode[x].lower())
+                filterString += "({!prefix f="+filterFieldsLookup[x]+"}"+str2+") AND "
+            else:
+                filterString += filterFieldsLookup[x]+":'"+mode[x] +"' AND "
+            if x[:-7] not in sort_params:
+                sort_params[x[:-7]] = {}
+            sort_params[x[:-7]]["filter"] = mode[x]
+            print sort_params
+
+    if len(filterString) > 0:
+        filterString = filterString[:-4]
+
+    for x in ["database_name", "last_update", "type"]:
+        if (x in sort_params) and ( "name" in sort_params[x]):
+            sort_params["selected_name"] = x
+            sort_params["selected_value"] = sort_params[x]["name"]
+            if sort_params[x]["name"] == "asc":
+                sort_params[x]["click_url"]='?s={"'+x+'":"desc"}'
+                sort_params[x]["next"]='desc'
+                sort_params[x]["icon"]="icon-chevron-down"                
+            elif sort_params[x]["name"] == "desc":
+                sort_params[x]["click_url"]='?s={"'+x+'":"asc"}'
+                sort_params[x]["next"]='asc'
+                sort_params[x]["icon"]="icon-chevron-up"
+        else:
+            if x not in sort_params:
+                sort_params[x] = {}
+            sort_params[x]["click_url"]='?s={"'+x+'":"asc"}'
+            sort_params[x]["next"]='asc'
+            sort_params[x]["icon"]="icon-minus"
+        
+    print sortString
+
+    start = (int(page) - 1) * rows
+
+    #print mode
+    if "extraObjects" in mode:
+        extraObjects = mode["extraObjects"]
+    else:
+        extraObjects = {}
+    sort_params["extraObjects"] = json.dumps(extraObjects)
+    #print sort_params
+    return (sortString, filterString, sort_params, start)
+
+def paginator_process_list(list_databases, hits, start):
+    nList = []
+    
+    for x in xrange(0,start):
+        nList.append(None)
+    nList.extend(list_databases)
+    while len(nList)<hits:
+        nList.append(None)
+
+    return nList
+
+# def databases(request, page=1, template_name='databases.html'):
+#     #first lets clean the query session log
+#     if 'query' in request.session:
+#         del request.session['query']
+        
+#     if 'isAdvanced' in request.session:
+#         del request.session['isAdvanced'] 
+    
+#     if 'query_id' in request.session:
+#         del request.session['query_id']
+#     if 'query_type' in request.session:
+#         del request.session['query_type']
+        
+#     # Get the list of databases for a specific user
+
+#     user = request.user
+#     #list_databases = get_databases_from_db(request)
+#     _filter = "user_t:" + user.username
+#     if user.is_superuser:
+#         _filter = "user_t:*" 
+#     list_databases = get_databases_from_solr(request, _filter)
+
+
+#     ## Paginator ##
+#     rows = 5
+#     myPaginator = Paginator(list_databases, rows)
+#     try:
+#         pager =  myPaginator.page(page)
+#     except PageNotAnInteger, e:
+#         pager =  myPaginator.page(1)
+#     ## End Paginator ##
+
+#     return render(request, template_name, {'request': request, 'export_my_answers': True,
+#                                            'list_databases': list_databases, 'breadcrumb': True, 'collapseall': False,
+#                                            'page_obj': pager,
+#                                            'api_token': True, 
+#                                            'owner_fingerprint': False,
+#                                            'add_databases': True})
+
+# GET ALL DATABASES ACCORDING TO USER INTERESTS
+def all_databases_user(request, page=1, template_name='alldatabases.html', force=False):
+    rows = 5
+    if request.POST and not force:
+        page = request.POST["page"]
+
+    if page == None:
+        page = 1
+    # lets clear the geolocation session search filter (if any)
+    try:
+        del request.session['query']
+    except:
+        pass
+    
+    emifprofile = request.user.get_profile()
+    interests = emifprofile.interests.all()
+
+    type_t_list = ""
+    if interests:
+        for i in interests:
+            type_t = i.name.replace(" ", "").lower()
+            type_t_list+=(type_t + ",")
+
+        type_t_list = type_t_list[:-1]
+
+        query = "type_t:" + type_t_list
+        (sortString, filterString, sort_params, start) = paginator_process_params(request.POST, page, rows)    
+        sort_params["base_filter"] = query;
+        if len(filterString) > 0:
+            query += " AND " + filterString
+
+        print query
+
+        (list_databases,hits) = get_databases_from_solr_v2(request, query, sort=sortString, rows=rows, start=start)
+
+        list_databases = paginator_process_list(list_databases, hits, start)
+        if start > hits and not force:
+            return all_databases_user(request, 1, force=True)  
+  
+    else:
+        list_databases = []
+        #list_databases = get_databases_from_solr(request, "*:*")
+
+    ## Paginator ##
+    
+    myPaginator = Paginator(list_databases, rows)
+    try:
+        pager =  myPaginator.page(page)
+    except PageNotAnInteger, e:
+        pager =  myPaginator.page(1)
+    ## End Paginator ##
+    
+    return render(request, template_name, {'request': request, 'export_all_answers': True, 'data_table': True,
+                                           'list_databases': list_databases,
+                                            'breadcrumb': True, 'collapseall': False, 
+                                            'geo': True,
+                                            'page_obj': pager,
+                                            'add_databases': True, "sort_params": sort_params, "page":page})
 
 def all_databases(request, page=1, template_name='alldatabases.html'):
     
@@ -1327,8 +1553,8 @@ def all_databases(request, page=1, template_name='alldatabases.html'):
 
 def qs_data_table(request, template_name='qs_data_table.html'):
     db_type = request.POST.get("db_type")
-    qset = request.POST.get("qset")
-    
+    qset = request.POST.getlist("qsets[]")
+
     answers = []
     # get only databases with correct type
     list_databases = get_databases_from_solr(request, "type_t:"+re.sub(r'\s+', '', db_type.lower()))
@@ -1345,7 +1571,7 @@ def qs_data_table(request, template_name='qs_data_table.html'):
 
                 (k, qs) = group    
               
-                if k == qset:
+                if k in qset:
                     for q in qs.list_ordered_tags:
                         q_list.append(q)
                         a_list.append(q.value)
@@ -1497,6 +1723,137 @@ def createqsets(runcode, qsets=None, clean=True):
                     question_group = QuestionGroup()
                     qsets[aux_results[0].question.questionset.text] = question_group
                     
+            else:
+                text = k
+
+            info = text
+            t.tag = info
+            #print t.tag
+
+            if question_group != None and question_group.list_ordered_tags != None:
+                try:
+                    t = question_group.list_ordered_tags[question_group.list_ordered_tags.index(t)]
+                except:
+                    pass
+
+            value = clean_value(str(result[k].encode('utf-8')))
+            
+            try:
+
+               t.comment = result['comment_question_'+k]
+               #print t.comment
+            except KeyError:
+               pass
+            if clean:
+                t.value = value.replace("#", " ")
+            else:
+                t.value = value
+
+            if k == "database_name_t":
+                name = t.value
+            list_values.append(t)
+            if question_group != None:
+                try:
+                    question_group.list_ordered_tags[question_group.list_ordered_tags.index(t)] = t
+                except:
+                    pass
+        break
+    # What should I do with this code?
+    # I know that it actually do nothing    
+    if (users!=""):
+        users.split(" \\ ")
+
+    return (qsets, name, db_owners, fingerprint_ttype)
+
+def createqset(runcode, qsid, qsets=None, clean=True):
+    qsid = int(qsid) 
+    print "Got into createqset!!"
+    #print "createqsets"
+    c = CoreEngine()
+    results = c.search_fingerprint('id:' + runcode)
+
+    if qsets == None:
+        qsets = ordered_dict()
+    name = ""
+    list_values = []
+    blacklist = ['created_t', 'type_t', '_version_', 'date_last_modification_t']
+    name = "Not defined."
+    users = ""
+    fingerprint_ttype = ""
+
+    db_owners = "" 
+
+
+    questionnaires_ids = {}
+    qqs = Questionnaire.objects.all()
+    for q in qqs:
+        questionnaires_ids[q.slug] = (q.pk, q.name)
+
+
+    for result in results:
+
+
+        (fingerprint_ttype, type_name) = questionnaires_ids[result['type_t']]
+
+        # Get the slug of fingerprint type
+        q_aux = Questionnaire.objects.filter(slug=result['type_t'])
+
+        try:
+            users = result['user_t']
+            db_owners = result['user_t']
+        except:
+            pass
+
+        list_qsets = QuestionSet.objects.filter(questionnaire=q_aux[0]).order_by('sortid')
+
+        
+        for qset in list_qsets:
+            if (qset.sortid == qsid):
+                question_group = QuestionGroup()
+                question_group.sortid = qset.sortid
+                
+                qsets[qset.text] = question_group
+                qset.sortid
+                list_questions = Question.objects.filter(questionset=qset).order_by('number')
+                for question in list_questions:
+                    t = Tag()
+                    t.tag = question.text.encode('utf-8')
+                    t.value = ""
+                    t.number = question.number
+                    t.ttype = question.type
+                    question_group.list_ordered_tags.append(t)
+
+
+                qsets[qset.text] = question_group
+
+                break
+
+        for k in result:
+            #print k
+            if k in blacklist:
+                continue
+            if k.startswith("comment_question_"):
+                continue0
+
+            t = Tag()
+
+            aux_results = Slugs.objects.filter(slug1=k[:-2], question__questionset__questionnaire=q_aux[0].pk)
+            qs = None
+            question_group = None
+            q_number = None
+            if len(aux_results) > 0:
+                text = aux_results[0].description
+                qs = aux_results[0].question.questionset.text
+                q_number = qs = aux_results[0].question.number
+                if qsets.has_key(aux_results[0].question.questionset.text):
+                    # Add the Tag to the QuestionGroup
+                    question_group = qsets[aux_results[0].question.questionset.text]
+                '''else:
+                    # Add a new QuestionGroup
+                    question_group = QuestionGroup()
+                    qsets[aux_results[0].question.questionset.text] = question_group
+                    print aux_results[0].question.questionset.text
+                '''    
             else:
                 text = k
 
@@ -2234,7 +2591,7 @@ def show_fingerprint_page_read_only(request, q_id, qs_id, SouMesmoReadOnly=False
                 Type = question.get_type()
                 if SouMesmoReadOnly and Type == 'open-button':
                    Type = "open"
-               
+
                 _qnum, _qalpha = split_numal(question.number)
 
                 qdict = {
@@ -2287,7 +2644,9 @@ def show_fingerprint_page_read_only(request, q_id, qs_id, SouMesmoReadOnly=False
             
             
         # qvalues = {'1a': 'teste'}   
-            
+        print question_set.questionnaire.questionsets()
+
+
         errors = {}
         fingerprint_id = generate_hash()
         r = r2r(template_name, request,
@@ -2307,9 +2666,9 @@ def show_fingerprint_page_read_only(request, q_id, qs_id, SouMesmoReadOnly=False
                 questions_list=qlist_general,
                 fingerprint_id=fingerprint_id,
                 breadcrumb=True,
-                hide_add = hide_add,
-                q_id = q_id,
-                aqid = aqid,
+                hide_add=hide_add,
+                q_id=q_id,
+                aqid=aqid,
                 serialized_query=serialized_query
                 
         )
@@ -2317,9 +2676,8 @@ def show_fingerprint_page_read_only(request, q_id, qs_id, SouMesmoReadOnly=False
         r['Expires'] = "Thu, 24 Jan 1980 00:00:00 GMT"
 
     except:
+        raise
 
-        raise   
-        
     return r
 
 
@@ -2487,10 +2845,16 @@ def show_fingerprint_page(request, runinfo, errors={}, template_name='database_e
     return r
 
 
-def create_auth_token(request, page=1, templateName='api-key.html'):
+def create_auth_token(request, page=1, templateName='api-key.html', force=False):
     """
     Method to create token to authenticate when calls REST API
     """
+    rows = 5
+    if request.POST and not force:
+        page = request.POST["page"]
+
+    if page == None:
+        page = 1   
 
     user = request.user
     if not Token.objects.filter(user=user).exists():
@@ -2498,14 +2862,21 @@ def create_auth_token(request, page=1, templateName='api-key.html'):
     else:
         token = Token.objects.get(user=user)
 
-    # print token
+    _filter = "user_t:" + user.username
 
-    list_databases = get_databases_from_solr(request, "user_t:" + user.username)
-    # for database in list_databases:
-    #     print database.id
+    (sortString, filterString, sort_params, range) = paginator_process_params(request.POST, page, rows)    
+        
+    sort_params["base_filter"] = _filter;
 
-     ## Paginator ##
-    rows = 5
+    if len(filterString) > 0:
+        _filter += " AND " + filterString
+
+    (list_databases,hits) = get_databases_from_solr_v2(request, _filter, sort=sortString, rows=rows, start=range)
+    if range > hits and force < 2:
+        return create_auth_token(request, page=1, force=True)  
+
+    list_databases = paginator_process_list(list_databases, hits, range) 
+    
     myPaginator = Paginator(list_databases, rows)
     try:
         pager =  myPaginator.page(page)
@@ -2514,7 +2885,7 @@ def create_auth_token(request, page=1, templateName='api-key.html'):
     ## End Paginator ##
 
     return render_to_response(templateName, {'list_databases': list_databases, 'token': token, 'user': user,
-                              'request': request, 'breadcrumb': True, 'page_obj': pager}, RequestContext(request))
+                              'request': request, 'breadcrumb': True, 'page_obj': pager, "sort_params": sort_params, "page":page}, RequestContext(request))
 
 
 def sharedb(request, db_id, template_name="sharedb.html"):
@@ -3156,4 +3527,22 @@ def import_questionnaire(request, template_name='import_questionnaire.html'):
     return render_to_response(template_name, {'import_questionnaire': True,
                               'request': request, 'breadcrumb': True}, RequestContext(request))
 
+# Redirect user after login. Rules:
+# - settings value should be represented by "REDIRECT_" plus the profile.name in uppercase
+# and with out spaces. Ex: REDIRECT_DATACUSTODIAN - for profile.name="Data Custodian"
+@login_required
+def wherenext(request):
+    try:
+        emifprofile = request.user.get_profile()
+        if emifprofile.profiles.count():
+            for profile in emifprofile.profiles.all():
+                redirect = getattr(settings, "REDIRECT_" + profile.name.upper().strip().replace(" ", ""), 
+                    'emif.views.all_databases_user')
+                return HttpResponseRedirect(reverse(redirect))
 
+        interests = emifprofile.interests.all()
+        if interests:
+            return HttpResponseRedirect(reverse('emif.views.all_databases_user'))
+    except:
+        logging.warn("User has no emifprofile nor interests")
+        return HttpResponseRedirect(reverse('emif.views.all_databases'))

@@ -14,7 +14,8 @@
 
 <head>
     <!-- This is WRONG and just for testing, on deploy it must be changed to static base url -->
-    <base href="http://{{request.get_host}}">
+    <!--<base id="base_link" href="http://{{request.get_host}}">-->
+    <base id="base_link" href="{{ BASE_URL }}">
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
     <title>{% block title %}EMIF Catalogue{% endblock title %}</title>
@@ -23,6 +24,7 @@
     <link rel="shortcut icon" href="{{ STATIC_URL }}img/favicon.ico" type="image/x-icon" />
     <link rel="stylesheet" href="{{ STATIC_URL }}css/bootstrap.min.css">
     <link rel="stylesheet" href="{{ STATIC_URL }}font-awesome/css/font-awesome.min.css">
+    <link href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet">
     <!-- IE 7 doesnt recognize awesome icons correctly... -->
     <!--[if IE]>
         <link rel="stylesheet" media="all" href="{{ STATIC_URL }}font-awesome/css/font-awesome-ie7.min.css" />
@@ -49,7 +51,8 @@
     <script src="{{ STATIC_URL }}js/vendor/bootstrap.min.js"></script>
     <script src="{{ STATIC_URL }}js/vendor/jquery.cookie.js"></script>
     <script src="{{ STATIC_URL }}js/vendor/jquery.canclear.js"></script>
-    
+    <script src="{{ STATIC_URL }}js/vendor/jquery.highlight.js"></script>
+   
     <script type="application/javascript">
         // We need to configure this to be able to send requests by json with the csrftoken
         var csrftoken = $.cookie('csrftoken');
@@ -97,6 +100,7 @@
     <div class="navbar navbar-fixed-top">
         <div class="navbar-inner">
             <div class="container">
+                
                 <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
@@ -157,7 +161,11 @@
                                             <li class="dropdown-submenu">
                                                 <a href="" onclick="return false;">Add new databases</a>
                                                 <ul class="dropdown-menu">
-                                                    {% show_fingerprints %}
+                                                    {% if request.user.get_profile %}
+                                                        {% show_fingerprints_interests request.user %}
+                                                    {% else %}
+                                                        {% show_fingerprints %}
+                                                    {% endif %}
                                                 </ul>
                                             </li>
                                             
@@ -236,24 +244,29 @@
                         {% block headerlogin %} 
                         {% if not request.user.is_authenticated %}
                             <li id="auth-logged-out">
-                        <form class="navbar-form pull-right" method="post" action="accounts/signin/">
-                            {% csrf_token %}
-                            <input name="identification" class="signin-header-form-email" type="text" placeholder="Email">
-                            <input name="password" class="signin-header-form-pass" type="password" placeholder="Password">
-                            <button type="submit" class="btn">Sign in</button>
-                        </form>
+                                <form class="navbar-form pull-right" method="post" action="accounts/signin/">
+                                    {% csrf_token %}
+                                    <input name="identification" class="signin-header-form-email" type="text" placeholder="Email">
+                                    <input name="password" class="signin-header-form-pass" type="password" placeholder="Password">
+                                    <button type="submit" class="btn">Sign in</button>
+                                </form> 
                             </li>
                         {% else %}
                             <li id="auth-logged-in">
-                                <p class="navbar-text pull-right">
-
-                            
-                            {% comment %}
-                                <em>{{ request.user.get_full_name }}
-                            {% endcomment %}</em>[
-                            <a href="accounts/signout/" class="navbar-link">Sign out</a>]
-                        </p>
-                        
+                                <button style="white-space:nowrap;" class="btn btn-success dropdown-toggle" data-toggle="dropdown" tabindex="-1">
+                                    {% if not request.user.first_name and not request.user.last_name %}
+                                        <i class="icon-user"></i><small>&nbsp; {{request.user.username}} &nbsp;</small><i class="icon-angle-down"></i>
+                                    {% else %}
+                                        <i class="icon-user"></i><small>&nbsp; {{request.user.first_name}} {{request.user.last_name}} &nbsp;</small><i class="icon-angle-down"></i>
+                                    {% endif %}
+                                </button>
+                                <ul class="dropdown-menu">
+                                    {% show_profiles request.user %}
+                                    {% show_fingerprints_interests_profile request.user %}
+                                    <li class="divider"></li>
+                                    <li><a href="accounts/profile_edit/" class="navbar-link"><i class="icon-edit"></i>&nbsp; Edit Profile &nbsp;</a></li>
+                                    <li><a href="accounts/signout/" class="navbar-link"><i class="icon-signout"></i>&nbsp; Sign out &nbsp;</a></li>
+                                </ul>
                             </li>
                     {% endif %} 
                     {% endblock %}

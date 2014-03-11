@@ -26,7 +26,7 @@
 function getFingerprintID(){
   var url = document.URL;
   var fingerprint_id='abcd';
-  console.log(url)
+
   try{
     fingerprint_id = url.split("fingerprint/")[1].split("/1")[0];
   }
@@ -38,10 +38,26 @@ function getFingerprintID(){
 };
 
 
+var translations = {};
+var translationsBack = {};
+var activeChart='';
+
+var actualChart = null; 
+
+
 /** TODO: there are a lot of static and hardcore parameters in this function
   * This need to be fixed */ 
 function PCAPI () 
 {
+    // This was already globally defined, but ie8, for some obscure reason cant find it...
+    $.ajaxSetup({
+                crossDomain: false, // obviates need for sameOrigin test
+                beforeSend: function(xhr, settings) {
+                    if (!csrfSafeMethod(settings.type)) {
+                        xhr.setRequestHeader("X-CSRFToken", $.cookie('csrftoken'));
+                    }
+                }
+    });
     this.getGender = function(){
         var result = {}
           
@@ -50,7 +66,7 @@ function PCAPI ()
           url: "population/jerboalistvalues/Active patients/Gender/abcd",
           async: false,
           data: result,
-          success: function (data){result=data;},
+          success: function (data){result=data;}
         });
         return result;
     };
@@ -63,7 +79,7 @@ function PCAPI ()
           url: "population/jerboalistvalues/Active patients/Name1/abcd",
           async: false,
           data: result,
-          success: function (data){result=data;},
+          success: function (data){result=data;}
         });
         return result;
     };
@@ -76,7 +92,7 @@ function PCAPI ()
           url: "population/jerboalistvalues/Active patients/Name2/abcd",
           async: false,
           data: result,
-          success: function (data){result=data;},
+          success: function (data){result=data;}
         });
         return result;
     };
@@ -90,7 +106,7 @@ function PCAPI ()
           url: "population/jerboalistvalues/Active patients/Value1/abcd",
           async: false,
           data: result,
-          success: function (data){result=data;},
+          success: function (data){result=data;}
         });
         return result;
     };
@@ -104,7 +120,7 @@ function PCAPI ()
           url: "population/jerboalistvalues/Active patients/Name2/abcd",
           async: false,
           data: result,
-          success: function (data){result=data;},
+          success: function (data){result=data;}
         });
         return result;
     };
@@ -117,7 +133,7 @@ function PCAPI ()
           url: "population/jerboalistvalues/" + nameN,
           async: false,
           data: result,
-          success: function (data){result=data;},
+          success: function (data){result=data;}
         });
         return result;
     };
@@ -130,7 +146,7 @@ function PCAPI ()
           url: "population/jerboalistvalues/" + valueN,
           async: false,
           data: result,
-          success: function (data){result=data;},
+          success: function (data){result=data;}
         });
         return result;
     };
@@ -143,7 +159,7 @@ function PCAPI ()
           url: "population/jerboalistvalues/Var",
           async: false,
           data: result,
-          success: function (data){result=data;},
+          success: function (data){result=data;}
         });
         return result;
     };
@@ -156,7 +172,7 @@ function PCAPI ()
           url: "population/jerboalistvalues/Var",
           async: false,
           data: result,
-          success: function (data){result=data;},
+          success: function (data){result=data;}
         });
         return result;
     };
@@ -168,20 +184,38 @@ function PCAPI ()
           url: "population/jerboalistvalues/"+Var+"/"+Row+"/" + fingerprintID,
           async: false,
           data: result,
-          success: function (data){result=data;},
+          success: function (data){result=data;}
         });
         return result;
     };
-
-    this.getFilter = function(Var, Row, fingerprintID){
+     this.getValuesRowWithFilters = function(Var, Row, fingerprintID, filters){
         var result = {}
-        fingerprintID = 'abcd';  
+
+
+        $.ajax({
+          dataType: "json",
+          url: "population/jerboalistvalues/"+Var+"/"+Row+"/" + fingerprintID,
+          async: false,
+          type: "POST",
+          data: filters,
+          success: function (data){
+            result=data;
+          }
+        });
+
+        
+
+        return result;
+    };
+
+    this.getFilter = function(Var, fingerprintID){
+        var result = {} ;
         $.ajax({
           dataType: "json",
           url: "population/filters/"+Var+"/" + fingerprintID,
           async: false,
           data: result,
-          success: function (data){result=data;},
+          success: function (data){result=data;}
         });
         return result;
     };
@@ -196,58 +230,112 @@ function PCAPI ()
  (function( $ )
  {
 
+
+
+    /** Draft code */ 
+    function getFiltersSelected(){
+
+      return filtersMap;
+
+    };
+
+    var filtersMap = {};
+    translations = {};
+    translationsBack = {};
+
     var methods = {
         init : function( options, name, fingerprintId ) {
 
             
             /** Get a list of filters */
-            values = options.getFilter(name.text,fingerprintId);
-            console.log("parsing2:");
-            console.log(JSON.parse(values.values));
+            values = options.getFilter(name,fingerprintId);
+
             if (values===undefined)
             {
                 return;
             };
 
-            
+            filtersMap = {}
             var self = this;
             self.html('');
-            console.log("for each:");
+
             values.values.forEach(function(_value){
-               console.log("_value:");
+
               var xFilter = JSON.parse(_value);
 
               
-              self.append(xFilter.value+": ");
+              self.append(xFilter.name+": ");
               var tmpUl = $('<ul class="nav nav-pills nav-stacked">');
 
               self.append(tmpUl);
+              console.log(xFilter);
               $.each(xFilter.values, function (data){
-                console.log('data');
-                console.log(data);
+
                   if (xFilter.values[data]==="")
                       return;
-                  tmpUl.append('<li><a class="filterBar" href="#" onclick="return false;"><i id="iproximity" class="icon-ok icon-black active"></i> '+xFilter.values[data]+'</a></li>')
+                    /*if ('values.' + xFilter.name in filtersMap)
+                    {
+                      console.log(xFilter.name);
+                      filtersMap['values.' + xFilter.name].push(xFilter.values[data]);
+                    }
+                    else
+                    {
+                      console.log(xFilter.name);
+                      filtersMap['values.' + xFilter.name] = [xFilter.values[data]];
+                    }*/
+
+
+                  var fType = xFilter.name;
+                  if (xFilter.key!= null)
+                  {
+                    fType = xFilter.value;
+
+                  }
+                  var originalValue = xFilter.values[data];
+
+                  if (xFilter['translation'] != null)
+                  {
+                    if (xFilter['translation'].hasOwnProperty(originalValue))
+                    {
+                        translations[originalValue] = xFilter['translation'][originalValue];
+                        translationsBack[xFilter['translation'][originalValue]] = originalValue;
+                        originalValue = xFilter['translation'][originalValue];
+                    }
+                    
+
+                      
+                  }
+                  
+                 
+                  tmpUl.append('<li><a class="filterBar" id=_'+fType+'_'+xFilter.values[data]+' href="#" onclick="return false;"> '+originalValue+'</a></li>')
+                    
+                  
+                    
               });
             });
 
-            console.log(values);
-            
+
             /** The magic of the filters will happen here */ 
             $(".filterBar").bind('click',function(e)
                     { 
                       e.preventDefault(); 
                       e.stopPropagation();
-                      
-                      
-                      if ($(e.toElement.firstChild).hasClass('icon-ok')) 
+
+
+                      var charDraw = new PCDraw(actualChart, activeChart, null);
+
+                      var str = e.target.id;
+                      var filterType =str.substring(str.indexOf("_")+1,str.lastIndexOf("_"));
+
+                      var _value = e.target.innerHTML.trim();
+                      if (translationsBack.hasOwnProperty(_value))
                       {
-                        $(e.toElement.firstChild).removeClass('icon-ok') 
-                      }
-                      else
-                      {
-                        $(e.toElement.firstChild).addClass('icon-ok') 
-                      }
+                          _value = translationsBack[_value];
+                      } 
+                      filtersMap['values.'+filterType] = [_value];
+                      charDraw.refresh(getFiltersSelected());
+
+
                       return false;
                     });
 
@@ -256,8 +344,7 @@ function PCAPI ()
         },
         draw : function( options ) {
             
-        },
-
+        }
     };
 
     $.fn.populationChartsBar = function(method) {
@@ -282,6 +369,7 @@ function PCAPI ()
  {
 
     var PC = null;
+    var chartTypes = null; 
     function Filters()
     {
       this.drawFilters = function(){
@@ -294,7 +382,7 @@ function PCAPI ()
                     { 
                       e.preventDefault(); 
                       e.stopPropagation();
-                      console.log(this.parent);
+  
                       
                       // Anyone have a better suggestion to do it?
                       // I'm more focuses in other staff right now.
@@ -302,34 +390,26 @@ function PCAPI ()
                       $('.graphTypes').closest('li').removeClass('active')
                       $(this.parentNode).closest('li').addClass('active')
 
-                      PC = new PCAPI();
-                      fingerprintID = getFingerprintID();
-                      console.log(fingerprintID);
-                      var valuesFromGraph = PC.getValuesRow(e.toElement.innerHTML, 
-                        'Count',fingerprintID );
-                      console.log('valuesFromGraph: '+valuesFromGraph);
-                      console.log(valuesFromGraph);
-                      $("#pc_chart_place").html('');
-                      $("#pc_chart_place").graphicChart('init');
-                      $("#pc_chart_place").graphicChart('drawBarChart', valuesFromGraph,valuesFromGraph,valuesFromGraph);
+                      chartTypes.forEach(function(a){
+                          console.log();
+                          if (a.title.fixed_title==e.target.innerHTML) 
+                          {
+                              actualChart = a;
+                          }
+                          
+                      });
+                      if (actualChart==null)
+                      {
+                          // do something here like an abort or shit! 
+                      }
 
-
-                      var pc = new PCAPI();
-                      //$("#pcBarContentRoot").removeClass("hidden");
-                      //$("#pcBarContentRoot").addClass("show");
-                      $("#pcBarContent").populationChartsBar(pc,this,fingerprintID);
-                      $("#pcBarContent").populationChartsBar('draw', pc);
-
-                      $("#pctitle").html("<h2>"+ e.toElement.innerHTML +"</h2>");
+                      var charDraw = new PCDraw(actualChart, actualChart.title['var'], e);
+                      var _filters = {};
+                      charDraw.draw(_filters);
+                      charDraw.drawBar();
+                      $(".filterBar").last().click();   
+                      $(".filterBar").first().click(); 
                       
-                      if ($(e.toElement.firstChild).hasClass('icon-ok')) 
-                      {
-                        $(e.toElement.firstChild).removeClass('icon-ok') 
-                      }
-                      else
-                      {
-                        $(e.toElement.firstChild).addClass('icon-ok') 
-                      }
                       return false;
                     });
       };
@@ -345,15 +425,18 @@ function PCAPI ()
             var self = this;
             self.append("Characteristic Type: ");
             tmpUl = $('<ul class="nav nav-list nav-pills nav-stacked">');
-            values = options.getChartTitles();
+            values = options.getChartTitles(getFingerprintID());
+            var configs = new PCConfs();
+            var charts = configs.getSettings(getFingerprintID());
+            chartTypes = charts;
             self.append(tmpUl);
             $.each(values, function (data){
                 if (values[data]==="")
                     return;
-                console.log(values[data]);
+
                 tmpUl.append('<li class=""><a class="graphTypes" href="#" onclick="return false;">'+values[data]+'</a></li>')
             });
-            console.log(api);
+
             var myPC = options;
             
             filters = new Filters();
@@ -362,8 +445,7 @@ function PCAPI ()
         },
         draw : function( options ) {
             
-        },
-
+        }
     };
 
     $.fn.populationChartsTypes = function(method) {
@@ -388,11 +470,15 @@ $(document).ready(
 
         $("#pc_list").populationChartsTypes(chartLayout, PCAPI);
         $("#pc_list").populationChartsTypes('draw', chartLayout); 
-        $(".graphTypes").each(function(d,a){
-          console.log(a);
-          if (d==0) $(this)[0].click()
-        });
+
+          $('.tabbable a[data-toggle="tab"]').on('shown', function (e) {
+            if(e.target.innerText == 'Population Characteristics'){
+              $(".graphTypes").first().click();
+
+              $(".filterBar").first().click(); 
+            }
+          })
+
         }
     
 );
-

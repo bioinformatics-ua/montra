@@ -51,6 +51,18 @@ ADMINS = (
 SOLR_HOST = "localhost"
 SOLR_PORT = "8983"
 
+TEMPLATE_CONTEXT_PROCESSORS = (
+    "django.contrib.auth.context_processors.auth",
+    "django.core.context_processors.debug",
+    "django.core.context_processors.i18n",
+    "django.core.context_processors.media",
+    "django.core.context_processors.static",
+    "django.core.context_processors.tz",
+    "django.contrib.messages.context_processors.messages",
+    "emif.context_processors.debug",
+    "emif.context_processors.baseurl"
+)
+
 MANAGERS = ADMINS
 
 DATABASE_PATH_SQLITE3 = "emif.db"
@@ -277,7 +289,7 @@ USERENA_WITHOUT_USERNAMES = True
 USERENA_DISABLE_PROFILE_LIST = True
 USERENA_USE_MESSAGES = False
 USERENA_REDIRECT_ON_SIGNOUT = BASE_URL
-USERENA_SIGNIN_REDIRECT_URL = BASE_URL + 'databases'
+USERENA_SIGNIN_REDIRECT_URL = BASE_URL + 'wherenext'
 USERENA_MODERATE_REGISTRATION = True                    #True - need admin approval (activation)
 USERENA_ACTIVATION_REJECTED = 'ACTIVATION_REJECTED'
 USERENA_PENDING_MODERATION = 'PENDING_MODERATION'
@@ -393,6 +405,7 @@ LOGIN_EXEMPT_URLS = (
     r'^accounts/activate/(?P<activation_key>\w+)/$',
     r'^accounts/signup/complete',
     r'^accounts/password/reset/',
+    r'^accounts/(?P<username>[^/]+)/disabled/',
     r'^api/metadata',
     r'^api/search',
     r'^api-token-auth-create/',
@@ -457,3 +470,8 @@ try:
 except ConnectionFailure, e:
     sys.stderr.write("Could not connect to MongoDB: %s" % e)
     sys.exit(1)
+
+# REDIRECT USER ACCORDING TO PROFILE
+REDIRECT_DATACUSTODIAN = 'emif.views.databases'
+REDIRECT_RESEARCHER = 'emif.views.all_databases_user'
+

@@ -35,9 +35,9 @@ button {
 
 
 {% block scriptextraincludes %}
-<script src="{{ STATIC_URL }}js/vendor/jquery.tablesorter.min.js"></script>
-<script src="{{ STATIC_URL }}js/vendor/jquery.tablesorter.widgets.min.js"></script>
 <script src="{{ STATIC_URL }}js/emif.databases.js"></script>
+<script src="{{ STATIC_URL }}js/vendor/jquery.ba-throttle-debounce.min.js"></script>
+<script src="{{ STATIC_URL }}js/paginator-sorter.js"></script>
 {% endblock %}
 
 
@@ -45,22 +45,45 @@ button {
 {% block content %}
 
 {% if list_databases %}
-<table class="table table-hover tablesorter" id="table_databases" data-provides="rowlink">
+<table class="table table-bordered table-hover fingerprint_table table-striped" id="table_databases" data-provides="rowlink">
     <thead>
         <tr>
             <!--<th class="sorter-false filter-false"></th>-->
-            <th>Name</th>
+            <th class="sorter {%if "icon-minus" not in sort_params.database_name.icon %}selected-sorter{% endif %}"  onclick="a.onClick('database_name', '{{sort_params.database_name.next}}');">
+            <div class="pull-left">Name</div>
+                 <div class="pull-right"><i class="{{sort_params.database_name.icon}}"></i></div>
+            </th>
             <!--<th>Creation Date</th>-->
-            <th>Last update</th>
-            <th>Type</th>
+            <th class="sorter {%if "icon-minus" not in sort_params.last_update.icon %}selected-sorter{% endif %}" onclick="a.onClick('last_update', '{{sort_params.last_update.next}}');">
+            <div class="pull-left">Last update</div>
+                <div class="pull-right"><i class="{{sort_params.last_update.icon}}"></i></div> 
+            </th>
+            <th class="sorter {%if "icon-minus" not in sort_params.type.icon %}selected-sorter{% endif %}" style="width: 200px;" onclick="a.onClick('type', '{{sort_params.type.next}}');">
+            <div class="pull-left">Type</div>
+              <div class="pull-right"><i class="{{sort_params.type.icon}}"></i></div> 
+            </th>
             {% comment %}
             <th class="sorter-false filter-false">Modify</th>
             {% endcomment %}
 
         </tr>
+        <tr>
+          <td class="table_filter">
+                <input class="filter_input" id="database_name_filter" type="text" value="{{sort_params.database_name.filter}}" placeholder="Filter">
+          </td>
+           <td class="table_filter">
+                 <input class="filter_input" id="last_update_filter" type="text" value="{{sort_params.last_update.filter}}" placeholder="Filter">
+          </td>
+           <td class="table_filter">
+              <select id="type_filter" class="selectpicker" def_value="{{sort_params.type.filter}}">
+                <option value="">None</option>
+                <option value="adcohort">AD Cohort</option>
+                <option value="observationaldatasources">Observational Data Sources</option>
+              </select>
+          </td>
+        </tr>
     </thead>
-    <tbody>
-
+    <tbody id="table_content">
         {% for t in page_obj %}
         <tr>
             <!--<td><img class="db_logo" src="{{ STATIC_URL }}upload_images/{{t.logo}}" width="50px" height="50px" /></td>-->
@@ -83,14 +106,14 @@ button {
                  {{ t.date }}
         -->
           </td>
-          <td style="min-width: 120px;">
+          <td class="date">
                 {% if t.last_activity %}
                     {{t.last_activity|datehhmm}}
                 {% else %}
                     {{ t.date }}
                 {% endif %}
           </td>
-          <td>{{ t.type_name }} </td>
+          <td class="type">{{ t.type_name }} </td>
           {% comment %}
           <td style="width:100px">
 
@@ -108,6 +131,15 @@ button {
 
     </tbody>
 </table>
+
+<script type="text/javascript">
+var a;
+$(document).ready(function(){
+    a = new PaginatorSorter("table_databases", '{{sort_params.base_filter}}', '{{sort_params.selected_name}}', '{{sort_params.selected_value}}');
+
+    paginator_via_post();
+});
+</script>
 
 {% load bootstrap_pagination %}
 
@@ -128,9 +160,16 @@ button {
   <a class="btn btn-large btn-success" href="advancedSearch/1">Add new database</a>
 {% endcomment %}
 </div>
+<form id="send2" method="POST" > 
+  <input id="page" type="hidden" name="page" value="{{page}}"></input>
+  <input id="s" type="hidden" name="s" value=""></input>  
+  <input id="submit_simulate" style="display:none" type="submit" value="Submit">
+ 
+{% csrf_token %}
+</form>
 
-
-<form id="send" method="POST" > {% csrf_token %}
+<form id="send" method="POST" > 
+ {% csrf_token %}
 </form>
 
 

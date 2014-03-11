@@ -58,6 +58,7 @@ class Filter(object):
         self.key = None
         self.value = None
         self.values = None
+        self.translation = None
 
         
     def to_JSON(self):
@@ -78,6 +79,12 @@ class Axis(object):
         self.var = None
         self.scale = None
         self.filters = None
+        self.static_filters = []
+        self.categorized = False
+        self.multivalue = False
+        self.transformation = None
+        self.sort_func = None
+        self.label = None
         
     def to_JSON(self):
         return json.dumps(self, default=lambda o: o.__dict__, sort_keys=True, indent=4)

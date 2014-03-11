@@ -33,27 +33,6 @@ function post_to_url(path, params, method) {
     form.submit();
 }
 
-
-$(function() {
-
-  // call the tablesorter plugin
-  $("table").tablesorter({
-    theme : 'blue',
-
-    // sort on the first column and third column in ascending order
-    sortList: [[0,0],[2,0]],
-
-        // hidden filter input/selects will resize the columns, so try to minimize the change
-    widthFixed : true,
-
-    // initialize zebra striping and filter widgets
-    widgets: ["zebra", "filter"]
-
-
-  });
-
-});
-
 $('#li_workspace').addClass("active");
 
 jQuery('#add_toolbar').click(function () {

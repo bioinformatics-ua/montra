@@ -1,4 +1,5 @@
 
+
 function OpenButtonValidator(context){
     this.context = context;
     this.database_name = null;
@@ -13,13 +14,13 @@ OpenButtonValidator.prototype ={
         }
     },
     validate : function(question_number, controllerDOM){
-        draw_validator = this.context.draw_validator;
+        var draw_validator = this.context.draw_validator;
         question_number = question_number.replace(".","\\.");
         var text = $(controllerDOM).val();
         
         //getValidator
         var validator = $('#open-button_validator_'+question_number);
-        console.log(validator);
+        //console.log(validator);
         var validated = false;
 
         if(text.length == 0){
@@ -66,16 +67,16 @@ NumericValidator.prototype ={
         
     },
     validate : function(question_number, controllerDOM){
-        draw_validator = this.context.draw_validator;        
+        var draw_validator = this.context.draw_validator;        
         question_number = question_number.replace(".","\\.");        
         var validator = $('#numeric_validator_'+question_number);
-        console.log(validator);
+        //console.log(validator);
         
         var regex = /\D/i;
 
         var text = $(controllerDOM).val();
         
-        res = regex.exec(text);
+        var res = regex.exec(text);
         if(res != null)
             draw_validator(validator, false, "This Field must be numeric");
         else
@@ -97,8 +98,8 @@ function Fingerprint_Validator(searchMode){
 }
 Fingerprint_Validator.prototype ={
     onInit : function(){
-        self = this;
-
+        var self = this;
+        
         for( x in self.validators ){
             $("."+self.validators[x].n).each(function(i, v) {        
                 self.validators[x].v.onInit(v);
@@ -106,6 +107,7 @@ Fingerprint_Validator.prototype ={
         }
 
         $("#qform").submit(function(evnt){
+            //console.log(self);
             self.validateForm(evnt);
         });
     },
@@ -128,7 +130,7 @@ Fingerprint_Validator.prototype ={
         }   
     },
     validateForm: function(evnt){
-        self = this;
+        var self = this;
 
         for( x in self.validators ){
             $("."+self.validators[x].n).each(function(i, v) {
@@ -137,14 +139,14 @@ Fingerprint_Validator.prototype ={
                 var validator_id = $(v).attr("id");
                 validator_id= validator_id.replace(self.validators[x].n+"_", "");
 
-                console.log(validator_id);
+                //console.log(validator_id);
 
                 if( !self.validators[x].v.validate( validator_id, cDOM)){
                     evnt.preventDefault();     
 
                     var qs_id = validator_id.split(".")[0];
 
-                    console.log(qs_id);
+                    //console.log(qs_id);
                     questionsets_handle( $("#qs_"+qs_id )[0]);
                 }
 

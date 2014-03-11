@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load extra_tags %}
 {% load url from future %}
 {% load django_bootstrap_breadcrumbs %}
 
@@ -11,15 +12,14 @@
 {% endblock %}
 
 {% block headextra %}
-    <link rel="stylesheet" href="{{ STATIC_URL }}css/theme.blue.css">
 {% endblock %}
 
 
 {% block scriptextraincludes %}
 
-    <script src="{{ STATIC_URL }}js/vendor/jquery.tablesorter.min.js"></script>
-    <script src="{{ STATIC_URL }}js/vendor/jquery.tablesorter.widgets.js"></script>
-    <script src="{{ STATIC_URL }}js/emif.paginator.js"></script>
+    <script src="{{ STATIC_URL }}js/vendor/jquery.ba-throttle-debounce.min.js"></script>
+<script src="{{ STATIC_URL }}js/paginator-sorter.js"></script>
+<script src="{{ STATIC_URL }}js/emif.paginator.js"></script>
 
 
 {% endblock %}
@@ -47,43 +47,82 @@
     <p><strong>Fingerptints</strong></p>
 
     {% if list_databases %}
-    <table class="table table-hover tablesorter" id="table_databases" data-provides="rowlink">
-        <thead>
+    <table class="table table-hover fingerprint_table table-striped" id="table_databases" data-provides="rowlink">
+    <thead>
         <tr>
-            <th class="sorter-false filter-false"></th>
-            <th>Name</th>
-            <th>Date</th>
-
+            <th class="sorter {%if "icon-minus" not in sort_params.database_name.icon %}selected-sorter{% endif %}"  onclick="a.onClick('database_name', '{{sort_params.database_name.next}}');">Name
+                 <div class="pull-right"><i class="{{sort_params.database_name.icon}}"></i></div>
+            </th>
+            <th class="sorter {%if "icon-minus" not in sort_params.last_update.icon %}selected-sorter{% endif %}" onclick="a.onClick('last_update', '{{sort_params.last_update.next}}');">Last update
+                <div class="pull-right"><i class="{{sort_params.last_update.icon}}"></i></div> 
+            </th>
+            <th class="sorter {%if "icon-minus" not in sort_params.type.icon %}selected-sorter{% endif %}" style="width: 200px;" onclick="a.onClick('type', '{{sort_params.type.next}}');">Type
+              <div class="pull-right"><i class="{{sort_params.type.icon}}"></i></div> 
+            </th>
         </tr>
-        </thead>
-        <tbody>
+         <tr>
+          <td class="table_filter">
+                <input class="filter_input" id="database_name_filter" type="text" value="{{sort_params.database_name.filter}}" placeholder="Filter">
+          </td>
+           <td class="table_filter">
+                 <input class="filter_input" id="last_update_filter" type="text" value="{{sort_params.last_update.filter}}" placeholder="Filter">
+          </td>
+           <td class="table_filter">
+              <select id="type_filter" class="selectpicker" def_value="{{sort_params.type.filter}}">
+                <option value="">None</option>
+                <option value="adcohort">AD Cohort</option>
+                <option value="observationaldatasources">Observational Data Sources</option>
+              </select>
+          </td>
+        </tr>
+    </thead>
+    <tbody id="table_content">
 
         {% for t in page_obj %}
         <tr>
-            <td><img class="db_logo" src="{{ STATIC_URL }}upload_images/{{t.logo}}" width="50px" height="50px"/></td>
-            <td>
-                <a href="fingerprint/{{ t.id }}/1">{{ t.name }}</a>
+            <!--<td><img class="db_logo" src="{{ STATIC_URL }}upload_images/{{t.logo}}" width="50px" height="50px" /></td>-->
+          <td>
+            <a href="fingerprint/{{ t.id }}/1">{{ t.name }}</a>
 
-                <div style="margin-left:20px">
-                    Institution Name: {{t.institution}}
-                </div>
+            <div style="margin-left:20px">
+             Institution Name: {{t.institution}}
+            </div>
 
-                <div style="margin-left:20px">
-                    Location: {{t.location}}
-                </div>
-                <div style="margin-left:20px">
-                    ID: {{t.id}}
-                </div>
-            </td>
-            <td>{{ t.date }}</td>
-
-
+            <div style="margin-left:20px">
+             Location: {{t.location}}
+            </div>
+            <div style="margin-left:20px">
+             Number of patients: {{t.number_patients}}
+            </div>
+        </td>
+        <!--
+          <td style="min-width: 120px;">
+                 {{ t.date }}
+        -->
+          </td>
+          <td class="date">
+                {% if t.last_activity %}
+                    {{t.last_activity|datehhmm}}
+                {% else %}
+                    {{ t.date }}
+                {% endif %}
+          </td>
+          <td class="type">{{ t.type_name }} </td>
         </tr>
 
         {% endfor %}
 
         </tbody>
     </table>
+
+    <script type="text/javascript">
+    var a;
+    $(document).ready(function(){
+        a = new PaginatorSorter("table_databases", '{{sort_params.base_filter}}', '{{sort_params.selected_name}}', '{{sort_params.selected_value}}');
+
+        paginator_via_post();
+    });
+    </script>
 
     {% load bootstrap_pagination %}
 
@@ -93,7 +132,11 @@
     <p><strong>Info: </strong> Currently, there are no databases in your account. You can add new ones through the
         option "Workspace -> Add new databases"</p>
     {% endif %}
-
+    <form id="send2" method="POST" > 
+      <input id="page" type="hidden" name="page" value="{{page}}"></input>
+      <input id="s" type="hidden" name="s" value=""></input>  
+    {% csrf_token %}
+    </form>
 
     {% endblock %}
 
@@ -101,34 +144,7 @@
     {% comment %}
     <script>
         {% endcomment %}
-
-       
-
         $('#li_workspace').addClass("active");
-
-        $(function () {
-
-            // call the tablesorter plugin
-            $("table").tablesorter({
-                theme: 'blue',
-
-                // sort on the first column and third column in ascending order
-                sortList: [
-                    [0, 0],
-                    [2, 0]
-                ],
-
-                // hidden filter input/selects will resize the columns, so try to minimize the change
-                widthFixed: true,
-
-                // initialize zebra striping and filter widgets
-                widgets: ["zebra", "filter"]
-
-
-            });
-
-        });
-
         {% comment %}
     </script>
     {% endcomment %}

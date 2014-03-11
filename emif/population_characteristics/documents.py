@@ -28,7 +28,7 @@ from .serialize import serialize
 from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import user_passes_test, login_required
 
-from emif.views import createqsets, get_api_info
+from emif.views import createqsets, createqset, get_api_info
 from django.shortcuts import render
 
 import os
@@ -114,6 +114,12 @@ def parsejerboa(request, template_name='documents_upload_form.html'):
     response['Content-Disposition'] = 'inline; filename=files.json'
     return response
 
+def single_qset_view(request, runcode, qsid, template_name='fingerprint_qs.html'):
+
+    qset, name, db_owners, fingerprint_ttype = createqset(runcode, qsid)
+    
+    return render(request, template_name,{'request': request, 'qset': qset})   
+
 def document_form_view(request, runcode, qs, activetab='summary',
     template_name='documents_upload_form.html'):
     
@@ -122,7 +128,7 @@ def document_form_view(request, runcode, qs, activetab='summary',
     if fingerprint_ttype == "":
         raise "There is missing ttype of questionarie, something is really wrong"
 
-    apiinfo = json.dumps(get_api_info(runcode));
+    apiinfo = json.dumps(get_api_info(runcode))
     owner_fingerprint = False
     for owner in db_owners.split(" "):
         print owner
