@@ -26,6 +26,9 @@
 {% block scriptextraincludes %}
 
 <script src="{{ STATIC_URL}}js/vendor/jquery.boolrelwidget.js"></script>
+<script src="{{ STATIC_URL }}js/vendor/jquery.ba-throttle-debounce.min.js"></script>
+<script src="{{ STATIC_URL }}js/vendor/json2.js"></script>
+<script src="{{ STATIC_URL }}js/paginator-sorter.js"></script>
 
 
 {% endblock %}
@@ -44,7 +47,7 @@
     <div class="btn-group pull-right">
 
       <div class="btn-group"></div>
-      <a id="comparabtn" class="btn "  href=""  rel="tooltip" data-container="body" data-placement="bottom" data-original-title="You only can select two databases for a comparison" disabled> <i  class=" icon"></i>
+      <a id="comparabtn" class="btn "  href=""  rel="tooltip" data-container="body" data-placement="bottom" data-original-title="This allows to compare databases.<br /> It is only possible to compare databases of the same type. <br /> When a database is selected, the type is defined automatically, and databases of other types can't be choosen. <br /> To be able to select other type, you must unselect all the databases." class="help_selectresults icon-question-sign" disabled> <i  class=" icon"></i>
         Compare</a>
 
       <a class="btn" href="geo" onclick="" > <i class=" icon"></i>Geolocation</a>
@@ -57,7 +60,6 @@
 {% load bootstrap_pagination %}
 
 {% block content %}
-
 
 {% if isAdvanced %}
 <div id="bool_container"></div>
@@ -88,24 +90,47 @@
     {% if page_obj != None %}
     <form id="result_form" action="resultscomp" method="POST">
   {% csrf_token %}
-<table class="table table-hover fingerprint_table table-striped" id="table_databases" data-provides="rowlink">
+<table class="table table-bordered table-hover fingerprint_table table-striped" id="table_databases" data-provides="rowlink">
     <thead>
         <tr>
-            <th class="sorter" onclick="window.location.search='{{sort_params.database_name.click_url}}'">Name
-                 <div class="pull-right"><i class="{{sort_params.database_name.icon}}"></i></div> 
+            <th class="sorter {%if "icon-minus" not in sort_params.database_name.icon %}selected-sorter{% endif %}"  onclick="a.onClick('database_name', '{{sort_params.database_name.next}}');">
+            <div class="pull-left">Name</div>
+                 <div class="pull-right"><i class="{{sort_params.database_name.icon}}"></i></div>
             </th>
             <!--<th>Creation Date</th>-->
-            <th class="sorter" onclick="window.location.search='{{sort_params.last_update.click_url}}'">Last update
+            <th class="sorter {%if "icon-minus" not in sort_params.last_update.icon %}selected-sorter{% endif %}" onclick="a.onClick('last_update', '{{sort_params.last_update.next}}');">
+            <div class="pull-left">Last update</div>
                 <div class="pull-right"><i class="{{sort_params.last_update.icon}}"></i></div> 
             </th>
-            <th class="sorter" onclick="window.location.search='{{sort_params.type.click_url}}'">Type
+            <th class="sorter {%if "icon-minus" not in sort_params.type.icon %}selected-sorter{% endif %}" style="width: 200px;" onclick="a.onClick('type', '{{sort_params.type.next}}');">
+            <div class="pull-left">Type</div>
               <div class="pull-right"><i class="{{sort_params.type.icon}}"></i></div> 
             </th>
             <th class="sorter-false filter-false">Select</th>
 
         </tr>
+        <tr>
+          <td class="table_filter">
+                <input class="filter_input" id="database_name_filter" type="text" value="{{sort_params.database_name.filter}}" placeholder="Filter">
+          </td>
+           <td class="table_filter">
+                 <input class="filter_input" id="last_update_filter" type="text" value="{{sort_params.last_update.filter}}" placeholder="Filter">
+          </td>
+           <td class="table_filter">
+              <select id="type_filter" class="selectpicker" def_value="{{sort_params.type.filter}}">
+                <option value="">None</option>
+                <option value="adcohort">AD Cohort</option>
+                <option value="observationaldatasources">Observational Data Sources</option>
+              </select>
+          </td>
+          <td style="width:50px;" class="table_filter">
+            <div style="text-align: center;">
+              <i data-toggle="tooltip" data-placement="bottom" title=" This row allows to compare databases.<br /> It is only possible to compare databases of the same type. <br /> When a database is selected, the type is defined automatically, and databases of other types can't be choosen. <br /> To be able to select other type, you must unselect all the databases." class="help_selectresults icon-question-sign"></i>
+            </div>
+          </td>
+        </tr>
     </thead>
-    <tbody>
+    <tbody id="table_content">
 
   {% for t in page_obj %}
    <tr>          
@@ -133,7 +158,7 @@
           <td class="type">{{ t.type_name }} </td>
           
         
-          <td> <input class="checkbox" type="checkbox" name="chk_{{ t.id }}"></td>
+          <td style="text-align:center"> <input class="checkbox dbtype_{{t.type_name|removespaces}}" type="checkbox" name="chk_{{ t.id }}"></td>
 
           
         </tr>
@@ -184,7 +209,27 @@
 
     </tbody>
 </table>
+<script type="text/javascript">
+var a;
+$(document).ready(function(){
+    
+    a = new PaginatorSorter("table_databases", '{{sort_params.base_filter}}', '{{sort_params.selected_name}}', '{{sort_params.selected_value}}', '{{sort_params.extraObjects|safe}}');
+
+    //TO Be Applied in future releases.
+    //a.atachPlugin( new SelectPaginatorPlugin());
+
+    paginator_via_post();
+});
+</script>
+
   </form>
+  <form id="send2" method="POST" > 
+  <input id="page" type="hidden" name="page" value="{{page}}"></input>
+  <input id="s" type="hidden" name="s" value=""></input>  
+    <input id="submit_simulate" style="display:none" type="submit" value="Submit">
+
+{% csrf_token %}
+</form>
     {% else %}
     <div style="margin-top: 60px;"></div>
   {% endif %}
@@ -207,6 +252,22 @@ var counter = 0;
 
 // URL Hack to make paginator work with base
 $(document).ready(function(){
+
+    if($('input:checkbox:checked', table_databases).length >= 1){
+      var classes = $('input:checkbox:checked', table_databases).first().prop("class").split(' ');
+      var a_class = null;
+      for(var i=0;i<classes.length;i++){
+        if(classes[i].indexOf('dbtype_') != -1)
+          a_class=classes[i];
+      }
+      if(a_class){
+        console.log("["+a_class+"]");
+        $(".checkbox").prop( "disabled", true );
+
+        $("."+a_class).prop("disabled", false);
+      }
+    }
+    
     if($('input:checkbox:checked', table_databases).length >= 2){
         $("#comparabtn").removeAttr('disabled');
         counter = $('input:checkbox:checked', table_databases).length;
@@ -222,6 +283,8 @@ $(document).ready(function(){
     $('a[href="#"]').attr('href', function(i, val){
         return window.location + val;
     });
+
+    $('.help_selectresults').tooltip({container: 'body', 'html': true});
     
 });
 {% endif %}
@@ -262,39 +325,20 @@ $("#comparabtn").bind('click',function(e)
 
 $('.checkbox').click(function()
 {
-    console.log(counter);
+    //console.log(counter);
     if($(this).is(':checked')){
         counter++;
     } else 
     {
         counter--;
     }
-    if (counter==2)
-    {
-      $("#comparabtn").removeAttr('disabled');
-      
-      $('.checkbox').each(function(cbox)
-      {
-        console.log(this);
-        $("#comparabtn").bind('click',function(e)
-        { 
-          
-          $('#result_form').submit();
-
-          return false;
-        });
-
-        if(!$(this).is(':checked')){
-            $(this).prop('disabled', true);
-        };
-      });
-      
+    console.log(counter);
+    if(counter == 0){
+      $('.checkbox').prop( "disabled", false);
     }
-    else
-    {
-      $("#comparabtn").attr('disabled', true);
+    else if(counter == 1){
+     $("#comparabtn").attr('disabled', true);
       
-      console.log($("#comparabtn"))
       $("#comparabtn").unbind();
       $("#comparabtn").bind('click',function(e)
         { 
@@ -304,19 +348,35 @@ $('.checkbox').click(function()
           return false;
         });
 
-    
-      $('.checkbox').each(function(cbox)
-      {
-        
-        $(this).prop('disabled', false);
+      var classes = $(this).prop("class").split(' ');
+      var a_class = null;
+      for(var i=0;i<classes.length;i++){
+        if(classes[i].indexOf('dbtype_') != -1)
+          a_class=classes[i];
+      }
+      if(a_class){
+        console.log("["+a_class+"]");
+        $(".checkbox").prop( "disabled", true );
 
-        
-      });
+        $("."+a_class).prop("disabled", false);
+      }
+      
+    }
+    else if (counter>=2)
+    {
+      $("#comparabtn").removeAttr('disabled');
+      $("#comparabtn").bind('click',function(e)
+        { 
+          
+          $('#result_form').submit();
 
+          return false;
+        });      
     }
 
 });
-$('[rel=tooltip]').tooltip() 
+$('[rel=tooltip]').tooltip({container: 'body', 'html': true});
+
 $('.popover').popover({
     container: 'body'
 });

@@ -38,7 +38,8 @@ function getFingerprintID(){
 };
 
 
-
+var translations = {};
+var translationsBack = {};
 var activeChart='';
 
 var actualChart = null; 
@@ -239,8 +240,8 @@ function PCAPI ()
     };
 
     var filtersMap = {};
-    var translations = {};
-    var translationsBack = {};
+    translations = {};
+    translationsBack = {};
 
     var methods = {
         init : function( options, name, fingerprintId ) {
@@ -406,6 +407,7 @@ function PCAPI ()
                       var _filters = {};
                       charDraw.draw(_filters);
                       charDraw.drawBar();
+                      $(".filterBar").last().click();   
                       $(".filterBar").first().click(); 
                       
                       return false;
@@ -471,7 +473,8 @@ $(document).ready(
 
           $('.tabbable a[data-toggle="tab"]').on('shown', function (e) {
             if(e.target.innerText == 'Population Characteristics'){
-              $(".graphTypes").first().click();  
+              $(".graphTypes").first().click();
+
               $(".filterBar").first().click(); 
             }
           })

@@ -102,6 +102,7 @@ urlpatterns = patterns('',
     url(r'^fingerprintqs/(?P<runcode>[^/]+)/(?P<qsid>[0-9]+)/$', 'population_characteristics.documents.single_qset_view'),
 
     # List Databases
+    url(r'^query/(?P<page>[-]{0,1}\d+)?$', 'emif.views.query_solr'),
     url(r'^databases/(?P<page>[-]{0,1}\d+)?$', 'emif.views.databases', name="databases"),
 #    url(r'^alldatabases/(?P<page>[-]{0,1}\d+)?$', 'emif.views.all_databases'),
     url(r'^alldatabases/(?P<page>[-]{0,1}\d+)?$', 'emif.views.all_databases_user'),
