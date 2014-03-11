@@ -1212,7 +1212,7 @@ def delete_fingerprint(request, id):
     user = request.user
 
     c = CoreEngine()
-    results = c.search_fingerprint('user_t:' + user.username)
+    results = c.search_fingerprint('user_t:' + '"' + user.username + '"')
     
     for result in results:
         if (id == result['id']):
@@ -1295,7 +1295,8 @@ def databases(request, page=1, template_name='databases.html', force=False):
     # Get the list of databases for a specific user
     user = request.user
     #list_databases = get_databases_from_db(request)
-    _filter = "user_t:" + user.username
+    _filter = "user_t:" + '"' + user.username + '"'
+    print _filter
     if user.is_superuser:
         _filter = "user_t:*" 
 
@@ -1448,7 +1449,7 @@ def paginator_process_list(list_databases, hits, start):
 
 #     user = request.user
 #     #list_databases = get_databases_from_db(request)
-#     _filter = "user_t:" + user.username
+#     _filter = "user_t:" + '"' + user.username + '"'
 #     if user.is_superuser:
 #         _filter = "user_t:*" 
 #     list_databases = get_databases_from_solr(request, _filter)
@@ -1812,7 +1813,6 @@ def createqset(runcode, qsid, qsets=None, clean=True):
 
 
     for result in results:
-
 
         (fingerprint_ttype, type_name) = questionnaires_ids[result['type_t']]
 
@@ -3106,7 +3106,7 @@ def export_my_answers(request):
     """
 
     user = request.user
-    list_databases = get_databases_from_solr(request, "user_t:" + user.username)
+    list_databases = get_databases_from_solr(request, "user_t:" + '"' + user.username + '"')
 
     return save_answers_to_csv(list_databases, "MyDBs")
 
