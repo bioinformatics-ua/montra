@@ -2301,7 +2301,7 @@ def check_database_add_conditions(request, questionnaire_id, sortid,
                 question_set = qs.pk
                 break
     if (int(sortid) == 99):
-            sortid = len(qs_list) - 1
+            sortid = len(questionnaire.questionsets()) - 1
     
     question_set2 = qsobjs[int(sortid)]
 
