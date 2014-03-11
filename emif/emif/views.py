@@ -167,12 +167,16 @@ def results_fulltext(request, page=1, full_text=True,template_name='results.html
         request.session['query'] = query
     except:
         in_post = False
-        
+
     if not in_post:
-        query = request.session.get('query', "")
+        query = request.session.get("query","")
+
+    if isAdvanced == False:
+        query = "text_t:"+query
+
     if not full_text:
         return results_fulltext_aux(request, query, page, template_name, isAdvanced)
-    return results_fulltext_aux(request, "text_t:" + query, page, template_name, isAdvanced)
+    return results_fulltext_aux(request, query, page, template_name, isAdvanced)
 
 
 def results_fulltext_aux(request, query, page=1, template_name='results.html', isAdvanced=False, force=False):
@@ -381,14 +385,21 @@ def results_diff(request, page=1, template_name='results_diff.html'):
     return results_fulltext(request, page, full_text=False, isAdvanced=request.session['isAdvanced'])
 
 def geo(request, template_name='geo.html'):
+
     query = None
-    try:
-        query = request.session['query']
-        query = 'text_t:' + query
-    except:
-        pass
-    if query == None:
-        query = "*:*"
+    isAdvanced = False
+    if(request.session.get('isAdvanced') == True): 
+        query = request.session.get('query')
+        if query == None:
+            query = "*:*"
+
+        isAdvanced = True
+    else:
+        if(request.session.get('query') != None):
+            query = "text_t:"+request.session.get('query')
+        else:
+            query = "*:*"
+
     print "query@" + query
     list_databases = get_databases_from_solr(request, query)
 
@@ -409,7 +420,8 @@ def geo(request, template_name='geo.html'):
             _loc = database.location
         
 
-        
+        print "CITY:"+_loc
+
         city=None
         g = geocoders.GeoNames(username='bastiao')
 
@@ -466,9 +478,14 @@ def geo(request, template_name='geo.html'):
             })
 
         list_locations.append(_loc)
-        
-    return render(request, template_name, {'request': request, 'db_list' : db_list,
-                                           'list_cities': list_locations, 'lats_longs': _long_lats, 'breadcrumb': True})
+
+    print isAdvanced
+
+    return render(request, template_name, {'request': request, 'db_list' : db_list, 
+                                           'search_old': request.session.get('query',''),
+                                           'list_cities': list_locations, 
+                                           'lats_longs': _long_lats, 
+                                           'breadcrumb': True, 'isAdvanced': isAdvanced})
 
 
 
@@ -520,6 +537,12 @@ def calculate_databases_per_location():
 
 
 def advanced_search(request, questionnaire_id, question_set, aqid):
+    try:
+        del request.session['isAdvanced']
+        del request.session['query']
+        del request.session['serialized_query']
+    except:
+        pass
 
 
     return show_fingerprint_page_read_only(request, questionnaire_id, question_set, True, aqid)
@@ -1164,10 +1187,14 @@ def get_databases_from_solr_v2(request, query="*:*", sort="", rows=100, start=0)
             else:
                 database_aux.name = r['database_name_t']
 
-            if (not r.has_key('location_t')):
-                database_aux.location = ''
-            else:
+            database_aux.localtion = ''
+
+            if(r.has_key('city_t')):
+                database_aux.location = r['city_t']
+            if (r.has_key('location_t')):
                 database_aux.location = r['location_t']
+            if (r.has_key('PI:_Address_t')):
+                database_aux.location = r['PI:_Address_t']
 
             if (not r.has_key('institution_name_t')):
                 database_aux.institution = ''
@@ -1481,6 +1508,8 @@ def all_databases_user(request, page=1, template_name='alldatabases.html', force
     # lets clear the geolocation session search filter (if any)
     try:
         del request.session['query']
+        del request.session['isAdvanced']
+        del request.session['serialized_query']
     except:
         pass
     
@@ -2571,12 +2600,13 @@ def show_fingerprint_page_read_only(request, q_id, qs_id, SouMesmoReadOnly=False
         qexpression = None  # boolean expression
         qserialization = None   # boolean expression serialization to show on results
                 
-        if not request.POST:
+        #if not request.POST:
             
-            if 'query' in request.session:
-                del request.session['query']
-            if 'search_full' in request.session:
-                del request.session['search_full']
+            #if 'query' in request.session:
+                #del request.session['query']
+
+            #if 'search_full' in request.session:
+                #del request.session['search_full']
 
         if request.POST:
             for k, v in request.POST.items():
