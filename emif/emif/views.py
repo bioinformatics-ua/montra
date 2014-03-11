@@ -3285,6 +3285,7 @@ def get_slug(slug):
 #     slugsAux.question = question
 #     slugsAux.save()
 
+
 def save_slug(slugName, desc):
     slugsAux = Slugs()
     slugsAux.slug1 = slugName
