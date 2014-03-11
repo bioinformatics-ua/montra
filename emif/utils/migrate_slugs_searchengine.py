@@ -27,14 +27,14 @@ print '\nbegin copying slugs to searchengine.Slugs ...\n'
 for question in Question.objects.all():
 	print 'adding slug ' + question.slug
 	if not question.slug_fk:
-		try:
-			if Slugs.objects.get(slug1=question.slug):
-				question.slug_fk = Slugs.objects.get(slug1=question.slug)
-				question.save()
-		except:
-			s1 = Slugs(slug1=question.slug)
+		slugs = Slugs.objects.filter(slug1=question.slug, description=question.text)
+		if len(slugs) > 0:
+			question.slug_fk = slugs[0]
+			question.save()
+		else:
+			s1 = Slugs(slug1=question.slug, description=question.text)
 			s1.save()
-			question.slug_fk = Slugs.objects.get(slug1=question.slug)
+			question.slug_fk = s1
 			question.save()
 
 print '\nend!'

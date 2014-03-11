@@ -243,7 +243,7 @@ class StatsView(APIView):
             question_set = int(request.GET['qs_id'])
             slug = request.GET['slug']
 
-            question = Question.objects.filter(questionset_id=question_set, slug=slug, stats='1',
+            question = Question.objects.filter(questionset_id=question_set, slug_fk__slug1=slug, stats='1',
                                                questionset__questionnaire=questionnaire_id).order_by('number')
 
             results = self.getResults(question)

@@ -151,7 +151,7 @@ class Migration(SchemaMigration):
             'Meta': {'object_name': 'Slugs'},
             'description': ('django.db.models.fields.TextField', [], {}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'slug1': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '1256'})
+            'slug1': ('django.db.models.fields.CharField', [], {'max_length': '1256'})
         }
     }
 
