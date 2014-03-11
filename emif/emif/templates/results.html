@@ -46,9 +46,12 @@
   <div class="span6">
 
     <div class="btn-group pull-right">
+    <button type="button" class="btn" onclick="window.print();" title="Print">
+      <i class="icon-print"></i>
+    </button>
       <div class="btn-group"></div>
       <span id="selected_databases" class="btn disabled"> <strong>Type Selected:</strong> <span id="selected_dbstype">---</span> &nbsp; &nbsp; <strong>Selected databases:</strong> <span id="selected_dbscount">0</span></span>      
-      <a id="comparabtn" class="btn "  href=""  rel="tooltip" data-container="body" data-placement="bottom" data-original-title="You only can select two databases for a comparison" disabled> <i  class=" icon"></i>
+      <a id="comparabtn" class="btn "  href=""  rel="tooltip" data-container="body" data-placement="bottom" data-original-title="This allows to compare databases.<br /> It is only possible to compare databases of the same type. <br /> When a database is selected, the type is defined automatically, and databases of other types can't be choosen. <br /> To be able to select other type, you must unselect all the databases." class="help_selectresults icon-question-sign" disabled> <i  class=" icon"></i>
         Compare</a>
 
       <a class="btn" href="geo" onclick="" > <i class=" icon"></i>Geolocation</a>
@@ -112,7 +115,7 @@
             <div class="pull-left">Type</div>
               <div class="pull-right"><i class="{{sort_params.type.icon}}"></i></div> 
             </th>
-            <th class="sorter-false filter-false">Select</th>
+            <th class="sorter-false filter-false select_line">Select</th>
 
         </tr>
         <tr>
@@ -129,7 +132,11 @@
                 <option value="observationaldatasources">Observational Data Sources</option>
               </select>
           </td>
-          <td style="width:50px;" class="table_filter"></td>
+          <td style="width:50px;" class="table_filter select_line">
+            <div style="text-align: center;">
+              <i data-toggle="tooltip" data-placement="bottom" title=" This row allows to compare databases.<br /> It is only possible to compare databases of the same type. <br /> When a database is selected, the type is defined automatically, and databases of other types can't be choosen. <br /> To be able to select other type, you must unselect all the databases." class="help_selectresults icon-question-sign"></i>
+            </div>
+          </td>
         </tr>
     </thead>
     <tbody id="table_content">
@@ -160,9 +167,8 @@
           <td class="type">{{ t.type_name }} </td>
           
         
-          <td style="text-align:center"> <input class="checkbox" type="checkbox" 
+          <td class="select_line"> <input class="checkbox dbtype_{{t.type_name|removespaces}}" type="checkbox" 
           typedb="{{ t.type_name }}" name="chk_{{ t.id }}"></td>
-
           
         </tr>
 
@@ -268,6 +274,9 @@ $(document).ready(function(){
     $('a[href="#"]').attr('href', function(i, val){
         return window.location + val;
     });
+
+    $('.help_selectresults').tooltip({container: 'body', 'html': true});
+    
 });
 {% endif %}
 
@@ -387,7 +396,8 @@ $('.checkbox').click(function()
     }
 
 });
-$('[rel=tooltip]').tooltip() 
+$('[rel=tooltip]').tooltip({container: 'body', 'html': true});
+
 $('.popover').popover({
     container: 'body'
 });

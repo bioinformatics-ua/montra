@@ -1,0 +1,140 @@
+#map-canvas {
+    height: 100%;
+}
+
+#info-window {
+    width: 350px;
+    max-height: 400px !important;
+    margin: 0px !important;
+    padding: 0px !important;
+    overflow-x: hidden !important;
+}
+
+.footer-maps {
+    margin: 0px !important;
+    margin-left: -15px !important;
+}
+
+.icon {
+    width: 20px;
+    text-align: center;
+}
+
+.theme {
+    font-size: 11px !important;
+    text-wrap: normal;
+    background-color: #888;
+    color: #FFF;
+    padding: 2px 4px;
+    border-radius: 5px;
+    margin-bottom: 2px;
+}
+
+.row {
+    margin-left: 0px !important;
+    margin-right: 0px !important;
+
+}
+.organization-address{
+    line-height: 15px;
+    font-size: 7px;
+    color: #999;
+    margin-bottom: -10px;
+    /*padding-bottom: 10px;
+    border-bottom: 1px solid #BBB;*/
+}
+
+.well{
+    margin: 5px 0px -15px 0px !important;
+    padding: 8px !important;
+    font-size: 12px !important;
+}
+
+.search{
+    margin-bottom: 8px;
+}
+
+.organization{
+    padding: 20px 20px;
+}
+
+.organization-even{
+    background-color: #EEE;
+}
+
+.organization-title{
+    font-weight: bold;
+}
+
+
+.login-panel{
+    padding: 10px 0px 15px 0px !important;
+}
+
+.login-label {
+    font-size: 11px;
+    display: block;
+    border-radius: 0px;
+    margin: -10px -1px 10px -1px;
+}
+
+.login-logo{
+    margin-top: 50px;
+}
+
+.login-letters-title{
+    font-size: 15px;
+    text-transform: uppercase;
+    color: #015A9A;
+    font-weight: bold;
+}
+
+.login-letters-subtitle{
+    font-size: 12px;
+    color: #999;
+    padding-top: 5px;
+    padding-bottom: 30px;
+    text-transform: uppercase;
+
+}
+
+
+.footer-space{
+    height: 50px;
+}
+
+footer.navbar{
+    min-height: 0px !important;
+    font-size: 11px !important;
+}
+
+.navbar-content{
+    font-size: 11px !important;
+    height: 30px !important;
+    background: #F5F5F5;
+    padding-top: 7px;
+    color: #999;
+}
+.navbar-maps{
+    background-color: transparent;
+    height: 26px !important;
+}
+
+.copyright-maps{
+    padding: 2px 7px;
+    margin-left: 90px;
+    background-color: rgba(255,255,255, 0.85);
+    width: 202px;
+    border-radius: 3px;
+}
+
+.pager-detail{
+    font-size: 11px;
+    color: #999;
+    margin-top: -20px;
+    margin-bottom: 5px;
+}
+
+.gm-style{
+    font-family: "Helvetica Neue",Helvetica,Arial,sans-serif !important;
+}

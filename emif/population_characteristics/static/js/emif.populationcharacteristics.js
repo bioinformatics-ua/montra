@@ -38,7 +38,8 @@ function getFingerprintID(){
 };
 
 
-
+var translations = {};
+var translationsBack = {};
 var activeChart='';
 
 var actualChart = null; 
@@ -239,8 +240,8 @@ function PCAPI ()
     };
 
     var filtersMap = {};
-    var translations = {};
-    var translationsBack = {};
+    translations = {};
+    translationsBack = {};
 
     var methods = {
         init : function( options, name, fingerprintId ) {

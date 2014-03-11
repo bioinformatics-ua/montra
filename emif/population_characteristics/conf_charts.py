@@ -713,6 +713,43 @@ class ConfCharts(object):
         c14.filters = [f2]
         sc.charts.append(c14)
 
+
+        #################################################
+        ### Patient Time
+        #################################################
+        c = Chart()
+        c.title = Title()
+        c.title.operation = Operation.UNIQUE
+        c.title.var = "Observation time in years" 
+        c.title.fixed_title = "Patient time" 
+        c.x_axis = Axis()
+        c.x_axis.operation = "unique"
+        c.x_axis.var = "Value1"
+        c.x_axis.label = 'Patient time (years)'
+        c.y_axis = Axis()
+        c.y_axis.operation = "unique"
+        c.y_axis.var = "Count"
+        c.y_axis.label = 'Number of patients'
+        f1 = Filter()
+        f1.name = 'Year'
+        f1.key = 'Name1'
+        f1.value = 'Value1'
+
+        f2 = Filter()
+        f2.name = 'Gender'
+        f2.key = None
+        f2.value = 'Gender'
+        f2.translation = {'M': 'Male', 'F': 'Female', 'T': 'Total'}
+
+        ss = Scale()
+        ss.unit = "Year"
+        ss.bins = "10"
+
+        c.filters = [f2]
+
+        sc.charts.append(c)
+
+
         return sc
 
 conf = ConfCharts()
