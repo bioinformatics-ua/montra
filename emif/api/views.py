@@ -374,7 +374,7 @@ def validate_fingerprint(user, fingerprintID):
 
     result = False
     c = CoreEngine()
-    results = c.search_fingerprint('user_t:' + user.username)
+    results = c.search_fingerprint('user_t:' + '"' + user.username + '"')
 
     for r in results:
         if fingerprintID == r['id']:
