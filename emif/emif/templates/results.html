@@ -258,9 +258,10 @@ $(document).ready(function(){
 
     var dbcount = updateSelectCount();
 
+    counter = dbcount;
+
     if(dbcount >= 2){
         $("#comparabtn").removeAttr('disabled');
-        counter = dbcount;
         $("#comparabtn").bind('click',function(e)
         { 
           postComparison();
@@ -375,16 +376,24 @@ $('.checkbox').click(function()
 
     if(counter == 0){
       updateSelectCountJs("---", ""+counter);   
-      $('.checkbox').prop("disabled", false);
+      $('input.checkbox').prop("disabled", false);
 
-      $("#comparabtn").attr('disabled', true);  
+      $("#comparabtn").attr("disabled", true);  
     }
     else if(counter == 1){
+    console.log('cai here');
+
       $("#comparabtn").attr('disabled', true);
 
-      var checkedtype = $('.checkbox:checked').first().attr('typedb');
-
+      var checkedtype; 
+      if(a != undefined && a.plugin != undefined && a.plugin.typedb !=undefined){
+        checkedtype = a.plugin.typedb;
+      } else {
+        checkedtype = $('.checkbox:checked').first().attr('typedb');
+      }
       updateSelectCountJs(checkedtype, counter);
+
+      $('input.checkbox').prop("disabled", false);
 
       $('input.checkbox:not([typedb="' + checkedtype 
       + '"])').prop('disabled', true);
