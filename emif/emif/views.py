@@ -312,9 +312,14 @@ def results_diff(request, page=1, template_name='results_diff.html'):
                 elif k == "qid":
                     qid = v
 
+            if qexpression == None or qserialization == None or qexpression.strip()=="" or qserialization.strip() == "":
+                response = HttpResponse()
+                response.status_code = 500
+                return response
+                
             query = convert_qvalues_to_query(qvalues, qid, qexpression)
             query = convert_query_from_boolean_widget(qexpression, qid)
-            print "Query: " + query
+            #print "Query: " + query
             request.session['query'] = query
             
             # We will be saving the query on to the serverside to be able to pull it all together at a later date
@@ -2366,7 +2371,7 @@ def check_database_add_conditions(request, questionnaire_id, sortid,
                 question_set = qs.pk
                 break
     if (int(sortid) == 99):
-            sortid = len(qs_list) - 1
+            sortid = len(questionnaire.questionsets()) - 1
     
     question_set2 = qsobjs[int(sortid)]
 
