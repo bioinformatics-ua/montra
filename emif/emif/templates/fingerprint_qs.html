@@ -17,15 +17,10 @@
 						<td title="{{ t.value|safe }}">{{ t.value|safe }}
 						<div class="pull-right">
 							{% if not t.comment|safe == None and not t.comment|safe == "" %}
-							<button type="button" class="comment_button btn btn-darkgray btn-small" data-container="body" data-toggle="popover" data-placement="left" data-title="Comment" data-content="{{ t.comment|safe }}">See comments</button>
+							<i class="comment_button icon-comment" data-container="body" data-toggle="popover" data-placement="left" data-title="Comment" data-content="{{ t.comment|safe }}"></i>
 							{% endif %}
 							</div>
 						</td>
-						<!--td class="commented">
-							{% if not t.comment|safe == None and not t.comment|safe == "" %}
-							<button type="button" class="comment_button btn btn-link btn-small" data-container="body" data-toggle="popover" data-placement="left" data-title="Comment" data-content="{{ t.comment|safe }}">show</button>
-							{% endif %}
-						</td-->
 					</tr>
 					{% endfor %}
 				</tbody>
