@@ -198,6 +198,7 @@ function GraphicChartC3D3(divArg, dataArg)
     chartConfigs.axis.x['label_position']['dy'] = "3.5em";
     chartConfigs.axis.y['label_position']['dx'] = "-5.2em";
     chartConfigs.axis.y['label_position']['dy'] = "-6.5em";
+    chartConfigs.axis.x['tick']['culling'] = true;
     console.log('chartConfigs');
     console.log(chartConfigs);
     try{var chart = c3.generate(chartConfigs);}

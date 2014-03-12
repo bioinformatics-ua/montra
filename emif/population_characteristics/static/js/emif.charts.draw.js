@@ -49,7 +49,15 @@ function PCDraw(actualChart,chartType, e)
       }
       var valueFilters = "";
       $.each(filters, function (data){
-        valueFilters += " , " +filters[data];
+        var fV = filters[data];
+        console.log(translations);
+        console.log('do'+translations);
+        if (translations.hasOwnProperty(filters[data]))
+        {
+          console.log('do'+filters[data]);
+            fV = translations[filters[data]];
+        }
+        valueFilters += " , " + fV;
       });
       /*valuesFromGraph = PC.getValuesRow(this.chartType, 
         'Count',fingerprintID );*/
