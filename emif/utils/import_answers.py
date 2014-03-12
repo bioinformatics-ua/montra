@@ -11,7 +11,7 @@ fl=''
 
 import pickle
 
-pkl_file = open('fingerprints.pkl', 'rb')
+pkl_file = open('/Users/melojms/Downloads/fingerprints.pkl', 'rb')
 
 docs = pickle.load(pkl_file)
 

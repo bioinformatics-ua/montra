@@ -41,11 +41,11 @@ else:
     MIDDLE_DIR = "emif/emif/"
 
 ADMINS = (
-    ('Luis A. Bastiao Silva', 'bastiao@ua.pt'),
-    ('José Luis Oliveira', 'jlo@ua.pt'),
-    ('Tiago Godinho', 'tmgodinh@ua.pt'),
+#    ('Luis A. Bastiao Silva', 'bastiao@ua.pt'),
+#    ('José Luis Oliveira', 'jlo@ua.pt'),
+#    ('Tiago Godinho', 'tmgodinh@ua.pt'),
     ('Jose Melo', 'melojms@gmail.com'),
-    ('Ricardo Ribeiro', 'ribeiro.r@ua.pt'),
+#    ('Ricardo Ribeiro', 'ribeiro.r@ua.pt'),
 )
 
 SOLR_HOST = "localhost"
@@ -70,33 +70,33 @@ DATABASE_PATH_SQLITE3 = "emif.db"
 if not DEBUG:
     DATABASE_PATH_SQLITE3 = PROJECT_DIR_ROOT + "emif/" + DATABASE_PATH_SQLITE3
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': DATABASE_PATH_SQLITE3,                      # Or path to database file if using sqlite3.
-        'USER': '',                      # Not used with sqlite3.
-        'PASSWORD': '',                  # Not used with sqlite3.
-        'HOST': '',                      # Set to empty string for localhost. Not used with sqlite3.
-        'PORT': '',                      # Set to empty string for default. Not used with sqlite3.
-    }
-}
-
 # DATABASES = {
 #     'default': {
-#         #        'ENGINE': 'django.db.backends.mysql', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
-#         'ENGINE': 'django.db.backends.postgresql_psycopg2', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
-#         'NAME': 'emif_dev', # Or path to database file if using sqlite3.
-#         'USER': 'postgres', # Not used with sqlite3.
-#         'PASSWORD': 'ieeta123IEETA', # Not used with sqlite3.
-#         'HOST': 'localhost', # Set to empty string for localhost. Not used with sqlite3.
-#         'PORT': '', # Set to empty string for default. Not used with sqlite3.
-#         'AUTOCOMMIT': True,
-#         'autocommit': True,
-#         'OPTIONS': {
-#             'autocommit': True,
-#         },
-#     },
+#         'ENGINE': 'django.db.backends.sqlite3', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
+#         'NAME': DATABASE_PATH_SQLITE3,                      # Or path to database file if using sqlite3.
+#         'USER': '',                      # Not used with sqlite3.
+#         'PASSWORD': '',                  # Not used with sqlite3.
+#         'HOST': '',                      # Set to empty string for localhost. Not used with sqlite3.
+#         'PORT': '',                      # Set to empty string for default. Not used with sqlite3.
+#     }
 # }
+
+DATABASES = {
+    'default': {
+        #        'ENGINE': 'django.db.backends.mysql', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
+        'ENGINE': 'django.db.backends.postgresql_psycopg2', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
+        'NAME': 'emif_dev', # Or path to database file if using sqlite3.
+        'USER': 'postgres', # Not used with sqlite3.
+        'PASSWORD': 'admin', # Not used with sqlite3.
+        'HOST': 'localhost', # Set to empty string for localhost. Not used with sqlite3.
+        'PORT': '', # Set to empty string for default. Not used with sqlite3.
+        'AUTOCOMMIT': True,
+        'autocommit': True,
+        'OPTIONS': {
+            'autocommit': True,
+        },
+    },
+}
 
 # Hosts/domain names that are valid for this site; required if DEBUG is False
 # See https://docs.djangoproject.com/en/1.4/ref/settings/#allowed-hosts
@@ -218,6 +218,7 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.markup',
+    'django.contrib.comments',
 
     # Admin area
     'django_admin_bootstrapped',

@@ -3309,7 +3309,7 @@ def import_questionnaire(request, template_name='import_questionnaire.html'):
     # wb = load_workbook(filename = r'/Volumes/EXT1/Dropbox/MAPi-Dropbox/EMIF/Code/emif/emif/questionnaire_ad_v2.xlsx')
     # wb = load_workbook(filename = r'/Volumes/EXT1/Dropbox/MAPi-Dropbox/EMIF/Observational_Data_Sources_Template_v5.xlsx')
     # wb = load_workbook(filename = r'C:/Questionnaire_template_v3.4.xlsx')
-    wb = load_workbook(filename =r'/Users/ribeiro/Downloads/Questionnaire_template_v3.5.3.xlsx')
+    wb = load_workbook(filename =r'/Users/melojms/Downloads/Questionnaire_template_v3.5.3.xlsx')
     ws = wb.get_active_sheet()
     log = ''
 
