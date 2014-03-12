@@ -271,7 +271,12 @@ SelectPaginatorPlugin.prototype = {
 function paginator_via_post() {
     $("a", ".pagination").each(function() {
         $(this).click(function(e) {
-
+            var parent = $(this).parent("li");
+            if(parent.hasClass("active") || parent.hasClass("disabled")){
+                e.preventDefault();
+                return false;
+            }
+            
             var href = $(this).attr("href");
             console.log(href);
             var patt = /\/(\d+)/g;
