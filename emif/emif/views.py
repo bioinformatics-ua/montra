@@ -3322,6 +3322,7 @@ def get_slug(slug):
 #     slugsAux.question = question
 #     slugsAux.save()
 
+
 def save_slug(slugName, desc):
     slugsAux = Slugs()
     slugsAux.slug1 = slugName
@@ -3486,7 +3487,7 @@ def import_questionnaire(request, template_name='import_questionnaire.html'):
 
                         #Create or load slug
                         print slug
-                        slugs = Slugs.objects.filter(slug1=slug)
+                        slugs = Slugs.objects.filter(slug1=slug, description=text_en)
                         if len(slugs) <= 0:
                             slug_db = Slugs(slug1=slug, description=text_en)
                             slug_db.save()
@@ -3574,7 +3575,7 @@ def import_questionnaire(request, template_name='import_questionnaire.html'):
 
                         print slug
                         #Create or load slug
-                        slugs = Slugs.objects.filter(slug1=slug)
+                        slugs = Slugs.objects.filter(slug1=slug, description=text_en)
                         if len(slugs) <= 0:
                             slug_db = Slugs(slug1=slug, description=text_en)
                             slug_db.save()
@@ -3596,7 +3597,7 @@ def import_questionnaire(request, template_name='import_questionnaire.html'):
                             # TODO: I think we don't need this now, since question now has a slug foreign key
                         #    save_slug(question.slug,  question.text_en, question)
 
-                        # slugs.append((question.slug,  question.text_en, question))
+                        # slugs.append((questionslugs.slug,  question.text_en, question))
                         log += '\n%s - Question saved %s ' % (type_Column.row, question)
                         if dataType_column.value in ['choice', 'choice-freeform', 'choice-multiple', 'choice-multiple-freeform']:
                             _choices_array_aux = []
