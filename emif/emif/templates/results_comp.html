@@ -5,7 +5,10 @@
 
 {% block breadcrumbs %}
     {{ block.super }}
+    {% breadcrumb "Search" "resultsdiff/1" %} 
+
     {% breadcrumb "Compare Databases" "" %}
+
 
 {% endblock %}
 
@@ -82,6 +85,7 @@ th, td {
   {% endblock %}
 
 {% block content %}
+
 <div class="clearboth">
 <!--[if lte IE 8]>
 <div class="well">Currently IE 7 and 8 don't support this functionality. To use this functionality please update your browser to a modern browser, like IE 9 or better, Google Chrome, Firefox, Opera or Safari.</div>
@@ -100,7 +104,6 @@ th, td {
 
 </ul>
 </div>
-
 <div style="margin: 0px;" class="span12">
   <div style="overflow-x: auto;" class="well accordion" id="accordion2">
   <div id="database_listings">
@@ -120,7 +123,7 @@ th, td {
         {% endif %}
         </div>
     </div>   
-      {% for k,v in qset.items %}
+      {% for k,v in qset.ordered_items %}
       <div style="background-color: white" class="accordion-group">
         <div class="accordion-heading">
           <a id="a_collapse{{k|removespaces}}_{{name|removespaces}}" class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapse{{k|removespaces}}_{{name|removespaces}}">{{k|removeh1}}</a>
@@ -173,7 +176,7 @@ function applyFilters(){
   var filter_string = $("#searchfilter").val();
 
           {%for name, qset in results|slice:":1" %}
-            {% for k,v in qset.items %}
+            {% for k,v in qset.ordered_items %}
             filter_results([reference_table+'_{{k|removespaces}}'],filter_string, match, unmatch, emptyrows, proximity);
             filter_results([compared_table+'_{{k|removespaces}}'],filter_string, match, unmatch, emptyrows, proximity);
 
@@ -420,7 +423,7 @@ function compareDatabases(show_modal){
   }catch(err){}
 
   {%for name, qset in results|slice:":1" %}
-    {% for k,v in qset.items %}
+    {% for k,v in qset.ordered_items %}
       var thread = new Runnable(compareDatabase, priority++, reference_table+'_{{k|removespaces}}', compared_table+'_{{k|removespaces}}'); threadpool.run(thread);  
     {% endfor %}
   {% endfor %}
