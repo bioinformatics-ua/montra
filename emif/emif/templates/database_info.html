@@ -291,7 +291,12 @@ function loadqspart(sortid, pk){
         //console.dir(highlights);
 
         if(highlights.length > 0){
-           $( "#qs_"+sortid ).parent().siblings().find('.accordion-icon').html('<i class="icon-eye-open"></i>');
+           var this_row = $( "#qs_"+sortid ).parent().siblings().find('.accordion-icon');
+           this_row.html('<img title="This section has search keywords" class="markered" src="{{STATIC_URL}}/img/marker.png" />');
+           $(".markered" ,this_row).tooltip({container: "body"});
+           $(".markered" ,this_row).click(function(){
+            this_row.parent().siblings().first().collapse('toggle');
+           });
         }     
     });    
 
