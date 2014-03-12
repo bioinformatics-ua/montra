@@ -6,7 +6,7 @@
 					<tr>
 						<th>Tag</th>
 						<th>Value</th>
-						<th class="commented"><i class="icon-comment"></i></th>
+						<!--th class="commented"><i class="icon-comment"></i></th-->
 					</tr>
 				</thead>
 				<tbody>
@@ -14,12 +14,18 @@
 					<tr>
 						<!-- title="{{ t.tag|safe }}" -->
 						<td title="{{ t.tag|safe|removehs }}">{{ t.tag|removehs }}</td>
-						<td title="{{ t.value|safe }}">{{ t.value|safe }}</td>
-						<td class="commented">
+						<td title="{{ t.value|safe }}">{{ t.value|safe }}
+						<div class="pull-right">
 							{% if not t.comment|safe == None and not t.comment|safe == "" %}
-							<button type="button" class="comment_button btn btn-link btn-small" data-container="body" data-toggle="popover" data-placement="left" data-title="Comment for this field" data-content="{{ t.comment|safe }}">show</button>
+							<button type="button" class="comment_button btn btn-darkgray btn-small" data-container="body" data-toggle="popover" data-placement="left" data-title="Comment" data-content="{{ t.comment|safe }}">See comments</button>
 							{% endif %}
+							</div>
 						</td>
+						<!--td class="commented">
+							{% if not t.comment|safe == None and not t.comment|safe == "" %}
+							<button type="button" class="comment_button btn btn-link btn-small" data-container="body" data-toggle="popover" data-placement="left" data-title="Comment" data-content="{{ t.comment|safe }}">show</button>
+							{% endif %}
+						</td-->
 					</tr>
 					{% endfor %}
 				</tbody>
@@ -36,6 +42,6 @@
   /*$('.comment_button', '#t2_{{qs.sortid}}').click(function(){
   	$(this).parent().find('.comment_text').toggle('fast');
   });*/
-	$('.comment_button', '#t2_{{qs.sortid}}').popover({trigger: 'hover'});
+	$('.comment_button', '#t2_{{qs.sortid}}').popover({trigger: 'hover', html: true});
 </script>
 {% endfor %}
