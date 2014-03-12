@@ -242,6 +242,7 @@ function PCAPI ()
     var filtersMap = {};
     translations = {};
     translationsBack = {};
+    
 
     var methods = {
         init : function( options, name, fingerprintId ) {
@@ -307,7 +308,7 @@ function PCAPI ()
                   }
                   
                  
-                  tmpUl.append('<li><a class="filterBar" id=_'+fType+'_'+xFilter.values[data]+' href="#" onclick="return false;"> '+originalValue+'</a></li>')
+                  tmpUl.append('<li><a class="filterBar '+fType+'" id=_'+fType+'_'+xFilter.values[data]+' href="#" onclick="return false;"> '+originalValue+'</a></li>')
                     
                   
                     
@@ -334,7 +335,10 @@ function PCAPI ()
                       } 
                       filtersMap['values.'+filterType] = [_value];
                       charDraw.refresh(getFiltersSelected());
-
+                      
+                      $(".filterBar " + fType).removeClass("active");
+                      $(this.parentNode).closest('li').addClass("active");
+                      
 
                       return false;
                     });
