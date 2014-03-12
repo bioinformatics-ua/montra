@@ -336,7 +336,7 @@ function PCAPI ()
                       filtersMap['values.'+filterType] = [_value];
                       charDraw.refresh(getFiltersSelected());
                       
-                      $(".filterBar " + fType).removeClass("active");
+                      $("." + filterType).closest('li').removeClass("active");
                       $(this.parentNode).closest('li').addClass("active");
                       
 
