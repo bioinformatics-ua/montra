@@ -117,7 +117,22 @@ def truncate(value):
 
 @register.filter
 def whitespacesplit(str):
-    return str.split()
+    words = []
+
+    for m in re.finditer(r'"(.*?)"', str):
+        words.append(m.group(1))
+        str = str.replace(m.group(0), "")
+
+    words = words + str.strip().split()
+
+    return words
+
+@register.filter
+def ellipsis(str, size):
+    if(len(str) > size):
+        return str[:size]+"..."
+
+    return str
 
 def fingerprints_list():
     
