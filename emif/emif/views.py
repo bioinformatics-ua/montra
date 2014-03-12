@@ -1867,7 +1867,7 @@ def createqset(runcode, qsid, qsets=None, clean=True):
             if k in blacklist:
                 continue
             if k.startswith("comment_question_"):
-                continue0
+                continue
 
             t = Tag()
 
