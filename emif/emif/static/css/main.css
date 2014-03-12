@@ -449,6 +449,7 @@ box-shadow: inset 0 3px 8px rgba(0,0,0,0.125);
 
 #selected_databases{
   opacity: 1 !important;
+  font-size: 11px;
 }
 .select_line{
   text-align: center !important;
