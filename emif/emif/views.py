@@ -129,7 +129,7 @@ def results_comp(request, template_name='results_comp.html'):
         for k, v in request.POST.items():
             print k
             print v
-            if k.startswith("chk_") and v == "on":
+            if k.startswith("chks_") and v == "on":
                 arr = k.split("_")
 
                 list_fingerprint_to_compare.append(arr[1])
@@ -1235,7 +1235,7 @@ def delete_fingerprint(request, id):
     user = request.user
 
     c = CoreEngine()
-    results = c.search_fingerprint('user_t:' + user.username)
+    results = c.search_fingerprint('user_t:' + '"' + user.username + '"')
     
     for result in results:
         if (id == result['id']):
@@ -1318,7 +1318,7 @@ def databases(request, page=1, template_name='databases.html', force=False):
     # Get the list of databases for a specific user
     user = request.user
     #list_databases = get_databases_from_db(request)
-    _filter = "user_t:" + user.username
+    _filter = "user_t:" + '"' + user.username + '"'
     if user.is_superuser:
         _filter = "user_t:*" 
 
@@ -1471,7 +1471,7 @@ def paginator_process_list(list_databases, hits, start):
 
 #     user = request.user
 #     #list_databases = get_databases_from_db(request)
-#     _filter = "user_t:" + user.username
+#     _filter = "user_t:" + '"' + user.username + '"'
 #     if user.is_superuser:
 #         _filter = "user_t:*" 
 #     list_databases = get_databases_from_solr(request, _filter)
@@ -2897,7 +2897,7 @@ def create_auth_token(request, page=1, templateName='api-key.html', force=False)
     else:
         token = Token.objects.get(user=user)
 
-    _filter = "user_t:" + user.username
+    _filter = "user_t:" + '"' + user.username + '"'
 
     (sortString, filterString, sort_params, range) = paginator_process_params(request.POST, page, rows)    
         
@@ -3105,7 +3105,7 @@ def export_my_answers(request):
     """
 
     user = request.user
-    list_databases = get_databases_from_solr(request, "user_t:" + user.username)
+    list_databases = get_databases_from_solr(request, "user_t:" + '"' + user.username + '"')
 
     return save_answers_to_csv(list_databases, "MyDBs")
 
