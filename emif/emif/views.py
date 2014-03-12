@@ -129,7 +129,7 @@ def results_comp(request, template_name='results_comp.html'):
         for k, v in request.POST.items():
             print k
             print v
-            if k.startswith("chk_") and v == "on":
+            if k.startswith("chks_") and v == "on":
                 arr = k.split("_")
 
                 list_fingerprint_to_compare.append(arr[1])
