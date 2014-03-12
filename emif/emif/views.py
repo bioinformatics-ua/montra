@@ -129,7 +129,7 @@ def results_comp(request, template_name='results_comp.html'):
         for k, v in request.POST.items():
             print k
             print v
-            if k.startswith("chk_") and v == "on":
+            if k.startswith("chks_") and v == "on":
                 arr = k.split("_")
 
                 list_fingerprint_to_compare.append(arr[1])
@@ -167,12 +167,16 @@ def results_fulltext(request, page=1, full_text=True,template_name='results.html
         request.session['query'] = query
     except:
         in_post = False
-        
+
     if not in_post:
-        query = request.session.get('query', "")
+        query = request.session.get("query","")
+
+    if isAdvanced == False:
+        query = "text_t:"+query
+
     if not full_text:
         return results_fulltext_aux(request, query, page, template_name, isAdvanced)
-    return results_fulltext_aux(request, "text_t:" + query, page, template_name, isAdvanced)
+    return results_fulltext_aux(request, query, page, template_name, isAdvanced)
 
 
 def results_fulltext_aux(request, query, page=1, template_name='results.html', isAdvanced=False, force=False):
@@ -308,9 +312,14 @@ def results_diff(request, page=1, template_name='results_diff.html'):
                 elif k == "qid":
                     qid = v
 
+            if qexpression == None or qserialization == None or qexpression.strip()=="" or qserialization.strip() == "":
+                response = HttpResponse()
+                response.status_code = 500
+                return response
+                
             query = convert_qvalues_to_query(qvalues, qid, qexpression)
             query = convert_query_from_boolean_widget(qexpression, qid)
-            print "Query: " + query
+            #print "Query: " + query
             request.session['query'] = query
             
             # We will be saving the query on to the serverside to be able to pull it all together at a later date
@@ -381,14 +390,21 @@ def results_diff(request, page=1, template_name='results_diff.html'):
     return results_fulltext(request, page, full_text=False, isAdvanced=request.session['isAdvanced'])
 
 def geo(request, template_name='geo.html'):
+
     query = None
-    try:
-        query = request.session['query']
-        query = 'text_t:' + query
-    except:
-        pass
-    if query == None:
-        query = "*:*"
+    isAdvanced = False
+    if(request.session.get('isAdvanced') == True): 
+        query = request.session.get('query')
+        if query == None:
+            query = "*:*"
+
+        isAdvanced = True
+    else:
+        if(request.session.get('query') != None):
+            query = "text_t:"+request.session.get('query')
+        else:
+            query = "*:*"
+
     print "query@" + query
     list_databases = get_databases_from_solr(request, query)
 
@@ -409,7 +425,8 @@ def geo(request, template_name='geo.html'):
             _loc = database.location
         
 
-        
+        print "CITY:"+_loc
+
         city=None
         g = geocoders.GeoNames(username='bastiao')
 
@@ -466,9 +483,14 @@ def geo(request, template_name='geo.html'):
             })
 
         list_locations.append(_loc)
-        
-    return render(request, template_name, {'request': request, 'db_list' : db_list,
-                                           'list_cities': list_locations, 'lats_longs': _long_lats, 'breadcrumb': True})
+
+    print isAdvanced
+
+    return render(request, template_name, {'request': request, 'db_list' : db_list, 
+                                           'search_old': request.session.get('query',''),
+                                           'list_cities': list_locations, 
+                                           'lats_longs': _long_lats, 
+                                           'breadcrumb': True, 'isAdvanced': isAdvanced})
 
 
 
@@ -520,6 +542,12 @@ def calculate_databases_per_location():
 
 
 def advanced_search(request, questionnaire_id, question_set, aqid):
+    try:
+        del request.session['isAdvanced']
+        del request.session['query']
+        del request.session['serialized_query']
+    except:
+        pass
 
 
     return show_fingerprint_page_read_only(request, questionnaire_id, question_set, True, aqid)
@@ -1155,10 +1183,14 @@ def get_databases_from_solr_v2(request, query="*:*", sort="", rows=100, start=0)
             else:
                 database_aux.name = r['database_name_t']
 
-            if (not r.has_key('location_t')):
-                database_aux.location = ''
-            else:
+            database_aux.localtion = ''
+
+            if(r.has_key('city_t')):
+                database_aux.location = r['city_t']
+            if (r.has_key('location_t')):
                 database_aux.location = r['location_t']
+            if (r.has_key('PI:_Address_t')):
+                database_aux.location = r['PI:_Address_t']
 
             if (not r.has_key('institution_name_t')):
                 database_aux.institution = ''
@@ -1203,7 +1235,7 @@ def delete_fingerprint(request, id):
     user = request.user
 
     c = CoreEngine()
-    results = c.search_fingerprint('user_t:' + user.username)
+    results = c.search_fingerprint('user_t:' + '"' + user.username + '"')
     
     for result in results:
         if (id == result['id']):
@@ -1286,7 +1318,7 @@ def databases(request, page=1, template_name='databases.html', force=False):
     # Get the list of databases for a specific user
     user = request.user
     #list_databases = get_databases_from_db(request)
-    _filter = "user_t:" + user.username
+    _filter = "user_t:" + '"' + user.username + '"'
     if user.is_superuser:
         _filter = "user_t:*" 
 
@@ -1439,7 +1471,7 @@ def paginator_process_list(list_databases, hits, start):
 
 #     user = request.user
 #     #list_databases = get_databases_from_db(request)
-#     _filter = "user_t:" + user.username
+#     _filter = "user_t:" + '"' + user.username + '"'
 #     if user.is_superuser:
 #         _filter = "user_t:*" 
 #     list_databases = get_databases_from_solr(request, _filter)
@@ -1472,6 +1504,8 @@ def all_databases_user(request, page=1, template_name='alldatabases.html', force
     # lets clear the geolocation session search filter (if any)
     try:
         del request.session['query']
+        del request.session['isAdvanced']
+        del request.session['serialized_query']
     except:
         pass
     
@@ -2301,7 +2335,7 @@ def check_database_add_conditions(request, questionnaire_id, sortid,
                 question_set = qs.pk
                 break
     if (int(sortid) == 99):
-            sortid = len(qs_list) - 1
+            sortid = len(questionnaire.questionsets()) - 1
     
     question_set2 = qsobjs[int(sortid)]
 
@@ -2535,12 +2569,13 @@ def show_fingerprint_page_read_only(request, q_id, qs_id, SouMesmoReadOnly=False
         qexpression = None  # boolean expression
         qserialization = None   # boolean expression serialization to show on results
                 
-        if not request.POST:
+        #if not request.POST:
             
-            if 'query' in request.session:
-                del request.session['query']
-            if 'search_full' in request.session:
-                del request.session['search_full']
+            #if 'query' in request.session:
+                #del request.session['query']
+
+            #if 'search_full' in request.session:
+                #del request.session['search_full']
 
         if request.POST:
             for k, v in request.POST.items():
@@ -2862,7 +2897,7 @@ def create_auth_token(request, page=1, templateName='api-key.html', force=False)
     else:
         token = Token.objects.get(user=user)
 
-    _filter = "user_t:" + user.username
+    _filter = "user_t:" + '"' + user.username + '"'
 
     (sortString, filterString, sort_params, range) = paginator_process_params(request.POST, page, rows)    
         
@@ -3070,7 +3105,7 @@ def export_my_answers(request):
     """
 
     user = request.user
-    list_databases = get_databases_from_solr(request, "user_t:" + user.username)
+    list_databases = get_databases_from_solr(request, "user_t:" + '"' + user.username + '"')
 
     return save_answers_to_csv(list_databases, "MyDBs")
 
