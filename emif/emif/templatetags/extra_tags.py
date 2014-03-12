@@ -52,6 +52,7 @@ def replaceplicas(value):
 @register.filter(name='removehs')
 @stringfilter
 def removehs(value):
+    value = value.replace('h0. ','')
     value = value.replace('h1. ','')
     value = value.replace('h2. ','')
     value = value.replace('h3. ','')
