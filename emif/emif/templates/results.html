@@ -266,6 +266,9 @@ $(document).ready(function(){
           postComparison();
           return false;
         });
+
+        // This is to remove later, only until compare_database integration
+        $("input:checkbox:not(:checked)").prop('disabled', true); 
     }
 
   }
@@ -391,7 +394,14 @@ $('.checkbox').click(function()
     else if (counter >= 2){
       updateSelectCountJs(null, counter); 
       $("#comparabtn").attr('disabled', false);
+         $("#comparabtn").bind('click',function(e)
+        { 
+          postComparison();
+          return false;
+        });  
 
+        // This is to remove later, only until compare_database integration
+        $("input:checkbox:not(:checked)").prop('disabled', true);   
     }
 
 });
