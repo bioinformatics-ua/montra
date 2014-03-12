@@ -470,3 +470,5 @@ label input[type="radio"], label input[type="checkbox"]{
     height: auto !important;
   }
 }
+@media (min-width: 1200px) {.span2_5 {width: 300px !important;}}
+@media (max-width: 1200px) {.span2_5 {width: 130px !important;}}
