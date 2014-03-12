@@ -161,9 +161,12 @@ $( document ).ready(function() {
     /* This must be after, boolrelwidget declaration */
     if (!(typeof bool_container === 'undefined')) {
         $('#qform').submit(
-                     
                     function(e) {
-
+                     if(bool_container.isEmpty()){
+                        e.preventDefault();
+                        alert("It's not possible to search without specifying parameters first.");
+                        return false;
+                      }
                         // Update hidden inputs (in case they are not updated because we are using the other buttons not in control by the plugin)
                         bool_container.readyToSubmit(); 
                     }     

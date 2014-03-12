@@ -27,6 +27,7 @@
 
 <script src="{{ STATIC_URL}}js/vendor/jquery.boolrelwidget.js"></script>
 <script src="{{ STATIC_URL }}js/vendor/jquery.ba-throttle-debounce.min.js"></script>
+<script src="{{ STATIC_URL }}js/vendor/json2.js"></script>
 <script src="{{ STATIC_URL }}js/paginator-sorter.js"></script>
 
 
@@ -43,8 +44,11 @@
 {% block toolbar %}
 {% if page_obj != None %}
   <div class="span6">
-    <div class="btn-group pull-right">
 
+    <div class="btn-group pull-right">
+    <button type="button" class="btn" onclick="window.print();" title="Print">
+      <i class="icon-print"></i>
+    </button>
       <div class="btn-group"></div>
       <a id="comparabtn" class="btn "  href=""  rel="tooltip" data-container="body" data-placement="bottom" data-original-title="This allows to compare databases.<br /> It is only possible to compare databases of the same type. <br /> When a database is selected, the type is defined automatically, and databases of other types can't be choosen. <br /> To be able to select other type, you must unselect all the databases." class="help_selectresults icon-question-sign" disabled> <i  class=" icon"></i>
         Compare</a>
@@ -105,7 +109,7 @@
             <div class="pull-left">Type</div>
               <div class="pull-right"><i class="{{sort_params.type.icon}}"></i></div> 
             </th>
-            <th class="sorter-false filter-false">Select</th>
+            <th class="sorter-false filter-false select_line">Select</th>
 
         </tr>
         <tr>
@@ -122,7 +126,7 @@
                 <option value="observationaldatasources">Observational Data Sources</option>
               </select>
           </td>
-          <td style="width:50px;" class="table_filter">
+          <td style="width:50px;" class="table_filter select_line">
             <div style="text-align: center;">
               <i data-toggle="tooltip" data-placement="bottom" title=" This row allows to compare databases.<br /> It is only possible to compare databases of the same type. <br /> When a database is selected, the type is defined automatically, and databases of other types can't be choosen. <br /> To be able to select other type, you must unselect all the databases." class="help_selectresults icon-question-sign"></i>
             </div>
@@ -157,7 +161,7 @@
           <td class="type">{{ t.type_name }} </td>
           
         
-          <td style="text-align:center"> <input class="checkbox dbtype_{{t.type_name|removespaces}}" type="checkbox" name="chk_{{ t.id }}"></td>
+          <td class="select_line"> <input class="checkbox dbtype_{{t.type_name|removespaces}}" type="checkbox" name="chk_{{ t.id }}"></td>
 
           
         </tr>
@@ -211,7 +215,12 @@
 <script type="text/javascript">
 var a;
 $(document).ready(function(){
-    a = new PaginatorSorter("table_databases", '{{sort_params.base_filter}}', '{{sort_params.selected_name}}', '{{sort_params.selected_value}}');
+    
+    a = new PaginatorSorter("table_databases", '{{sort_params.base_filter}}', '{{sort_params.selected_name}}', '{{sort_params.selected_value}}', '{{sort_params.extraObjects|safe}}');
+
+    //TO Be Applied in future releases.
+    //a.atachPlugin( new SelectPaginatorPlugin());
+
     paginator_via_post();
 });
 </script>

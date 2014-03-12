@@ -12,4 +12,4 @@ def baseurl(request):
     else:
         scheme = 'http://'
         
-    return {'BASE_URL': scheme + request.get_host(),}
+    return {'BASE_URL': scheme + request.get_host() + settings.BASE_URL,}

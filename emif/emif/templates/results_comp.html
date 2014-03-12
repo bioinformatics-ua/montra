@@ -47,8 +47,11 @@ th, td {
 <form id="result_form" action="resultscomp" method="POST">
   {% csrf_token %}
   <div class="span6">
-    <div class="btn-group pull-right">
 
+    <div class="btn-group pull-right">
+    <button type="button" class="btn" onclick="window.print();" title="Print">
+      <i class="icon-print"></i>
+    </button>  
       <div class="btn-group"></div>
       
       <a id="collapseall" class="btn" href="" >

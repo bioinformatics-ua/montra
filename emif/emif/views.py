@@ -167,12 +167,16 @@ def results_fulltext(request, page=1, full_text=True,template_name='results.html
         request.session['query'] = query
     except:
         in_post = False
-        
+
     if not in_post:
-        query = request.session.get('query', "")
+        query = request.session.get("query","")
+
+    if isAdvanced == False:
+        query = "text_t:"+query
+
     if not full_text:
         return results_fulltext_aux(request, query, page, template_name, isAdvanced)
-    return results_fulltext_aux(request, "text_t:" + query, page, template_name, isAdvanced)
+    return results_fulltext_aux(request, query, page, template_name, isAdvanced)
 
 
 def results_fulltext_aux(request, query, page=1, template_name='results.html', isAdvanced=False, force=False):
@@ -184,19 +188,20 @@ def results_fulltext_aux(request, query, page=1, template_name='results.html', i
     if page == None:
         page = 1
 
-    if query == "":
+    if query == "" or query.strip()=="text_t:*" :
         return render(request, "results.html", {'request': request, 'breadcrumb': True,
                                                 'num_results': 0, 'page_obj': None})
     (sortString, filterString, sort_params, range) = paginator_process_params(request.POST, page, rows)   
     sort_params["base_filter"] = query;
+    query_filtered=query
     if len(filterString) > 0:
-        query += " AND " + filterString
+        query_filtered += " AND " + filterString
 
-    print query
+    print query_filtered
 
-    (list_databases, hits) = get_databases_from_solr_v2(request, query, sort=sortString, rows=rows, start=range)    
+    (list_databases, hits) = get_databases_from_solr_v2(request, query_filtered, sort=sortString, rows=rows, start=range)    
     if range > hits and not force:
-        return results_fulltext_aux(request, query, 1, isAdvanced=isAdvanced, force=force)  
+        return results_fulltext_aux(request, query, 1, isAdvanced=isAdvanced, force=True)  
 
     if len(list_databases) == 0 :
         query_old = request.session.get('query', "")
@@ -307,9 +312,14 @@ def results_diff(request, page=1, template_name='results_diff.html'):
                 elif k == "qid":
                     qid = v
 
+            if qexpression == None or qserialization == None or qexpression.strip()=="" or qserialization.strip() == "":
+                response = HttpResponse()
+                response.status_code = 500
+                return response
+                
             query = convert_qvalues_to_query(qvalues, qid, qexpression)
             query = convert_query_from_boolean_widget(qexpression, qid)
-            print "Query: " + query
+            #print "Query: " + query
             request.session['query'] = query
             
             # We will be saving the query on to the serverside to be able to pull it all together at a later date
@@ -380,14 +390,21 @@ def results_diff(request, page=1, template_name='results_diff.html'):
     return results_fulltext(request, page, full_text=False, isAdvanced=request.session['isAdvanced'])
 
 def geo(request, template_name='geo.html'):
+
     query = None
-    try:
-        query = request.session['query']
-        query = 'text_t:' + query
-    except:
-        pass
-    if query == None:
-        query = "*:*"
+    isAdvanced = False
+    if(request.session.get('isAdvanced') == True): 
+        query = request.session.get('query')
+        if query == None:
+            query = "*:*"
+
+        isAdvanced = True
+    else:
+        if(request.session.get('query') != None):
+            query = "text_t:"+request.session.get('query')
+        else:
+            query = "*:*"
+
     print "query@" + query
     list_databases = get_databases_from_solr(request, query)
 
@@ -408,7 +425,8 @@ def geo(request, template_name='geo.html'):
             _loc = database.location
         
 
-        
+        print "CITY:"+_loc
+
         city=None
         g = geocoders.GeoNames(username='bastiao')
 
@@ -465,9 +483,14 @@ def geo(request, template_name='geo.html'):
             })
 
         list_locations.append(_loc)
-        
-    return render(request, template_name, {'request': request, 'db_list' : db_list,
-                                           'list_cities': list_locations, 'lats_longs': _long_lats, 'breadcrumb': True})
+
+    print isAdvanced
+
+    return render(request, template_name, {'request': request, 'db_list' : db_list, 
+                                           'search_old': request.session.get('query',''),
+                                           'list_cities': list_locations, 
+                                           'lats_longs': _long_lats, 
+                                           'breadcrumb': True, 'isAdvanced': isAdvanced})
 
 
 
@@ -519,6 +542,12 @@ def calculate_databases_per_location():
 
 
 def advanced_search(request, questionnaire_id, question_set, aqid):
+    try:
+        del request.session['isAdvanced']
+        del request.session['query']
+        del request.session['serialized_query']
+    except:
+        pass
 
 
     return show_fingerprint_page_read_only(request, questionnaire_id, question_set, True, aqid)
@@ -771,7 +800,8 @@ def extract_answers(request2, questionnaire_id, question_set, qs_list):
             comment_id = "comment_question_"+question.number#.replace(".", "")
             try:
                 if request.POST and request.POST[comment_id]!='':
-                    comment_id_index = "comment_question_"+question.slug
+                    #comment_id_index = "comment_question_"+question.slug
+                    comment_id_index = "comment_question_"+question.slug_fk.slug1
                     extra_comments[question] = request.POST[comment_id]
                     extra_fields[comment_id_index+'_t'] = request.POST[comment_id]
             except KeyError:
@@ -1162,10 +1192,14 @@ def get_databases_from_solr_v2(request, query="*:*", sort="", rows=100, start=0)
             else:
                 database_aux.name = r['database_name_t']
 
-            if (not r.has_key('location_t')):
-                database_aux.location = ''
-            else:
+            database_aux.localtion = ''
+
+            if(r.has_key('city_t')):
+                database_aux.location = r['city_t']
+            if (r.has_key('location_t')):
                 database_aux.location = r['location_t']
+            if (r.has_key('PI:_Address_t')):
+                database_aux.location = r['PI:_Address_t']
 
             if (not r.has_key('institution_name_t')):
                 database_aux.institution = ''
@@ -1409,6 +1443,13 @@ def paginator_process_params(request, page, rows):
 
     start = (int(page) - 1) * rows
 
+    #print mode
+    if "extraObjects" in mode:
+        extraObjects = mode["extraObjects"]
+    else:
+        extraObjects = {}
+    sort_params["extraObjects"] = json.dumps(extraObjects)
+    #print sort_params
     return (sortString, filterString, sort_params, start)
 
 def paginator_process_list(list_databases, hits, start):
@@ -1472,6 +1513,8 @@ def all_databases_user(request, page=1, template_name='alldatabases.html', force
     # lets clear the geolocation session search filter (if any)
     try:
         del request.session['query']
+        del request.session['isAdvanced']
+        del request.session['serialized_query']
     except:
         pass
     
@@ -2328,7 +2371,7 @@ def check_database_add_conditions(request, questionnaire_id, sortid,
                 question_set = qs.pk
                 break
     if (int(sortid) == 99):
-            sortid = len(qs_list) - 1
+            sortid = len(questionnaire.questionsets()) - 1
     
     question_set2 = qsobjs[int(sortid)]
 
@@ -2562,12 +2605,13 @@ def show_fingerprint_page_read_only(request, q_id, qs_id, SouMesmoReadOnly=False
         qexpression = None  # boolean expression
         qserialization = None   # boolean expression serialization to show on results
                 
-        if not request.POST:
+        #if not request.POST:
             
-            if 'query' in request.session:
-                del request.session['query']
-            if 'search_full' in request.session:
-                del request.session['search_full']
+            #if 'query' in request.session:
+                #del request.session['query']
+
+            #if 'search_full' in request.session:
+                #del request.session['search_full']
 
         if request.POST:
             for k, v in request.POST.items():
@@ -3442,7 +3486,7 @@ def import_questionnaire(request, template_name='import_questionnaire.html'):
                         print slug
                         slugs = Slugs.objects.filter(slug1=slug)
                         if len(slugs) <= 0:
-                            slug_db = Slug(slug1=slug, description=text_en)
+                            slug_db = Slugs(slug1=slug, description=text_en)
                             slug_db.save()
                         else:
                             slug_db = slugs[0]
@@ -3458,7 +3502,8 @@ def import_questionnaire(request, template_name='import_questionnaire.html'):
                         _questions_rows[type_Column.row] = str(questionNumber)
 
                         #if not _debug:
-                            #save_slug(question.slug,  question.text_en, question)
+                            # TODO: I think we don't need this now, since question now has a slug foreign key
+                        #    save_slug(question.slug,  question.text_en, question)
 
                         # slugs.append((question.slug,  question.text_en, question))
                         log += '\n%s - Category saved %s ' % (type_Column.row, question)
@@ -3546,6 +3591,7 @@ def import_questionnaire(request, template_name='import_questionnaire.html'):
                         _questions_rows[type_Column.row] = str(questionNumber)
 
                         #if not _debug:
+                            # TODO: I think we don't need this now, since question now has a slug foreign key
                         #    save_slug(question.slug,  question.text_en, question)
 
                         # slugs.append((question.slug,  question.text_en, question))
