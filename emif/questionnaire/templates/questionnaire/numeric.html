@@ -1,5 +1,6 @@
 {% load i18n %}
 {% load extra_tags %}
+
 <div class="clearfix">
     
     <div class="input">
@@ -23,5 +24,10 @@
                 $('[id="answered_'+{{ question.number|removedots }}+'"]').show();
             </script>
         {% endif %}
+        <script type="text/javascript">         
+            $(document).ready(function(){
+                $("#question_{{ question.number|escapedots }}").inputmask("decimal", { radixPoint: ",", autoGroup: true, groupSeparator: ".", groupSize: 3 });
+            });
+        </script>
     </div>
 </div>
