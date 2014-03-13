@@ -123,7 +123,7 @@ PaginatorSorter.prototype = {
                     context.submitthis();
                 } else {
                     $("#table_content").html('<td colspan="9999"><center>No results to show</center></td>');
-                    $(".pagination").html('');
+                    $(".pagination, .pagination-centered").html('');
                     //console.log('NOTSUCCESS');
                     /*
   					for(filter in context.filters){ 	
