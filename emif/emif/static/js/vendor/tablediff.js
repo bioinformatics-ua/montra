@@ -37,12 +37,20 @@ compare_cell = function(table, cell_name, value) {
             try {
                 var question = $(this.childNodes[1].childNodes[0]);
                 var response = $(this.childNodes[3].childNodes[0]);
+
+
                 if (question.context.data == cell_name.data) {
+                    //console.log(question.context.data + "? --" + (response.length == 0 && (value == undefined || value.data == undefined)));
                     //console.log("FOUND: " + value.data);
                     //console.log($(this.childNodes[3].childNodes[0])[0].textContent);
                     //console.log($(this.childNodes[3].childNodes[0])[0].textContent.indexOf(value.data));
                     //if (value.data.indexOf($(this.childNodes[3].childNodes[0]).context) !== -1))
-                    if (response[0].textContent.indexOf(value.data) !== -1 && response[0].textContent === value.data) {
+                    //console.log("COMPARE:[" + response[0].textContent + "][" + value.data + "]");
+                    if (response.length == 0 && (value == undefined || value.data == undefined)) {
+                        result_final = 3;
+
+                        return false;
+                    } else if (response[0].textContent.indexOf(value.data) !== -1 && response[0].textContent === value.data) {
                         //console.log("True: " + value.data);
                         //$(this.childNodes[1]).addClass("success");
                         result_final = 1;
@@ -103,6 +111,9 @@ comparetable = function(table1, table2) {
                     } else if (result == 2) {
                         //$($('#' + table2).childNodes[1].childNodes[0]).addClass("warning");
                         $(this).addClass("warning");
+                    } else if (result == 3) {
+                        //$($('#' + table2).childNodes[1].childNodes[0]).addClass("warning");
+                        $(this).addClass("emptycells");
                     } else {
                         //$($('#' + table2).childNodes[1].childNodes[0]).addClass("error");
                         $(this).addClass("error");
@@ -150,6 +161,7 @@ paint_table2 = function(table2, tag, nameClass) {
 };
 
 comparetable_two = function(table1, table2) {
+    var empty_rows = 0;
     // Compare two tables: highlight the differences
     $(function() {
 
@@ -166,9 +178,10 @@ comparetable_two = function(table1, table2) {
                     //console.log(response);
 
                     var result = -2;
-                    if (response && response.length !== 0)
-                        result = compare_cell(table2, question.context, response.context);
-                    //console.log('Result: ' + result );
+                    // if (response && response.length !== 0)
+                    result = compare_cell(table2, question.context, response.context);
+                    //console.log("RESULT: " + result + "TEST:[" + question.context.data + "]");
+
                     if (result == 1) {
 
                         //console.log($('#' + table2));
@@ -183,6 +196,10 @@ comparetable_two = function(table1, table2) {
                         $(this).addClass("warning");
 
                         paint_table2(table2, question.context.data, "warning");
+                    } else if (result == 3) {
+                        paint_table2(table2, question.context.data, "emptycells");
+                        $(this).addClass("emptycells");
+
                     } else {
                         //$($('#' + table2).childNodes[1].childNodes[0]).addClass("error");
                         $(this).addClass("error");
@@ -277,6 +294,7 @@ cleantablediff = function() {
     $('.database_listing .error').removeClass('error');
     $('.database_listing .success').removeClass('success');
     $('.database_listing .warning').removeClass('warning');
+    $('.database_listing .emptycells').removeClass('emptycells');
     $('.database_listing .entry').show();
 }
 
@@ -362,7 +380,12 @@ function filter_results(list_tables, word, show_match, show_unmatch, show_emptyr
         }
 
         // emptyrows
-        hideEmptyCells(list_tables, table_tmp, show_emptyrows);
+        //hideEmptyCells(list_tables, table_tmp, show_emptyrows);
+        if (show_emptyrows) {
+            $('#' + list_tables[table_tmp] + ' .emptycells').show();
+        } else {
+            $('#' + list_tables[table_tmp] + ' .emptycells').hide();
+        }
 
         // filter
         hideTableCell(list_tables, table_tmp, word);
