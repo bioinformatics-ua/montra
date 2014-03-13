@@ -269,6 +269,15 @@ SelectPaginatorPlugin.prototype = {
 }
 
 function paginator_via_post() {
+    var rows = $("#paginator_rows").val();
+    //console.log("Rows: "+rows);
+    $("#page_rows").val(rows);
+
+    $("#paginator_rows").change(function(){
+        $("#page_rows").val($(this).val());
+        $("#send2").submit();
+    });
+
     $("a", ".pagination").each(function() {
         $(this).click(function(e) {
             var parent = $(this).parent("li");
