@@ -57,7 +57,10 @@ function PCDraw(actualChart,chartType, e)
           console.log('do'+filters[data]);
             fV = translations[filters[data]];
         }
-        valueFilters += " , " + fV;
+        if (fV=="Total") fV = "";
+        if (fV=="Male") fV = "(Male)";
+        if (fV=="Female") fV = "(Female)";
+        valueFilters += " " + fV;
       });
       /*valuesFromGraph = PC.getValuesRow(this.chartType, 
         'Count',fingerprintID );*/
