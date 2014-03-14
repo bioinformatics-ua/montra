@@ -41,6 +41,12 @@ def removeh1(value):
 def clean(value):
     return value.replace('//','')
 
+@register.filter(name='escapedots')
+@stringfilter
+def escapedots(value):
+    print value.replace('.','\\\\.')
+    return value.replace('.','\\\\.')
+
 
 @register.filter(name='replaceplicas')
 @stringfilter
@@ -52,6 +58,7 @@ def replaceplicas(value):
 @register.filter(name='removehs')
 @stringfilter
 def removehs(value):
+    value = value.replace('h0. ','')
     value = value.replace('h1. ','')
     value = value.replace('h2. ','')
     value = value.replace('h3. ','')
@@ -117,7 +124,22 @@ def truncate(value):
 
 @register.filter
 def whitespacesplit(str):
-    return str.split()
+    words = []
+
+    for m in re.finditer(r'"(.*?)"', str):
+        words.append(m.group(1))
+        str = str.replace(m.group(0), "")
+
+    words = words + str.strip().split()
+
+    return words
+
+@register.filter
+def ellipsis(str, size):
+    if(len(str) > size):
+        return str[:size]+"..."
+
+    return str
 
 def fingerprints_list():
     

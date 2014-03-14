@@ -1,4 +1,3 @@
-
 /**********************************************************************
 # Copyright (C) 2014 Luís A. Bastião Silva and Universidade de Aveiro
 #
@@ -21,11 +20,11 @@
 
 
 /** This counters was added here by:
-  * Bastiao, Feb 26, 2014
-  * 
-  * The structure will be a dictionary with number of total questions and number of filled questions.
-  * In modern browsers:  questionSets[qId].count and questionSets[qId].filledQuestions
-  */ 
+ * Bastiao, Feb 26, 2014
+ *
+ * The structure will be a dictionary with number of total questions and number of filled questions.
+ * In modern browsers:  questionSets[qId].count and questionSets[qId].filledQuestions
+ */
 var questionSetsCounters = {};
 
 
@@ -42,20 +41,20 @@ function CounterCore(questionnaireId) {
     this.questionnaireId = questionnaireId;
 
     /**
-    * This method counts the number of total questions of a question set
-    *
-    * @method countQuestionSet
-    * @param {Integer} qId Identifier of Question Set (sort to keep the order )
-    * @return {Integer} Returns the number of questions that the question set have.
-    */
-    this.countQuestionSet = function(qId){
-      var counter = 0;
-      // Go for each question set and counts the questions 
-      $('#qs_'+ qId + ' .question').each(function(question){
-          counter = counter + 1;
+     * This method counts the number of total questions of a question set
+     *
+     * @method countQuestionSet
+     * @param {Integer} qId Identifier of Question Set (sort to keep the order )
+     * @return {Integer} Returns the number of questions that the question set have.
+     */
+    this.countQuestionSet = function(qId) {
+        var counter = 0;
+        // Go for each question set and counts the questions 
+        $('#qs_' + qId + ' .question').each(function(question) {
+            counter = counter + 1;
 
         });
-      return counter;
+        return counter;
     };
 
     /**
@@ -67,30 +66,33 @@ function CounterCore(questionnaireId) {
     * @return {Integer} Returns the number of questions that are filled 
       in the question set.
     */
-    this.countFilledQuestionSet = function(qId){
-      var counter = 0;
-      // Go for each question set and counts the questions 
-      $('#qs_'+ qId + ' .hasValue').each(function(question){
+    this.countFilledQuestionSet = function(qId) {
+        var counter = 0;
+        // Go for each question set and counts the questions 
+        $('#qs_' + qId + ' .hasValue').each(function(question) {
 
-          counter = counter + 1;
+            counter = counter + 1;
         });
 
-      return counter;
+        return counter;
 
     };
 
 
     /**
-    * This methods fill the global array to count all questions/filled. 
-    *
-    * @method countFilledQuestionSet
-    * @param {Integer} qId Identifier of Question Set (sort to keep the order )
-    */
-    this.fullCount = function(qId){
-      var filled = this.countFilledQuestionSet(qId);
-      var all = this.countQuestionSet(qId);
-      questionSetsCounters[qId] = {filledQuestions : filled, count: all };
-      return questionSetsCounters[qId] ;
+     * This methods fill the global array to count all questions/filled.
+     *
+     * @method countFilledQuestionSet
+     * @param {Integer} qId Identifier of Question Set (sort to keep the order )
+     */
+    this.fullCount = function(qId) {
+        var filled = this.countFilledQuestionSet(qId);
+        var all = this.countQuestionSet(qId);
+        questionSetsCounters[qId] = {
+            filledQuestions: filled,
+            count: all
+        };
+        return questionSetsCounters[qId];
 
     };
 };
@@ -106,47 +108,56 @@ function CounterCore(questionnaireId) {
 */
 function CounterUI() {
 
-  this.handlers = [];
+    this.handlers = [];
 
 
-  /**
-    * This class update the counts in the graphical interface 
-    *
-    * @method updateCounters
-    * @param {Integer} qId Identifier of Question Set (sort to keep the order )
-    * @param {Dictionary} counters dicionary with the values filledQuestions and count.
-    */
-  this.updateCounters = function(qId, counters){
-    var filled = counters['filledQuestions'];
-    var total = counters['count'];
+    /**
+     * This class update the counts in the graphical interface
+     *
+     * @method updateCounters
+     * @param {Integer} qId Identifier of Question Set (sort to keep the order )
+     * @param {Dictionary} counters dicionary with the values filledQuestions and count.
+     */
+    this.updateCounters = function(qId, counters) {
+        var filled = counters['filledQuestions'];
+        var total = counters['count'];
 
-    var percentage = Math.round((filled/total)*100);
+        if (filled < 0)
+            filled = 0;
 
-    $('#qs_'+ qId + ' .questionset-title label').html(filled + ' of ' + total
-       + ' - ' + percentage + '%');
+        if (total < 0)
+            total = 0;
 
-    var this_label = $('#counter_'+ qId);
-    this_label.html(filled+"/"+total+"<br />"+percentage + '%');
-    this_label.removeClass('hidden');
-  };
+        var percentage = Math.round((filled / total) * 100);
 
+        $('#qs_' + qId + ' .questionset-title label').html(filled + ' of ' + total + ' - ' + percentage + '%');
 
-  /**
-    * This class update the counts in the graphical interface 
-    *
-    * @method updateCounters
-    * @param {Integer} qId Identifier of Question Set (sort to keep the order )
-    * @param {Dictionary} counters dicionary with the values filledQuestions and count.
-    */
-  this.updateCountersClean = function(qId){
-    console.log(qId);
-    this.updateCounters(qId, questionSetsCounters[qId]);
-  };
+        var this_label0 = $('#counter0_' + qId);
+        var this_label1 = $('#counter1_' + qId);
 
-  
+        this_label0.html("&nbsp;(" + filled + "/" + total + ")");
+        this_label0.removeClass('hidden');
+        this_label1.html(percentage + '%');
+        this_label1.removeClass('hidden');
+    };
 
 
-}; 
+    /**
+     * This class update the counts in the graphical interface
+     *
+     * @method updateCounters
+     * @param {Integer} qId Identifier of Question Set (sort to keep the order )
+     * @param {Dictionary} counters dicionary with the values filledQuestions and count.
+     */
+    this.updateCountersClean = function(qId) {
+        console.log(qId);
+        this.updateCounters(qId, questionSetsCounters[qId]);
+    };
+
+
+
+
+};
 
 
 /**
@@ -160,47 +171,47 @@ function CounterUI() {
 */
 function CounterTasker(ui, questionnaireId) {
 
-  this.POLL_MAX = 20;
-  this.questionnaireId = questionnaireId;
-  this.ui = ui;
+    this.POLL_MAX = 20;
+    this.questionnaireId = questionnaireId;
+    this.ui = ui;
 
 
-  /**
-    * Run all the task for update counters at init process
-    *
-    * @method run
+    /**
+     * Run all the task for update counters at init process
+     *
+     * @method run
+     
+     */
+    this.run = function() {
+        var threadpool = new ThreadPool(this.POLL_MAX);
+        var core = new CounterCore(this.questionnaireId);
 
-    */
-  this.run = function(){
-    var threadpool = new ThreadPool(this.POLL_MAX);
-    var core = new CounterCore(this.questionnaireId);
-    function count(_core,  qId, _ui)
-    {
+        function count(_core, qId, _ui) {
 
-        // Execute update 
-        var counters = _core.fullCount(qId);
-        _ui.updateCounters(qId,counters );
-        // Set this task to be completed. 
-        this.complete();
-    }
-    var self = this;
-    $('.questionset').each(function(qsetId){
-          if (qsetId!=0 && qsetId!=99) {
-            var runnable = new Runnable(count, 1, core, qsetId, self.ui);
-            threadpool.run(runnable);
-          }
+            // Execute update 
+            var counters = _core.fullCount(qId);
+            _ui.updateCounters(qId, counters);
+            // Set this task to be completed. 
+            this.complete();
+        }
+        var self = this;
+        $('.questionset').each(function(qsetId) {
+            if (qsetId != 0 && qsetId != 99) {
+                var runnable = new Runnable(count, 1, core, qsetId, self.ui);
+                threadpool.run(runnable);
+            }
         });
-    threadpool.destroy();
+        threadpool.destroy();
 
-  };
+    };
 
 
 };
 
-$(document).ready(function () {
-  var core = new CounterCore();
-  var ui = new CounterUI();
-  var tasker = new CounterTasker(ui, 0);
-  tasker.run();
+$(document).ready(function() {
+    var core = new CounterCore();
+    var ui = new CounterUI();
+    var tasker = new CounterTasker(ui, 0);
+    tasker.run();
 
 });
