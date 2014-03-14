@@ -731,6 +731,7 @@ class RequestMonkeyPatch(object):
 
 def extract_answers(request2, questionnaire_id, question_set, qs_list):
 
+    
     question_set2 = question_set
     request = request2
     # Extract files if they exits 
@@ -788,7 +789,7 @@ def extract_answers(request2, questionnaire_id, question_set, qs_list):
             if (len(answer) == 2):
                 ans['ANSWER'] = value
             elif (len(answer) == 3):
-                ans[answer[2]] = value
+                ans[key] = value
             else:
                 print "Poorly formed form element name: %r" % answer
                 logging.warn("Poorly formed form element name: %r" % answer)
@@ -904,7 +905,7 @@ def extract_answers(request2, questionnaire_id, question_set, qs_list):
                     qvalues[question.number] = cd['default']
                 if Type in QuestionProcessors:
 
-                    qdict.update(QuestionProcessors[Type](request, question))
+                    qdict.update(QuestionProcessors[Type](request2, question))
                     try:
                         qdict['comment'] = extra_comments[question]
                     except KeyError:
