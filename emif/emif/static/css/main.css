@@ -487,3 +487,7 @@ label input[type="radio"], label input[type="checkbox"]{
   width: 55px;
   text-align: center !important;
 }
+
+.paginator-page-selector{
+  color: #08c !important;
+}

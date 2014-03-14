@@ -123,7 +123,7 @@ PaginatorSorter.prototype = {
                     context.submitthis();
                 } else {
                     $("#table_content").html('<td colspan="9999"><center>No results to show</center></td>');
-                    $(".pagination").html('<td colspan="9999"><center>No results to show</center></td>');
+                    $(".pagination, .pagination-centered").html('');
                     //console.log('NOTSUCCESS');
                     /*
   					for(filter in context.filters){ 	
@@ -269,9 +269,23 @@ SelectPaginatorPlugin.prototype = {
 }
 
 function paginator_via_post() {
+    var rows = $("#paginator_rows").val();
+    //console.log("Rows: "+rows);
+    $("#page_rows").val(rows);
+
+    $("#paginator_rows").change(function(){
+        $("#page_rows").val($(this).val());
+        $("#send2").submit();
+    });
+
     $("a", ".pagination").each(function() {
         $(this).click(function(e) {
-
+            var parent = $(this).parent("li");
+            if(parent.hasClass("active") || parent.hasClass("disabled")){
+                e.preventDefault();
+                return false;
+            }
+            
             var href = $(this).attr("href");
             console.log(href);
             var patt = /\/(\d+)/g;

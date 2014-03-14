@@ -181,7 +181,7 @@ def results_fulltext(request, page=1, full_text=True,template_name='results.html
 
 def results_fulltext_aux(request, query, page=1, template_name='results.html', isAdvanced=False, force=False):
     
-    rows = 5
+    rows = define_rows(request)
     if request.POST and "page" in request.POST and not force:
         page = request.POST["page"]
 
@@ -224,11 +224,11 @@ def results_fulltext_aux(request, query, page=1, template_name='results.html', i
         
     if isAdvanced == True:
         return render(request, template_name, {'request': request,
-                                           'num_results': hits, 'page_obj': pager,
+                                           'num_results': hits, 'page_obj': pager, 'page_rows': rows,
                                             'breadcrumb': True, 'isAdvanced': True, "sort_params": sort_params, "page":page})
     else :
         return render(request, template_name, {'request': request,
-                                           'num_results': hits, 'page_obj': pager, 'breadcrumb': True, 'search_old': query_old, 'isAdvanced': False, "sort_params": sort_params, "page":page})
+                                           'num_results': hits, 'page_obj': pager, 'page_rows': rows,'breadcrumb': True, 'search_old': query_old, 'isAdvanced': False, "sort_params": sort_params, "page":page})
 
 
 def store_query(user_request, query_executed):
@@ -1323,7 +1323,7 @@ def databases(request, page=1, template_name='databases.html', force=False):
     if user.is_superuser:
         _filter = "user_t:*" 
 
-    rows = 5
+    rows = define_rows(request)
     if request.POST and not force:
         page = request.POST["page"]
 
@@ -1363,7 +1363,7 @@ def databases(request, page=1, template_name='databases.html', force=False):
 
     return render(request, template_name, {'request': request, 'export_my_answers': True,
                                            'list_databases': list_databases, 'breadcrumb': True, 'collapseall': False,
-                                           'page_obj': pager,
+                                           'page_obj': pager, 'page_rows': rows,
                                            'api_token': True, 
                                            'owner_fingerprint': False,
                                            'add_databases': True, "sort_params": sort_params, "page":page})
@@ -1494,9 +1494,20 @@ def paginator_process_list(list_databases, hits, start):
 #                                            'owner_fingerprint': False,
 #                                            'add_databases': True})
 
+def define_rows(request):
+    if request.POST and "page_rows" in request.POST:
+        rows = int(request.POST["page_rows"])
+        if rows == -1:
+            rows = 99999
+    else:
+        rows = 5
+
+    return rows
 # GET ALL DATABASES ACCORDING TO USER INTERESTS
 def all_databases_user(request, page=1, template_name='alldatabases.html', force=False):
-    rows = 5
+    
+    rows = define_rows(request)
+
     if request.POST and not force:
         page = request.POST["page"]
 
@@ -1552,11 +1563,11 @@ def all_databases_user(request, page=1, template_name='alldatabases.html', force
                                            'list_databases': list_databases,
                                             'breadcrumb': True, 'collapseall': False, 
                                             'geo': True,
-                                            'page_obj': pager,
+                                            'page_obj': pager, "page_rows": rows,
                                             'add_databases': True, "sort_params": sort_params, "page":page})
 
 def all_databases(request, page=1, template_name='alldatabases.html'):
-    
+    print "FUUUUUUUUUUUU"
     # lets clear the geolocation session search filter (if any)
     try:
         del request.session['query']
@@ -1570,7 +1581,13 @@ def all_databases(request, page=1, template_name='alldatabases.html'):
     list_databases = get_databases_from_solr(request, "*:*")
 
     ## Paginator ##
-    rows = 5
+    print "TIAGO"
+    print request.POST
+    if request.POST:
+        rows = request.POST["page_rows"]
+        print "ROWWWWWS" + str(rows)
+    else:
+        rows = 5
     myPaginator = Paginator(list_databases, rows)
     try:
         pager =  myPaginator.page(page)
@@ -1583,6 +1600,7 @@ def all_databases(request, page=1, template_name='alldatabases.html'):
                                             'breadcrumb': True, 'collapseall': False, 
                                             'geo': True,
                                             'page_obj': pager,
+                                            'page_rows': rows,
                                             'add_databases': False,
                                             'hide_add': True})
 
@@ -2885,7 +2903,7 @@ def create_auth_token(request, page=1, templateName='api-key.html', force=False)
     """
     Method to create token to authenticate when calls REST API
     """
-    rows = 5
+    rows = define_rows(request)
     if request.POST and not force:
         page = request.POST["page"]
 
@@ -2921,7 +2939,7 @@ def create_auth_token(request, page=1, templateName='api-key.html', force=False)
     ## End Paginator ##
 
     return render_to_response(templateName, {'list_databases': list_databases, 'token': token, 'user': user,
-                              'request': request, 'breadcrumb': True, 'page_obj': pager, "sort_params": sort_params, "page":page}, RequestContext(request))
+                              'request': request, 'breadcrumb': True, 'page_obj': pager, 'page_rows': rows, "sort_params": sort_params, "page":page}, RequestContext(request))
 
 
 def sharedb(request, db_id, template_name="sharedb.html"):
