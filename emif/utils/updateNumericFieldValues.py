@@ -23,15 +23,15 @@ def query(solr, id):
 	return results
 
 updateList = [{
-        "number_active_patients_jan2012_t": "3600000",
+        "number_active_patients_jan2012_t": "3.600.000",
         "id": "768185357ce7e4e0aeae6d2e69f6d7e0"
       },
       {
-        "number_active_patients_jan2012_t": "1800000",
+        "number_active_patients_jan2012_t": "1.800.000",
         "id": "2b9291151f7b3f2fd1fed0d876e59b7a"
       },
       {
-        "number_active_patients_jan2012_t": "50000",
+        "number_active_patients_jan2012_t": "50.000",
         "id": "21d11ac0eb3f0bb30c094fb7caf5e28d"
       },
       {
@@ -39,11 +39,11 @@ updateList = [{
         "id": "45b7ccb3aca47bc37f9bd82504f09b3b"
       },
       {
-        "number_active_patients_jan2012_t": "900000",
+        "number_active_patients_jan2012_t": "900.000",
         "id": "52d4981701f0126d947014244744efea"
       },
       {
-        "number_active_patients_jan2012_t": "324234",
+        "number_active_patients_jan2012_t": "324.234",
         "id": "66a47f694ffb676bf7676dfde24900e6"
       },
       {
@@ -51,19 +51,19 @@ updateList = [{
         "id": "2151825ca52388e960d1ed0728dc38b2"
       },
       {
-        "number_active_patients_jan2012_t": "1800000",
+        "number_active_patients_jan2012_t": "1.800.000",
         "id": "54d8384917b21fb7928ba72a1e72326b"
       },
       {
-        "number_active_patients_jan2012_t": "1000",
+        "number_active_patients_jan2012_t": "1.000",
         "id": "7b128593480b53409ac83c9582badbb7"
       },
       {
-        "number_active_patients_jan2012_t": "150000",
+        "number_active_patients_jan2012_t": "150.000",
         "id": "5d8f88d91f1dc3e2806d825f61260b76"
       },
       {
-        "number_active_patients_jan2012_t": "5000000",
+        "number_active_patients_jan2012_t": "5.000.000",
         "id": "cc7f3a8f8af0f6c99f9385c7372c8fe3"
       },
       {
@@ -71,7 +71,7 @@ updateList = [{
         "id": "a201c870db5c30a7371d0c0d4eb11f5f"
       },
       {
-        "number_active_patients_jan2012_t": "3828859",
+        "number_active_patients_jan2012_t": "3.828.859",
         "id": "7a205644571c31bc50965c68d7565622"
       }]
 
