@@ -28,7 +28,7 @@ def add_city(qlist_general):
     # iterate until we find the location field (City or location fields)
     for qs_aux, qlist in qlist_general:
         for question, qdict in qlist:
-            print question.text
+            
             if question.text == 'Location' or question.text == 'City':
                 city_name = qdict['value'].lower()
                 # check if the city is on the db
