@@ -249,6 +249,7 @@ INSTALLED_APPS = (
 
     'searchengine',
     'api',
+    'fingerprint',
     'control_version',
     'docs_manager',
     'population_characteristics',

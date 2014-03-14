@@ -38,6 +38,7 @@ from searchengine.models import Slugs
 import searchengine.search_indexes
 from searchengine.search_indexes import index_answeres_from_qvalues
 from searchengine.search_indexes import convert_text_to_slug
+from fingerprint.models import Fingerprint
 from emif.utils import *
 from emif.models import *
 from questionnaire.models import Answer
@@ -680,6 +681,14 @@ def render_one_questionset(request, q_id, qs_id, errors={}, aqid=None, template_
                 fingerprint_id=fingerprint_id,
                 breadcrumb=True,
         )
+
+        # Add fingerprint hash to DB
+        try:
+            fp = Fingerprint(fingerprint_hash=fingerprint_id)
+            fp.save()
+        except:
+            print fingerprint_id + ' already added'
+
         r['Cache-Control'] = 'no-cache'
         r['Expires'] = "Thu, 24 Jan 1980 00:00:00 GMT"
 
@@ -1022,6 +1031,14 @@ def database_edit(request, fingerprint_id, questionnaire_id, template_name="data
             created_date=created_date,
             hide_add=True
     )
+
+    # Add fingerprint hash to DB
+    try:
+        fp = Fingerprint(fingerprint_hash=fingerprint_id, description=fingerprint_name.encode('utf-8'))
+        fp.save()
+    except:
+        print fingerprint_id + ' already added'
+
     r['Cache-Control'] = 'no-cache'
     r['Expires'] = "Thu, 24 Jan 1980 00:00:00 GMT"
         
@@ -2378,6 +2395,14 @@ def check_database_add_conditions(request, questionnaire_id, sortid,
                 breadcrumb=True,
                 extra_fields=extra_fields
         )
+
+    # Add fingerprint hash to DB
+    try:
+        fp = Fingerprint(fingerprint_hash=fingerprint_id)
+        fp.save()
+    except:
+        print fingerprint_id + ' already added'
+
     r['Cache-Control'] = 'no-cache'
     r['Expires'] = "Thu, 24 Jan 1980 00:00:00 GMT"
 
@@ -2685,6 +2710,7 @@ def show_fingerprint_page_read_only(request, q_id, qs_id, SouMesmoReadOnly=False
 
         errors = {}
         fingerprint_id = generate_hash()
+
         r = r2r(template_name, request,
                 questionset=question_set,
                 questionsets=question_set.questionnaire.questionsets,
@@ -2706,8 +2732,15 @@ def show_fingerprint_page_read_only(request, q_id, qs_id, SouMesmoReadOnly=False
                 q_id=q_id,
                 aqid=aqid,
                 serialized_query=serialized_query
-                
         )
+
+        # Add fingerprint hash to DB
+        try:
+            fp = Fingerprint(fingerprint_hash=fingerprint_id)
+            fp.save()
+        except:
+            print fingerprint_id + ' already added'
+
         r['Cache-Control'] = 'no-cache'
         r['Expires'] = "Thu, 24 Jan 1980 00:00:00 GMT"
 
@@ -2898,7 +2931,7 @@ def create_auth_token(request, page=1, templateName='api-key.html', force=False)
     else:
         token = Token.objects.get(user=user)
 
-    _filter = "user_t:" + user.username
+    _filter = "user_t:" + '"' + user.username + '"'
 
     (sortString, filterString, sort_params, range) = paginator_process_params(request.POST, page, rows)    
         
