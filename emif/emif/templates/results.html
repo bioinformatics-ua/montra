@@ -218,19 +218,12 @@
 </table>
 
   </form>
-  <form id="send2" method="POST" > 
-  <input id="page" type="hidden" name="page" value="{{page}}"></input>
-  <input id="s" type="hidden" name="s" value=""></input>  
-    <input id="submit_simulate" style="display:none" type="submit" value="Submit">
-
-{% csrf_token %}
-</form>
     {% else %}
     <div style="margin-top: 60px;"></div>
   {% endif %}
 
   {% if page_obj != None %}
-    {% bootstrap_paginate page_obj range=10 url_view_name="views.results_diff" show_prev_next="false" show_first_last="true" %}
+    {% include "post_paginator.html" %}
 
 {% endif %}
 {% endblock %}
@@ -252,7 +245,6 @@ $(document).ready(function(){
     //TO Be Applied in future releases.
     a.atachPlugin(new SelectPaginatorPlugin());
 
-    paginator_via_post();
   if(a != undefined && a.plugin != undefined){
 
     var dbcount = updateSelectCount();
