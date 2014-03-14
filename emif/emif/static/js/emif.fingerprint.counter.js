@@ -122,6 +122,12 @@ function CounterUI() {
         var filled = counters['filledQuestions'];
         var total = counters['count'];
 
+        if (filled < 0)
+            filled = 0;
+
+        if (total < 0)
+            total = 0;
+
         var percentage = Math.round((filled / total) * 100);
 
         $('#qs_' + qId + ' .questionset-title label').html(filled + ' of ' + total + ' - ' + percentage + '%');
