@@ -76,14 +76,13 @@
 
           <h4>
               <span id="results_size"></span>
-            {% if page_obj != None %}
-            Total results 
-              {%if not isAdvanced %}
+            {% if page_obj != None %}            
+            <span class="label label-inverse"> {{num_results}}</span> results found
+            {%if not isAdvanced %}
                 for {{search_old}}
               {% endif %}
-            <span class="label label-inverse"> {{num_results}}</span>
             {% else %}
-            No results found 
+            No results found<br><button id="refine_search_btn" class="btn btn-link">Try to refine your search</button>
           {% endif %}
           </h4>
         </div>
@@ -283,6 +282,16 @@ $(document).ready(function(){
 });
 {% endif %}
 
+$(document).ready(function(){
+  $("#refine_search_btn").click( function(){
+      {% if isAdvanced %}
+      window.location.replace($('#base_link').prop('href')+"advancedSearch/{{request.session.query_type}}/1/{{request.session.query_id}}");
+      {% else %}
+        $("input[name=query]").focus();
+      {% endif %}  
+    });    
+});
+
  {% if isAdvanced %}
  var bool_container;
 $(function(){
@@ -290,7 +299,6 @@ $(function(){
    
     window.setTimeout(function(){window.location.hash = "#back";}, 100);
     window.setTimeout(function(){window.location.hash = "#search";}, 100);
-
 });
   /* This is a trick, to be able to redirect on back button since browsers try to prevent us to do so 
    I must do this, because the back url is different from the url on history */
