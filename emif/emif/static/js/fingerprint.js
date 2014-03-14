@@ -231,7 +231,9 @@ $(document).ready(function() {
 
         id_answered = id_answered.replace('acc_qc_', '');
 
-        console.log("ID_ANSWERED: " + id_answered);
+        id_answered = id_answered.replace('qc_', '');
+
+        //console.log("ID_ANSWERED: " + id_answered);
         // Since were using name="" as selector, we dont need to do the escaping 
         //id_answered = id_answered.replace('.','\\.');
         //id_answered = replaceall(id_answered, '.','\\.')
@@ -247,7 +249,7 @@ $(document).ready(function() {
         return str.indexOf(suffix, str.length - suffix.length) !== -1;
     }
     advValidator.onInit();
-    $(document).on('change', '.answer input,.answer select,.answer textarea, button', function(e) {
+    $(document).on('change', '.answer input,.answer select,.answer textarea', function(e) {
         e.preventDefault();
 
         if (endsWith($(this).attr('id'), "_opt"))
@@ -262,12 +264,15 @@ $(document).ready(function() {
 
 
         //Detects widget class and sends it to the advanced validator.
-        var className = $('[id="qc_' + id_answered + '"]').attr("class");
-        className = classNamePatternAUX.exec(className)[1];
-        if (className != undefined) {
-            advValidator.validate(className, id_answered, el);
+        try{
+            var className = $('[id="qc_' + id_answered + '"]').attr("class");
+            className = classNamePatternAUX.exec(className)[1];
+            if (className != undefined) {
+                advValidator.validate(className, id_answered, el);
+            }
+        } catch(err){
+            console.warn("There was a error validating a field.");
         }
-
 
         var valueCounter = 0;
 
@@ -282,11 +287,15 @@ $(document).ready(function() {
             if (toSum && toSum2) {
                 valueCounter = 0;
             }
-            console.log('after' + valueCounter);
+            //console.log('QID: ' + qId);
             /* Update Counter */
-            questionSetsCounters[qId]['filledQuestions'] = questionSetsCounters[qId]['filledQuestions'] + valueCounter;
-            var ui = new CounterUI();
-            ui.updateCountersClean(qId);
+            try{ 
+                questionSetsCounters[qId]['filledQuestions'] = questionSetsCounters[qId]['filledQuestions'] + valueCounter;
+                var ui = new CounterUI();
+                ui.updateCountersClean(qId);
+            } catch(err){
+                console.warn("Tried to update a non tracked input");
+            }
         }
 
 
