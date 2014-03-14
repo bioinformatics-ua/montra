@@ -37,7 +37,7 @@ function getFingerprintID(){
 
 };
 
-
+var filtersMap = {};
 var translations = {};
 var translationsBack = {};
 var activeChart='';
@@ -239,7 +239,7 @@ function PCAPI ()
 
     };
 
-    var filtersMap = {};
+    
     translations = {};
     translationsBack = {};
     
@@ -270,20 +270,15 @@ function PCAPI ()
 
               self.append(tmpUl);
               console.log(xFilter);
+              if (xFilter.name == "Gender")
+              {
+                  xFilter.values.push("ALL");                
+              }
+
               $.each(xFilter.values, function (data){
 
                   if (xFilter.values[data]==="")
                       return;
-                    /*if ('values.' + xFilter.name in filtersMap)
-                    {
-                      console.log(xFilter.name);
-                      filtersMap['values.' + xFilter.name].push(xFilter.values[data]);
-                    }
-                    else
-                    {
-                      console.log(xFilter.name);
-                      filtersMap['values.' + xFilter.name] = [xFilter.values[data]];
-                    }*/
 
 
                   var fType = xFilter.name;
@@ -302,8 +297,6 @@ function PCAPI ()
                         translationsBack[xFilter['translation'][originalValue]] = originalValue;
                         originalValue = xFilter['translation'][originalValue];
                     }
-                    
-
                       
                   }
                   
@@ -313,7 +306,10 @@ function PCAPI ()
                   
                     
               });
+
+
             });
+            
 
 
             /** The magic of the filters will happen here */ 
@@ -322,6 +318,7 @@ function PCAPI ()
                       e.preventDefault(); 
                       e.stopPropagation();
 
+                      console.log()
 
                       var charDraw = new PCDraw(actualChart, activeChart, null);
 
@@ -333,8 +330,19 @@ function PCAPI ()
                       {
                           _value = translationsBack[_value];
                       } 
-                      filtersMap['values.'+filterType] = [_value];
+                      /*if(filtersMap['values.'+filterType])
+                      {
+                        filtersMap['values.'+filterType] = [_value, filtersMap['values.'+filterType][0]];
+                      }
+                      else
+                      {
+                        filtersMap['values.'+filterType] = [_value];  
+                      }*/
+                      filtersMap['values.'+filterType] = [_value];  
+                      console.log("filterMap:");
+                      console.log(filtersMap);
                       charDraw.refresh(getFiltersSelected());
+                      
                       
                       $("." + filterType).closest('li').removeClass("active");
                       $(this.parentNode).closest('li').addClass("active");
@@ -386,6 +394,10 @@ function PCAPI ()
                     { 
                       e.preventDefault(); 
                       e.stopPropagation();
+
+                      filtersMap = {};
+                      translations = {};
+                      translationsBack = {};
   
                       
                       // Anyone have a better suggestion to do it?

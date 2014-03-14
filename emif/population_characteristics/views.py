@@ -37,8 +37,14 @@ def jerboa_list_values(request, var, row, fingerprint_id, template_name='documen
         # Get the filters to apply.
 
         filters = {}
-        for i in request.POST:
-            filters[i[0:-2]] = request.POST[i]
+        print request.POST
+        myRq = dict(request.POST.lists())
+        for i in myRq:
+            print i
+            print myRq[i]
+            import pdb
+            
+            filters[i[0:-2]] = myRq[i]
 
         print "Filters" + str(filters)
     

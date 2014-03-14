@@ -17,7 +17,13 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 ***********************************************************************/
-
+Array.max = function( array ){
+    return Math.max.apply( Math, array );
+};
+ 
+Array.min = function( array ){
+    return Math.min.apply( Math, array );
+};
 
 
 function GraphicChartC3D3(divArg, dataArg)
@@ -30,6 +36,7 @@ function GraphicChartC3D3(divArg, dataArg)
   this.xscale = null ;
   this.yscale = null ;
   this.legend = false;
+  this.multivalue_comp = {}; 
   this.self = this;
 
   this.init = function(){
@@ -44,26 +51,66 @@ function GraphicChartC3D3(divArg, dataArg)
     xscale.bins = 25;
     var i = 1;
     legend = actualChart.legend;
+    multivalue_comp = {};
     datasetY = [actualChart.title['var']];
     datasetX = ['x'];
     
     datasetYs = [];
     var i = 0;
     
+
+    console.log("translateDatatranslateDatatranslateDatatranslateDatatranslateDatatranslateData");
+    console.log(objects);
     if (actualChart.y_axis.multivalue)
       {
-        actualChart.y_axis['var'].forEach(function(a){
+        if($.type(actualChart.y_axis['var']) === "string") {
+            
+            $.each(actualChart.filters, function(a){
+              console.log("actualChart.filters[a]['name']");
+              console.log(actualChart.filters[a]['name']);
+              console.log(datasetYs);
+              if (actualChart.filters[a]['name']=="Gender")
+              {
+                $.each(actualChart.filters[a]['translation'], function(tr) {
+                  console.log(tr);
+                    if (tr!="ALL")
+                    {
+                      datasetYs.push([tr]);
+
+                      multivalue_comp[tr] = datasetYs[datasetYs.length-1];
+  
+                    }
+                    
+
+                  });
+
+              }
+              
+
+            });
+            datasetX = ['x'];
+
+          
+        }
+        else
+        {
+
+          actualChart.y_axis['var'].forEach(function(a){
           i = i +1;
           datasetYs.push([a]);
-        });
-        datasetX = ['x'];
+          });
+          datasetX = ['x'];
+
+        }
+        
       }
-    
+
+    var _xValuesMV = {};
     objects.values.forEach(function(row){
       /*datasetX.push(parseInt(row.Value1));
       datasetY.push(parseInt(row.Count));*/
       
-      if (actualChart.x_axis.categorized )
+      if (actualChart.x_axis.categorized && !actualChart.y_axis.multivalue )
       {
         if ( row[actualChart.x_axis['var']] != ""){
           datasetX.push(row[actualChart.x_axis['var']]);  
@@ -76,11 +123,27 @@ function GraphicChartC3D3(divArg, dataArg)
       {
         
         var k = 0;
-        datasetX.push(row[actualChart.x_axis['var']]);  
-        actualChart.y_axis['var'].forEach(function(a){
+        if (!_xValuesMV[row[actualChart.x_axis['var']]])
+        {
+          datasetX.push(row[actualChart.x_axis['var']]);  
+        }
+        
+        _xValuesMV[row[actualChart.x_axis['var']]] = true;
+        if($.type(actualChart.y_axis['var']) === "string") {
+           
+            
+            var _vv = parseFloat(row[actualChart.y_axis['var']]);
+            _vv = +_vv || 0;
+
+            multivalue_comp[row['Gender']].push(_vv);  
+
+
+        } else {
+          actualChart.y_axis['var'].forEach(function(a){
           datasetYs[k].push(parseFloat(row[a.trim()]));  
           k = k +1 ;
-        });
+          });
+        }
           
       }
       else
@@ -95,8 +158,10 @@ function GraphicChartC3D3(divArg, dataArg)
   };
 
   this.draw = function(div, dataset){
+
     var tmpValue = actualChart.title['var'];
-    var chartConfigs = {
+
+    chartConfigs = {
          padding: {
         left: 100,
 
@@ -144,21 +209,27 @@ function GraphicChartC3D3(divArg, dataArg)
       };
     chartConfigs.data.types[tmpValue] = 'bar';
 
-    if (actualChart.x_axis.categorized)
+    if (actualChart.x_axis.categorized && !actualChart.y_axis.multivalue)
     {
         var arr2 = datasetX.slice(0);
         arr2.shift();
         chartConfigs.axis.x.type = 'categorized';
         chartConfigs.axis.x.categories = arr2;
-        chartConfigs.data.columns = [datasetY];
+        
+        chartConfigs.data.columns = [datasetY];  
+        
+        
         chartConfigs.data.xs = {};
+        chartConfigs.data.x = {};
         
     }
+    
     if (actualChart.y_axis.multivalue)
     {
       
       var arrX = datasetX.slice(0);
-      var arrYs = datasetYs.slice(0);
+      var arrYs = datasetYs;
+
       arrYs.push(arrX);
 
       chartConfigs = {
@@ -172,14 +243,19 @@ function GraphicChartC3D3(divArg, dataArg)
           x : 'x',
             
           columns: 
-            arrYs,
+            datasetYs,
           
           
         },
         axis: {
           x: {
             label_position : {},
-            tick: { format: function (x) {return parseInt(x)}
+            tick: { format: function (x) {
+              console.log("x");
+              console.log(x);
+              if ($.type(x) === "string") { return x; }
+              return parseInt(x);
+            }
           },
 
           },
@@ -194,8 +270,58 @@ function GraphicChartC3D3(divArg, dataArg)
         }
         
       };
+      if($.type(actualChart.y_axis['var']) === "string") {
+        chartConfigs.data.types = {};
+
+        chartConfigs.data.types['T'] = 'bar';
+        if (actualChart.x_axis.categorized )
+        {
+            var arr2 = datasetX.slice(0);
+            arr2.shift();
+            chartConfigs.axis.x.type = 'categorized';
+            chartConfigs.axis.x.categories = arr2;
+            $.each(chartConfigs.data.columns, function(d){
+                if (chartConfigs.data.columns[d][0]=="x"){
+                  chartConfigs.data.columns[d] = ["x"];
+                }
+            });
+            chartConfigs.data.xs = {};
+            chartConfigs.data.x = {};
+            
+        }
+        if (datasetYs.length==4)
+        {
+            if (datasetYs[1].length!=1 && datasetYs[2].length!=1 && datasetYs[3].length!=1)
+            {
+              chartConfigs.data.types['T'] = '';
+              var arrY1 = datasetYs[0].slice(1);
+              var arrY2 = datasetYs[1].slice(1);
+
+              chartConfigs.axis.y['max'] = Math.max(Array.max(arrY1), Array.max(arrY2));
+              chartConfigs.axis.y['min'] = 0;
+            }
+        }
+        
+        chartConfigs.data.types['M'] = 'bar';
+        chartConfigs.data.types['F'] = 'bar';
+        
+        
+        
+        legend = true;
+        //chartConfigs.data.x = {};
+        chartConfigs.axis.x['tick'] = { format: function (x) {
+             // console.log(x)
+              if ($.type(x) === "string") {
+                  return x;
+              } 
+
+            return parseInt(x);
+            } };
+         
+      }
       
     }
+
     chartConfigs.axis.x['label'] = actualChart.x_axis['label'];
     chartConfigs.axis.y['label'] =actualChart.y_axis['label'];
     chartConfigs.axis.x['label_position']['dy'] = "3.5em";
@@ -207,6 +333,7 @@ function GraphicChartC3D3(divArg, dataArg)
     
     console.log('chartConfigs');
     console.log(chartConfigs);
+    
     try{var chart = c3.generate(chartConfigs);}
     catch(ex)
     {
