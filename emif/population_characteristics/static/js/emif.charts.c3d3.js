@@ -291,7 +291,7 @@ function GraphicChartC3D3(divArg, dataArg)
         }
         if (datasetYs.length==4)
         {
-            if (datasetYs[1].length!=1 && datasetYs[2].length!=1 && datasetYs[3].length!=1)
+            if (datasetYs[0].length!=1 && datasetYs[1].length!=1 && datasetYs[2].length!=1)
             {
               chartConfigs.data.types['T'] = '';
               var arrY1 = datasetYs[0].slice(1);
