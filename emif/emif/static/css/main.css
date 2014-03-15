@@ -496,3 +496,7 @@ label input[type="radio"], label input[type="checkbox"]{
 #edit_profile_form  label input[type="checkbox"]{
   margin-top: 5px;
 }
+
+.minwidth250{
+  min-width: 250px;
+}
