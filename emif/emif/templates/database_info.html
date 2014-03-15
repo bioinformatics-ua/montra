@@ -317,9 +317,8 @@ $(document).ready(function() {
         }        
     });
 
-    var json_aux = '{{apiinfo}}';
-console.log("ayx" + json_aux.length);
-console.log("ayx" + json_aux);
+    var json_aux = '{{apiinfo|safe}}';
+
     
     if (json_aux == '' || json_aux == null || json_aux.length == 2) {
         $("#pivot_table_extra_information").html('No information available. You can add information from external applications with <a href="api-info">API web services.</a>');
@@ -327,7 +326,7 @@ console.log("ayx" + json_aux);
         $("#btn_pivot_table").removeClass("hidden");
         $("#btn_pivot_table").addClass("show");
         json_aux = json_aux.replace("/&quot;/g", "\"");
-        alert(json_aux);
+        
         json = JSON.parse(json_aux);
         //console.log(json_aux);
         //console.log(json);
