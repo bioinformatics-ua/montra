@@ -491,3 +491,12 @@ label input[type="radio"], label input[type="checkbox"]{
 .paginator-page-selector{
   color: #08c !important;
 }
+
+#edit_profile_form label input[type="radio"], 
+#edit_profile_form  label input[type="checkbox"]{
+  margin-top: 5px;
+}
+
+.minwidth250{
+  min-width: 250px;
+}
