@@ -25,10 +25,10 @@ from emif.models import City
 from geopy import geocoders 
 
 def add_city(qlist_general):
-    print 'Adding city'
     # iterate until we find the location field (City or location fields)
     for qs_aux, qlist in qlist_general:
         for question, qdict in qlist:
+            
             if question.text == 'Location' or question.text == 'City':
                 city_name = qdict['value'].lower()
                 # check if the city is on the db
@@ -60,8 +60,9 @@ def add_city(qlist_general):
 def retrieve_geolocation(city_name):
 
     try:
-        g = geocoders.GeoNames(username='bastiao')
-
+        #g = geocoders.GeoNames(username='bastiao')
+        g = geocoders.GoogleV3()
+        
         if g == None:
             return None
 

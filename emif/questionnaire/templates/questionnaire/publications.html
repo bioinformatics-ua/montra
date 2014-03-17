@@ -6,34 +6,34 @@
 
     <div class="control-group span12" >
         <label class="control-label span2">Pubmed id: </label>
-        <input class="" type="text" id="question_{{ question.number|removedots }}_pubmedid" />
+        <input class="span5" type="text" id="question_{{ question.number|removedots }}_pubmedid" />
         <button id="loadpubbtn" style="margin-bottom:10px;" type="button" class="btn btn-primary disabled" ><i style="color:white;" class="icon-large icon-search icon-white"></i></button>
     </div>
 
 
     <div class="control-group span12">
         <label class="control-label span2 ">Publication title:</label>
-        <input class="" type="text" id="question_{{ question.number|removedots }}_pubtitle" cols="80" />    
+        <input class="span5" type="text" id="question_{{ question.number|removedots }}_pubtitle" cols="80" />    
     </div>
     <div class="control-group span12">
         <label class="control-label span2">Journal:</label>
-        <input class="" type="text" id="question_{{ question.number|removedots }}_pubjournal" />    
+        <input class="span5" type="text" id="question_{{ question.number|removedots }}_pubjournal" />    
     </div>
     <div class="control-group span12" >
         <label class="control-label span2">Year:</label>
-        <input class="" type="text" id="question_{{ question.number|removedots }}_pubyear" />  
+        <input class="span5" type="text" id="question_{{ question.number|removedots }}_pubyear" />  
     </div>
     <div class="control-group span12">
         <label class="control-label span2">Volume:</label>
-        <input class="" type="text" id="question_{{ question.number|removedots }}_pubvolume" />    
+        <input class="span5" type="text" id="question_{{ question.number|removedots }}_pubvolume" />    
     </div >
     <div class="control-group span12">
         <label class="control-label span2">Pages:</label>
-        <input class="" type="text" id="question_{{ question.number|removedots }}_pubpages" />    
+        <input class="span5" type="text" id="question_{{ question.number|removedots }}_pubpages" />    
     </div>
     <div class="control-group span12">
         <label class="control-label span2">Authors (last name initials):</label>
-        <input class="" type="text" id="question_{{ question.number|removedots }}_pubauthors" />    
+        <input class="span5" type="text" id="question_{{ question.number|removedots }}_pubauthors" />    
     </div>
     
     <div class="control-group span12">
@@ -76,6 +76,22 @@
 
 
 <script type="text/javascript">
+var publications_counter = 0;
+function pubcounterupdate(){
+    publications_counter--;
+
+    if(publications_counter == 0){
+        if (!(typeof questionSetsCounters === 'undefined')) {
+            var qId = parseInt("{{ question.number }}");
+
+                        //console.log(qId);
+            questionSetsCounters[qId]['filledQuestions'] = 0;
+
+            var ui = new CounterUI();
+            ui.updateCountersClean(qId);
+        }
+    }
+}
 function removePublication(id){
     $('#'+id).remove();
 }
@@ -122,6 +138,17 @@ function PublicationWidget ()
             
             pw{{ question.number|removedots }}.addPublication();
             $('[id="answered_'+{{ question.number|removedots }}+'"]').show();
+
+            if (!(typeof questionSetsCounters === 'undefined')) {
+                var qId = parseInt("{{ question.number }}");
+
+                //console.log(qId);
+                questionSetsCounters[qId]['filledQuestions'] = 1;
+
+                var ui = new CounterUI();
+                ui.updateCountersClean(qId);
+            }
+
         });
 
         $("#cleanpub" ).bind( "click", function() {
@@ -143,6 +170,8 @@ function PublicationWidget ()
 
         $( "#removepub" ).bind( "click", function() {
             pw{{ question.number|removedots }}.removeSelectedPublication();
+
+
         });
         
         
@@ -188,11 +217,11 @@ function PublicationWidget ()
         if(pubtitle.length == 0)
             return false;
         
-        if(pubjournal.length == 0)
-            return false;
+        //if(pubjournal.length == 0)
+        //    return false;
         
-        if(pubyear.length == 0)
-            return false;
+        //if(pubyear.length == 0)
+        //    return false;
         
         if(pubauthors.length == 0)
             return false;
@@ -236,6 +265,7 @@ function PublicationWidget ()
             return;
         }
 
+        publications_counter++;
         $('#question_{{ question.number|removedots }}_table > tbody:last').append('<tr id="pub_'+_pubmedid+'"><td><a class="deleteLink" href="#" ><img src="static/img/glyphicons_192_circle_remove.png"/></a></td><td>'+_pubmedid+'</td><td>'+_pubtitle+'</td><td>'+_pubjournal+'</td><td>'+_pubyear+'</td><td>'+_pubvolume+'</td><td>'+_pubpages+'</td><td>'+_pubauthors+'</td></tr>');
 
         // Add to boolean container if possible
@@ -246,9 +276,11 @@ function PublicationWidget ()
         
         $(".deleteLink").click(function(e) {
                 e.preventDefault();
+
+                pubcounterupdate();
             
                 // Add to boolean container if possible
-                if(bool_container){
+                if (!(typeof bool_container === 'undefined')) {
                     bool_container.splice('pub_'+_pubmedid, 'pub #'+_pubmedid+': '+_pubtitle,_pubtitle);
                 }
                 $(this).closest('tr').remove();
@@ -312,13 +344,17 @@ function PublicationWidget ()
             var _publink = _objs[i]['link'];
 
             if(_pubtitle != undefined){
+                publications_counter++;
                  $('#question_{{ question.number|removedots }}_table > tbody:last').append('<tr id="pub_'+_pubmedid+'"><td><a class="deleteLink" href="#" ><img src="static/img/glyphicons_192_circle_remove.png"/></a></td><td>'+_pubmedid+'</td><td>'+_pubtitle+'</td><td>'+_pubjournal+'</td><td>'+_pubyear+'</td><td>'+_pubvolume+'</td><td>'+_pubpages+'</td><td>'+_pubauthors+'</td><td>'+_publink+'</td></tr>'); 
             }
 
         }
         $(".deleteLink").click(function(e) {
                 e.preventDefault();
-                $(this).closest('tr').remove()
+
+                pubcounterupdate();
+
+                $(this).closest('tr').remove();
                 
                 if(pw{{ question.number|removedots }}.stringfy().length == 0) {
                     $('[id="answered_'+{{ question.number|removedots }}+'"]').hide();

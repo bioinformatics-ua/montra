@@ -1,5 +1,6 @@
 {% load i18n %}
 {% load extra_tags %}
+
 <div class="clearfix">
     
     <div class="input">
@@ -10,8 +11,8 @@
           </div>
         {% else %}
           <div id='numeric_validator_{{question.number}}' class="control-group numeric_validator">  
-            <input type="text" class="span6" size="60" id="question_{{ question.number }}" name="question_{{ question.number }}" value="{{ qdict.value }}" />
-            <span class="help-inline">Numeric Field!!!</span>
+            <input type="text" class="span6" size="60" id="question_{{ question.number }}" name="question_{{ question.number }}" value="{{ qdict.value }}" style="text-align:left"/>
+            <span class="help-inline">It should be a number.</span>
           </div>
         {% endif %}
         
@@ -23,5 +24,10 @@
                 $('[id="answered_'+{{ question.number|removedots }}+'"]').show();
             </script>
         {% endif %}
+        <script type="text/javascript">         
+            $(document).ready(function(){
+                $("#question_{{ question.number|escapedots }}").inputmask("decimal", { radixPoint: ",", autoGroup: true, groupSeparator: ".", groupSize: 3, rightAlignNumerics: false  });
+            });
+        </script>
     </div>
 </div>

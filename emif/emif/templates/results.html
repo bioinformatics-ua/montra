@@ -27,6 +27,7 @@
 
 <script src="{{ STATIC_URL}}js/vendor/jquery.boolrelwidget.js"></script>
 <script src="{{ STATIC_URL }}js/vendor/jquery.ba-throttle-debounce.min.js"></script>
+<script src="{{ STATIC_URL }}js/vendor/json2.js"></script>
 <script src="{{ STATIC_URL }}js/paginator-sorter.js"></script>
 
 
@@ -43,12 +44,15 @@
 {% block toolbar %}
 {% if page_obj != None %}
   <div class="span6">
+
     <div class="btn-group pull-right">
-
       <div class="btn-group"></div>
-      <a id="comparabtn" class="btn "  href=""  rel="tooltip" data-container="body" data-placement="bottom" data-original-title="You only can select two databases for a comparison" disabled> <i  class=" icon"></i>
+      <span id="selected_databases" class="btn disabled"> <strong>Type Selected:</strong> <span id="selected_dbstype">---</span> &nbsp; &nbsp; <strong>Selected databases:</strong> <span id="selected_dbscount">0</span></span>      
+      <a id="comparabtn" class="btn "  href=""  rel="tooltip" data-container="body" data-placement="bottom" data-original-title="This allows to compare databases.<br /> It is only possible to compare databases of the same type. <br /> When a database is selected, the type is defined automatically, and databases of other types can't be choosen. <br /> To be able to select other type, you must unselect all the databases." class="help_selectresults icon-question-sign" disabled> <i  class=" icon"></i>
         Compare</a>
-
+    <button type="button" class="btn" onclick="window.print();" title="Print">
+      <i class="icon-print"></i>
+    </button>
       <a class="btn" href="geo" onclick="" > <i class=" icon"></i>Geolocation</a>
 
     </div>
@@ -66,20 +70,19 @@
   <div id="row_loading" class="row">
 
 
-    <div class="span12" style="text-align:center">
+    <div class="span12 clearboth" style="text-align:center">
       <div class="navbar" id="loading">
         <div class="navbar-inner">
 
           <h4>
               <span id="results_size"></span>
-            {% if page_obj != None %}
-            Total results 
-              {%if not isAdvanced %}
+            {% if page_obj != None %}            
+            {{num_results}} results found
+            {%if not isAdvanced %}
                 for {{search_old}}
               {% endif %}
-            <span class="label label-inverse"> {{num_results}}</span>
             {% else %}
-            No results found 
+            No results found<br><button id="refine_search_btn" class="btn btn-link">Try to refine your search</button>
           {% endif %}
           </h4>
         </div>
@@ -87,6 +90,11 @@
     </div>
     </div>
     {% if page_obj != None %}
+    <form id="compare_form" action="resultscomp" method="POST">
+      {% csrf_token %}
+      <div id="comparedbs"></div>
+      <input id="submitdbsimulate" type="submit" value="Submit">
+    </form>
     <form id="result_form" action="resultscomp" method="POST">
   {% csrf_token %}
 <table class="table table-bordered table-hover fingerprint_table table-striped" id="table_databases" data-provides="rowlink">
@@ -105,7 +113,7 @@
             <div class="pull-left">Type</div>
               <div class="pull-right"><i class="{{sort_params.type.icon}}"></i></div> 
             </th>
-            <th class="sorter-false filter-false">Select</th>
+            <th class="sorter-false filter-false select_line">Select</th>
 
         </tr>
         <tr>
@@ -122,7 +130,11 @@
                 <option value="observationaldatasources">Observational Data Sources</option>
               </select>
           </td>
-          <td style="width:50px;" class="table_filter"></td>
+          <td style="width:50px;" class="table_filter select_line">
+            <div style="text-align: center;">
+              <i data-toggle="tooltip" data-placement="bottom" title=" This row allows to compare databases.<br /> It is only possible to compare databases of the same type. <br /> When a database is selected, the type is defined automatically, and databases of other types can't be choosen. <br /> To be able to select other type, you must unselect all the databases." class="help_selectresults icon-question-sign"></i>
+            </div>
+          </td>
         </tr>
     </thead>
     <tbody id="table_content">
@@ -153,8 +165,8 @@
           <td class="type">{{ t.type_name }} </td>
           
         
-          <td style="text-align:center"> <input class="checkbox" type="checkbox" name="chk_{{ t.id }}"></td>
-
+          <td class="select_line"> <input class="checkbox dbtype_{{t.type_name|removespaces}}" type="checkbox" 
+          typedb="{{ t.type_name }}" name="chk_{{ t.id }}"></td>
           
         </tr>
 
@@ -204,28 +216,14 @@
 
     </tbody>
 </table>
-<script type="text/javascript">
-var a;
-$(document).ready(function(){
-    a = new PaginatorSorter("table_databases", '{{sort_params.base_filter}}', '{{sort_params.selected_name}}', '{{sort_params.selected_value}}');
-    paginator_via_post();
-});
-</script>
 
   </form>
-  <form id="send2" method="POST" > 
-  <input id="page" type="hidden" name="page" value="{{page}}"></input>
-  <input id="s" type="hidden" name="s" value=""></input>  
-    <input id="submit_simulate" style="display:none" type="submit" value="Submit">
-
-{% csrf_token %}
-</form>
     {% else %}
     <div style="margin-top: 60px;"></div>
   {% endif %}
 
   {% if page_obj != None %}
-    {% bootstrap_paginate page_obj range=10 url_view_name="views.results_diff" show_prev_next="false" show_first_last="true" %}
+    {% include "post_paginator.html" %}
 
 {% endif %}
 {% endblock %}
@@ -239,27 +237,52 @@ $(document).ready(function(){
 {% if page_obj != None %}
 
 var counter = 0;
-
-// URL Hack to make paginator work with base
+var a;
 $(document).ready(function(){
-    if($('input:checkbox:checked', table_databases).length >= 2){
+    
+    a = new PaginatorSorter("table_databases", '{{sort_params.base_filter}}', '{{sort_params.selected_name}}', '{{sort_params.selected_value}}', '{{sort_params.extraObjects|safe}}');
+
+    //TO Be Applied in future releases.
+    a.atachPlugin(new SelectPaginatorPlugin());
+
+  if(a != undefined && a.plugin != undefined){
+
+    var dbcount = updateSelectCount();
+
+    counter = dbcount;
+
+    if(dbcount >= 2){
         $("#comparabtn").removeAttr('disabled');
-        counter = $('input:checkbox:checked', table_databases).length;
         $("#comparabtn").bind('click',function(e)
         { 
-          
-          $('#result_form').submit();
-
+          postComparison();
           return false;
         });
+
+        // This is to remove later, only until compare_database integration
+        $("input:checkbox:not(:checked)").prop('disabled', true); 
     }
+
+  }
     
     $('a[href="#"]').attr('href', function(i, val){
         return window.location + val;
     });
+
+    $('.help_selectresults').tooltip({container: 'body', 'html': true});
     
 });
 {% endif %}
+
+$(document).ready(function(){
+  $("#refine_search_btn").click( function(){
+      {% if isAdvanced %}
+      window.location.replace($('#base_link').prop('href')+"advancedSearch/{{request.session.query_type}}/1/{{request.session.query_id}}");
+      {% else %}
+        $("input[name=query]").focus();
+      {% endif %}  
+    });    
+});
 
  {% if isAdvanced %}
  var bool_container;
@@ -268,7 +291,6 @@ $(function(){
    
     window.setTimeout(function(){window.location.hash = "#back";}, 100);
     window.setTimeout(function(){window.location.hash = "#search";}, 100);
-
 });
   /* This is a trick, to be able to redirect on back button since browsers try to prevent us to do so 
    I must do this, because the back url is different from the url on history */
@@ -279,7 +301,36 @@ window.onhashchange = function(){
     
 }
   {% endif %}
-  
+function updateSelectCount(){
+
+    try{
+    var dbs = a.plugin.getExtraObjects().selectedList;
+    var type = a.plugin.typedb;
+
+    if(type)
+      $('#selected_dbstype').text(type); 
+    else
+      $('#selected_dbstype').text("---"); 
+
+    $('#selected_dbscount').text(dbs.length); 
+
+    return dbs.length;
+
+    } catch(err){
+      $('#selected_dbscount').text(0); 
+    }
+
+    return 0;
+    }
+function updateSelectCountJs(type, count){
+
+    if(type)
+      $('#selected_dbstype').text(type); 
+
+    if(count)
+      $('#selected_dbscount').text(count); 
+
+}
 function hidecheckbox()
 {
   $('.checkbox').toggle();
@@ -294,64 +345,77 @@ $("#comparabtn").bind('click',function(e)
         });
 
 //$("#comparabtn").unbind();
+function postComparison(){
+  //$('#result_form').submit();
+  //console.log('A: '+a);
+  //console.log('A-plugin: '+a.plugin);
+  if(a != undefined && a.plugin != undefined){
+    $('#comparedbs').html('');
 
+    var dbs = a.plugin.getExtraObjects().selectedList;
+    //console.error(dbs.length);
+    for(var i=0;i<dbs.length;i++){
+      $('#comparedbs').append('<input type="checkbox" name="chks_'+dbs[i]+'" checked>');
+    }
+
+    $('#submitdbsimulate').click();
+  }
+  
+}
 $('.checkbox').click(function()
 {
-    console.log(counter);
+
     if($(this).is(':checked')){
         counter++;
     } else 
     {
         counter--;
     }
-    if (counter==2)
-    {
-      $("#comparabtn").removeAttr('disabled');
-      
-      $('.checkbox').each(function(cbox)
-      {
-        console.log(this);
-        $("#comparabtn").bind('click',function(e)
-        { 
-          
-          $('#result_form').submit();
 
-          return false;
-        });
 
-        if(!$(this).is(':checked')){
-            $(this).prop('disabled', true);
-        };
-      });
-      
+
+    if(counter == 0){
+      updateSelectCountJs("---", ""+counter);   
+      $('input.checkbox').prop("disabled", false);
+
+      $("#comparabtn").attr("disabled", true);  
     }
-    else
-    {
+    else if(counter == 1){
+    console.log('cai here');
+
       $("#comparabtn").attr('disabled', true);
-      
-      console.log($("#comparabtn"))
-      $("#comparabtn").unbind();
-      $("#comparabtn").bind('click',function(e)
+
+      var checkedtype; 
+      if(a != undefined && a.plugin != undefined && a.plugin.typedb !=undefined){
+        checkedtype = a.plugin.typedb;
+      } else {
+        checkedtype = $('.checkbox:checked').first().attr('typedb');
+      }
+      updateSelectCountJs(checkedtype, counter);
+
+      $('input.checkbox').prop("disabled", false);
+
+      $('input.checkbox:not([typedb="' + checkedtype 
+      + '"])').prop('disabled', true);
+
+
+    }
+    else if (counter >= 2){
+      updateSelectCountJs(null, counter); 
+      $("#comparabtn").attr('disabled', false);
+         $("#comparabtn").bind('click',function(e)
         { 
-          
-          e.preventDefault(); 
-          e.stopPropagation();
+          postComparison();
           return false;
-        });
+        });  
 
-    
-      $('.checkbox').each(function(cbox)
-      {
-        
-        $(this).prop('disabled', false);
-
-        
-      });
-
+        // This is to remove later, only until compare_database integration
+        $("input:checkbox:not(:checked)").prop('disabled', true);   
     }
 
 });
-$('[rel=tooltip]').tooltip() 
+$('[rel=tooltip]').tooltip({container: 'body', 'html': true});
+
 $('.popover').popover({
     container: 'body'
 });

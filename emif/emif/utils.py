@@ -99,6 +99,21 @@ class Database:
     logo = ''
     last_activity = ''
 
+    admin_name = ''
+    admin_address = ''
+    admin_email = ''
+    admin_phone = ''
+
+    scien_name = ''
+    scien_address = ''
+    scien_email = ''
+    scien_phone = ''
+
+    tec_name = ''
+    tec_address = ''
+    tec_email = ''
+    tec_phone = ''
+
 
 class ordered_dict(dict):
     def __init__(self, *args, **kwargs):

@@ -288,10 +288,15 @@ function loadqspart(sortid, pk){
         
         var highlights = $("#qs_"+sortid).find('.highlight');
 
-        console.dir(highlights);
+        //console.dir(highlights);
 
         if(highlights.length > 0){
-           $( "#qs_"+sortid ).parent().siblings().find('.accordion-icon').html('<i class="icon-eye-open"></i>');
+           var this_row = $( "#qs_"+sortid ).parent().siblings().find('.accordion-icon');
+           this_row.html('<img title="This section has search keywords" class="markered" src="{{STATIC_URL}}/img/marker.png" />');
+           $(".markered" ,this_row).tooltip({container: "body"});
+           $(".markered" ,this_row).click(function(){
+            this_row.parent().siblings().first().collapse('toggle');
+           });
         }     
     });    
 
@@ -312,9 +317,8 @@ $(document).ready(function() {
         }        
     });
 
-    var json_aux = '{{apiinfo}}';
-console.log("ayx" + json_aux.length);
-console.log("ayx" + json_aux);
+    var json_aux = '{{apiinfo|safe}}';
+
     
     if (json_aux == '' || json_aux == null || json_aux.length == 2) {
         $("#pivot_table_extra_information").html('No information available. You can add information from external applications with <a href="api-info">API web services.</a>');
@@ -322,7 +326,7 @@ console.log("ayx" + json_aux);
         $("#btn_pivot_table").removeClass("hidden");
         $("#btn_pivot_table").addClass("show");
         json_aux = json_aux.replace("/&quot;/g", "\"");
-        alert(json_aux);
+        
         json = JSON.parse(json_aux);
         //console.log(json_aux);
         //console.log(json);

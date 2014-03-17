@@ -29,7 +29,9 @@ function GraphicChartC3D3(divArg, dataArg)
   this.dataValues = dataArg;
   this.xscale = null ;
   this.yscale = null ;
+  this.legend = false;
   this.self = this;
+
   this.init = function(){
     // Just init the parameters, if it is really necessary.
   };
@@ -41,6 +43,7 @@ function GraphicChartC3D3(divArg, dataArg)
     xscale = {'bins':5}
     xscale.bins = 25;
     var i = 1;
+    legend = actualChart.legend;
     datasetY = [actualChart.title['var']];
     datasetX = ['x'];
     
@@ -198,6 +201,10 @@ function GraphicChartC3D3(divArg, dataArg)
     chartConfigs.axis.x['label_position']['dy'] = "3.5em";
     chartConfigs.axis.y['label_position']['dx'] = "-5.2em";
     chartConfigs.axis.y['label_position']['dy'] = "-6.5em";
+    chartConfigs.axis.x['tick']['culling'] = true;
+    chartConfigs.legend = {}
+    chartConfigs.legend['show'] = legend;
+    
     console.log('chartConfigs');
     console.log(chartConfigs);
     try{var chart = c3.generate(chartConfigs);}
