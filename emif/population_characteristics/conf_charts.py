@@ -433,6 +433,7 @@ class ConfCharts(object):
         #################################################
         c12 = Chart()
         c12.title = Title()
+        c12.legend = True
         c12.title.operation = Operation.UNIQUE
         c12.title.fixed_title = "Age at patient start - percentiles" 
         c12.title.var = "Age at patient start" 
@@ -489,6 +490,7 @@ class ConfCharts(object):
         #################################################
         c13 = Chart()
         c13.title = Title()
+        c13.legend = True
         c13.title.operation = Operation.UNIQUE
         c13.title.fixed_title = "Age at patient end - percentiles" 
         c13.title.var = "Age at patient end" 
@@ -547,6 +549,7 @@ class ConfCharts(object):
         #################################################
         c14 = Chart()
         c14.title = Title()
+        c14.legend = True
         c14.title.operation = Operation.UNIQUE
         c14.title.fixed_title = "Age at start of year - percentiles" 
         c14.title.var = "Age at start of year" 
@@ -605,6 +608,7 @@ class ConfCharts(object):
         #################################################
         c14 = Chart()
         c14.title = Title()
+        c14.legend = True
         c14.title.operation = Operation.UNIQUE
         c14.title.fixed_title = "Patient time before a year - percentile" 
         c14.title.var = "Observation time before a year" 
@@ -662,6 +666,7 @@ class ConfCharts(object):
         #################################################
         c14 = Chart()
         c14.title = Title()
+        c14.legend = True
         c14.title.operation = Operation.UNIQUE
         c14.title.fixed_title = "Patient time after a year - percentile" 
         c14.title.var = "Observation time after a year" 

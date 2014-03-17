@@ -360,7 +360,7 @@ box-shadow: inset 0 3px 8px rgba(0,0,0,0.125);
 .counter_badge{
   text-align: center; 
   width: 35px; 
-  margin-top: -10px; 
+  margin-top: -7px; 
   margin-left: 0px;
   margin-bottom: -10px; 
   margin-right:-15px; 
@@ -431,6 +431,11 @@ box-shadow: inset 0 3px 8px rgba(0,0,0,0.125);
   margin:0px !important;
   width: 98% !important;
 }
+#compare_form{
+  position:absolute;
+  top: -9999px;
+  left: -9999px;
+}
 .selected-sorter{
     background-color: #f9f9f9;
     background-image: -moz-linear-gradient(bottom,#fff,#f2f2f2);
@@ -440,8 +445,16 @@ box-shadow: inset 0 3px 8px rgba(0,0,0,0.125);
     background-image: linear-gradient(to top,#fff,#f2f2f2);
     background-repeat: repeat-x;
 }
+
+#selected_databases{
+  opacity: 1 !important;
+  font-size: 11px;
+}
 .select_line{
   text-align: center !important;
+}
+label input[type="radio"], label input[type="checkbox"]{
+  margin-top: -3px;
 }
 /* Styles for printing */
 @media print{
@@ -466,4 +479,24 @@ box-shadow: inset 0 3px 8px rgba(0,0,0,0.125);
   .tabbable .collapse, #database_listings .collapse{
     height: auto !important;
   }
+}
+@media (min-width: 1200px) {.span2_5 {width: 300px !important;}}
+@media (max-width: 1200px) {.span2_5 {width: 130px !important;}}
+
+.commented{
+  width: 55px;
+  text-align: center !important;
+}
+
+.paginator-page-selector{
+  color: #08c !important;
+}
+
+#edit_profile_form label input[type="radio"], 
+#edit_profile_form  label input[type="checkbox"]{
+  margin-top: 5px;
+}
+
+.minwidth250{
+  min-width: 250px;
 }

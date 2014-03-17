@@ -120,11 +120,23 @@ function addtrigger(elemid) {
 }
 
 function clear_selection(question_name, response){
-    $(":radio[name='" + question_name.replace('question_nr_','question_') + "']").prop('checked', false);
+    var quest = question_name.replace('question_nr_','question_');
+    var was_checked = $(":radio[name='" + quest + "']").is(':checked');
+
+    $(":radio[name='" + quest + "']").prop('checked', false);
     if (!(typeof bool_container === 'undefined')) {
             bool_container.splice(question_name, response, '');
     }        
-    
+    if(was_checked){
+        if (!(typeof questionSetsCounters === 'undefined')) {
+                var qId = parseInt(quest.split("_")[1]);
+
+                questionSetsCounters[qId]['filledQuestions'] = questionSetsCounters[qId]['filledQuestions']-1;
+
+                var ui = new CounterUI();
+                ui.updateCountersClean(qId);
+        }
+    }
 }
 
 /* 
