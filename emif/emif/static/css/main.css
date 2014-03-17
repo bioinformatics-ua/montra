@@ -270,7 +270,7 @@ box-shadow: inset 0 3px 8px rgba(0,0,0,0.125);
 **********************************************************************/
 
 #documents  {
-  font-weight: bold;
+  /*font-weight: bold;*/
   padding-left: 30px;
 }
 
