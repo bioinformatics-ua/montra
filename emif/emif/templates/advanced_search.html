@@ -40,6 +40,7 @@ text-decoration: none;
 <script src="{{ STATIC_URL}}js/vendor/bootstrap-tooltip.js"></script>
 <script src="{{ STATIC_URL}}js/vendor/bootstrap-popover.js"></script>
 <script src="{{ STATIC_URL}}js/fingerprint_validation.js"></script>
+<script src="{{ STATIC_URL }}js/vendor/jquery.inputmask.bundle.min.js" type="text/javascript"></script>
 <script src="{{ STATIC_URL}}js/fingerprint.js"></script>
 <script src="{{ STATIC_URL}}js/vendor/jquery.boolrelwidget.js"></script>
 
@@ -161,9 +162,12 @@ $( document ).ready(function() {
     /* This must be after, boolrelwidget declaration */
     if (!(typeof bool_container === 'undefined')) {
         $('#qform').submit(
-                     
                     function(e) {
-
+                     if(bool_container.isEmpty()){
+                        e.preventDefault();
+                        alert("It's not possible to search without specifying parameters first.");
+                        return false;
+                      }
                         // Update hidden inputs (in case they are not updated because we are using the other buttons not in control by the plugin)
                         bool_container.readyToSubmit(); 
                     }     
@@ -189,7 +193,7 @@ function load_questionnary(){
 
         console.log( "Loading questionnary by parts, we have {{questionset.questionnaire.questionsets.count}} sets");  
         
-        var threadpool = new ThreadPool(1);
+        var threadpool = new ThreadPool(20);
         parts_missing = {{ questionset.questionnaire.questionsets.count }};
 
 

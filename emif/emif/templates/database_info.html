@@ -308,8 +308,10 @@
     $('#set_container').append(containers.join(''));
 
     console.log( "Loading questionnary by parts, we have {{qsets|length}} sets");  
-
-    var threadpool = new ThreadPool(1);
+    
+    console.log( "Loading questionnary by parts, we have {{qsets|length}} sets");  
+        
+    var threadpool = new ThreadPool(20);
     parts_missing = {{qsets|length}};
 
 
@@ -335,12 +337,17 @@ $( "#qs_"+sortid ).html( data );
 
 var highlights = $("#qs_"+sortid).find('.highlight');
 
-console.dir(highlights);
+        //console.dir(highlights);
 
-if(highlights.length > 0){
-$( "#qs_"+sortid ).parent().siblings().find('.accordion-icon').html('<i class="icon-eye-open"></i>');
-}     
-});    
+        if(highlights.length > 0){
+           var this_row = $( "#qs_"+sortid ).parent().siblings().find('.accordion-icon');
+           this_row.html('<img title="This section has search keywords" class="markered" src="{{STATIC_URL}}/img/marker.png" />');
+           $(".markered" ,this_row).tooltip({container: "body"});
+           $(".markered" ,this_row).click(function(){
+            this_row.parent().siblings().first().collapse('toggle');
+           });
+        }     
+    });    
 
 threads['qs_'+sortid] = null;
 parts_missing--;

@@ -60,6 +60,7 @@ OpenButtonValidator.prototype ={
 }
 
 function NumericValidator(context){
+    this.regex = /^\d{1,3}(\.\d{3})*$/;
     this.context = context;
 }
 NumericValidator.prototype ={
@@ -71,19 +72,20 @@ NumericValidator.prototype ={
         question_number = question_number.replace(".","\\.");        
         var validator = $('#numeric_validator_'+question_number);
         //console.log(validator);
-        
-        var regex = /\D/i;
 
         var text = $(controllerDOM).val();
-        
-        var res = regex.exec(text);
-        if(res != null)
-            draw_validator(validator, false, "This Field must be numeric");
-        else
+        if(text.length == 0){
             draw_validator(validator, true, "");
-            
+            return true;
+        }
+        var res = this.regex.test(text);
+        if(!res){
+            draw_validator(validator, false, "This Field must be numeric");
+        }else{
+            draw_validator(validator, true, "");
+        }
 
-        return res == null;
+        return res;
     },
     controllerDOM : function(validatorDOM){
         return $("input", validatorDOM);

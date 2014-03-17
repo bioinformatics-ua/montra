@@ -119,14 +119,10 @@
     var a;
     $(document).ready(function(){
         a = new PaginatorSorter("table_databases", '{{sort_params.base_filter}}', '{{sort_params.selected_name}}', '{{sort_params.selected_value}}');
-
-        paginator_via_post();
-    });
+   });
     </script>
-
-    {% load bootstrap_pagination %}
-
-    {% bootstrap_paginate page_obj url_view_name="views.create_auth_token" range=10  show_prev_next="false" show_first_last="true"%}
+    
+    {% include "post_paginator.html" %}
 
     {% else %}
     <p><strong>Info: </strong> Currently, there are no databases in your account. You can add new ones through the
