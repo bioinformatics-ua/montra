@@ -7,5 +7,6 @@ class Fingerprint(models.Model):
   description = models.TextField(blank=True, null=True, validators=[MaxLengthValidator(600)])
 
 
+
   def __unicode__(self):
     return self.fingerprint_hash
