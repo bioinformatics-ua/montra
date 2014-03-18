@@ -330,7 +330,7 @@ def convert_query_from_boolean_widget(query, q_id):
     questionsets = QuestionSet.objects.filter(questionnaire=q_id)
     print "convert_query_from_boolean_widget"
     print query
-    query = re.sub("_____[\w .]+_____", "", query)
+    query = re.sub("_____.*_____", "", query)
     print query
 
     def check(m):
