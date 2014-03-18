@@ -13,7 +13,7 @@
 					{% for t in qs.list_ordered_tags %}
 					<tr>
 						<!-- title="{{ t.tag|safe }}" -->
-						<td title="{{ t.tag|safe|removehs }}">{{ t.tag|removehs }}</td>
+						<td title="{{ t.tag|removehs|safe }}">{{ t.tag|removehs|safe }}</td>
 						<td title="{{ t.value|safe }}">{{ t.value|safe }}
 						<div class="pull-right">
 							{% if not t.comment|safe == None and not t.comment|safe == "" %}
@@ -28,12 +28,12 @@
 <script type="text/javascript">
 	addTooltip('#t2_{{qs.sortid}}');
 	// Add highlighting
-	{% if request.session.query and not isAdvanced %}
+	/*{% if request.session.query and not isAdvanced %}
 
 		{% for word in request.session.query|whitespacesplit %}
 			$('#set_container, .tooltip').highlight('{{word}}');
 		{% endfor %}
-	{% endif %}
+	{% endif %}*/
   /*$('.comment_button', '#t2_{{qs.sortid}}').click(function(){
   	$(this).parent().find('.comment_text').toggle('fast');
   });*/
