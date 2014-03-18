@@ -330,7 +330,8 @@ def convert_query_from_boolean_widget(query, q_id):
     questionsets = QuestionSet.objects.filter(questionnaire=q_id)
     print "convert_query_from_boolean_widget"
     print query
-    query = re.sub("_____.*_____", "", query)
+    # I cant remove the symbol
+    query = re.sub("_____[a-zA-Z0-9._()\[\]\/\-\+?!'@#$%&*=~^|\\<>;,\.\" ]+_____", "", query)
     print query
 
     def check(m):
@@ -343,11 +344,50 @@ def convert_query_from_boolean_widget(query, q_id):
         except:
             raise
             return 'null'
-        return q[0].slug + '_t'
+        temp = q[0].slug + '_t'
+        # setting name as literal, and after escaping the literal definer
+        return escapeSolrArg(temp)
     
+
     r = re.sub('question_nr_[10-9\\.]+', check, query)
     r = r + " AND type_t:"+ttype
     return r
 
+## Reference on how to escape this efficiently from: 
+# - http://www.opensourceconnections.com/2013/01/17/escaping-solr-query-characters-in-python/
+# These rules all independent, order of
+# escaping doesn't matter
+escapeRules = {'+': r'\+',
+               '-': r'\-',
+               '&': r'\&',
+               '|': r'\|',
+               '!': r'\!',
+               '(': r'\(',
+               ')': r'\)',
+               '{': r'\{',
+               '}': r'\}',
+               '[': r'\[',
+               ']': r'\]',
+               '^': r'\^',
+               '~': r'\~',
+               '*': r'\*',
+               '?': r'\?',
+               ':': r'\:',
+               '"': r'\"',
+               ';': r'\;',
+               ' ': r'\ '}
 
-    
+def escapedSeq(term):
+    """ Yield the next string based on the
+        next character (either this char
+        or escaped version """
+    for char in term:
+        if char in escapeRules.keys():
+            yield escapeRules[char]
+        else:
+            yield char
+def escapeSolrArg(term):
+    """ Apply escaping to the passed in query terms
+        escaping special characters like : , etc"""
+    term = term.replace('\\', r'\\')   # escape \ first
+    return "".join([nextStr for nextStr in escapedSeq(term)])

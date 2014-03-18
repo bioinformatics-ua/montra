@@ -93,7 +93,8 @@ function valchanged(qnum, value, self) {
                                , dirty.substring(index+1,dirty.length));
         } else {       
             if( value != 'yes' && value != 'no' && value != 'dontknow ')
-            bool_container.pushWithDelegate('question_nr_'+clean, clean.replace('_','')+'. '+the_question+'', value, 'clear_selection("question_nr_'+clean+'", " ");');   
+            bool_container.pushWithDelegate('question_nr_'+clean, clean.replace('_','')+'. '+the_question.replace(/\s{2,}/g, ' ')+'', 
+                value, 'clear_selection("question_nr_'+clean+'", " ");');   
                         
         }
     }    
