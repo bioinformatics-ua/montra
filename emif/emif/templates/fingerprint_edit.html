@@ -178,7 +178,7 @@
                 {% if k.prev and k.next %}
 
                 {% endif %}
-                {% if k.next %}
+                {% if k.next and k.next.sortid != 99 %}
                     <a href="dbEdit/{{ fingerprint_id }}/{{ k.next.sortid }}" class="btn large primary" onclick="questionsets_handle(qs_{{ k.next.sortid }});  return false;">{% trans "Next" %}</a>
                 {% endif %}
 

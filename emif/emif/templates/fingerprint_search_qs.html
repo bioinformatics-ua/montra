@@ -16,7 +16,7 @@
                 {% if questions_list.0.0.prev and questions_list.0.0.next %}
 
                 {% endif %}
-                {% if questions_list.0.0.next %}
+                {% if questions_list.0.0.next and questions_list.0.0.next.sortid != 99 %}
                     <a href="advancedSearch/{{ questionset.questionnaire.pk }}/{{ questions_list.0.0.next.sortid }}" class="btn large primary" onclick="questionsets_handle(qs_{{ questions_list.0.0.next.sortid }});  return false;">{% trans "Next" %}</a>
                 {% endif %}
 
@@ -179,7 +179,7 @@
                 {% if questions_list.0.0.prev and questions_list.0.0.next %}
 
                 {% endif %}
-                {% if questions_list.0.0.next %}
+                {% if questions_list.0.0.next and questions_list.0.0.next.sortid != 99 %}
                     <a href="advancedSearch/{{ questionset.questionnaire.pk }}/{{ questions_list.0.0.next.sortid }}" class="btn large primary" onclick="questionsets_handle(qs_{{ questions_list.0.0.next.sortid }});  return false;">{% trans "Next" %}</a>
                 {% endif %}
 
