@@ -172,6 +172,7 @@ def results_fulltext(request, page=1, full_text=True,template_name='results.html
         query = request.session.get("query","")
 
     if isAdvanced == False:
+        query = "'"+re.sub("['\"']","\\'",query)+"'"  
         query = "text_t:"+query
 
     if not full_text:
@@ -317,17 +318,11 @@ def results_diff(request, page=1, template_name='results_diff.html'):
                 response.status_code = 500
                 return response
                 
-            print "--------------------------------------------------------------"
-            print qserialization
-            print "--------------------------------------------------------------\n"
 
             query = convert_qvalues_to_query(qvalues, qid, qexpression)
             query = convert_query_from_boolean_widget(qexpression, qid)
             #print "Query: " + query
 
-            print "--------------------------------------------------------------"
-            print query
-            print "--------------------------------------------------------------\n"
 
             request.session['query'] = query
             
@@ -377,7 +372,6 @@ def results_diff(request, page=1, template_name='results_diff.html'):
     if not in_post:
         query = request.session.get('query', "")
         
-    #print "query_@" + query
     if query == "":
         return render(request, "results.html", {'request': request,
                                                 'num_results': 0, 'page_obj': None, 'breadcrumb': True})
@@ -410,7 +404,8 @@ def geo(request, template_name='geo.html'):
         isAdvanced = True
     else:
         if(request.session.get('query') != None):
-            query = "text_t:"+request.session.get('query')
+            query = "'"+re.sub("['\"']","\\'",request.session.get('query'))+"'"  
+            query = "text_t:"+query
         else:
             query = "*:*"
 
