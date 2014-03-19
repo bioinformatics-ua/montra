@@ -1383,10 +1383,18 @@ def paginator_process_params(request, page, rows):
     sortFieldsLookup["last_update"] = "last_activity_sort"
     sortFieldsLookup["type"] = "type_name_sort"
 
+    sortFieldsLookup["institution"] = "institution_sort"
+    sortFieldsLookup["location"] = "location_sort"
+    sortFieldsLookup["nrpatients"] = "nrpatients_sort"
+
     filterFieldsLookup = {}
     filterFieldsLookup["database_name_filter"] = "database_name_sort"
     filterFieldsLookup["last_update_filter"] = ""
     filterFieldsLookup["type_filter"] = "type_t"
+
+    filterFieldsLookup["institution_filter"] = "institution_name_t"
+    filterFieldsLookup["location_filter"] = "location_t"
+    filterFieldsLookup["nrpatients_filter"] = "number_active_patients_jan2012_t"
 
     sortString = ""
     filterString = ""
@@ -1421,7 +1429,7 @@ def paginator_process_params(request, page, rows):
     if len(filterString) > 0:
         filterString = filterString[:-4]
 
-    for x in ["database_name", "last_update", "type"]:
+    for x in ["database_name", "last_update", "type", "institution", "location", "nrpatients"]:
         if (x in sort_params) and ( "name" in sort_params[x]):
             sort_params["selected_name"] = x
             sort_params["selected_value"] = sort_params[x]["name"]
