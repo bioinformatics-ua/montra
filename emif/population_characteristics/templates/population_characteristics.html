@@ -49,30 +49,27 @@
         <!-- Redirect browsers with JavaScript disabled to the origin page -->
         <!--<noscript><input type="hidden" name="redirect" value="http://blueimp.github.io/jQuery-File-Upload/"></noscript>-->
         <!-- The fileupload-buttonbar contains buttons to add/delete files and start/cancel the upload -->
-        <div class="row fileupload-buttonbar">
-            <div class="span7">
-                
+        <div class="row fileupload-buttonbar">                
                 <fieldset>
 
-                <label>Name:</label> <input size="255" type="text" cols="100" name="pc_name" >
+                <label>Name:</label> <input size="255" class="span7" type="text" cols="100" name="pc_name" >
                 <label>Description about extracted population characteristics: </label>
-                <textarea class="input-block-level" rows="4" name="pc_comments" ></textarea>
+                <textarea class="span7 input-block-level" rows="4" name="pc_comments" ></textarea>
 
                 <!-- The fileinput-button span is used to style the file input field as button -->
-
-                <span class="btn btn-success fileinput-button">
+                <br />
+                <div style="margin-left: 0px !important;" class="span7 btn btn-success fileinput-button">
                     <i class="glyphicon glyphicon-plus"></i>
                     <span>Add files...</span>
                     <input type="file" name="file" multiple>
-                </span>
+                </div>
                 
                 
                 <!-- The loading indicator is shown during file processing -->
                 <span class="fileupload-loading"></span>
                 </fieldset>
-            </div>
             <!-- The global progress information -->
-            <div class="span5 fileupload-progress fade">
+            <div class="span6 fileupload-progress fade">
                 <!-- The global progress bar -->
                 <div class="progress progress-striped active" role="progressbar" aria-valuemin="0" aria-valuemax="100">
                     <div class="progress-bar progress-bar-success" style="width:0%;"></div>
@@ -95,7 +92,6 @@
 
     </tbody>
     </table>
-
     {% else %}
         {%if contains_population %}
 

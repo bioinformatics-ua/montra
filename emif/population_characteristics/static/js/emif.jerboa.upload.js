@@ -115,31 +115,32 @@ $(function () {
         previewCrop: true
     }).on('fileuploadadd', function (e, data) {
         console.log('File Upload - fileuploadadd');
-        data.context = $('<tr><td>').appendTo('#jerboafiles');
+        data.context = $('<tr>').appendTo('#jerboafiles');
         $.each(data.files, function (index, file) {
-            var node = $('<p/>')
-                    .append($('<span/>').text(file.name));
-            if (!index) {
-                node
-                    .append('<br>')
-                    .append(uploadButton.clone(true).data(data));
-            }
+            var node = $('<td>').text(file.name);
+
             node.appendTo(data.context);
+
+            var node2 = $('<td class="fmessage">');
+
+            node2.appendTo(data.context);
+
+            if (!index) {
+                uploadButton.clone(true).data(data).appendTo(data.context).wrap('<td style="width: 100px;">');
+            }
+            
         });
     }).on('fileuploadprocessalways', function (e, data) {
         console.log('File Upload - fileuploadprocessalways');
         var index = data.index,
             file = data.files[index],
-            node = $(data.context.children()[index]);
+            node = $(data.context.find('.fmessage'));
         if (file.preview) {
             node
-                .prepend('<br>')
                 .prepend(file.preview);
         }
         if (file.error) {
-            node
-                .append('<br>')
-                .append(file.error);
+            node.text(file.error);
         }
         if (index + 1 === data.files.length) {
             data.context.find('button')
