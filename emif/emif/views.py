@@ -1391,7 +1391,7 @@ def paginator_process_params(request, page, rows):
     filterFieldsLookup["location_filter"] = "location_sort"
     filterFieldsLookup["nrpatients_filter"] = "number_active_patients_jan2012_t"
     prefixFilters = ["database_name_filter"
-                #, "institution_filter", "location_filter"
+                , "institution_filter", "location_filter"
                 ]
     openTextFilters = ["institution_filter", "location_filter"]
 

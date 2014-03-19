@@ -67,7 +67,7 @@ PaginatorSorter.prototype = {
             try {
 
                 var content = $("#" + this.filters[i], this.innerTable);
-                json += ',"' + this.filters[i] + '": "' + content.val() + '"';
+                json += ',"' + this.filters[i] + '": "' + encodeURI(content.val()) + '"';
                 //console.log(content.val());
                 //console.log(content);
             } catch (err) {
