@@ -24,6 +24,11 @@ function PaginatorSorter(tableID, fString, selName, selValue, xtraData) {
     this.filters.push("database_name_filter"); // = $("#database_name_filter",this.innerTable);
     this.filters.push("last_update_filter"); // = $("#last_update_filter",this.innerTable);
     this.filters.push("type_filter"); // = $("#type_filter",this.innerTable);
+    this.filters.push("institution_filter"); // = $("#type_filter",this.innerTable);
+    this.filters.push("location_filter"); // = $("#type_filter",this.innerTable);
+    this.filters.push("nrpatients_filter"); // = $("#type_filter",this.innerTable);
+
+
 
     this.selName = selName;
     this.selValue = selValue;
@@ -166,9 +171,28 @@ PaginatorSorter.prototype = {
                 context.plugin.clearSelection();
             }
             context.onClick(context.selName, context.selValue);
-
         });
 
+
+        $("#institution_filter", this.innerTable).delayKeyup(function() {
+            if (context.plugin != undefined) {
+                context.plugin.clearSelection();
+            }
+            context.onClick(context.selName, context.selValue);
+        }, 500);
+        $("#location_filter", this.innerTable).delayKeyup(function() {
+            if (context.plugin != undefined) {
+                context.plugin.clearSelection();
+            }
+            context.onClick(context.selName, context.selValue);
+        }, 500);
+        
+        $("#nrpatients_filter", this.innerTable).delayKeyup(function() {
+            if (context.plugin != undefined) {
+                context.plugin.clearSelection();
+            }
+            context.onClick(context.selName, context.selValue);
+        }, 500);
 
         $("#send2").submit(function() {
             context.updateForm();

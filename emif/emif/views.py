@@ -1387,9 +1387,13 @@ def paginator_process_params(request, page, rows):
     filterFieldsLookup["last_update_filter"] = ""
     filterFieldsLookup["type_filter"] = "type_t"
 
-    filterFieldsLookup["institution_filter"] = "institution_name_t"
-    filterFieldsLookup["location_filter"] = "location_t"
+    filterFieldsLookup["institution_filter"] = "institution_name_t"#"institution_sort"
+    filterFieldsLookup["location_filter"] = "location_sort"
     filterFieldsLookup["nrpatients_filter"] = "number_active_patients_jan2012_t"
+    prefixFilters = ["database_name_filter"
+                #, "institution_filter", "location_filter"
+                ]
+    openTextFilters = ["institution_filter", "location_filter"]
 
     sortString = ""
     filterString = ""
@@ -1407,13 +1411,15 @@ def paginator_process_params(request, page, rows):
                 if x not in sort_params:
                     sort_params[x] = {}
                 sort_params[x]["name"] = mode[x]
-        elif filterFieldsLookup.has_key(x):
+        elif len(mode[x])>0 and filterFieldsLookup.has_key(x):
             if x == "last_update_filter":
                 filterString += "(created_t:\""+mode[x] + "\" OR date_last_modification_t:\""+mode[x] + "\") AND "
-            elif x== "database_name_filter":
+            elif x in prefixFilters:
                 p = re.compile("([^a-z])")
                 str2 = re.sub(p, "", mode[x].lower())
                 filterString += "({!prefix f="+filterFieldsLookup[x]+"}"+str2+") AND "
+            elif x in openTextFilters:
+                filterString += "("+filterFieldsLookup[x]+":"+mode[x] +") AND "
             else:
                 filterString += filterFieldsLookup[x]+":'"+mode[x] +"' AND "
             if x[:-7] not in sort_params:

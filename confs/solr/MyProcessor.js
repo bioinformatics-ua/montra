@@ -1,3 +1,10 @@
+//SLUG DEFENITION
+var numberofpatientsslug = "number_active_patients_jan2012_t"
+var numberofpatients_sort = "nrpatients_sort"
+
+var location_slug_chain = ["city_t", "location_t", "PI:_Address_t"]
+var location_sort = "location_sort"
+
 function parseDateString(str){
   if(str == null)
 	return null;
@@ -16,6 +23,38 @@ function parseDateString(str){
   }
 
   return null;
+}
+
+function removeNumericFieldMask(numericString){
+	var number = 0;
+	if(numericString != undefined && numericString.length() > 0){
+		//var r = /\./g
+		//var nString = numericString.replace(r, '');
+		var nString = numericString.split("\\.").join("");				
+		number = parseInt(nString);
+		if(number == NaN)
+			return 0
+	}		
+	return number;	
+}
+
+function populateNumberOfPatientsSort(doc){
+	var n = removeNumericFieldMask(doc.getFieldValue(numberofpatientsslug));	
+	logger.info("___TIAGO___#EXTRACTED NUMBER OF PATIENTS: "+doc.getFieldValue(numberofpatientsslug));
+	logger.info("___TIAGO___#REPLACED NUMBER OF PATIENTS: "+n);
+	doc.setField(numberofpatients_sort, n); 	
+}
+
+function populateLocationSortField(doc){
+	for(i in location_slug_chain){
+		var value = doc.getFieldValue(location_slug_chain[i]);
+		if(  value != null && value.length() > 0  ){
+			doc.setField(location_sort, value);
+			logger.info("___TIAGO___#SETTING LOCATION SORT: "+value); 		
+			return ;	
+		}
+	}
+	doc.setField(location_sort, ""); 		
 }
 
 function processAdd(cmd) {
@@ -44,6 +83,9 @@ function processAdd(cmd) {
   doc.setField("last_activity_sort", last_activ);  
 	
   logger.info("MyProcessor#ADDING Index: last_activity="+last_activ);
+
+  populateNumberOfPatientsSort(doc);
+  populateLocationSortField(doc);
 // Set a field value:
 //  doc.setField("foo_s", "whatever");
 
