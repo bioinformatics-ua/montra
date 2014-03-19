@@ -109,7 +109,7 @@
                 <a class="brand" href="">EMIF Catalogue</a>
                 <div class="nav-collapse collapse">
                             {% if request.user.is_authenticated %}
-                            <ul class="nav">
+                            <ul class="nav" style="margin-right: 0 !important;">
                                 <li id="li_workspace" class="dropdown">
                                     <a href="" class="dropdown-toggle" data-toggle="dropdown">Workspace
                                         <b class="caret"></b>
@@ -198,9 +198,9 @@
                     <li id="search_li" class="pull-left">
                             <form class="navbar-search pull-left" method="POST" action="resultsdiff/1">{% csrf_token %}
                                 {% if isAdvanced %}
-                                                                <input title="Enter the terms you wish to search for." class="search-query span3 form-text" placeholder="" type="text" id="edit-search-block-form--3" name="query" value="" size="25" maxlength="256">
+                                                                <input title="Enter the terms you wish to search for." class="search-query span2_5 form-text" placeholder="" type="text" id="edit-search-block-form--3" name="query" value="" size="25" maxlength="256">
                                 {% else %}
-                                <input title="Enter the terms you wish to search for." class="search-query span3 form-text" placeholder="" type="text" id="edit-search-block-form--3" name="query" value="{{search_old}}" size="25" maxlength="256">
+                                <input title="Enter the terms you wish to search for." class="search-query span2_5 form-text" placeholder="" type="text" id="edit-search-block-form--3" name="query" value="{{search_old}}" size="25" maxlength="256">
                                 {% endif %}
                                 <input name='search_full' value='search_full' type='hidden'>
                             </form>
@@ -253,12 +253,13 @@
                             </li>
                         {% else %}
                             <li id="auth-logged-in">
-                                <button style="white-space:nowrap;" class="btn btn-success dropdown-toggle" data-toggle="dropdown" tabindex="-1">
-                                    {% if not request.user.first_name and not request.user.last_name %}
-                                        <i class="icon-user"></i><small>&nbsp; {{request.user.username}} &nbsp;</small><i class="icon-angle-down"></i>
-                                    {% else %}
-                                        <i class="icon-user"></i><small>&nbsp; {{request.user.first_name}} {{request.user.last_name}} &nbsp;</small><i class="icon-angle-down"></i>
-                                    {% endif %}
+                                <button class="btn btn-success dropdown-toggle" data-toggle="dropdown" tabindex="-1">
+                                        {% if not request.user.first_name and not request.user.last_name %}
+                                            <i class="icon-user"></i><small>&nbsp; {{request.user.username|ellipsis:17}} &nbsp;</small><i class="icon-angle-down"></i>
+                                        {% else %}
+                                            <i class="icon-user"></i><small>&nbsp; {{request.user.first_name|add:" "|add:request.user.last_name|ellipsis:17}} &nbsp;</small><i class="icon-angle-down"></i>
+                                        {% endif %}
+                                            
                                 </button>
                                 <ul class="dropdown-menu">
                                     {% show_profiles request.user %}

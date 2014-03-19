@@ -5,7 +5,7 @@
 <div class="span8">
     <form name="qform" id="qform" action="dbEdit/{{fingerprint_id}}/{{questionset.questionnaire.pk}}" method="POST" enctype="multipart/form-data">
 
-        <input type="hidden" id="edit_db_inputs" value="1">
+        <input type="hidden" id="edit_db_inputs" value="0">
         <input type="hidden" name="active_qs" id="active_qs" value="0">
         <input type="hidden" name="active_qs_sortid" id="active_qs_sortid" value="0">
         <input type="hidden" name="fingerprint_id" value="{{ fingerprint_id }}">
@@ -92,7 +92,7 @@
 
                             {% else %}
                                 <div class="question-text {% if qdict.required %}required{% endif %} {% if error %}text-error{% endif %} qtext_{{question.text|geths}}">
-                                    <span class="qnumber_{{question.text|geths}}">{{ question.display_number }}.</span>
+                                    <span class="qnumber_{{question.text|geths}}">{% if question.display_number != '0' %}{{question.display_number }}.{% endif %}</span>
                                     <span class="qtext">{{ question.text|removehs|safe }}
                                     {% if question.tooltip and question.help_text %}
                                     <div class="question-help-text" style="display: none;">
@@ -211,6 +211,7 @@
 <script src="{{ STATIC_URL}}js/vendor/bootstrap-tooltip.js"></script>
 <script src="{{ STATIC_URL}}js/vendor/bootstrap-popover.js"></script>
 <script src="{{ STATIC_URL}}js/fingerprint_validation.js"></script>
+<script src="{{ STATIC_URL }}js/vendor/jquery.inputmask.bundle.min.js" type="text/javascript"></script>
 <script src="{{ STATIC_URL}}js/fingerprint.js"></script>
 
 <!--keep the order -->

@@ -197,6 +197,11 @@ def question_multiple_options(request, question):
         key = "question_%s_multiple_%d" % (question.number, choice.sortid)
         key_value = "question_%s_%d_opt" % (question.number, choice.sortid)
         
+        if val == None or val == '':
+            try:
+                val = request.POST.get(key, '')
+            except:
+                pass
         _aux = ""
         try:
             _aux = request.POST[key_value]
@@ -206,15 +211,24 @@ def question_multiple_options(request, question):
 
         if key in request.POST or (val!=None and (choice.value in val)) or \
           (request.method == 'GET' and choice.value in defaults):
-            choices.append( (choice, key, ' checked',get_aux_text(val,choice.value, _aux )) )
+            _tmp_v = get_aux_text(val,choice.value, _aux )
+            if _tmp_v == None or _tmp_v == '':
+                _tmp_v = _aux
+            choices.append( (choice, key, ' checked',_tmp_v) )
             hasValue = hasValue or True
+            
         else:
-
-            choices.append( (choice, key, '',get_aux_text(val,choice.value,_aux )) )
+            _tmp_v = get_aux_text(val,choice.value, _aux )
+            if _tmp_v == None or _tmp_v == '':
+                _tmp_v = _aux
+            choices.append( (choice, key, '',_tmp_v) )
+            
     extracount = int(cd.get('extracount', 0))
     if not extracount and question.type == 'choice-multiple-freeform-options':
         extracount = 1
     extras = []
+    #import pdb
+    #pdb.set_trace()
     
     for x in range(1, extracount+1):
 
