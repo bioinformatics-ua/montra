@@ -2,10 +2,7 @@
 {% load markup questionnaire i18n %}
 
 <div class="span8">
-    <form name="qform" id="qform" action="addPost/{{questionset.questionnaire.pk}}/1" method="POST" enctype="multipart/form-data">
-        <input type="hidden" name="active_qs" id="active_qs" value="0" />
-        <input type="hidden" name="active_qs_sortid" id="active_qs_sortid" value="0" />
-        <input type="hidden" name="fingerprint_id" value="{{ fingerprint_id }}" />
+
         
 
     {% setglobal iteratorQ 0 %}
@@ -16,6 +13,11 @@
 
 
     <div id="qs_{{ k.sortid }}" class="{% if k.sortid == questionset.sortid %} {% else %} hide {% endif %} questionset">
+
+    <form name="qform{{ k.sortid }}" id="qform{{ k.sortid }}" action="addPost/{{questionset.questionnaire.pk}}/1" method="POST" enctype="multipart/form-data">
+        <input type="hidden" name="active_qs" id="active_qs" value="0" />
+        <input type="hidden" name="active_qs_sortid" id="active_qs_sortid" value="0" />
+        <input type="hidden" name="fingerprint_id" value="{{ fingerprint_id }}" />
 
     {% if k.sortid != 0 and k.sortid != 99 %}
         <div><a id="collapseall_qs_{{ k.sortid }}"  class="btn pull-right" href="#">Collapse all </a></div>
@@ -202,9 +204,12 @@
                 {% endif %}
             </div>
         </div>
+
+        </form>
+
     </div>
+
     {% endfor %}
-    </form>
 
 </div>
 <script src="{{ STATIC_URL}}js/vendor/threadpool.js"></script>

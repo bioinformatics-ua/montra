@@ -76,6 +76,8 @@ text-decoration: none;
 
 {% block content %}
 
+<div style="display: none; z-index: 2000; position:fixed; bottom:20px; right: 20px;" class="alert alert-info" id="loading-message">
+Saving... please don't close this questionnary yet.</div>
 
 <div style="margin-bottom: 60px;"></div>
 <hr>
@@ -171,6 +173,30 @@ function questionsets_handle(id_questionset)
 
     $('#active_qs').val(id_questionset.id);
     $('#active_qs_sortid').val(id[1]);
+
+
+      // First we get the previous form
+      var previous_id = $('.questionset:not(.hide)').first().attr('id').split('_')[1];
+      var current_form = $('#qform'+previous_id);
+
+      // If any response given
+      console.log($('.icon-check.green:visible', current_form).length);
+      if($('.icon-check.green:visible', current_form).length > 0){
+        // If its not the first or last
+        if(current_form.length != 0 && id[1] != '0' && id[1] != '99'){
+          console.log(current_form.serialize());
+
+
+          // Save this questionset using an ajax post
+          var posting = $.post(current_form.attr("action"), current_form.serialize());
+
+          $("#loading-message").fadeIn('fast');
+
+          posting.done(function(data) {
+            $("#loading-message").fadeOut('fast');
+          });
+        }
+      }
 
   $('.questionset').each(function(i, obj) {
 
