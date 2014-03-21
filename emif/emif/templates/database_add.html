@@ -173,8 +173,6 @@ function questionsets_handle(id_questionset)
       if($('.icon-check.green:visible', current_form).length > 0){
         // If its not the first or last
         if(current_form.length != 0 && id[1] != '0' && id[1] != '99'){
-          console.log(current_form.serialize());
-
 
           // Save this questionset using an ajax post
           var posting = $.post(current_form.attr("action"), current_form.serialize());
@@ -210,7 +208,9 @@ function questionsets_handle(id_questionset)
     document.body.scrollTop = document.documentElement.scrollTop = 0;
 };
 
-
+$(function(){
+  $('.reqfield').tooltip({container: 'body'});
+});
 
 {% endblock %}
 

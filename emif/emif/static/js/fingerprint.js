@@ -39,12 +39,12 @@ $(document).ready(function() {
             return message;
         }
     }
-    $(document).on('change', '#qform input, #qform select, #qform textarea', function(e) {
+    $(document).on('change', '[id^="qform"] input, [id^="qform"] select, [id^="qform"] textarea', function(e) {
         formHasChanged = true;
         submitted = false;
     });
 
-    $("#qform").submit(function() {
+    $('[id^="qform"]').submit(function() {
         submitted = true;
         formHasChanged = false;
     });

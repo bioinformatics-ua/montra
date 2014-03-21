@@ -104,7 +104,7 @@
                                     </div>
 
                                 {% endif %}
-                                   </span>
+                                   </span> {% if qdict.required %}<span title="This fields is required to be able to publish this database (and make it public)" class="reqfield lead text-error">*</span>{% endif %}
                                 {% if question.text|geths != 'h1' %}
                                     {% if request.user.is_staff %}
                                     <span class="pull-right">

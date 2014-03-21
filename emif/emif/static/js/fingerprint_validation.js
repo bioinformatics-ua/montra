@@ -108,7 +108,7 @@ Fingerprint_Validator.prototype ={
             });    
         }
 
-        $("#qform").submit(function(evnt){
+        $('[id^="qform"]').submit(function(evnt){
             //console.log(self);
             self.validateForm(evnt);
         });

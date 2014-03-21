@@ -146,8 +146,21 @@ function clear_selection(question_name, response){
 */
 (function($){
     $(document).ready(function() {
-        $('#qform').submit(function() {
+        $('[id^="qform"]').submit(function(e) {
+            e.preventDefault();
+            // Save this questionset using an ajax post
+            var posting = $.post($(this).attr("action"), $(this).serialize());
 
+            $("#loading-message").fadeIn('fast');
+            var input = $('.questionset-submit input');
+            input.attr('disabled', true);
+
+            posting.done(function(data) {
+                $("#loading-message").fadeOut('fast');
+                input.attr('disabled', false);
+            });
+
+            /*
             var input = $('.questionset-submit input');
             var interval = 400; // ms
             var duration = 10000; // 10s
@@ -180,6 +193,7 @@ function clear_selection(question_name, response){
 
             // id is availabe in the animate method. js closures ftw!
             var id = setInterval(animate, interval);
+            */
         });
     });
 })(jQuery);

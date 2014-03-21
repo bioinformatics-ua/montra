@@ -198,7 +198,7 @@ def results_fulltext_aux(request, query, page=1, template_name='results.html', i
     if len(filterString) > 0:
         query_filtered += " AND " + filterString
 
-    print query_filtered
+    #print query_filtered
 
     (list_databases, hits) = get_databases_from_solr_v2(request, query_filtered, sort=sortString, rows=rows, start=range)    
     if range > hits and not force:
