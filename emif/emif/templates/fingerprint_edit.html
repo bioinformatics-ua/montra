@@ -12,7 +12,7 @@
 
     <div id="qs_{{ k.sortid }}" class="{% if k.sortid == 0 %} {% else %} hide {% endif %} questionset">
 
-    <form name="qform{{ k.sortid }}" id="qform{{ k.sortid }}" action="dbEdit/{{fingerprint_id}}/{{questionset.questionnaire.pk}}" method="POST" enctype="multipart/form-data">
+    <form name="qform{{ k.sortid }}" id="qform{{ k.sortid }}" action="addPost/{{questionset.questionnaire.pk}}/1/{{ k.sortid }}" method="POST" enctype="multipart/form-data">
 
         <input type="hidden" id="edit_db_inputs" value="0">
         <input type="hidden" name="active_qs" id="active_qs" value="0">

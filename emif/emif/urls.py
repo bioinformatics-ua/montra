@@ -63,12 +63,12 @@ urlpatterns = patterns('',
 
     url(r'^add/(?P<questionnaire_id>[0-9]+)/(?P<sortid>[0-9]+)/$', 'emif.views.database_add'),
     url(r'^searchqs/(?P<questionnaire_id>[0-9]+)/(?P<sortid>[0-9]+)/(?P<aqid>[0-9]+)?$', 'emif.views.database_search_qs'),
-    url(r'^addPost/(?P<questionnaire_id>[0-9]+)/(?P<sortid>[0-9]+)$', 'emif.views.check_database_add_conditions'),
+    url(r'^addPost/(?P<questionnaire_id>[0-9]+)/(?P<sortid>[0-9]+)/(?P<saveid>[0-9]+)$', 'emif.views.check_database_add_conditions'),
     
 
     
     # Database Edit
-    url(r'^dbEdit/(?P<fingerprint_id>[^/]+)/(?P<questionnaire_id>[0-9]+)$$', 'emif.views.database_edit'),
+    url(r'^dbEdit/(?P<fingerprint_id>[^/]+)/(?P<questionnaire_id>[0-9]+)$', 'emif.views.database_edit'),
     #url(r'^dbEdit/(?P<questionnaire_id>[0-9]+)/$$', 'emif.views.database_edit'),
     url(r'^q3/(?P<runcode>[^/]+)/$', questionaries_with_sets, name='questionaries_with_sets'),
     url(r'^q3/(?P<runcode>[^/]+)/(?P<qs>[-]{0,1}\d+)/$',

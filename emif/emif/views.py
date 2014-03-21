@@ -2365,7 +2365,7 @@ def handle_uploaded_file(f):
             destination.write(chunk)
 
 
-def check_database_add_conditions(request, questionnaire_id, sortid,
+def check_database_add_conditions(request, questionnaire_id, sortid, saveid,
                                   template_name='database_add.html', users_db=None, created_date=None):
     # -------------------------------------
     # --- Process POST with QuestionSet ---
@@ -2381,6 +2381,7 @@ def check_database_add_conditions(request, questionnaire_id, sortid,
     qsobjs = QuestionSet.objects.filter(questionnaire=questionnaire_id)
     questionnaire = qsobjs[0].questionnaire
     question_set = None
+    saveqs = None
 
     try:
         question_set = request.POST['active_qs']
@@ -2390,6 +2391,12 @@ def check_database_add_conditions(request, questionnaire_id, sortid,
             if qs.sortid == int(sortid):
                 question_set = qs.pk
                 break
+
+    for qs in qsobjs:
+        if qs.sortid == int(saveid):
+            saveqs = [qs]
+            break        
+
     if (int(sortid) == 99):
             sortid = len(questionnaire.questionsets()) - 1
     
@@ -2400,9 +2407,9 @@ def check_database_add_conditions(request, questionnaire_id, sortid,
     request2 = RequestMonkeyPatch()
    
     if request.POST:
-        (qlist_general, qlist, jstriggers, qvalues, jsinclude, cssinclude, extra_fields, hasErrors) = extract_answers(request, questionnaire_id, question_set2, qsobjs)
+        (qlist_general, qlist, jstriggers, qvalues, jsinclude, cssinclude, extra_fields, hasErrors) = extract_answers(request, questionnaire_id, question_set2, saveqs)
     else:
-        (qlist_general, qlist, jstriggers, qvalues, jsinclude, cssinclude, extra_fields, hasErrors) = extract_answers(request2, questionnaire_id, question_set2, qsobjs)
+        (qlist_general, qlist, jstriggers, qvalues, jsinclude, cssinclude, extra_fields, hasErrors) = extract_answers(request2, questionnaire_id, question_set2, saveqs)
 
     if fingerprint_id != None:
         if users_db==None:
