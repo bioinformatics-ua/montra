@@ -2,9 +2,10 @@
 <!--[if gte IE 9]><!-->
 <script src="{{ STATIC_URL}}js/emif.charts.filters.js"></script>
 <script src="{{ STATIC_URL}}js/emif.charts.draw.js"></script>
+<script src="{{ STATIC_URL}}js/emif.populationcharacteristics.comments.js"></script>
 <!--<![endif]-->
 
-
+<link rel="stylesheet" href="{{ STATIC_URL }}css/pc.css">
 <style type="text/css">
 
 .axis path,
@@ -34,6 +35,8 @@
 
 }
 </style>
+
+
 <!--[if lte IE 8]>
 <div class="well">Currently IE 7 and 8 don't support this functionality. To use this functionality please update your browser to a modern browser, like IE 9 or better, Google Chrome, Firefox, Opera or Safari.</div>
 <![endif]-->
@@ -171,13 +174,25 @@
     
     <div class="span6" id="chart2">
     
-
-
         <div class='row'>
             <div id='pctitle'>
             </div>
             <div id='pc_chart_place'>
             </div>
+            {%if owner_fingerprint%}
+                <div id="pc_comment_id" class="pc_comment">
+                <form id="chartcomments" method="post" action="comments" >
+                    {% csrf_token %}
+                    <input id="pc_chart_comment_id" type="hidden" value="">
+                    <label>Title:</label> <input size="255" maxlength="40" style='width:35em' class="" type="text" cols="80" name="pc_chart_comment_name" >
+
+                    <label>Comments about extracted data: </label>
+                    <textarea class=" input-block-level" rows="4" cols="80" name="pc_chart_comment_description" ></textarea>
+                    <label> </label>
+                    <input type="submit" class="btn btn-primary" id="pc_chart_comment_submit" name="pc_chart_comment_submit" disabled="">
+                </form>
+                </div>
+            {%endif%}
         </div>
     </div>
     

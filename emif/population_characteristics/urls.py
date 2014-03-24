@@ -42,6 +42,9 @@ urlpatterns = patterns('',
     # Parsing Jerboa 
     url(r'^parsejerboa$', 'population_characteristics.documents.parsejerboa'),
 
+    # Comments 
+    url(r'^comments$', 'population_characteristics.views.comments'),
+
     # Just testing URLs:
     url(r'^new/(?P<runcode>[^/]+)/(?P<qs>[-]{0,1}\d+)/$', 'population_characteristics.documents.document_form_view'),
     

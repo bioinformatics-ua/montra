@@ -51,6 +51,10 @@ def jerboa_list_values(request, var, row, fingerprint_id, template_name='documen
     return response
 
 
+def comments(request):
+
+
+
 def filters(request, var, fingerprint_id, template_name='documents_upload_form.html'):
 
     pc = PopulationCharacteristic(None)
