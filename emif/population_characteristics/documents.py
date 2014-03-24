@@ -117,9 +117,11 @@ def parsejerboa(request, template_name='documents_upload_form.html'):
 def single_qset_view(request, runcode, qsid, template_name='fingerprint_qs.html'):
     
     h = None
-    if "highlight_results" in request.session and runcode in request.session["highlight_results"]:
-        h =  merge_highlight_results(request.session["query"] , request.session["highlight_results"][runcode])
-     #   print h["questions"]
+    if "query" in request.session and "highlight_results" in request.session:
+        h = request.session["highlight_results"]
+    #if "query" in request.session and "highlight_results" in request.session and runcode in request.session["highlight_results"]:
+    #    h =  merge_highlight_results(request.session["query"] , request.session["highlight_results"][runcode])
+    #   print h["questions"]
 
     qset, name, db_owners, fingerprint_ttype = createqset(runcode, qsid, highlights=h)   
     

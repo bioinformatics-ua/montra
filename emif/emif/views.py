@@ -199,9 +199,17 @@ def results_fulltext_aux(request, query, page=1, template_name='results.html', i
 
     print query_filtered
 
-    (list_databases, hits, hi) = get_databases_from_solr_with_highlight(request, query, sort=sortString, rows=rows, start=range)    
+    if not isAdvanced:
+        (list_databases, hits, hi) = get_databases_from_solr_with_highlight(request, query, sort=sortString, rows=rows, start=range)
+        hi = merge_highlight_results( request.session["query"] , hi)
+    else:
+        (list_databases, hits) = get_databases_from_solr_v2(request, query, sort=sortString, rows=rows, start=range)
+        hi = None
+    
+
     if range > hits and not force:
         return results_fulltext_aux(request, query, 1, isAdvanced=isAdvanced, force=True)  
+    
     request.session["highlight_results"] = hi
 
     if len(list_databases) == 0 :
@@ -1868,6 +1876,12 @@ def createqset(runcode, qsid, qsets=None, clean=True, highlights=None):
     for q in qqs:
         questionnaires_ids[q.slug] = (q.pk, q.name)
 
+    rHighlights = None
+    qhighlights = None
+    if highlights != None and "results" in highlights and runcode in highlights["results"]:
+        qhighlights = highlights["questions"]
+        rHighlights = highlights["results"][runcode]
+
     for result in results:
 
 
@@ -1949,8 +1963,8 @@ def createqset(runcode, qsid, qsets=None, clean=True, highlights=None):
 
             qs_text = k[:-1] + "qs"
             id_text = "questionaire_"+str(fingerprint_ttype)
-            if highlights != None and id_text in highlights["questions"] and qs_text in highlights["questions"][id_text]:
-                t.tag = highlights["questions"][id_text][qs_text][0].encode('utf-8')
+            if qhighlights != None and id_text in qhighlights and qs_text in qhighlights[id_text]:
+                t.tag = qhighlights[id_text][qs_text][0].encode('utf-8')
 
             try:
 
@@ -1960,8 +1974,8 @@ def createqset(runcode, qsid, qsets=None, clean=True, highlights=None):
                pass
             if clean:
                 t.value = value.replace("#", " ")
-                if highlights != None and k in highlights["results"]:
-                    t.value = highlights["results"][k][0].encode('utf-8')
+                if rHighlights != None and k in rHighlights:
+                    t.value = rHighlights[k][0].encode('utf-8')
                     #if len(highlights["results"][k])>1:
                     #print t.value
             else:
