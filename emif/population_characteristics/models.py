@@ -17,7 +17,9 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 from django.db import models
+from django.contrib.auth.models import User
 
+from django.db.models.fields import *
 
 from docs_manager.models import Document
 
@@ -34,6 +36,6 @@ class Comments(models.Model):
     title = models.TextField()
     description = models.TextField()
     
-    
+    def get_list_comments(self, chart_id):
+        pass
 
-    
