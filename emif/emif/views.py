@@ -1845,10 +1845,11 @@ def createqsets(runcode, qsets=None, clean=True):
 
 def createqset(runcode, qsid, qsets=None, clean=True, highlights=None):
     qsid = int(qsid) 
-    print "Got into createqset!!"
+    print "Got into createqset!!" + str(qsid)
     #print "createqsets"
     c = CoreEngine()
     results = c.search_fingerprint('id:' + runcode)
+    #print len(results)    
     #results = c.search_highlight('id:' + runcode, hlfl="text_t")
     
     if qsets == None:
@@ -1906,14 +1907,14 @@ def createqset(runcode, qsid, qsets=None, clean=True, highlights=None):
                 break
 
         for k in result:
-            #print k
             if k in blacklist:
                 continue
+            
             if k.startswith("comment_question_"):
                 continue
-
+                
             t = Tag()
-
+            
             aux_results = Slugs.objects.filter(slug1=k[:-2], question__questionset__questionnaire=q_aux[0].pk)
             qs = None
             question_group = None
@@ -1938,7 +1939,6 @@ def createqset(runcode, qsid, qsets=None, clean=True, highlights=None):
             info = text
             t.tag = info
             #print t.tag
-
             if question_group != None and question_group.list_ordered_tags != None:
                 try:
                     t = question_group.list_ordered_tags[question_group.list_ordered_tags.index(t)]                   
@@ -1949,7 +1949,7 @@ def createqset(runcode, qsid, qsets=None, clean=True, highlights=None):
 
             qs_text = k[:-1] + "qs"
             id_text = "questionaire_"+str(fingerprint_ttype)
-            if id_text in highlights["questions"] and qs_text in highlights["questions"][id_text]:
+            if highlights != None and id_text in highlights["questions"] and qs_text in highlights["questions"][id_text]:
                 t.tag = highlights["questions"][id_text][qs_text][0].encode('utf-8')
 
             try:
@@ -1963,11 +1963,12 @@ def createqset(runcode, qsid, qsets=None, clean=True, highlights=None):
                 if highlights != None and k in highlights["results"]:
                     t.value = highlights["results"][k][0].encode('utf-8')
                     #if len(highlights["results"][k])>1:
-                        #print t.value
+                    #print t.value
             else:
                 t.value = value
             if k == "database_name_t":
-                name = t.value
+                name = t.value           
+
             list_values.append(t)
             if question_group != None:
                 try:
