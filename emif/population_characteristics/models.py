@@ -24,4 +24,16 @@ from docs_manager.models import Document
 class Characteristic(Document):
     pass
 
+
+class Comments(models.Model):
+    user = models.ForeignKey(User, unique=False, blank=True, null=True)
+    fingerprint_id = models.CharField(max_length=255)
+    created_date = models.DateTimeField(auto_now_add=True)
+    latest_date = models.DateTimeField(auto_now=True)
+    document = models.ForeignKey(Characteristic, unique=False, blank=True, null=True)
+    title = models.TextField()
+    description = models.TextField()
+    
+    
+
     
