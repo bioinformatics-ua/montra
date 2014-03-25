@@ -110,7 +110,7 @@ Fingerprint_Validator.prototype ={
 
         $('[id^="qform"]').submit(function(evnt){
             //console.log(self);
-            self.validateForm(evnt);
+            self.validateFormContext(evnt, this);
         });
     },
     validate : function (clas, questionNumber, controllerDOM){
@@ -134,6 +134,7 @@ Fingerprint_Validator.prototype ={
     validateForm: function(evnt){
         var self = this;
 
+        list = [];
         for( x in self.validators ){
             $("."+self.validators[x].n).each(function(i, v) {
 
@@ -149,12 +150,42 @@ Fingerprint_Validator.prototype ={
                     var qs_id = validator_id.split(".")[0];
 
                     //console.log(qs_id);
-                    questionsets_handle( $("#qs_"+qs_id )[0]);
+                    //questionsets_handle( $("#qs_"+qs_id )[0]);
+                    list.push(validator_id);
                 }
 
-            });    
+            });
+        return list;  
         }
     },
+    validateFormContext: function(evnt, context){
+        var self = this;
+
+        list = [];
+
+        for( x in self.validators ){
+
+            $("."+self.validators[x].n, context).each(function(i, v) {
+
+                var cDOM = self.validators[x].v.controllerDOM(v);
+                var validator_id = $(v).attr("id");
+                validator_id= validator_id.replace(self.validators[x].n+"_", "");
+
+                if( !self.validators[x].v.validate( validator_id, cDOM)){
+                    evnt.preventDefault();     
+
+                    var qs_id = validator_id.split(".")[0];
+
+                    //console.log(qs_id);
+                    //questionsets_handle( $("#qs_"+qs_id )[0]);
+                    list.push(validator_id);
+                }
+
+            });
+        }
+        return list;  
+
+    },    
     searchMode: function(searchMode){
         if(searchMode == undefined || !searchMode){
             this.validators["open-button"] = { n: "open-button_validator", v: new OpenButtonValidator(this)};

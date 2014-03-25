@@ -48,6 +48,8 @@ text-decoration: none;
 <!-- this was a duplicate import. may cause conflicts -->
 <!--script type="text/javascript" src="{{ STATIC_URL }}jquery.min.js"></script-->
 <script type="text/javascript" src="{{ STATIC_URL }}questionset.js"></script>
+<script src="{{ STATIC_URL }}js/vendor/jquery.errornavigator.js"></script>
+
 <link rel="stylesheet" href="{{ STATIC_URL }}progressbar.css"></script>
 {% for x in jsinclude %}
 <script type="text/javascript" src="{{ x }}"></script>
@@ -70,6 +72,8 @@ text-decoration: none;
 {% endblock %}
 
 {% block content %}
+
+<div style="display: none;" id="errornavigator"></div>
 
 <div style="display: none; z-index: 2000; position:fixed; bottom:20px; right: 20px;" class="alert alert-info" id="loading-message">
 Saving... please don't close this questionnary yet.</div>
@@ -168,48 +172,78 @@ function questionsets_handle(id_questionset)
       var previous_id = $('.questionset:not(.hide)').first().attr('id').split('_')[1];
       var current_form = $('#qform'+previous_id);
 
-      // If any response given
-      console.log($('.icon-check.green:visible', current_form).length);
-      if($('.icon-check.green:visible', current_form).length > 0){
-        // If its not the first or last
-        if(current_form.length != 0 && id[1] != '0' && id[1] != '99'){
 
-          // Save this questionset using an ajax post
-          var posting = $.post(current_form.attr("action"), current_form.serialize());
+      if (!(typeof errornavigator === 'undefined')) {
+      errornavigator.hideErrorPage();
+      errornavigator.reset();
 
-          $("#loading-message").fadeIn('fast');
+      var list_invalid = advValidator.validateFormContext(event, current_form);
+      //console.log(list_invalid);
 
-          posting.done(function(data) {
-            $("#loading-message").fadeOut('fast');
-          });
+
+      if(list_invalid.length == 0){
+
+        if(formHasChanged){
+          // If its not the first or last
+          if(current_form.length != 0 && id[1] != '0' && id[1] != '99'){
+
+            // Save this questionset using an ajax post
+            var posting = $.post(current_form.attr("action"), current_form.serialize());
+
+            $("#loading-message").fadeIn('fast');
+
+            posting.done(function(data) {
+              $("#loading-message").fadeOut('fast');
+            });
+          }
         }
+        $('.questionset').each(function(i, obj) {
+
+          if (obj.id==id_questionset.id)
+          {
+
+             $('#'+obj.id).addClass("show");
+             $('#li_'+id_questionset.id).addClass("active");
+             $('#'+obj.id).removeClass("hide");
+
+             
+          }
+          else {
+            $('#li_'+obj.id).removeClass("active");
+            $('#'+obj.id).addClass("hide");
+            $('#'+obj.id).removeClass("show");
+          }
+          
+        }
+
+        );
+        document.body.scrollTop = document.documentElement.scrollTop = 0; 
+
+        formHasChanged = false;   
+        list_invalid = []; 
+
+      } else {
+        console.log("Jump to errors and show error navigator.");
+
+          for(var i = 0;i<list_invalid.length;i++){
+            errornavigator.addError('qc_'+list_invalid[i]);
+          }
+          errornavigator.showErrorPager();
+
+          // jump to first problem
+          errornavigator.nextError();
+
+        }
+
+
+
+
       }
-
-  $('.questionset').each(function(i, obj) {
-
-    if (obj.id==id_questionset.id)
-    {
-
-       $('#'+obj.id).addClass("show");
-       $('#li_'+id_questionset.id).addClass("active");
-       $('#'+obj.id).removeClass("hide");
-
-       
-    }
-    else {
-      $('#li_'+obj.id).removeClass("active");
-      $('#'+obj.id).addClass("hide");
-      $('#'+obj.id).removeClass("show");
-    }
-    
-  }
-
-  );
-    document.body.scrollTop = document.documentElement.scrollTop = 0;
 };
-
+var errornavigator;
 $(function(){
   $('.reqfield').tooltip({container: 'body'});
+  errornavigator = $('#errornavigator').errornavigator();
 });
 
 {% endblock %}
