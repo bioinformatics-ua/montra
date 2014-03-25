@@ -148,17 +148,55 @@ function clear_selection(question_name, response){
     $(document).ready(function() {
         $('[id^="qform"]').submit(function(e) {
             e.preventDefault();
+
+            var self = $(this);
+
+      if (!(typeof errornavigator === 'undefined')) {
+      errornavigator.hideErrorPage();
+      errornavigator.reset();
+
+      var list_invalid = advValidator.validateFormContext(event, self);
+      //console.log(list_invalid);
+
+
+      if(list_invalid.length == 0){
+
+        if(formHasChanged){
+          // If its not the first or last
+          var id = this.id.split('_');
+
+          if(self.length != 0 && id[1] != '0' && id[1] != '99'){
+
             // Save this questionset using an ajax post
-            var posting = $.post($(this).attr("action"), $(this).serialize());
+            var posting = $.post(self.attr("action"), self.serialize());
 
             $("#loading-message").fadeIn('fast');
-            var input = $('.questionset-submit input');
-            input.attr('disabled', true);
 
             posting.done(function(data) {
-                $("#loading-message").fadeOut('fast');
-                input.attr('disabled', false);
+              $("#loading-message").fadeOut('fast');
             });
+          }
+        }
+
+        document.body.scrollTop = document.documentElement.scrollTop = 0; 
+
+        formHasChanged = false;   
+        list_invalid = []; 
+
+      } else {
+        console.log("Jump to errors and show error navigator.");
+
+          for(var i = 0;i<list_invalid.length;i++){
+            errornavigator.addError('qc_'+list_invalid[i]);
+          }
+          errornavigator.showErrorPager();
+
+          // jump to first problem
+          errornavigator.nextError();
+
+        }
+
+      }
 
             /*
             var input = $('.questionset-submit input');
