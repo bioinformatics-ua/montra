@@ -93,7 +93,8 @@ function valchanged(qnum, value, self) {
                                , dirty.substring(index+1,dirty.length));
         } else {       
             if( value != 'yes' && value != 'no' && value != 'dontknow ')
-            bool_container.pushWithDelegate('question_nr_'+clean, clean.replace('_','')+'. '+the_question+'', value, 'clear_selection("question_nr_'+clean+'", " ");');   
+            bool_container.pushWithDelegate('question_nr_'+clean, clean.replace('_','')+'. '+the_question.replace(/\s{2,}/g, ' ')+'', 
+                value, 'clear_selection("question_nr_'+clean+'", " ");');   
                         
         }
     }    
@@ -107,6 +108,17 @@ function valchanged(qnum, value, self) {
         var res = eval(checks);
         statusChanged(t, res)
     }
+}
+function initialvalchanged(qnum, value, self){
+    qvalues[qnum] = value;
+    // qnum may be 'X_Y' for option Y of multiple choice question X
+    qnum = qnum.split('_')[0];
+    for (var t in qtriggers) {
+        t = qtriggers[t];
+        checks = getChecksAttr(t);
+        var res = eval(checks);
+        statusChanged(t, res)
+    }   
 }
 
 function addtrigger(elemid) {

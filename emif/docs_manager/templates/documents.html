@@ -27,16 +27,15 @@
         <!--<noscript><input type="hidden" name="redirect" value="http://blueimp.github.io/jQuery-File-Upload/"></noscript>-->
         <!-- The fileupload-buttonbar contains buttons to add/delete files and start/cancel the upload -->
         <div class="row fileupload-buttonbar">
-            <div class="span7">
             <fieldset>
 
-                <label>Name:</label> <input size="255" type="text" cols="100" name="pc_name" >
+                <label>Name:</label> <input class="span7" size="255" type="text" cols="100" name="pc_name" >
                 <label>Description: </label>
-                <textarea class="input-block-level" rows="4" name="pc_comments" ></textarea>
+                <textarea class="span7 input-block-level" rows="4" name="pc_comments" ></textarea>
 
                 <!-- The fileinput-button span is used to style the file input field as button -->
 
-                <span class="btn btn-success fileinput-button">
+                <span style="margin-left: 0px !important;" class="span7 btn btn-success fileinput-button">
                     <i class="glyphicon glyphicon-plus"></i>
                     <span>Add files...</span>
                     <input type="file" name="file" multiple>
@@ -45,7 +44,6 @@
                 
                 <!-- The loading indicator is shown during file processing -->
                 <span class="fileupload-loading"></span>
-            </div>
             <!-- The global progress information -->
             <div class="span5 fileupload-progress fade">
                 <!-- The global progress bar -->
@@ -71,7 +69,7 @@
     <table class="table table-striped">
     <tbody class="files" id="files">
 
-    <tr class="">
+    <!--tr class="">
         <td>
             <span class="preview">
                 
@@ -79,7 +77,7 @@
             </span>
         </td>
         
-    </tr>
+    </tr-->
 
     </tbody>
     </table>
