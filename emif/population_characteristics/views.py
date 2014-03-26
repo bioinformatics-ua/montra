@@ -28,6 +28,8 @@ from django.core import serializers
 
 from django.conf import settings
 
+from django.http import *
+
 
 def jerboa_list_values(request, var, row, fingerprint_id, template_name='documents_upload_form.html'):
 
@@ -52,6 +54,12 @@ def jerboa_list_values(request, var, row, fingerprint_id, template_name='documen
 
 
 def comments(request):
+    if request.POST:
+        # TODO: Handle the parameters here
+        pass
+
+    # Return bad requests
+    return HttpResponseBadRequest()
 
 
 
