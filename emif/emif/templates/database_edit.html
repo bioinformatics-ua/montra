@@ -120,22 +120,24 @@ Saving... please don't close this questionnary yet.</div>
 
 </div>
 </div>
+{% comment %}
 {% include "fingerprint_edit.html" %}
+{% endcomment %}
+<div class="span8" id="set_container"></div>
+
 </div>
-<script type="text/javascript">
-console.log("trigger");
-        {% for trigger in triggers %}
-            addtrigger("{{trigger}}");
-        {% endfor %}
 
-        {% for k,v in qvalues.items %}
-            qvalues['{{ k|escapejs }}'] = '{{ v|escapejs }}';
-        {% endfor %}
+{% endblock %}
 
-        for(key in qvalues) {
-            valchanged(key, qvalues[key]);
-        }
-    </script>
+{% block scriptextraincludes %} 
+<script src="{{ STATIC_URL}}js/emif.fingerprint.counter.js"></script>
+
+<!-- Fix later -->
+<script src="{{ STATIC_URL}}js/vendor/bootstrap-tooltip.js"></script>
+<script src="{{ STATIC_URL}}js/vendor/bootstrap-popover.js"></script>
+<script src="{{ STATIC_URL}}js/fingerprint_validation.js"></script>
+<script src="{{ STATIC_URL }}js/vendor/jquery.inputmask.bundle.min.js" type="text/javascript"></script>
+<script src="{{ STATIC_URL}}js/fingerprint.js"></script>
 {% endblock %}
 
 <script type="text/javascript">
@@ -220,7 +222,12 @@ function questionsets_handle(id_questionset)
              $('#li_'+id_questionset.id).addClass("active");
              $('#'+obj.id).removeClass("hide");
 
-             
+             if($('#'+obj.id).find('.loadingindicator').length != 0){
+              loadqspart("{{fingerprint_id}}", "{{q_id}}",obj.id.replace("qs_",""));
+              console.log("Loading to dom");
+             } else {
+               console.log("Already on dom");
+             }
           }
           else {
             $('#li_'+obj.id).removeClass("active");
@@ -251,18 +258,38 @@ function questionsets_handle(id_questionset)
 
       }
 };
+function generateStub(){
+          var containers = [];
 
+        // We build the qs containers in memory and just do dom op, on the end, for speed
+        // on ie joins are significantly faster than concatenation
+        {% for qs in questionset.questionnaire.questionsets %}
+            containers.push('<div id="qs_{{ qs.sortid }}" class="{% if qs.sortid == questionset.sortid %} {% else %} hide {% endif %} questionset"><h4 class="loadingindicator pull-center">Loading...</h4></div>\n');
+        {% endfor %}
+
+        $('#set_container').append(containers.join(''));
+}
+function loadqspart(fingerprint, pk, sortid){
+    
+    //console.log("getting part from searchqs/"+pk+"/"+sortid+"/");
+        $.get( "editqs/"+fingerprint+"/"+pk+"/"+sortid+"/", function( data ) {
+          $( "#qs_"+sortid ).html( data );
+        });
+}
 var errornavigator;
 $(function(){
+  generateStub();  
+
   $('.reqfield').tooltip({container: 'body'});
   errornavigator = $('#errornavigator').errornavigator();
+
+  loadqspart("{{fingerprint_id}}", "{{q_id}}", "{{questionset.sortid}}");
+
+  // Clearly identify database name before the edition
+  advValidator.setDatabase("{{name}}");
 });
 
 //questionsets_handle(qs_0);
-
-
-
-
 
 {% endblock %}
 

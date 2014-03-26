@@ -62,13 +62,19 @@ import os
 import os.path
 import time
 
+import base64
+
+from django.core.cache import cache
+from django.views.decorators.cache import cache_page
+
+
 def list_questions():
     print "list_questions"
     objs = Questionnaire.objects.all()
     results = {}
     for q in objs:
         results[q.id] = q.name
-    print results
+
     return results
 
 
@@ -553,11 +559,18 @@ def advanced_search(request, questionnaire_id, question_set, aqid):
 
     return show_fingerprint_page_read_only(request, questionnaire_id, question_set, True, aqid)
 
-
 def database_add(request, questionnaire_id, sortid):
 
+
+    t1 = datetime.datetime.now()
+ 
     response = show_fingerprint_page_read_only(request, questionnaire_id, sortid,
                                                template_name='database_add.html')
+
+    # Second timestamp
+    t2 = datetime.datetime.now()   
+
+    print "Execution time: %s" % (t2-t1)
 
     return response
 
@@ -568,7 +581,21 @@ def database_search_qs(request, questionnaire_id, sortid, aqid):
 
     return response
 
-def render_one_questionset(request, q_id, qs_id, errors={}, aqid=None, template_name='fingerprint_add_qs.html'):
+def database_add_qs(request, questionnaire_id, sortid):
+
+    response = render_one_questionset(request, questionnaire_id, sortid,
+                                               template_name='fingerprint_add_qs.html')
+
+    return response
+
+def database_edit_qs(request, fingerprint_id, questionnaire_id, sort_id):
+
+    response = render_one_questionset(request, questionnaire_id, sort_id, fingerprint_id = fingerprint_id,
+                                               template_name='fingerprint_add_qs.html')
+
+    return response
+
+def render_one_questionset(request, q_id, qs_id, errors={}, aqid=None, fingerprint_id=None, template_name='fingerprint_add_qs.html'):
     """
     Return the QuestionSet template
 
@@ -576,6 +603,7 @@ def render_one_questionset(request, q_id, qs_id, errors={}, aqid=None, template_
     """
     request2 = None
     
+    # In case we should be getting an advancedquery 
     if aqid != None:
         this_query = AdvancedQuery.objects.get(id=aqid)
         this_answers = AdvancedQueryAnswer.objects.filter(refquery=this_query)
@@ -587,6 +615,61 @@ def render_one_questionset(request, q_id, qs_id, errors={}, aqid=None, template_
         for answer in this_answers:
             request2.get_post()[answer.question] = answer.answer
     
+    if fingerprint_id != None:
+        c = CoreEngine()
+
+        extra = {} 
+
+        results = c.search_fingerprint("id:" + fingerprint_id)
+        items = None
+        for r in results:
+            items = r
+            break
+
+        request2 = RequestMonkeyPatch()
+
+        request2.method = request.method
+        for item in items:
+            key = item
+            value = items[key]
+            if item.startswith("comment_question_"):
+                
+                slug = item.split("comment_question_")[1]
+                # results = Slugs.objects.filter(slug1=slug[:-2], question__questionset__questionnaire=questionnaire_id)
+                # if results == None or len(results) == 0:
+                #     continue
+                # question = results[0].question
+                results = Question.objects.filter(slug_fk__slug1=slug[:-2], questionset__questionnaire=q_id)
+                if results == None or len(results) == 0:
+                    continue
+                question = results[0]
+                request2.get_post()['comment_question_%s' % question.number] = value
+                continue
+
+            if item == '_version_':
+                continue
+
+            # results = Slugs.objects.filter(slug1=str(item)[:-2],question__questionset__questionnaire=questionnaire_id )
+            # print len(results)
+            # if results == None or len(results) == 0:
+            #     continue
+            # question = results[0].question
+            results = Question.objects.filter(slug_fk__slug1=str(item)[:-2], questionset__questionnaire=q_id)
+            if results == None or len(results) == 0:
+                continue
+            question = results[0]
+            answer = str(question.number)
+
+            extra[question] = ans = extra.get(question, {})
+            if "[" in value:
+                value = value.replace("]", "").replace("[", "")
+            request2.get_post()['question_%s' % question.number] = value
+            
+            
+            ans['ANSWER'] = value
+            
+            extra[question] = ans
+
     try:
 
         qs_list = QuestionSet.objects.filter(questionnaire=q_id, sortid=qs_id).order_by('sortid')
@@ -688,7 +771,11 @@ def render_one_questionset(request, q_id, qs_id, errors={}, aqid=None, template_
         if aqid != None:
             (qlist_general, qlist, jstriggers, qvalues, jsinclude, cssinclude, extra_fields, hasErrors) = extract_answers(request2, q_id, question_set, qs_list)
         
-        print jstriggers
+        elif fingerprint_id != None:
+            (qlist_general, qlist, jstriggers, qvalues, jsinclude, cssinclude, extra_fields, hasErrors) = extract_answers(request2, q_id, question_set, qs_list)
+
+
+        #print jstriggers
         
         fingerprint_id = generate_hash()
         r = r2r(template_name, request,
@@ -1041,6 +1128,7 @@ def database_edit(request, fingerprint_id, questionnaire_id, template_name="data
             jsinclude=jsinclude,
             cssinclude=cssinclude,
             fingerprint_id=fingerprint_id,
+            q_id = q_id,
             async_progress=None,
             async_url=None,
             qs_list=qs_list,
@@ -2591,6 +2679,8 @@ def show_fingerprint_page_read_only(request, q_id, qs_id, SouMesmoReadOnly=False
 
     Also add the javascript dependency code.
     """
+    # Getting first timestamp
+
     if template_name == "database_add.html" :
         hide_add = True
     else:
@@ -2604,8 +2694,9 @@ def show_fingerprint_page_read_only(request, q_id, qs_id, SouMesmoReadOnly=False
         
     try:
 
-        qs_list = QuestionSet.objects.filter(questionnaire=q_id).order_by('sortid')
         
+        qs_list = QuestionSet.objects.filter(questionnaire=q_id).order_by('sortid')
+
         #print "Q_id: " + q_id
         #print "Qs_id: " + qs_id
         #print "QS List: " + str(qs_list)
@@ -2675,8 +2766,7 @@ def show_fingerprint_page_read_only(request, q_id, qs_id, SouMesmoReadOnly=False
                 return results_fulltext_aux(request, query, isAdvanced=True)
             else:
                 return results_fulltext_aux(request, query)
-
-
+        
         qlist_general = []
 
         for k in qs_list:
@@ -2740,41 +2830,42 @@ def show_fingerprint_page_read_only(request, q_id, qs_id, SouMesmoReadOnly=False
                 qs_aux = k
             qlist_general.append((qs_aux, qlist))
             
-            
-        # qvalues = {'1a': 'teste'}   
-        print question_set.questionnaire.questionsets()
-
-
         errors = {}
         fingerprint_id = generate_hash()
+
+    
         r = r2r(template_name, request,
-                questionset=question_set,
-                questionsets=question_set.questionnaire.questionsets,
-                runinfo=None,
-                errors=errors,
-                qlist=qlist,
-                progress=None,
-                triggers=jstriggers,
-                qvalues=qvalues,
-                jsinclude=jsinclude,
-                cssinclude=cssinclude,
-                async_progress=None,
-                async_url=None,
-                qs_list=qs_list,
-                questions_list=qlist_general,
-                fingerprint_id=fingerprint_id,
-                breadcrumb=True,
-                hide_add=hide_add,
-                q_id=q_id,
-                aqid=aqid,
-                serialized_query=serialized_query
-                
-        )
+                        questionset=question_set,
+                        questionsets=question_set.questionnaire.questionsets,
+                        runinfo=None,
+                        errors=errors,
+                        qlist=qlist,
+                        progress=None,
+                        triggers=jstriggers,
+                        qvalues=qvalues,
+                        jsinclude=jsinclude,
+                        cssinclude=cssinclude,
+                        async_progress=None,
+                        async_url=None,
+                        qs_list=qs_list,
+                        questions_list=qlist_general,
+                        fingerprint_id=fingerprint_id,
+                        breadcrumb=True,
+                        hide_add=hide_add,
+                        q_id=q_id,
+                        aqid=aqid,
+                        serialized_query=serialized_query)
         r['Cache-Control'] = 'no-cache'
+
         r['Expires'] = "Thu, 24 Jan 1980 00:00:00 GMT"
+
 
     except:
         raise
+
+
+
+
 
     return r
 

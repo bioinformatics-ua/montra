@@ -56,6 +56,9 @@ OpenButtonValidator.prototype ={
     },
     controllerDOM : function(validatorDOM){
         return $("input", validatorDOM);
+    },
+    setDatabase : function(db){
+        this.database_name = db;
     }
 }
 
@@ -94,8 +97,9 @@ NumericValidator.prototype ={
 
 function Fingerprint_Validator(searchMode){
     this.validators = [];
+    this.fingerprint_name = new OpenButtonValidator(this);
 
-    this.validators["open-button"] = { n: "open-button_validator", v: new OpenButtonValidator(this)};
+    this.validators["open-button"] = { n: "open-button_validator", v: this.fingerprint_name};
     this.validators["numeric"] = { n: "numeric_validator", v: new NumericValidator(this)};
 }
 Fingerprint_Validator.prototype ={
@@ -130,6 +134,9 @@ Fingerprint_Validator.prototype ={
             validator.addClass("error");
             $("span", validator).text(feedback_message);
         }   
+    },
+    setDatabase : function(db){
+        this.fingerprint_name.setDatabase(db);
     },
     validateForm: function(evnt){
         var self = this;

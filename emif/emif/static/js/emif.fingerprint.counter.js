@@ -209,9 +209,10 @@ function CounterTasker(ui, questionnaireId) {
 };
 
 $(document).ready(function() {
+    /*
     var core = new CounterCore();
     var ui = new CounterUI();
     var tasker = new CounterTasker(ui, 0);
     tasker.run();
-
+    */
 });
