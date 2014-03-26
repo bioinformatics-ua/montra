@@ -199,12 +199,11 @@ def results_fulltext_aux(request, query, page=1, template_name='results.html', i
 
     print query_filtered
 
+    (list_databases, hits, hi) = get_databases_from_solr_with_highlight(request, query, sort=sortString, rows=rows, start=range)
     if not isAdvanced:
-        (list_databases, hits, hi) = get_databases_from_solr_with_highlight(request, query, sort=sortString, rows=rows, start=range)
         hi = merge_highlight_results( request.session["query"] , hi)
     else:
-        (list_databases, hits) = get_databases_from_solr_v2(request, query, sort=sortString, rows=rows, start=range)
-        hi = None
+        hi = merge_highlight_results( None , hi)
     
 
     if range > hits and not force:
@@ -1257,12 +1256,13 @@ def get_databases_from_solr_with_highlight(request, query="*:*", sort="", rows=1
 
 def merge_highlight_results(query, resultHighlights):
     c = CoreEngine()
-    qresults = c.highlight_questions(query)
-
     h = {}
     h["results"] = resultHighlights
-    h["questions"] = qresults.highlighting
-        
+    
+    if query:
+        qresults = c.highlight_questions(query)
+        h["questions"] = qresults.highlighting
+
     return h  
 
 def delete_fingerprint(request, id):
@@ -1878,10 +1878,12 @@ def createqset(runcode, qsid, qsets=None, clean=True, highlights=None):
 
     rHighlights = None
     qhighlights = None
-    if highlights != None and "results" in highlights and runcode in highlights["results"]:
-        qhighlights = highlights["questions"]
-        rHighlights = highlights["results"][runcode]
-
+    if highlights != None:
+        if "results" in highlights and runcode in highlights["results"]:
+            rHighlights = highlights["results"][runcode]
+        if "questions" in highlights:
+            qhighlights = highlights["questions"]
+        
     for result in results:
 
 
