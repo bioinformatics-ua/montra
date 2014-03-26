@@ -1107,10 +1107,29 @@ def database_edit(request, fingerprint_id, questionnaire_id, template_name="data
 
     #import pdb
     #pdb.set_trace()
+    #### Find out about the number of answers serverside 
+
+    c = CoreEngine()
+
+    this_document = c.search_fingerprint('id:' + fingerprint_id).docs[0]
+
+    qreturned = []
+
+    for x in question_set.questionnaire.questionsets():
+        ttct = x.total_count()
+        ans = len(intersect(this_document, x))
+        try:
+            percentage = (ans * 100) / ttct
+        except ZeroDivisionError:
+            percentage = 0
+
+        qreturned.append([x, ans, ttct, percentage])
+
+    #### End of finding out about the number of answers serverside
 
     r = r2r(template_name, request,
             questionset=question_set,
-            questionsets=question_set.questionnaire.questionsets,
+            questionsets=qreturned,
             runinfo=None,
             errors=errors,
             #qlist=qlist,
@@ -1144,6 +1163,14 @@ def database_edit(request, fingerprint_id, questionnaire_id, template_name="data
 #    last_activity = ''
     
 
+def intersect(this_document, questionset):
+    intersection = []
+
+    for question in questionset.questions():
+        if this_document.has_key(question.slug+"_t"):
+            intersection.append(question.slug+"_t")
+
+    return intersection
 
 def get_databases_from_db(request):
     user = request.user
@@ -2694,6 +2721,7 @@ def show_fingerprint_page_read_only(request, q_id, qs_id, SouMesmoReadOnly=False
         #print "QS List: " + str(qs_list)
         if (int(qs_id) == 99):
             qs_id = len(qs_list) - 1
+
         question_set = qs_list[int(qs_id)]
         #questions = Question.objects.filter(questionset=qs_id)
 
@@ -2714,121 +2742,36 @@ def show_fingerprint_page_read_only(request, q_id, qs_id, SouMesmoReadOnly=False
         qvalues = {}
         qexpression = None  # boolean expression
         qserialization = None   # boolean expression serialization to show on results
-                
-        #if not request.POST:
-            
-            #if 'query' in request.session:
-                #del request.session['query']
-
-            #if 'search_full' in request.session:
-                #del request.session['search_full']
-
-        if request.POST:
-            for k, v in request.POST.items():
-                
-                if (len(v)==0):
-                    continue
-                if k.startswith("question_"):
-                    s = k.split("_")
-                    if len(s) == 4:
-                        #qvalues[s[1]+'_'+v] = '1' # evaluates true in JS
-                        if (qvalues.has_key(s[1])):
-                            qvalues[s[1]] += " " + v # evaluates true in JS
-                        else:
-                            qvalues[s[1]] = v # evaluates true in JS
-                    elif len(s) == 3 and s[2] == 'comment':
-                        qvalues[s[1] + '_' + s[2]] = v
-                    else:
-                        if (qvalues.has_key(s[1])):
-                            qvalues[s[1]] += " " + v
-                        else:
-                            qvalues[s[1]] = v
-                            #print qvalues
-                elif k == "boolrelwidget-boolean-representation":            
-                    qexpression = v
-                elif k == "boolrelwidget-boolean-serialization":     
-                    # we add the serialization to the session
-                    request.session['serialization_query'] = v
-
-            query = convert_qvalues_to_query(qvalues, q_id, qexpression)
-            query = convert_query_from_boolean_widget(qexpression, q_id)
-            #print "Query: " + query
-            request.session['query'] = query
-            if template_name=='advanced_search.html':
-                return results_fulltext_aux(request, query, isAdvanced=True)
-            else:
-                return results_fulltext_aux(request, query)
         
         qlist_general = []
-        ''' THIS IS NO LONGER NEEDED, THANK GOD THE MERCIFUL
-        for k in qs_list:
-            qlist = []
-            qs_aux = None
-            for question in questions_list[k.id]:
-                qs_aux = question.questionset
-                #print "Question: " + str(question.number)
-                
-                Type = question.get_type()
-                if SouMesmoReadOnly and Type == 'open-button':
-                   Type = "open"
 
-                _qnum, _qalpha = split_numal(question.number)
-
-                qdict = {
-                    'template': 'questionnaire/%s.html' % (Type),
-                    'qnum': _qnum,
-                    'qalpha': _qalpha,
-                    'qtype': Type,
-                    'qnum_class': (_qnum % 2 == 0) and " qeven" or " qodd",
-                    'qalpha_class': _qalpha and (ord(_qalpha[-1]) % 2 \
-                                                     and ' alodd' or ' aleven') or '',
-                }
-                # add javascript dependency checks
-                cd = question.getcheckdict()
-                
-                depon = cd.get('requiredif', None) or cd.get('dependent', None)
-                if depon:
-                    # extra args to BooleanParser are not required for toString
-                    parser = BooleanParser(dep_check)
-                    # qdict['checkstring'] = ' checks="%s"' % parser.toString(depon)
-
-                    #It allows only 1 dependency
-                    #The line above allows multiple dependencies but it has a bug when is parsing white spaces
-                    qdict['checkstring'] = ' checks="dep_check(\'question_%s\')"' % depon
-                    
-
-                    qdict['depon_class'] = ' depon_class'
-                    jstriggers.append('qc_%s' % question.number)
-                    if question.text[:2] == 'h1':
-                        jstriggers.append('acc_qc_%s' % question.number)
-                if 'default' in cd and not question.number in cookiedict:
-                    qvalues[question.number] = cd['default']
-                if Type in QuestionProcessors:
-                    qdict.update(QuestionProcessors[Type](request, question))
-                    
-                    if 'jsinclude' in qdict:
-                        if qdict['jsinclude'] not in jsinclude:
-                            jsinclude.extend(qdict['jsinclude'])
-                    if 'cssinclude' in qdict:
-                        if qdict['cssinclude'] not in cssinclude:
-                            cssinclude.extend(qdict['jsinclude'])
-                    if 'jstriggers' in qdict:
-                        jstriggers.extend(qdict['jstriggers'])
-                        
-                qlist.append((question, qdict))
-               
-            if qs_aux == None:
-                #print "$$$$$$ NONE"
-                qs_aux = k
-            qlist_general.append((qs_aux, qlist))'''
-            
         errors = {}
         fingerprint_id = generate_hash()
 
-    
+
+        #### Find out about the number of answers serverside 
+
+        #c = CoreEngine()
+
+        #this_document = c.search_fingerprint('id:' + db_id)
+
+        qreturned = []
+
+        for x in question_set.questionnaire.questionsets():
+            ttct = x.total_count()
+            ans = 0
+            try:
+                percentage = (ans * 100) / ttct
+            except ZeroDivisionError:
+                percentage = 0
+            qreturned.append([x, ans, ttct, percentage])
+
+        print qreturned
+        #### End of finding out about the number of answers serverside
+
         r = r2r(template_name, request,
                         questionset=question_set,
-                        questionsets=question_set.questionnaire.questionsets,
+                        questionsets=qreturned,
                         runinfo=None,
                         errors=errors,
                         qlist=qlist,
@@ -2854,10 +2797,6 @@ def show_fingerprint_page_read_only(request, q_id, qs_id, SouMesmoReadOnly=False
 
     except:
         raise
-
-
-
-
 
     return r
 

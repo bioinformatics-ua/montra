@@ -290,7 +290,12 @@ $(document).ready(function() {
             //console.log('QID: ' + qId);
             /* Update Counter */
             try{ 
-                questionSetsCounters[qId]['filledQuestions'] = questionSetsCounters[qId]['filledQuestions'] + valueCounter;
+                var cc = new CounterCore(qId);
+
+
+                //questionSetsCounters[qId]['filledQuestions'] = questionSetsCounters[qId]['filledQuestions'] + valueCounter;
+                questionSetsCounters[qId]['filledQuestions'] = cc.countFilledQuestionSet(qId);
+
                 var ui = new CounterUI();
                 ui.updateCountersClean(qId);
             } catch(err){

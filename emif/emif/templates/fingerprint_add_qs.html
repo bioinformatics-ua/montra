@@ -223,5 +223,7 @@ collapseAll($("#collapseall_qs_{{ k.sortid }}"), div_id);
 {% endif %}
 {% endfor %}
 add_triggers();
+setsaveqs("qform{{ questions_list.0.0.sortid }}");
+
 {% endblock %}
 </script>

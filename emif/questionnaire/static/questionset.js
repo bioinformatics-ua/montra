@@ -144,9 +144,8 @@ function clear_selection(question_name, response){
  - do it for a total of 5 seconds by which time the page should've been sent
  - oscillate the sending class which does some fancy css transition trickery
 */
-(function($){
-    $(document).ready(function() {
-        $('[id^="qform"]').submit(function(e) {
+function setsaveqs(id){
+        $('#'+id).submit(function(e) {
             e.preventDefault();
 
             var self = $(this);
@@ -198,40 +197,6 @@ function clear_selection(question_name, response){
 
       }
 
-            /*
-            var input = $('.questionset-submit input');
-            var interval = 400; // ms
-            var duration = 10000; // 10s
-
-            var disable = function(){
-                input.attr('disabled', 'disabled');
-                input.toggleClass('sending', false);
-            };
-
-            var enable = function(){
-                $('body').css({'cursor':'auto'});
-                input.removeAttr('disabled');  
-            };
-
-            var step = 0; 
-            var animate = function() {
-                // re-enable the button after the duration
-                if (interval * step > duration) {
-                    clearInterval(id);
-                    enable();
-                }
-                    
-                step += 1;
-                input.toggleClass('sending');
-            };
-            
-            // start animating before disabling as it looks nicer
-            animate();
-            disable();
-
-            // id is availabe in the animate method. js closures ftw!
-            var id = setInterval(animate, interval);
-            */
         });
-    });
-})(jQuery);
+    }
+
