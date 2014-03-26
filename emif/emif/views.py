@@ -1096,13 +1096,13 @@ def database_edit(request, fingerprint_id, questionnaire_id, template_name="data
     qs_list = QuestionSet.objects.filter(questionnaire=questionnaire_id)
 
     question_set = qs_list[int(qs_id)]
-    if request.POST:
+    '''if request.POST:
         (qlist_general, qlist, jstriggers, qvalues, jsinclude, cssinclude, extra_fields, hasErrors) = extract_answers(request, questionnaire_id, question_set, qs_list)
     else:
         (qlist_general, qlist, jstriggers, qvalues, jsinclude, cssinclude, extra_fields, hasErrors) = extract_answers(request2, questionnaire_id, question_set, qs_list)
 
     print hasErrors
-
+    '''
     if (question_set.sortid == 99 or request.POST):
         # Index on Solr
         try:
@@ -1121,18 +1121,18 @@ def database_edit(request, fingerprint_id, questionnaire_id, template_name="data
             questionsets=question_set.questionnaire.questionsets,
             runinfo=None,
             errors=errors,
-            qlist=qlist,
+            #qlist=qlist,
             progress=None,
-            triggers=jstriggers,
-            qvalues=qvalues,
-            jsinclude=jsinclude,
-            cssinclude=cssinclude,
+            #triggers=jstriggers,
+            #qvalues=qvalues,
+            #jsinclude=jsinclude,
+            #cssinclude=cssinclude,
             fingerprint_id=fingerprint_id,
             q_id = q_id,
             async_progress=None,
             async_url=None,
             qs_list=qs_list,
-            questions_list=qlist_general,
+            #questions_list=qlist_general,
             breadcrumb=True,
             name=fingerprint_name.encode('utf-8'),
             id=fingerprint_id,
@@ -2768,7 +2768,7 @@ def show_fingerprint_page_read_only(request, q_id, qs_id, SouMesmoReadOnly=False
                 return results_fulltext_aux(request, query)
         
         qlist_general = []
-
+        ''' THIS IS NO LONGER NEEDED, THANK GOD THE MERCIFUL
         for k in qs_list:
             qlist = []
             qs_aux = None
@@ -2828,7 +2828,7 @@ def show_fingerprint_page_read_only(request, q_id, qs_id, SouMesmoReadOnly=False
             if qs_aux == None:
                 #print "$$$$$$ NONE"
                 qs_aux = k
-            qlist_general.append((qs_aux, qlist))
+            qlist_general.append((qs_aux, qlist))'''
             
         errors = {}
         fingerprint_id = generate_hash()
