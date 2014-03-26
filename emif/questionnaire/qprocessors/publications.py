@@ -18,7 +18,7 @@ def question_pub(request, question):
     #print request.POST
     if key in request.POST:
         value = request.POST[key]
-        print "REQUEST" + value
+        #print "REQUEST" + value
     return {
         'required' : question.getcheckdict().get('required', False),
         'value' : value,

@@ -14,8 +14,8 @@
 
 <head>
     <!-- This is WRONG and just for testing, on deploy it must be changed to static base url -->
-    <!--<base id="base_link" href="http://{{request.get_host}}">-->
-    <base id="base_link" href="{{ BASE_URL }}">
+    <base id="base_link" href="{{ BASE_URL }}">-
+    <!--<base id="base_link" href="{{ request.get_host }}">-->
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
     <title>{% block title %}EMIF Catalogue{% endblock title %}</title>

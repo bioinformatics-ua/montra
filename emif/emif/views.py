@@ -324,9 +324,18 @@ def results_diff(request, page=1, template_name='results_diff.html'):
                 response.status_code = 500
                 return response
                 
+            print "--------------------------------------------------------------"
+            print qserialization
+            print "--------------------------------------------------------------\n"
+
             query = convert_qvalues_to_query(qvalues, qid, qexpression)
             query = convert_query_from_boolean_widget(qexpression, qid)
             #print "Query: " + query
+
+            print "--------------------------------------------------------------"
+            print query
+            print "--------------------------------------------------------------\n"
+
             request.session['query'] = query
             
             # We will be saving the query on to the serverside to be able to pull it all together at a later date
@@ -375,7 +384,7 @@ def results_diff(request, page=1, template_name='results_diff.html'):
     if not in_post:
         query = request.session.get('query', "")
         
-    print "query_@" + query
+    #print "query_@" + query
     if query == "":
         return render(request, "results.html", {'request': request,
                                                 'num_results': 0, 'page_obj': None, 'breadcrumb': True})
@@ -1476,7 +1485,7 @@ def databases(request, page=1, template_name='databases.html', force=False):
     except PageNotAnInteger, e:
         pager =  myPaginator.page(page)
     ## End Paginator ##
-    print list_databases
+    #print list_databases
 
     return render(request, template_name, {'request': request, 'export_my_answers': True,
                                            'list_databases': list_databases, 'breadcrumb': True, 'collapseall': False,

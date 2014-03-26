@@ -213,8 +213,9 @@ function add_triggers() {
             {% endfor %}
             
             for(key in qvalues) {
-                valchanged(key, qvalues[key], this);
+                initialvalchanged(key, qvalues[key], this);
             }
+            
 }
              
 $(function(){
