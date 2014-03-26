@@ -55,8 +55,11 @@ def jerboa_list_values(request, var, row, fingerprint_id, template_name='documen
 
 def comments(request):
     if request.POST:
-        # TODO: Handle the parameters here
-        pass
+        status = True
+        data = {'comments': status}
+        response = JSONResponse(data, mimetype="application/json")
+        response['Content-Disposition'] = 'inline; filename=files.json'
+        return response
 
     # Return bad requests
     return HttpResponseBadRequest()
@@ -131,19 +134,6 @@ def list_jerboa_files(request, fingerprint):
     response = JSONResponse(data, mimetype=response_mimetype(request))
     response['Content-Disposition'] = 'inline; filename=files.json'
     return response
-
-
-def get_pde_types(self):
-    """This function returns the Primary Data Extract type of graphs
-    """
-
-
-def upload_jerboa_request(request, template_name='uploadjerboa.html'):
-    """
-    This functions is responsabible to handle the upload files of jerboa 
-    """
-    pass
-
 
 
 

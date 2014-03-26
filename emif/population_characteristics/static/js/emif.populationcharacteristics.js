@@ -269,7 +269,7 @@ function PCAPI ()
               var tmpUl = $('<ul class="nav nav-pills nav-stacked">');
 
               self.append(tmpUl);
-              console.log(xFilter);
+              
               $.each(xFilter.values, function (data){
 
                   if (xFilter.values[data]==="")
@@ -395,7 +395,7 @@ function PCAPI ()
                       $(this.parentNode).closest('li').addClass('active')
 
                       chartTypes.forEach(function(a){
-                          console.log();
+                          
                           if (a.title.fixed_title==e.target.innerHTML) 
                           {
                               actualChart = a;

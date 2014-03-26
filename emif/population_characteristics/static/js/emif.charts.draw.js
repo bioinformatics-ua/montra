@@ -50,11 +50,10 @@ function PCDraw(actualChart,chartType, e)
       var valueFilters = "";
       $.each(filters, function (data){
         var fV = filters[data];
-        console.log(translations);
-        console.log('do'+translations);
+        
         if (translations.hasOwnProperty(filters[data]))
         {
-          console.log('do'+filters[data]);
+          
             fV = translations[filters[data]];
         }
         if (fV=="Total") fV = "";

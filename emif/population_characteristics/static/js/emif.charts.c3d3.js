@@ -205,8 +205,7 @@ function GraphicChartC3D3(divArg, dataArg)
     chartConfigs.legend = {}
     chartConfigs.legend['show'] = legend;
     
-    console.log('chartConfigs');
-    console.log(chartConfigs);
+    
     try{var chart = c3.generate(chartConfigs);}
     catch(ex)
     {
