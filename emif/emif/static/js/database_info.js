@@ -394,6 +394,7 @@ function addTooltip(table_id) {
             $(this).removeAttr("title");
         });
     } else {
+        
         /* I decided to change this as this is was a very intensive process, 
             I instead tagged them, and add to the class the instance, this way i only have on instance per, table
             declaring a tooltip instance every td...*/

@@ -5,12 +5,16 @@
 
 {% block breadcrumbs %}
     {{ block.super }}
+    {% breadcrumb "Search" "resultsdiff/1" %} 
+
     {% breadcrumb "Compare Databases" "" %}
+
 
 {% endblock %}
 
 {% block scriptextraincludes %}
-<script src="static/js/vendor/tablediff.js"></script>
+<script src="{{ STATIC_URL}}js/vendor/tablediff.js"></script>
+<script src="{{ STATIC_URL}}js/vendor/threadpool.js"></script>
 
 {% endblock %}
 
@@ -54,14 +58,14 @@ th, td {
       <div class="btn-group"></div>
       
       <a id="collapseall" class="btn" href="" >
-        Expand all
+       <i class="icon-plus"></i>&nbsp; Expand all
       </a>
 
       
 
       <div class="btn-group">
         <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
-    Show/Hide
+    <i class="icon-wrench"></i>&nbsp; Show/Hide
     <span class="caret"></span>
   </a>
 
@@ -82,30 +86,59 @@ th, td {
 
 {% block content %}
 
-<div class="span12">
-  <div class="accordion" id="accordion2">
+<div class="clearboth">
+<!--[if lte IE 8]>
+<div class="well">Currently IE 7 and 8 don't support this functionality. To use this functionality please update your browser to a modern browser, like IE 9 or better, Google Chrome, Firefox, Opera or Safari.</div>
+<![endif]-->
+<!--[if gte IE 9]><!-->
+
+<ul class="pager">
+  <li class="pull-left"><input type="text" size="60" style="margin-left: 0px;" class="span9" id="searchfilter" placeholder="To filter type here" tabindex="1"></li>
+  <li>
+    <div class="pull-right btn-group">
+      <button id="compare_previous" class="btn"><i class="icon-arrow-left"></i></button>
+      <span id="compare_id" class="btn disabled">1/{{results|length|add:-1}}</span>
+      <button id="compare_next" class="btn"><i class="icon-arrow-right"></i></button>
+    </div>
+  </li>
+
+</ul>
+</div>
+<div style="margin: 0px;" class="span12">
+  <div style="overflow-x: auto;" class="well accordion" id="accordion2">
+  <div id="database_listings">
+  <div id="database_rows">
+
     {% for name, qset in results %}
                       
-    
-    <div class="span6" {% if forloop.first%}style="margin-left: 0px;"{% endif %}>
-      <span class="label label-inverse">{{name}}</span>
-
-      {% for k,v in qset.items %}
-      <div class="accordion-group">
+    <div class="database_listing {%if forloop.counter == 2 %}database_listing_pointer{% endif %} {%if forloop.counter > 2 %}database_listing_away{% endif %}">
+    <div {% if forloop.first%}style="margin-left: 0px;"{% endif %}>
+     <div class="clearfix database_title btn-darkgrey">
+      <div class="database_title_text pull-left">{{name}}</div>
+      <div>
+        {%if database_to_compare|removespaces in name|removespaces %}
+          <button type="button" id="ref{{name|removespaces}}" class="pull-right set_reference btn btn-small btn-primary">Using as reference</button>
+        {% else %}
+          <button type="button" id="ref{{name|removespaces}}" class="pull-right set_reference btn btn-small btn-success">Set as reference</button>   
+        {% endif %}
+        </div>
+    </div>   
+      {% for k,v in qset.ordered_items %}
+      <div style="background-color: white" class="accordion-group">
         <div class="accordion-heading">
           <a id="a_collapse{{k|removespaces}}_{{name|removespaces}}" class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapse{{k|removespaces}}_{{name|removespaces}}">{{k|removeh1}}</a>
         </div>
         <div id="collapse{{k|removespaces}}_{{name|removespaces}}" class="accordion-body collapse">
           <div class="accordion-inner">
 
-            <table id="{{name|removespaces}}_{{k|removespaces}}" class="table table-bordered  table-hover table-striped">
+            <table id="{{name|removespaces}}_{{k|removespaces}}" class="table table-bordered table-hover table-striped">
               <thead></thead>
 
               <tbody>
                 {% for t in v.list_ordered_tags %}
-                <tr>
-                  <td data-original-title="{{ t.tag|removehs }}" title="">{{ t.tag|removehs }}</td> 
-                   <td data-original-title="{{ t.value }}" title="">{{ t.value }}</td>
+                <tr class="entry rowid_{{forloop.parentloop.counter}}_{{forloop.counter}}">
+                  <td class="tooltippable" data-original-title="{{ t.tag|removehs }}" title="">{{ t.tag|removehs }}</td> 
+                   <td class="tooltippable" data-original-title="{{ t.value }}" title="">{{ t.value }}</td>
                 </tr>
                 {% endfor %}
               </tbody>
@@ -115,54 +148,56 @@ th, td {
       </div>
       {% endfor %}
     </div>
+    </div>
     {% endfor %}
+    </div>
+    </div>
+    <div id="no_results" class="pull-center">No results found, for this filtering parameters.</div>
   </div>
 </div>
+
+<!--<![endif]-->
+
 </div>  
+<!--[if gte IE 9]><!-->
+<script type="text/javascript" src="{{ STATIC_URL }}js/emif.results_comp.js"></script>
+<!--<![endif]-->
 
 {% endblock %}
-
-
-
-{% comment %}
-<script type="text/javascript" >
-{% endcomment %}
+<!--[if gte IE 9]><!-->
 {% block scriptextra %}
 
+function applyFilters(){
+  reset_empties();
+  var reference_table = $('.database_listing').eq(0).find('.set_reference').prop('id').substring(3);
+  var compared_table = $('.database_listing_pointer').find('.set_reference').prop('id').substring(3);
 
-$("#collapseall").bind('click',function(e)
-        { 
-          e.preventDefault(); 
-          e.stopPropagation();
-          
-          if ($(this).text().indexOf('Collapse')!==-1)
-          {
-            $(this).text('Expand all');
-            change_name_collapse(false);
-          }
-          else
-          {
-              $(this).text('Collapse all');
-              change_name_collapse(true);
-          }
-            
-          return false;
-        });
+  console.log('IDS TO COMPARE: '+reference_table +":"+compared_table);
+  var filter_string = $("#searchfilter").val();
 
-var match=false;
+          {%for name, qset in results|slice:":1" %}
+            {% for k,v in qset.ordered_items %}
+            filter_results([reference_table+'_{{k|removespaces}}'],filter_string, match, unmatch, emptyrows, proximity);
+            filter_results([compared_table+'_{{k|removespaces}}'],filter_string, match, unmatch, emptyrows, proximity);
+
+            {% endfor %}
+          {% endfor %}
+
+  doublecheck_expansions();
+  check_empties();  
+
+}
+
+
 $("#match").bind('click',function(e)
 { 
 
           e.preventDefault(); 
           e.stopPropagation();
-          {% for name, qset in results %}
-            {% for k,v in qset.items %}
 
-            show_hide_match(['{{name|removespaces}}_{{k|removespaces}}'], match);
-          {% endfor %}
-          {% endfor %}
-          match = !match ;
-          if (match)
+          match = !match;
+
+          if (!match)
           {
             $('#imatch').removeClass('icon-ok') 
 
@@ -171,27 +206,24 @@ $("#match").bind('click',function(e)
           {
             $('#imatch').addClass('icon-ok')
           }
+          applyFilters();
+
           return false;
 });
 
-
-var unmatch=false;
 $("#unmatch").bind('click',function(e)
 { 
 
           e.preventDefault(); 
           e.stopPropagation();
-          {% for name, qset in results %}
-            {% for k,v in qset.items %}
 
-            show_hide_unmatch(['{{name|removespaces}}_{{k|removespaces}}'], unmatch);
-          {% endfor %}
-          {% endfor %}
+          
+
           unmatch = !unmatch ;
-          if (unmatch)
+          applyFilters();
+          if (!unmatch)
           {
             $('#iunmatch').removeClass('icon-ok') 
-            
           }
           else
           {
@@ -200,20 +232,18 @@ $("#unmatch").bind('click',function(e)
           return false;
 });
 
-var emptyrows=false;
+
 $("#emptyrows").bind('click',function(e)
 { 
 
           e.preventDefault(); 
           e.stopPropagation();
-          {% for name, qset in results %}
-            {% for k,v in qset.items %}
 
-            show_hide_empty_rows(['{{name|removespaces}}_{{k|removespaces}}'], emptyrows);
-          {% endfor %}
-          {% endfor %}
+          
+
           emptyrows = !emptyrows ;
-          if (emptyrows)
+          applyFilters();
+          if (!emptyrows)
           {
             $('#iemptyrows').removeClass('icon-ok') 
             
@@ -227,20 +257,18 @@ $("#emptyrows").bind('click',function(e)
 
 
 
-var proximity=false;
+
 $("#proximity").bind('click',function(e)
 { 
 
           e.preventDefault(); 
           e.stopPropagation();
-          {% for name, qset in results %}
-            {% for k,v in qset.items %}
 
-            show_hide_proximity(['{{name|removespaces}}_{{k|removespaces}}'], proximity);
-          {% endfor %}
-          {% endfor %}
+
           proximity = !proximity ;
-          if (proximity)
+          applyFilters();
+
+          if (!proximity)
           {
             $('#iproximity').removeClass('icon-ok') 
             
@@ -252,157 +280,172 @@ $("#proximity").bind('click',function(e)
           return false;
 });
 
+var comparing_current=1;
+var max_comparing = {{results|length|add:-1}};
+$(function(){
+  $('[id^="{{database_to_compare|removespaces}}"] td').addClass("basetable");
 
-
-
-
-
-function change_name_collapse(value)
-{
-
-  
-    {% for name, qset in results %}
-      {% for k,v in qset.items %}
-
-
-    $("div[id^='collapse']").filter(function(){
-    var regexp = /^collapse(.*)$/;
-    return (this.id.match(regexp));
-    }).each(function(){
-    //this.innerHTML = this.id;
-    console.log(this.id);
-    var current = "{{name|removespaces}}_{{k|removespaces}}";
-    if (this.id.indexOf(current))
-    {
-        if(value) { //expand
-//            console.log("expand");
-            $('#'+this.id).collapse('show');
-        }
-        else {  //collapse
-//            console.log("collapse");
-            $('#'+this.id).collapse('hide');
-        }
-
-    };
-    });
-
-      //show_hide_empty_rows(['{{name|removespaces}}_{{k|removespaces}}'], value);
-      {% endfor %}
-      {% endfor %}
-      return false;
-};
-
-function hidecheckbox()
-{
-  console.log("togle");
-  $('.checkbox').toggle();
-}
-
-
-myFunc = function(name)
-{
-  console.log(this);
-  console.log(name);
-  var current = this.id;
-  current = current.replace("a_", "");
-  current = current.split("_")[0];
-  //console.log(this.parent);
-  
-   $('div[id]').filter(function () {
-    return /^collapse.*$/.test(this.id);
-}).each(function (name2) {
-    //console.log(name2);
-});
-
-
-
-
-$("div[id^='collapse']").filter(function(){
-    var regexp = /^collapse(.*)$/;
-    return (this.id.match(regexp));
-}).each(function(){
-    //this.innerHTML = this.id;
-    console.log(this.id);
-    console.log(current);
-    if (!this.id.indexOf(current))
-    { 
-      $('#'+this.id).collapse('toggle'); 
-    };
-});
-
-
-
-};
-$('body').on('click', '.accordion-toggle', myFunc);
-
-
-
-/*
-
-function highlight(text, text_to_highlight)
-{
-    inputText = document.getElementById("inputText")
-    var innerHTML = inputText.innerHTML
-    var index = innerHTML.indexOf(text);
-    if ( index >= 0 )
-    { 
-        innerHTML = innerHTML.substring(0,index) + "
-<span class='highlight'>" + innerHTML.substring(index,index+text.length) + "</span>
-" + innerHTML.substring(index + text.length);
-        inputText.innerHTML = innerHTML 
-    }
-
-}
-
-*/
-
-$.fn.textWidth = function() {
-  var node, original, width;
-  original = $(this).html();
-  node = $("<span style='position:absolute;width:auto;left:-9999px'>" + original + "</span>");
-  //node.css('font-family', $(this).css('font-family')).css('font-size', $(this).//css('font-size'));
-  $('body').append(node);
-  width = node.width();
-  node.remove();
-  return width;
-};
-
-
-
-$(function() {
-  $('td').each(function() 
-  {
-
-    var content;
-    content = $(this).text().replace(/\s+/gi, ' ');
-
+  $('#compare_previous').click(function(){
+    $('#compare_next').prop('disabled', false);
     
-    if ($(this).textWidth() > $(this).width()) {
-    
-      return $(this).tooltip({container:"body"});
-    }
+    comparing_current--;
+    if(comparing_current == 1)
+      $(this).prop('disabled', true);
+
+    $('#compare_id').text(comparing_current+'/'+max_comparing);
+
+    $('.database_listing_pointer').first().removeClass("database_listing_pointer").addClass("database_listing_away");
+
+    var newreference = $('.database_listing_away').eq(comparing_current-1);
+
+    newreference.removeClass("database_listing_away").addClass("database_listing_pointer");
+    newreference.hide();
+    newreference.fadeIn(1000);
+
+      compareDatabases(true);
+
+    newreference.css('display','table-cell');      
   });
+
+  $('#compare_next').click(function(){
+    $('#compare_previous').prop('disabled', false);
+
+    comparing_current++;
+    if(comparing_current == max_comparing)
+      $(this).prop('disabled', true);
+    $('#compare_id').text(comparing_current+'/'+max_comparing);
+  
+    $('.database_listing_pointer').first().removeClass("database_listing_pointer").addClass("database_listing_away"); 
+
+    var newreference = $('.database_listing_away').eq(comparing_current-1);
+
+    newreference.removeClass("database_listing_away").addClass("database_listing_pointer");
+    newreference.hide();
+    newreference.fadeIn(1000);
+
+      compareDatabases(true);
+
+     newreference.css('display','table-cell');
+     });
+
+  $('.set_reference').click(function(){
+    var self_parent = $(this).closest('.database_listing');
+
+
+    var identity = $(this).prop('id').substring(3);
+    
+    console.log(identity);
+
+    // If not is reference
+    if(!$(this).hasClass('btn-primary')){
+      $('.database_listing_pointer').first().removeClass("database_listing_pointer"); 
+      
+      $('.set_reference').each(function(){
+        if($(this).hasClass('btn-primary')){
+          $(this).removeClass('btn-primary');
+          $(this).addClass('btn-success');
+          $(this).text('Set as reference'); 
+
+          $(this).closest('.database_listing').addClass('database_listing_pointer'); 
+        }
+
+        
+      });
+      $(this).removeClass('btn-success');
+      $(this).addClass('btn-primary');
+      $(this).text('Using as reference');
+
+      // Clean all status
+      $('.basetable').removeClass("basetable");
+      $('.success').removeClass("success");
+      $('.warning').removeClass("warning");
+      $('.error').removeClass("error");
+
+
+      $('[id^="'+identity+'"] td').addClass("basetable");
+      $('#database_listings .database_listing').sort(CustomSort).appendTo('#database_rows');
+
+
+// Ref from: http://stackoverflow.com/questions/18625321/detect-webkit-browser-in-javascript
+// For some reason gecko and presto dont understand the animation i wanted correctly, only webkit browsers,
+// so i do it only on webkit, on others i have a fallback
+var isWebkit = (typeof window.webkitConvertPointFromNodeToPage === 'function');
+
+  if(isWebkit){
+
+      self_parent.hide("drop", {direction: "right"}, 900);
+      $('.database_listing_pointer').hide("drop", {direction: "left"}, 900);
+
+      self_parent.show("drop", {direction: "right"}, 900);
+      $('.database_listing_pointer').show("drop", {direction: "left"}, 900);
+
+} else {
+      self_parent.fadeOut(900);
+      $('.database_listing_pointer').fadeOut(900);      
+
+      self_parent.fadeIn(900);
+      $('.database_listing_pointer').fadeIn(900);    
+}
+
+
+      compareDatabases(false);
+
+
+      self_parent.css('display','table-cell'); 
+      $('.database_listing_pointer').css('display','table-cell');  
+    } 
+
+  });
+
+  $('#compare_previous').prop('disabled', true);
+  if(comparing_current == max_comparing)
+     $('#compare_next').prop('disabled', true);
+   
 });
+var databases = [];
 
+function compareDatabases(show_modal){
 
-{% for name, qset in results %}
+  if(show_modal)
+    loading_modal.showPleaseWait();
 
-{% if not forloop.first %}
-{% for k,v in qset.items %}
-/*
-tablediffall_two('{{database_to_compare|removespaces}}_{{k|removespaces}}',['{{name|removespaces}}_{{k|removespaces}}'] )
-*/
-tablediffall_two('{{database_to_compare|removespaces}}_{{k|removespaces}}', ['{{name|removespaces}}_{{k|removespaces}}'])
+  if(show_modal)
+    cleantablediff();
 
-{% endfor %}
-{% endif %}
+  var threadpool = new ThreadPool(20);
+  var priority=1;
 
+  var reference_table;
+  var compared_table;
+  try{
+    reference_table = $('.database_listing').eq(0).find('.set_reference').prop('id').substring(3);
+    compared_table = $('.database_listing_pointer').find('.set_reference').prop('id').substring(3);  
+  }catch(err){}
 
-{% endfor %}
+  {%for name, qset in results|slice:":1" %}
+    {% for k,v in qset.ordered_items %}
+      var thread = new Runnable(compareDatabase, priority++, reference_table+'_{{k|removespaces}}', compared_table+'_{{k|removespaces}}'); threadpool.run(thread);  
+    {% endfor %}
+  {% endfor %}
 
-{% comment %}
-</script>
-{% endcomment %}
+  threadpool.destroy(
+    function(){
+        $(".tooltippable").tooltip({container:"body"});
 
+        applyFilters();
 
+        if(show_modal)        
+          loading_modal.hidePleaseWait();
+    }
+  );
+}
+
+function compareDatabase(base, other){
+  tablediffall_two(base, [other]);
+
+  this.complete();
+}
+
+compareDatabases(false);
 {% endblock %}
+<!--<![endif]-->

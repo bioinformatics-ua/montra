@@ -262,7 +262,7 @@ function load_questionnary(){
 
         console.log( "Loading questionnary by parts, we have {{qsets|length}} sets");  
         
-        var threadpool = new ThreadPool(1);
+        var threadpool = new ThreadPool(20);
         parts_missing = {{qsets|length}};
         
 

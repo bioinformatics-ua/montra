@@ -332,7 +332,9 @@
         _gaq.push(['_setAccount', 'UA-38876251-1']);
         _gaq.push(['_trackPageview']);
         $(function(){
-            $('.search-query').canclear();
+            if ($(".search-query").length > 0){
+                $('.search-query').canclear();
+            }
         });
         (function() {
             var ga = document.createElement('script');
