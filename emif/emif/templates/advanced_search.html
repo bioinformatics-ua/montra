@@ -173,8 +173,13 @@ $( document ).ready(function() {
                     }     
         );
     }
-    load_questionnary();
-
+    generateStub();
+    //load_questionnary();
+    {% if not aqid %}
+      loadqspart("{{questionset.sortid}}", "{{q_id}}", null);
+    {% else %}
+      loadqspart("{{questionset.sortid}}", "{{q_id}}", "{{aqid}}");
+    {% endif %}  
 });
 var threads = {};
 function load_questionnary(){
@@ -227,11 +232,21 @@ function loadqspart(sortid, pk, aqid){
           $( "#qs_"+sortid ).html( data );
         });    
     }
-    threads['qs_'+sortid] = null;
-    parts_missing--;
-    this.complete();
+    //threads['qs_'+sortid] = null;
+    //parts_missing--;
+    //this.complete();
 }
+function generateStub(){
+          var containers = [];
 
+        // We build the qs containers in memory and just do dom op, on the end, for speed
+        // on ie joins are significantly faster than concatenation
+        {% for qs in questionset.questionnaire.questionsets %}
+            containers.push('<div id="qs_{{ qs.sortid }}" class="{% if qs.sortid == questionset.sortid %} {% else %} hide {% endif %} questionset"><h4 class="loadingindicator pull-center">Loading...</h4></div>\n');
+        {% endfor %}
+
+        $('#set_container').append(containers.join(''));
+}
 function next_questionset(id_questionset)
 {
 
@@ -280,6 +295,18 @@ function questionsets_handle(id_questionset)
        $('#'+obj.id).removeClass("hide");
 
        
+       if($('#'+obj.id).find('.loadingindicator').length != 0){
+              
+              {% if not aqid %}
+                loadqspart(obj.id.replace("qs_",""), "{{q_id}}", null);
+              {% else %}
+                loadqspart(obj.id.replace("qs_",""), "{{q_id}}", "{{aqid}}");
+              {% endif %}     
+              console.log("Loading to dom");
+       } else {
+               console.log("Already on dom");
+      }
+
     }
     else {
       $('#li_'+obj.id).removeClass("active");

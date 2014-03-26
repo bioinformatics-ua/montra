@@ -561,16 +561,8 @@ def advanced_search(request, questionnaire_id, question_set, aqid):
 
 def database_add(request, questionnaire_id, sortid):
 
-
-    t1 = datetime.datetime.now()
- 
     response = show_fingerprint_page_read_only(request, questionnaire_id, sortid,
                                                template_name='database_add.html')
-
-    # Second timestamp
-    t2 = datetime.datetime.now()   
-
-    print "Execution time: %s" % (t2-t1)
 
     return response
 
@@ -581,21 +573,21 @@ def database_search_qs(request, questionnaire_id, sortid, aqid):
 
     return response
 
-def database_add_qs(request, questionnaire_id, sortid):
+def database_add_qs(request, fingerprint_id, questionnaire_id, sortid):
 
-    response = render_one_questionset(request, questionnaire_id, sortid,
+    response = render_one_questionset(request, questionnaire_id, sortid, fingerprint_id= fingerprint_id,
                                                template_name='fingerprint_add_qs.html')
 
     return response
 
 def database_edit_qs(request, fingerprint_id, questionnaire_id, sort_id):
 
-    response = render_one_questionset(request, questionnaire_id, sort_id, fingerprint_id = fingerprint_id,
+    response = render_one_questionset(request, questionnaire_id, sort_id, fingerprint_id = fingerprint_id, is_new=False,
                                                template_name='fingerprint_add_qs.html')
 
     return response
 
-def render_one_questionset(request, q_id, qs_id, errors={}, aqid=None, fingerprint_id=None, template_name='fingerprint_add_qs.html'):
+def render_one_questionset(request, q_id, qs_id, errors={}, aqid=None, fingerprint_id=None, is_new=True, template_name='fingerprint_add_qs.html'):
     """
     Return the QuestionSet template
 
@@ -615,13 +607,16 @@ def render_one_questionset(request, q_id, qs_id, errors={}, aqid=None, fingerpri
         for answer in this_answers:
             request2.get_post()[answer.question] = answer.answer
     
-    if fingerprint_id != None:
+
+    if fingerprint_id != None and not is_new:
+        print "HERY"
         c = CoreEngine()
 
         extra = {} 
 
         results = c.search_fingerprint("id:" + fingerprint_id)
         items = None
+
         for r in results:
             items = r
             break
@@ -629,46 +624,47 @@ def render_one_questionset(request, q_id, qs_id, errors={}, aqid=None, fingerpri
         request2 = RequestMonkeyPatch()
 
         request2.method = request.method
-        for item in items:
-            key = item
-            value = items[key]
-            if item.startswith("comment_question_"):
-                
-                slug = item.split("comment_question_")[1]
-                # results = Slugs.objects.filter(slug1=slug[:-2], question__questionset__questionnaire=questionnaire_id)
+        if items != None:
+            for item in items:
+                key = item
+                value = items[key]
+                if item.startswith("comment_question_"):
+                    
+                    slug = item.split("comment_question_")[1]
+                    # results = Slugs.objects.filter(slug1=slug[:-2], question__questionset__questionnaire=questionnaire_id)
+                    # if results == None or len(results) == 0:
+                    #     continue
+                    # question = results[0].question
+                    results = Question.objects.filter(slug_fk__slug1=slug[:-2], questionset__questionnaire=q_id)
+                    if results == None or len(results) == 0:
+                        continue
+                    question = results[0]
+                    request2.get_post()['comment_question_%s' % question.number] = value
+                    continue
+
+                if item == '_version_':
+                    continue
+
+                # results = Slugs.objects.filter(slug1=str(item)[:-2],question__questionset__questionnaire=questionnaire_id )
+                # print len(results)
                 # if results == None or len(results) == 0:
                 #     continue
                 # question = results[0].question
-                results = Question.objects.filter(slug_fk__slug1=slug[:-2], questionset__questionnaire=q_id)
+                results = Question.objects.filter(slug_fk__slug1=str(item)[:-2], questionset__questionnaire=q_id)
                 if results == None or len(results) == 0:
                     continue
                 question = results[0]
-                request2.get_post()['comment_question_%s' % question.number] = value
-                continue
+                answer = str(question.number)
 
-            if item == '_version_':
-                continue
-
-            # results = Slugs.objects.filter(slug1=str(item)[:-2],question__questionset__questionnaire=questionnaire_id )
-            # print len(results)
-            # if results == None or len(results) == 0:
-            #     continue
-            # question = results[0].question
-            results = Question.objects.filter(slug_fk__slug1=str(item)[:-2], questionset__questionnaire=q_id)
-            if results == None or len(results) == 0:
-                continue
-            question = results[0]
-            answer = str(question.number)
-
-            extra[question] = ans = extra.get(question, {})
-            if "[" in value:
-                value = value.replace("]", "").replace("[", "")
-            request2.get_post()['question_%s' % question.number] = value
-            
-            
-            ans['ANSWER'] = value
-            
-            extra[question] = ans
+                extra[question] = ans = extra.get(question, {})
+                if "[" in value:
+                    value = value.replace("]", "").replace("[", "")
+                request2.get_post()['question_%s' % question.number] = value
+                
+                
+                ans['ANSWER'] = value
+                
+                extra[question] = ans
 
     try:
 
@@ -771,13 +767,9 @@ def render_one_questionset(request, q_id, qs_id, errors={}, aqid=None, fingerpri
         if aqid != None:
             (qlist_general, qlist, jstriggers, qvalues, jsinclude, cssinclude, extra_fields, hasErrors) = extract_answers(request2, q_id, question_set, qs_list)
         
-        elif fingerprint_id != None:
+        elif fingerprint_id != None and not is_new:
             (qlist_general, qlist, jstriggers, qvalues, jsinclude, cssinclude, extra_fields, hasErrors) = extract_answers(request2, q_id, question_set, qs_list)
 
-
-        #print jstriggers
-        
-        fingerprint_id = generate_hash()
         r = r2r(template_name, request,
                 questionset=question_set,
                 questionsets=question_set.questionnaire.questionsets,
@@ -919,9 +911,9 @@ def extract_answers(request2, questionnaire_id, question_set, qs_list):
     
     for question, ans in extra.items():
         
-        if u"Trigger953" not in ans:
+        '''if u"Trigger953" not in ans:
             logging.warn("User attempted to insert extra question (or it's a bug)")
-            continue
+            continue'''
         try:
             cd = question.getcheckdict()
             

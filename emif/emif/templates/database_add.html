@@ -198,6 +198,7 @@ function questionsets_handle(id_questionset)
 
             posting.done(function(data) {
               $("#loading-message").fadeOut('fast');
+
             });
           }
         }
@@ -211,12 +212,12 @@ function questionsets_handle(id_questionset)
              $('#'+obj.id).removeClass("hide");
 
              if($('#'+obj.id).find('.loadingindicator').length != 0){
-              loadqspart("{{q_id}}",obj.id.replace("qs_",""));
+              loadqspart("{{fingerprint_id}}", "{{q_id}}",obj.id.replace("qs_",""));
               console.log("Loading to dom");
              } else {
                console.log("Already on dom");
              }
-             
+             advValidator.reload();
           }
           else {
 
@@ -263,10 +264,10 @@ function generateStub(){
 
         $('#set_container').append(containers.join(''));
 }
-function loadqspart(pk, sortid){
+function loadqspart(fid, pk, sortid){
     
     //console.log("getting part from searchqs/"+pk+"/"+sortid+"/");
-        $.get( "addqs/"+pk+"/"+sortid+"/", function( data ) {
+        $.get( "addqs/"+fid+"/"+pk+"/"+sortid+"/", function( data ) {
           $( "#qs_"+sortid ).html( data );
         });
 }
@@ -276,7 +277,7 @@ $(function(){
   $('.reqfield').tooltip({container: 'body'});
   errornavigator = $('#errornavigator').errornavigator();
 
-  loadqspart("{{q_id}}","{{questionset.sortid}}");
+  loadqspart("{{fingerprint_id}}","{{q_id}}","{{questionset.sortid}}");
 });
 
 {% endblock %}

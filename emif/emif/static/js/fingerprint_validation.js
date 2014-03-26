@@ -117,6 +117,9 @@ Fingerprint_Validator.prototype ={
             self.validateFormContext(evnt, this);
         });
     },
+    reload : function(){
+        this.onInit();
+    }, 
     validate : function (clas, questionNumber, controllerDOM){
         var validator = this.validators[clas];
         if(validator != undefined){
