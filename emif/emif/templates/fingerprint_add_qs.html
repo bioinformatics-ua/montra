@@ -71,7 +71,11 @@
                 <span>{{ question.help_text|safe }}</span>
             </div>
             {% endif %}
-            </span> {% if qdict.required %}<span title="This fields is required to be able to publish this database (and make it public)" class="reqfield lead text-error">*</span>{% endif %}
+            </span> 
+            {% comment %}
+            {% if qdict.required %}<span title="This fields is required to be able to publish this database (and make it public)" class="reqfield lead text-error">*</span>
+            {% endif %}
+            {% endcomment %}
             {% if question.text|geths != 'h1' %}
             {% if request.user.is_staff %}
             <span class="pull-right">

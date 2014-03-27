@@ -298,6 +298,27 @@ function initialCounterSetup(){
 
   {% endfor %}
 }
+    function collapseAll(element, div_id){
+        if (element.text().indexOf('Collapse') !== -1) {
+           console.log('Collapse all');
+           element.text('Expand all');
+           if (!element.hasClass('disabled')){
+            element.parents().find('#'+div_id +' .collapse').each(function(index){
+                $(this).addClass('in');
+                $(this).collapse('hide');
+            });
+           }
+       } else {
+           console.log('Expand all');
+            element.text('Collapse all');
+           if (!element.hasClass('disabled')){
+            element.parents().find('#'+div_id +' .collapse').each(function(index){
+                $(this).removeClass('in');
+                $(this).collapse('show');
+            });
+           }
+       }
+    };
 {% endblock %}
 
 </script>
