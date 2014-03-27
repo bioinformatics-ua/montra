@@ -20,6 +20,7 @@
 from django.shortcuts import render, render_to_response
 from .services import *
 from .response import JSONResponse, response_mimetype
+from .comments import *
 from .serialize import serialize
 
 from population_characteristics.models import *
@@ -53,8 +54,23 @@ def jerboa_list_values(request, var, row, fingerprint_id, template_name='documen
     return response
 
 
-def comments(request):
+def comments(request, fingerprint_id=None):
     if request.POST:
+
+        # Extract fingerprint id
+        fingerprint_id = request.POST["pc_chart_comment_fingerprint_id"]
+
+        # Extract chart_id
+        chart_id = request.POST["pc_chart_comment_id"]
+
+        # Title and Description 
+        title = request.POST["pc_chart_comment_name"]
+        description = request.POST["pc_chart_comment_description"]
+
+        # Now have the values, send it to the comment manager 
+        cm = CommentManager(fingerprint_id)
+        cm.comment(chart_id, title, description, request.user)
+
         status = True
         data = {'comments': status}
         response = JSONResponse(data, mimetype="application/json")
