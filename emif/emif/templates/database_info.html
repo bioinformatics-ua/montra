@@ -84,6 +84,7 @@
 {% endblock %} 
 
 {% block content %} 
+
 {% if qsets %}
 
 <div class="span12">
@@ -260,7 +261,10 @@ function load_questionnary(){
                 containers.push('<div class="{% if not permissions.allow_printing %}noprinting {% endif %}'+
                 '{% if not permissions.allow_exporting %}noexporting {% endif %}'+
                 'accordion-group">'
-                +'<div class="accordion-heading"><a style="display: inline-block; width: 90%;" class="accordion-toggle" data-toggle="collapse" data-parent="#accordion1" href="#collapse{{ tuple.0|removespaces|safe|clean }}">{{ tuple.0|removeh1 }} </a><span class="accordion-icon"></span></div><div id="collapse{{ tuple.0|removespaces|safe|clean }}" class="accordion-body collapse"><div id="qs_{{ tuple.1.sortid }}" class="accordion-inner"><h4 class="pull-center">Loading...</h4></div></div></div>');
+                +'<div class="accordion-heading"><a style="display: inline-block; width: 90%;" class="accordion-toggle" data-toggle="collapse" data-parent="#accordion1" href="#collapse{{ tuple.0|removespaces|safe|clean }}">{{ tuple.0|removeh1 }} </a>'+
+                '{% if not permissions.allow_printing %}<img class="tooltipit" title="The data custodian doesn\'t allow this section to be printed." src="{{ STATIC_URL}}img/noprint.png"/>{% endif %}'+
+                '{% if not permissions.allow_exporting %}<img class="tooltipit" title="The data custodian doesn\'t allow this section to be exported." src="{{ STATIC_URL}}img/noexport.png"/>{% endif %}'+
+                '<span class="accordion-icon"></span></div><div id="collapse{{ tuple.0|removespaces|safe|clean }}" class="accordion-body collapse"><div id="qs_{{ tuple.1.sortid }}" class="accordion-inner"><h4 class="pull-center">Loading...</h4></div></div></div>');
             {% endif %}
         
         {% endfor %}
@@ -317,6 +321,9 @@ function loadqspart(sortid, pk){
 $(document).ready(function() {
 
     load_questionnary();
+
+    $(".tooltipit").tooltip({container: "body"});
+
     // On expand event, we burst the priority of this thread to load before the others
     $('.accordion-heading').click(function(){
         var load_faster = $('.accordion-inner', $(this).parent()).attr('id');
