@@ -1884,8 +1884,9 @@ def createqsets(runcode, qsets=None, clean=True):
             if (qset.sortid != 0 and qset.sortid != 99):
                 question_group = QuestionGroup()
                 question_group.sortid = qset.sortid
-                
+                question_group.qsid = qset.id
                 qsets[qset.text] = question_group
+
                 qset.sortid
                 list_questions = Question.objects.filter(questionset=qset).order_by('number')
                 for question in list_questions:
@@ -3225,24 +3226,41 @@ def save_answers_to_csv(list_databases, filename):
 
             qsets, name, db_owners, fingerprint_ttype = createqsets(id, clean=False)
 
-            for group in qsets.ordered_items():
-                (k, qs) = group
-                if (qs!=None and qs.list_ordered_tags!= None):
-                    list_aux = sorted(qs.list_ordered_tags)
-                    #import pdb
-                    #pdb.set_trace()
-                    for q in list_aux:
-                        _answer = clean_str_exp(str(q.value))
-                        if (_answer == "" and q.ttype=='comment'):
-                            _answer = "-"
-                        writer.writerow([id, name, k.replace('h1. ', ''), clean_str_exp(str(q.tag)), str(q.number), _answer])
-            writer.writerow([id, name, "System", "Date", "99.0", t.date])
-            writer.writerow([id, name, "System", "Date Modification", "99.1", t.date_modification])
-            writer.writerow([id, name, "System", "Type", "99.2", t.type_name])
-            writer.writerow([id, name, "System", "Type Identifier", "99.3", t.ttype])
+            qsets = attachPermissions(id, qsets)
 
+            for (k, qs), permissions in qsets:
+                if permissions.visibility == 0 and permissions.allow_exporting == True:
+                    writeGroup(id, k, qs, writer, name, t)
+
+        writer.writerow([id, name, "System", "Date", "99.0", t.date])
+        writer.writerow([id, name, "System", "Date Modification", "99.1", t.date_modification])
+        writer.writerow([id, name, "System", "Type", "99.2", t.type_name])
+        writer.writerow([id, name, "System", "Type Identifier", "99.3", t.ttype])
     return response
 
+def attachPermissions(fingerprint_id, qsets):
+    zipper = qsets
+    zipee = []
+
+    #print type(zipper)
+
+    for q, v in zipper.ordered_items():
+        qpermissions = getPermissions(fingerprint_id, QuestionSet.objects.get(id=v.qsid))
+        zipee.append(qpermissions)
+
+    merged = zip(zipper.ordered_items(), zipee)
+
+    return merged
+
+def writeGroup(id, k, qs, writer, name, t):
+    if (qs!=None and qs.list_ordered_tags!= None):
+        list_aux = sorted(qs.list_ordered_tags)
+
+        for q in list_aux:
+            _answer = clean_str_exp(str(q.value))
+            if (_answer == "" and q.ttype=='comment'):
+                _answer = "-"
+            writer.writerow([id, name, k.replace('h1. ', ''), clean_str_exp(str(q.tag)), str(q.number), _answer])
 
 def export_all_answers(request):
     """

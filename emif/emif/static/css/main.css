@@ -521,7 +521,7 @@ label input[type="radio"], label input[type="checkbox"]{
   .visible-print  { display: inherit !important; }
   .hidden-print  .navbar, .btn-group, .pagination,
   .btn, .select_line,
-  .table_filter
+  .table_filter, .noprinting
   { display: none !important; }
   a:link, 
   a:visited { 
@@ -564,3 +564,4 @@ label input[type="radio"], label input[type="checkbox"]{
 .qspreference{
   margin-top: 3px !important;
 }
+
