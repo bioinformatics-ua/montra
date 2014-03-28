@@ -324,17 +324,17 @@ def results_diff(request, page=1, template_name='results_diff.html'):
                 response.status_code = 500
                 return response
                 
-            print "--------------------------------------------------------------"
-            print qserialization
-            print "--------------------------------------------------------------\n"
+            #print "--------------------------------------------------------------"
+            #print qserialization
+            #print "--------------------------------------------------------------\n"
 
             query = convert_qvalues_to_query(qvalues, qid, qexpression)
             query = convert_query_from_boolean_widget(qexpression, qid)
             #print "Query: " + query
 
-            print "--------------------------------------------------------------"
-            print query
-            print "--------------------------------------------------------------\n"
+            #print "--------------------------------------------------------------"
+            #print query
+            #print "--------------------------------------------------------------\n"
 
             request.session['query'] = query
             
@@ -618,7 +618,6 @@ def render_one_questionset(request, q_id, qs_id, errors={}, aqid=None, fingerpri
     
 
     if fingerprint_id != None and not is_new:
-        print "HERY"
         c = CoreEngine()
 
         extra = {} 
@@ -779,6 +778,8 @@ def render_one_questionset(request, q_id, qs_id, errors={}, aqid=None, fingerpri
         elif fingerprint_id != None and not is_new:
             (qlist_general, qlist, jstriggers, qvalues, jsinclude, cssinclude, extra_fields, hasErrors) = extract_answers(request2, q_id, question_set, qs_list)
 
+        permissions = getPermissions(fingerprint_id, question_set)
+
         r = r2r(template_name, request,
                 questionset=question_set,
                 questionsets=question_set.questionnaire.questionsets,
@@ -796,6 +797,7 @@ def render_one_questionset(request, q_id, qs_id, errors={}, aqid=None, fingerpri
                 questions_list=qlist_general,
                 fingerprint_id=fingerprint_id,
                 breadcrumb=True,
+                permissions=permissions
         )
         r['Cache-Control'] = 'no-cache'
         r['Expires'] = "Thu, 24 Jan 1980 00:00:00 GMT"
@@ -804,7 +806,28 @@ def render_one_questionset(request, q_id, qs_id, errors={}, aqid=None, fingerpri
 
         raise
     return r
-    
+
+# GET permissions model
+def getPermissions(fingerprint_id, question_set):
+
+    if fingerprint_id == None or question_set == None:
+        return None
+
+
+    permissions = None
+    try:
+        permissions = QuestionSetPermissions.objects.get(fingerprint_id=fingerprint_id, qs=question_set)
+
+    except QuestionSetPermissions.DoesNotExist:
+        print "Does not exist yet, creating a new permissions object."
+        permissions = QuestionSetPermissions(fingerprint_id=fingerprint_id, qs=question_set, visibility=0,
+         allow_printing=True, allow_indexing=True, allow_exporting=True)
+        permissions.save()
+            
+    except QuestionSetPermissions.MultipleObjectsReturned:
+        print "Error retrieved several models for this questionset, its impossible, so something went very wrong."    
+
+    return permissions
 
 class RequestMonkeyPatch(object):
     POST = {}
@@ -2533,6 +2556,12 @@ def check_database_add_conditions(request, questionnaire_id, sortid, saveid,
 
         if not hasErrors:
             add_city(qlist_general)
+
+            if request.POST:
+                setNewPermissions(request)
+            else:
+                setNewPermissions(request2)
+
             index_answeres_from_qvalues(qlist_general, question_set2.questionnaire, users_db,
                                         fingerprint_id, extra_fields=extra_fields, created_date=created_date)
 
@@ -2559,6 +2588,37 @@ def check_database_add_conditions(request, questionnaire_id, sortid, saveid,
     r['Expires'] = "Thu, 24 Jan 1980 00:00:00 GMT"
 
     return r
+
+# Set new permissions for a questionset, based on a post request
+def setNewPermissions(request):
+
+    if(request == None or not request.POST):
+        return False
+
+    id = request.POST['_qs_perm']
+
+    if(id != None):
+
+        try:
+            this_permissions                = QuestionSetPermissions.objects.get(id=id)
+
+            this_permissions.visibility     = int(request.POST['_qs_visibility'])
+            this_permissions.allow_printing = (request.POST['_qs_printing'] == 'true')
+            this_permissions.allow_indexing = (request.POST['_qs_indexing'] == 'true')
+            this_permissions.allow_exporting= (request.POST['_qs_exporting'] == 'true')
+
+            this_permissions.save()
+
+            return True
+
+        except QuestionSetPermissions.DoesNotExist:
+            print "Can't save this since, there's no permissions object to this questionset yet."
+        except QuestionSetPermissions.MultipleObjectsReturned:
+            print "Can't save this since there's several objects for this questionset permissions (should be only one)"
+
+
+    return False
+
 ## ###############
 ##  STIL MIGHT BE USEFULL FOR DEBUG PORPOSES
 ## #######################
@@ -2775,7 +2835,7 @@ def show_fingerprint_page_read_only(request, q_id, qs_id, SouMesmoReadOnly=False
                 percentage = 0
             qreturned.append([x, ans, ttct, percentage])
 
-        print qreturned
+        #print qreturned
         #### End of finding out about the number of answers serverside
 
         r = r2r(template_name, request,
