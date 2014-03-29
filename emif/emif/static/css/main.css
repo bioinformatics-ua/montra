@@ -565,3 +565,6 @@ label input[type="radio"], label input[type="checkbox"]{
   margin-top: 3px !important;
 }
 
+.privategroup{
+  background-color: #f8f8f8;
+}
