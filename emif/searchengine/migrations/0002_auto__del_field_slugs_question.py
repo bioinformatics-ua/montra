@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-import datetime
+from south.utils import datetime_utils as datetime
 from south.db import db
 from south.v2 import SchemaMigration
 from django.db import models
@@ -15,7 +15,7 @@ class Migration(SchemaMigration):
     def backwards(self, orm):
         # Adding field 'Slugs.question'
         db.add_column('searchengine_slugs', 'question',
-                      self.gf('django.db.models.fields.related.ForeignKey')(default=datetime.datetime(2014, 3, 27, 0, 0), to=orm['questionnaire.Question']),
+                      self.gf('django.db.models.fields.related.ForeignKey')(default=None, to=orm['questionnaire.Question']),
                       keep_default=False)
 
 
