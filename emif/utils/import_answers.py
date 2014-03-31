@@ -19,7 +19,7 @@ docs = pickle.load(pkl_file)
 pkl_file.close()
 
 for d in docs:
-    del d['_version']
+    del d['_version_']
 
 xml_answer = solr.add(docs)
 print(xml_answer)
