@@ -18,6 +18,8 @@ docs = pickle.load(pkl_file)
 
 pkl_file.close()
 
+for d in docs:
+    del d['_version']
 
 xml_answer = solr.add(docs)
 print(xml_answer)
