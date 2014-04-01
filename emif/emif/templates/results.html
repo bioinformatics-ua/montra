@@ -77,7 +77,7 @@
           <h4>
               <span id="results_size"></span>
             {% if page_obj != None %}            
-            <span class="label label-inverse"> {{num_results}}</span> results found
+            {{num_results}} results found
             {%if not isAdvanced %}
                 for {{search_old}}
               {% endif %}
@@ -259,8 +259,6 @@ $(document).ready(function(){
           return false;
         });
 
-        // This is to remove later, only until compare_database integration
-        $("input:checkbox:not(:checked)").prop('disabled', true); 
     }
 
   }
@@ -407,10 +405,7 @@ $('.checkbox').click(function()
         { 
           postComparison();
           return false;
-        });  
-
-        // This is to remove later, only until compare_database integration
-        $("input:checkbox:not(:checked)").prop('disabled', true);   
+        });    
     }
 
 });
