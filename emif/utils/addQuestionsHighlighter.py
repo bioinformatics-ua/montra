@@ -17,9 +17,9 @@ for quest in questionaires:
 		#print qs
 		questions = qs.questions()
 		for q in questions:
-			for x in Slugs.objects.filter(question=q):
-				key = str(x.slug1) + "_qs"
-				obj[key] = x.question.text
+			x = q.slug_fk
+			key = str(x.slug1) + "_qs"
+			obj[key] = q.text
 	slugs.append(obj)
 
 		
