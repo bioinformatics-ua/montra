@@ -33,6 +33,7 @@ class Characteristic(Document):
 class Comments(models.Model):
     user = models.ForeignKey(User, unique=False, blank=True, null=True)
     fingerprint_id = models.CharField(max_length=255)
+    chart_id = models.CharField(max_length=255)
     created_date = models.DateTimeField(auto_now_add=True)
     latest_date = models.DateTimeField(auto_now=True)
     document = models.ForeignKey(Characteristic, unique=False, blank=True, null=True)
@@ -40,8 +41,8 @@ class Comments(models.Model):
     description = models.TextField()
 
     
-    def get_list_comments(self, chart_id):
-        pass
+    
+        
     def __str__(self):
         s = "User: " + str(self.user) + "\n"
         s += "Fingerprint ID: " + self.fingerprint_id + "\n"

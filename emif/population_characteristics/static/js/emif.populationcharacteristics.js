@@ -386,6 +386,7 @@ function PCAPI ()
                     { 
                       e.preventDefault(); 
                       e.stopPropagation();
+                      $("#pc_comments_placeholder").html("");
   
                       
                       // Anyone have a better suggestion to do it?
@@ -406,9 +407,15 @@ function PCAPI ()
                       {
                           // do something here like an abort or shit! 
                       }
-                      $("#pc_chart_comment_id").val(actualChart.uid);
-                      $("#pc_chart_comment_fingerprint_id").val(getFingerprintID());
 
+                      // Comments ids
+                      var fid = getFingerprintID();
+                      $("#pc_chart_comment_id").val(actualChart.uid);
+                      $("#pc_chart_comment_fingerprint_id").val(fid);
+
+                      cm = new CommentsManager();
+                      cm.listComments(fid, actualChart.uid);
+                      
                       var charDraw = new PCDraw(actualChart, actualChart.title['var'], e);
                       var _filters = {};
                       charDraw.draw(_filters);

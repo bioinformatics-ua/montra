@@ -72,8 +72,10 @@ def jerboa_list_values(request, var, row, fingerprint_id, template_name='documen
     return response
 
 
-def comments(request, fingerprint_id=None):
-    if request.POST:
+def comments(request, fingerprint_id=None, chart_id=None):
+    print request.method
+    if request.method=="POST":
+        # Add new comment
 
         # Extract fingerprint id
         fingerprint_id = request.POST["pc_chart_comment_fingerprint_id"]
@@ -95,7 +97,20 @@ def comments(request, fingerprint_id=None):
         response = JSONResponse(data, mimetype="application/json")
         response['Content-Disposition'] = 'inline; filename=files.json'
         return response
+    elif request.method=="GET":
+        # List comments
+        cm = CommentManager(fingerprint_id)
+        comments = cm.get_list_comments(fingerprint_id, chart_id)
+        lst_return = []
+        for c in comments: 
 
+            data = {'t_title' : c.title, "description": c.description, "id": c.pk, "latest_date": serialize_date(c.latest_date)}
+            lst_return.append(data)
+        response = JSONResponse(lst_return, mimetype="application/json")
+        response['Content-Disposition'] = 'inline; filename=files.json'
+        return response
+
+    
     # Return bad requests
     return HttpResponseBadRequest()
 

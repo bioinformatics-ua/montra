@@ -19,6 +19,53 @@
 ***********************************************************************/
 
 var commentsBinded = false;
+var NONCONTACTCOMMENTS = "This chart does not have any associated comments.";
+function CommentsManager()
+{
+
+  var self =this;
+
+    this.addComment = function(data) {
+        if ($("#pc_comments_placeholder").text()==NONCONTACTCOMMENTS)
+        {
+          $("#pc_comments_placeholder").html("");
+        }
+        $("#pc_comments_placeholder").append('<div id="comment_1"><blockquote><p style="font-size: 16px">'+data.t_title+'</p>'
+                          + '<small>'+data.description+' <br />posted on '+data.latest_date+' </small>'
+                          + '</blockquote>'
+                        +'</div>');
+    }; 
+
+
+
+    this.listComments = function(fingerprintID, chartID){
+        var results = null;
+        var result = {}
+          
+        $.ajax({
+          dataType: "json",
+          url: "population/comments/" + fingerprintID + "/" + chartID,
+          async: false,
+          data: result,
+          success: function (data){
+            result=data;
+          }
+        });
+        
+        if (result.length==0)
+          $("#pc_comments_placeholder").html(NONCONTACTCOMMENTS);
+
+        $.each(result, function(data)
+          {
+            data = result[data];
+            
+            self.addComment(data);
+
+          });
+        return result;
+    };
+
+};
 
 
 $( document ).ready(function() {
@@ -28,6 +75,7 @@ $( document ).ready(function() {
 
         $('#chartcomments').unbind("submit");
         $("#chartcomments").submit(function(ev){
+            cm = new CommentsManager();
              var url = "population/comments"; // the script where you handle the form input.
             $.ajax({
                    type: "POST",
@@ -36,10 +84,7 @@ $( document ).ready(function() {
                    success: function(data)
                    {
                        
-                       $("#pc_comments_placeholder").append('<div id="comment_1"><blockquote><p style="font-size: 16px">'+data.t_title+'</p>'
-                        + '<small>'+data.description+' <br />posted on '+data.latest_date+' </small>'
-                        + '</blockquote>'
-                      +'</div>');
+                       cm.addComment(data);
                    }
                  });
             ev.preventDefault();
@@ -48,4 +93,6 @@ $( document ).ready(function() {
             });
     });
     $("#pc_chart_comment_submit").prop('disabled', false);
+
+
 });

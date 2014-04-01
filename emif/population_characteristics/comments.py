@@ -46,8 +46,12 @@ class CommentManager(object):
         comments.fingerprint_id = self.fingerprint_id
         jerboa_documents = Characteristic.objects.filter(fingerprint_id=self.fingerprint_id).order_by('latest_date')
         contains_population = len(jerboa_documents)!=0
-        comments.document = jerboa_documents[0]
+        if contains_population:
+            comments.document = jerboa_documents[0]
+        else:
+            comments.document = None
         comments.title = title 
+        comments.chart_id = chart_id
         comments.description = description
         comments.save()
         logger.error('comments is: %s' % comments.__str__())
@@ -55,9 +59,8 @@ class CommentManager(object):
 
     """List of comments for a specific chart of a specific fingerprint id
     """
-    def list_comments(self, fingerprint_id, chart_id):
-        pass
-
-
+    def get_list_comments(self, fingerprint_id, chart_id):
+        return Comments.objects.filter(fingerprint_id=self.fingerprint_id, chart_id=chart_id).order_by('latest_date')
+        
 
 
