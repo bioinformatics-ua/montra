@@ -23,6 +23,9 @@ from django.db.models.fields import *
 
 from docs_manager.models import Document
 
+import json
+
+
 class Characteristic(Document):
     pass
 
@@ -35,7 +38,16 @@ class Comments(models.Model):
     document = models.ForeignKey(Characteristic, unique=False, blank=True, null=True)
     title = models.TextField()
     description = models.TextField()
+
     
     def get_list_comments(self, chart_id):
         pass
-
+    def __str__(self):
+        s = "User: " + str(self.user) + "\n"
+        s += "Fingerprint ID: " + self.fingerprint_id + "\n"
+        s += "created date: " + str(self.created_date) + "\n"
+        s += "latest date: " + str(self.latest_date)+ "\n"
+        s += "document: " + str(self.document)+ "\n"
+        s += "title: " + self.title+ "\n"
+        s += "description: " + self.description+ "\n"
+        return s

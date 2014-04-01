@@ -406,6 +406,8 @@ function PCAPI ()
                       {
                           // do something here like an abort or shit! 
                       }
+                      $("#pc_chart_comment_id").val(actualChart.uid);
+                      $("#pc_chart_comment_fingerprint_id").val(getFingerprintID());
 
                       var charDraw = new PCDraw(actualChart, actualChart.title['var'], e);
                       var _filters = {};
@@ -413,6 +415,7 @@ function PCAPI ()
                       charDraw.drawBar();
                       $(".filterBar").last().click();   
                       $(".filterBar").first().click(); 
+
                       
                       return false;
                     });

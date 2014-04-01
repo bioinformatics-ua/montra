@@ -183,8 +183,8 @@
                 <div id="pc_comment_id" class="pc_comment">
                 <form id="chartcomments" method="post" action="comments" >
                     {% csrf_token %}
-                    <input id="pc_chart_comment_id" type="hidden" value="">
-                    <input id="pc_chart_comment_fingerprint_id" type="hidden" value="">
+                    <input id="pc_chart_comment_id" name="pc_chart_comment_id" type="hidden" value="">
+                    <input id="pc_chart_comment_fingerprint_id" name="pc_chart_comment_fingerprint_id" type="hidden" value="">
                     <label>Title:</label> <input size="255" maxlength="40" style='width:35em' class="" type="text" cols="80" name="pc_chart_comment_name" >
 
                     <label>Comments about extracted data: </label>
@@ -194,6 +194,8 @@
                 </form>
                 </div>
             {%endif%}
+            <div id='pc_comments_placeholder' class="pc_comment">
+            </div>
 
         </div>
     </div>

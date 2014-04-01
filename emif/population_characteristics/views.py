@@ -32,6 +32,24 @@ from django.conf import settings
 from django.http import *
 
 
+from dateutil.tz import tzutc
+
+UTC = tzutc()
+
+def serialize_date(dt):
+    """
+    Serialize a date/time value into an ISO8601 text representation
+    adjusted (if needed) to UTC timezone.
+
+    For instance:
+    >>> serialize_date(datetime(2012, 4, 10, 22, 38, 20, 604391))
+    '2012-04-10T22:38:20.604391Z'
+    """
+    if dt.tzinfo:
+        dt = dt.astimezone(UTC).replace(tzinfo=None)
+    return dt.isoformat() + 'Z'
+
+
 def jerboa_list_values(request, var, row, fingerprint_id, template_name='documents_upload_form.html'):
 
     filters = []
@@ -69,10 +87,11 @@ def comments(request, fingerprint_id=None):
 
         # Now have the values, send it to the comment manager 
         cm = CommentManager(fingerprint_id)
-        cm.comment(chart_id, title, description, request.user)
+        c = cm.comment(chart_id, title, description, request.user)
 
         status = True
-        data = {'comments': status}
+        data = {'comments': status, 't_title' : c.title, "description": 
+        c.description, "id": c.pk, "latest_date": serialize_date(c.latest_date)}
         response = JSONResponse(data, mimetype="application/json")
         response['Content-Disposition'] = 'inline; filename=files.json'
         return response
@@ -113,22 +132,6 @@ def get_settings(request, runcode):
     return response
 
 
-from dateutil.tz import tzutc
-
-UTC = tzutc()
-
-def serialize_date(dt):
-    """
-    Serialize a date/time value into an ISO8601 text representation
-    adjusted (if needed) to UTC timezone.
-
-    For instance:
-    >>> serialize_date(datetime(2012, 4, 10, 22, 38, 20, 604391))
-    '2012-04-10T22:38:20.604391Z'
-    """
-    if dt.tzinfo:
-        dt = dt.astimezone(UTC).replace(tzinfo=None)
-    return dt.isoformat() + 'Z'
 
 def list_jerboa_files(request, fingerprint):
 

@@ -17,33 +17,47 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
+# import the logging library
+import logging
+
+
 from .models import * 
 
-class Comments(models.Model):
-    user = models.ForeignKey(User, unique=False, blank=True, null=True)
-    fingerprint_id = models.CharField(max_length=255)
-    created_date = models.DateTimeField(auto_now_add=True)
-    latest_date = models.DateTimeField(auto_now=True)
-    document = models.ForeignKey(Characteristic, unique=False, blank=True, null=True)
-    title = models.TextField()
-    description = models.TextField()
+logger = logging.getLogger(__name__)
+
+"""
+Management of comments 
+"""
+
 
 class CommentManager(object):
 
 
     def __init__(self, fingerprint_id):
         self.fingerprint_id=fingerprint_id
+        logger.debug('Fingerprint id: %s' % fingerprint_id)
 
-
+    """
+    Comment for a specific chart of a a fingerprint 
+    """
     def comment(self, chart_id, title, description, user):
         comments = Comments()
         comments.user = user
         comments.fingerprint_id = self.fingerprint_id
-        jerboa_documents = Characteristic.objects.filter(fingerprint_id=fingerprint_id).order_by('latest_date')
-        contains_population = len(jerboa_files)!=0
-        comments.document = None
+        jerboa_documents = Characteristic.objects.filter(fingerprint_id=self.fingerprint_id).order_by('latest_date')
+        contains_population = len(jerboa_documents)!=0
+        comments.document = jerboa_documents[0]
         comments.title = title 
         comments.description = description
+        comments.save()
+        logger.error('comments is: %s' % comments.__str__())
+        return comments 
+
+    """List of comments for a specific chart of a specific fingerprint id
+    """
+    def list_comments(self, fingerprint_id, chart_id):
         pass
+
+
 
 
