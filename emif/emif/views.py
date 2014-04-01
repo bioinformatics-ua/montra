@@ -1849,7 +1849,7 @@ def all_databases_data_table(request, template_name='alldatabases_data_table.htm
                                            })
 
 
-def createqsets(runcode, qsets=None, clean=True):
+def createqsets(runcode, qsets=None, clean=True, highlights=None):
     #print "createqsets"
     c = CoreEngine()
     results = c.search_fingerprint('id:' + runcode)
@@ -1871,6 +1871,13 @@ def createqsets(runcode, qsets=None, clean=True):
     for q in qqs:
         questionnaires_ids[q.slug] = (q.pk, q.name)
 
+    rHighlights = None
+    qhighlights = None
+    if highlights != None:
+        if "results" in highlights and runcode in highlights["results"]:
+            rHighlights = highlights["results"][runcode]
+        if "questions" in highlights:
+            qhighlights = highlights["questions"]
 
     for result in results:
 
@@ -1953,12 +1960,16 @@ def createqsets(runcode, qsets=None, clean=True):
             info = text
             t.tag = info
             #print t.tag
-
             if question_group != None and question_group.list_ordered_tags != None:
                 try:
                     t = question_group.list_ordered_tags[question_group.list_ordered_tags.index(t)]
                 except:
                     pass
+
+            qs_text = k[:-1] + "qs"
+            id_text = "questionaire_"+str(fingerprint_ttype)
+            if question_group != None and qhighlights != None and id_text in qhighlights and qs_text in qhighlights[id_text]:
+                question_group.info = True
 
             value = clean_value(str(result[k].encode('utf-8')))
             
@@ -1970,6 +1981,8 @@ def createqsets(runcode, qsets=None, clean=True):
                pass
             if clean:
                 t.value = value.replace("#", " ")
+                if question_group != None and rHighlights != None and k in rHighlights:
+                    question_group.info = True
             else:
                 t.value = value
 

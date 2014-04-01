@@ -130,7 +130,10 @@ def single_qset_view(request, runcode, qsid, template_name='fingerprint_qs.html'
 def document_form_view(request, runcode, qs, activetab='summary',
     template_name='documents_upload_form.html'):
     
-    qsets, name, db_owners, fingerprint_ttype = createqsets(runcode)
+    h = None
+    if "query" in request.session and "highlight_results" in request.session:
+        h = request.session["highlight_results"]
+    qsets, name, db_owners, fingerprint_ttype = createqsets(runcode, highlights=h)
 
     if fingerprint_ttype == "":
         raise "There is missing ttype of questionarie, something is really wrong"
