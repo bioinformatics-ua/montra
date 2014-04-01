@@ -41,11 +41,11 @@ else:
     MIDDLE_DIR = "emif/emif/"
 
 ADMINS = (
-#    ('Luis A. Bastiao Silva', 'bastiao@ua.pt'),
-#    ('José Luis Oliveira', 'jlo@ua.pt'),
-#    ('Tiago Godinho', 'tmgodinh@ua.pt'),
+    ('Luis A. Bastiao Silva', 'bastiao@ua.pt'),
+    ('José Luis Oliveira', 'jlo@ua.pt'),
+    ('Tiago Godinho', 'tmgodinh@ua.pt'),
     ('Jose Melo', 'melojms@gmail.com'),
-#    ('Ricardo Ribeiro', 'ribeiro.r@ua.pt'),
+    ('Ricardo Ribeiro', 'ribeiro.r@ua.pt'),
 )
 
 SOLR_HOST = "localhost"
