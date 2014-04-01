@@ -900,6 +900,58 @@ def q_15_01_06():
 
 
 
+def q_20_02_13():
+
+	desiredQN = "20.02.13"
+
+	def getQuestionObj(id):
+		arr = Question.objects.filter(questionset=id, number=desiredQN)
+		for x in arr:
+			return x
+		return Question()
+
+	def create_question(qset):
+		#Create Question;
+		q = getQuestionObj(qset.id)
+		q.questionset = qset
+		q.number = desiredQN
+		q.text_en = "h2. Specify other assessements"	
+		q.type = "open-textfield"
+		q.help_text = "Specify other analytics of interests separated by line."
+		q.slug = "Specify_any_other_tests_20_02_13"
+		q.checks = "dependent=\"20.01,yes\""
+		return q
+
+	def updateSlug(qs):
+		arr = Slugs.objects.filter(question=qs)
+		if len(arr) == 0:
+			x = Slugs()
+			x.question = qs
+			x.slug1 = qs.slug
+			x.description = qs.text
+			print x
+			x.save()
+			return
+		for x in arr:
+			x.slug1 = qs.slug
+			x.description = qs.text
+			print x
+			x.save()
+		return
+
+
+	qsets = QuestionSet.objects.filter(heading="adcohort_Cognitive_screening_tests")
+	print qsets
+	print len(qsets)
+	for qs in qsets:
+	 	print "iterate questions"
+	 	print qs
+	 	question = create_question(qs)
+		question.save()
+		print "Saved Question"
+		updateSlug(question)
+
+	print "QUITTING"
 
 q_5_02_04()
 q_7_03_10()
@@ -916,6 +968,7 @@ q_9_01_06()
 q_11_01_10()
 q_12_01_10()
 q_15_01_06()
+q_20_02_13()
 
 
 
