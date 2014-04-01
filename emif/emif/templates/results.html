@@ -259,8 +259,6 @@ $(document).ready(function(){
           return false;
         });
 
-        // This is to remove later, only until compare_database integration
-        $("input:checkbox:not(:checked)").prop('disabled', true); 
     }
 
   }
@@ -407,10 +405,7 @@ $('.checkbox').click(function()
         { 
           postComparison();
           return false;
-        });  
-
-        // This is to remove later, only until compare_database integration
-        $("input:checkbox:not(:checked)").prop('disabled', true);   
+        });    
     }
 
 });
