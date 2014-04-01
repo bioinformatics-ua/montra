@@ -902,7 +902,7 @@ def q_15_01_06():
 
 def q_20_02_13():
 
-	desiredQN = "20.02.13"
+	desiredQN = "20.01.02.13"
 
 	def getQuestionObj(id):
 		arr = Question.objects.filter(questionset=id, number=desiredQN)
@@ -918,7 +918,7 @@ def q_20_02_13():
 		q.text_en = "h2. Specify other assessements"	
 		q.type = "open-textfield"
 		q.help_text = "Specify other analytics of interests separated by line."
-		q.slug = "Specify_any_other_tests_20_02_13"
+		q.slug = "Specify_any_other_tests_20_01_02_13"
 		q.checks = "dependent=\"20.01,yes\""
 		return q
 
