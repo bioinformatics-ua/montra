@@ -100,7 +100,7 @@ class QuestionSet(models.Model):
     sortid = models.IntegerField() # used to decide which order to display in
     heading = models.CharField(max_length=255)
     checks = models.CharField(max_length=128, blank=True,
-        help_text = """Current options are 'femaleonly' or 'maleonly' and shownif="QuestionNumber,Answer" which takes the same format as <tt>requiredif</tt> for questions.""")
+    help_text = """Current options are 'femaleonly' or 'maleonly' and shownif="QuestionNumber,Answer" which takes the same format as <tt>requiredif</tt> for questions.""")
     text = models.TextField(help_text="This is interpreted as Textile: <a href='http://hobix.com/textile/quick.html'>http://hobix.com/textile/quick.html</a>")
     help_text = models.CharField(max_length=2255, blank=True, null=True)
     tooltip = models.BooleanField(default=False, help_text="If help text appears in a tooltip")
@@ -110,6 +110,16 @@ class QuestionSet(models.Model):
             self.__qcache = list(Question.objects.filter(questionset=self).order_by('number'))
             self.__qcache.sort()
         return self.__qcache
+
+    # Returns the serverside total and filled count for this questionset
+    def total_count(self):
+        if not hasattr(self, "__qcache"):
+            self.__qcache = list(Question.objects.filter(questionset=self).order_by('number'))
+            self.__qcache.sort()
+
+        questions = self.__qcache
+
+        return len(questions);
 
     def next(self):
         qs = self.questionnaire.questionsets()
