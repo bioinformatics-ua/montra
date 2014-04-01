@@ -940,7 +940,7 @@ def q_20_02_13():
 		return
 
 
-	qsets = QuestionSet.objects.filter(heading="adcohort_Cognitive_screening_tests")
+	qsets = QuestionSet.objects.filter(heading="adcohort_CSF_collection")
 	print qsets
 	print len(qsets)
 	for qs in qsets:
