@@ -5,6 +5,9 @@ from django.utils.translation import ugettext as _
 from questionnaire import *
 from django.utils.translation import ugettext as _
 from django.utils.simplejson import dumps
+import re
+
+regex = re.compile("\\d{1,3}(\\.\\d{3})*$")
 
 @question_proc('numeric')
 def question_(request, question):
@@ -15,7 +18,7 @@ def question_(request, question):
 
     if key in request.POST:
         value = request.POST[key]
-        print "REQUEST!!!!" + value
+        #print "REQUEST!!!!" + value
     return {
         'required' : question.getcheckdict().get('required', False),
         'value' : value,
@@ -31,8 +34,10 @@ def process_(question, ansdict):
     ans = ansdict['ANSWER'] or ''
     qtype = question.get_type()
 
-    if len(ans)!=0 and not ans.isdigit():
-        raise AnswerException(_(u'Must be a mumeric field. ex: 1000000000 = 1 Million'))
+    boo = regex.match(ans) == None
+    
+    if len(ans)!=0 and boo:
+        raise AnswerException(_(u'Must be a mumeric field. ex: 1.000.000.000 = 1 Million'))
 
     if ansdict.has_key('comment') and len(ansdict['comment']) > 0:
         return dumps([ans, [ansdict['comment']]])

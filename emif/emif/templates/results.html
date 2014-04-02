@@ -76,14 +76,13 @@
 
           <h4>
               <span id="results_size"></span>
-            {% if page_obj != None %}
-            Total results 
-              {%if not isAdvanced %}
+            {% if page_obj != None %}            
+            {{num_results}} results found
+            {%if not isAdvanced %}
                 for {{search_old}}
               {% endif %}
-            <span class="label label-inverse"> {{num_results}}</span>
             {% else %}
-            No results found 
+            No results found<br><button id="refine_search_btn" class="btn btn-link">Try to refine your search</button>
           {% endif %}
           </h4>
         </div>
@@ -219,19 +218,12 @@
 </table>
 
   </form>
-  <form id="send2" method="POST" > 
-  <input id="page" type="hidden" name="page" value="{{page}}"></input>
-  <input id="s" type="hidden" name="s" value=""></input>  
-    <input id="submit_simulate" style="display:none" type="submit" value="Submit">
-
-{% csrf_token %}
-</form>
     {% else %}
     <div style="margin-top: 60px;"></div>
   {% endif %}
 
   {% if page_obj != None %}
-    {% bootstrap_paginate page_obj range=10 url_view_name="views.results_diff" show_prev_next="false" show_first_last="true" %}
+    {% include "post_paginator.html" %}
 
 {% endif %}
 {% endblock %}
@@ -253,7 +245,6 @@ $(document).ready(function(){
     //TO Be Applied in future releases.
     a.atachPlugin(new SelectPaginatorPlugin());
 
-    paginator_via_post();
   if(a != undefined && a.plugin != undefined){
 
     var dbcount = updateSelectCount();
@@ -268,8 +259,6 @@ $(document).ready(function(){
           return false;
         });
 
-        // This is to remove later, only until compare_database integration
-        $("input:checkbox:not(:checked)").prop('disabled', true); 
     }
 
   }
@@ -283,6 +272,16 @@ $(document).ready(function(){
 });
 {% endif %}
 
+$(document).ready(function(){
+  $("#refine_search_btn").click( function(){
+      {% if isAdvanced %}
+      window.location.replace($('#base_link').prop('href')+"advancedSearch/{{request.session.query_type}}/1/{{request.session.query_id}}");
+      {% else %}
+        $("input[name=query]").focus();
+      {% endif %}  
+    });    
+});
+
  {% if isAdvanced %}
  var bool_container;
 $(function(){
@@ -290,7 +289,6 @@ $(function(){
    
     window.setTimeout(function(){window.location.hash = "#back";}, 100);
     window.setTimeout(function(){window.location.hash = "#search";}, 100);
-
 });
   /* This is a trick, to be able to redirect on back button since browsers try to prevent us to do so 
    I must do this, because the back url is different from the url on history */
@@ -407,10 +405,7 @@ $('.checkbox').click(function()
         { 
           postComparison();
           return false;
-        });  
-
-        // This is to remove later, only until compare_database integration
-        $("input:checkbox:not(:checked)").prop('disabled', true);   
+        });    
     }
 
 });

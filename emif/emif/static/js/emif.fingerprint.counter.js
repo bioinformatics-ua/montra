@@ -68,11 +68,14 @@ function CounterCore(questionnaireId) {
     */
     this.countFilledQuestionSet = function(qId) {
         var counter = 0;
+
+        counter = $('.icon-check.green:visible', $('#qs_' + qId)).length;
+
         // Go for each question set and counts the questions 
-        $('#qs_' + qId + ' .hasValue').each(function(question) {
+        /*$('#qs_' + qId + ' .hasValue').each(function(question) {
 
             counter = counter + 1;
-        });
+        });*/
 
         return counter;
 
@@ -121,6 +124,12 @@ function CounterUI() {
     this.updateCounters = function(qId, counters) {
         var filled = counters['filledQuestions'];
         var total = counters['count'];
+
+        if (filled < 0)
+            filled = 0;
+
+        if (total < 0)
+            total = 0;
 
         var percentage = Math.round((filled / total) * 100);
 
@@ -203,9 +212,10 @@ function CounterTasker(ui, questionnaireId) {
 };
 
 $(document).ready(function() {
+    /*
     var core = new CounterCore();
     var ui = new CounterUI();
     var tasker = new CounterTasker(ui, 0);
     tasker.run();
-
+    */
 });

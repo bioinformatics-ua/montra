@@ -128,20 +128,9 @@ button {
 var a;
 $(document).ready(function(){
     a = new PaginatorSorter("table_databases", '{{sort_params.base_filter}}', '{{sort_params.selected_name}}', '{{sort_params.selected_value}}');
-
-    paginator_via_post();
 });
 </script>
-{% load bootstrap_pagination %}
-
-{% bootstrap_paginate page_obj url_view_name="views.all_databases_user" range=10  show_prev_next="false" show_first_last="true"%}
-
-<form id="send2" method="POST" > 
-  <input id="page" type="hidden" name="page" value="{{page}}"></input>
-  <input id="s" type="hidden" name="s" value=""></input>  
-  <input id="submit_simulate" style="display:none" type="submit" value="Submit">
-{% csrf_token %}
-</form>
+{% include "post_paginator.html" %}
 
 {% else %}
 <div class="row">  

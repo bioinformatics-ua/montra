@@ -80,12 +80,11 @@ $(document).ready(
         });
         console.log(result);
         result.conf.forEach(function(d){
-            var context = $('<tr>').appendTo('#files');
-            var node = $('<td/>')
-                        .append($('<span/>').html("<p>File name: " + d.file_name
-                            + "</p><p>Description: " + d.comments 
-                            + "</p><p>Last update: " + d.latest_date ));
-            context.append(node);
+            //var context = $('<tr>').appendTo('#files');
+            var node = $('<tr>').html("<td>File name: " + d.file_name
+                            + "</td><td>Description: " + d.comments 
+                            + "</td><td>Last update: " + d.latest_date +"</td>");
+            node.appendTo('#files');
             //node.appendTo(context);    
         });
         
@@ -194,30 +193,33 @@ $(function () {
         previewMaxHeight: 100,
         previewCrop: true
     }).on('fileuploadadd', function (e, data) {
-        data.context = $('<tr><td><div class="span3"/>').appendTo('#files');
+        console.log('File Upload - fileuploadadd');
+        data.context = $('<tr>').appendTo('#files');
         $.each(data.files, function (index, file) {
-            var node = $('<p/>')
-                    .append($('<span/>').text(file.name));
-            if (!index) {
-                node
-                    .append('<br>')
-                    .append(uploadButton.clone(true).data(data));
-            }
+            var node = $('<td>').text(file.name);
+
             node.appendTo(data.context);
+
+            var node2 = $('<td class="fmessage">');
+
+            node2.appendTo(data.context);
+
+            if (!index) {
+                uploadButton.clone(true).data(data).appendTo(data.context).wrap('<td style="text-align: right; width: 100px;">');
+            }
+            
         });
     }).on('fileuploadprocessalways', function (e, data) {
+        console.log('File Upload - fileuploadprocessalways');
         var index = data.index,
             file = data.files[index],
-            node = $(data.context.children()[index]);
+            node = $(data.context.find('.fmessage'));
         if (file.preview) {
             node
-                .prepend('<br>')
                 .prepend(file.preview);
         }
         if (file.error) {
-            node
-                .append('<br>')
-                .append(file.error);
+            node.text(file.error);
         }
         if (index + 1 === data.files.length) {
             data.context.find('button')
@@ -235,8 +237,8 @@ $(function () {
             var link = $('<a>')
                 .attr('target', '_blank')
                 .prop('href', file.url);
-            $(data.context.children()[index])
-                .wrap(link);
+            var td = $(data.context.children()[index]);
+            td.wrapInner(link);
         });
     }).on('fileuploadfail', function (e, data) {
         $.each(data.result.files, function (index, file) {

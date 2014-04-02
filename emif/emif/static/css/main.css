@@ -286,7 +286,7 @@ box-shadow: inset 0 3px 8px rgba(0,0,0,0.125);
 **********************************************************************/
 
 #documents  {
-  font-weight: bold;
+  /*font-weight: bold;*/
   padding-left: 30px;
 }
 
@@ -546,4 +546,17 @@ label input[type="radio"], label input[type="checkbox"]{
 .commented{
   width: 55px;
   text-align: center !important;
+}
+
+.paginator-page-selector{
+  color: #08c !important;
+}
+
+#edit_profile_form label input[type="radio"], 
+#edit_profile_form  label input[type="checkbox"]{
+  margin-top: 5px;
+}
+
+.minwidth250{
+  min-width: 250px;
 }

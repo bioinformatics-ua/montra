@@ -41,6 +41,12 @@ def removeh1(value):
 def clean(value):
     return value.replace('//','')
 
+@register.filter(name='escapedots')
+@stringfilter
+def escapedots(value):
+    print value.replace('.','\\\\.')
+    return value.replace('.','\\\\.')
+
 
 @register.filter(name='replaceplicas')
 @stringfilter

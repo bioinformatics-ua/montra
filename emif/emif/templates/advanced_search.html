@@ -40,6 +40,7 @@ text-decoration: none;
 <script src="{{ STATIC_URL}}js/vendor/bootstrap-tooltip.js"></script>
 <script src="{{ STATIC_URL}}js/vendor/bootstrap-popover.js"></script>
 <script src="{{ STATIC_URL}}js/fingerprint_validation.js"></script>
+<script src="{{ STATIC_URL }}js/vendor/jquery.inputmask.bundle.min.js" type="text/javascript"></script>
 <script src="{{ STATIC_URL}}js/fingerprint.js"></script>
 <script src="{{ STATIC_URL}}js/vendor/jquery.boolrelwidget.js"></script>
 
@@ -104,7 +105,7 @@ text-decoration: none;
     <div class="span8">
 
 
-        <form name="qform" id="qform" action="resultsdiff/1" method="POST">
+        <form name="asform" id="asform" action="resultsdiff/1" method="POST">
             {% csrf_token %}
             <input type="hidden" name="qid" value="{{q_id}}" />
                     <div id="set_container">
@@ -154,13 +155,13 @@ $( document ).ready(function() {
     '<p>To use the toolbar, just fill in the fields you intend to search.</p><p> After complete, go to the toolbar, and it is possible to see that there are already a default query built with the concepts chosen, with a default relationship between them. Each concept is represented by a box like the one below:</p><image src="{{ STATIC_URL }}img/help1.png" /><p>It is possible to see three things: a label with the name relation (that if we hover will give us the full text if it is to big and the answer currently written in the search form), a area with a drop icon and a delete button.</p><p>Also, it is possible to see a big query:</p><image src="{{ STATIC_URL }}img/help2.png" /><p>You can drag blocks by its label to the drop area of other blocks, and this will create a relation between them. It is possible to put the blocks inside each other. This can be seen in the image below:</p><image src="{{ STATIC_URL }}img/help3.png" /><br /><image src="{{ STATIC_URL }}img/help4.png" /><p>The concept is now on a nested relation. And there is an option to collapse/expand this relation.</p><p>After define the boolean query, you will be able to search and obtain the results.</p><p>If the results are not the expected, you can refine the query at any time by click oin the "refine search" button from the toolbar on the results, or simply go back on the browser.</p><h3>Video Demonstration of use</h3><iframe width="100%" height="315" src="//www.youtube.com/embed/b4IAIbjXX6c" frameborder="0" allowfullscreen></iframe></div>';
 
     {% if not serialized_query %}
-            bool_container = $('#bool_container').boolrelwidget({form_anchor: '#qform', help: help_text});
+            bool_container = $('#bool_container').boolrelwidget({form_anchor: '#asform', help: help_text});
     {% else %}
-            bool_container = $('#bool_container').boolrelwidget({form_anchor: '#qform', view_serialized_string:'{{serialized_query}}', help: help_text});
+            bool_container = $('#bool_container').boolrelwidget({form_anchor: '#asform', view_serialized_string:'{{serialized_query}}', help: help_text});
     {% endif %}
     /* This must be after, boolrelwidget declaration */
     if (!(typeof bool_container === 'undefined')) {
-        $('#qform').submit(
+        $('#asform').submit(
                     function(e) {
                      if(bool_container.isEmpty()){
                         e.preventDefault();
@@ -172,8 +173,13 @@ $( document ).ready(function() {
                     }     
         );
     }
-    load_questionnary();
-
+    generateStub();
+    //load_questionnary();
+    {% if not aqid %}
+      loadqspart("{{questionset.sortid}}", "{{q_id}}", null);
+    {% else %}
+      loadqspart("{{questionset.sortid}}", "{{q_id}}", "{{aqid}}");
+    {% endif %}  
 });
 var threads = {};
 function load_questionnary(){
@@ -226,11 +232,21 @@ function loadqspart(sortid, pk, aqid){
           $( "#qs_"+sortid ).html( data );
         });    
     }
-    threads['qs_'+sortid] = null;
-    parts_missing--;
-    this.complete();
+    //threads['qs_'+sortid] = null;
+    //parts_missing--;
+    //this.complete();
 }
+function generateStub(){
+          var containers = [];
 
+        // We build the qs containers in memory and just do dom op, on the end, for speed
+        // on ie joins are significantly faster than concatenation
+        {% for qs in questionset.questionnaire.questionsets %}
+            containers.push('<div id="qs_{{ qs.sortid }}" class="{% if qs.sortid == questionset.sortid %} {% else %} hide {% endif %} questionset"><h4 class="loadingindicator pull-center">Loading...</h4></div>\n');
+        {% endfor %}
+
+        $('#set_container').append(containers.join(''));
+}
 function next_questionset(id_questionset)
 {
 
@@ -279,6 +295,18 @@ function questionsets_handle(id_questionset)
        $('#'+obj.id).removeClass("hide");
 
        
+       if($('#'+obj.id).find('.loadingindicator').length != 0){
+              
+              {% if not aqid %}
+                loadqspart(obj.id.replace("qs_",""), "{{q_id}}", null);
+              {% else %}
+                loadqspart(obj.id.replace("qs_",""), "{{q_id}}", "{{aqid}}");
+              {% endif %}     
+              console.log("Loading to dom");
+       } else {
+               console.log("Already on dom");
+      }
+
     }
     else {
       $('#li_'+obj.id).removeClass("active");

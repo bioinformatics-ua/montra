@@ -243,10 +243,18 @@
    <!--dynamicField name="*" type="ignored" multiValued="true" /-->
 
 	<!--TIAGO!!!!-->
+	<dynamicField name="*_qs"  type="text_general"    indexed="true"  stored="true"/>
+
 	<field name="database_name_sort" type="alphaOnlySort" indexed="true" stored="false"/>
 	<field name="last_activity_sort" type="long" indexed="true" stored="false"/>
 	<!--<field name="created_sort" type="string" indexed="true" stored="false"/>-->
-	<field name="type_name_sort" type="string" indexed="true" stored="false"/>   
+	<field name="type_name_sort" type="string" indexed="true" stored="false"/>
+	<field name="qs_all" type="text_general" indexed="true" stored="false" multiValued="true"/>    
+
+	<!--Extra Sorting fields/-->
+	<field name="institution_sort" type="alphaOnlySort" indexed="true" stored="false"/>
+	<field name="location_sort" type="alphaOnlySort" indexed="true" stored="false"/> <!-- Updated via Script: Reason Multiple sources-->
+	<field name="nrpatients_sort" type="int" indexed="true" stored="false"/> <!-- Updated via Script: Reason Convertion to integer!!/-->
  </fields>
 
 
@@ -274,6 +282,10 @@
         is added to the index.  It's used either to index the same field differently,
         or to add multiple fields to the same field for easier/faster searching.  -->
 	
+	<!--COPY TO Extra Sorting fields/-->
+	<copyField source="institution_name_t" dest="institution_sort" />
+	
+	<copyField source="*_qs" dest="qs_all" />
 	<copyField source="database_name_t" dest="database_name_sort" />
 	<!--<copyField source="date_last_modification_t" dest="last_activity_sort" />
 	<copyField source="created_t" dest="created_sort" />-->
