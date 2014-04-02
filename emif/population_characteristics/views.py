@@ -72,7 +72,7 @@ def jerboa_list_values(request, var, row, fingerprint_id, template_name='documen
     return response
 
 
-def comments(request, fingerprint_id=None, chart_id=None):
+def comments(request, fingerprint_id=None, chart_id=None, comment_id=None):
     print request.method
     if request.method=="POST":
         # Add new comment
@@ -110,6 +110,17 @@ def comments(request, fingerprint_id=None, chart_id=None):
         response['Content-Disposition'] = 'inline; filename=files.json'
         return response
 
+    elif request.method=="DELETE":
+
+        cm = CommentManager(None)
+        cm.delete(comment_id, request.user)
+        response = JSONResponse({"sucess": True}, mimetype="application/json")
+        response['Content-Disposition'] = 'inline; filename=files.json'
+        return response
+        
+    elif request.method=="UPDATE":
+        pass
+    
     
     # Return bad requests
     return HttpResponseBadRequest()

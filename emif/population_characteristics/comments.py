@@ -63,4 +63,13 @@ class CommentManager(object):
         return Comments.objects.filter(fingerprint_id=self.fingerprint_id, chart_id=chart_id).order_by('latest_date')
         
 
+    def delete(self, id, user):
+        c = Comments.objects.filter(id=id)[0]
+        
+        if (c.user.username == user.username):
+            c.delete()
+        else:
+            raise  Exception('Not allowed', 'Not allowed')
+
+
 
