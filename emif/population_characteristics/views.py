@@ -20,6 +20,7 @@
 from django.shortcuts import render, render_to_response
 from .services import *
 from .response import JSONResponse, response_mimetype
+from .comments import *
 from .serialize import serialize
 
 from population_characteristics.models import *
@@ -27,6 +28,26 @@ from population_characteristics.models import *
 from django.core import serializers
 
 from django.conf import settings
+
+from django.http import *
+
+
+from dateutil.tz import tzutc
+
+UTC = tzutc()
+
+def serialize_date(dt):
+    """
+    Serialize a date/time value into an ISO8601 text representation
+    adjusted (if needed) to UTC timezone.
+
+    For instance:
+    >>> serialize_date(datetime(2012, 4, 10, 22, 38, 20, 604391))
+    '2012-04-10T22:38:20.604391Z'
+    """
+    if dt.tzinfo:
+        dt = dt.astimezone(UTC).replace(tzinfo=None)
+    return dt.isoformat() + 'Z'
 
 
 def jerboa_list_values(request, var, row, fingerprint_id, template_name='documents_upload_form.html'):
@@ -55,6 +76,61 @@ def jerboa_list_values(request, var, row, fingerprint_id, template_name='documen
     response = JSONResponse(data, mimetype="application/json")
     response['Content-Disposition'] = 'inline; filename=files.json'
     return response
+
+
+def comments(request, fingerprint_id=None, chart_id=None, comment_id=None):
+    print request.method
+    if request.method=="POST":
+        # Add new comment
+
+        # Extract fingerprint id
+        fingerprint_id = request.POST["pc_chart_comment_fingerprint_id"]
+
+        # Extract chart_id
+        chart_id = request.POST["pc_chart_comment_id"]
+
+        # Title and Description 
+        title = request.POST["pc_chart_comment_name"]
+        description = request.POST["pc_chart_comment_description"]
+
+        # Now have the values, send it to the comment manager 
+        cm = CommentManager(fingerprint_id)
+        c = cm.comment(chart_id, title, description, request.user)
+
+        status = True
+        data = {'comments': status, 't_title' : c.title, "description": 
+        c.description, "id": c.pk, "latest_date": serialize_date(c.latest_date)}
+        response = JSONResponse(data, mimetype="application/json")
+        response['Content-Disposition'] = 'inline; filename=files.json'
+        return response
+    elif request.method=="GET":
+        # List comments
+        cm = CommentManager(fingerprint_id)
+        comments = cm.get_list_comments(fingerprint_id, chart_id)
+        lst_return = []
+        for c in comments: 
+
+            data = {'t_title' : c.title, "description": c.description, "id": c.pk, "latest_date": serialize_date(c.latest_date)}
+            lst_return.append(data)
+        response = JSONResponse(lst_return, mimetype="application/json")
+        response['Content-Disposition'] = 'inline; filename=files.json'
+        return response
+
+    elif request.method=="DELETE":
+
+        cm = CommentManager(None)
+        cm.delete(comment_id, request.user)
+        response = JSONResponse({"sucess": True}, mimetype="application/json")
+        response['Content-Disposition'] = 'inline; filename=files.json'
+        return response
+        
+    elif request.method=="UPDATE":
+        pass
+    
+    
+    # Return bad requests
+    return HttpResponseBadRequest()
+
 
 
 def filters(request, var, fingerprint_id, template_name='documents_upload_form.html'):
@@ -88,22 +164,6 @@ def get_settings(request, runcode):
     return response
 
 
-from dateutil.tz import tzutc
-
-UTC = tzutc()
-
-def serialize_date(dt):
-    """
-    Serialize a date/time value into an ISO8601 text representation
-    adjusted (if needed) to UTC timezone.
-
-    For instance:
-    >>> serialize_date(datetime(2012, 4, 10, 22, 38, 20, 604391))
-    '2012-04-10T22:38:20.604391Z'
-    """
-    if dt.tzinfo:
-        dt = dt.astimezone(UTC).replace(tzinfo=None)
-    return dt.isoformat() + 'Z'
 
 def list_jerboa_files(request, fingerprint):
 
@@ -125,19 +185,6 @@ def list_jerboa_files(request, fingerprint):
     response = JSONResponse(data, mimetype=response_mimetype(request))
     response['Content-Disposition'] = 'inline; filename=files.json'
     return response
-
-
-def get_pde_types(self):
-    """This function returns the Primary Data Extract type of graphs
-    """
-
-
-def upload_jerboa_request(request, template_name='uploadjerboa.html'):
-    """
-    This functions is responsabible to handle the upload files of jerboa 
-    """
-    pass
-
 
 
 

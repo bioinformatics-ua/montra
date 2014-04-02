@@ -43,6 +43,7 @@ class ConfCharts(object):
         ### Active patients
         #################################################
         c = Chart()
+        c.uid = 1
         c.title = Title()
         c.title.operation = Operation.UNIQUE
         c.title.var = "Active patients" 
@@ -83,6 +84,7 @@ class ConfCharts(object):
         #################################################
 
         c1 = Chart()
+        c1.uid = 2
         c1.title = Title()
         c1.title.operation = Operation.UNIQUE
         c1.title.var = "Birth in year" 
@@ -114,6 +116,7 @@ class ConfCharts(object):
         #################################################
 
         c10 = Chart()
+        c10.uid = 3
         c10.title = Title()
         c10.title.operation = Operation.UNIQUE
         c10.title.var = "Age at patient start" 
@@ -167,6 +170,7 @@ class ConfCharts(object):
         f2.translation = {'M': 'Male', 'F': 'Female', 'T': 'Total',  'ALL': 'Male/Female'}
 
         c11 = Chart()
+        c11.uid = 4
         c11.title = Title()
         c11.title.operation = Operation.UNIQUE
         c11.title.var = "Age at patient end" 
@@ -209,6 +213,7 @@ class ConfCharts(object):
 
 
         c2 = Chart()
+        c2.uid = 5
         c2.title = Title()
         c2.title.operation = Operation.UNIQUE
         c2.title.var = "Age at start of year" 
@@ -272,6 +277,7 @@ class ConfCharts(object):
 
 
         c4 = Chart()
+        c4.uid = 6
         c4.title = Title()
         c4.title.operation = Operation.UNIQUE
         c4.title.var = "Age at patient start" 
@@ -335,6 +341,7 @@ class ConfCharts(object):
 
 
         c3 = Chart()
+        c3.uid = 7
         c3.title = Title()
         c3.title.operation = Operation.UNIQUE
         c3.title.var = "Age at patient end" 
@@ -402,6 +409,7 @@ class ConfCharts(object):
 
 
         c5 = Chart()
+        c5.uid = 8
         c5.title = Title()
         c5.title.operation = Operation.UNIQUE
         c5.title.var = "Observation time in a year" 
@@ -454,6 +462,7 @@ class ConfCharts(object):
         ### Age at patient start - percentiles
         #################################################
         c12 = Chart()
+        c12.uid = 9
         c12.title = Title()
         c12.legend = True
         c12.title.operation = Operation.UNIQUE
@@ -511,6 +520,7 @@ class ConfCharts(object):
         ### Age at patient end - percentiles
         #################################################
         c13 = Chart()
+        c13.uid = 10
         c13.title = Title()
         c13.legend = True
         c13.title.operation = Operation.UNIQUE
@@ -570,6 +580,7 @@ class ConfCharts(object):
         ### Age at start of year - percentiles
         #################################################
         c14 = Chart()
+        c14.uid = 11
         c14.title = Title()
         c14.legend = True
         c14.title.operation = Operation.UNIQUE
@@ -629,6 +640,7 @@ class ConfCharts(object):
         ### Patient time before a year - percentile
         #################################################
         c14 = Chart()
+        c14.uid = 12
         c14.title = Title()
         c14.legend = True
         c14.title.operation = Operation.UNIQUE
@@ -687,6 +699,7 @@ class ConfCharts(object):
         ### Patient time after a year - percentile
         #################################################
         c14 = Chart()
+        c14.uid = 13
         c14.title = Title()
         c14.legend = True
         c14.title.operation = Operation.UNIQUE
@@ -745,6 +758,7 @@ class ConfCharts(object):
         ### Patient Time
         #################################################
         c = Chart()
+        c.uid = 14
         c.title = Title()
         c.title.operation = Operation.UNIQUE
         c.title.var = "Observation time in years" 
