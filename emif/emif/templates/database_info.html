@@ -187,9 +187,13 @@
 
 <div class="tab-pane {%if activetab == 'discussion'%}active{%endif%}" id="discussion">
     <div class="container-fluid">
+        <div id="commentInserted" class="alert alert-success" style="display:none;">
+          <button type="button" class="close" data-dismiss="alert">&times;</button>
+          <strong>Comment sent!</strong> Your comment was posted successfully.
+        </div>
         {% if user.is_authenticated %}
         {% get_comment_form for fingerprint.fingerprint fingerprint_pk as form %}
-        <form action="{% comment_form_target %}" method="POST">
+        <form id="comment_form" action="{% comment_form_target %}" method="POST">
             <fieldset>
                 {% csrf_token %}
                 <textarea id="id_comment" rows="5" name="comment" class="span8" autofocus></textarea>
@@ -198,8 +202,8 @@
                 {{ form.timestamp }}
                 {{ form.security_hash }}
             </br>
-            <input type="hidden" name="next" value="{{request.get_full_path}}" />
-            <button class="btn btn-primary" type="submit" id="id_submit">Post comment</button>
+            <!--<input type="hidden" name="next" value="{{request.get_full_path}}" />-->
+            <button id="submit_button" class="btn btn-primary" type="submit"  data-loading-text="Sending comment...">Post comment</button>
         </fieldset>
     </form>
     {% else %}
@@ -207,10 +211,11 @@
     {% endif %}
     <br/>
     {% get_comment_count for fingerprint.fingerprint fingerprint_pk as comment_count %}
-    {{ comment_count }} comment{{ comment_count|pluralize }}
+    <span id="comments_total">{{ comment_count }}</span> comment{{ comment_count|pluralize }}
     <br/>
     <br/>
     {% get_comment_list for fingerprint.fingerprint fingerprint_pk as comment_list %}
+    <div id="newComments"></div>
     {% for comment in comment_list reversed%}
     <div id="comment_{{ comment.id }}">
         <blockquote>
@@ -279,6 +284,41 @@
     <script src="{{ STATIC_URL}}js/emif.populationcharacteristics.js"></script>
     <!--<![endif]-->
 
+    <script type="text/javascript" charset="utf-8">
+    function bindPostCommentHandler() {
+        $('#comment_form input.submit-preview').remove();
+        $('#comment_form').submit(function() {
+            $('#submit_button').button('loading');
+            $.ajax({
+                type: "POST",
+                data: $('#comment_form').serialize(),
+                url: "{% comment_form_target %}",
+                cache: false,
+                dataType: "html",
+                success: function(html, textStatus) {
+                    var total = parseInt($('#comments_total').html()) + 1;
+                    $('#comments_total').html(total);
+                    console.log(html);
+                    $('#submit_button').button('reset');
+                    $('#comment_form').hide();
+                    $('#commentInserted').fadeIn(1000);
+                    $('#newComments').prepend('<blockquote><p style="font-size: 16px">' + $('#id_comment').val() + '</p><small>{{ request.user.first_name }} {{ request.user.last_name }} posted a while ago</small></blockquote>').hide().fadeIn(1000);
+                    //$('#comments_list').replaceWith(html);
+                    //$('.comt_message').show();
+                    //bindPostCommentHandler();
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    alert('Your comment was unable to be posted at this time.  We apologise for the inconvenience.');
+                    $('#submit_button').button('reset');
+                }
+            });
+            return false;
+        });
+    }
+    $(document).ready(function() {
+        bindPostCommentHandler();
+    });
+    </script>
 
     {% endblock %}
 
