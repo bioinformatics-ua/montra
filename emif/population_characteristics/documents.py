@@ -28,7 +28,7 @@ from .serialize import serialize
 from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import user_passes_test, login_required
 
-from emif.views import createqsets, createqset, get_api_info
+from emif.views import createqsets, createqset, get_api_info, merge_highlight_results
 from django.shortcuts import render
 
 import os
@@ -115,15 +115,25 @@ def parsejerboa(request, template_name='documents_upload_form.html'):
     return response
 
 def single_qset_view(request, runcode, qsid, template_name='fingerprint_qs.html'):
+    
+    h = None
+    if "query" in request.session and "highlight_results" in request.session:
+        h = request.session["highlight_results"]
+    #if "query" in request.session and "highlight_results" in request.session and runcode in request.session["highlight_results"]:
+    #    h =  merge_highlight_results(request.session["query"] , request.session["highlight_results"][runcode])
+    #   print h["questions"]
 
-    qset, name, db_owners, fingerprint_ttype = createqset(runcode, qsid)
+    qset, name, db_owners, fingerprint_ttype = createqset(runcode, qsid, highlights=h)   
     
     return render(request, template_name,{'request': request, 'qset': qset})   
 
 def document_form_view(request, runcode, qs, activetab='summary',
     template_name='documents_upload_form.html'):
     
-    qsets, name, db_owners, fingerprint_ttype = createqsets(runcode)
+    h = None
+    if "query" in request.session and "highlight_results" in request.session:
+        h = request.session["highlight_results"]
+    qsets, name, db_owners, fingerprint_ttype = createqsets(runcode, highlights=h)
 
     if fingerprint_ttype == "":
         raise "There is missing ttype of questionarie, something is really wrong"

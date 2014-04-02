@@ -120,6 +120,36 @@ class CoreEngine:
                 })
         return results
 
+    def search_highlight(self, query, start=0, rows=100, fl='', sort='', hlfl=""):
+        """search the fingerprint
+        """
+        #hl=true&hl.fl=text_t
+        results = self.solr.search(query,**{
+                'rows': rows,
+                'start': start,
+                'fl': fl,
+                'sort': sort,
+                'hl':"true",
+                'hl.fl': hlfl, "hl.fragsize":0
+                })
+        return results
+
+    def highlight_questions(self, query, start=0, rows=1000, fl='id', sort='', hlfl="*"):
+        """search the fingerprint
+        """
+        #hl=true&hl.fl=text_t
+        query = "qs_all:"+query
+        print(query)
+        results = self.solr.search(query,**{
+                'rows': rows,
+                'start': start,
+                'fl': fl,
+                'sort': sort,
+                'hl':"true",
+                'hl.fl': hlfl
+                })
+        return results
+
     def more_like_this(self, id_doc):
         similar = self.solr.more_like_this(q='id:doc_2', mltfl='text')
         return similar

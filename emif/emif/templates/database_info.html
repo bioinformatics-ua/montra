@@ -254,8 +254,14 @@ function load_questionnary(){
         // We build the qs containers in memory and just do dom op, on the end, for speed
         // on ie joins are significantly faster than concatenation
         {% for k, qs in qsets.ordered_items %}
-            containers.push('<div class="accordion-group"><div class="accordion-heading"><a style="display: inline-block; width: 90%;" class="accordion-toggle" data-toggle="collapse" data-parent="#accordion1" href="#collapse{{ k|removespaces|safe|clean }}">{{ k|removeh1 }} </a><span class="accordion-icon"></span></div><div id="collapse{{ k|removespaces|safe|clean }}" class="accordion-body collapse"><div id="qs_{{ qs.sortid }}" class="accordion-inner"><h4 class="pull-center">Loading...</h4></div></div></div>');
+            containers.push('<div class="accordion-group"><div class="accordion-heading"><a style="display: inline-block; width: 90%;" class="accordion-toggle" data-toggle="collapse" data-parent="#accordion1" href="#collapse{{ k|removespaces|safe|clean }}">{{ k|removeh1 }} </a><span class="accordion-icon">{% if qs.info %}<img title="This section has search keywords" class="markered" src="{{STATIC_URL}}/img/marker.png" />{% endif %}</span></div><div id="collapse{{ k|removespaces|safe|clean }}" class="accordion-body collapse"><div id="qs_{{ qs.sortid }}" class="accordion-inner"><h4 class="pull-center">Loading...</h4></div></div></div>');
         
+            {% if qs.info %}
+                console.log("QS_DEBUG: {{qs.sortid}} : {{qs.info}}");
+            {% endif %}
+
+            
+
         {% endfor %}
 
         $('#set_container').append(containers.join(''));
@@ -286,7 +292,7 @@ function loadqspart(sortid, pk){
         // Mark the tab as highlighted if there's any highlight inside it
 
         
-        var highlights = $("#qs_"+sortid).find('.highlight');
+        /*var highlights = $("#qs_"+sortid).find('.highlight');
 
         //console.dir(highlights);
 
@@ -297,7 +303,7 @@ function loadqspart(sortid, pk){
            $(".markered" ,this_row).click(function(){
             this_row.parent().siblings().first().collapse('toggle');
            });
-        }     
+        }  */   
     });    
 
     threads['qs_'+sortid] = null;

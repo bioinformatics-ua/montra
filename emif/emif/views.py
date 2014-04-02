@@ -206,9 +206,17 @@ def results_fulltext_aux(request, query, page=1, template_name='results.html', i
 
     #print query_filtered
 
-    (list_databases, hits) = get_databases_from_solr_v2(request, query_filtered, sort=sortString, rows=rows, start=range)    
+    (list_databases, hits, hi) = get_databases_from_solr_with_highlight(request, query, sort=sortString, rows=rows, start=range)
+    if not isAdvanced:
+        hi = merge_highlight_results( request.session["query"] , hi)
+    else:
+        hi = merge_highlight_results( None , hi)
+    
+
     if range > hits and not force:
         return results_fulltext_aux(request, query, 1, isAdvanced=isAdvanced, force=True)  
+    
+    request.session["highlight_results"] = hi
 
     if len(list_databases) == 0 :
         query_old = request.session.get('query', "")
@@ -1269,10 +1277,9 @@ def __get_scientific_contact(db, db_solr, type_name):
             db.tec_phone = db_solr['TC__phone_t']
 
     return db
-
-def get_databases_from_solr_v2(request, query="*:*", sort="", rows=100, start=0):
-    c = CoreEngine()
-    results = c.search_fingerprint(query, sort=sort, rows=rows, start=start)
+    
+    
+def get_databases_process_results(results):
     print "Solr"
     list_databases = []
     questionnaires_ids = {}
@@ -1354,9 +1361,35 @@ def get_databases_from_solr_v2(request, query="*:*", sort="", rows=100, start=0)
         except Exception, e:
             print e
             pass
-            #raise
+
+    return list_databases
+
+def get_databases_from_solr_v2(request, query="*:*", sort="", rows=100, start=0):
+    c = CoreEngine()
+    results = c.search_fingerprint(query, sort=sort, rows=rows, start=start)
+    
+    list_databases = get_databases_process_results(results)
+    
     return (list_databases,results.hits)
 
+def get_databases_from_solr_with_highlight(request, query="*:*", sort="", rows=100, start=0):
+    c = CoreEngine()
+    results = c.search_highlight(query, sort=sort, rows=rows, start=start, hlfl="*")
+    
+    list_databases = get_databases_process_results(results)
+    
+    return (list_databases,results.hits, results.highlighting)
+
+def merge_highlight_results(query, resultHighlights):
+    c = CoreEngine()
+    h = {}
+    h["results"] = resultHighlights
+    
+    if query:
+        qresults = c.highlight_questions(query)
+        h["questions"] = qresults.highlighting
+
+    return h  
 
 def delete_fingerprint(request, id):
     user = request.user
@@ -1816,7 +1849,7 @@ def all_databases_data_table(request, template_name='alldatabases_data_table.htm
                                            })
 
 
-def createqsets(runcode, qsets=None, clean=True):
+def createqsets(runcode, qsets=None, clean=True, highlights=None):
     #print "createqsets"
     c = CoreEngine()
     results = c.search_fingerprint('id:' + runcode)
@@ -1838,6 +1871,13 @@ def createqsets(runcode, qsets=None, clean=True):
     for q in qqs:
         questionnaires_ids[q.slug] = (q.pk, q.name)
 
+    rHighlights = None
+    qhighlights = None
+    if highlights != None:
+        if "results" in highlights and runcode in highlights["results"]:
+            rHighlights = highlights["results"][runcode]
+        if "questions" in highlights:
+            qhighlights = highlights["questions"]
 
     for result in results:
 
@@ -1920,12 +1960,16 @@ def createqsets(runcode, qsets=None, clean=True):
             info = text
             t.tag = info
             #print t.tag
-
             if question_group != None and question_group.list_ordered_tags != None:
                 try:
                     t = question_group.list_ordered_tags[question_group.list_ordered_tags.index(t)]
                 except:
                     pass
+
+            qs_text = k[:-1] + "qs"
+            id_text = "questionaire_"+str(fingerprint_ttype)
+            if question_group != None and qhighlights != None and id_text in qhighlights and qs_text in qhighlights[id_text]:
+                question_group.info = True
 
             value = clean_value(str(result[k].encode('utf-8')))
             
@@ -1937,6 +1981,8 @@ def createqsets(runcode, qsets=None, clean=True):
                pass
             if clean:
                 t.value = value.replace("#", " ")
+                if question_group != None and rHighlights != None and k in rHighlights:
+                    question_group.info = True
             else:
                 t.value = value
 
@@ -1956,13 +2002,15 @@ def createqsets(runcode, qsets=None, clean=True):
 
     return (qsets, name, db_owners, fingerprint_ttype)
 
-def createqset(runcode, qsid, qsets=None, clean=True):
+def createqset(runcode, qsid, qsets=None, clean=True, highlights=None):
     qsid = int(qsid) 
-    print "Got into createqset!!"
+    print "Got into createqset!!" + str(qsid)
     #print "createqsets"
     c = CoreEngine()
     results = c.search_fingerprint('id:' + runcode)
-
+    #print len(results)    
+    #results = c.search_highlight('id:' + runcode, hlfl="text_t")
+    
     if qsets == None:
         qsets = ordered_dict()
     name = ""
@@ -1973,14 +2021,20 @@ def createqset(runcode, qsid, qsets=None, clean=True):
     fingerprint_ttype = ""
 
     db_owners = "" 
-
-
+    
     questionnaires_ids = {}
     qqs = Questionnaire.objects.all()
     for q in qqs:
         questionnaires_ids[q.slug] = (q.pk, q.name)
 
-
+    rHighlights = None
+    qhighlights = None
+    if highlights != None:
+        if "results" in highlights and runcode in highlights["results"]:
+            rHighlights = highlights["results"][runcode]
+        if "questions" in highlights:
+            qhighlights = highlights["questions"]
+        
     for result in results:
 
 
@@ -2020,12 +2074,12 @@ def createqset(runcode, qsid, qsets=None, clean=True):
                 break
 
         for k in result:
-            #print k
             if k in blacklist:
                 continue
+            
             if k.startswith("comment_question_"):
                 continue
-
+                
             t = Tag()
 
             #aux_results = Slugs.objects.filter(slug1=k[:-2], question__questionset__questionnaire=q_aux[0].pk)
@@ -2066,15 +2120,19 @@ def createqset(runcode, qsid, qsets=None, clean=True):
             info = text
             t.tag = info
             #print t.tag
-
             if question_group != None and question_group.list_ordered_tags != None:
                 try:
-                    t = question_group.list_ordered_tags[question_group.list_ordered_tags.index(t)]
+                    t = question_group.list_ordered_tags[question_group.list_ordered_tags.index(t)]                   
                 except:
                     pass
 
             value = clean_value(str(result[k].encode('utf-8')))
-            
+
+            qs_text = k[:-1] + "qs"
+            id_text = "questionaire_"+str(fingerprint_ttype)
+            if qhighlights != None and id_text in qhighlights and qs_text in qhighlights[id_text]:
+                t.tag = qhighlights[id_text][qs_text][0].encode('utf-8')
+
             try:
 
                t.comment = result['comment_question_'+k]
@@ -2083,11 +2141,15 @@ def createqset(runcode, qsid, qsets=None, clean=True):
                pass
             if clean:
                 t.value = value.replace("#", " ")
+                if rHighlights != None and k in rHighlights:
+                    t.value = rHighlights[k][0].encode('utf-8')
+                    #if len(highlights["results"][k])>1:
+                    #print t.value
             else:
                 t.value = value
-
             if k == "database_name_t":
-                name = t.value
+                name = t.value           
+
             list_values.append(t)
             if question_group != None:
                 try:
