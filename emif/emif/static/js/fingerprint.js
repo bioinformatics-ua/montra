@@ -148,7 +148,9 @@ function validateById(id_answered, id_answered_aux) {
     */
     var qc_id = $('[id="qc_' + id_answered + '"]');
 
-    if (qc_id.hasClass('type_open') || qc_id.hasClass('type_open-button') || qc_id.hasClass('type_open-upload-image') || qc_id.hasClass('type_open-textfield') || qc_id.hasClass('type_publication')) {
+    if (qc_id.hasClass('type_open') ||
+        qc_id.hasClass('type_numeric') 
+        || qc_id.hasClass('type_open-button') || qc_id.hasClass('type_open-upload-image') || qc_id.hasClass('type_open-textfield') || qc_id.hasClass('type_publication')) {
         var myValue = $('[id="answered_' + id_answered_aux + '"]').parent().parent()[0].id;
 
 
@@ -252,6 +254,7 @@ $(document).ready(function() {
     $(document).on('change', '.answer input,.answer select,.answer textarea', function(e) {
         e.preventDefault();
 
+
         if (endsWith($(this).attr('id'), "_opt"))
             return false;
 
@@ -261,7 +264,6 @@ $(document).ready(function() {
         var toSum = $('[id="answered_' + id_answered_aux + '"]').hasClass('hasValue');
 
         var qId = parseInt(id_answered);
-
 
         //Detects widget class and sends it to the advanced validator.
         try{

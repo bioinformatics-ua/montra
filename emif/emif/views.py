@@ -787,6 +787,14 @@ def render_one_questionset(request, q_id, qs_id, errors={}, aqid=None, fingerpri
         elif fingerprint_id != None and not is_new:
             (qlist_general, qlist, jstriggers, qvalues, jsinclude, cssinclude, extra_fields, hasErrors) = extract_answers(request2, q_id, question_set, qs_list)
 
+        permissions = getPermissions(fingerprint_id, question_set)
+
+
+        advanced_search=False
+        if template_name == 'fingerprint_search_qs.html':
+            advanced_search = True
+
+
         r = r2r(template_name, request,
                 questionset=question_set,
                 questionsets=question_set.questionnaire.questionsets,
@@ -801,6 +809,7 @@ def render_one_questionset(request, q_id, qs_id, errors={}, aqid=None, fingerpri
                 async_progress=None,
                 async_url=None,
                 qs_list=qs_list,
+                advanced_search = advanced_search,
                 questions_list=qlist_general,
                 fingerprint_id=fingerprint_id,
                 breadcrumb=True,
