@@ -88,6 +88,7 @@ Saving... please don't close this questionnary yet.</div>
     <ul class="nav nav-list nav-pills nav-stacked ">
       <li class="nav-header">Step-by-Step</li>
 
+
       {% for qs, answered, total_count, percentage in questionsets %}
      
       <li{% if questionset.text == qs.text %} class="active" {% endif %} id="li_qs_{{qs.sortid}}">
@@ -113,6 +114,7 @@ Saving... please don't close this questionnary yet.</div>
       </a>
       
     </li>
+
     {% endfor %}
   </ul>
 

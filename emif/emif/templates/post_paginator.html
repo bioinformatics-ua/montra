@@ -1,7 +1,10 @@
 {% load bootstrap_pagination %}
 
+<div style="min-width: 560px;">
+
 {% bootstrap_paginate page_obj url_view_name="views.all_databases_user" range=10  show_prev_next="false" show_first_last="true"%}
-<div class="pagination-centered">
+
+<div style="margin-top: -55px;" class="pull-right pagination-centered">
 <select id="paginator_rows" class="span1 paginator-page-selector" >
   <option value="5" {% if page_rows == 5 %}selected{% endif %}>5</option>
   <option value="10" {% if page_rows == 10 %}selected{% endif %}>10</option>
@@ -18,7 +21,8 @@
   <input id="submit_simulate" style="display:none" type="submit" value="Submit">
 {% csrf_token %}
 </form>
-
+<div class="clearboth"></div>
+</div>
 <script>
 	$(document).ready(function(){
 		paginator_via_post();
