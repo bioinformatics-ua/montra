@@ -91,13 +91,13 @@
         <div class="tabbable">
             <ul class="nav nav-tabs">
                 <li class="{%if activetab == 'summary'%}active{%endif%}">
-                    <a href="#metadata" data-toggle="tab">Fingerprint</a>
+                    <a href="#metadata" data-toggle="tab"><i class="icon-list"></i>&nbsp; Fingerprint</a>
                 </li>
                 <li class="{%if activetab == 'pc'%}active{%endif%}">
-                    <a href="#populationcharacteristics" data-toggle="tab">Population Characteristics</a>
+                    <a href="#populationcharacteristics" data-toggle="tab"><i class="icon-signal"></i>&nbsp; Population Characteristics</a>
                 </li>
                 <li  class="{%if activetab == 'docs'%}active{%endif%}">
-                    <a href="#documents" data-toggle="tab">Documents</a>
+                    <a href="#documents" data-toggle="tab"><i class="icon-folder-close"></i>&nbsp; Documents</a>
                 </li>
                 <!--
                 <li  class="{%if activetab == 'literature'%}active{%endif%}">
@@ -106,13 +106,13 @@
                 -->
                 
                 <li  class="{%if activetab == 'extra'%}active{%endif%}">
-                    <a href="#apiinfo" data-toggle="tab">Extra Information</a>
+                    <a href="#apiinfo" data-toggle="tab"><i class="icon-download-alt"></i> &nbsp; Extra Information</a>
                 </li>
             </ul>
             <div class="tab-content">
                 <div class="tab-pane {%if activetab == 'summary'%}active{%endif%}" id="metadata">
                     <div>
-                        <a id="collapseall_metadata" class="btn pull-right" href="">Expand all</a>
+                        <a id="collapseall_metadata" class="btn pull-right" href=""><i class="icon-plus"></i>&nbsp; Expand all</a>
                     </div>
                     <div class="accordion fullwidth pull-left " id="accordion1" style="margin-top: 10px;">
                         <div id="set_container"></div>
@@ -136,7 +136,7 @@
 
                 <div class="tab-pane {%if activetab == 'literature'%}active{%endif%}" id="literature">
                     <div>
-                        <a id="collapseall_literature" class="btn pull-right" href="">Expand all</a>
+                        <a id="collapseall_literature" class="btn pull-right" href=""><i class="icon-plus"></i>&nbsp; Expand all</a>
                     </div>
                     <div class="accordion pull-left " id="accordion2" style="margin-top: 10px;">
                         <div class="accordion-group">

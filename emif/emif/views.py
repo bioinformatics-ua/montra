@@ -179,6 +179,7 @@ def results_fulltext(request, page=1, full_text=True,template_name='results.html
         query = request.session.get("query","")
 
     if isAdvanced == False:
+        query = "'"+re.sub("['\"']","\\'",query)+"'"  
         query = "text_t:"+query
 
     if not full_text:
@@ -332,17 +333,11 @@ def results_diff(request, page=1, template_name='results_diff.html'):
                 response.status_code = 500
                 return response
                 
-            print "--------------------------------------------------------------"
-            print qserialization
-            print "--------------------------------------------------------------\n"
 
             query = convert_qvalues_to_query(qvalues, qid, qexpression)
             query = convert_query_from_boolean_widget(qexpression, qid)
             #print "Query: " + query
 
-            print "--------------------------------------------------------------"
-            print query
-            print "--------------------------------------------------------------\n"
 
             request.session['query'] = query
             
@@ -392,7 +387,6 @@ def results_diff(request, page=1, template_name='results_diff.html'):
     if not in_post:
         query = request.session.get('query', "")
         
-    #print "query_@" + query
     if query == "":
         return render(request, "results.html", {'request': request,
                                                 'num_results': 0, 'page_obj': None, 'breadcrumb': True})
@@ -425,7 +419,8 @@ def geo(request, template_name='geo.html'):
         isAdvanced = True
     else:
         if(request.session.get('query') != None):
-            query = "text_t:"+request.session.get('query')
+            query = "'"+re.sub("['\"']","\\'",request.session.get('query'))+"'"  
+            query = "text_t:"+query
         else:
             query = "*:*"
 
@@ -1542,10 +1537,22 @@ def paginator_process_params(request, page, rows):
     sortFieldsLookup["last_update"] = "last_activity_sort"
     sortFieldsLookup["type"] = "type_name_sort"
 
+    sortFieldsLookup["institution"] = "institution_sort"
+    sortFieldsLookup["location"] = "location_sort"
+    sortFieldsLookup["nrpatients"] = "nrpatients_sort"
+
     filterFieldsLookup = {}
     filterFieldsLookup["database_name_filter"] = "database_name_sort"
     filterFieldsLookup["last_update_filter"] = ""
     filterFieldsLookup["type_filter"] = "type_t"
+
+    filterFieldsLookup["institution_filter"] = "institution_name_t"#"institution_sort"
+    filterFieldsLookup["location_filter"] = "location_sort"
+    filterFieldsLookup["nrpatients_filter"] = "number_active_patients_jan2012_t"
+    prefixFilters = ["database_name_filter"
+                , "institution_filter", "location_filter"
+                ]
+    openTextFilters = ["institution_filter", "location_filter"]
 
     sortString = ""
     filterString = ""
@@ -1563,13 +1570,15 @@ def paginator_process_params(request, page, rows):
                 if x not in sort_params:
                     sort_params[x] = {}
                 sort_params[x]["name"] = mode[x]
-        elif filterFieldsLookup.has_key(x):
+        elif len(mode[x])>0 and filterFieldsLookup.has_key(x):
             if x == "last_update_filter":
                 filterString += "(created_t:\""+mode[x] + "\" OR date_last_modification_t:\""+mode[x] + "\") AND "
-            elif x== "database_name_filter":
+            elif x in prefixFilters:
                 p = re.compile("([^a-z])")
                 str2 = re.sub(p, "", mode[x].lower())
                 filterString += "({!prefix f="+filterFieldsLookup[x]+"}"+str2+") AND "
+            elif x in openTextFilters:
+                filterString += "("+filterFieldsLookup[x]+":"+mode[x] +") AND "
             else:
                 filterString += filterFieldsLookup[x]+":'"+mode[x] +"' AND "
             if x[:-7] not in sort_params:
@@ -1580,7 +1589,7 @@ def paginator_process_params(request, page, rows):
     if len(filterString) > 0:
         filterString = filterString[:-4]
 
-    for x in ["database_name", "last_update", "type"]:
+    for x in ["database_name", "last_update", "type", "institution", "location", "nrpatients"]:
         if (x in sort_params) and ( "name" in sort_params[x]):
             sort_params["selected_name"] = x
             sort_params["selected_value"] = sort_params[x]["name"]

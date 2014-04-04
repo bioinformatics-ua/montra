@@ -510,8 +510,28 @@ box-shadow: inset 0 1px 0 rgba(255,255,255,0.2),0 1px 2px rgba(0,0,0,0.05);
   opacity: 1 !important;
   font-size: 11px;
 }
+/* Style for results table */
 .select_line{
   text-align: center !important;
+  width: 50px;
+}
+.sorter-type{
+  width: 18%;
+  } 
+.sorter-lastupdate{
+  width: 12%;
+} 
+.sorter-nrpatients{
+  width: 11%;
+  } 
+.sorter-location {
+  width: 18%;
+  } 
+.sorter-institution{
+  width: 20%;
+}
+.sorter-database_name{
+  width: 21%;
 }
 label input[type="radio"], label input[type="checkbox"]{
   margin-top: -3px;

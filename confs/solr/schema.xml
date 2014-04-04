@@ -249,6 +249,7 @@
 	<field name="last_activity_sort" type="long" indexed="true" stored="false"/>
 	<!--<field name="created_sort" type="string" indexed="true" stored="false"/>-->
 	<field name="type_name_sort" type="string" indexed="true" stored="false"/>
+
 	<field name="qs_all" type="text_general" indexed="true" stored="false" multiValued="true"/>    
 
 	<!--Extra Sorting fields/-->
@@ -285,7 +286,9 @@
 	<!--COPY TO Extra Sorting fields/-->
 	<copyField source="institution_name_t" dest="institution_sort" />
 	
+
 	<copyField source="*_qs" dest="qs_all" />
+
 	<copyField source="database_name_t" dest="database_name_sort" />
 	<!--<copyField source="date_last_modification_t" dest="last_activity_sort" />
 	<copyField source="created_t" dest="created_sort" />-->
