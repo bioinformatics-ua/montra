@@ -69,6 +69,8 @@ class ConfCharts(object):
         f2.key = None
         f2.value = 'Gender'
         f2.translation = {'M': 'Male', 'F': 'Female', 'T': 'Total',  'ALL': 'Male/Female'}
+        f2.comparable = True
+        f2.comparable_values = ['M', 'F']
 
         ss = Scale()
         ss.unit = "Year"

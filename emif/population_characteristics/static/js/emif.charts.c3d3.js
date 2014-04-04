@@ -17,6 +17,9 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 ***********************************************************************/
+
+/* Auxliar functions to calculate minimum and max */ 
+
 Array.max = function( array ){
     return Math.max.apply( Math, array );
 };
@@ -51,32 +54,42 @@ function GraphicChartC3D3(divArg, dataArg)
     xscale.bins = 25;
     var i = 1;
     legend = actualChart.legend;
+
+    // This is a array of the pointers to the values 
+    // For instance, to map the values F to array of values
+    // M to the array of values, etc. 
+    // This will increase the speed to access the data and also it is more easier.
     multivalue_comp = {};
+
+    // values for the Y 
     datasetY = [actualChart.title['var']];
+    // Values for the X axis
     datasetX = ['x'];
-    
+    // values for the Y - it can be an array with the values, 
+    // because some values might be compared (for instance male and females)
     datasetYs = [];
     var i = 0;
-    
-
-    console.log("translateDatatranslateDatatranslateDatatranslateDatatranslateDatatranslateData");
-    console.log(objects);
+    // Probably all of them are multivalue, maybe 
     if (actualChart.y_axis.multivalue)
       {
+
+        // This will check if only a value is to be draw at the Y Bar
         if($.type(actualChart.y_axis['var']) === "string") {
             
+            // It will look for all filters, because some filters on Y might have 
+            // special treament, such as translation or multi value comparison 
             $.each(actualChart.filters, function(a){
-              console.log("actualChart.filters[a]['name']");
-              console.log(actualChart.filters[a]['name']);
-              console.log(datasetYs);
+              
+              // Translate the fields (for now staticly hard coded for Gender)
               if (actualChart.filters[a]['name']=="Gender")
               {
                 $.each(actualChart.filters[a]['translation'], function(tr) {
-                  console.log(tr);
+                    
+                    // Only the simple ones will be translated. ALL is ignored by default 
                     if (tr!="ALL")
                     {
-                      datasetYs.push([tr]);
 
+                      datasetYs.push([tr]);
                       multivalue_comp[tr] = datasetYs[datasetYs.length-1];
   
                     }
@@ -92,9 +105,9 @@ function GraphicChartC3D3(divArg, dataArg)
 
           
         }
-        else
-        {
-
+        else // If you need to draw several dimensions in the Y, like for instance, percentils (25, 50, 75 etc)
+        {  // They will appear in the Y values. It is required to create the multiple datasets to support them
+          // This lines works basically for initializers 
           actualChart.y_axis['var'].forEach(function(a){
           i = i +1;
           datasetYs.push([a]);
@@ -107,18 +120,19 @@ function GraphicChartC3D3(divArg, dataArg)
 
     var _xValuesMV = {};
     objects.values.forEach(function(row){
-      /*datasetX.push(parseInt(row.Value1));
-      datasetY.push(parseInt(row.Count));*/
       
+      // Categorized means that the value of X is a string 
+      // Y not a multi value - not sure if it happens sometime.
       if (actualChart.x_axis.categorized && !actualChart.y_axis.multivalue )
       {
+       
         if ( row[actualChart.x_axis['var']] != ""){
           datasetX.push(row[actualChart.x_axis['var']]);  
           datasetY.push(parseFloat(row[actualChart.y_axis['var']]));  
         }
         
       }
-      
+      // Y has multiple values 
       else if (actualChart.y_axis.multivalue)
       {
         
@@ -126,9 +140,10 @@ function GraphicChartC3D3(divArg, dataArg)
         if (!_xValuesMV[row[actualChart.x_axis['var']]])
         {
           datasetX.push(row[actualChart.x_axis['var']]);  
+          _xValuesMV[row[actualChart.x_axis['var']]] = true;
         }
         
-        _xValuesMV[row[actualChart.x_axis['var']]] = true;
+        // Check if it is only a value, i.e a value in the Y axis
         if($.type(actualChart.y_axis['var']) === "string") {
            
             
@@ -138,7 +153,7 @@ function GraphicChartC3D3(divArg, dataArg)
             multivalue_comp[row['Gender']].push(_vv);  
 
 
-        } else {
+        } else { // More than a value. 
           actualChart.y_axis['var'].forEach(function(a){
           datasetYs[k].push(parseFloat(row[a.trim()]));  
           k = k +1 ;
@@ -146,7 +161,7 @@ function GraphicChartC3D3(divArg, dataArg)
         }
           
       }
-      else
+      else // Simple one 
       {
         datasetX.push(parseInt(row[actualChart.x_axis['var']]));
         datasetY.push(parseFloat(row[actualChart.y_axis['var']]));  
@@ -157,29 +172,30 @@ function GraphicChartC3D3(divArg, dataArg)
     
   };
 
+
+  /***
+  * 
+  */
   this.draw = function(div, dataset){
 
+    // Get the temporary var to get the chart title 
     var tmpValue = actualChart.title['var'];
 
+    // Pre-set configurations to c3 
     chartConfigs = {
          padding: {
         left: 100,
 
     },
         bindto: '#pc_chart_place',
-
         data: {
           x : 'x',
-
-            
           columns: [
           datasetX,
            datasetY,
-
           ],
           types: {
            // data1: 'bar',
-            
           },
           
         },
@@ -188,7 +204,6 @@ function GraphicChartC3D3(divArg, dataArg)
             //type: 'categorized',
             label_position : {},
             tick: { format: function (x) {
-             // console.log(x)
               if ($.type(x) === "string")  return x; 
 
             return parseInt(x);
@@ -207,6 +222,8 @@ function GraphicChartC3D3(divArg, dataArg)
         }
         
       };
+
+    // By default, it is a var chart for this types.   
     chartConfigs.data.types[tmpValue] = 'bar';
 
     if (actualChart.x_axis.categorized && !actualChart.y_axis.multivalue)
@@ -215,7 +232,7 @@ function GraphicChartC3D3(divArg, dataArg)
         arr2.shift();
         chartConfigs.axis.x.type = 'categorized';
         chartConfigs.axis.x.categories = arr2;
-        
+
         chartConfigs.data.columns = [datasetY];  
         
         
@@ -236,23 +253,20 @@ function GraphicChartC3D3(divArg, dataArg)
          padding: {
         left: 100,
 
-    },
-        bindto: '#pc_chart_place',
+      },
+      bindto: '#pc_chart_place',
 
         data: {
           x : 'x',
             
           columns: 
-            datasetYs,
-          
-          
+            datasetYs,          
         },
         axis: {
           x: {
             label_position : {},
             tick: { format: function (x) {
-              console.log("x");
-              console.log(x);
+
               if ($.type(x) === "string") { return x; }
               return parseInt(x);
             }
@@ -284,9 +298,11 @@ function GraphicChartC3D3(divArg, dataArg)
                 if (chartConfigs.data.columns[d][0]=="x"){
                   chartConfigs.data.columns[d] = ["x"];
                 }
+                
             });
             chartConfigs.data.xs = {};
             chartConfigs.data.x = {};
+
             
         }
         if (datasetYs.length==4)
@@ -322,11 +338,10 @@ function GraphicChartC3D3(divArg, dataArg)
       
     }
 
-    chartConfigs.axis.x['label'] = actualChart.x_axis['label'];
-    chartConfigs.axis.y['label'] =actualChart.y_axis['label'];
-    chartConfigs.axis.x['label_position']['dy'] = "3.5em";
-    chartConfigs.axis.y['label_position']['dx'] = "-5.2em";
-    chartConfigs.axis.y['label_position']['dy'] = "-6.5em";
+    // Default configs
+    chartConfigs.axis.x['label'] = {'text': actualChart.x_axis['label'], 'position': 'outer-center'};
+    chartConfigs.axis.y['label'] = {'text': actualChart.y_axis['label'], 'position': 'outer-middle'};
+
     chartConfigs.axis.x['tick']['culling'] = true;
     chartConfigs.legend = {}
     chartConfigs.legend['show'] = legend;
@@ -336,6 +351,7 @@ function GraphicChartC3D3(divArg, dataArg)
     catch(ex)
     {
       // Handle the shit here!
+      // Otherwise once you will be fucked up.
     }
    }; 
 };

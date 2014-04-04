@@ -93,16 +93,29 @@ class PopulationCharacteristic(object):
         print "filters"
         print filters
         # Apply filters in the query 
+        dict_query_general=[]
+        
+        
+        
         for ve in filters:
+            print "ve"
             print ve
-            print
+            
             if  isinstance(filters[ve], list):
-                dict_query["$or"] = [ ]
+                #if not "$or" in dict_query:
+                _or_dict_query = {}
+                _or_dict_query["$or"] = [ ]
                 for _aux in filters[ve]:
-                    dict_query["$or"].append({ve: _aux})
+                    _or_dict_query2 = {ve: _aux}
+                    _or_dict_query["$or"].append(_or_dict_query2)
+                dict_query_general.append(_or_dict_query)    
             else:
                 dict_query[ve] = filters[ve]
-        
+                
+                
+        if dict_query_general != []:
+            dict_query["$and"]= dict_query_general
+        print dict_query
         values =  jerboa_collection.find(dict_query )
         
 
