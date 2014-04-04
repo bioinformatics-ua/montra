@@ -79,7 +79,10 @@ def list_questions():
 
 
 def index(request, template_name='index_new.html'):
-    return render(request, template_name, {'request': request})
+    if request.user.is_authenticated():
+        return HttpResponseRedirect('/wherenext/')
+    else:
+        return render(request, template_name, {'request': request})
 
 def about(request, template_name='about.html'):
     return render(request, template_name, {'request': request, 'breadcrumb': True})
