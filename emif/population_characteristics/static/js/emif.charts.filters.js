@@ -27,9 +27,14 @@ function TransformFilter(filters){
             return this.filters;
         var maleSelected = this.filters['values.Gender'].indexOf('M') >= 0; 
         var femaleSelected =  this.filters['values.Gender'].indexOf('F') >= 0; 
+        var compare =  this.filters['values.Gender'].indexOf('ALL') >= 0; 
         if (maleSelected &femaleSelected )
         {
-            this.filters['values.Gender'] = ['T']
+            this.filters['values.Gender'] = ['T'];
+        }
+        if (compare)
+        {
+            this.filters['values.Gender'] = ['M', 'F', 'T'];    
         }
 
         return this.filters;        
