@@ -20,6 +20,7 @@
 
 from django.db import models
 from django.contrib.auth.models import User
+
 class Document(models.Model):
     user = models.ForeignKey(User, unique=False, blank=True, null=True)
     fingerprint_id = models.CharField(max_length=255)

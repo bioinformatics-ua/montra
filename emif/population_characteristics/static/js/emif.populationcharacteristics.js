@@ -269,7 +269,7 @@ function PCAPI ()
               var tmpUl = $('<ul class="nav nav-pills nav-stacked">');
 
               self.append(tmpUl);
-              console.log(xFilter);
+              
               $.each(xFilter.values, function (data){
 
                   if (xFilter.values[data]==="")
@@ -386,6 +386,7 @@ function PCAPI ()
                     { 
                       e.preventDefault(); 
                       e.stopPropagation();
+                      $("#pc_comments_placeholder").html("");
   
                       
                       // Anyone have a better suggestion to do it?
@@ -395,7 +396,7 @@ function PCAPI ()
                       $(this.parentNode).closest('li').addClass('active')
 
                       chartTypes.forEach(function(a){
-                          console.log();
+                          
                           if (a.title.fixed_title==e.target.innerHTML) 
                           {
                               actualChart = a;
@@ -407,12 +408,21 @@ function PCAPI ()
                           // do something here like an abort or shit! 
                       }
 
+                      // Comments ids
+                      var fid = getFingerprintID();
+                      $("#pc_chart_comment_id").val(actualChart.uid);
+                      $("#pc_chart_comment_fingerprint_id").val(fid);
+
+                      cm = new CommentsManager();
+                      cm.listComments(fid, actualChart.uid);
+                      
                       var charDraw = new PCDraw(actualChart, actualChart.title['var'], e);
                       var _filters = {};
                       charDraw.draw(_filters);
                       charDraw.drawBar();
                       $(".filterBar").last().click();   
                       $(".filterBar").first().click(); 
+
                       
                       return false;
                     });
