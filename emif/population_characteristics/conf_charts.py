@@ -56,6 +56,9 @@ class ConfCharts(object):
         c.y_axis.operation = "unique"
         c.y_axis.var = "Count"
         c.y_axis.label = 'Number of patients'
+        c.y_axis.multivalue = True
+
+
         f1 = Filter()
         f1.name = 'Year'
         f1.key = 'Name1'
@@ -65,7 +68,9 @@ class ConfCharts(object):
         f2.name = 'Gender'
         f2.key = None
         f2.value = 'Gender'
-        f2.translation = {'M': 'Male', 'F': 'Female', 'T': 'Total'}
+        f2.translation = {'M': 'Male', 'F': 'Female', 'T': 'Total',  'ALL': 'Male/Female'}
+        f2.comparable = True
+        f2.comparable_values = ['M', 'F']
 
         ss = Scale()
         ss.unit = "Year"
@@ -95,12 +100,13 @@ class ConfCharts(object):
         c1.y_axis.operation = "unique"
         c1.y_axis.var = "Count"
         c1.y_axis.label = 'Number of patients'
+        c1.y_axis.multivalue = True
 
         f2 = Filter()
         f2.name = 'Gender'
         f2.key = None
         f2.value = 'Gender'
-        f2.translation = {'M': 'Male', 'F': 'Female', 'T': 'Total'}
+        f2.translation = {'M': 'Male', 'F': 'Female', 'T': 'Total',  'ALL': 'Male/Female'}
         
         c1.filters = [f2]
 
@@ -125,6 +131,7 @@ class ConfCharts(object):
         c10.y_axis.operation = "unique"
         c10.y_axis.var = "Count"
         c10.y_axis.label = 'Number of patients'
+        c10.y_axis.multivalue = True
 
 
         fy1 = Filter()
@@ -149,7 +156,7 @@ class ConfCharts(object):
         f2.name = 'Gender'
         f2.key = None
         f2.value = 'Gender'
-        f2.translation = {'M': 'Male', 'F': 'Female', 'T': 'Total'}
+        f2.translation = {'M': 'Male', 'F': 'Female', 'T': 'Total',  'ALL': 'Male/Female'}
         c10.filters = [f2]
         sc.charts.append(c10)
 
@@ -162,7 +169,7 @@ class ConfCharts(object):
         f2.name = 'Gender'
         f2.key = None
         f2.value = 'Gender'
-        f2.translation = {'M': 'Male', 'F': 'Female', 'T': 'Total'}
+        f2.translation = {'M': 'Male', 'F': 'Female', 'T': 'Total',  'ALL': 'Male/Female'}
 
         c11 = Chart()
         c11.uid = 4
@@ -178,6 +185,7 @@ class ConfCharts(object):
         c11.y_axis.operation = "unique"
         c11.y_axis.var = "Count"
         c11.y_axis.label = 'Number of patients'
+        c11.y_axis.multivalue = True
         fy1 = Filter()
         fy1.name = 'Name2'
         fy1.key = 'Name2'
@@ -233,7 +241,7 @@ class ConfCharts(object):
         c2.y_axis.operation = "unique"
         c2.y_axis.var = "Count"
         c2.y_axis.label = "Number of patients"
-
+        c2.y_axis.multivalue = True
 
         fy2 = Filter()
         fy2.name = 'Name2'
@@ -258,7 +266,7 @@ class ConfCharts(object):
         f2.name = 'Gender'
         f2.key = None
         f2.value = 'Gender'
-        f2.translation = {'M': 'Male', 'F': 'Female', 'T': 'Total'}
+        f2.translation = {'M': 'Male', 'F': 'Female', 'T': 'Total',  'ALL': 'Male/Female'}
         c2.filters = [f2, f_year]
 
         sc.charts.append(c2)
@@ -297,7 +305,7 @@ class ConfCharts(object):
         c4.y_axis.operation = "unique"
         c4.y_axis.var = "Count"
         c4.x_axis.label = "Number of patients"
-
+        c4.y_axis.multivalue = True
 
         fy2 = Filter()
         fy2.name = 'Name2'
@@ -322,7 +330,7 @@ class ConfCharts(object):
         f2.name = 'Gender'
         f2.key = None
         f2.value = 'Gender'
-        f2.translation = {'M': 'Male', 'F': 'Female', 'T': 'Total'}
+        f2.translation = {'M': 'Male', 'F': 'Female', 'T': 'Total',  'ALL': 'Male/Female'}
         c4.filters = [f2, f_year]
 
         sc.charts.append(c4)
@@ -361,6 +369,7 @@ class ConfCharts(object):
         c3.y_axis.operation = "unique"
         c3.y_axis.var = "Count"
         c3.y_axis.label = "Number of patients"
+        c3.y_axis.multivalue = True
 
 
         fy2 = Filter()
@@ -386,7 +395,7 @@ class ConfCharts(object):
         f2.name = 'Gender'
         f2.key = None
         f2.value = 'Gender'
-        f2.translation = {'M': 'Male', 'F': 'Female', 'T': 'Total'}
+        f2.translation = {'M': 'Male', 'F': 'Female', 'T': 'Total',  'ALL': 'Male/Female'}
         c3.filters = [f2, f_year]
 
         sc.charts.append(c3)
@@ -416,6 +425,21 @@ class ConfCharts(object):
         c5.y_axis.var = "Count"
         c5.y_axis.transformation = "y / 12"
         c5.y_axis.label = "Sum of the patients observation time (years)"
+        c5.y_axis.multivalue = True
+
+        fy2 = Filter()
+        fy2.name = 'Name2'
+        fy2.key = 'Name2'
+        fy2.value = ''
+
+        fy3 = Filter()
+        fy3.name = 'Value2'
+        fy3.key = 'Value2'
+        fy3.value = ''
+
+        c5.y_axis.static_filters = [fy2, fy3]
+
+
         f1 = Filter()
         f1.name = 'Year'
         f1.key = 'Name1'
@@ -425,7 +449,7 @@ class ConfCharts(object):
         f2.name = 'Gender'
         f2.key = None
         f2.value = 'Gender'
-        f2.translation = {'M': 'Male', 'F': 'Female', 'T': 'Total'}
+        f2.translation = {'M': 'Male', 'F': 'Female', 'T': 'Total',  'ALL': 'Male/Female'}
 
         ss = Scale()
         ss.unit = "Year"
@@ -488,7 +512,7 @@ class ConfCharts(object):
         f2.name = 'Gender'
         f2.key = None
         f2.value = 'Gender'
-        f2.translation = {'M': 'Male', 'F': 'Female', 'T': 'Total'}
+        f2.translation = {'M': 'Male', 'F': 'Female', 'T': 'Total',  'ALL': 'Male/Female'}
 
         c12.filters = [f2]
         sc.charts.append(c12)
@@ -547,7 +571,7 @@ class ConfCharts(object):
         f2.name = 'Gender'
         f2.key = None
         f2.value = 'Gender'
-        f2.translation = {'M': 'Male', 'F': 'Female', 'T': 'Total'}
+        f2.translation = {'M': 'Male', 'F': 'Female', 'T': 'Total',  'ALL': 'Male/Female'}
 
         c13.filters = [f2]
         sc.charts.append(c13)
@@ -607,7 +631,7 @@ class ConfCharts(object):
         f2.name = 'Gender'
         f2.key = None
         f2.value = 'Gender'
-        f2.translation = {'M': 'Male', 'F': 'Female', 'T': 'Total'}
+        f2.translation = {'M': 'Male', 'F': 'Female', 'T': 'Total',  'ALL': 'Male/Female'}
 
         c14.filters = [f2]
         sc.charts.append(c14)
@@ -667,7 +691,7 @@ class ConfCharts(object):
         f2.name = 'Gender'
         f2.key = None
         f2.value = 'Gender'
-        f2.translation = {'M': 'Male', 'F': 'Female', 'T': 'Total'}
+        f2.translation = {'M': 'Male', 'F': 'Female', 'T': 'Total',  'ALL': 'Male/Female'}
 
         c14.filters = [f2]
         sc.charts.append(c14)
@@ -726,7 +750,7 @@ class ConfCharts(object):
         f2.name = 'Gender'
         f2.key = None
         f2.value = 'Gender'
-        f2.translation = {'M': 'Male', 'F': 'Female', 'T': 'Total'}
+        f2.translation = {'M': 'Male', 'F': 'Female', 'T': 'Total',  'ALL': 'Male/Female'}
 
         c14.filters = [f2]
         sc.charts.append(c14)
@@ -749,6 +773,7 @@ class ConfCharts(object):
         c.y_axis.operation = "unique"
         c.y_axis.var = "Count"
         c.y_axis.label = 'Number of patients'
+        c.y_axis.multivalue = True
         f1 = Filter()
         f1.name = 'Year'
         f1.key = 'Name1'
@@ -758,7 +783,7 @@ class ConfCharts(object):
         f2.name = 'Gender'
         f2.key = None
         f2.value = 'Gender'
-        f2.translation = {'M': 'Male', 'F': 'Female', 'T': 'Total'}
+        f2.translation = {'M': 'Male', 'F': 'Female', 'T': 'Total',  'ALL': 'Male/Female'}
 
         ss = Scale()
         ss.unit = "Year"

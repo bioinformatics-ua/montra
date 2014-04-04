@@ -44,6 +44,9 @@ function PCDraw(actualChart,chartType, e)
 
         tfilter = new TransformFilter(filters);
         filters = tfilter.transform();
+        console.log("output filters")
+        console.log(filters);
+
         valuesFromGraph = PC.getValuesRowWithFilters(this.actualChart.title.fixed_title, 
           this.actualChart.y_axis['var'],fingerprintID, filters );
       }
