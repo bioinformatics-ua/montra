@@ -87,7 +87,6 @@ function RepresentData(wrapper)
                  ];
             w_g.translateData(_data);
 
-            console.log(dataset);
 
             w_g.draw('#pc_chart_place', dataset);
             
