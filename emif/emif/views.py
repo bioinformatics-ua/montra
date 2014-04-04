@@ -782,7 +782,7 @@ def render_one_questionset(request, q_id, qs_id, errors={}, aqid=None, fingerpri
         elif fingerprint_id != None and not is_new:
             (qlist_general, qlist, jstriggers, qvalues, jsinclude, cssinclude, extra_fields, hasErrors) = extract_answers(request2, q_id, question_set, qs_list)
 
-        permissions = getPermissions(fingerprint_id, question_set)
+        #permissions = getPermissions(fingerprint_id, question_set)
 
 
         advanced_search=False

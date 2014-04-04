@@ -80,7 +80,7 @@ class CoreEngine:
         """Index fingerprint as json
         """
         # index document
-        print(d)
+        #print(d)
         xml_answer = self.solr.add([d])
         #print(xml_answer)
         self.optimize()
