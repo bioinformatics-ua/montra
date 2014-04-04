@@ -80,28 +80,29 @@ text-decoration: none;
     <ul class="nav nav-list nav-pills nav-stacked ">
       <li class="nav-header">Step-by-Step</li>
       {% for qs in questionset.questionnaire.questionsets %}
-
-      <li{% if questionset.text == qs.text %} class="active" {% endif %} id="li_qs_{{qs.sortid}}">
-        <!--<a href="q2/{{runinfo.random}}/{{ qs.sortid }}">
-        -->
-        <a href="add/{{qs.questionnaire.pk}}/{{ qs.sortid }}" onclick="questionsets_handle(qs_{{ qs.sortid }}); return false;">
-          <table class="fullwidth">
-            <tr>
-              <td style="width: 80%; font-size: 93%;">
-              {% if qs.sortid != 0 and qs.sortid != 99 %}{{ qs.sortid }}. {% endif %}{{ qs.text|removeh1 }}
-              <span id="counter0_{{ qs.sortid }}" class="hidden"></span>
-              </td>
-              <td style="width: 10%; text-align: right;">
-              {% if qs.sortid != 0 and qs.sortid != 99 %}
-               <span id="counter1_{{ qs.sortid }}" class="hidden counter_badge"></span>
-               {%endif%}
-   
-            </td>
-          </tr>
-        </table>
-      </a>
-      
-    </li>
+        {% if qs.sortid != 99 %}
+          <li{% if questionset.text == qs.text %} class="active" {% endif %} id="li_qs_{{qs.sortid}}">
+            <!--<a href="q2/{{runinfo.random}}/{{ qs.sortid }}">
+            -->
+            <a href="add/{{qs.questionnaire.pk}}/{{ qs.sortid }}" onclick="questionsets_handle(qs_{{ qs.sortid }}); return false;">
+              <table class="fullwidth">
+                <tr>
+                  <td style="width: 80%; font-size: 93%;">
+                  {% if qs.sortid != 0 and qs.sortid != 99 %}{{ qs.sortid }}. {% endif %}{{ qs.text|removeh1 }}
+                  <span id="counter0_{{ qs.sortid }}" class="hidden"></span>
+                  </td>
+                  <td style="width: 10%; text-align: right;">
+                  {% if qs.sortid != 0 and qs.sortid != 99 %}
+                   <span id="counter1_{{ qs.sortid }}" class="hidden counter_badge"></span>
+                   {%endif%}
+       
+                </td>
+              </tr>
+            </table>
+          </a>
+          
+        </li>
+        {% endif %}
     {% endfor %}
   </ul>
 

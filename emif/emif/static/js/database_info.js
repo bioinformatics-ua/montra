@@ -96,13 +96,13 @@ $("#collapseall_literature").bind('click', function(e) {
 
 function collapse_expand(context) {
     if ($(context).text().indexOf('Collapse') !== -1) {
-        $(context).text('Expand all');
+        $(context).html('<i class="icon-plus"></i>&nbsp; Expand all');
         //change_name_collapse(false);
 
         $(".collapse:visible").collapse("hide");
 
     } else {
-        $(context).text('Collapse all');
+        $(context).html('<i class="icon-minus"></i>&nbsp; Collapse all');
         //change_name_collapse(true);
         $(".collapse:visible").collapse("show");
     }
