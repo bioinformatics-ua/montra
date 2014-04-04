@@ -22,6 +22,7 @@ from .services import *
 from .response import JSONResponse, response_mimetype
 from .comments import *
 from .serialize import serialize
+from .comparison import * 
 
 from population_characteristics.models import *
 
@@ -186,5 +187,7 @@ def list_jerboa_files(request, fingerprint):
     response['Content-Disposition'] = 'inline; filename=files.json'
     return response
 
+def compare(request):
+    return handle_compare(request)
 
 

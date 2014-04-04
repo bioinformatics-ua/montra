@@ -1,0 +1,67 @@
+{% extends 'base.html' %} 
+{% load url from future %} 
+{% load extra_tags %} 
+{% load django_bootstrap_breadcrumbs %} 
+
+{% block headextra %}
+
+<link rel="stylesheet" href="{{ STATIC_URL }}css/vendor/style.css">
+
+<link rel="stylesheet" href="{{ STATIC_URL }}css/c3.css">
+
+{% endblock %} 
+{% block breadcrumbs %} 
+{{ block.super }} 
+    {% if search_old %}
+        {% breadcrumb "Search" "resultsdiff/1" %} 
+        {% breadcrumb breadcrumb_name "databases" %} 
+    {% elif style == '1' %} 
+        {% breadcrumb "My Databases" "databases" %} 
+        {% breadcrumb breadcrumb_name "databases" %} 
+    {% else %} 
+        {% breadcrumb "All Databases" "alldatabases" %} 
+        {% breadcrumb breadcrumb_name "databases" %} 
+    {% endif %}
+
+{% endblock %}
+
+{% block toolbar %} 
+    {% include "menu_toolbar.html" with collapse=collapseall %} 
+{% endblock %} 
+
+{% block content %} 
+
+
+{% include "population_characteristics.html" %}
+
+
+
+{% endblock %} 
+
+{% block scriptextraincludes %}
+<!-- Include the widget embedding script -->
+<script src="//bioinformatics.ua.pt/becas/embed-widget.js"></script>
+
+
+<!--[if lte IE 8]>
+    <script src="{{ STATIC_URL}}js/d3/r2d3.min.js" charset="utf-8"></script>
+    <![endif]-->
+<!--[if gte IE 9]><!-->
+
+    <script src="{{ STATIC_URL}}js/d3/d3.v3.min.js" charset="utf-8"></script>
+    <script src="{{ STATIC_URL}}js/d3/d3.layout.cloud.js"></script>
+    <script src="{{ STATIC_URL}}js/c3.js"></script>   
+<!--<![endif]-->
+
+
+<script src="{{ STATIC_URL}}js/database_info.js"></script>
+<script src="{{ STATIC_URL }}js/emif.database.delete.js"></script>
+
+<!--[if gte IE 9]><!-->
+<script src="{{ STATIC_URL}}js/emif.populationcharacteristics.charts.js"></script>
+
+<script src="{{ STATIC_URL}}js/emif.populationcharacteristics.js"></script>
+<!--<![endif]-->
+
+{% endblock %}
+

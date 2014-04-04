@@ -29,6 +29,7 @@
 <script src="{{ STATIC_URL }}js/vendor/jquery.ba-throttle-debounce.min.js"></script>
 <script src="{{ STATIC_URL }}js/vendor/json2.js"></script>
 <script src="{{ STATIC_URL }}js/paginator-sorter.js"></script>
+<script src="{{ STATIC_URL }}js/emif.comparison_populations.js"></script>
 
 {% endblock %}
 
@@ -49,6 +50,9 @@
       <span id="selected_databases" class="btn disabled"> <strong>Type Selected:</strong> <span id="selected_dbstype">---</span> &nbsp; &nbsp; <strong>Selected databases:</strong> <span id="selected_dbscount">0</span></span>      
       <a id="comparabtn" class="btn "  href=""  rel="tooltip" data-container="body" data-placement="bottom" data-original-title="This allows to compare databases.<br /> It is only possible to compare databases of the same type. <br /> When a database is selected, the type is defined automatically, and databases of other types can't be choosen. <br /> To be able to select other type, you must unselect all the databases." class="help_selectresults icon-question-sign" disabled> <i  class=" icon"></i>
         <i class="icon-retweet"></i> Compare</a>
+      <a id="comparabtnPC" class="btn "  href=""  rel="tooltip" data-container="body" data-placement="bottom" data-original-title="Compare Populations: Compare for instance the patient time across the databases."> <i  class=" icon"></i>
+        <i class="icon-retweet"></i> Compare Populations</a>
+          
     <button type="button" class="btn" onclick="window.print();" title="Print">
       <i class="icon-print"></i>
     </button>
@@ -251,7 +255,7 @@
 var counter = 0;
 var a;
 $(document).ready(function(){
-    
+        
     a = new PaginatorSorter("table_databases", '{{sort_params.base_filter}}', '{{sort_params.selected_name}}', '{{sort_params.selected_value}}', '{{sort_params.extraObjects|safe}}');
 
     //TO Be Applied in future releases.

@@ -30,6 +30,10 @@ class ConfCharts(object):
         # TODO
         pass
 
+
+
+    """ get the default settings to load 
+    """
     def get_main_settings(self):
         
 
