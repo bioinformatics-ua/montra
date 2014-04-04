@@ -56,6 +56,9 @@ OpenButtonValidator.prototype ={
     },
     controllerDOM : function(validatorDOM){
         return $("input", validatorDOM);
+    },
+    setDatabase : function(db){
+        this.database_name = db;
     }
 }
 
@@ -94,8 +97,9 @@ NumericValidator.prototype ={
 
 function Fingerprint_Validator(searchMode){
     this.validators = [];
+    this.fingerprint_name = new OpenButtonValidator(this);
 
-    this.validators["open-button"] = { n: "open-button_validator", v: new OpenButtonValidator(this)};
+    this.validators["open-button"] = { n: "open-button_validator", v: this.fingerprint_name};
     this.validators["numeric"] = { n: "numeric_validator", v: new NumericValidator(this)};
 }
 Fingerprint_Validator.prototype ={
@@ -108,11 +112,14 @@ Fingerprint_Validator.prototype ={
             });    
         }
 
-        $("#qform").submit(function(evnt){
+        $('[id^="qform"]').submit(function(evnt){
             //console.log(self);
-            self.validateForm(evnt);
+            self.validateFormContext(evnt, this);
         });
     },
+    reload : function(){
+        this.onInit();
+    }, 
     validate : function (clas, questionNumber, controllerDOM){
         var validator = this.validators[clas];
         if(validator != undefined){
@@ -131,9 +138,13 @@ Fingerprint_Validator.prototype ={
             $("span", validator).text(feedback_message);
         }   
     },
+    setDatabase : function(db){
+        this.fingerprint_name.setDatabase(db);
+    },
     validateForm: function(evnt){
         var self = this;
 
+        list = [];
         for( x in self.validators ){
             $("."+self.validators[x].n).each(function(i, v) {
 
@@ -149,12 +160,42 @@ Fingerprint_Validator.prototype ={
                     var qs_id = validator_id.split(".")[0];
 
                     //console.log(qs_id);
-                    questionsets_handle( $("#qs_"+qs_id )[0]);
+                    //questionsets_handle( $("#qs_"+qs_id )[0]);
+                    list.push(validator_id);
                 }
 
-            });    
+            });
+        return list;  
         }
     },
+    validateFormContext: function(evnt, context){
+        var self = this;
+
+        list = [];
+
+        for( x in self.validators ){
+
+            $("."+self.validators[x].n, context).each(function(i, v) {
+
+                var cDOM = self.validators[x].v.controllerDOM(v);
+                var validator_id = $(v).attr("id");
+                validator_id= validator_id.replace(self.validators[x].n+"_", "");
+
+                if( !self.validators[x].v.validate( validator_id, cDOM)){
+                    evnt.preventDefault();     
+
+                    var qs_id = validator_id.split(".")[0];
+
+                    //console.log(qs_id);
+                    //questionsets_handle( $("#qs_"+qs_id )[0]);
+                    list.push(validator_id);
+                }
+
+            });
+        }
+        return list;  
+
+    },    
     searchMode: function(searchMode){
         if(searchMode == undefined || !searchMode){
             this.validators["open-button"] = { n: "open-button_validator", v: new OpenButtonValidator(this)};

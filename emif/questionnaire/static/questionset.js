@@ -156,42 +156,59 @@ function clear_selection(question_name, response){
  - do it for a total of 5 seconds by which time the page should've been sent
  - oscillate the sending class which does some fancy css transition trickery
 */
-(function($){
-    $(document).ready(function() {
-        $('#qform').submit(function() {
+function setsaveqs(id){
+        $('#'+id).submit(function(e) {
+            e.preventDefault();
 
-            var input = $('.questionset-submit input');
-            var interval = 400; // ms
-            var duration = 10000; // 10s
+            var self = $(this);
 
-            var disable = function(){
-                input.attr('disabled', 'disabled');
-                input.toggleClass('sending', false);
-            };
+      if (!(typeof errornavigator === 'undefined')) {
+      errornavigator.hideErrorPage();
+      errornavigator.reset();
 
-            var enable = function(){
-                $('body').css({'cursor':'auto'});
-                input.removeAttr('disabled');  
-            };
+      var list_invalid = advValidator.validateFormContext(event, self);
+      //console.log(list_invalid);
 
-            var step = 0; 
-            var animate = function() {
-                // re-enable the button after the duration
-                if (interval * step > duration) {
-                    clearInterval(id);
-                    enable();
-                }
-                    
-                step += 1;
-                input.toggleClass('sending');
-            };
-            
-            // start animating before disabling as it looks nicer
-            animate();
-            disable();
 
-            // id is availabe in the animate method. js closures ftw!
-            var id = setInterval(animate, interval);
+      if(list_invalid.length == 0){
+
+        if(formHasChanged){
+          // If its not the first or last
+          var id = this.id.split('_');
+
+          if(self.length != 0 && id[1] != '0' && id[1] != '99'){
+
+            // Save this questionset using an ajax post
+            var posting = $.post(self.attr("action"), self.serialize());
+
+            $("#loading-message").fadeIn('fast');
+
+            posting.done(function(data) {
+              $("#loading-message").fadeOut('fast');
+            });
+          }
+        }
+
+        document.body.scrollTop = document.documentElement.scrollTop = 0; 
+
+        formHasChanged = false;   
+        list_invalid = []; 
+
+      } else {
+        console.log("Jump to errors and show error navigator.");
+
+          for(var i = 0;i<list_invalid.length;i++){
+            errornavigator.addError('qc_'+list_invalid[i]);
+          }
+          errornavigator.showErrorPager();
+
+          // jump to first problem
+          errornavigator.nextError();
+
+        }
+
+      }
+
         });
-    });
-})(jQuery);
+    }
+

@@ -80,9 +80,9 @@ class CoreEngine:
         """Index fingerprint as json
         """
         # index document
-        
+        print(d)
         xml_answer = self.solr.add([d])
-        print(xml_answer)
+        #print(xml_answer)
         self.optimize()
 
     def optimize(self):
@@ -120,6 +120,36 @@ class CoreEngine:
                 })
         return results
 
+    def search_highlight(self, query, start=0, rows=100, fl='', sort='', hlfl=""):
+        """search the fingerprint
+        """
+        #hl=true&hl.fl=text_t
+        results = self.solr.search(query,**{
+                'rows': rows,
+                'start': start,
+                'fl': fl,
+                'sort': sort,
+                'hl':"true",
+                'hl.fl': hlfl, "hl.fragsize":0
+                })
+        return results
+
+    def highlight_questions(self, query, start=0, rows=1000, fl='id', sort='', hlfl="*"):
+        """search the fingerprint
+        """
+        #hl=true&hl.fl=text_t
+        query = "qs_all:"+query
+        print(query)
+        results = self.solr.search(query,**{
+                'rows': rows,
+                'start': start,
+                'fl': fl,
+                'sort': sort,
+                'hl':"true",
+                'hl.fl': hlfl
+                })
+        return results
+
     def more_like_this(self, id_doc):
         similar = self.solr.more_like_this(q='id:doc_2', mltfl='text')
         return similar
@@ -149,21 +179,33 @@ def get_slug_from_choice(v, q):
 
 
 def index_answeres_from_qvalues(qvalues, questionnaire, subject, fingerprint_id, extra_fields=None, created_date=None):
-    
+
     c = CoreEngine()
     d = {}
     
+    # print("Indexing...")
+    results = c.search_fingerprint("id:"+fingerprint_id)
+    if (len(results)>0):
+        d = results.docs[0]
+        del d['_version_']
+        c.delete(results.docs[0]['id'])
+
+
     text = ""
-    slugs_objs = Slugs.objects.all()
+    ''' For god sake, i dont understand what this was doing here, since its not being used
+     slugs_objs = Slugs.objects.all()
     slugs = []
     for s in slugs_objs:
         slugs.append(s.description)
+    '''    
     appending_text = ""
-    slugs_objs = None
+    #slugs_objs = None
     now = datetime.datetime.now()
 
     for qs_aux, qlist in qvalues:
         for question, qdict in qlist:
+
+            #print(question.slug_fk.slug1)
 
             try:
                 choices = None
@@ -268,11 +310,6 @@ def index_answeres_from_qvalues(qvalues, questionnaire, subject, fingerprint_id,
             except:
                 # raise
                 pass
-                
-    # print("Indexing...")
-    results = c.search_fingerprint("id:"+fingerprint_id)
-    if (len(results)>0):
-        c.delete(results.docs[0]['id'])
 
 
     d['id']=fingerprint_id
@@ -288,7 +325,7 @@ def index_answeres_from_qvalues(qvalues, questionnaire, subject, fingerprint_id,
 
     if extra_fields!=None:
         d = dict(d.items() + extra_fields.items())
-        
+    
     c.index_fingerprint_as_json(d)
 
 
@@ -298,7 +335,7 @@ def convert_answers_to_solr(runinfo):
     runid = runinfo.runid
     answers = Answer.objects.filter(runid=runid)
 
-    print(answers)
+    #print(answers)
     d = {}
     text = ""
     for a in answers:

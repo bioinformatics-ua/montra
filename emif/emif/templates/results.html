@@ -30,7 +30,6 @@
 <script src="{{ STATIC_URL }}js/vendor/json2.js"></script>
 <script src="{{ STATIC_URL }}js/paginator-sorter.js"></script>
 
-
 {% endblock %}
 
 
@@ -49,11 +48,11 @@
       <div class="btn-group"></div>
       <span id="selected_databases" class="btn disabled"> <strong>Type Selected:</strong> <span id="selected_dbstype">---</span> &nbsp; &nbsp; <strong>Selected databases:</strong> <span id="selected_dbscount">0</span></span>      
       <a id="comparabtn" class="btn "  href=""  rel="tooltip" data-container="body" data-placement="bottom" data-original-title="This allows to compare databases.<br /> It is only possible to compare databases of the same type. <br /> When a database is selected, the type is defined automatically, and databases of other types can't be choosen. <br /> To be able to select other type, you must unselect all the databases." class="help_selectresults icon-question-sign" disabled> <i  class=" icon"></i>
-        Compare</a>
+        <i class="icon-retweet"></i> Compare</a>
     <button type="button" class="btn" onclick="window.print();" title="Print">
       <i class="icon-print"></i>
     </button>
-      <a class="btn" href="geo" onclick="" > <i class=" icon"></i>Geolocation</a>
+      <a class="btn" href="geo" onclick="" ><i class="icon-globe"></i> Geolocation</a>
 
     </div>
   </div>
@@ -100,16 +99,28 @@
 <table class="table table-bordered table-hover fingerprint_table table-striped" id="table_databases" data-provides="rowlink">
     <thead>
         <tr>
-            <th class="sorter {%if "icon-minus" not in sort_params.database_name.icon %}selected-sorter{% endif %}"  onclick="a.onClick('database_name', '{{sort_params.database_name.next}}');">
-            <div class="pull-left">Name</div>
+            <th class="sorter-database_name sorter {%if "icon-minus" not in sort_params.database_name.icon %}selected-sorter{% endif %}"  onclick="a.onClick('database_name', '{{sort_params.database_name.next}}');">
+            <div class="pull-left">Acronym</div>
                  <div class="pull-right"><i class="{{sort_params.database_name.icon}}"></i></div>
             </th>
-            <!--<th>Creation Date</th>-->
-            <th class="sorter {%if "icon-minus" not in sort_params.last_update.icon %}selected-sorter{% endif %}" onclick="a.onClick('last_update', '{{sort_params.last_update.next}}');">
+            <th class="sorter-institution sorter {%if "icon-minus" not in sort_params.institution.icon %}selected-sorter{% endif %}"  onclick="a.onClick('institution', '{{sort_params.institution.next}}');">
+            <div class="pull-left">Institution Name</div>
+                 <div class="pull-right"><i class="{{sort_params.institution.icon}}"></i></div>
+            </th>            
+            <!--<th>Creation Date</th>-->            
+            <th class="sorter-location sorter {%if "icon-minus" not in sort_params.location.icon %}selected-sorter{% endif %}" onclick="a.onClick('location', '{{sort_params.location.next}}');">
+                <div class="pull-left">Location</div>
+                <div class="pull-right"><i class="{{sort_params.location.icon}}"></i></div> 
+            </th>             
+            <th class="sorter-nrpatients sorter {%if "icon-minus" not in sort_params.nrpatients.icon %}selected-sorter{% endif %}" onclick="a.onClick('nrpatients', '{{sort_params.nrpatients.next}}');">
+                <div class="pull-left">Nr. Patients</div>
+                <div class="pull-right"><i class="{{sort_params.nrpatients.icon}}"></i></div> 
+            </th>            
+            <th class="sorter-lastupdate sorter {%if "icon-minus" not in sort_params.last_update.icon %}selected-sorter{% endif %}" onclick="a.onClick('last_update', '{{sort_params.last_update.next}}');">
             <div class="pull-left">Last update</div>
                 <div class="pull-right"><i class="{{sort_params.last_update.icon}}"></i></div> 
             </th>
-            <th class="sorter {%if "icon-minus" not in sort_params.type.icon %}selected-sorter{% endif %}" style="width: 200px;" onclick="a.onClick('type', '{{sort_params.type.next}}');">
+            <th class="sorter-type sorter {%if "icon-minus" not in sort_params.type.icon %}selected-sorter{% endif %}" onclick="a.onClick('type', '{{sort_params.type.next}}');">
             <div class="pull-left">Type</div>
               <div class="pull-right"><i class="{{sort_params.type.icon}}"></i></div> 
             </th>
@@ -121,6 +132,15 @@
                 <input class="filter_input" id="database_name_filter" type="text" value="{{sort_params.database_name.filter}}" placeholder="Filter">
           </td>
            <td class="table_filter">
+                 <input class="filter_input" id="institution_filter" type="text" value="{{sort_params.institution.filter}}" placeholder="Filter">
+          </td>
+          <td class="table_filter">
+                 <input class="filter_input" id="location_filter" type="text" value="{{sort_params.location.filter}}" placeholder="Filter">
+          </td>
+          <td class="table_filter">
+                 <input class="filter_input" id="nrpatients_filter" type="text" value="{{sort_params.nrpatients.filter}}" placeholder="Filter">
+          </td>
+          <td class="table_filter">
                  <input class="filter_input" id="last_update_filter" type="text" value="{{sort_params.last_update.filter}}" placeholder="Filter">
           </td>
            <td class="table_filter">
@@ -130,7 +150,7 @@
                 <option value="observationaldatasources">Observational Data Sources</option>
               </select>
           </td>
-          <td style="width:50px;" class="table_filter select_line">
+          <td class="table_filter select_line">
             <div style="text-align: center;">
               <i data-toggle="tooltip" data-placement="bottom" title="This allows to compare databases.<br /> It is only possible to compare databases of the same type.  For instance, you cannot compare databases from AD Cohort with a databases from Observational Data.<br /> When a database is selected, the type is defined automatically, and databases of other types cannot be chosen. <br /> To be able to select other type, you must unselect all the databases." class="help_selectresults icon-question-sign"></i>
             </div>
@@ -143,18 +163,10 @@
    <tr>          
           <td>
             <a href="fingerprint/{{ t.id }}/1">{{ t.name }}</a>
-
-            <div style="margin-left:20px">
-             Institution Name: {{t.institution}}
-            </div>
-
-            <div style="margin-left:20px">
-             Location: {{t.location}}
-            </div>
-            <div style="margin-left:20px">
-             Number of patients: {{t.number_patients}}
-            </div> 
         </td>
+        <td>{{t.institution}}</td>
+        <td>{{t.location}}</td>
+        <td>{{t.number_patients}}</td>
           <td class="date">            
                 {% if t.last_activity %}
                     {{t.last_activity|datehhmm}}

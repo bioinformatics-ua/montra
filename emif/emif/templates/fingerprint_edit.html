@@ -3,15 +3,6 @@
 {% load markup questionnaire i18n %}
 
 <div class="span8">
-    <form name="qform" id="qform" action="dbEdit/{{fingerprint_id}}/{{questionset.questionnaire.pk}}" method="POST" enctype="multipart/form-data">
-
-        <input type="hidden" id="edit_db_inputs" value="0">
-        <input type="hidden" name="active_qs" id="active_qs" value="0">
-        <input type="hidden" name="active_qs_sortid" id="active_qs_sortid" value="0">
-        <input type="hidden" name="fingerprint_id" value="{{ fingerprint_id }}">
-        <input type="hidden" name="users_db" value="{{ users_db }}">
-        <input type="hidden" name="created_date" value="{{ created_date }}">
-
     {% setglobal iteratorQ 0 %}
     {% for k, qlist in questions_list %}
 
@@ -20,6 +11,15 @@
 
 
     <div id="qs_{{ k.sortid }}" class="{% if k.sortid == 0 %} {% else %} hide {% endif %} questionset">
+
+    <form name="qform{{ k.sortid }}" id="qform{{ k.sortid }}" action="addPost/{{questionset.questionnaire.pk}}/1/{{ k.sortid }}" method="POST" enctype="multipart/form-data">
+
+        <input type="hidden" id="edit_db_inputs" value="0">
+        <input type="hidden" name="active_qs" id="active_qs" value="0">
+        <input type="hidden" name="active_qs_sortid" id="active_qs_sortid" value="0">
+        <input type="hidden" name="fingerprint_id" value="{{ fingerprint_id }}">
+        <input type="hidden" name="users_db" value="{{ users_db }}">
+        <input type="hidden" name="created_date" value="{{ created_date }}">
 
     {% if k.sortid != 0 and k.sortid != 99 %}
         <div><a id="collapseall_qs_{{ k.sortid }}"  class="btn pull-right" href="#">Collapse all </a></div>
@@ -173,13 +173,13 @@
             <!-- If Questionset is not the first (Introduction) or the final (Thank you) -->
 
                 {% if k.prev %}
-                    <a href="dbEdit/{{ fingerprint_id }}/{{ k.prev.sortid }}" class="btn large primary" onclick="questionsets_handle(qs_{{ k.prev.sortid }});  return false;">{% trans "Previous" %}</a>
+                    <a href="dbEdit/{{ fingerprint_id }}/{{ k.prev.sortid }}" class="btn large primary" onclick="questionsets_handle(qs_{{ k.prev.sortid }});  return false;"><i class="icon-chevron-left"></i> &nbsp;{% trans "Previous" %}</a>
                 {% endif %}
                 {% if k.prev and k.next %}
 
                 {% endif %}
-                {% if k.next %}
-                    <a href="dbEdit/{{ fingerprint_id }}/{{ k.next.sortid }}" class="btn large primary" onclick="questionsets_handle(qs_{{ k.next.sortid }});  return false;">{% trans "Next" %}</a>
+                {% if k.next and k.next.sortid != 99 %}
+                    <a href="dbEdit/{{ fingerprint_id }}/{{ k.next.sortid }}" class="btn large primary" onclick="questionsets_handle(qs_{{ k.next.sortid }});  return false;">{% trans "Next" %} &nbsp;<i class="icon-chevron-right"></i></a>
                 {% endif %}
 
 
@@ -190,7 +190,10 @@
             </div>
             <div class="span2 text-right">
                 {% if k.sortid != 0 %}
-                    <input class="btn large btn-primary" name="submit" type="submit" value="{% trans 'Save' %}" />
+                    <!--input class="btn large btn-primary" name="submit" type="submit" value="{% trans 'Save' %}" /-->
+                    <button type="submit" class="btn btn-primary">
+                      <i class="icon-file icon-white"></i>&nbsp; {% trans 'Save' %}
+                    </button>
                 {% endif %}
                 {% if k.sortid == 0 %}
                 {% endif %}
@@ -200,9 +203,9 @@
                 {% endif %}
             </div>
         </div>
+        </form>
     </div>
     {% endfor %}
-    </form>
 
 </div>
 
