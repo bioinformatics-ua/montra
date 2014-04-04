@@ -5,6 +5,8 @@
         -o-background-size: cover;
         background-size: cover;
         height: 100%;
+        /*display:none;
+        opacity: 0.0;*/
     }
 
     body {
@@ -32,6 +34,8 @@
         border-bottom-left-radius:5px;
         border-bottom-right-radius:5px;
         text-align: center;
+        display:none;
+        opacity: 0.0;
     }
 
     .inside{
@@ -39,6 +43,7 @@
         margin-bottom:80px;
         margin-right:50px;
         margin-left:50px;
+
     }
     .inside2{
         margin-top:15px;

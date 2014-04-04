@@ -77,7 +77,6 @@
                             <h1>EMIF Catalogue</h1>
 
                             <p class="lead">Your medical research data everywhere!</p>
-                            {% if not request.user.is_authenticated %}
                             <form action="accounts/signin/" id="signin_form" class="margin-base-vertical" method="post">
                                 {% csrf_token %}
                                 <p>Sign in or <a href="{% url 'userena_signup' %}">create a new account</a></p>
@@ -107,8 +106,6 @@
             </div>
             {% if next %}<input type="hidden" name="next" value="{{ next }}" />{% endif %}
         </form>
-        {% else %}
-        {% endif %}
     </div>
     <div class="inside2">
         <hr>
@@ -136,6 +133,30 @@ var focusFirstField = function () {
   $('#signin_form input:nth(0)').focus();
 };
 focusFirstField();
+
+$(document).ready(function(){
+    /* setTimeout(function() {
+    $('html').animate({
+        opacity: '+=1',
+        left: "show"
+    }, 300, function() {
+        $('.panel').animate({
+            opacity: '+=1',
+            left: "show"
+        }, 600, function() {
+    // Animation complete.
+});
+    });
+}, 200);*/
+setTimeout(function() {
+    $('.panel').animate({
+        opacity: '+=1',
+        left: "show"
+    }, 600, function() {
+    // Animation complete.
+});
+}, 200);
+});
 
 var _gaq = _gaq || [];
 _gaq.push(['_setAccount', 'UA-38876251-1']);
