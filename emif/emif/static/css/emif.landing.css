@@ -1,0 +1,41 @@
+html {
+    background: url(img/microscope.jpg) no-repeat center center fixed;
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    -o-background-size: cover;
+    background-size: cover;
+}
+
+body {
+    padding-top: 20px;
+    font-size: 16px;
+    font-family: "Open Sans",serif;
+    background: transparent;
+}
+
+button{
+    font-family: "Open Sans",serif;
+    width: 220px;
+}
+
+h1 {
+    font-family: "Abel", Arial, sans-serif;
+    font-size: 80px;
+    margin-bottom:50px;
+}
+
+/* Override B3 .panel adding a subtly transparent background */
+.panel {
+    background-color: rgba(255, 255, 255, 0.85);
+    border-radius:5px;
+    text-align: center;
+}
+.inside{
+    margin-top:20px;
+    margin-bottom:100px;
+    margin-right:50px;
+    margin-left:50px;
+}
+
+.margin-base-vertical {
+    margin: 40px 0;

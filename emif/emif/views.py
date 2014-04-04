@@ -78,7 +78,7 @@ def list_questions():
     return results
 
 
-def index(request, template_name='index.html'):
+def index(request, template_name='index_new.html'):
     return render(request, template_name, {'request': request})
 
 def about(request, template_name='about.html'):
