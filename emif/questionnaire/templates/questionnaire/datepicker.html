@@ -1,7 +1,103 @@
 {% load i18n %}
 {% load extra_tags %}
 <div class="clearfix">
+    {% if advanced_search %}
+        {% include "questionnaire/range_field.html" %}    
 
+<script type="text/javascript">
+$("#from_{{ question.number|removedots }}").inputmask("y-m-d",{ "placeholder": "yyyy-mm-dd" });
+$("#to_{{ question.number|removedots }}").inputmask("y-m-d",{ "placeholder": "yyyy-mm-dd" });
+$('[id="question_{{ question.number }}"]').inputmask("y-m-d",{ "placeholder": "yyyy-mm-dd" });
+
+// Reactive, in case we try to use range, but decided to erase the search, and use it as a simple value one
+$('[id="question_{{ question.number }}"]').change(function() {
+    if ($(this).val() == '') {
+        $(this).inputmask("remove");
+        $(this).inputmask("y-m-d",{ "placeholder": "yyyy-mm-dd" });
+    }
+});
+
+$('.dropdown-menu').on('click', function(e) {
+    if ($(this).hasClass('dropdown-menu-form')) {
+        e.stopPropagation();
+    }
+});
+$('#anyfrom_{{ question.number|removedots }}').change(function() {
+    if ($(this).is(':checked')) {
+        $('#from_{{ question.number|removedots }}').prop('disabled', true);
+    } else {
+        $('#from_{{ question.number|removedots }}').prop('disabled', false);
+    }
+});
+$('#anyto_{{ question.number|removedots }}').change(function() {
+    if ($(this).is(':checked')) {
+        $('#to_{{ question.number|removedots }}').prop('disabled', true);
+    } else {
+        $('#to_{{ question.number|removedots }}').prop('disabled', false);
+    }
+});
+
+$('#define_{{ question.number|removedots }}').click(function() {
+    var is_any_from = $('#anyfrom_{{ question.number|removedots }}').is(':checked');
+    var is_any_to = $('#anyto_{{ question.number|removedots }}').is(':checked');
+    //console.log("from: " + is_any_from);
+    //console.log("to: " + is_any_to);
+
+    if (is_any_from && is_any_to) {
+        $('#error_{{ question.number|removedots }}').text("Having a range start and end on \"any value\", is the same as not specifying one.").fadeIn('fast');
+    } else {
+        var start = null;
+        var end = null;
+        if (is_any_from) {
+            start = '*';
+            var iscomplete = $('#to_{{ question.number|removedots }}').inputmask("isComplete");
+
+            var to_val = $('#to_{{ question.number|removedots }}').val();
+
+            if(iscomplete)
+                end = to_val;
+
+        } else if (is_any_to) {
+            end = '*';
+            var iscomplete = $('#from_{{ question.number|removedots }}').inputmask("isComplete");
+
+            var from_val = $('#from_{{ question.number|removedots }}').val();
+            if(iscomplete)
+                start = from_val;
+        } else {
+            var iscomplete1 = $('#from_{{ question.number|removedots }}').inputmask("isComplete");
+            var from_val = $('#from_{{ question.number|removedots }}').val();
+            if(iscomplete1)
+                start = from_val;
+
+            var iscomplete2 = $('#to_{{ question.number|removedots }}').inputmask("isComplete");
+            var to_val = $('#to_{{ question.number|removedots }}').val();
+            if(iscomplete2)
+                end = to_val;
+
+            if (end < start) {
+                var temp = start;
+                start = end;
+                end = temp;
+            }
+        }
+        //console.log("start: " + start);
+        //console.log("end: " + end);
+        if (start == null || end == null) {
+            $('#error_{{ question.number|removedots }}').text("You must specify range of valid date's.").fadeIn('fast');
+        } else {
+            var result = "[ " + start + " TO " + end + " ]";
+            //console.log('result: '+result);
+            $('[id="question_{{ question.number }}"]').inputmask('remove');
+            $('[id="question_{{ question.number }}"]').val(result);
+            
+            $('#error_{{ question.number|removedots }}').fadeOut('fast');
+            $('[id="question_{{ question.number }}"]').change();
+        }
+    }
+});
+</script>
+    {% else %}
     <div class="input" style="margin-top: 10px;">
         <input type="date" class="span6" size="60" id="question_{{ question.number }}" name="question_{{ question.number }}" value="{{ qdict.value }}" />
         {% if question.extra %}
@@ -13,4 +109,5 @@
             </script>
         {% endif %}
     </div>
+    {% endif %}  
 </div>

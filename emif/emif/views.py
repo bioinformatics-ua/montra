@@ -621,7 +621,6 @@ def render_one_questionset(request, q_id, qs_id, errors={}, aqid=None, fingerpri
     
 
     if fingerprint_id != None and not is_new:
-        print "HERY"
         c = CoreEngine()
 
         extra = {} 
