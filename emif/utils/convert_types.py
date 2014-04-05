@@ -1,9 +1,7 @@
 from questionnaire.models import *
 from questionnaire import QuestionChoices
 
-from searchengine.search_indexes import CoreEngine
-
-from datetime import datetime
+from searchengine.search_indexes import CoreEngine, convert_value, assert_suffix
 
 # Find fields slugs of a certain type
 def findFieldsOnSlugs(type):
@@ -41,6 +39,8 @@ def findFieldsOnSlugs(type):
 
 # convert all the solr documents to have the list of fields with proper suffix
 def convertFieldsOnSolr(fields, new_type):
+    c = CoreEngine()
+
     suffix = assert_suffix(new_type)
 
 
@@ -48,7 +48,6 @@ def convertFieldsOnSolr(fields, new_type):
         print '-- Invalid new type, process cancelled.'
         return False
 
-    c = CoreEngine()
     documents = c.search_fingerprint("*:*")
         
     print "Started converting fields on all databases, number of databases: "+str(len(documents))
@@ -75,52 +74,7 @@ def convertFieldsOnSolr(fields, new_type):
         c.index_fingerprint_as_json(doc)
 
     print "Done converting fields on all databases"
-    return True
-
-def assert_suffix(type):
-    if type == "numeric":
-        return "_d"
-    elif type == "datepicker":
-        return "_dt"
-    # else
-    return None 
-
-def convert_value(value, type):
-    if type == "numeric":
-        try:
-            # remove separators if they exist on representation
-            value = re.sub("[']", "", value)
-            # replace usual mistake , to .
-            value = re.sub("[,]", ".", value)
-            value = float(value)
-            return value
-        except ValueError:
-            pass            
-
-    elif type == "datepicker":
-        date = value
-        try:
-            # First we try converting to normalized format, yyyy-mm-dd
-            date = datetime.strptime(value, "%Y-%m-%d")
-            return date
-        except ValueError:
-            pass
-
-        try:
-            # We try yyyy/mm/dd
-            date = datetime.strptime(value, "%Y/%m/%d")
-            return date
-        except ValueError:
-            pass
-
-        try:
-            # We try just the year, yyyy
-            date = datetime.strptime(value, "%Y")
-            return date
-        except ValueError:
-            pass
-
-    return None     
+    return True  
 
 def convert(type):
     # do stuff
