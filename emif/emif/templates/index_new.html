@@ -149,9 +149,9 @@ $(document).ready(function(){
     });
 }, 200);*/
 setTimeout(function() {
-    $('.panel').animate({
-        opacity: '+=1',
-        left: "show"
+    $('.panel').css('visibility', 'visible').animate({
+        opacity: 1,
+        top: "20px"
     }, 600, function() {
     // Animation complete.
 });
