@@ -134,9 +134,7 @@ var focusFirstField = function () {
 };
 focusFirstField();
 
-
 $(document).ready(function(){
-
     setTimeout(function() {
         $('html').css('visibility', 'visible').animate({
             opacity: 1
@@ -148,12 +146,10 @@ $(document).ready(function(){
         $('.panel').css('visibility', 'visible').animate({
             opacity: 1,
             top: "20px"
-        }, 400, function() {
+        }, 400, 'linear', function() {
         });
     }, 600);
 });
-
-
 
 
 var _gaq = _gaq || [];
