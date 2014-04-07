@@ -4,12 +4,8 @@
         -moz-background-size: cover;
         -o-background-size: cover;
         background-size: cover;
-        
-        -webkit-transition: all 1s ease;
-        -moz-transition: all 1s ease;
-        -o-transition: all 1s ease;
-        transition: all 1s ease;
-
+        visibility: hidden;
+        opacity: 0.0;
         height: 100%;
     }
 
@@ -35,17 +31,18 @@
     /* Override B3 .panel adding a subtly transparent background */
     .panel {
         background-color: rgba(255, 255, 255, 0.75);
+        filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr='#4cffffff', endColorstr='#4cffffff'); /* IE */
         border-bottom-left-radius:5px;
         border-bottom-right-radius:5px;
         text-align: center;
         visibility: hidden;
         opacity: 0.0;
         position: relative;
-        margin-top:-20px;
+        margin-top:-40px;
     }
 
     .inside{
-        margin-top:50px;
+        margin-top:30px;
         margin-bottom:80px;
         margin-right:50px;
         margin-left:50px;

@@ -134,29 +134,27 @@ var focusFirstField = function () {
 };
 focusFirstField();
 
+
 $(document).ready(function(){
-    /* setTimeout(function() {
-    $('html').animate({
-        opacity: '+=1',
-        left: "show"
-    }, 300, function() {
-        $('.panel').animate({
-            opacity: '+=1',
-            left: "show"
-        }, 600, function() {
-    // Animation complete.
+
+    setTimeout(function() {
+        $('html').css('visibility', 'visible').animate({
+            opacity: 1
+        }, 400, 'linear', function() {
+        });
+    }, 200);
+
+    setTimeout(function() {
+        $('.panel').css('visibility', 'visible').animate({
+            opacity: 1,
+            top: "20px"
+        }, 400, function() {
+        });
+    }, 600);
 });
-    });
-}, 200);*/
-setTimeout(function() {
-    $('.panel').css('visibility', 'visible').animate({
-        opacity: 1,
-        top: "20px"
-    }, 600, function() {
-    // Animation complete.
-});
-}, 200);
-});
+
+
+
 
 var _gaq = _gaq || [];
 _gaq.push(['_setAccount', 'UA-38876251-1']);
