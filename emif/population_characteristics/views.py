@@ -164,8 +164,6 @@ def get_settings(request, runcode):
     response['Content-Disposition'] = 'inline; filename=files.json'
     return response
 
-
-
 def list_jerboa_files(request, fingerprint):
 
     # List the Jerboa files for a particular fingerprint
@@ -190,4 +188,6 @@ def list_jerboa_files(request, fingerprint):
 def compare(request):
     return handle_compare(request)
 
+def compare_values(request,  var, row, fingerprint_id):
+    return handle_compare_values(request, var, row, fingerprint_id)
 

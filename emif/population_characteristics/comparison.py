@@ -56,10 +56,29 @@ This code is only made to the comparison between databases
 """
 
 def handle_compare(request, template_name="compare_populations.html"):
+
+    cp = ComparisonPopulation(None)
+    # Only hard coded for testing 
+    fingerprint_ids = ["66a47f694ffb676bf7676dfde24900e6", "0d4917a4c4e2c93818a9a2a813e24c7e"]
+    var = "Active patients"
+    row = "Count"
+    print cp.get_variables(var, row, fingerprints_id=fingerprint_ids)
+
     return render(request, template_name, {'request': request,  
         'owner_fingerprint':False,
         'contains_population': True }) 
 
+
+def handle_compare_values(request, var, row, fingerprint_id, template_name="compare_populations.html"):
+    cp = ComparisonPopulation(None)
+    # Only hard coded for testing 
+    fingerprint_ids = ["66a47f694ffb676bf7676dfde24900e6", "0d4917a4c4e2c93818a9a2a813e24c7e"]
+    
+    values = cp.get_variables(var, row, fingerprints_id=fingerprint_ids)
+    data = {'values': values}
+    response = JSONResponse(data, mimetype="application/json")
+    response['Content-Disposition'] = 'inline; filename=files.json'
+    return response
 
 
 class ComparisonPopulation(object):
@@ -68,6 +87,16 @@ class ComparisonPopulation(object):
     def __init__(self, arg=None):
         
         self.arg = arg
+
+    # Get the list of fingerprints
+    def __fingerprints_to_mongo_query(self, fingerprints_id):
+        filter_fp = []
+        for fid in fingerprints_id:
+            _filter_fp = {"fingerprint_id": fid}
+            filter_fp.append(_filter_fp)
+
+        return filter_fp
+
 
 
 
@@ -82,14 +111,10 @@ class ComparisonPopulation(object):
         __filters = mrules.get_filter(var)
         c1 = mrules.get_chart(var)
 
-        dict_query = {'fingerprint_id':fingerprint_id, 
+        dict_query = {'$or': self.__fingerprints_to_mongo_query(fingerprints_id), 
             'values.Var': c1.title.var}
 
         
-        # Comparable 
-        #comparable = True 
-        #values_compare = ["M", "F"]
-
         for ve in vars_that_should_exists:
             dict_query['values.'+ve] = { "$exists" : True }
 

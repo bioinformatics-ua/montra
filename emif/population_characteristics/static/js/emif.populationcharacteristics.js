@@ -37,6 +37,31 @@ function getFingerprintID(){
 
 };
 
+
+// This is the mode 
+var PAGE_TYPE = "PC";
+// This is the mode that exists right now
+var PC_NORMAL = "PC_NORMAL"; // Population Characteristics for one database
+var PC_COMPARE = "PC_compare"; // Population Characteristics for many databases
+
+
+
+function getPageType()
+{
+  var url = document.URL;
+  if (url.indexOf("compare")!=-1)
+  {
+    PAGE_TYPE =PC_COMPARE;
+  }
+  else
+  {
+    PAGE_TYPE = PC_NORMAL;
+  }
+};
+
+getPageType();
+
+
 var filtersMap = {};
 var translations = {};
 var translationsBack = {};
@@ -47,8 +72,17 @@ var actualChart = null;
 
 /** TODO: there are a lot of static and hardcore parameters in this function
   * This need to be fixed */ 
-function PCAPI () 
+function PCAPI (endpoint) 
 {
+
+    if (endpoint==null)
+    {
+      this.endpoint="population/jerboalistvalues";  
+    }
+    else {
+      this.endpoint=endpoint;
+    }
+    
     // This was already globally defined, but ie8, for some obscure reason cant find it...
     $.ajaxSetup({
                 crossDomain: false, // obviates need for sameOrigin test
@@ -63,7 +97,7 @@ function PCAPI ()
           
         $.ajax({
           dataType: "json",
-          url: "population/jerboalistvalues/Active patients/Gender/abcd",
+          url: this.endpoint+"/Active patients/Gender/abcd",
           async: false,
           data: result,
           success: function (data){result=data;}
@@ -76,7 +110,7 @@ function PCAPI ()
           
         $.ajax({
           dataType: "json",
-          url: "population/jerboalistvalues/Active patients/Name1/abcd",
+          url: this.endpoint+"/Active patients/Name1/abcd",
           async: false,
           data: result,
           success: function (data){result=data;}
@@ -89,7 +123,7 @@ function PCAPI ()
           
         $.ajax({
           dataType: "json",
-          url: "population/jerboalistvalues/Active patients/Name2/abcd",
+          url: this.endpoint+"/Active patients/Name2/abcd",
           async: false,
           data: result,
           success: function (data){result=data;}
@@ -103,7 +137,7 @@ function PCAPI ()
           
         $.ajax({
           dataType: "json",
-          url: "population/jerboalistvalues/Active patients/Value1/abcd",
+          url: this.endpoint+"/Active patients/Value1/abcd",
           async: false,
           data: result,
           success: function (data){result=data;}
@@ -117,7 +151,7 @@ function PCAPI ()
           
         $.ajax({
           dataType: "json",
-          url: "population/jerboalistvalues/Active patients/Name2/abcd",
+          url: this.endpoint+"/Active patients/Name2/abcd",
           async: false,
           data: result,
           success: function (data){result=data;}
@@ -130,7 +164,7 @@ function PCAPI ()
           
         $.ajax({
           dataType: "json",
-          url: "population/jerboalistvalues/" + nameN,
+          url: this.endpoint+ nameN,
           async: false,
           data: result,
           success: function (data){result=data;}
@@ -143,7 +177,7 @@ function PCAPI ()
           
         $.ajax({
           dataType: "json",
-          url: "population/jerboalistvalues/" + valueN,
+          url: this.endpoint+"" + valueN,
           async: false,
           data: result,
           success: function (data){result=data;}
@@ -156,7 +190,7 @@ function PCAPI ()
           
         $.ajax({
           dataType: "json",
-          url: "population/jerboalistvalues/Var",
+          url: this.endpoint+"/Var",
           async: false,
           data: result,
           success: function (data){result=data;}
@@ -169,7 +203,7 @@ function PCAPI ()
           
         $.ajax({
           dataType: "json",
-          url: "population/jerboalistvalues/Var",
+          url: this.endpoint+"/Var",
           async: false,
           data: result,
           success: function (data){result=data;}
@@ -181,7 +215,7 @@ function PCAPI ()
           
         $.ajax({
           dataType: "json",
-          url: "population/jerboalistvalues/"+Var+"/"+Row+"/" + fingerprintID,
+          url: this.endpoint+"/"+Var+"/"+Row+"/" + fingerprintID,
           async: false,
           data: result,
           success: function (data){result=data;}
@@ -194,7 +228,7 @@ function PCAPI ()
 
         $.ajax({
           dataType: "json",
-          url: "population/jerboalistvalues/"+Var+"/"+Row+"/" + fingerprintID,
+          url: this.endpoint+"/"+Var+"/"+Row+"/" + fingerprintID,
           async: false,
           type: "POST",
           data: filters,
@@ -226,11 +260,8 @@ function PCAPI ()
 **************** Population Characteristics - Bar (Jquery Plugin) 
 *********************************************************************/
 
-
  (function( $ )
  {
-
-
 
     /** Draft code */ 
     function getFiltersSelected(){

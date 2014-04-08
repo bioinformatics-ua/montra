@@ -49,6 +49,7 @@ urlpatterns = patterns('',
 
     # Compare
     url(r'^compare$', 'population_characteristics.views.compare'),
+    url(r'^compare/values/(?P<var>[^/]+)/(?P<row>[^/]+)/(?P<fingerprint_id>[^/]+)$', 'population_characteristics.views.compare_values'),
 
     # Just testing URLs:
     url(r'^new/(?P<runcode>[^/]+)/(?P<qs>[-]{0,1}\d+)/$', 'population_characteristics.documents.document_form_view'),

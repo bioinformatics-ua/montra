@@ -24,7 +24,17 @@ function PCDraw(actualChart,chartType, e)
     this.chartType=chartType;
     this.e = e;
     this.drawBar = function() {
-      var pc = new PCAPI();
+      if (PAGE_TYPE==PC_NORMAL)
+      {
+        var pc = new PCAPI(null);
+      }
+      else if (PAGE_TYPE==PC_COMPARE)
+      {
+        var pc = new PCAPI("population/compare/values");
+      }
+        
+      
+      
       $("#pcBarContent").populationChartsBar('init', pc,this.actualChart.title.fixed_title,
         fingerprintID);
       $("#pcBarContent").populationChartsBar('draw', pc);
@@ -33,7 +43,16 @@ function PCDraw(actualChart,chartType, e)
     this.draw = function(filters) {
 
 
-      PC = new PCAPI();
+      if (PAGE_TYPE==PC_NORMAL)
+      {
+        var PC = new PCAPI(null);
+      }
+      else if (PAGE_TYPE==PC_COMPARE)
+      {
+        var PC = new PCAPI("population/compare/values");
+      }
+
+      
       fingerprintID = getFingerprintID();
       
       
