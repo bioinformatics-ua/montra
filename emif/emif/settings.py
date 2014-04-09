@@ -257,6 +257,7 @@ INSTALLED_APPS = (
 
     # Django NVD3
     'django_nvd3',
+    'djcelery',
     #'djangobower',
 
 )
