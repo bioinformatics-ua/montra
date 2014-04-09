@@ -30,10 +30,9 @@ class ConfCharts(object):
         # TODO
         pass
 
-
-
     """ get the default settings to load 
     """
+    
     def get_main_settings(self):
         
 
@@ -792,6 +791,229 @@ class ConfCharts(object):
         ss = Scale()
         ss.unit = "Year"
         ss.bins = "10"
+
+        c.filters = [f2]
+
+        sc.charts.append(c)
+
+
+        return sc
+
+
+
+    ############################################################
+    ############################################################
+    ############################################################ 
+
+    """ get the compare settings to load 
+    """
+    ############################################################
+    ############################################################
+    ############################################################
+
+    def get_compare_settings(self):
+        
+
+        sc = SetCharst()
+
+        sc.charts = []
+
+        
+
+
+        #################################################
+        ### Total patient time in a year
+        #################################################
+
+
+        c5 = Chart()
+        c5.uid = 8
+        c5.title = Title()
+        c5.title.operation = Operation.UNIQUE
+        c5.title.var = "Observation time in a year" 
+        c5.title.fixed_title = "Total Overall patient time in a year" 
+        c5.x_axis = Axis()
+        c5.x_axis.operation = "unique"
+        c5.x_axis.var = "Value1"
+        c5.x_axis.label = "Years"
+        c5.y_axis = Axis()
+        c5.y_axis.operation = "unique"
+        c5.y_axis.var = "Count"
+        c5.y_axis.transformation = "y / 12"
+        c5.y_axis.label = "Sum of the patients observation time (years)"
+        c5.y_axis.multivalue = True
+
+        fy2 = Filter()
+        fy2.name = 'Name2'
+        fy2.key = 'Name2'
+        fy2.value = ''
+
+        fy3 = Filter()
+        fy3.name = 'Value2'
+        fy3.key = 'Value2'
+        fy3.value = ''
+
+        c5.y_axis.static_filters = [fy2, fy3]
+
+
+        f1 = Filter()
+        f1.name = 'Year'
+        f1.key = 'Name1'
+        f1.value = 'Value1'
+
+        f2 = Filter()
+        f2.name = 'Gender'
+        f2.key = None
+        f2.value = 'Gender'
+        f2.translation = {'M': 'Male', 'F': 'Female', 'T': 'Total',  'ALL': 'Male/Female'}
+
+        ss = Scale()
+        ss.unit = "Year"
+        ss.bins = "10"
+
+        c5.filters = [f2]
+
+        sc.charts.append(c5)
+
+
+         #################################################
+        ### Total patient time in a year
+        #################################################
+
+
+        c5 = Chart()
+        c5.uid = 8
+        c5.title = Title()
+        c5.title.operation = Operation.UNIQUE
+        c5.title.var = "Observation time in a year" 
+        c5.title.fixed_title = "Total patient time in a year" 
+        c5.x_axis = Axis()
+        c5.x_axis.operation = "unique"
+        c5.x_axis.var = "Value1"
+        c5.x_axis.label = "Years"
+        c5.y_axis = Axis()
+        c5.y_axis.operation = "unique"
+        c5.y_axis.var = "Count"
+        c5.y_axis.transformation = "y / 12"
+        c5.y_axis.label = "Sum of the patients observation time (years)"
+        c5.y_axis.multivalue = True
+
+        fy2 = Filter()
+        fy2.name = 'Name2'
+        fy2.key = 'Name2'
+        fy2.value = ''
+
+        fy3 = Filter()
+        fy3.name = 'Value2'
+        fy3.key = 'Value2'
+        fy3.value = ''
+
+        c5.y_axis.static_filters = [fy2, fy3]
+
+
+        f1 = Filter()
+        f1.name = 'Year'
+        f1.key = 'Name1'
+        f1.value = 'Value1'
+
+        f2 = Filter()
+        f2.name = 'Gender'
+        f2.key = None
+        f2.value = 'Gender'
+        f2.translation = {'M': 'Male', 'F': 'Female', 'T': 'Total',  'ALL': 'Male/Female'}
+
+        ss = Scale()
+        ss.unit = "Year"
+        ss.bins = "10"
+
+        c5.filters = [f2]
+
+        sc.charts.append(c5)
+
+        #################################################
+        ### Total patient time in age groups
+        #################################################
+
+
+        c5 = Chart()
+        c5.uid = 8
+        c5.title = Title()
+        c5.title.operation = Operation.UNIQUE
+        c5.title.var = "Observation time in a year" 
+        c5.title.fixed_title = "Total patient time in a year" 
+        c5.x_axis = Axis()
+        c5.x_axis.operation = "unique"
+        c5.x_axis.var = "Value1"
+        c5.x_axis.label = "Years"
+        c5.y_axis = Axis()
+        c5.y_axis.operation = "unique"
+        c5.y_axis.var = "Count"
+        c5.y_axis.transformation = "y / 12"
+        c5.y_axis.label = "Sum of the patients observation time (years)"
+        c5.y_axis.multivalue = True
+
+        fy2 = Filter()
+        fy2.name = 'Name2'
+        fy2.key = 'Name2'
+        fy2.value = ''
+
+        fy3 = Filter()
+        fy3.name = 'Value2'
+        fy3.key = 'Value2'
+        fy3.value = ''
+
+        c5.y_axis.static_filters = [fy2, fy3]
+
+
+        f1 = Filter()
+        f1.name = 'Year'
+        f1.key = 'Name1'
+        f1.value = 'Value1'
+
+        f2 = Filter()
+        f2.name = 'Gender'
+        f2.key = None
+        f2.value = 'Gender'
+        f2.translation = {'M': 'Male', 'F': 'Female', 'T': 'Total',  'ALL': 'Male/Female'}
+
+        ss = Scale()
+        ss.unit = "Year"
+        ss.bins = "10"
+
+        c5.filters = [f2]
+
+        sc.charts.append(c5)
+
+        
+        #################################################
+        ### Active patients
+        #################################################
+        c = Chart()
+        c.uid = 1
+        c.title = Title()
+        c.title.operation = Operation.UNIQUE
+        c.title.var = "Active patients" 
+        c.title.fixed_title = "Active patients" 
+        c.x_axis = Axis()
+        c.x_axis.operation = "unique"
+        c.x_axis.var = "fingerprint_id"
+        c.x_axis.categorized = True
+        c.x_axis.label = 'Databases'
+        c.y_axis = Axis()
+        c.y_axis.operation = "unique"
+        c.y_axis.var = "Count"
+        c.y_axis.label = 'Number of patients'
+        c.y_axis.multivalue = True
+
+
+        f2 = Filter()
+        f2.name = 'Gender'
+        f2.key = None
+        f2.value = 'Gender'
+        f2.translation = {'M': 'Male', 'F': 'Female', 'T': 'Total'}
+        f2.comparable = False
+        f2.comparable_values = ['M', 'F']
+
 
         c.filters = [f2]
 
