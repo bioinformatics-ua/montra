@@ -11,13 +11,15 @@ fl=''
 
 import pickle
 
-pkl_file = open('/Users/bastiao/Desktop/fingerprints.pkl', 'rb')
+pkl_file = open('fingerprints.pkl', 'rb')
 
 docs = pickle.load(pkl_file)
 
 
 pkl_file.close()
 
+for d in docs:
+    del d['_version_']
 
 xml_answer = solr.add(docs)
 print(xml_answer)

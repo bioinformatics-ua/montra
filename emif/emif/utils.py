@@ -32,6 +32,7 @@ import random
 
 from django.conf import settings
 
+import re
 
 def generate_hash():
     hash = md5.new()
@@ -96,6 +97,22 @@ class Database:
     ttype = ''
     type_name = ''
     logo = ''
+    last_activity = ''
+
+    admin_name = ''
+    admin_address = ''
+    admin_email = ''
+    admin_phone = ''
+
+    scien_name = ''
+    scien_address = ''
+    scien_email = ''
+    scien_phone = ''
+
+    tec_name = ''
+    tec_address = ''
+    tec_email = ''
+    tec_phone = ''
 
 
 class ordered_dict(dict):
@@ -154,6 +171,7 @@ class QuestionGroup:
         self.list_ordered_tags = []
         self.name = ""
         self.sortid = ""
+        self.info = False
 
     def __eq__(self, other):
         return other.name == self.name
@@ -228,17 +246,30 @@ def get_database_from_id_with_tlv(db):
     return db
 
 WORKSPACE_PATH={'Workspace'}
- 
-def convert_dict_to_query(params):
+def convert_dict_to_query2(params):
     query = ""
-    i = 0 
+    i = 0
     size_params = len(params)
     for key in params:
         query += key+"_t:" + params[key]+"*"
-        i = i + 1 
+        i = i + 1
         if (size_params != i ):
             query += " AND "
 
+    return query
+def is_only_space(s):
+    return s == len(s) * ' '
+def convert_dict_to_query(params):
+    query = ""
+    i = 0
+    size_params = len(params)
+    for key in params:
+        if (params[key]!="" or not is_only_space(params[key])):
+            query += key+"_t:" + params[key]+"*"
+            i = i + 1
+            if (size_params != i ):
+                query += " AND "
+    print query
     return query
 
 
@@ -263,11 +294,101 @@ def convert_qvalues_to_query(qvalues, questionnaire_id):
     
     return convert_dict_to_query(query_parameters)
 
-
-
-
-
-
-
-
+def convert_qvalues_to_query(qvalues, questionnaire_id, qexpression):
+    questionsets = QuestionSet.objects.filter(questionnaire=questionnaire_id)
     
+    questions = Question.objects.filter(questionset__in=questionsets)
+    
+    numbers = {}
+
+    for q in questions:
+        numbers[q.number] = q.slug
+    query_parameters = {}
+    query = ""  
+    for k in qvalues:
+        try:
+            if (qvalues[k]!=None and qvalues[k]!="" ):
+                query_parameters[numbers[k]] = qvalues[k]
+            query = query + " " + qvalues[k]
+        except:
+            pass
+    
+    return convert_dict_to_query(query_parameters)
+
+# Example to test the funcion: 
+
+#a = "question_nr_1.01: 'sadsa' AND question_nr_1.02: 'dsadsadsa' AND question_nr_1.04: 'asdsaa'"
+#print convert_query_from_boolean_widget(a, 49)
+def convert_query_from_boolean_widget(query, q_id):
+    # Example of input
+    #question_nr_1.01: 'sadsa' AND question_nr_1.02: 'dsadsadsa' AND question_nr_1.04: 'asdsaa'
+    # Example of output
+    # ..
+
+    questionnarie = Questionnaire.objects.filter(id=q_id)[0]
+    ttype = questionnarie.slug
+
+    questionsets = QuestionSet.objects.filter(questionnaire=q_id)
+    print "convert_query_from_boolean_widget"
+    print query
+    # I cant remove the symbol
+    query = re.sub("_____[a-zA-Z0-9._()\[\]\/\-\+?!'@#$%&*=~^|\\<>;,\.\" ]+_____", "", query)
+    print query
+
+    def check(m):
+        try:
+            print m
+            question_id = m.group(0)
+            question_id = question_id.replace('question_nr_', '')
+            q = Question.objects.filter(number=question_id, questionset__in=questionsets)
+            print q
+        except:
+            raise
+            return 'null'
+        temp = q[0].slug + '_t'
+        # setting name as literal, and after escaping the literal definer
+        return escapeSolrArg(temp)
+    
+
+    r = re.sub('question_nr_[10-9\\.]+', check, query)
+    r = r + " AND type_t:"+ttype
+    return r
+
+## Reference on how to escape this efficiently from: 
+# - http://www.opensourceconnections.com/2013/01/17/escaping-solr-query-characters-in-python/
+# These rules all independent, order of
+# escaping doesn't matter
+escapeRules = {'+': r'\+',
+               '-': r'\-',
+               '&': r'\&',
+               '|': r'\|',
+               '!': r'\!',
+               '(': r'\(',
+               ')': r'\)',
+               '{': r'\{',
+               '}': r'\}',
+               '[': r'\[',
+               ']': r'\]',
+               '^': r'\^',
+               '~': r'\~',
+               '*': r'\*',
+               '?': r'\?',
+               ':': r'\:',
+               '"': r'\"',
+               ';': r'\;',
+               ' ': r'\ '}
+
+def escapedSeq(term):
+    """ Yield the next string based on the
+        next character (either this char
+        or escaped version """
+    for char in term:
+        if char in escapeRules.keys():
+            yield escapeRules[char]
+        else:
+            yield char
+def escapeSolrArg(term):
+    """ Apply escaping to the passed in query terms
+        escaping special characters like : , etc"""
+    term = term.replace('\\', r'\\')   # escape \ first
+    return "".join([nextStr for nextStr in escapedSeq(term)])

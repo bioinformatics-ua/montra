@@ -49,6 +49,7 @@ function ThreadPool(size, timeout) {
     this.poolSize = size;
     this.pool = [];
     this.die = false;
+    this.onDie = null;
 
     if (timeout === undefined)
     {
@@ -56,9 +57,6 @@ function ThreadPool(size, timeout) {
     };
     this.timeout = timeout;
     this._init();
-
-
-
 };
 
 ThreadPool.prototype = { 
@@ -88,6 +86,11 @@ ThreadPool.prototype = {
             if (self.pool.length == 0 && self.die)
             {
                 clearInterval(self.poolHandler) // this code remmember me Python.
+
+                // If any onDie defined
+                if(self.onDie != null)
+                    self.onDie();
+
                 return; 
             };
             self.pool = self.pool.sort(function (x, y) {
@@ -101,10 +104,12 @@ ThreadPool.prototype = {
 
         }, this.timeout);
     },
-
     destroy : function() {
+        if(arguments.length == 1){
+            this.onDie=arguments[0];
+        }
         this.die = true;
-    }
+    }  
 };
 
 

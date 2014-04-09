@@ -8,7 +8,7 @@ import re
 def question_choice(request, question):
     choices = []
     jstriggers = []
-
+    hasValue = False
     cd = question.getcheckdict()
     key = "question_%s" % question.number
     key2 = "question_%s_comment" % question.number
@@ -19,10 +19,14 @@ def question_choice(request, question):
         if 'default' in cd:
             val = cd['default']
 
-    if val != None and "#" in val:
+    if val != None and val != '' and "#" in val:
         val = val.split("#")[0]
+
     for choice in question.choices():
         choices.append( ( choice.value == val, choice, ) )
+        hasValue = hasValue or choice.value == val
+
+    #print "hasValue: "+str(hasValue)
 
     if question.type == 'choice-freeform':
         jstriggers.append('question_%s_comment' % question.number)
@@ -32,6 +36,7 @@ def question_choice(request, question):
         'sel_entry' : val == '_entry_',
         'qvalue'    : val or '',
         'required'  : True,
+        'hasValue'  : hasValue,
         'comment'   : request.POST.get(key2, ""),
         'jstriggers': jstriggers,
     }
@@ -64,9 +69,10 @@ def question_multiple(request, question):
     choices = []
     counter = 0
     cd = question.getcheckdict()
-    val = None
+    val = ''
+    hasValue = False
     try:
-        val = request.POST.get(key, None)
+        val = request.POST.get(key, '')
     except:
         pass
     defaults = cd.get('default','').split(',')
@@ -74,9 +80,10 @@ def question_multiple(request, question):
         counter += 1
         key = "question_%s_multiple_%d" % (question.number, choice.sortid)
         
-        if key in request.POST or (val!=None and (choice.value in val)) or \
+        if key in request.POST or (val!=None and val != '' and (choice.value in val)) or \
           (request.method == 'GET' and choice.value in defaults):
             choices.append( (choice, key, ' checked',) )
+            hasValue = hasValue or True
         else:
             choices.append( (choice, key, '',) )
     extracount = int(cd.get('extracount', 0))
@@ -94,16 +101,20 @@ def question_multiple(request, question):
             extras_value = request.POST[key_aux].split("||")
             if (len(extras_value)>1):
                 extras.append( (key, extras_value[1]) )
+                hasValue = hasValue or True
             else:
                 extras.append( (key, '') )
         elif key in request.POST:
             extras.append( (key, request.POST[key]) )
+            hasValue = hasValue or True
         else:
             extras.append( (key, '',) )
 
     return {
         "choices": choices,
         "extras": extras,
+        "qvalue" : val,
+        "hasValue": hasValue,
         "template"  : "questionnaire/choice-multiple-freeform.html",
         "required" : cd.get("required", False) and cd.get("required") != "0",
 
@@ -149,7 +160,7 @@ def get_aux_text(full_value, choice_value, original_value=None):
     if (full_value==None):
         return original_value
     if isinstance(full_value, basestring):
-        print "full_value is string" 
+        #print "full_value is string" 
         _aux = full_value.split("#")
         #print _aux
         for v in _aux:
@@ -161,7 +172,6 @@ def get_aux_text(full_value, choice_value, original_value=None):
                     return values[0]
         return ''
     else:
-        print "full_value is not string" 
         return original_value
 
 
@@ -170,12 +180,13 @@ def get_aux_text(full_value, choice_value, original_value=None):
 def question_multiple_options(request, question):
     key = "question_%s" % question.number
     #print key
+    hasValue = False
     choices = []
     counter = 0
     cd = question.getcheckdict()
-    val = None
+    val = ''
     try:
-        val = request.POST.get(key, None)
+        val = request.POST.get(key, '')
     except:
         pass
     defaults = cd.get('default','').split(',')
@@ -186,6 +197,11 @@ def question_multiple_options(request, question):
         key = "question_%s_multiple_%d" % (question.number, choice.sortid)
         key_value = "question_%s_%d_opt" % (question.number, choice.sortid)
         
+        if val == None or val == '':
+            try:
+                val = request.POST.get(key, '')
+            except:
+                pass
         _aux = ""
         try:
             _aux = request.POST[key_value]
@@ -195,13 +211,24 @@ def question_multiple_options(request, question):
 
         if key in request.POST or (val!=None and (choice.value in val)) or \
           (request.method == 'GET' and choice.value in defaults):
-            choices.append( (choice, key, ' checked',get_aux_text(val,choice.value, _aux )) )
+            _tmp_v = get_aux_text(val,choice.value, _aux )
+            if _tmp_v == None or _tmp_v == '':
+                _tmp_v = _aux
+            choices.append( (choice, key, ' checked',_tmp_v) )
+            hasValue = hasValue or True
+            
         else:
-            choices.append( (choice, key, '',get_aux_text(val,choice.value,_aux )) )
+            _tmp_v = get_aux_text(val,choice.value, _aux )
+            if _tmp_v == None or _tmp_v == '':
+                _tmp_v = _aux
+            choices.append( (choice, key, '',_tmp_v) )
+            
     extracount = int(cd.get('extracount', 0))
     if not extracount and question.type == 'choice-multiple-freeform-options':
         extracount = 1
     extras = []
+    #import pdb
+    #pdb.set_trace()
     
     for x in range(1, extracount+1):
 
@@ -213,16 +240,20 @@ def question_multiple_options(request, question):
             extras_value = request.POST[key_aux].split("||")
             if (len(extras_value)>1):
                 extras.append( (key, extras_value[1]) )
+                
             else:
                 extras.append( (key, '') )
         elif key in request.POST:
             extras.append( (key, request.POST[key]) )
+            
         else:
             extras.append( (key, '',) )
-
+    
     return {
         "choices": choices,
         "extras": extras,
+        "qvalue" : val,
+        "hasValue": hasValue,
         "template"  : "questionnaire/choice-multiple-freeform-options.html",
         "required" : cd.get("required", False) and cd.get("required") != "0",
 

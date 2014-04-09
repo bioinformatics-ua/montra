@@ -4,9 +4,9 @@
 {% load staticfiles %}
 
 <!DOCTYPE html>
-<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
-<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
-<!--[if IE 8]>         <html class="no-js lt-ie9 gt-ie7"> <![endif]-->
+<!--[if lt IE 7]>      <html class="no-js ns lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js ns lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js ns lt-ie9 gt-ie7"> <![endif]-->
 <!--[if IE 9 ]>    <html class="no-js ie9 gt-ie7"> <![endif]-->
 <!--[if (gt IE 9)|!(IE)]><!-->
 <html lang="en" class="no-js">
@@ -14,7 +14,8 @@
 
 <head>
     <!-- This is WRONG and just for testing, on deploy it must be changed to static base url -->
-    <base href="http://{{request.get_host}}">
+    <base id="base_link" href="{{ BASE_URL }}">
+    <!--<base id="base_link" href="{{ request.get_host }}">-->
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
     <title>{% block title %}EMIF Catalogue{% endblock title %}</title>
@@ -23,6 +24,7 @@
     <link rel="shortcut icon" href="{{ STATIC_URL }}img/favicon.ico" type="image/x-icon" />
     <link rel="stylesheet" href="{{ STATIC_URL }}css/bootstrap.min.css">
     <link rel="stylesheet" href="{{ STATIC_URL }}font-awesome/css/font-awesome.min.css">
+    <link href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet">
     <!-- IE 7 doesnt recognize awesome icons correctly... -->
     <!--[if IE]>
         <link rel="stylesheet" media="all" href="{{ STATIC_URL }}font-awesome/css/font-awesome-ie7.min.css" />
@@ -38,19 +40,40 @@
             }
     </style>
     <link rel="stylesheet" href="{{ STATIC_URL }}css/bootstrap-responsive.min.css">
-    <link rel="stylesheet" href="{{ STATIC_URL }}css/main.css">
+    <link rel="stylesheet" href="{{ STATIC_URL }}css/main.css" />
     <style type="text/css">
         {% block styleextra %}
         {% endblock %}
     </style>
     <script src="{{ STATIC_URL }}js/vendor/modernizr-2.6.2.min.js"></script>
     <script src="{{ STATIC_URL }}js/vendor/jquery-1.9.1.min.js"></script>
+    <script src="{{ STATIC_URL }}js/vendor/jquery-ui-1.10.4.custom.min.js"></script>
     <script src="{{ STATIC_URL }}js/vendor/bootstrap.min.js"></script>
+    <script src="{{ STATIC_URL }}js/vendor/jquery.cookie.js"></script>
+    <script src="{{ STATIC_URL }}js/vendor/jquery.canclear.js"></script>
+    <script src="{{ STATIC_URL }}js/vendor/jquery.highlight.js"></script>
+   
+    <script type="application/javascript">
+        // We need to configure this to be able to send requests by json with the csrftoken
+        var csrftoken = $.cookie('csrftoken');
 
+                    function csrfSafeMethod(method) {
+                // these HTTP methods do not require CSRF protection
+                return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+            }
+            $.ajaxSetup({
+                crossDomain: false, // obviates need for sameOrigin test
+                beforeSend: function(xhr, settings) {
+                    if (!csrfSafeMethod(settings.type)) {
+                        xhr.setRequestHeader("X-CSRFToken", csrftoken);
+                    }
+                }
+            });
+    </script>
     <!--[if lt IE 9]>
-            <link rel="stylesheet" href="bootstrap_ie_compatibility">
 
             <script src="{{ STATIC_URL }}js/vendor/respond.min.js"></script>
+            <link rel="stylesheet" href="bootstrap_ie_compatibility" />
 
 
         <![endif]-->
@@ -62,19 +85,31 @@
 </head>
 
 <body>
-
+        <div class="well not-supported">
+                <div class="navbar navbar-fixed-top">
+        <div class="navbar-inner">
+            <div class="container">
+                            <a class="brand" href="">EMIF Catalogue</a>
+</div>
+            </div>
+            </div>
+                You seem to be using a old version of Internet Explorer.<br /><br />
+                The Internet browser you're currently using is not supported by the EMIF Catalogue. We currently only support I7-IE11, Chrome, Safari, Firefox and Opera. To be able to use our webpage we recommend you to update your Internet Explorer, or use another modern browser from the supported list.
+        </div>
+        <div class="supported">
     <div class="navbar navbar-fixed-top">
         <div class="navbar-inner">
             <div class="container">
+                
                 <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </a>
-                <a class="brand" href="#">EMIF Catalogue</a>
+                <a class="brand" href="">EMIF Catalogue</a>
                 <div class="nav-collapse collapse">
                             {% if request.user.is_authenticated %}
-                            <ul class="nav">
+                            <ul class="nav" style="margin-right: 0 !important;">
                                 <li id="li_workspace" class="dropdown">
                                     <a href="" class="dropdown-toggle" data-toggle="dropdown">Workspace
                                         <b class="caret"></b>
@@ -126,7 +161,11 @@
                                             <li class="dropdown-submenu">
                                                 <a href="" onclick="return false;">Add new databases</a>
                                                 <ul class="dropdown-menu">
-                                                    {% show_fingerprints %}
+                                                    {% if request.user.get_profile %}
+                                                        {% show_fingerprints_interests request.user %}
+                                                    {% else %}
+                                                        {% show_fingerprints %}
+                                                    {% endif %}
                                                 </ul>
                                             </li>
                                             
@@ -149,7 +188,7 @@
                                         {% endcomment %}
 
 
-                                    <li id="li_advanced_search" class="dropdown">
+                                    <li id="li_advanced_search" class="pull-left dropdown">
                                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">
                                             Advanced Search <b class="caret"></b>
                                         </a>
@@ -158,7 +197,12 @@
 
                     <li id="search_li" class="pull-left">
                             <form class="navbar-search pull-left" method="POST" action="resultsdiff/1">{% csrf_token %}
-                                <input title="Enter the terms you wish to search for." class="search-query span3 form-text" placeholder="{{search_old}}" type="text" id="edit-search-block-form--3" name="query" value="" size="25" maxlength="256">
+                                {% if isAdvanced %}
+                                                                <input title="Enter the terms you wish to search for." class="search-query span2_5 form-text" placeholder="" type="text" id="edit-search-block-form--3" name="query" value="" size="25" maxlength="256">
+                                {% else %}
+                                <input title="Enter the terms you wish to search for." class="search-query span2_5 form-text" placeholder="" type="text" id="edit-search-block-form--3" name="query" value="{{search_old}}" size="25" maxlength="256">
+                                {% endif %}
+                                <input name='search_full' value='search_full' type='hidden'>
                             </form>
                           </li>
                         </ul>
@@ -182,6 +226,12 @@
                                
                             </li>
                              {% endif %}
+                            {% if request.user.is_authenticated %}
+                            <li id="li_history">
+                                <a href="controlversion/history">History</a>
+                            </li>
+                            {%endif%}
+
                             <li id="li_feedback">
                                 <a href="feedback">Feedback</a>
                             </li>
@@ -194,24 +244,30 @@
                         {% block headerlogin %} 
                         {% if not request.user.is_authenticated %}
                             <li id="auth-logged-out">
-                        <form class="navbar-form pull-right" method="post" action="accounts/signin/">
-                            {% csrf_token %}
-                            <input name="identification" class="signin-header-form-email" type="text" placeholder="Email">
-                            <input name="password" class="signin-header-form-pass" type="password" placeholder="Password">
-                            <button type="submit" class="btn">Sign in</button>
-                        </form>
+                                <form class="navbar-form pull-right" method="post" action="accounts/signin/">
+                                    {% csrf_token %}
+                                    <input name="identification" class="signin-header-form-email" type="text" placeholder="Email">
+                                    <input name="password" class="signin-header-form-pass" type="password" placeholder="Password">
+                                    <button type="submit" class="btn">Sign in</button>
+                                </form> 
                             </li>
                         {% else %}
                             <li id="auth-logged-in">
-                                <p class="navbar-text pull-right">
-
-                            
-                            {% comment %}
-                                <em>{{ request.user.get_full_name }}
-                            {% endcomment %}</em>[
-                            <a href="accounts/signout/" class="navbar-link">Sign out</a>]
-                        </p>
-                        
+                                <button class="btn btn-success dropdown-toggle" data-toggle="dropdown" tabindex="-1">
+                                        {% if not request.user.first_name and not request.user.last_name %}
+                                            <i class="icon-user"></i><small>&nbsp; {{request.user.username|ellipsis:17}} &nbsp;</small><i class="icon-angle-down"></i>
+                                        {% else %}
+                                            <i class="icon-user"></i><small>&nbsp; {{request.user.first_name|add:" "|add:request.user.last_name|ellipsis:17}} &nbsp;</small><i class="icon-angle-down"></i>
+                                        {% endif %}
+                                            
+                                </button>
+                                <ul class="dropdown-menu">
+                                    {% show_profiles request.user %}
+                                    {% show_fingerprints_interests_profile request.user %}
+                                    <li class="divider"></li>
+                                    <li><a href="accounts/profile_edit/" class="navbar-link"><i class="icon-edit"></i>&nbsp; Edit Profile &nbsp;</a></li>
+                                    <li><a href="accounts/signout/" class="navbar-link"><i class="icon-signout"></i>&nbsp; Sign out &nbsp;</a></li>
+                                </ul>
                             </li>
                     {% endif %} 
                     {% endblock %}
@@ -239,20 +295,21 @@
             {% block toolbar %} {% endblock %}
         </div>
 
-        {% block content %}
-        {% endblock %}
-
+            {% block content %}
+            {% endblock %}
 
 
         <hr>
 
+
+    </div>
+               </div>     
         <div class="row" style="text-align:center">
             <footer>
-                <p>&copy; EMIF Project 2013</p>
+                <p>&copy; EMIF Catalogue v{% get_version %} <br/><small id="supportability">This website is optimised to Safari, Chrome, Firefox, Opera and IE9+. It runs in IE7-IE8, but it has low performance and no enhanced features.</small></p>
 
             </footer>
         </div>
-    </div>
     <!-- /container -->
 
     <script src="{{ STATIC_URL }}js/main.js"></script>
@@ -274,7 +331,11 @@
         var _gaq = _gaq || [];
         _gaq.push(['_setAccount', 'UA-38876251-1']);
         _gaq.push(['_trackPageview']);
-
+        $(function(){
+            if ($(".search-query").length > 0){
+                $('.search-query').canclear();
+            }
+        });
         (function() {
             var ga = document.createElement('script');
             ga.type = 'text/javascript';

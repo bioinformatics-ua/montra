@@ -1,10 +1,11 @@
 {% extends 'base.html' %}
+{% load extra_tags %}
 {% load url from future %}
 {% load django_bootstrap_breadcrumbs %}
 
 {% block breadcrumbs %}
     {{ block.super }}
-    
+
     {% breadcrumb "My Databases" "databases" %}
 
 {% endblock %}
@@ -34,9 +35,9 @@ button {
 
 
 {% block scriptextraincludes %}
-
-<script src="{{ STATIC_URL }}js/vendor/jquery.tablesorter.min.js"></script>
-<script src="{{ STATIC_URL }}js/vendor/jquery.tablesorter.widgets.min.js"></script>
+<script src="{{ STATIC_URL }}js/emif.databases.js"></script>
+<script src="{{ STATIC_URL }}js/vendor/jquery.ba-throttle-debounce.min.js"></script>
+<script src="{{ STATIC_URL }}js/paginator-sorter.js"></script>
 {% endblock %}
 
 
@@ -44,46 +45,98 @@ button {
 {% block content %}
 
 {% if list_databases %}
-<table class="table table-hover tablesorter" id="table_databases" data-provides="rowlink">
+<table class="table table-bordered table-hover fingerprint_table table-striped" id="table_databases" data-provides="rowlink">
     <thead>
         <tr>
-            <th class="sorter-false filter-false"></th>
-            <th>Name</th>
-            <th>Date</th>
-            <th>Type</th>
-
+            <!--<th class="sorter-false filter-false"></th>-->
+            <th class="sorter-database_name sorter {%if "icon-minus" not in sort_params.database_name.icon %}selected-sorter{% endif %}"  onclick="a.onClick('database_name', '{{sort_params.database_name.next}}');">
+            <div class="pull-left">Acronym</div>
+                 <div class="pull-right"><i class="{{sort_params.database_name.icon}}"></i></div>
+            </th>
+            <th class="sorter-institution sorter {%if "icon-minus" not in sort_params.institution.icon %}selected-sorter{% endif %}"  onclick="a.onClick('institution', '{{sort_params.institution.next}}');">
+            <div class="pull-left">Institution Name</div>
+                 <div class="pull-right"><i class="{{sort_params.institution.icon}}"></i></div>
+            </th>            
+            <!--<th>Creation Date</th>-->            
+            <th class="sorter-location sorter {%if "icon-minus" not in sort_params.location.icon %}selected-sorter{% endif %}" onclick="a.onClick('location', '{{sort_params.location.next}}');">
+                <div class="pull-left">Location</div>
+                <div class="pull-right"><i class="{{sort_params.location.icon}}"></i></div> 
+            </th>             
+            <th class="sorter-nrpatients sorter {%if "icon-minus" not in sort_params.nrpatients.icon %}selected-sorter{% endif %}" onclick="a.onClick('nrpatients', '{{sort_params.nrpatients.next}}');">
+                <div class="pull-left">Nr. Patients</div>
+                <div class="pull-right"><i class="{{sort_params.nrpatients.icon}}"></i></div> 
+            </th>            
+            <th class="sorter-lastupdate sorter {%if "icon-minus" not in sort_params.last_update.icon %}selected-sorter{% endif %}" onclick="a.onClick('last_update', '{{sort_params.last_update.next}}');">
+            <div class="pull-left">Last update</div>
+                <div class="pull-right"><i class="{{sort_params.last_update.icon}}"></i></div> 
+            </th>
+            <th class="sorter-type sorter {%if "icon-minus" not in sort_params.type.icon %}selected-sorter{% endif %}" onclick="a.onClick('type', '{{sort_params.type.next}}');">
+            <div class="pull-left">Type</div>
+              <div class="pull-right"><i class="{{sort_params.type.icon}}"></i></div> 
+            </th>
+            {% comment %}
             <th class="sorter-false filter-false">Modify</th>
+            {% endcomment %}
 
         </tr>
+        <tr>
+          <td class="table_filter">
+                <input class="filter_input" id="database_name_filter" type="text" value="{{sort_params.database_name.filter}}" placeholder="Filter">
+          </td>
+           <td class="table_filter">
+                 <input class="filter_input" id="institution_filter" type="text" value="{{sort_params.institution.filter}}" placeholder="Filter">
+          </td>
+          <td class="table_filter">
+                 <input class="filter_input" id="location_filter" type="text" value="{{sort_params.location.filter}}" placeholder="Filter">
+          </td>
+          <td class="table_filter">
+                 <input class="filter_input" id="nrpatients_filter" type="text" value="{{sort_params.nrpatients.filter}}" placeholder="Filter">
+          </td>
+          <td class="table_filter">
+                 <input class="filter_input" id="last_update_filter" type="text" value="{{sort_params.last_update.filter}}" placeholder="Filter">
+          </td>
+           <td class="table_filter">
+              <select id="type_filter" class="selectpicker" def_value="{{sort_params.type.filter}}">
+                <option value="">None</option>
+                <option value="adcohort">AD Cohort</option>
+                <option value="observationaldatasources">Observational Data Sources</option>
+              </select>
+          </td>
+        </tr>
     </thead>
-    <tbody>
-        
+    <tbody id="table_content">
         {% for t in page_obj %}
         <tr>
-            <td><img class="db_logo" src="{{ STATIC_URL }}upload_images/{{t.logo}}" width="50px" height="50px" /></td>
+            <!--<td><img class="db_logo" src="{{ STATIC_URL }}upload_images/{{t.logo}}" width="50px" height="50px" /></td>-->
           <td>
             <a href="fingerprint/{{ t.id }}/1">{{ t.name }}</a>
-            
-            <div style="margin-left:20px">
-             Institution Name: {{t.institution}}
-            </div>
-
-            <div style="margin-left:20px">
-             Location: {{t.location}}
-            </div>
-            <div style="margin-left:20px">
-             Number of patients: {{t.number_patients}}
-            </div>
         </td>
-          <td>{{ t.date }} </td>
-          <td>{{ t.type_name }} </td>
+        <td>{{t.institution}}</td>
+        <td>{{t.location}}</td>
+        <td>{{t.number_patients}}</td>
+        <!--
+          <td style="min-width: 120px;">
+                 {{ t.date }}
+        -->
+          </td>
+          <td class="date">
+                {% if t.last_activity %}
+                    {{t.last_activity|datehhmm}}
+                {% else %}
+                    {{ t.date }}
+                {% endif %}
+          </td>
+          <td class="type">{{ t.type_name }} </td>
+          {% comment %}
           <td style="width:100px">
-          
+
             <a  href="dbEdit/{{t.id}}/{{t.ttype}}" title="Edit Database"><img src="{{ STATIC_URL }}img/glyphicons_150_edit.png"  /></a>
-            <a href="#" onclick="return false;"  class="confirm-delete" data-id="{{ t.id }}"  title="Remove Database"><img src="{{ STATIC_URL }}img/glyphicons_192_circle_remove.png"/></a>
+            <a href="#" onclick="return false;"  class="confirm-delete" data-id="{{ t.id }}" data-name="{{ t.name }}" title="Remove Database"><img src="{{ STATIC_URL }}img/glyphicons_192_circle_remove.png"/></a>
               <a href="#" onclick="return false;" class="sharedb" data-id="{{ t.id }}" title="Share Database" ><img src="{{ STATIC_URL }}img/glyphicons_308_share_alt.png"/></a>
-          
+
             </td>
+            {% endcomment %}
+
 
         </tr>
 
@@ -92,64 +145,39 @@ button {
     </tbody>
 </table>
 
-{% load bootstrap_pagination %}
-
-{% bootstrap_paginate page_obj url_view_name="views.databases" range=10  show_prev_next="false" show_first_last="true"%}
+<script type="text/javascript">
+var a;
+$(document).ready(function(){
+    a = new PaginatorSorter("table_databases", '{{sort_params.base_filter}}', '{{sort_params.selected_name}}', '{{sort_params.selected_value}}');
+});
+</script>
+{% include "post_paginator.html" %}
 
 {% else %}
-<div class="row">  
-<div class="span4">  
-<div class="alert">  
-  <a class="close" data-dismiss="error">×</a>  
+<div class="row">
+<div class="span4">
+<div class="alert">
+
   <strong>Info: </strong> Currently, there are no databases in your account. You can add new ones through the option "Workspace -> Add new databases"
-</div>  
-</div>  
-</div>  
+</div>
+</div>
+</div>
 {% endif %}
 
 {% comment %}
   <a class="btn btn-large btn-success" href="advancedSearch/1">Add new database</a>
 {% endcomment %}
 </div>
+<form id="send2" method="POST" > 
+  <input id="page" type="hidden" name="page" value="{{page}}"></input>
+  <input id="s" type="hidden" name="s" value=""></input>  
+  <input id="submit_simulate" style="display:none" type="submit" value="Submit">
+ 
+{% csrf_token %}
+</form>
 
-
-<div id="modal-from-dom" class="modal hide fade" style="display:none"  >
-    <div class="modal-header">
-        <a href="#" onclick="$('#modal-from-dom').modal('hide'); return false;" class="close">&times;</a>
-         <h3>Delete Fingerprint</h3>
-    </div>
-    <div class="modal-body">
-        <p>You are removing the database fingerprint. This procedure is irreversible.</p>
-        <p>Do you want to proceed?</p>
-        <p id="debug-url"></p>
-    </div>
-    <div class="modal-footer">
-        <a href="rm/ref" class="btn btn-danger">Yes</a>
-        <!-- <a href="delete.php?some=param&ref=" class="btn danger">Yes 2</a> -->
-        <a href="#" onclick="$('#modal-from-dom').modal('hide'); return false;" class="btn btn-secondary">Cancel</a>
-    </div>
-</div>
-
-<div id="modal-from-dom-share" class="modal hide fade" style="display:none"  >
-    <div class="modal-header">
-        <a href="#" onclick="$('#modal-from-dom-share').modal('hide'); return false;" class="close">&times;</a>
-         <h3>Share Database</h3>
-    </div>
-    <div class="modal-body">
-        <p>What are the email address of your team member?</p>
-        
-        <p id="debug-url"></p>
-        Email: <input type="text" id="share_email"/>
-         
-    </div>
-    <div class="modal-footer">
-        <a href="share/ref" class="btn sharedb2" >Share</a>
-        
-        <a href="#" onclick="$('#modal-from-dom-share').modal('hide'); return false;" class="btn btn-secondary">Cancel</a>
-    </div>
-</div>
-
-<form id="send" method="POST" > {% csrf_token %}
+<form id="send" method="POST" > 
+ {% csrf_token %}
 </form>
 
 
@@ -159,107 +187,6 @@ button {
 {% comment %}
 <script>
 {% endcomment %}
-
-// URL Hack to make paginator work with base
-$(document).ready(function(){
-    $('a[href="#"]').attr('href', function(i, val){
-        return window.location + val;
-    });
-});
-
-function post_to_url(path, params, method) {
-    method = method || "post"; // Set method to post by default if not specified.
-
-    // The rest of this code assumes you are not using a library.
-    // It can be made less wordy if you use one.
-    //var form = document.createElement("form");
-    var form = document.getElementById("send");
-    form.setAttribute("method", method);
-    form.setAttribute("action", path);
-
-    for(var key in params) {
-        if(params.hasOwnProperty(key)) {
-            var hiddenField = document.createElement("input");
-            hiddenField.setAttribute("type", "hidden");
-            hiddenField.setAttribute("name", key);
-            hiddenField.setAttribute("value", params[key]);
-
-            form.appendChild(hiddenField);
-         }
-    }
-
-    document.body.appendChild(form);
-    form.submit();
-}
-
-
-$(function() {
-
-  // call the tablesorter plugin
-  $("table").tablesorter({
-    theme : 'blue',
-
-    // sort on the first column and third column in ascending order
-    sortList: [[0,0],[2,0]],
-
-        // hidden filter input/selects will resize the columns, so try to minimize the change
-    widthFixed : true,
-
-    // initialize zebra striping and filter widgets
-    widgets: ["zebra", "filter"]
-
-
-  });
-
-});
-
-$('#li_workspace').addClass("active");
-
-$('#modal-from-dom').bind('show', function() {
-    var id = $(this).data('id'),
-        removeBtn = $(this).find('.btn-danger'),
-        href = removeBtn.attr('href');
-    console.log('id' + id);
-
-    removeBtn.attr('href', href.replace('ref', '' + id));
-});
-
-
-$('.confirm-delete').click(function(e) {
-    e.preventDefault();
-    
-    var id = $(this).data('id');
-    $('#modal-from-dom').data('id', id).modal('show');
-});
-
-
-$('#modal-from-dom-share').bind('show', function() {
-    var id = $(this).data('id'),
-        removeBtn = $(this).find('.sharedb2'),
-        href = removeBtn.attr('href');
-    
-    removeBtn.attr('href', href.replace('ref', '' + id));
-});
-
-$(".sharedb" ).click(function(e) 
-{
-  e.preventDefault();
-  var id = $(this).data('id');
-  $('#modal-from-dom-share').data('id', id).modal('show');
-       
-});
-$(".sharedb2" ).click(function(e) 
-{
-  e.preventDefault();
-  post_to_url($(this).attr('href'), {"email": $("#share_email").val(), "csrfmiddlewaretoken": $('input[name="csrfmiddlewaretoken"]').prop('value')});
-
-});
-
-jQuery('#add_toolbar').click(function () {
-
-$('#group_toolbar').addClass("open");
-console.log($('#group_toolbar'))
-});
 
 
 {% comment %}

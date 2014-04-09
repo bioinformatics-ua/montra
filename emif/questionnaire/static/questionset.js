@@ -57,8 +57,48 @@ function statusChanged(obj, res) {
     //obj.style.backgroundColor = !res ? "#eee" : "#fff";
     obj.disabled = !res;
 }
+function clearcheck(id){
+    console.warn('clearcheck ID: '+id);
+    $(':input[name="'+id+'"]').removeAttr('checked');
+    //$(':input[name="'+id+'"]').click();
+}
+function valchanged(qnum, value, self) {
+    if (!(typeof bool_container === 'undefined')) {
+        var $self = $(self);
+        
+        var just_number = qnum.split('_')[1];
+        var clean = qnum.replace('question_','').replace(/(\\)/g, '');
+        var dirty = qnum.replace('question_','').replace('_',':');
+        var index = dirty.indexOf(':');
 
-function valchanged(qnum, value) {
+        // We have to get the question
+        var the_question = $('#question_'+clean.split('_')[0].replace(/(\.)/g,'')).text().trim(); 
+        if(value==true){
+
+            //console.log(qnum);
+            //console.log(clean.replace('_','. ')+' ('+the_question+')');
+            //console.log(value);
+            
+            //var optional = $('#question_'+clean.split('_')[0].replace(/(\.)/g,'')).closest('input[type="text"]');
+            //console.log(optional.attr('id'));
+            
+            //var optional = $('#question_'+just_number.replace(/(\.)/g,'\\.')+"_1_opt").val();
+            bool_container.pushWithDelegate('question_nr_'+dirty.substring(0,index)+"_____"+clean+"_____",
+                                clean.replace('_','. ')+' ('+the_question+')'
+                               , dirty.substring(index+1,dirty.length), 'clearcheck("'+$self.attr('id')+'");');
+        } else if(value==false){
+            var optional = $('#question_'+just_number.replace(/(\.)/g,'')+"_opt").val();
+            bool_container.splice('question_nr_'+dirty.substring(0,index)+"_____"+clean+"_____",
+                                clean.replace('_','. ')+' ('+the_question+')'
+                               , dirty.substring(index+1,dirty.length));
+        } else {       
+            if( value != 'yes' && value != 'no' && value != 'dontknow ')
+            bool_container.pushWithDelegate('question_nr_'+clean, clean.replace('_','')+'. '+the_question.replace(/\s{2,}/g, ' ')+'', 
+                value, 'clear_selection("question_nr_'+clean+'", " ");');   
+                        
+        }
+    }    
+
     qvalues[qnum] = value;
     // qnum may be 'X_Y' for option Y of multiple choice question X
     qnum = qnum.split('_')[0];
@@ -69,14 +109,46 @@ function valchanged(qnum, value) {
         statusChanged(t, res)
     }
 }
+function initialvalchanged(qnum, value, self){
+    qvalues[qnum] = value;
+    // qnum may be 'X_Y' for option Y of multiple choice question X
+    qnum = qnum.split('_')[0];
+    for (var t in qtriggers) {
+        t = qtriggers[t];
+        checks = getChecksAttr(t);
+        var res = eval(checks);
+        statusChanged(t, res)
+    }   
+}
 
 function addtrigger(elemid) {
     var elem = document.getElementById(elemid);
+    //console.log(elemid + " : " + elem + " : "+document.getElementById(elemid));
     if(!elem) {
-      alert("addtrigger: Element with id "+elemid+" not found.");
+      console.error("addtrigger: Element with id "+elemid+" not found.");
       return;
     }
     qtriggers[qtriggers.length] = elem;
+}
+
+function clear_selection(question_name, response){
+    var quest = question_name.replace('question_nr_','question_');
+    var was_checked = $(":radio[name='" + quest + "']").is(':checked');
+
+    $(":radio[name='" + quest + "']").prop('checked', false);
+    if (!(typeof bool_container === 'undefined')) {
+            bool_container.splice(question_name, response, '');
+    }        
+    if(was_checked){
+        if (!(typeof questionSetsCounters === 'undefined')) {
+                var qId = parseInt(quest.split("_")[1]);
+
+                questionSetsCounters[qId]['filledQuestions'] = questionSetsCounters[qId]['filledQuestions']-1;
+
+                var ui = new CounterUI();
+                ui.updateCountersClean(qId);
+        }
+    }
 }
 
 /* 
@@ -84,42 +156,59 @@ function addtrigger(elemid) {
  - do it for a total of 5 seconds by which time the page should've been sent
  - oscillate the sending class which does some fancy css transition trickery
 */
-(function($){
-    $(document).ready(function() {
-        $('#qform').submit(function() {
+function setsaveqs(id){
+        $('#'+id).submit(function(e) {
+            e.preventDefault();
 
-            var input = $('.questionset-submit input');
-            var interval = 400; // ms
-            var duration = 10000; // 10s
+            var self = $(this);
 
-            var disable = function(){
-                input.attr('disabled', 'disabled');
-                input.toggleClass('sending', false);
-            };
+      if (!(typeof errornavigator === 'undefined')) {
+      errornavigator.hideErrorPage();
+      errornavigator.reset();
 
-            var enable = function(){
-                $('body').css({'cursor':'auto'});
-                input.removeAttr('disabled');  
-            };
+      var list_invalid = advValidator.validateFormContext(event, self);
+      //console.log(list_invalid);
 
-            var step = 0; 
-            var animate = function() {
-                // re-enable the button after the duration
-                if (interval * step > duration) {
-                    clearInterval(id);
-                    enable();
-                }
-                    
-                step += 1;
-                input.toggleClass('sending');
-            };
-            
-            // start animating before disabling as it looks nicer
-            animate();
-            disable();
 
-            // id is availabe in the animate method. js closures ftw!
-            var id = setInterval(animate, interval);
+      if(list_invalid.length == 0){
+
+        if(formHasChanged){
+          // If its not the first or last
+          var id = this.id.split('_');
+
+          if(self.length != 0 && id[1] != '0' && id[1] != '99'){
+
+            // Save this questionset using an ajax post
+            var posting = $.post(self.attr("action"), self.serialize());
+
+            $("#loading-message").fadeIn('fast');
+
+            posting.done(function(data) {
+              $("#loading-message").fadeOut('fast');
+            });
+          }
+        }
+
+        document.body.scrollTop = document.documentElement.scrollTop = 0; 
+
+        formHasChanged = false;   
+        list_invalid = []; 
+
+      } else {
+        console.log("Jump to errors and show error navigator.");
+
+          for(var i = 0;i<list_invalid.length;i++){
+            errornavigator.addError('qc_'+list_invalid[i]);
+          }
+          errornavigator.showErrorPager();
+
+          // jump to first problem
+          errornavigator.nextError();
+
+        }
+
+      }
+
         });
-    });
-})(jQuery);
+    }
+

@@ -1,0 +1,74 @@
+{% load extra_tags %}
+
+
+
+<div class="dataTables_scrollBody" style="overflow-y: auto; position: relative; width: 100%; height: 470px;">
+    <table cellpadding="0" cellspacing="0" border="1" class="display dataTable table table-hover tablesorter "  data-provides="rowlink" id="table_databases" style="margin: 0px;">
+	<thead>
+		<tr>
+			<th class="minwidth250">{{ titles.0 }}</th>
+            {% for t in titles.1 %}
+               <th class="minwidth250" title="{{ t.tag|removehs }}">{{t.tag|truncate|removehs}} </th>
+            {% endfor %}
+		</tr>
+	</thead>
+    <tbody>
+
+            {% for ans in answers %}
+            <tr class="">
+                <td>{{ ans.0 }}</td>
+                {% for a in ans.1 %}
+                    <td title="{{a}}"> {{ a|truncate  }}</td>
+                {% endfor %}
+                </tr>
+            {% endfor %}
+    </tbody>
+</table>
+</div>
+<script type="application/javascript">
+$(function() {
+
+  // call the tablesorter plugin
+  $("#table_databases").tablesorter({
+    theme : 'blue',
+
+    // sort on the first column and third column in ascending order
+    sortList: [[0,0],[2,0]],
+
+    // hidden filter input/selects will resize the columns, so try to minimize the change
+    widthFixed : true,
+
+    // initialize zebra striping and filter widgets
+    widgets: ["zebra",  'stickyHeaders', "filter"],
+    widgetOptions: {
+
+      // extra class name added to the sticky header row
+      stickyHeaders : '',
+      // number or jquery selector targeting the position:fixed element
+      stickyHeaders_offset : null,
+      // added to table ID, if it exists
+      stickyHeaders_cloneId : '-sticky',
+      // trigger "resize" event on headers
+      stickyHeaders_addResizeEvent : true,
+      // if false and a caption exist, it won't be included in the sticky header
+      stickyHeaders_includeCaption : true,
+      // The zIndex of the stickyHeaders, allows the user to adjust this to their needs
+      stickyHeaders_zIndex : 2,
+      // jQuery selector or object to attach sticky header to
+      stickyHeaders_attachTo : $(".dataTables_scrollBody"),
+
+      // adding zebra striping, using content and default styles - the ui css removes the background from default
+      // even and odd class names included for this demo to allow switching themes
+      zebra   : ["ui-widget-content even", "ui-state-default odd"],
+      // use uitheme widget to apply defauly jquery ui (jui) class names
+      // see the uitheme demo for more details on how to change the class names
+      uitheme : 'jui'
+    }
+    
+  });
+//$("#table_databases").stickyTableHeaders({container: ".dataTables_scrollBody"});
+
+	
+});
+
+</script>

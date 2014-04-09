@@ -13,31 +13,18 @@
 
 
 {% block headextra %}
-<link rel="stylesheet" href="static/css/theme.blue.css">
+<link rel="stylesheet" href="{{STATIC_URL}}css/theme.blue.css">
+<link rel="stylesheet" href="{{STATIC_URL}}css/vendor/bootstrap-select.min.css">
 {% endblock %}
 
 
 {% block scriptextraincludes %}
-<script src="static/js/vendor/jquery.tablesorter.min.js"></script>
-<script src="static/js/vendor/jquery.tablesorter.widgets.js"></script>
+<script src="{{STATIC_URL}}js/vendor/jquery.tablesorter.min.js"></script>
+<script src="{{STATIC_URL}}js/vendor/jquery.tablesorter.widgets.js"></script>
+<!--script src="{{STATIC_URL}}js/vendor/jquery.stickytableheaders.min.js"></script-->
+<script src="{{STATIC_URL}}js/vendor/bootstrap-select.min.js"></script>
 
-        
-        <script type="text/javascript" language="javascript" src="static/js/jquery.dataTables.js"></script>
-        <script type="text/javascript" charset="utf-8">
-            $(document).ready(function() {
-                $('#table_databases').dataTable( {
-                        "sScrollY": 200,
-                    "sScrollX": "200%",
-                    "sScrollXInner": "210%",
-                    "bScrollCollapse": true
-                } );
-
-
-
-
-             
-        </script>
-
+<script src="{{STATIC_URL}}js/databases_datatable.js"></script>
 
 {% endblock %}
 
@@ -62,38 +49,56 @@ button {
 {% block content %}
 
 {% if list_databases %}
-<div style="margin-bottom: 70px;"></div>
+<div style="clear: both;"></div>
 
+<select class="pull-left" id="db_type">
+<option value="0">Select a database type</option>
+{% for k in databases_types  %}
+ <option value="{{k}}">{{k}}</option>
+{% endfor %}
+</select>
 
+{% for k, qsets in databases_types.items  %}
+<!--select id="q_select_{{k}}" class="depon_class qsets1">
 
+<option value="0">-- Select a questionset</option>
+    {% for text, ref in qsets  %}
+     <option value="{{text}}">{{text|removeh1}}</option>
+    {% endfor %}
+</select-->
+<!-- Very nice trick, to use dropdown with checkboxes from: http://www.rasmuslarsson.se/2013/07/how-to-put-checkboxes-in-bootstrap-dropdowns/-->
+<div id="q_select_{{k|removespaces}}" class="small-margin-left depon_class qsets pull-left dropdown">
+    <a class="dropdown-toggle btn" data-toggle="dropdown" href="#">
+        Questionsets to show
+        <b class="caret"></b>
+    </a>
+    <div class="dropdown-menu dropdown-menu-form" role="menu">
+          <button onclick="selectall('#q_select_{{k|removespaces}}');" class="btn pull-right btn-link" type="button">Select/Deselect all</button>
+          <ul class="select_checkbox_container">
+        {% for text, ref in qsets  %}
+        <li>
+            <label class="checkbox">
+                <input class="qset_option" value="{{text}}" type="checkbox">
+                {{text|removeh1}}
+            </label>
+        </li>
+        {% endfor %}
+    </ul>
+    </div>
 
-
-
-
-<div class="dataTables_scrollBody" style="overflow: auto; width: 100%; height: 540px;">
-<table cellpadding="0" cellspacing="0" border="1" class="display dataTable table table-hover tablesorter "  data-provides="rowlink" id="table_databases" style="margin-left: 0px; ;">
-	<thead>
-		<tr>
-			<th >{{ titles.0 }}</th>
-            {% for t in titles.1 %}
-               <th  title="{{ t.tag }}">{{t.tag|truncate}} </th>
-            {% endfor %}
-		</tr>
-	</thead>
-    <tbody>
-
-            {% for ans in answers %}
-            <tr class="">
-                <td>{{ ans.0 }}</td>
-                {% for a in ans.1 %}
-                    <td title="{{a}}"> {{ a|truncate  }}</td>
-                {% endfor %}
-                </tr>
-            {% endfor %}
-
-    </tbody>
-</table>
 </div>
+
+{% endfor %}
+  <button id="update_table_button" class="small-margin-left btn depon_class" type="button">Show Datatable</button>
+
+
+<div class="clearboth" id="tabular_container">
+    <div class="well pull-center">
+    To see a tabular view of all databases, please choose a database type and a questionset.
+    </div>
+</div>
+
+
 {% else %}
 <div class="row">
 <div class="span4">
@@ -120,28 +125,7 @@ button {
 {% endcomment %}
 
 
-$(function() {
-
-  // call the tablesorter plugin
-  $("table").tablesorter({
-    theme : 'blue',
-
-    // sort on the first column and third column in ascending order
-    sortList: [[0,0],[2,0]],
-
-    // hidden filter input/selects will resize the columns, so try to minimize the change
-    widthFixed : true,
-
-    // initialize zebra striping and filter widgets
-    widgets: ["zebra", "filter"]
-
-  });
-
-});
-
-
 $('#li_workspace').addClass("active");
-
 
 {% comment %}
 </script>

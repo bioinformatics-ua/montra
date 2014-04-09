@@ -1,27 +1,34 @@
 {% extends 'base.html' %}
+{% load extra_tags %}
 {% load url from future %}
 {% load django_bootstrap_breadcrumbs %}
 
 {% block breadcrumbs %}
     {{ block.super }}
-    {% breadcrumb "Search" "/resultsdiff/1" %}
+    {% breadcrumb "Search" "resultsdiff/1" %}
+{% if not isAdvanced %}
     {% if search_old == None %}
         {% breadcrumb "None" "" %}
     {% else %}
         {% breadcrumb search_old "" %}
     {% endif %}
+{% endif %}
 {% endblock %}
 
 
 {% block headextra %}
 <link rel="stylesheet" href="static/css/theme.blue.css">
+<link rel="stylesheet" href="{{ STATIC_URL }}css/vendor/jquery.boolrelwidget.css"></script>
+
 {% endblock %}
 
 
 {% block scriptextraincludes %}
 
-<script src="static/js/vendor/jquery.tablesorter.min.js"></script>
-<script src="static/js/vendor/jquery.tablesorter.widgets.js"></script>
+<script src="{{ STATIC_URL}}js/vendor/jquery.boolrelwidget.js"></script>
+<script src="{{ STATIC_URL }}js/vendor/jquery.ba-throttle-debounce.min.js"></script>
+<script src="{{ STATIC_URL }}js/vendor/json2.js"></script>
+<script src="{{ STATIC_URL }}js/paginator-sorter.js"></script>
 
 {% endblock %}
 
@@ -34,16 +41,18 @@
 {% endblock %}
 
 {% block toolbar %}
-
 {% if page_obj != None %}
   <div class="span6">
+
     <div class="btn-group pull-right">
-
       <div class="btn-group"></div>
-      <a id="comparabtn" class="btn "  href=""  rel="tooltip" data-container="body" data-placement="bottom" data-original-title="You only can select two databases for a comparison" disabled> <i  class=" icon"></i>
-        Compare</a>
-
-      <a class="btn" href="geo" onclick="" > <i class=" icon"></i>Geolocation</a>
+      <span id="selected_databases" class="btn disabled"> <strong>Type Selected:</strong> <span id="selected_dbstype">---</span> &nbsp; &nbsp; <strong>Selected databases:</strong> <span id="selected_dbscount">0</span></span>      
+      <a id="comparabtn" class="btn "  href=""  rel="tooltip" data-container="body" data-placement="bottom" data-original-title="This allows to compare databases.<br /> It is only possible to compare databases of the same type. <br /> When a database is selected, the type is defined automatically, and databases of other types can't be choosen. <br /> To be able to select other type, you must unselect all the databases." class="help_selectresults icon-question-sign" disabled> <i  class=" icon"></i>
+        <i class="icon-retweet"></i> Compare</a>
+    <button type="button" class="btn" onclick="window.print();" title="Print">
+      <i class="icon-print"></i>
+    </button>
+      <a class="btn" href="geo" onclick="" ><i class="icon-globe"></i> Geolocation</a>
 
     </div>
   </div>
@@ -54,20 +63,25 @@
 
 {% block content %}
 
+{% if isAdvanced %}
+<div id="bool_container"></div>
+{% endif %}
   <div id="row_loading" class="row">
 
 
-    <div class="span12" style="text-align:center">
+    <div class="span12 clearboth" style="text-align:center">
       <div class="navbar" id="loading">
         <div class="navbar-inner">
 
           <h4>
               <span id="results_size"></span>
-            {% if page_obj != None %}
-            total results for {{search_old}}
-            <span class="label label-inverse"> {{list_results.num_results}}</span>
+            {% if page_obj != None %}            
+            {{num_results}} results found
+            {%if not isAdvanced %}
+                for {{search_old}}
+              {% endif %}
             {% else %}
-            No results found 
+            No results found<br><button id="refine_search_btn" class="btn btn-link">Try to refine your search</button>
           {% endif %}
           </h4>
         </div>
@@ -75,46 +89,96 @@
     </div>
     </div>
     {% if page_obj != None %}
+    <form id="compare_form" action="resultscomp" method="POST">
+      {% csrf_token %}
+      <div id="comparedbs"></div>
+      <input id="submitdbsimulate" type="submit" value="Submit">
+    </form>
     <form id="result_form" action="resultscomp" method="POST">
   {% csrf_token %}
-<table class="table table-hover tablesorter" id="table_databases" data-provides="rowlink">
+<table class="table table-bordered table-hover fingerprint_table table-striped" id="table_databases" data-provides="rowlink">
     <thead>
         <tr>
-            <th class="sorter-false filter-false"></th>
-            <th>Name</th>
-            <th>Date</th>
-            <th>Type</th>
-            <th class="sorter-false filter-false">Select</th>
+            <th class="sorter-database_name sorter {%if "icon-minus" not in sort_params.database_name.icon %}selected-sorter{% endif %}"  onclick="a.onClick('database_name', '{{sort_params.database_name.next}}');">
+            <div class="pull-left">Acronym</div>
+                 <div class="pull-right"><i class="{{sort_params.database_name.icon}}"></i></div>
+            </th>
+            <th class="sorter-institution sorter {%if "icon-minus" not in sort_params.institution.icon %}selected-sorter{% endif %}"  onclick="a.onClick('institution', '{{sort_params.institution.next}}');">
+            <div class="pull-left">Institution Name</div>
+                 <div class="pull-right"><i class="{{sort_params.institution.icon}}"></i></div>
+            </th>            
+            <!--<th>Creation Date</th>-->            
+            <th class="sorter-location sorter {%if "icon-minus" not in sort_params.location.icon %}selected-sorter{% endif %}" onclick="a.onClick('location', '{{sort_params.location.next}}');">
+                <div class="pull-left">Location</div>
+                <div class="pull-right"><i class="{{sort_params.location.icon}}"></i></div> 
+            </th>             
+            <th class="sorter-nrpatients sorter {%if "icon-minus" not in sort_params.nrpatients.icon %}selected-sorter{% endif %}" onclick="a.onClick('nrpatients', '{{sort_params.nrpatients.next}}');">
+                <div class="pull-left">Nr. Patients</div>
+                <div class="pull-right"><i class="{{sort_params.nrpatients.icon}}"></i></div> 
+            </th>            
+            <th class="sorter-lastupdate sorter {%if "icon-minus" not in sort_params.last_update.icon %}selected-sorter{% endif %}" onclick="a.onClick('last_update', '{{sort_params.last_update.next}}');">
+            <div class="pull-left">Last update</div>
+                <div class="pull-right"><i class="{{sort_params.last_update.icon}}"></i></div> 
+            </th>
+            <th class="sorter-type sorter {%if "icon-minus" not in sort_params.type.icon %}selected-sorter{% endif %}" onclick="a.onClick('type', '{{sort_params.type.next}}');">
+            <div class="pull-left">Type</div>
+              <div class="pull-right"><i class="{{sort_params.type.icon}}"></i></div> 
+            </th>
+            <th class="sorter-false filter-false select_line">Select</th>
 
         </tr>
+        <tr>
+          <td class="table_filter">
+                <input class="filter_input" id="database_name_filter" type="text" value="{{sort_params.database_name.filter}}" placeholder="Filter">
+          </td>
+           <td class="table_filter">
+                 <input class="filter_input" id="institution_filter" type="text" value="{{sort_params.institution.filter}}" placeholder="Filter">
+          </td>
+          <td class="table_filter">
+                 <input class="filter_input" id="location_filter" type="text" value="{{sort_params.location.filter}}" placeholder="Filter">
+          </td>
+          <td class="table_filter">
+                 <input class="filter_input" id="nrpatients_filter" type="text" value="{{sort_params.nrpatients.filter}}" placeholder="Filter">
+          </td>
+          <td class="table_filter">
+                 <input class="filter_input" id="last_update_filter" type="text" value="{{sort_params.last_update.filter}}" placeholder="Filter">
+          </td>
+           <td class="table_filter">
+              <select id="type_filter" class="selectpicker" def_value="{{sort_params.type.filter}}">
+                <option value="">None</option>
+                <option value="adcohort">AD Cohort</option>
+                <option value="observationaldatasources">Observational Data Sources</option>
+              </select>
+          </td>
+          <td class="table_filter select_line">
+            <div style="text-align: center;">
+              <i data-toggle="tooltip" data-placement="bottom" title="This allows to compare databases.<br /> It is only possible to compare databases of the same type.  For instance, you cannot compare databases from AD Cohort with a databases from Observational Data.<br /> When a database is selected, the type is defined automatically, and databases of other types cannot be chosen. <br /> To be able to select other type, you must unselect all the databases." class="help_selectresults icon-question-sign"></i>
+            </div>
+          </td>
+        </tr>
     </thead>
-    <tbody>
+    <tbody id="table_content">
 
-
-  {% for t in list_results.list_results %}
-
-   <tr>
-            <td><img class="db_logo" src="static/upload_images/{{t.logo}}" width="50px" height="50px"/></td>
-          
+  {% for t in page_obj %}
+   <tr>          
           <td>
-            <a href="fingerprint/{{ t.id }}/1">{{ t.name }}</a> - <a href="databases/mlt/{{ t.id }}/1">More Like This!</a>
-            <div style="margin-left:20px">
-             Institution Name: {{t.institution}}
-            </div>
-
-            <div style="margin-left:20px">
-             Location: {{t.location}}
-            </div>
-            <div style="margin-left:20px">
-             Number of patients: {{t.number_patients}}
-            </div>
+            <a href="fingerprint/{{ t.id }}/1">{{ t.name }}</a>
         </td>
-          <td>{{ t.date }}</td>
-          <td>{{ t.type_name }} </td>
+        <td>{{t.institution}}</td>
+        <td>{{t.location}}</td>
+        <td>{{t.number_patients}}</td>
+          <td class="date">            
+                {% if t.last_activity %}
+                    {{t.last_activity|datehhmm}}
+                {% else %}
+                    {{ t.date }}
+                {% endif %}
+          </td>
+          <td class="type">{{ t.type_name }} </td>
           
         
-          <td> <input class="checkbox" type="checkbox" name="chk_{{ t.id }}"></td>
-
+          <td class="select_line"> <input class="checkbox dbtype_{{t.type_name|removespaces}}" type="checkbox" 
+          typedb="{{ t.type_name }}" name="chk_{{ t.id }}"></td>
           
         </tr>
 
@@ -164,18 +228,16 @@
 
     </tbody>
 </table>
+
   </form>
     {% else %}
     <div style="margin-top: 60px;"></div>
   {% endif %}
-  {{list_results.paginator_url}}
+
   {% if page_obj != None %}
-    {% if list_results.paginator_url != None %}
-      {% bootstrap_paginate page_obj range=10 url_view_name=list_results.paginator_url url_extra_kwargs=list_results.paginator_kwargs show_prev_next="false" show_first_last="true"%}
-    {% else %}
-      {% bootstrap_paginate page_obj range=10 url_view_name="views.results_diff" show_prev_next="false" show_first_last="true"%}
-    {% endif %} 
-  {% endif %}
+    {% include "post_paginator.html" %}
+
+{% endif %}
 {% endblock %}
 
 {% comment %}
@@ -185,34 +247,100 @@
 {% block scriptextra %}
 
 {% if page_obj != None %}
-$(function() {
 
-  // call the tablesorter plugin
-  $("table").tablesorter({
-    theme : 'blue',
-
-    // sort on the first column and third column in ascending order
-    sortList: [[0,0],[2,0]],
-
-    // hidden filter input/selects will resize the columns, so try to minimize the change
-    widthFixed : true,
-
-    // initialize zebra striping and filter widgets
-    widgets: ["zebra", "filter"]
-  });
-
-});
-
-// URL Hack to make paginator work with base
+var counter = 0;
+var a;
 $(document).ready(function(){
+    
+    a = new PaginatorSorter("table_databases", '{{sort_params.base_filter}}', '{{sort_params.selected_name}}', '{{sort_params.selected_value}}', '{{sort_params.extraObjects|safe}}');
+
+    //TO Be Applied in future releases.
+    a.atachPlugin(new SelectPaginatorPlugin());
+
+  if(a != undefined && a.plugin != undefined){
+
+    var dbcount = updateSelectCount();
+
+    counter = dbcount;
+
+    if(dbcount >= 2){
+        $("#comparabtn").removeAttr('disabled');
+        $("#comparabtn").bind('click',function(e)
+        { 
+          postComparison();
+          return false;
+        });
+
+    }
+
+  }
+    
     $('a[href="#"]').attr('href', function(i, val){
         return window.location + val;
     });
+
+    $('.help_selectresults').tooltip({container: 'body', 'html': true});
+    
 });
 {% endif %}
 
+$(document).ready(function(){
+  $("#refine_search_btn").click( function(){
+      {% if isAdvanced %}
+      window.location.replace($('#base_link').prop('href')+"advancedSearch/{{request.session.query_type}}/1/{{request.session.query_id}}");
+      {% else %}
+        $("input[name=query]").focus();
+      {% endif %}  
+    });    
+});
 
-var counter = 0;
+ {% if isAdvanced %}
+ var bool_container;
+$(function(){
+    bool_container = $('#bool_container').boolrelwidget({view_only: true, view_serialized_string: '{{request.session.serialization_query}}', link_back: $('#base_link').prop('href')+"advancedSearch/{{request.session.query_type}}/1/{{request.session.query_id}}" });
+   
+    window.setTimeout(function(){window.location.hash = "#back";}, 100);
+    window.setTimeout(function(){window.location.hash = "#search";}, 100);
+});
+  /* This is a trick, to be able to redirect on back button since browsers try to prevent us to do so 
+   I must do this, because the back url is different from the url on history */
+window.onhashchange = function(){
+   if (location.hash == "#back") {
+        window.location.replace($('#base_link').prop('href')+"advancedSearch/{{request.session.query_type}}/1/{{request.session.query_id}}");
+    }
+    
+}
+  {% endif %}
+function updateSelectCount(){
+
+    try{
+    var dbs = a.plugin.getExtraObjects().selectedList;
+    var type = a.plugin.typedb;
+
+    if(type)
+      $('#selected_dbstype').text(type); 
+    else
+      $('#selected_dbstype').text("---"); 
+
+    $('#selected_dbscount').text(dbs.length); 
+
+    return dbs.length;
+
+    } catch(err){
+      $('#selected_dbscount').text(0); 
+    }
+
+    return 0;
+    }
+function updateSelectCountJs(type, count){
+
+    if(type)
+      $('#selected_dbstype').text(type); 
+
+    if(count)
+      $('#selected_dbscount').text(count); 
+
+}
 function hidecheckbox()
 {
   $('.checkbox').toggle();
@@ -227,64 +355,74 @@ $("#comparabtn").bind('click',function(e)
         });
 
 //$("#comparabtn").unbind();
+function postComparison(){
+  //$('#result_form').submit();
+  //console.log('A: '+a);
+  //console.log('A-plugin: '+a.plugin);
+  if(a != undefined && a.plugin != undefined){
+    $('#comparedbs').html('');
 
+    var dbs = a.plugin.getExtraObjects().selectedList;
+    //console.error(dbs.length);
+    for(var i=0;i<dbs.length;i++){
+      $('#comparedbs').append('<input type="checkbox" name="chks_'+dbs[i]+'" checked>');
+    }
+
+    $('#submitdbsimulate').click();
+  }
+  
+}
 $('.checkbox').click(function()
 {
-    console.log(counter);
+
     if($(this).is(':checked')){
         counter++;
     } else 
     {
         counter--;
     }
-    if (counter==2)
-    {
-      $("#comparabtn").removeAttr('disabled');
-      
-      $('.checkbox').each(function(cbox)
-      {
-        console.log(this);
-        $("#comparabtn").bind('click',function(e)
-        { 
-          
-          $('#result_form').submit();
 
-          return false;
-        });
 
-        if(!$(this).is(':checked')){
-            $(this).prop('disabled', true);
-        };
-      });
-      
+
+    if(counter == 0){
+      updateSelectCountJs("---", ""+counter);   
+      $('input.checkbox').prop("disabled", false);
+
+      $("#comparabtn").attr("disabled", true);  
     }
-    else
-    {
+    else if(counter == 1){
+    console.log('cai here');
+
       $("#comparabtn").attr('disabled', true);
-      
-      console.log($("#comparabtn"))
-      $("#comparabtn").unbind();
-      $("#comparabtn").bind('click',function(e)
+
+      var checkedtype; 
+      if(a != undefined && a.plugin != undefined && a.plugin.typedb !=undefined){
+        checkedtype = a.plugin.typedb;
+      } else {
+        checkedtype = $('.checkbox:checked').first().attr('typedb');
+      }
+      updateSelectCountJs(checkedtype, counter);
+
+      $('input.checkbox').prop("disabled", false);
+
+      $('input.checkbox:not([typedb="' + checkedtype 
+      + '"])').prop('disabled', true);
+
+
+    }
+    else if (counter >= 2){
+      updateSelectCountJs(null, counter); 
+      $("#comparabtn").attr('disabled', false);
+         $("#comparabtn").bind('click',function(e)
         { 
-          
-          e.preventDefault(); 
-          e.stopPropagation();
+          postComparison();
           return false;
-        });
-
-    
-      $('.checkbox').each(function(cbox)
-      {
-        
-        $(this).prop('disabled', false);
-
-        
-      });
-
+        });    
     }
 
 });
-$('[rel=tooltip]').tooltip() 
+$('[rel=tooltip]').tooltip({container: 'body', 'html': true});
+
 $('.popover').popover({
     container: 'body'
 });
@@ -296,8 +434,6 @@ function () {
 $(this).css('overflow','hidden');
 }
 );
-
-
 {% endblock %}
 
 {% comment %}

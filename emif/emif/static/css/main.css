@@ -29,18 +29,26 @@
 }
 
 .question-text {
-    font-size: 1.2em;
     line-height: 1.1em;
 }
-
+.question-text > .qtext{
+  font-size: 1.1em;
+  text-align:justify;
+  text-justify:inter-word;
+}
+.qs-description{
+  font-size: 1.1em;
+  margin-bottom: 20px;
+  text-align:justify;
+  text-justify:inter-word;
+}
 div.input {
     margin-left: 35px;
 }
 
 .answer {
-    margin: 5px 0 25px 0;
+    margin: 5px 0 15px 0;
     padding: 0;
-    border-top: 1px solid #dadada;
 }
 
 .answer label {
@@ -170,7 +178,6 @@ div .tooltip {
     font-size: 14px;
     /*margin-left: 0px;*/
 
-
 }
 
 .qnumber_h2 {
@@ -208,6 +215,10 @@ div .tooltip {
     display: none;
 }
 
+.pull-center {
+    text-align:center;
+}
+
 .fa-green {
             color: limegreen;
         }
@@ -227,8 +238,345 @@ clear: both;
     width: 50px;
 }
 
-.ie9 #search_li {
+.ie9 #search_li, .gt-ie7 #li_advanced_search {
 
-list-style-type: none;
+list-style-type: none !important;
     
+}
+
+.gt-ie7 #li_advanced_search{
+    margin: 10px 0px !important;
+}
+.gt-ie7 #li_advanced_search > a{
+
+padding: 10px 15px 10px;
+color: #777;
+text-decoration: none;
+text-shadow: 0 1px 0 #fff;
+}
+
+.gt-ie7 #li_advanced_search > a:focus, .gt-ie7 #li_advanced_search > a:focus {
+color: #555;
+text-decoration: none;
+background-color: #e5e5e5;
+-webkit-box-shadow: inset 0 3px 8px rgba(0,0,0,0.125);
+-moz-box-shadow: inset 0 3px 8px rgba(0,0,0,0.125);
+box-shadow: inset 0 3px 8px rgba(0,0,0,0.125);
+}
+
+.btn-darkgrey {
+  background-color: hsl(169, 0%, 72%) !important;
+  background-repeat: repeat-x;
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#e0e0e0", endColorstr="#b7b7b7");
+  background-image: -khtml-gradient(linear, left top, left bottom, from(#e0e0e0), to(#b7b7b7));
+  background-image: -moz-linear-gradient(top, #e0e0e0, #b7b7b7);
+  background-image: -ms-linear-gradient(top, #e0e0e0, #b7b7b7);
+  background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #e0e0e0), color-stop(100%, #b7b7b7));
+  background-image: -webkit-linear-gradient(top, #e0e0e0, #b7b7b7);
+  background-image: -o-linear-gradient(top, #e0e0e0, #b7b7b7);
+  background-image: linear-gradient(#e0e0e0, #b7b7b7);
+  border-color: #b7b7b7 #b7b7b7 hsl(169, 0%, 68%);
+  color: #333 !important;
+  text-shadow: 0 1px 1px rgba(255, 255, 255, 0.26);
+  -webkit-font-smoothing: antialiased;
+}
+
+/**********************************************************************
+****** Documents ******************************************************
+**********************************************************************/
+
+#documents  {
+  /*font-weight: bold;*/
+  padding-left: 30px;
+}
+
+
+#documents .nodocs {
+  font-weight: bold;
+}
+
+/**********************************************************************
+****** Population charactetistics *************************************
+**********************************************************************/
+
+#populationcharacteristics
+{
+  height: 600px;
+  padding-left: 30px;
+}
+
+.populationcharacteristicsbar {
+  padding-right: 70px;
+
+}
+
+#pcBarContent ul li {
+  margin-bottom: 0px;
+}
+
+
+
+
+.not-supported{
+    display: none;
+    margin: 50px;
+}
+.supported {
+    display: block;
+}
+
+.ns .not-supported{
+    display: none !important;
+}
+.ns .supported {
+    display: block !important;
+}
+ #supportability{
+    display: none;
+}
+.ns #supportability{
+    display: block !important;
+    background-color: orange;
+    color: white;
+    padding: 5px;
+    font-weight: bold; 
+}
+
+.navbar .nav>li>a{
+    /* Overriding default bootstrap behaviour*/
+    padding: 10px 10px 10px !important;
+}
+.navbar .brand{
+     /* Overriding default bootstrap behaviour*/
+    padding: 10px 10px 10px !important;   
+}
+
+.fullwidth {
+  width: 100%;
+}
+.clearboth{
+  clear: both;
+}
+.small-margin-left{
+  margin-left: 5px;
+}
+.small-margin{
+  margin: 5px;
+}
+.select_checkbox_container{
+  width: 300px; max-height: 400px; overflow: scroll; list-style: none;
+}
+
+.highlight {
+  background-color: #ffcc00;
+  color: black;
+  padding: 2px;
+}
+
+.counter_badge{
+  text-align: center; 
+  width: 35px; 
+  margin-top: -7px; 
+  margin-left: 0px;
+  margin-bottom: -10px; 
+  margin-right:-15px; 
+  float:right; 
+  font-size:12px;
+  word-wrap:break-word;
+}
+
+.span2_5{
+  width: 168px;
+}
+@media all and (min-width: 1200px) {
+.span2_5{
+  width: 226px;
+}
+}
+#no_results{
+  display: none;
+}
+.basetable{
+  background-color: #ECF3FF !important;
+}
+.basetable:hover{
+  background-color: #d7e0f0 !important;
+}
+
+.help_selectresults{
+  font-size: 150%;
+  cursor: pointer;
+}
+.set_reference{
+  cursor: pointer;
+}
+#database_listings{
+  display: table;
+}
+#database_rows{
+  display: table-row;
+}
+.database_listing{
+  padding:2px;
+  min-width: 400px; 
+  display: table-cell;
+}
+.database_listing_away{
+  position: absolute;
+  left: -19999px;
+  top: -19999px;
+  visibility: hidden;
+}
+.database_title{
+  display: block;
+  padding: 4px 12px;
+  margin-bottom: 3px;
+  font-size: 14px;
+  line-height: 20px;
+  vertical-align: middle;
+  border-color: #b3b3b3;  
+  -webkit-border-radius: 4px;
+  -moz-border-radius: 4px;
+  border-radius: 4px;
+  color: black;
+  font-weight: bold;
+  border: 1px solid #b3b3b3;
+-webkit-box-shadow: inset 0 1px 0 rgba(255,255,255,0.2),0 1px 2px rgba(0,0,0,0.05);
+-moz-box-shadow: inset 0 1px 0 rgba(255,255,255,0.2),0 1px 2px rgba(0,0,0,0.05);
+box-shadow: inset 0 1px 0 rgba(255,255,255,0.2),0 1px 2px rgba(0,0,0,0.05);  
+}
+.database_title_text{
+  font-size: 85%;
+  margin-top: 4px;
+}
+.set_reference{
+  width: 155px;
+}
+/* ==========================================================================
+   My databases table
+   ========================================================================== */
+.fingerprint_table .date{
+  width: 200px;
+}
+.fingerprint_table .type{
+  width: 100px;
+
+}
+
+.sorter:hover{
+    cursor: pointer;
+    background-color: #fafafa;
+    background-image: -moz-linear-gradient(bottom,#fff,#f2f2f2);
+    background-image: -webkit-gradient(linear,0 0,0 100%,from(#fff),to(#f2f2f2));
+    background-image: -webkit-linear-gradient(bottom,#fff,#f2f2f2);
+    background-image: -o-linear-gradient(bottom,#fff,#f2f2f2);
+    background-image: linear-gradient(to top,#fff,#f2f2f2);
+    background-repeat: repeat-x;
+}
+
+.table_filter{  
+  margin:0px !important;
+  padding: 4px !important;
+  background-color: #eee !important;
+}
+.filter_input{
+  margin: 0px !important;
+  width: 100% !important;
+  height: 30px !important;
+   box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;  
+}
+#type_filter{
+  margin:0px !important;
+  width: 98% !important;
+}
+#compare_form{
+  position:absolute;
+  top: -9999px;
+  left: -9999px;
+}
+.selected-sorter{
+    background-color: #f9f9f9;
+    background-image: -moz-linear-gradient(bottom,#fff,#f2f2f2);
+    background-image: -webkit-gradient(linear,0 0,0 100%,from(#fff),to(#f2f2f2));
+    background-image: -webkit-linear-gradient(bottom,#fff,#f2f2f2);
+    background-image: -o-linear-gradient(bottom,#fff,#f2f2f2);
+    background-image: linear-gradient(to top,#fff,#f2f2f2);
+    background-repeat: repeat-x;
+}
+
+#selected_databases{
+  opacity: 1 !important;
+  font-size: 11px;
+}
+/* Style for results table */
+.select_line{
+  text-align: center !important;
+  width: 50px;
+}
+.sorter-type{
+  width: 18%;
+  } 
+.sorter-lastupdate{
+  width: 12%;
+} 
+.sorter-nrpatients{
+  width: 11%;
+  } 
+.sorter-location {
+  width: 18%;
+  } 
+.sorter-institution{
+  width: 20%;
+}
+.sorter-database_name{
+  width: 21%;
+}
+label input[type="radio"], label input[type="checkbox"]{
+  margin-top: -3px;
+}
+/* Styles for printing */
+@media print{
+  .visible-print  { display: inherit !important; }
+  .hidden-print  .navbar, .btn-group, .pagination,
+  .btn, .select_line,
+  .table_filter
+  { display: none !important; }
+  a:link, 
+  a:visited { 
+    color: blue !important; 
+    background: transparent !important; 
+    font-weight: bold !important; 
+    text-decoration: underline !important;  
+  }
+  a[href]:after {
+    content: none !important;
+  }  
+  .nav-tabs{
+    clear: both !important;
+  }
+  .tabbable .collapse, #database_listings .collapse{
+    height: auto !important;
+  }
+}
+@media (min-width: 1200px) {.span2_5 {width: 300px !important;}}
+@media (max-width: 1200px) {.span2_5 {width: 130px !important;}}
+
+.commented{
+  width: 55px;
+  text-align: center !important;
+}
+
+.paginator-page-selector{
+  color: #08c !important;
+}
+
+#edit_profile_form label input[type="radio"], 
+#edit_profile_form  label input[type="checkbox"]{
+  margin-top: 5px;
+}
+
+.minwidth250{
+  min-width: 250px;
 }

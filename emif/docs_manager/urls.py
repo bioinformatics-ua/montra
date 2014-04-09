@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-
 # Copyright (C) 2013 Luís A. Bastião Silva and Universidade de Aveiro
 #
 # Authors: Luís A. Bastião Silva <bastiao@ua.pt>
@@ -17,19 +16,17 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
+from django.conf.urls.defaults import *
+from views import *
+from documents import * 
 
+urlpatterns = patterns('',
+   
+    # Upload Documents 
+    url(r'^uploadfile/(?P<fingerprint_id>[^/]+)/$', 'docs_manager.views.upload_file'),
+    
+    # List Files
+    url(r'^docfiles/(?P<fingerprint>[^/]+)/$', 'docs_manager.views.list_fingerprint_files'),
 
-
-from github3 import login
-
-
-class Issue(object):
-	def __init__(self, user, pw):
-		
-		self.gh = login(user, pw)
-
-	def create(self, title, body ):
-		r = self.gh.repository("bioinformatics-ua", "emif-fb")
-		i = r.create_issue(title, body)
-
-
+    
+)

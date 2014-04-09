@@ -73,6 +73,11 @@ def api_root(request, format=None):
     })
 
 
+############################################################
+##### Search (Extra information) - Web services
+############################################################
+
+
 class SearchView(APIView):
     """
     Class to search and return fingerprint details, like Name, ID and structure
@@ -102,6 +107,12 @@ class SearchView(APIView):
         return response
 
 
+
+############################################################
+##### Advanced Search - Web services
+############################################################
+
+
 class AdvancedSearchView(APIView):
     def get(self, request, *args, **kw):
         # Process any get params that you may need
@@ -113,6 +124,13 @@ class AdvancedSearchView(APIView):
         result = {'myValue': 'lol', 'myValue2': 'lol', }
         response = Response(result, status=status.HTTP_200_OK)
         return response
+
+
+
+
+############################################################
+##### Metadata - Managemnt (Extra Information) Web services
+############################################################
 
 
 class MetaDataView(APIView):
@@ -173,8 +191,9 @@ class ValidateView(APIView):
     def get(self, request, *args, **kw):
 
         database_name = request.GET['name']
+        
         c = CoreEngine()
-        results = c.search_fingerprint("database_name_t:" + database_name)
+        results = c.search_fingerprint("database_name_t:\"" +database_name+'"')
         result = {'contains': len(results) != 0}
 
         response = Response(result, status=status.HTTP_200_OK)
@@ -195,6 +214,12 @@ class ValidateView(APIView):
             print("fuck")
             raise
         return response
+
+
+
+############################################################
+############ Statistics Web services
+############################################################
 
 
 class StatsView(APIView):
@@ -218,7 +243,7 @@ class StatsView(APIView):
             question_set = int(request.GET['qs_id'])
             slug = request.GET['slug']
 
-            question = Question.objects.filter(questionset_id=question_set, slug=slug, stats='1',
+            question = Question.objects.filter(questionset_id=question_set, slug_fk__slug1=slug, stats='1',
                                                questionset__questionnaire=questionnaire_id).order_by('number')
 
             results = self.getResults(question)
@@ -277,6 +302,10 @@ class StatsView(APIView):
 
 
 
+############################################################
+############ Publication Web services
+############################################################
+
 
 class PublicationsView(APIView):
     """
@@ -286,16 +315,14 @@ class PublicationsView(APIView):
     def get(self, request, *args, **kw):
         results = dict()
         pmid = request.GET['pmid']
+        
         if (pmid==None or pmid==''):
             return Response(results, status=status.HTTP_400_BAD_REQUEST)    
-
-        pmid = int(request.GET['pmid'])
         
-        doi_object = PubMedObject("pmid:"+str(pmid))
-        try:
-            #print "Downloading " + doi_object.pubmed_url + "..."
-            doi_object.download()
-            doi_object.fill_data()
+        doi_object = PubMedObject(pmid)
+        request_status = doi_object.fetch_info()
+
+        if request_status != None:
             results['authors'] =  doi_object.authors
             results['title'] =  doi_object.title
             results['pages'] =  doi_object.pages
@@ -303,15 +330,41 @@ class PublicationsView(APIView):
             results['journal'] =  doi_object.journal
             results['pubmed_url'] =  doi_object.pubmed_url
             results['volume'] =  doi_object.volume
-            
-            
-        except urllib2.HTTPError:
-            print "Skipping " + doi_object.pubmed_url + "..."
+            return Response(results, status=status.HTTP_200_OK)
 
+        return Response(results, status=status.HTTP_400_BAD_REQUEST)    
             
-        return Response(results, status=status.HTTP_200_OK)    
 
 
+
+############################################################
+############ Populations Characteristics Web services
+############################################################
+
+class PopulationView(APIView):
+    """PopulationCharactersticsService
+    This web service is responsabible to handle jerboa documents 
+
+    """
+    
+        
+    def get(self, request, *args, **kw):
+        """
+        List the Jerboa documents 
+        """
+        pass
+
+    def post(self, request, *args, **kw):
+        """
+        Upload Jerboa files
+        """
+        pass
+
+
+
+############################################################
+############ Auxiliar functions ############################
+############################################################
 def validate_fingerprint(user, fingerprintID):
     """
     Verify if fingerprint belongs to given user
@@ -321,7 +374,7 @@ def validate_fingerprint(user, fingerprintID):
 
     result = False
     c = CoreEngine()
-    results = c.search_fingerprint('user_t:' + user.username)
+    results = c.search_fingerprint('user_t:' + '"' + user.username + '"')
 
     for r in results:
         if fingerprintID == r['id']:

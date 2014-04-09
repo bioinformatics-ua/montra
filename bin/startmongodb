@@ -1,0 +1,2 @@
+mkdir -p /tmp/trash
+mongod --dbpath /tmp/trash

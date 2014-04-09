@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+{% load url from future %}
+{% load django_bootstrap_breadcrumbs %}
+
+{% block breadcrumbs %}
+
+        {% breadcrumb "Home" "home" %}
+        {% breadcrumb "History" "" %}
+
+{% endblock %}
+
+{% block content%}
+
+<div class="row">
+    <div id="contact_wrap" class="rows">
+        <div class="span6 center">
+            
+
+            <h2>Releases</h2>
+
+            <ul>
+            {% for milestone in milestones %}
+                <li>{{milestone.title}}, - {{milestone.description|safe}}  
+                </li>
+            {% endfor %}
+            </ul>
+            {% if request.user.is_staff %}
+            <h2>List Issues</h2>
+
+
+            <h3>Recently issues closed:</h3>
+            <ul>
+            {% for issue in issues_closed %}
+                <li>{{issue.title}} 
+                {%comment%}
+                {%for l in issue.labels %}
+                 {{l}} 
+                 {%endfor%}
+                 {%endcomment%}
+                </li>
+            {% endfor %}
+            </ul>
+            <h3>Active issues: </h3>
+            <ul>
+            {% for issue in issues_open %}
+                <li>{{issue.title}} 
+
+                </li>
+            {% endfor %}
+            </ul>
+            {%endif%}
+
+        </div>
+        <!-- end contact_wrap --> </div>
+</div>
+
+{% endblock %}
+
+ {% block scriptextra %}
+{% comment %}
+<script>
+{% endcomment %}
+
+$('#li_history').addClass("active");
+
+{% comment %}
+</script>
+{% endcomment %}
+
+{% endblock %}
+
+

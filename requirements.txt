@@ -17,12 +17,16 @@ pytz==2012j
 textile==2.1.5
 wsgiref==0.1.2
 djangorestframework==2.2.6
-django-bootstrap-breadcrumbs==0.3
+django-bootstrap-breadcrumbs==0.6.2
 django-bootstrap-pagination==0.1.10
 pysolr==3.0.6
-github3.py==0.7.0
+github3.py==0.8.1
 django-jenkins
 -e git://github.com/bioinformatics-ua/django-userena.git#egg=userena
 PIL==1.1.7
 geopy==0.96.2
 openpyxl==1.6.2
+request==1.2.3
+biopython==1.63
+django_nvd3==0.6.0
+python-dateutil==2.2

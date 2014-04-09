@@ -36,6 +36,8 @@ from django.conf import settings
 
 urlpatterns = patterns('',
 
+    # Where to go when loggedin (according to Profile)
+    url(r'^wherenext/$', 'emif.views.wherenext'),
 
     # Uncomment the admin/doc line below to enable admin documentation:
     url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
@@ -55,17 +57,21 @@ urlpatterns = patterns('',
     url(r'^search$', 'emif.views.quick_search'),
 
     # Advanced Search
-    url(r'^advancedSearch/(?P<questionnaire_id>[0-9]+)/(?P<question_set>[0-9]+)/$', 'emif.views.advanced_search'),
+    url(r'^advancedSearch/(?P<questionnaire_id>[0-9]+)/(?P<question_set>[0-9]+)/(?P<aqid>[0-9]+)?$', 'emif.views.advanced_search'),
     
     # Database Add
 
     url(r'^add/(?P<questionnaire_id>[0-9]+)/(?P<sortid>[0-9]+)/$', 'emif.views.database_add'),
-    url(r'^addPost/(?P<questionnaire_id>[0-9]+)/(?P<sortid>[0-9]+)$', 'emif.views.check_database_add_conditions'),
+    url(r'^searchqs/(?P<questionnaire_id>[0-9]+)/(?P<sortid>[0-9]+)/(?P<aqid>[0-9]+)?$', 'emif.views.database_search_qs'),
+    url(r'^addqs/(?P<fingerprint_id>[^/]+)/(?P<questionnaire_id>[0-9]+)/(?P<sortid>[0-9]+)/$', 'emif.views.database_add_qs'),
+
+    url(r'^addPost/(?P<questionnaire_id>[0-9]+)/(?P<sortid>[0-9]+)/(?P<saveid>[0-9]+)$', 'emif.views.check_database_add_conditions'),
     
 
     
     # Database Edit
-    url(r'^dbEdit/(?P<fingerprint_id>[^/]+)/(?P<questionnaire_id>[0-9]+)$$', 'emif.views.database_edit'),
+    url(r'^dbEdit/(?P<fingerprint_id>[^/]+)/(?P<questionnaire_id>[0-9]+)$', 'emif.views.database_edit'),
+    url(r'^editqs/(?P<fingerprint_id>[^/]+)/(?P<questionnaire_id>[0-9]+)/(?P<sort_id>[0-9]+)/$', 'emif.views.database_edit_qs'),
     #url(r'^dbEdit/(?P<questionnaire_id>[0-9]+)/$$', 'emif.views.database_edit'),
     url(r'^q3/(?P<runcode>[^/]+)/$', questionaries_with_sets, name='questionaries_with_sets'),
     url(r'^q3/(?P<runcode>[^/]+)/(?P<qs>[-]{0,1}\d+)/$',
@@ -74,6 +80,7 @@ urlpatterns = patterns('',
 
     url(r'^feedback/thankyou/', 'emif.views.feedback_thankyou'),
     url(r'^feedback$', 'emif.views.feedback', name="feedback"),
+    url(r'^bugreport$', 'control_version.views.bug_report', name="bug_report"),
 
 
     (r'^contact/thankyou/', 'searchengine.views.thankyou'),
@@ -81,7 +88,7 @@ urlpatterns = patterns('',
     # Results
     #url(r'^results/(?P<query>[a-zA-Z0-9]+)/$', 'emif.views.results'),
     url(r'^results$', 'emif.views.results_fulltext'),
-    
+
     #Statistics
     url(r'^statistics/(?P<questionnaire_id>[0-9]+)/(?P<question_set>[0-9]+)/$', 'emif.views.statistics'),
     # url(r'^statistics$', 'emif.views.statistics'),
@@ -91,12 +98,19 @@ urlpatterns = patterns('',
 
     url(r'^resultsdiff/(?P<page>[-]{0,1}\d+)?$', 'emif.views.results_diff'),
     url(r'^resultscomp', 'emif.views.results_comp'),
-    url(r'^fingerprint/(?P<runcode>[^/]+)/(?P<qs>[-]{0,1}\d+)/$', 'emif.views.fingerprint'),
+    #url(r'^fingerprint/(?P<runcode>[^/]+)/(?P<qs>[-]{0,1}\d+)/$', 'emif.views.fingerprint'),
+    url(r'^fingerprint/(?P<runcode>[^/]+)/(?P<qs>[-]{0,1}\d+)/$', 'population_characteristics.documents.document_form_view'),
+    url(r'^fingerprint/(?P<runcode>[^/]+)/(?P<qs>[-]{0,1}\d+)/(?P<activetab>[^/]+)/$', 'population_characteristics.documents.document_form_view'),
+    # Single qs for load by blocks
+    url(r'^fingerprintqs/(?P<runcode>[^/]+)/(?P<qsid>[0-9]+)/$', 'population_characteristics.documents.single_qset_view'),
 
     # List Databases
+    url(r'^query/(?P<page>[-]{0,1}\d+)?$', 'emif.views.query_solr'),
     url(r'^databases/(?P<page>[-]{0,1}\d+)?$', 'emif.views.databases', name="databases"),
-    url(r'^alldatabases/(?P<page>[-]{0,1}\d+)?$', 'emif.views.all_databases'),
+#    url(r'^alldatabases/(?P<page>[-]{0,1}\d+)?$', 'emif.views.all_databases'),
+    url(r'^alldatabases/(?P<page>[-]{0,1}\d+)?$', 'emif.views.all_databases_user'),
     url(r'^alldatabases/data-table$', 'emif.views.all_databases_data_table'),
+    url(r'^qs_data_table$', 'emif.views.qs_data_table'),    
     url(r'^export_all_answers$', 'emif.views.export_all_answers'),
     url(r'^export_my_answers$', 'emif.views.export_my_answers'),
     url(r'^export_bd_answers/(?P<runcode>[^/]+)/$', 'emif.views.export_bd_answers'),
@@ -104,17 +118,19 @@ urlpatterns = patterns('',
     url(r'^delete-questionnaire/(?P<qId>[0-9]+)/$', 'utils.delete_questionnaire.delete'),
     # Documentation
     url(r'^docs/api$', 'emif.views.docs_api'),
-    #More Like This!
-    url(r'^databases/mlt/(?P<doc_id>[^/]+)/(?P<page>[-]{0,1}\d+)?$', 'emif.views.more_like_that'),
 
 
     url(r'^rm/(?P<id>[^/]+)', 'emif.views.delete_fingerprint'),
-
+    url(r'^force-rm/(?P<id>[^/]+)', 'emif.views.force_delete_fingerprint'),
+    
     url(r'^share/activation/(?P<activation_code>[^/]+)', 'emif.views.sharedb_activation'),
     url(r'^share/(?P<db_id>[^/]+)', 'emif.views.sharedb'),
 
     # API
     url(r'^api/', include('api.urls')),
+
+    # Control version
+    url(r'^controlversion/', include('control_version.urls')),
 
     # Questionnaire URLs
     url(r'q/', include('questionnaire.urls')),
@@ -130,7 +146,7 @@ urlpatterns = patterns('',
     url(r'^accounts/signup/$',
         signup,
         {'signup_form': SignupFormExtra,
-         'success_url': settings.BASE_URL + 'databases'},
+         'success_url': settings.BASE_URL + 'wherenext'},
         name='userena_signup'),
 
     url(r'^accounts/signup/complete/$',
@@ -148,9 +164,13 @@ urlpatterns = patterns('',
     url(r'^accounts/signin/$',
         signin,
         name='userena_signin'),
+
     url(r'^accounts/signout/$',
         userena_views.signout,
         name='userena_signout'),
+
+    # Edit Profile
+    url(r'^accounts/profile_edit/$', 'accounts.views.profile_edit'),
 
     # Reset password
     url(r'^accounts/password/reset/$',
@@ -207,11 +227,6 @@ urlpatterns = patterns('',
         {'template_name': 'userena/password_complete.html'},
         name='userena_password_change_complete'),
 
-    # Edit profile
-    url(r'^accounts/(?P<username>[^/]+)/edit/$',
-        userena_views.profile_edit,
-        name='userena_profile_edit'),
-
     # View profiles
     url(r'^accounts/(?P<username>(?!signout|signup|signin)[^/]+)/$',
         userena_views.profile_detail,
@@ -225,5 +240,17 @@ urlpatterns = patterns('',
 
     # url(r'^api-upload-info/', 'rest_framework.authtoken.views.obtain_auth_token'),
     url(r'^api-info/(?P<page>[-]{0,1}\d+)?', 'emif.views.create_auth_token', name="api-info"),
-    url(r'^docs/api', 'emif.views.docs_api'),    
+    url(r'^docs/api', 'emif.views.docs_api'),
+
+    # Population Characteristics URLs
+    url(r'population/', include('population_characteristics.urls')),
+
+    # Docs Manager
+    url(r'docsmanager/', include('docs_manager.urls')),
 )
+
+if settings.DEBUG:
+    urlpatterns += patterns('',
+        (r'^500/$', 'django.views.generic.simple.direct_to_template', {'template': '500.html'}),
+        (r'^404/$', 'django.views.generic.simple.direct_to_template', {'template': '404.html'}),
+    )

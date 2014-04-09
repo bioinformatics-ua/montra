@@ -26,6 +26,10 @@ from questionnaire.models import Questionnaire
 
 register = template.Library()
 
+
+from django.conf import settings
+
+
 @register.filter(name='removeh1')
 @stringfilter
 def removeh1(value):
@@ -36,6 +40,12 @@ def removeh1(value):
 @stringfilter
 def clean(value):
     return value.replace('//','')
+
+@register.filter(name='escapedots')
+@stringfilter
+def escapedots(value):
+    print value.replace('.','\\\\.')
+    return value.replace('.','\\\\.')
 
 
 @register.filter(name='replaceplicas')
@@ -48,6 +58,7 @@ def replaceplicas(value):
 @register.filter(name='removehs')
 @stringfilter
 def removehs(value):
+    value = value.replace('h0. ','')
     value = value.replace('h1. ','')
     value = value.replace('h2. ','')
     value = value.replace('h3. ','')
@@ -56,6 +67,14 @@ def removehs(value):
     value = value.replace('h6. ','')
     value = value.replace('h7. ','')
 
+    return value
+
+@register.filter(name='datehhmm')
+@stringfilter
+def datehhmm(value):
+    
+    value = value[:-10]
+    
     return value
 
 @register.filter(name='trim')
@@ -103,6 +122,24 @@ def truncate(value):
 
     return result
 
+@register.filter
+def whitespacesplit(str):
+    words = []
+
+    for m in re.finditer(r'"(.*?)"', str):
+        words.append(m.group(1))
+        str = str.replace(m.group(0), "")
+
+    words = words + str.strip().split()
+
+    return words
+
+@register.filter
+def ellipsis(str, size):
+    if(len(str) > size):
+        return str[:size]+"..."
+
+    return str
 
 def fingerprints_list():
     
@@ -117,6 +154,46 @@ def fingerprints_list():
 
     return results
 
+def fingerprints_list_user(user):
+
+    interests = user.get_profile().interests.all()
+    quests = []
+
+    try:
+        for inter in interests:
+            if inter.disable==False:
+                quests.append(inter)
+    except:
+        pass
+
+    results = {}
+    for q in quests:
+        results[q.id] = q.name
+
+    return results
+
+def profiles_list_user(user):
+    profiles = user.get_profile().profiles.all()
+    results = {}
+    for p in profiles:
+        results[p.id] = p.name
+
+    return results
+
+def show_profiles(user):
+
+    return {'profiles':profiles_list_user(user)}
+register.inclusion_tag('menu_ttags_profiles.html')(show_profiles)
+
+def show_fingerprints_interests_profile(user):
+
+    return {'fingerprints':fingerprints_list_user(user)}
+register.inclusion_tag('menu_ttags_interests.html')(show_fingerprints_interests_profile)
+
+def show_fingerprints_interests(user):
+
+    return {'fingerprints':fingerprints_list_user(user)}
+register.inclusion_tag('menu_ttags.html')(show_fingerprints_interests)
 
 def show_fingerprints():
     
@@ -189,6 +266,10 @@ class GlobalVariableGetNode( template.Node ):
         except AttributeError:
             return ''
 
+@register.simple_tag()
+def multiply(a, b, *args, **kwargs):
+    # you would need to do any localization of the result here
+    return a * b
 
 def getglobal( parser, token ):
     try:
@@ -215,4 +296,22 @@ def incrementglobal( parser, token ):
   except ValueError:
     raise template.TemplateSyntaxError("%r tag requires arguments" % token.contents.split()[0])
   return GlobalVariableIncrementNode(varname)
+
 register.tag( 'incrementglobal', incrementglobal )
+
+class VersionNode( template.Node ):
+  def __init__( self, varname ):
+    self.varname = varname
+  def render( self, context ):
+    return get_version()
+
+def get_version():
+    return settings.VERSION + " " + settings.VERSION_DATE
+
+def get_version_tag(parser, token):
+    return VersionNode('')
+register.tag( 'get_version', get_version_tag )
+
+
+
+
