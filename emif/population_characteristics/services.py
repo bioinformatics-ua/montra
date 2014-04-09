@@ -180,7 +180,10 @@ class PopulationCharacteristic(object):
     def filters(self, var, fingerprint_id):
 
         # Go to the rule matcher and ask for the filter for that particular case
-        mrules = RuleMatcher()
+        comp = False
+        if fingerprint_id=="COMPARE":
+            comp=True
+        mrules = RuleMatcher(comp=comp)
         filters = mrules.get_filter(var)
         chart = mrules.get_chart(var)
         #_filter = charts_conf.
@@ -190,11 +193,13 @@ class PopulationCharacteristic(object):
         for _filter in filters:
 
             # Generate query
+
             dict_query = {'fingerprint_id':fingerprint_id, 
                 'values.Var': chart.title.var,
                 
                 }
-
+            if comp:
+                dict_query = {'values.Var': chart.title.var,}
             if _filter.key != None:
                 dict_query['values.' + _filter.key]  = _filter.name
             print _filter

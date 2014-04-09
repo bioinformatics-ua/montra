@@ -156,6 +156,9 @@ def generic_filter(request, param, template_name='documents_upload_form.html'):
     return response
 
 def get_settings(request, runcode):
+    
+    if (runcode=="COMPARE"):
+        return get_compare_settings(request)
     pc = PopulationCharacteristic(None)
     values = pc.get_settings()
     data = {'conf': values.to_JSON()}

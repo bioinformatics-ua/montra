@@ -23,19 +23,7 @@
 **************** Population Characteristics API 
 *********************************************************/
 
-function getFingerprintID(){
-  var url = document.URL;
-  var fingerprint_id='abcd';
 
-  try{
-    fingerprint_id = url.split("fingerprint/")[1].split("/1")[0];
-  }
-  catch(err){
-    fingerprint_id='abcde'
-  };
-  return fingerprint_id;
-
-};
 
 
 // This is the mode 
@@ -60,7 +48,24 @@ function getPageType()
 };
 
 getPageType();
+var defaultFingerprintID = "NONE";
+if (PAGE_TYPE==PC_COMPARE)
+{
+  defaultFingerprintID = "COMPARE"
+}
+function getFingerprintID(){
+  var url = document.URL;
+  var fingerprint_id='abcd';
 
+  try{
+    fingerprint_id = url.split("fingerprint/")[1].split("/1")[0];
+  }
+  catch(err){
+    fingerprint_id=defaultFingerprintID;
+  };
+  return fingerprint_id;
+
+};
 
 var filtersMap = {};
 var translations = {};
@@ -92,124 +97,7 @@ function PCAPI (endpoint)
                     }
                 }
     });
-    this.getGender = function(){
-        var result = {}
-          
-        $.ajax({
-          dataType: "json",
-          url: this.endpoint+"/Active patients/Gender/abcd",
-          async: false,
-          data: result,
-          success: function (data){result=data;}
-        });
-        return result;
-    };
-
-    this.getName1 = function(){
-          var result = {}
-          
-        $.ajax({
-          dataType: "json",
-          url: this.endpoint+"/Active patients/Name1/abcd",
-          async: false,
-          data: result,
-          success: function (data){result=data;}
-        });
-        return result;
-    };
-
-    this.getName2 = function(){
-          var result = {}
-          
-        $.ajax({
-          dataType: "json",
-          url: this.endpoint+"/Active patients/Name2/abcd",
-          async: false,
-          data: result,
-          success: function (data){result=data;}
-        });
-        return result;
-    };
-
-
-    this.getValue1 = function(){
-          var result = {}
-          
-        $.ajax({
-          dataType: "json",
-          url: this.endpoint+"/Active patients/Value1/abcd",
-          async: false,
-          data: result,
-          success: function (data){result=data;}
-        });
-        return result;
-    };
-
-
-    this.getValue2 = function(){
-          var result = {}
-          
-        $.ajax({
-          dataType: "json",
-          url: this.endpoint+"/Active patients/Name2/abcd",
-          async: false,
-          data: result,
-          success: function (data){result=data;}
-        });
-        return result;
-    };
-
-    this.getNameN = function(nameN){
-          var result = {}
-          
-        $.ajax({
-          dataType: "json",
-          url: this.endpoint+ nameN,
-          async: false,
-          data: result,
-          success: function (data){result=data;}
-        });
-        return result;
-    };
-
-    this.getValueN = function(valueN){
-          var result = {}
-          
-        $.ajax({
-          dataType: "json",
-          url: this.endpoint+"" + valueN,
-          async: false,
-          data: result,
-          success: function (data){result=data;}
-        });
-        return result;
-    };
-
-    this.getVar = function(){
-        var result = {}
-          
-        $.ajax({
-          dataType: "json",
-          url: this.endpoint+"/Var",
-          async: false,
-          data: result,
-          success: function (data){result=data;}
-        });
-        return result;
-    };
-
-    this.getChart = function(){
-        var result = {}
-          
-        $.ajax({
-          dataType: "json",
-          url: this.endpoint+"/Var",
-          async: false,
-          data: result,
-          success: function (data){result=data;}
-        });
-        return result;
-    };
+    
     this.getValuesRow = function(Var, Row, fingerprintID){
         var result = {}
           
@@ -310,7 +198,7 @@ function PCAPI (endpoint)
 
 
               $.each(xFilter.values, function (data){
-
+                  
                   if (xFilter.values[data]==="")
                       return;
 
@@ -322,7 +210,8 @@ function PCAPI (endpoint)
 
                   }
                   var originalValue = xFilter.values[data];
-
+                  console.log("originalValue");
+                  console.log(originalValue);
                   if (xFilter['translation'] != null)
                   {
                     if (xFilter['translation'].hasOwnProperty(originalValue))

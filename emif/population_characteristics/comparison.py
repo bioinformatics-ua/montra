@@ -57,12 +57,25 @@ This code is only made to the comparison between databases
 
 def handle_compare(request, template_name="compare_populations.html"):
 
+    filters = []
+
+    if request.POST:
+        # Get the filters to apply.
+
+        filters = {}
+        print request.POST
+        myRq = dict(request.POST.lists())
+        for i in myRq:
+            filters[i[0:-2]] = myRq[i]
+
+        print "Filters" + str(filters)
+
     cp = ComparisonPopulation(None)
     # Only hard coded for testing 
-    fingerprint_ids = ["66a47f694ffb676bf7676dfde24900e6", "0d4917a4c4e2c93818a9a2a813e24c7e"]
+    fingerprint_ids = ["66a47f694ffb676bf7676dfde24900e6", "3dc3d622130eac4d092786afb9a0ec76", "2e303fd12bc5e5fd03a54651dd8d6334"]
     var = "Active patients"
     row = "Count"
-    print cp.get_variables(var, row, fingerprints_id=fingerprint_ids)
+    print cp.get_variables(var, row, fingerprints_id=fingerprint_ids, filters=filters)
 
     return render(request, template_name, {'request': request,  
         'owner_fingerprint':False,
@@ -70,16 +83,40 @@ def handle_compare(request, template_name="compare_populations.html"):
 
 
 def handle_compare_values(request, var, row, fingerprint_id, template_name="compare_populations.html"):
+
+    filters = []
+
+    if request.POST:
+        # Get the filters to apply.
+
+        filters = {}
+        print request.POST
+        myRq = dict(request.POST.lists())
+        for i in myRq:
+            filters[i[0:-2]] = myRq[i]
+
+        print "Filters" + str(filters)
+
     cp = ComparisonPopulation(None)
     # Only hard coded for testing 
-    fingerprint_ids = ["66a47f694ffb676bf7676dfde24900e6", "0d4917a4c4e2c93818a9a2a813e24c7e"]
+    fingerprint_ids = ["66a47f694ffb676bf7676dfde24900e6", "3dc3d622130eac4d092786afb9a0ec76", "2e303fd12bc5e5fd03a54651dd8d6334"]
     
-    values = cp.get_variables(var, row, fingerprints_id=fingerprint_ids)
+    values = cp.get_variables(var, row, fingerprints_id=fingerprint_ids, filters=filters)
     data = {'values': values}
     response = JSONResponse(data, mimetype="application/json")
     response['Content-Disposition'] = 'inline; filename=files.json'
     return response
 
+def get_compare_settings(request):
+
+    cc = ConfCharts()
+    values = cc.get_compare_settings()
+
+    data = {'conf': values.to_JSON()}
+
+    response = JSONResponse(data, mimetype=response_mimetype(request))
+    response['Content-Disposition'] = 'inline; filename=files.json'
+    return response
 
 class ComparisonPopulation(object):
     """PopulationCharacteristic: This class controls the Jerboa File
@@ -96,7 +133,6 @@ class ComparisonPopulation(object):
             filter_fp.append(_filter_fp)
 
         return filter_fp
-
 
 
 
@@ -167,6 +203,8 @@ class ComparisonPopulation(object):
             return values
         values_app = None
         for v in values:
+
+
             if c1.y_axis.transformation != None:
                 try:
                     print "transformation"
@@ -179,6 +217,7 @@ class ComparisonPopulation(object):
                 except:
                     #raise
                     print "bastard x error %s, %s " % (c1.y_axis.var, str(v[u'values']))
+            v[u'values']['fingerprint_id'] = v[u'fingerprint_id']
             results.append(v[u'values'])
 
         vorder = c1.x_axis.var

@@ -41,6 +41,7 @@ from docs_manager.storage_handler import *
 from population_characteristics.models import *
 
 from docs_manager.views import get_revision
+from population_characteristics.tasks import aggregation
 
 def document_form_view_upload(request, fingerprint_id, template_name='documents_upload_form.html'):
     """Store the files at the backend 
@@ -88,6 +89,7 @@ def document_form_view_upload(request, fingerprint_id, template_name='documents_
     pc.submit_new_revision(fingerprint_id, path_file)
 
 
+    aggregation(fingerprint_id)
     response = JSONResponse(data, mimetype=response_mimetype(request))
     response['Content-Disposition'] = 'inline; filename=files.json'
     return response

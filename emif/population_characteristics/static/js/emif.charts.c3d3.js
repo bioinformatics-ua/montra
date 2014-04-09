@@ -28,7 +28,7 @@ Array.min = function( array ){
     return Math.min.apply( Math, array );
 };
 
-
+var debug = null;
 function GraphicChartC3D3(divArg, dataArg)
 {
   /** Passes the initial arguments required to start and d3
@@ -47,7 +47,7 @@ function GraphicChartC3D3(divArg, dataArg)
   };
 
   this.translateData = function(objects){
-    
+    debug = objects;
 
     /*** Lets translate our data model to the d3 support data model */ 
     xscale = {'bins':5}
