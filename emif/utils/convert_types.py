@@ -84,3 +84,4 @@ def convert(type):
         convertFieldsOnSolr(fields, type)
 
 convert("datepicker")
+convert("numeric")
