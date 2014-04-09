@@ -89,7 +89,7 @@ def document_form_view_upload(request, fingerprint_id, template_name='documents_
     pc.submit_new_revision(fingerprint_id, path_file)
 
 
-    aggregation(fingerprint_id)
+    aggregation.apply_async([fingerprint_id])
     response = JSONResponse(data, mimetype=response_mimetype(request))
     response['Content-Disposition'] = 'inline; filename=files.json'
     return response

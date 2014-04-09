@@ -28,6 +28,8 @@ import time
 @shared_task
 def aggregation(fingerprint_id):
     # Operations
-    time.sleep(5)
+    print "start aggregation"
+    time.sleep(25)
+    print "ends aggregation"
     return fingerprint_id
 
