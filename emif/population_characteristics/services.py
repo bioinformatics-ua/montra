@@ -61,6 +61,7 @@ class PopulationCharacteristic(object):
             print "Sucess "
         except OperationFailure:
             print "Failure"
+        return json_data
 
 
     def get_variables(self, var, row, fingerprint_id='abcd', filters=[], vars_that_should_exists=[]):

@@ -468,6 +468,7 @@ try:
     db_mongo = client.emif_mongo
     # jerboa_collection = db_mongo.MONGO_EMIF['COLLECTION']
     jerboa_collection = db_mongo.jerboa_files
+    jerboa_aggregation_collection = db_mongo.jerboa_aggregation
 except ConnectionFailure, e:
     sys.stderr.write("Could not connect to MongoDB: %s" % e)
     sys.exit(1)

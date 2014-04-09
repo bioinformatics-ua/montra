@@ -26,7 +26,7 @@ from celery import shared_task
 import time
 
 @shared_task
-def aggregation(fingerprint_id):
+def aggregation(fingerprint_id, values):
     # Operations
     print "start aggregation"
     time.sleep(25)
