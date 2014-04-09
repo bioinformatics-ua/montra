@@ -889,7 +889,6 @@ BooleanTerminal.prototype = {
     },
     toQuery: function() {
         var suffix="]";
-
         if (this.id && this.val){
             if(this.val.lastIndexOf("[") == 0 && 
                 this.val.indexOf(suffix, this.val.length - suffix.length) !== -1)

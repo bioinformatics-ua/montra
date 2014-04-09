@@ -668,8 +668,8 @@ def render_one_questionset(request, q_id, qs_id, errors={}, aqid=None, fingerpri
                 answer = str(question.number)
 
                 extra[question] = ans = extra.get(question, {})
-                if "[" in value:
-                    value = value.replace("]", "").replace("[", "")
+                if "[" in str(value):
+                    value = str(value).replace("]", "").replace("[", "")
                 request2.get_post()['question_%s' % question.number] = value
                 
                 
@@ -1091,8 +1091,8 @@ def database_edit(request, fingerprint_id, questionnaire_id, template_name="data
         answer = str(question.number)
 
         extra[question] = ans = extra.get(question, {})
-        if "[" in value:
-            value = value.replace("]", "").replace("[", "")
+        if "[" in str(value):
+            value = str(value).replace("]", "").replace("[", "")
         request2.get_post()['question_%s' % question.number] = value
         
         
@@ -1988,7 +1988,7 @@ def createqsets(runcode, qsets=None, clean=True, highlights=None):
             if question_group != None and qhighlights != None and id_text in qhighlights and qs_text in qhighlights[id_text]:
                 question_group.info = True
 
-            value = clean_value(str(result[k].encode('utf-8')))
+            value = clean_value(str(result[k]).encode('utf-8'))
             
             try:
 
@@ -2143,7 +2143,7 @@ def createqset(runcode, qsid, qsets=None, clean=True, highlights=None):
                 except:
                     pass
 
-            value = clean_value(str(result[k].encode('utf-8')))
+            value = clean_value(str(result[k]).encode('utf-8'))
 
             qs_text = k[:-1] + "qs"
             id_text = "questionaire_"+str(fingerprint_ttype)

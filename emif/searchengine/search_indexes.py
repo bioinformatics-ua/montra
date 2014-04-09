@@ -366,11 +366,52 @@ def assert_suffix(type):
     # else
     return None  
 
+def convertDate(value):
+    value = re.sub("'", "", value)
+    print (value)
+    try:
+        # First we try converting to normalized format, yyyy-mm-dd
+        date = datetime.datetime.strptime(value, '%Y-%m-%d')
+        return date
+    except ValueError:
+        #print('failed 1')
+        pass
+
+    try:
+        # We try yyyy/mm/dd
+        date = datetime.datetime.strptime(value, '%Y/%m/%d')
+        return date
+    except ValueError:
+        #print('failed 2')
+        pass
+
+    try:
+        # We try just the year, yyyy
+        date = datetime.datetime.strptime(value, '%Y')
+        return date
+    except ValueError:
+        #print('failed 3')
+        pass
+
+    # failed conversion        
+    return None
+
+def replaceDate(m):
+    group = m.group(0)
+
+    converted_date = convertDate(group)
+    if converted_date == None:
+        return '*'
+    return converted_date.isoformat()+'T00:00:00Z'
+
 def convert_value(value, type):
+
     if type == "numeric":
+        #print("type numeric")
         try:
             # remove separators if they exist on representation
-            value = re.sub("[']", "", value)
+            value = re.sub("[^0-9.,]", "", value)
+            print ("value:"+value)
             # replace usual mistake , to .
             value = re.sub("[,]", ".", value)
             value = float(value)
@@ -379,27 +420,18 @@ def convert_value(value, type):
             pass            
 
     elif type == "datepicker":
-        date = value
-        try:
-            # First we try converting to normalized format, yyyy-mm-dd
-            date = datetime.datetime.strptime(value, "%Y-%m-%d")
-            return date
-        except ValueError:
-            pass
+        if (value.startswith('[') and value.endswith(']')):
+            temp = value
+            temp = re.sub("[0-9/-]+", replaceDate, temp)
 
-        try:
-            # We try yyyy/mm/dd
-            date = datetime.datetime.strptime(value, "%Y/%m/%d")
-            return date
-        except ValueError:
-            pass
-
-        try:
-            # We try just the year, yyyy
-            date = datetime.datetime.strptime(value, "%Y")
-            return date
-        except ValueError:
-            pass
+            return temp
+        else:           
+            # for some weird reason, single date queries to solr returns error, 
+            # they must be in a range format always ? wth i just do a range query on the same date
+            result = convertDate(value)
+            if (result != None):
+                result = result.isoformat()
+                return "["+result+"T00:00:00Z TO "+result+"T23:59:59Z]"
 
     return None
 

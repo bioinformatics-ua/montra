@@ -153,25 +153,38 @@ function validateById(id_answered, id_answered_aux) {
         || qc_id.hasClass('type_open-button') || qc_id.hasClass('type_open-upload-image') || qc_id.hasClass('type_open-textfield') || qc_id.hasClass('type_publication')) {
         var myValue = $('[id="answered_' + id_answered_aux + '"]').parent().parent()[0].id;
 
+        var old_value;
 
         if (myValue != undefined) {
             myValue = myValue.replace('acc_qc_', '');
             myValue = myValue.replace('qc_', '');
 
             var val = $(':input[name="question_' + myValue.replace(/\./g, '\\.') + '"]');
+
             var r = validate1(val, id_answered_aux, id_answered);
             if (r)
                 valueCounter = 1;
             else
                 valueCounter = -1;
+
         }
 
     } else if (qc_id.hasClass('type_datepicker') || qc_id.hasClass('type_range') || qc_id.hasClass('type_timeperiod')) {
+
         var myValue = $('[id="answered_' + id_answered_aux + '"]').parent().parent()[0].id;
+
+
 
         if (myValue != undefined) {
             myValue = myValue.replace('acc_qc_', '');
 
+            if(qc_id.hasClass('type_datepicker')){
+                var value = $('[id="question_'+myValue+'"]').val();
+                value = value.replace('mm','01');
+                value = value.replace(/y/g,'0');
+                value = value.replace('dd','01');
+                $('[id="question_'+myValue+'"]').val(value);
+            }
             var val = $(':input[name="question_' + myValue.replace(/\./g, '\\.') + '"]');
 
             var r = validate1(val, id_answered_aux, id_answered);

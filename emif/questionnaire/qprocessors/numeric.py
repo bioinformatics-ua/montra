@@ -7,8 +7,7 @@ from django.utils.translation import ugettext as _
 from django.utils.simplejson import dumps
 import re
 
-regex = re.compile("\\d{1,3}(\\.\\d{3})*$")
-
+regex = re.compile("^\d{1,3}(\\'\d{3})*(\\.[0-9]+)?")
 @question_proc('numeric')
 def question_(request, question):
     cd = question.getcheckdict()
@@ -31,7 +30,7 @@ def question_(request, question):
 def process_(question, ansdict):
     checkdict = question.getcheckdict()
     required = question.getcheckdict().get('required', 0)
-    ans = ansdict['ANSWER'] or ''
+    ans = str(ansdict['ANSWER']) or ''
     qtype = question.get_type()
 
     boo = regex.match(ans) == None

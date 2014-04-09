@@ -5,6 +5,15 @@
        {% include "questionnaire/range_field.html" %} 
     </div>
 <script type="text/javascript">
+$("#question_{{ question.number|escapedots }}").inputmask("decimal", { radixPoint: ".", autoGroup: true, groupSeparator: "'", groupSize: 3, rightAlignNumerics: false  });
+// Reactive, in case we try to use range, but decided to erase the search, and use it as a simple value one
+$('[id="question_{{ question.number }}"]').change(function() {
+    if ($(this).val() == '') {
+        $(this).inputmask("remove");
+        $(this).inputmask("decimal", { radixPoint: ".", autoGroup: true, groupSeparator: "'", groupSize: 3, rightAlignNumerics: false  });
+    }
+});
+
 $("#from_{{ question.number|removedots }}").inputmask("decimal", {
     radixPoint: ".",
     autoGroup: true,
@@ -76,7 +85,9 @@ $('#define_{{ question.number|removedots }}').click(function() {
                 end = temp;
             }
             var result = "[ " + start + " TO " + end + " ]";
-            console.log('result');
+            
+            $('[id="question_{{ question.number }}"]').inputmask('remove');
+
             $('[id="question_{{ question.number }}"]').val(result);
             $('[id="question_{{ question.number }}"]').change();
             $('#error_{{ question.number|removedots }}').fadeOut('fast');

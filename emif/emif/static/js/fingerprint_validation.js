@@ -63,7 +63,7 @@ OpenButtonValidator.prototype ={
 }
 
 function NumericValidator(context){
-    this.regex = /^\d{1,3}(\.\d{3})*$/;
+    this.regex = /^\d{1,3}(\'\d{3})*(\.[0-9]+)?$/;
     this.context = context;
 }
 NumericValidator.prototype ={
