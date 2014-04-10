@@ -73,6 +73,41 @@ class ConfAggregations(object):
 
         a1 = Aggregation()
 
+
+        a = Aggregation()
+
+        a.var = "Observation time in a year"
+        a.operation = Operation.SUM 
+        a.field_to_compute = "Count"
+
+        af = AggregationField()
+        af.ttype = "slug"
+        af.name = "location_t"
+        af.key = "location"
+        af.value = "location_value"
+
+        af1 = AggregationField()
+
+        af1.ttype = "tsv"
+        af1.name = 'Year'
+        af1.key = 'Name1'
+        af1.value = 'Value1'
+
+
+        af2 = AggregationField()
+
+        af2.ttype = "tsv"
+        af2.name = None
+        af2.key = None
+        af2.value = 'Gender'
+
+
+        #a.aggregation_fields = [af, af1, af2]
+        a.aggregation_fields = [af, af2]
+        result.append(a)
+
+
+
         a1.var = "Observation time in a year"
         a1.operation = Operation.SUM 
         a1.field_to_compute = "Count"
