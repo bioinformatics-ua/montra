@@ -991,7 +991,7 @@ class ConfCharts(object):
 
         c26.filters = [f2]
 
-        sc.charts.append(c26)
+        #sc.charts.append(c26)
 
         
         #################################################
