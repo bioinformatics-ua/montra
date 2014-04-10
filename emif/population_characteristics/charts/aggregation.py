@@ -36,9 +36,9 @@ class AggregationField:
         self.ttype = "slug" # slug or tsv
         self.name = None # columns of tsv or name of slug
         self.filters = []
-        self.operation = None # choose one of the operations 
         self.key = None
-        self.transformation = None
+        self.value = None
+        self.values = None 
 
     def to_JSON(self):
         return json.dumps(self, default=lambda o: o.__dict__, sort_keys=True, indent=4)
@@ -50,13 +50,10 @@ class Aggregation(object):
         self.var = None
         self.key = None
         self.value = None
-        self.values = None
-        self.translation = None
-        self.filters = None
-        self.static_filters = None 
         self.aggregation_fields = None 
         self.operation = None # choose one of the operations 
-        
+        self.field_to_compute = None
+        self.static_filters = None 
 
     def to_JSON(self):
         return json.dumps(self, default=lambda o: o.__dict__, sort_keys=True, indent=4)

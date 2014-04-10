@@ -18,7 +18,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-from emif.settings import jerboa_collection
+from emif.settings import jerboa_collection, jerboa_aggregation_collection
 from pymongo.errors import OperationFailure
 from .parseJerboaFile import * 
 import json 
@@ -143,7 +143,7 @@ class ComparisonPopulation(object):
         vars_that_should_exists = ['Count']
 
         # Get the Rule Matcher 
-        mrules = RuleMatcher()
+        mrules = RuleMatcher( comp=True)
         __filters = mrules.get_filter(var)
         c1 = mrules.get_chart(var)
 
@@ -183,7 +183,7 @@ class ComparisonPopulation(object):
         if dict_query_general != []:
             dict_query["$and"]= dict_query_general
         print dict_query
-        values =  jerboa_collection.find(dict_query )
+        values =  jerboa_aggregation_collection.find(dict_query )
         
 
         results = []

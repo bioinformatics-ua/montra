@@ -835,8 +835,9 @@ class ConfCharts(object):
         c5.title.fixed_title = "Total Overall patient time in a year" 
         c5.x_axis = Axis()
         c5.x_axis.operation = "unique"
-        c5.x_axis.var = "Value1"
+        c5.x_axis.var = "dbname_value"
         c5.x_axis.label = "Years"
+        c5.x_axis.categorized = True
         c5.y_axis = Axis()
         c5.y_axis.operation = "unique"
         c5.y_axis.var = "Count"
@@ -883,14 +884,15 @@ class ConfCharts(object):
 
 
         c5 = Chart()
-        c5.uid = 8
+        c5.uid = 18
         c5.title = Title()
         c5.title.operation = Operation.UNIQUE
         c5.title.var = "Observation time in a year" 
         c5.title.fixed_title = "Total patient time in a year" 
         c5.x_axis = Axis()
         c5.x_axis.operation = "unique"
-        c5.x_axis.var = "Value1"
+        c5.x_axis.var = "dbname_value"
+        c5.x_axis.categorized = True
         c5.x_axis.label = "Years"
         c5.y_axis = Axis()
         c5.y_axis.operation = "unique"
@@ -936,22 +938,22 @@ class ConfCharts(object):
         #################################################
 
 
-        c5 = Chart()
-        c5.uid = 8
-        c5.title = Title()
-        c5.title.operation = Operation.UNIQUE
-        c5.title.var = "Observation time in a year" 
-        c5.title.fixed_title = "Total patient time in a year" 
-        c5.x_axis = Axis()
-        c5.x_axis.operation = "unique"
-        c5.x_axis.var = "Value1"
-        c5.x_axis.label = "Years"
-        c5.y_axis = Axis()
-        c5.y_axis.operation = "unique"
-        c5.y_axis.var = "Count"
-        c5.y_axis.transformation = "y / 12"
-        c5.y_axis.label = "Sum of the patients observation time (years)"
-        c5.y_axis.multivalue = True
+        c26 = Chart()
+        c26.uid = 19
+        c26.title = Title()
+        c26.title.operation = Operation.UNIQUE
+        c26.title.var = "Observation time in a year" 
+        c26.title.fixed_title = "Total patient time in a year" 
+        c26.x_axis = Axis()
+        c26.x_axis.operation = "unique"
+        c26.x_axis.var = "Value1"
+        c26.x_axis.label = "Years"
+        c26.y_axis = Axis()
+        c26.y_axis.operation = "unique"
+        c26.y_axis.var = "Count"
+        c26.y_axis.transformation = "y / 12"
+        c26.y_axis.label = "Sum of the patients observation time (years)"
+        c26.y_axis.multivalue = True
 
         fy2 = Filter()
         fy2.name = 'Name2'
@@ -963,7 +965,7 @@ class ConfCharts(object):
         fy3.key = 'Value2'
         fy3.value = ''
 
-        c5.y_axis.static_filters = [fy2, fy3]
+        c26.y_axis.static_filters = [fy2, fy3]
 
 
         f1 = Filter()
@@ -981,9 +983,9 @@ class ConfCharts(object):
         ss.unit = "Year"
         ss.bins = "10"
 
-        c5.filters = [f2]
+        c26.filters = [f2]
 
-        sc.charts.append(c5)
+        sc.charts.append(c26)
 
         
         #################################################

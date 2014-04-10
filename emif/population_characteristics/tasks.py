@@ -25,11 +25,21 @@ from __future__ import absolute_import
 from celery import shared_task
 import time
 
+from population_characteristics.aggregator import *
+
 @shared_task
 def aggregation(fingerprint_id, values):
     # Operations
     print "start aggregation"
-    time.sleep(25)
+    try:
+        ac = AggregationPopulationCharacteristics(values,fingerprint_id, None)
+        print "created object"
+        new_values = ac.run()
+    except:
+        print "Exception!!!!!!!"
+        import traceback
+        traceback.print_exc()
+        
     print "ends aggregation"
     return fingerprint_id
 

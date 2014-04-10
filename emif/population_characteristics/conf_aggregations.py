@@ -41,26 +41,66 @@ class ConfAggregations(object):
         a = Aggregation()
 
         a.var = "Observation time in a year"
-        a.key = "Name3"
-        a.value = None
-        a.values = None
+        a.operation = Operation.SUM 
+        a.field_to_compute = "Count"
 
         af = AggregationField()
         af.ttype = "slug"
         af.name = "database_name_t"
+        af.key = "dbname"
+        af.value = "dbname_value"
 
-        f1 = Filter()
-        f1.name = 'Year'
-        f1.key = 'Name1'
-        f1.value = 'Value1'
-
-        
         af1 = AggregationField()
-        af1.ttype = "tsv"
-        af1.filters = [f1]
-        a.operation = Operation.SUM 
 
-        a.aggregation_fields = [af, af1]
+        af1.ttype = "tsv"
+        af1.name = 'Year'
+        af1.key = 'Name1'
+        af1.value = 'Value1'
+
+
+        af2 = AggregationField()
+
+        af2.ttype = "tsv"
+        af2.name = None
+        af2.key = None
+        af2.value = 'Gender'
+
+
+        #a.aggregation_fields = [af, af1, af2]
+        a.aggregation_fields = [af, af2]
+
+
+
+        a1 = Aggregation()
+
+        a1.var = "Observation time in a year"
+        a1.operation = Operation.SUM 
+        a1.field_to_compute = "Count"
+
+        af = AggregationField()
+        af.ttype = "slug"
+        af.name = "database_name_t"
+        af.key = "dbname"
+        af.value = "dbname_value"
+
+        af1 = AggregationField()
+
+        af1.ttype = "tsv"
+        af1.name = 'Year'
+        af1.key = 'Name1'
+        af1.value = 'Value1'
+
+
+        af2 = AggregationField()
+
+        af2.ttype = "tsv"
+        af2.name = None
+        af2.key = None
+        af2.value = 'Gender'
+
+
+        a1.aggregation_fields = [af, af1, af2]
+        #a.aggregation_fields = [af, af2]
 
 
         result.append(a)
