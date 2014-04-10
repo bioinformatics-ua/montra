@@ -159,6 +159,7 @@ STATICFILES_DIRS = (
     os.path.abspath(PROJECT_DIR_ROOT + MIDDLE_DIR + 'emif/static'),
     os.path.abspath(PROJECT_DIR_ROOT + MIDDLE_DIR + 'questionnaire/static/'),
     os.path.abspath(PROJECT_DIR_ROOT + MIDDLE_DIR + 'population_characteristics/static'),
+    os.path.abspath(PROJECT_DIR_ROOT + MIDDLE_DIR + 'literature/static'),
     os.path.abspath(PROJECT_DIR_ROOT + MIDDLE_DIR + 'docs_manager/static'),
 )
 
@@ -206,6 +207,7 @@ TEMPLATE_DIRS = (
     os.path.abspath(PROJECT_DIR_ROOT + MIDDLE_DIR + 'apps/seantis-questionnaire/questionnaire/templates'),
     os.path.abspath(PROJECT_DIR_ROOT + MIDDLE_DIR + 'emif/templates'),
     os.path.abspath(PROJECT_DIR_ROOT + MIDDLE_DIR + 'population_characteristics/templates'),
+    os.path.abspath(PROJECT_DIR_ROOT + MIDDLE_DIR + 'literature/templates'),
     os.path.abspath(PROJECT_DIR_ROOT + MIDDLE_DIR + 'control_version/templates'),
     os.path.abspath(PROJECT_DIR_ROOT + MIDDLE_DIR + 'docs_manager/templates'),
 )
@@ -251,6 +253,7 @@ INSTALLED_APPS = (
     'control_version',
     'docs_manager',
     'population_characteristics',
+    'literature',
     'django_bootstrap_breadcrumbs',
     'bootstrap-pagination',
     'django_jenkins',

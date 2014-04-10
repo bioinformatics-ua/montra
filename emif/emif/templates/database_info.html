@@ -99,11 +99,11 @@
                 <li  class="{%if activetab == 'docs'%}active{%endif%}">
                     <a href="#documents" data-toggle="tab"><i class="icon-folder-close"></i>&nbsp; Documents</a>
                 </li>
-                <!--
-                <li  class="{%if activetab == 'literature'%}active{%endif%}">
-                    <a href="#literature" data-toggle="tab">Literature</a>
+                
+                <li class="{%if activetab == 'literature'%}active{%endif%}">
+                    <a href="#literature" data-toggle="tab"><i class="icon-book"></i>&nbsp; Literature</a>
                 </li>
-                -->
+                
                 
                 <li  class="{%if activetab == 'extra'%}active{%endif%}">
                     <a href="#apiinfo" data-toggle="tab"><i class="icon-download-alt"></i> &nbsp; Extra Information</a>
@@ -135,36 +135,7 @@
 
 
                 <div class="tab-pane {%if activetab == 'literature'%}active{%endif%}" id="literature">
-                    <div>
-                        <a id="collapseall_literature" class="btn pull-right" href=""><i class="icon-plus"></i>&nbsp; Expand all</a>
-                    </div>
-                    <div class="accordion pull-left " id="accordion2" style="margin-top: 10px;">
-                        <div class="accordion-group">
-                            <div class="accordion-heading">
-                                <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapseOne">
-                                    Upregulation of chemokines and their receptors in Duchenne muscular dystrophy: potential for attenuation of myofiber necrosis.
-                                </a>
-                            </div>
-                            <div id="collapseOne" class="accordion-body collapse in">
-                                <div class="accordion-inner">
-                                    <div id="becas-widget-text" class="widget-container"></div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="accordion-group">
-                            <div class="accordion-heading">
-                                <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapseTwo">
-                                    Upregulation of chemokines and their receptors in Duchenne muscular dystrophy: potential for attenuation of myofiber necrosis.
-                                </a>
-                            </div>
-                            <div id="collapseTwo" class="accordion-body collapse">
-                                <div class="accordion-inner">
-                                    <!-- Container to hold another widget -->
-                                    <div id="becas-widget-pmid" class="widget-container"></div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                    <h4 class="loadingsection pull-center">Loading...</h4>
                 </div>
 
 
@@ -312,7 +283,11 @@ function loadqspart(sortid, pk){
 }
 <!-- This must be here because of dynamic code -->
 $(document).ready(function() {
-
+    $('.tabbable a[data-toggle="tab"]').on('shown', function (e) {
+        if(e.target.innerText == 'Population Characteristics'){
+          console.log("test");
+        }
+    });
     load_questionnary();
     // On expand event, we burst the priority of this thread to load before the others
     $('.accordion-heading').click(function(){
@@ -345,10 +320,25 @@ $(document).ready(function() {
         $("#pivot_table_extra_information").html(json_to_table(json2));
     }
 });
+    /* On tab change, to literature tab, lazy load literature tab */
+    $(document).on('shown', 'a[data-toggle="tab"]', function (e) {
+        if(e.target.innerText.toLowerCase().indexOf('literature')!=-1){
+            // if not loaded yet
+            if($('#literature').find('.loadingsection').length != 0){
+                console.log("Loading literature, since it was not loaded yet.");
+                $.get( "literature/{{fingerprint_id}}", function( data ) {
+                    $( "#literature" ).html( data );
+                });
+            }
+
+        }
+    });
  {% if isAdvanced %}
  var bool_container;
 $(function(){
+
     bool_container = $('#bool_container').boolrelwidget({view_only: true, view_serialized_string: '{{request.session.serialization_query}}', link_back: $('#base_link').prop('href')+"advancedSearch/{{request.session.query_type}}/1/{{request.session.query_id}}"});
+
 });
   {% endif %}
 

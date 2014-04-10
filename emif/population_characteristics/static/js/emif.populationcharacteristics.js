@@ -509,7 +509,7 @@ $(document).ready(
 
               $(".filterBar").first().click(); 
             }
-          })
+          });
 
         }
     
