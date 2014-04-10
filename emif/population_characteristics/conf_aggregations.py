@@ -68,7 +68,7 @@ class ConfAggregations(object):
 
         #a.aggregation_fields = [af, af1, af2]
         a.aggregation_fields = [af, af2]
-
+        result.append(a)
 
 
         a1 = Aggregation()
@@ -103,7 +103,7 @@ class ConfAggregations(object):
         #a.aggregation_fields = [af, af2]
 
 
-        result.append(a)
+        result.append(a1)
 
         return result
 

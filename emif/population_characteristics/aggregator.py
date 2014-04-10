@@ -54,7 +54,10 @@ class AggregationPopulationCharacteristics(object):
 
         # Doing a pre-processing to become the aggregation task easier
         self.var_pre_process_dict = {}
+        print self.confs
         for c in self.confs:
+            print c.var
+            
             if c.var in self.var_pre_process_dict:
                 self.var_pre_process_dict[c.var].append(c)
             else:
@@ -125,8 +128,7 @@ class AggregationPopulationCharacteristics(object):
                     if arr_values!=[]:
                         for combination in itertools.product(*arr_values, repeat=1):
                             print combination
-                            #print "arr_values"
-                            print arr_values
+                            
 
                             if combination in self.index_new_values:
                                 print "has value"
@@ -196,8 +198,6 @@ class AggregationPopulationCharacteristics(object):
             #print "self.__aggregate_entry(entry)"
             self.__aggregate_entry(entry)
         
-        print self.new_values
-        print self.index_new_values
         
         
         try:

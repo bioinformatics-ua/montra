@@ -846,13 +846,13 @@ class ConfCharts(object):
         c5.y_axis.multivalue = True
 
         fy2 = Filter()
-        fy2.name = 'Name2'
-        fy2.key = 'Name2'
+        fy2.name = 'Name1'
+        fy2.key = 'Name1'
         fy2.value = ''
 
         fy3 = Filter()
-        fy3.name = 'Value2'
-        fy3.key = 'Value2'
+        fy3.name = 'Value1'
+        fy3.key = 'Value1'
         fy3.value = ''
 
         c5.y_axis.static_filters = [fy2, fy3]
@@ -893,7 +893,7 @@ class ConfCharts(object):
         c5.x_axis.operation = "unique"
         c5.x_axis.var = "dbname_value"
         c5.x_axis.categorized = True
-        c5.x_axis.label = "Years"
+        c5.x_axis.label = "Db name"
         c5.y_axis = Axis()
         c5.y_axis.operation = "unique"
         c5.y_axis.var = "Count"
@@ -929,7 +929,13 @@ class ConfCharts(object):
         ss.unit = "Year"
         ss.bins = "10"
 
-        c5.filters = [f2]
+
+        f_year = Filter()
+        f_year.name = 'YEAR'
+        f_year.key = 'Name1'
+        f_year.value = 'Value1'
+
+        c5.filters = [f2, f_year]
 
         sc.charts.append(c5)
 
