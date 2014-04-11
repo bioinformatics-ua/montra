@@ -250,6 +250,9 @@ urlpatterns = patterns('',
 
     # Docs Manager
     url(r'docsmanager/', include('docs_manager.urls')),
+
+    # Literature URLs
+    url(r'literature/', include('literature.urls')),
 )
 
 if settings.DEBUG:
