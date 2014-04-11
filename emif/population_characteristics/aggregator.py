@@ -57,7 +57,7 @@ class AggregationPopulationCharacteristics(object):
         print self.confs
         for c in self.confs:
             print c.var
-            
+
             if c.var in self.var_pre_process_dict:
                 self.var_pre_process_dict[c.var].append(c)
             else:
@@ -82,11 +82,14 @@ class AggregationPopulationCharacteristics(object):
         
         # Go to mongodb and ask for the values or ask directly in the values 
         values = Set([])
+        
         for e in self.values:
-            #print "entry"
-            #print entry
+            
             if e['values']['Var'] == var:
                 values.add(e['values'][name])
+            #else:
+                #print e['values'][name]
+                #print e['values']['Var']
         return list(values)
 
     def __get_values(self, agregation_field, aggregation):
@@ -124,7 +127,8 @@ class AggregationPopulationCharacteristics(object):
                             af.values = value 
 
                             arr_values.append(af.values)
-                    
+                    #print "Processing: " + entry['values']['Var']
+                    #print "arr_values: " +str(arr_values)
                     if arr_values!=[]:
                         for combination in itertools.product(*arr_values, repeat=1):
                             print combination
