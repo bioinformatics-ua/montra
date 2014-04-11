@@ -17,111 +17,117 @@
 
 # Slugs
 - pk: 0
-  fields: {slug1: "literature_papers", description: ""}
+  fields: {slug1: "literature_papers", description: "Could you provide a list of peer-reviewed papers based on your data base covering the last 3 years?"}
   model: searchengine.slugs
 
 - pk: 1
-  fields: {slug1: "assess_prevalence_prevalence", description: ""}
+  fields: {slug1: "assess_prevalence_prevalence", description: "Can you assess the prevalence of diabetes mellitus in the population who enters your data base?"}
   model: searchengine.slugs
 
 - pk: 2
-  fields: {slug1: "contact_patient", description: ""}
+  fields: {slug1: "contact_patient", description: "Are you able to contact the patient for additional information?"}
   model: searchengine.slugs
 
 - pk: 3
-  fields: {slug1: "contact_care_provider", description: ""}
+  fields: {slug1: "contact_care_provider", description: "Are you able to contact the care provider for additional information?"}
   model: searchengine.slugs
 
 - pk: 4
-  fields: {slug1: "publically_doc_procedure", description: ""}
+  fields: {slug1: "publically_doc_procedure", description: "Do you have a publically available document that details the procedure by which approval can be requested?"}
   model: searchengine.slugs
 
 - pk: 5
-  fields: {slug1: "ethical_committee_comment", description: ""}
+  fields: {slug1: "ethical_committee_comment", description: "If yes, does the committee"}
   model: searchengine.slugs
 
 - pk: 6
-  fields: {slug1: "ethical_committee", description: ""}
+  fields: {slug1: "ethical_committee", description: "Do you have an ethical/review committee?"}
   model: searchengine.slugs
 
 - pk: 7
-  fields: {slug1: "patient_consent", description: ""}
+  fields: {slug1: "patient_consent", description: "Has the patient given informed consent for including his/her data in your data collection?"}
   model: searchengine.slugs
 
 - pk: 8
-  fields: {slug1: "procedures_information", description: ""}
+  fields: {slug1: "procedures_information", description: "Choose available procedures information"}
   model: searchengine.slugs
 
 - pk: 9
-  fields: {slug1: "prescription_information", description: ""}
+  fields: {slug1: "prescription_information", description: "Choose available prescription information"}
   model: searchengine.slugs
 
 - pk: 10
-  fields: {slug1: "diagnosis_information", description: ""}
+  fields: {slug1: "diagnosis_information", description: "Choose available diagnosis information"}
   model: searchengine.slugs
 
 - pk: 11
-  fields: {slug1: "information_follow_up", description: ""}
+  fields: {slug1: "information_follow_up", description: "During the follow-up period (that is, after a subject enters you data base), what information do you have?"}
   model: searchengine.slugs
 
 - pk: 12
-  fields: {slug1: "average_time_follow_up", description: ""}
+  fields: {slug1: "average_time_follow_up", description: "Can you estimate the average time of follow up (that is, the time when you are actively collecting data) for a subject in your database?"}
   model: searchengine.slugs
 
 - pk: 13
-  fields: {slug1: "number_active_patients_jan2012", description: ""}
+  fields: {slug1: "number_active_patients_jan2012", description: "What was the number of active patients in January 2012?"}
   model: searchengine.slugs
 
 - pk: 14
-  fields: {slug1: "total_number_subjects", description: ""}
+  fields: {slug1: "total_number_subjects", description: "What is the total (cumulative) number of subjects in your data source?"}
   model: searchengine.slugs
 
 - pk: 15
-  fields: {slug1: "causes_person_database", description: ""}
+  fields: {slug1: "causes_person_database", description: "What are the possible causes for a person to enter/exit your database?"}
   model: searchengine.slugs
 
 - pk: 16
-  fields: {slug1: "table_population", description: ""}
+  fields: {slug1: "table_population", description: "Why not be able to create such a table for the population of in your database?"}
   model: searchengine.slugs
 
 - pk: 17
-  fields: {slug1: "matching_table", description: ""}
+  fields: {slug1: "matching_table", description: "For a study, often a population table is required typically consisting of:
+<ul>
+  <li>Patient ID (some personal identifier for each subject in your data base)</li>
+  <li>Start Date (the date the subject enters your data base – possibly the subject enters/exist more than once)</li>
+  <li>End Date (the date the person exits your data base).</li>
+</ul>
+Would you be able to create such a table for the population of in your database?"}
   model: searchengine.slugs
 
 - pk: 18
-  fields: {slug1: "population_description", description: ""}
+  fields: {slug1: "population_description", description: "How would you briefly (in say five of six lines of text) describe the population of your database?"}
   model: searchengine.slugs
 
 - pk: 19
-  fields: {slug1: "disease_registry", description: ""}
+  fields: {slug1: "disease_registry", description: "If disease specific registry, please specify disease or event."}
   model: searchengine.slugs
 
 - pk: 20
-  fields: {slug1: "range_databases", description: ""}
+  fields: {slug1: "range_databases", description: "In the platform, we have a wide range of databases. Could you indicate what of the below would characterize your database? More answers are possible."}
   model: searchengine.slugs
 
 - pk: 21
-  fields: {slug1: "database_name", description: ""}
+  fields: {slug1: "database_name", description: "Database Name"}
   model: searchengine.slugs
 
 - pk: 22
-  fields: {slug1: "name_technical", description: ""}
+  fields: {slug1: "name_technical", description: "Technical contact (name)"}
   model: searchengine.slugs
 
 - pk: 23
-  fields: {slug1: "contact_technical", description: ""}
+  fields: {slug1: "contact_technical", description: "Technical contact (email)"}
   model: searchengine.slugs
 
 - pk: 24
-  fields: {slug1: "name_scientific", description: ""}
+  fields: {slug1: "name_scientific", description: "Scientific contact (name)"}
   model: searchengine.slugs
 
 - pk: 25
-  fields: {slug1: "contact_scientific", description: ""}
+  fields: {slug1: "contact_scientific", description: "Scientific contact (email)"}
   model: searchengine.slugs
 
 - pk: 26
-  fields: {slug1: "contact_administrative", description: ""}
+  fields: {slug1: "contact_administrative", description: "Administrative contact (email)"}
   model: searchengine.slugs
 
 - pk: 27
