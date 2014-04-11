@@ -36,6 +36,9 @@ from django.conf import settings
 
 urlpatterns = patterns('',
 
+    # Comments
+    url(r'^comments/', include('django.contrib.comments.urls')),
+
     # Where to go when loggedin (according to Profile)
     url(r'^wherenext/$', 'emif.views.wherenext'),
 
