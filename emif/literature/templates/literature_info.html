@@ -1,0 +1,54 @@
+{% load extra_tags %}
+{% load markup questionnaire i18n %}
+
+{% if publications == None or publications|length == 0 %}
+    <h4 class="pull-center">No publications associated with this database.</h4></div>
+    <p class="pull-center">Publications added to this database, will appear here accompanied with annotations.</p>
+{% else %}
+<script src="{{ STATIC_URL }}js/emif.literature.js"></script>
+
+        <a id="collapseall_literature" class="btn pull-right" href=""><i class="icon-plus"></i>&nbsp; Expand all</a>
+    <div class="accordion fullwidth pull-left" id="accordion2" style="margin-top: 10px;">
+        {% for publication in publications %}
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapse{{publication.pmid}}">
+                    {{publication.title}}
+                </a>
+            </div>
+            <div id="collapse{{publication.pmid}}" class="accordion-body collapse">
+                <div class="accordion-inner">
+                    <div id="becas-widget-{{publication.pmid}}" class="widget-container fullwidth"></div>
+                </div>
+                    <script type="text/javascript">      
+                        initializeBecas({{publication.pmid}}, "becas-widget-{{publication.pmid}}");
+                    </script>
+            </div>
+        </div>  
+        {% endfor %}
+        <!--div class="accordion-group">
+            <div class="accordion-heading">
+                <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapseOne">
+                Upregulation of chemokines and their receptors in Duchenne muscular dystrophy: potential for attenuation of myofiber necrosis.
+                </a>
+            </div>
+            <div id="collapseOne" class="accordion-body collapse in">
+                <div class="accordion-inner">
+                    <div id="becas-widget-text" class="widget-container"></div>
+                </div>
+            </div>
+        </div>
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapseTwo">
+                Upregulation of chemokines and their receptors in Duchenne muscular dystrophy: potential for attenuation of myofiber necrosis.
+                </a>
+            </div>
+            <div id="collapseTwo" class="accordion-body collapse">
+                <div class="accordion-inner">
+                    <div id="becas-widget-pmid" class="widget-container"></div>
+                </div>
+            </div>
+        </div-->
+    </div>
+{% endif %}

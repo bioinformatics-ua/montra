@@ -39,9 +39,12 @@ from .parseJerboaFile import *
 from .services import * 
 from docs_manager.storage_handler import *
 from population_characteristics.models import *
+from fingerprint.models import Fingerprint
 
 from docs_manager.views import get_revision
 from population_characteristics.tasks import aggregation
+
+from api.models import FingerprintAPI
 
 def document_form_view_upload(request, fingerprint_id, template_name='documents_upload_form.html'):
     """Store the files at the backend 
@@ -167,12 +170,18 @@ def document_form_view(request, runcode, qs, activetab='summary',
     else:
         isAdvanced = False    
         
+    # GET fingerprint primary key (for comments)
+    try:
+        fingerprint = Fingerprint.objects.get(fingerprint_hash=runcode)
+        fingerprint_pk = fingerprint.id
+    except:
+        fingerprint_pk = 0
 
     jerboa_files = Characteristic.objects.filter(fingerprint_id=runcode)
     contains_population = len(jerboa_files)!=0
     return render(request, template_name, 
         {'request': request, 'qsets': qsets, 'export_bd_answers': True, 
-        'apiinfo': apiinfo, 'fingerprint_id': runcode,
+        'apiinfo': apiinfo, 'fingerprint_id': runcode, 'fingerprint_pk': fingerprint_pk,
                    'breadcrumb': True, 'breadcrumb_name': name_bc.decode('utf-8'),
                     'style': qs, 'collapseall': False, 
                     'owner_fingerprint':owner_fingerprint,
