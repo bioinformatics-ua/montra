@@ -404,7 +404,7 @@ def replaceDate(m):
         return '*'
     return converted_date.isoformat()+'T00:00:00Z'
 
-def convert_value(value, type):
+def convert_value(value, type, search=False):
 
     if type == "numeric":
         #print("type numeric")
@@ -431,7 +431,10 @@ def convert_value(value, type):
             result = convertDate(value)
             if (result != None):
                 result = result.isoformat()
-                return "["+result+"T00:00:00Z TO "+result+"T23:59:59Z]"
+                if search:
+                    return "["+result+"T00:00:00Z TO "+result+"T23:59:59Z]"
+                else:
+                    return result+"T00:00:00Z"
 
     return None
 

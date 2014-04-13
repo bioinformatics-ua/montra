@@ -359,7 +359,9 @@ def convert_query_from_boolean_widget(query, q_id):
         else:
             temp = q[0].slug + '_t'
 
-        convert = convert_value(question_answer, q[0].type)
+        convert = convert_value(question_answer, q[0].type, True)
+
+        #print "CONVERT*:"+convert
         # setting name as literal, and after escaping the literal definer
         if convert == None:
             if question_answer.startswith('[') and question_answer.endswith(']'):
