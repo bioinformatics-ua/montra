@@ -121,6 +121,8 @@ urlpatterns = patterns('',
     url(r'^delete-questionnaire/(?P<qId>[0-9]+)/$', 'utils.delete_questionnaire.delete'),
     # Documentation
     url(r'^docs/api$', 'emif.views.docs_api'),
+    #more like this    
+    url(r'^mlt/(?P<doc_id>[^/]+)/(?P<page>[-]{0,1}\d+)?$', 'emif.views.more_like_that'),
 
 
     url(r'^rm/(?P<id>[^/]+)', 'emif.views.delete_fingerprint'),
