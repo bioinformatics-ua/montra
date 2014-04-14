@@ -1370,6 +1370,21 @@ def get_databases_from_solr_v2(request, query="*:*", sort="", rows=100, start=0)
     
     return (list_databases,results.hits)
 
+def get_query_from_more_like_this(doc_id, maxx=100):
+    c = CoreEngine()
+    #results = c.search_fingerprint(query, sort=sort, rows=rows, start=start)
+    results = c.more_like_this(doc_id, maxx=maxx)
+    
+    queryString = "id:("
+    for r in results:
+        if "id" in r:
+            queryString = queryString + r["id"]+" "
+
+    queryString = queryString + ")"
+    print queryString
+    
+    return queryString
+
 def get_databases_from_solr_with_highlight(request, query="*:*", sort="", rows=100, start=0):
     c = CoreEngine()
     results = c.search_highlight(query, sort=sort, rows=rows, start=start, hlfl="*")
@@ -3219,29 +3234,69 @@ def sharedb_activation(request, activation_code, template_name="sharedb_invited.
 def docs_api(request, template_name='docs/api.html'):
     return render(request, template_name, {'request': request, 'breadcrumb': True})
 
-def more_like_that(request, doc_id,  page=1, template_name='results.html'):
-    #print 'doc_id'
-    c = CoreEngine()
-    similar = c.more_like_this(doc_id)
-
-    nameResultSet = c.search_fingerprint("id: "+doc_id, 0, 1)    
-    query_old = "More_Like This"
-    for r in nameResultSet:
-        if len(nameResultSet) > 0 and r.has_key('database_name_t'):
-            query_old = 'More Like "'+r['database_name_t'] +'"'
+def more_like_that(request, doc_id, mlt_query=None, page=1, template_name='databases.html', force=False):
+    #first lets clean the query session log
+    if 'query' in request.session:
+        del request.session['query']
         
-    snipets = generate_database_snipet(similar, page)
-    snipets.paginator_url = "views.more_like_that"
-    snipets.paginator_kwargs = {"doc_id": doc_id}
-
-    #print len(similar)
-    #print page
-    #print snipets.num_results
-    #print snipets.paginator_url
+    if 'isAdvanced' in request.session:
+        del request.session['isAdvanced'] 
     
-    return render(request, template_name, {'request': request,
-                                           'list_results': snipets, 'page_obj': snipets.list_results,
-                                           'search_old': query_old, 'breadcrumb': True})
+    if 'query_id' in request.session:
+        del request.session['query_id']
+    if 'query_type' in request.session:
+        del request.session['query_type']
+
+    if mlt_query == None:
+        _filter = get_query_from_more_like_this(doc_id)
+    else:
+        _filter = mlt_query
+
+    rows = define_rows(request)
+    if request.POST and not force:
+        page = request.POST["page"]
+
+    if page == None:
+        page = 1   
+
+    (sortString, filterString, sort_params, range) = paginator_process_params(request.POST, page, rows)    
+        
+    sort_params["base_filter"] = _filter;
+
+    print filterString
+
+    if len(filterString) > 0:
+        _filter += " AND " + filterString
+
+    print _filter
+
+    (list_databases,hits) = get_databases_from_solr_v2(request, _filter, sort=sortString, rows=rows, start=range)
+    if range > hits and force < 2:
+        return databases(request, page=1, force=True)  
+
+    print "Range: "+str(range)
+    print "hits: "+str(hits)
+    print "len: "+str(len(list_databases))
+
+    list_databases = paginator_process_list(list_databases, hits, range) 
+    
+    print "len: "+str(len(list_databases))
+    ## Paginator ##
+    myPaginator = Paginator(list_databases, rows)
+    try:
+        pager =  myPaginator.page(page)
+    except PageNotAnInteger, e:
+        pager =  myPaginator.page(page)
+    ## End Paginator ##
+    #print list_databases
+
+    return render(request, template_name, {'request': request, 'export_my_answers': True,
+                                           'list_databases': list_databases, 'breadcrumb': True, 'collapseall': False,
+                                           'page_obj': pager, 'page_rows': rows,
+                                           'api_token': True, 
+                                           'owner_fingerprint': False,
+                                           'add_databases': True, "sort_params": sort_params, "page":page})
+
 
 def generate_database_snipet(results, page=1, rows=5):
     class ResultSnipet:
