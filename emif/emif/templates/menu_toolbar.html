@@ -13,7 +13,11 @@
 		{% if request.user.is_authenticated %} 
 		<div class="btn-group" id="group_toolbar">
 
-
+      {% if fingerprint_dump %}
+      <a class="btn btn morelikethis" href="mlt/{{fingerprint_id}}" id="morelikethis_toolbar"> <i class="icon-search icon"></i>
+        More Like This
+      </a>
+      {% endif %}
       {% if fingerprint_dump and owner_fingerprint or fingerprint_dump and request.user.is_superuser %}
       <a class="btn btn " href="dbEdit/{{fingerprint_id}}/{{fingerprint_ttype}}" id="edit_list_toolbar" title="Edit Database" title="Share Database"> <i class="icon-pencil icon"></i>
         Edit

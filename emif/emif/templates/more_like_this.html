@@ -86,7 +86,7 @@
     <thead>
         <tr>
            <th class="sorter-score sorter {%if "icon-minus" not in sort_params.score.icon %}selected-sorter{% endif %}"  onclick="a.onClick('score', '{{sort_params.score.next}}');">
-            <div class="pull-left">Relevance</div>
+            <div class="pull-left">Rel.</div>
                  <div class="pull-right"><i class="{{sort_params.score.icon}}"></i></div>
             </th>
             <th class="sorter-database_name sorter {%if "icon-minus" not in sort_params.database_name.icon %}selected-sorter{% endif %}"  onclick="a.onClick('database_name', '{{sort_params.database_name.next}}');">
@@ -119,6 +119,9 @@
         </tr>
         <tr>
           <td class="table_filter">
+            <div style="text-align: center;">
+                <i data-toggle="tooltip" data-placement="bottom" title="This ranking represents the relevance of the database in comparison with the reffered database, the higher the value, the more relevant it is." class="help_selectresults icon-question-sign"></i>
+              </div>
           </td>
           <td class="table_filter">
                 <input class="filter_input" id="database_name_filter" type="text" value="{{sort_params.database_name.filter}}" placeholder="Filter">
@@ -153,7 +156,7 @@
 
   {% for t in page_obj %}
    <tr> 
-        <td>{{t.score}}</td>         
+        <td style="text-align: center;">{{t.score}}</td>         
           <td>
             <a href="fingerprint/{{ t.id }}/1">{{ t.name }}</a>
         </td>
