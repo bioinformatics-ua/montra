@@ -2153,10 +2153,16 @@ def createqset(runcode, qsid, qsets=None, clean=True, highlights=None):
                pass
             if clean:
                 t.value = value.replace("#", " ")
+                
                 if rHighlights != None and k in rHighlights:
                     t.value = rHighlights[k][0].encode('utf-8')
                     #if len(highlights["results"][k])>1:
                     #print t.value
+                
+                if t.ttype in Fingerprint_Summary:
+                    t.value = Fingerprint_Summary[t.ttype](t.value)
+
+
             else:
                 t.value = value
             if k == "database_name_t":
