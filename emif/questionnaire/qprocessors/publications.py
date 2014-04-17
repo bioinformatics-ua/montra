@@ -76,7 +76,7 @@ def show_summ(value):
         journal = p["journal"]
         pages = p["pages"]
         volume = p["volume"]        
-        ret += "<li>" + str(authors) + " - " + str(title) + ". " + str(journal) + ". " + str(year) +" :" +str(pages) +":"+ str(volume) +"</li>"
+        ret += "<li>" + authors + " - " + title + ". " + journal + ". " + year +" :" +pages +":"+ volume +"</li>"
 
     ret += "</ul>"
     #print "##########"
