@@ -60,7 +60,7 @@ def process_pub(question, ansdict):
 @show_summary('publication')
 def show_summ(value):
 
-    pubs = json.loads("["+value+"]")
+    pubs = json.loads(value)
 
     if type(pubs) is not list:
         pubs = [pubs]

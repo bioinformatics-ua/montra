@@ -1,0 +1,43 @@
+{% load extra_tags %}
+{% if pubs and pubs.0.title %}
+<div style="white-space: normal;">
+    <ul>
+        {% for pub in pubs%}
+        <li class="publication_details" data-container="body" data-toggle="popover" data-placement="left" data-content='<div style="text-align:justify;">
+<div class="well well-small"><small><strong>{{pub.title}}</strong></small></div>
+{% if pub.authors %}
+<table>
+<tr>
+<td style="vertical-align: top;"><small><strong>Authors: </strong></small></td>
+<td><small>{% for author in pub.authors|commasplit %}
+    {{author}}<br />
+{% endfor %}</small></td>
+</tr>
+</table>
+{% endif %}
+{% if pub.journal %}
+<small><strong>Journal: </strong>{{pub.journal}}</small><br />
+{% endif %}
+{% if pub.volume %}
+<small><strong>Volume: </strong>{{pub.volume}}</small> &nbsp;
+{% endif %}
+{% if pub.pages %}
+<small><strong>Pages: </strong>{{pub.pages}}</small> &nbsp;
+{% endif %}
+{% if pub.year %}
+<small><strong>Year: </strong>{{pub.year}}</small><br />
+{% endif %}
+</div>'>{{pub.title}}</li>
+        {% endfor %}
+
+        <script type="text/javascript">
+        $(function (){
+            $('.publication_details').popover({trigger: 'hover', html: 'true'});    
+        });
+        </script>
+
+    </ul>
+</div>
+{% else %}
+    There's no publications associated.
+{% endif %}
