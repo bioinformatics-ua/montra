@@ -2138,7 +2138,8 @@ def createqset(runcode, qsid, qsets=None, clean=True, highlights=None):
                 except:
                     pass
 
-            value = clean_value(str(result[k].encode('utf-8')))
+            raw_value = str(result[k].encode('utf-8'))
+            value = clean_value(raw_value)
 
             qs_text = k[:-1] + "qs"
             id_text = "questionaire_"+str(fingerprint_ttype)
@@ -2160,7 +2161,7 @@ def createqset(runcode, qsid, qsets=None, clean=True, highlights=None):
                     #print t.value
                 
                 if t.ttype in Fingerprint_Summary:
-                    t.value = Fingerprint_Summary[t.ttype](t.value)
+                    t.value = Fingerprint_Summary[t.ttype](raw_value)
 
 
             else:
