@@ -122,6 +122,13 @@ def truncate(value):
 
     return result
 
+@register.filter(name='captioned')
+@stringfilter
+def captioned(value):
+    exclusion_list = ['publication']
+
+    return value not in exclusion_list
+
 @register.filter
 def whitespacesplit(str):
     words = []
@@ -131,6 +138,15 @@ def whitespacesplit(str):
         str = str.replace(m.group(0), "")
 
     words = words + str.strip().split()
+
+    return words
+
+@register.filter(name='commasplit')
+@stringfilter
+def commasplit(str):
+    words = []
+
+    words = words + str.strip().split(',')
 
     return words
 

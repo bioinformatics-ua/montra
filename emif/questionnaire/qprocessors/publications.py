@@ -7,7 +7,10 @@ from questionnaire import *
 from django.utils.translation import ugettext as _
 from django.utils.simplejson import dumps
 
+from django.template.loader import render_to_string
+
 import json 
+
 @question_proc('publication')
 def question_pub(request, question):
     cd = question.getcheckdict()
@@ -56,7 +59,9 @@ def process_pub(question, ansdict):
 
 @show_summary('publication')
 def show_summ(value):
-    pubs = json.loads(value)
+
+    pubs = json.loads("["+value+"]")
+
     if type(pubs) is not list:
         pubs = [pubs]
 
@@ -68,6 +73,8 @@ def show_summ(value):
     # \"pages\":\"180\",\"volume\":\"502-6\",
     # \"authors\":\"Viana-Ferreira C,Ferreira D,Valente F,Monteiro E,Costa C,Oliveira JL\",\"link\":\"\"}]",
         
+    return render_to_string('questionnaire/publications_summary.html', {'pubs': pubs})
+
     ret = "<ul>"
     for p in pubs:
         title = p["title"]
