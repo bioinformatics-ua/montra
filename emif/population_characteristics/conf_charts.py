@@ -832,7 +832,8 @@ class ConfCharts(object):
         c5.title = Title()
         c5.title.operation = Operation.UNIQUE
         c5.title.var = "Observation time in a year" 
-        c5.title.fixed_title = "Total Overall patient time in a year" 
+        c5.title.fixed_title = "Total Overall patient time in a year"
+        c5.stacked = True 
         c5.x_axis = Axis()
         c5.x_axis.operation = "unique"
         c5.x_axis.var = "dbname_value"
@@ -883,7 +884,7 @@ class ConfCharts(object):
         sc.charts.append(c5)
 
 
-         #################################################
+        #################################################
         ### Total patient time in a year
         #################################################
 
@@ -894,6 +895,7 @@ class ConfCharts(object):
         c5.title.operation = Operation.UNIQUE
         c5.title.var = "Observation time in a year" 
         c5.title.fixed_title = "Total patient time in a year" 
+        c5.stacked = True 
         c5.x_axis = Axis()
         c5.x_axis.operation = "unique"
         c5.x_axis.var = "dbname_value"
@@ -954,7 +956,8 @@ class ConfCharts(object):
         c5.uid = 8
         c5.title = Title()
         c5.title.operation = Operation.UNIQUE
-        c5.title.var = "Observation time in a year" 
+        c5.title.var = "Observation time in a year"
+        c5.stacked = True 
         c5.title.fixed_title = "Location Total Overall patient time in a year" 
         c5.x_axis = Axis()
         c5.x_axis.operation = "unique"
@@ -1023,6 +1026,7 @@ class ConfCharts(object):
         c.title.operation = Operation.UNIQUE
         c.title.var = "Active patients" 
         c.title.fixed_title = "Active patients" 
+        c.stacked = True 
         c.x_axis = Axis()
         c.x_axis.operation = "unique"
         c.x_axis.var = "fingerprint_id"
