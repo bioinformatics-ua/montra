@@ -103,56 +103,93 @@ class AggregationPopulationCharacteristics(object):
             return agregation_field.values
 
 
+    def __verify_static_filters(self, entry, agg):
+        result = True
+
+        # If it does not have filters, it pass this condition.
+        if agg.static_filters == None or agg.static_filters == []:
+            return result 
+
+        # If it is have filter, we need to check if the fields 
+        # matches the criterias
+        for f in agg.static_filters:
+            if entry['values'][f.key] != f.value:
+                return False 
+        return result 
     # Agregate the entry 
     def __aggregate_entry(self, entry):
+
         try:
-            #print "check if it have"
-            #print entry['values']['Var']
+            
             if entry['values']['Var'] in self.var_pre_process_dict: 
                 # It is the type of we want to aggregate, so we need to do some calculations 
-                
+                print "integrated"
+                print entry
+
                 for aggregation in self.var_pre_process_dict[entry['values']['Var']]:
                     # Get Aggregation Field
-                    #print "check aggregations now "
+                    
+                    # verify if it has operations 
+                    has_operations = self.__verify_static_filters(entry, aggregation)
+                    
                     arr_values = []
                     for af in aggregation.aggregation_fields:
                         if (af.values==None):
                             value = self.__get_values(af, aggregation)    
-                            if value == None:
-                                print "fuck"
-                                print af.key
-                                print af.value
-                                print af.name
-                                print aggregation.var
                             af.values = value 
-
-                            arr_values.append(af.values)
-                    #print "Processing: " + entry['values']['Var']
-                    #print "arr_values: " +str(arr_values)
+                        
+                        arr_values.append(af.values)
+                    print "Processing: " + entry['values']['Var']
+                    print "arr_values: " +str(arr_values)
                     if arr_values!=[]:
                         for combination in itertools.product(*arr_values, repeat=1):
                             print combination
                             
+                            # Discard combination 
+
+                            def check_filters(comb, aggr):
+                                result = False
+                                k = 0 
+                                for af in aggr.aggregation_fields:
+                                    if af.exclusive:
+                                        if entry['values'][af.value] == comb[k] and not result:
+                                            result = True
+                                        else:
+                                            result = False
+
+                                    k = k + 1 
+                                return result
+
+                            if not check_filters(combination, aggregation):
+                                continue
 
                             if combination in self.index_new_values:
-                                print "has value"
+                                #_entry = self.index_new_values[(entry['values']['Var'],combination)]
                                 _entry = self.index_new_values[combination]
                                 # TODO: Check the operation 
                                 # For now, only sums
-                                _entry['values'][aggregation.field_to_compute] = _entry['values'][aggregation.field_to_compute]  +  entry['values'][aggregation.field_to_compute]
+                                print combination
+                                print "operation detect previous values"
+                                print "old value"
+                                print _entry['values'][aggregation.field_to_compute]
+                                _entry['values'][aggregation.field_to_compute] = float(_entry['values'][aggregation.field_to_compute])  +  float(entry['values'][aggregation.field_to_compute])
+                                print "new value"
+                                print _entry['values'][aggregation.field_to_compute]
                             else:
-                                print "not has value"
+
                                 _entry = copy.deepcopy(entry)
-                                _entry['values']['Name1'] = ''
-                                _entry['values']['Name2'] = ''
-                                _entry['values']['Value1'] = ''
-                                _entry['values']['Value2'] = ''
+                                if has_operations:
+                                    _entry['values']['Name1'] = ''
+                                    _entry['values']['Name2'] = ''
+                                    _entry['values']['Value1'] = ''
+                                    _entry['values']['Value2'] = ''
                                 #entry['values'] = {}
                                 _entry['values'][aggregation.field_to_compute] = _entry['values'][aggregation.field_to_compute]
                                 i = 0 
                                 for af in aggregation.aggregation_fields:
                                     #print combination
                                     #print i
+
                                     if af.ttype == "slug":
                                         _entry['values'][af.value] = combination[i]
                                         _entry['values'][af.key] = af.key 
@@ -168,6 +205,7 @@ class AggregationPopulationCharacteristics(object):
                                 #print _entry 
                                 #print id(_entry )
                                 #print self.index_new_values
+                                #self.index_new_values[(entry['values']['Var'],combination)] = _entry
                                 self.index_new_values[combination] = _entry
                                 #print self.index_new_values
                                 self.new_values.append(_entry)
@@ -202,12 +240,11 @@ class AggregationPopulationCharacteristics(object):
             #print "self.__aggregate_entry(entry)"
             self.__aggregate_entry(entry)
         
-        
-        
         try:
             #Create MONGO record
             print "Create MONGO record"
-            for doc in self.new_values: 
+            for doc in self.new_values:
+                # Workaround to put it working  
                 doc['_id'] = ObjectId() 
                 jerboa_aggregation_collection.insert(doc)
             

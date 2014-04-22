@@ -162,8 +162,6 @@ class ComparisonPopulation(object):
         # Apply filters in the query 
         dict_query_general=[]
         
-        
-        
         for ve in filters:
             print "ve"
             print ve
@@ -207,15 +205,13 @@ class ComparisonPopulation(object):
 
             if c1.y_axis.transformation != None:
                 try:
-                    print "transformation"
                     values_app = transform(c1.y_axis.var, c1.y_axis.transformation,v[u'values'])
                     #y = float(v[u'values'][c1.y_axis.var])
                     #new_y = eval(c1.y_axis.transformation)
                     #v[u'values'][c1.y_axis.var] = new_y
                     v[u'values'] = values_app
-                    print values_app
+
                 except:
-                    #raise
                     print "bastard x error %s, %s " % (c1.y_axis.var, str(v[u'values']))
             v[u'values']['fingerprint_id'] = v[u'fingerprint_id']
             results.append(v[u'values'])
