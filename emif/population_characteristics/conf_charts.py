@@ -1026,7 +1026,7 @@ class ConfCharts(object):
         c.stacked = True 
         c.x_axis = Axis()
         c.x_axis.operation = "unique"
-        c.x_axis.var = "fingerprint_id"
+        c.x_axis.var = "dbname_value"
         c.x_axis.categorized = True
         c.x_axis.label = 'Databases'
         c.y_axis = Axis()

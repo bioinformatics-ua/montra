@@ -220,9 +220,6 @@ class ConfAggregations(object):
         result.append(a1)
 
 
-
-
-
         ### Active Patients per database 
         ###
         a = Aggregation()

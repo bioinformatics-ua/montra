@@ -19,7 +19,6 @@
 #
 
 
-
 from __future__ import absolute_import
 
 from celery import shared_task
@@ -31,6 +30,7 @@ from population_characteristics.aggregator import *
 def aggregation(fingerprint_id, values):
     # Operations
     print "start aggregation"
+    #print values 
     try:
         ac = AggregationPopulationCharacteristics(values,fingerprint_id, None)
         print "created object"

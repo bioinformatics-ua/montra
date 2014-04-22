@@ -31,6 +31,25 @@ from searchengine.search_indexes import *
 import itertools
 from sets import Set
 
+
+
+
+# Aux functions 
+def check_filters(comb, aggr, entry):
+    result = False
+    k = 0 
+    for af in aggr.aggregation_fields:
+        if af.exclusive:
+            if entry['values'][af.value] == comb[k] and not result:
+                result = True
+            else:
+                result = False
+
+        k = k + 1 
+    return result
+
+
+
 """
 This class do the aggregations from data comming from Jerboa 
 Marius and Peter from Erasmus MC has developed an R script to perform this task
@@ -54,7 +73,7 @@ class AggregationPopulationCharacteristics(object):
 
         # Doing a pre-processing to become the aggregation task easier
         self.var_pre_process_dict = {}
-        print self.confs
+        #print self.confs
         for c in self.confs:
             print c.var
 
@@ -123,8 +142,8 @@ class AggregationPopulationCharacteristics(object):
             
             if entry['values']['Var'] in self.var_pre_process_dict: 
                 # It is the type of we want to aggregate, so we need to do some calculations 
-                print "integrated"
-                print entry
+                #print "integrated"
+                #print entry
 
                 for aggregation in self.var_pre_process_dict[entry['values']['Var']]:
                     # Get Aggregation Field
@@ -139,36 +158,23 @@ class AggregationPopulationCharacteristics(object):
                             af.values = value 
                         
                         arr_values.append(af.values)
-                    print "Processing: " + entry['values']['Var']
-                    print "arr_values: " +str(arr_values)
+                    #print "Processing: " + entry['values']['Var']
+                    #print "arr_values: " +str(arr_values)
                     if arr_values!=[]:
                         for combination in itertools.product(*arr_values, repeat=1):
-                            print combination
+                            #print combination
                             
                             # Discard combination 
 
-                            def check_filters(comb, aggr):
-                                result = False
-                                k = 0 
-                                for af in aggr.aggregation_fields:
-                                    if af.exclusive:
-                                        if entry['values'][af.value] == comb[k] and not result:
-                                            result = True
-                                        else:
-                                            result = False
-
-                                    k = k + 1 
-                                return result
-
-                            if not check_filters(combination, aggregation):
+                            if not check_filters(combination, aggregation, entry):
                                 continue
 
-                            if combination in self.index_new_values:
-                                #_entry = self.index_new_values[(entry['values']['Var'],combination)]
-                                _entry = self.index_new_values[combination]
+                            if (entry['values']['Var'],combination) in self.index_new_values:
+                                _entry = self.index_new_values[(entry['values']['Var'],combination)]
+                                #_entry = self.index_new_values[combination]
                                 # TODO: Check the operation 
                                 # For now, only sums
-                                print combination
+                                print str((entry['values']['Var'],combination))
                                 print "operation detect previous values"
                                 print "old value"
                                 print _entry['values'][aggregation.field_to_compute]
@@ -176,7 +182,8 @@ class AggregationPopulationCharacteristics(object):
                                 print "new value"
                                 print _entry['values'][aggregation.field_to_compute]
                             else:
-
+                                #print self.index_new_values.keys()
+                                #print str((entry['values']['Var'],combination)) + " not in self.index_new_values"
                                 _entry = copy.deepcopy(entry)
                                 if has_operations:
                                     _entry['values']['Name1'] = ''
@@ -205,8 +212,8 @@ class AggregationPopulationCharacteristics(object):
                                 #print _entry 
                                 #print id(_entry )
                                 #print self.index_new_values
-                                #self.index_new_values[(entry['values']['Var'],combination)] = _entry
-                                self.index_new_values[combination] = _entry
+                                self.index_new_values[(entry['values']['Var'],combination)] = _entry
+                                #self.index_new_values[combination] = _entry
                                 #print self.index_new_values
                                 self.new_values.append(_entry)
                                 
@@ -242,18 +249,19 @@ class AggregationPopulationCharacteristics(object):
         
         try:
             #Create MONGO record
-            print "Create MONGO record"
+            #print "Create MONGO record"
             for doc in self.new_values:
                 # Workaround to put it working  
                 doc['_id'] = ObjectId() 
                 jerboa_aggregation_collection.insert(doc)
             
             print "Sucess "
+            #print self.index_new_values.keys()
         except OperationFailure as e:
             print "Failure"
             print e
             import traceback
             traceback.print_exc()
-        print "finishing staff"
+        print "finishing aggregation"
         return self.new_values 
         
