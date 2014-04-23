@@ -163,8 +163,6 @@ class ComparisonPopulation(object):
         dict_query_general=[]
         
         for ve in filters:
-            print "ve"
-            print ve
             
             if  isinstance(filters[ve], list):
                 #if not "$or" in dict_query:

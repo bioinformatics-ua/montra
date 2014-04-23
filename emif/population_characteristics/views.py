@@ -62,14 +62,8 @@ def jerboa_list_values(request, var, row, fingerprint_id, template_name='documen
         print request.POST
         myRq = dict(request.POST.lists())
         for i in myRq:
-            print i
-            print myRq[i]
-            import pdb
-            
             filters[i[0:-2]] = myRq[i]
 
-        print "Filters" + str(filters)
-    
 
     pc = PopulationCharacteristic(None)
     values = pc.get_variables(var, row, fingerprint_id, filters=filters)

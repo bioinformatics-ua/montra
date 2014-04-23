@@ -17,7 +17,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
         
-from emif.settings import jerboa_collection
+from emif.settings import jerboa_collection, jerboa_aggregation_collection
 from pymongo.errors import OperationFailure
 from .parseJerboaFile import * 
 import json 
@@ -206,7 +206,10 @@ class PopulationCharacteristic(object):
             print _filter
             print _filter.value
             print dict_query
-            values =  jerboa_collection.find( dict_query ).distinct('values.' + _filter.value )
+            if comp:
+                values =  jerboa_aggregation_collection.find( dict_query ).distinct('values.' + _filter.value )
+            else:
+                values =  jerboa_collection.find( dict_query ).distinct('values.' + _filter.value )
             print values
             _filter.values = values
         return filters

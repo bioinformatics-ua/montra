@@ -61,6 +61,7 @@ class Filter(object):
         self.translation = None
         self.comparable = False
         self.comparable_values = None
+        self.show = True
 
         
     def to_JSON(self):
