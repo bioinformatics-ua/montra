@@ -833,7 +833,7 @@ class ConfCharts(object):
         c5.title.operation = Operation.UNIQUE
         c5.title.var = "Observation time in a year" 
         c5.title.fixed_title = "Total Overall patient time in a year"
-        c5.stacked = True 
+        c5.stacked = False 
         c5.x_axis = Axis()
         c5.x_axis.operation = "unique"
         c5.x_axis.var = "dbname_value"
@@ -892,7 +892,7 @@ class ConfCharts(object):
         c5.title.operation = Operation.UNIQUE
         c5.title.var = "Observation time in a year" 
         c5.title.fixed_title = "Total patient time in a year" 
-        c5.stacked = True 
+        c5.stacked = False 
         c5.x_axis = Axis()
         c5.x_axis.operation = "unique"
         c5.x_axis.var = "dbname_value"
@@ -954,7 +954,7 @@ class ConfCharts(object):
         c5.title = Title()
         c5.title.operation = Operation.UNIQUE
         c5.title.var = "Observation time in a year"
-        c5.stacked = True 
+        c5.stacked = False 
         c5.title.fixed_title = "Location Total Overall patient time in a year" 
         c5.x_axis = Axis()
         c5.x_axis.operation = "unique"
@@ -1011,8 +1011,6 @@ class ConfCharts(object):
 
         sc.charts.append(c5)
 
-       
-
         
         #################################################
         ### Active patients
@@ -1023,7 +1021,7 @@ class ConfCharts(object):
         c.title.operation = Operation.UNIQUE
         c.title.var = "Active patients" 
         c.title.fixed_title = "Active patients" 
-        c.stacked = True 
+        c.stacked = False 
         c.x_axis = Axis()
         c.x_axis.operation = "unique"
         c.x_axis.var = "dbname_value"
@@ -1045,9 +1043,83 @@ class ConfCharts(object):
         f2.comparable_values = ['M', 'F']
 
 
-
-
         c.filters = [f2]
+
+
+        #################################################
+        ### Total patient time in a year (stacked age group)
+        #################################################
+
+
+        c5 = Chart()
+        c5.uid = 18
+        c5.title = Title()
+        c5.title.operation = Operation.UNIQUE
+        c5.title.var = "Observation time in a year" 
+        c5.title.fixed_title = "Total patient time in a year (Age Groups)" 
+        c5.stacked = True 
+        c5.x_axis = Axis()
+        c5.x_axis.operation = "unique"
+        c5.x_axis.var = "Value2"
+        c5.x_axis.label = "Age groups"
+        c5.x_axis.categorized = True
+        c5.x_axis.sort_func = "int(k[c1.x_axis.var].split('-')[0])"
+
+        c5.y_axis = Axis()
+        c5.y_axis.operation = "unique"
+        c5.y_axis.var = "Count"
+        c5.y_axis.transformation = "y / 12 / 1000"
+        c5.y_axis.label = "Sum of the patients observation time (years)"
+        c5.y_axis.multivalue = True
+
+        fy2 = Filter()
+        fy2.name = 'Name2'
+        fy2.key = 'Name2'
+        fy2.value = 'AGE'
+
+        fy3 = Filter()
+        fy3.name = 'Name1'
+        fy3.key = 'Name1'
+        fy3.value = 'YEAR'
+
+        c5.y_axis.static_filters = [fy3,fy2]
+
+
+        f1 = Filter()
+        f1.name = 'Year'
+        f1.key = 'Name1'
+        f1.value = 'Value1'
+
+        f2 = Filter()
+        f2.name = 'Gender'
+        f2.key = None
+        f2.value = 'Gender'
+        f2.translation = {'M': 'Male', 'F': 'Female', 'T': 'Total',  'ALL': 'Male/Female'}
+
+
+        f3 = Filter()
+        f3.name = None
+        f3.key = None
+        f3.value = "dbname_value"
+        f3.show = False
+        f3.comparable = True
+        f3.comparable_values = None
+
+
+        ss = Scale()
+        ss.unit = "Year"
+        ss.bins = "10"
+
+
+        f_year = Filter()
+        f_year.name = 'YEAR'
+        f_year.key = 'Name1'
+        f_year.value = 'Value1'
+
+        c5.filters = [f2, f_year, f3]
+
+        sc.charts.append(c5)
+
 
         sc.charts.append(c)
 
