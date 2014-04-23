@@ -29,6 +29,7 @@ Array.min = function( array ){
 };
 
 var debug = null;
+var chart = null;
 function GraphicChartC3D3(divArg, dataArg)
 {
   /** Passes the initial arguments required to start and d3
@@ -81,7 +82,7 @@ function GraphicChartC3D3(divArg, dataArg)
             $.each(actualChart.filters, function(a){
               
               // Translate the fields (for now staticly hard coded for Gender)
-              if (actualChart.filters[a]['name']=="Gender")
+              if (actualChart.filters[a]['translation']!=null && actualChart.filters[a]['show'])
               {
                 $.each(actualChart.filters[a]['translation'], function(tr) {
                     
@@ -98,6 +99,21 @@ function GraphicChartC3D3(divArg, dataArg)
                   });
 
               }
+              else if (actualChart.filters[a]['comparable']==true &&
+                actualChart.filters[a]['comparable_values']==null &&
+                actualChart.filters[a]['values']!=null)
+              {
+                console.log("chart filter");
+                console.log(actualChart.filters[a]);
+                console.log(actualChart.filters[a]['values']);
+                $.each(actualChart.filters[a]['values'], function(tr) {
+                    // Get the list of values 
+                    datasetYs.push([actualChart.filters[a]['values'][tr]]);
+                    multivalue_comp[actualChart.filters[a]['values'][tr]] = datasetYs[datasetYs.length-1];
+                  });
+  
+              };
+
               
 
             });
@@ -146,7 +162,6 @@ function GraphicChartC3D3(divArg, dataArg)
         // Check if it is only a value, i.e a value in the Y axis
         if($.type(actualChart.y_axis['var']) === "string") {
            
-            
             var _vv = parseFloat(row[actualChart.y_axis['var']]);
             _vv = +_vv || 0;
 
@@ -345,9 +360,19 @@ function GraphicChartC3D3(divArg, dataArg)
     chartConfigs.axis.x['tick']['culling'] = true;
     chartConfigs.legend = {}
     chartConfigs.legend['show'] = legend;
-    
+    if (actualChart.stacked)
+    {
+      chartConfigs['data']['groups'] = []
+      $.each(datasetYs, function(index){
+        if (datasetYs[index].length>1){
+          chartConfigs['data']['groups'].push(datasetYs[index][0]);
+        }
+        
+      });
+      
+    }    
 
-    try{var chart = c3.generate(chartConfigs);}
+    try{chart = c3.generate(chartConfigs);}
     catch(ex)
     {
       // Handle the shit here!

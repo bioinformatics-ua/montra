@@ -179,10 +179,15 @@ function PCAPI (endpoint)
             var self = this;
             self.html('');
 
+
+            filters_tmp = [];
+            
             values.values.forEach(function(_value){
 
               var xFilter = JSON.parse(_value);
-
+              filters_tmp.push(xFilter);
+              if (!xFilter.show)
+                return;
               
               self.append(xFilter.name+": ");
               var tmpUl = $('<ul class="nav nav-pills nav-stacked">');
@@ -233,6 +238,7 @@ function PCAPI (endpoint)
 
             });
             
+            actualChart.filters = filters_tmp;
 
 
             /** The magic of the filters will happen here */ 
