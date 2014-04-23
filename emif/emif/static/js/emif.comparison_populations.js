@@ -20,19 +20,11 @@
 
 
 function postComparisonPopulations(){
-
     
-    var newForm = jQuery('<form>', {
-        'action': 'population/compare',
-        'target': '_top'
-    }).append(jQuery('<input>', {
-        'name': 'q',
-        'value': 'stack overflow',
-        'type': 'hidden'
-    }));
-    newForm.submit();
+    $('#compare_form').attr('action', 'population/compare');
+    postComparison();
 
-   return false; 
+   return true; 
 };
 
 

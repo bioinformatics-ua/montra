@@ -33,6 +33,11 @@
 
 {% block content %} 
 
+<div class="hide" id="fingerprints_store">
+{%for fp in fingerprint_ids%}
+{{fp}} 
+{%endfor%}
+</div>
 <div class="pull-right" id="filters_dropdown"></div>
 <button onclick="filter_dropdown.getSelection();">Teste</button>
 <script type="text/javascript">

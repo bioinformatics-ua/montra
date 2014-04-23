@@ -254,6 +254,7 @@
 
 var counter = 0;
 var a;
+var fingerprints_ids = null;
 $(document).ready(function(){
         
     a = new PaginatorSorter("table_databases", '{{sort_params.base_filter}}', '{{sort_params.selected_name}}', '{{sort_params.selected_value}}', '{{sort_params.extraObjects|safe}}');
@@ -319,6 +320,7 @@ function updateSelectCount(){
 
     try{
     var dbs = a.plugin.getExtraObjects().selectedList;
+    fingerprints_ids = a.plugin.getExtraObjects().selectedList;
     var type = a.plugin.typedb;
 
     if(type)
