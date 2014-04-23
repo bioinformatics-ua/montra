@@ -1094,7 +1094,7 @@ class ConfCharts(object):
         f2.name = 'Gender'
         f2.key = None
         f2.value = 'Gender'
-        f2.translation = {'M': 'Male', 'F': 'Female', 'T': 'Total',  'ALL': 'Male/Female'}
+        f2.translation = {'M': 'Male', 'F': 'Female', 'T': 'Total'}
 
 
         f3 = Filter()

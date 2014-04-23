@@ -104,6 +104,7 @@ function PCAPI (endpoint)
         $.ajax({
           dataType: "json",
           url: this.endpoint+"/"+Var+"/"+Row+"/" + fingerprintID,
+
           async: false,
           data: result,
           success: function (data){result=data;}
@@ -198,7 +199,11 @@ function PCAPI (endpoint)
               console.log(xFilter);
               if (xFilter.name == "Gender")
               {
-                  xFilter.values.push("ALL");                
+                  if (xFilter.translation.hasOwnProperty("ALL"))
+                  {
+                    xFilter.values.push("ALL");                  
+                  }
+                  
               }
 
 

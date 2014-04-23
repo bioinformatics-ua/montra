@@ -63,11 +63,21 @@ function PCDraw(actualChart,chartType, e)
 
         tfilter = new TransformFilter(filters);
         filters = tfilter.transform();
-        console.log("output filters")
-        console.log(filters);
-
+        
+        if (PAGE_TYPE==PC_COMPARE)
+        {
+          
+          
+          filters['fingerprint_ids'] = $("#fingerprints_store").text();  
+          
+          
+        }
         valuesFromGraph = PC.getValuesRowWithFilters(this.actualChart.title.fixed_title, 
           this.actualChart.y_axis['var'],fingerprintID, filters );
+      }
+      if (PAGE_TYPE==PC_COMPARE)
+      {
+          delete filters['fingerprint_ids'];
       }
       var valueFilters = "";
       $.each(filters, function (data){
@@ -83,8 +93,7 @@ function PCDraw(actualChart,chartType, e)
         if (fV=="Female") fV = "(Female)";
         valueFilters += " " + fV;
       });
-      /*valuesFromGraph = PC.getValuesRow(this.chartType, 
-        'Count',fingerprintID );*/
+      
     
       $("#pc_chart_place").html('');
       $("#pc_chart_place").graphicChart('init');
