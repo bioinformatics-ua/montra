@@ -41,6 +41,7 @@ function GraphicChartC3D3(divArg, dataArg)
   this.yscale = null ;
   this.legend = false;
   this.multivalue_comp = {}; 
+  this.multivalue_stacked = null;
   this.self = this;
 
   this.init = function(){
@@ -84,6 +85,7 @@ function GraphicChartC3D3(divArg, dataArg)
               // Translate the fields (for now staticly hard coded for Gender)
               if (actualChart.filters[a]['translation']!=null && actualChart.filters[a]['show'])
               {
+                multivalue_stacked = actualChart.filters[a]['value'];
                 $.each(actualChart.filters[a]['translation'], function(tr) {
                     
                     // Only the simple ones will be translated. ALL is ignored by default 
@@ -106,15 +108,14 @@ function GraphicChartC3D3(divArg, dataArg)
                 console.log("chart filter");
                 console.log(actualChart.filters[a]);
                 console.log(actualChart.filters[a]['values']);
+                multivalue_stacked = actualChart.filters[a]['value']
                 $.each(actualChart.filters[a]['values'], function(tr) {
                     // Get the list of values 
                     datasetYs.push([actualChart.filters[a]['values'][tr]]);
                     multivalue_comp[actualChart.filters[a]['values'][tr]] = datasetYs[datasetYs.length-1];
                   });
-  
-              };
 
-              
+              };
 
             });
             datasetX = ['x'];
@@ -161,12 +162,19 @@ function GraphicChartC3D3(divArg, dataArg)
         
         // Check if it is only a value, i.e a value in the Y axis
         if($.type(actualChart.y_axis['var']) === "string") {
+
+
            
             var _vv = parseFloat(row[actualChart.y_axis['var']]);
             _vv = +_vv || 0;
 
-            multivalue_comp[row['Gender']].push(_vv);  
-
+            multivalue_comp[row[multivalue_stacked]].push(_vv);  
+            if (datasetYs[row[multivalue_stacked]]!=undefined)
+            {
+              datasetYs[row[multivalue_stacked]].push(_vv);  
+            }
+            //console.log("multivalue_comp");
+            //console.log(multivalue_comp[row[multivalue_stacked]]);
 
         } else { // More than a value. 
           actualChart.y_axis['var'].forEach(function(a){
@@ -273,7 +281,7 @@ function GraphicChartC3D3(divArg, dataArg)
 
         data: {
           x : 'x',
-            
+          groups : [],  
           columns: 
             datasetYs,          
         },
@@ -335,6 +343,19 @@ function GraphicChartC3D3(divArg, dataArg)
         
         chartConfigs.data.types['M'] = 'bar';
         chartConfigs.data.types['F'] = 'bar';
+
+        if (actualChart.stacked)
+        {
+          chartConfigs['data']['groups'] = [[]]
+          $.each(datasetYs, function(index){
+            if (datasetYs[index].length>1){
+              chartConfigs['data']['groups'][0].push(datasetYs[index][0]);
+              chartConfigs.data.types[datasetYs[index][0]] = 'bar';
+            }
+            
+          });
+          
+        } 
         
         
         
@@ -360,17 +381,7 @@ function GraphicChartC3D3(divArg, dataArg)
     chartConfigs.axis.x['tick']['culling'] = true;
     chartConfigs.legend = {}
     chartConfigs.legend['show'] = legend;
-    if (actualChart.stacked)
-    {
-      chartConfigs['data']['groups'] = []
-      $.each(datasetYs, function(index){
-        if (datasetYs[index].length>1){
-          chartConfigs['data']['groups'].push(datasetYs[index][0]);
-        }
-        
-      });
-      
-    }    
+       
 
     try{chart = c3.generate(chartConfigs);}
     catch(ex)
