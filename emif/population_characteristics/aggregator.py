@@ -142,8 +142,6 @@ class AggregationPopulationCharacteristics(object):
             
             if entry['values']['Var'] in self.var_pre_process_dict: 
                 # It is the type of we want to aggregate, so we need to do some calculations 
-                #print "integrated"
-                #print entry
 
                 for aggregation in self.var_pre_process_dict[entry['values']['Var']]:
                     # Get Aggregation Field
@@ -158,14 +156,11 @@ class AggregationPopulationCharacteristics(object):
                             af.values = value 
                         
                         arr_values.append(af.values)
-                    #print "Processing: " + entry['values']['Var']
-                    #print "arr_values: " +str(arr_values)
                     if arr_values!=[]:
                         for combination in itertools.product(*arr_values, repeat=1):
-                            #print combination
+
                             
                             # Discard combination 
-
                             if not check_filters(combination, aggregation, entry):
                                 continue
 
@@ -174,47 +169,41 @@ class AggregationPopulationCharacteristics(object):
                                 #_entry = self.index_new_values[combination]
                                 # TODO: Check the operation 
                                 # For now, only sums
-                                print str((entry['values']['Var'],combination))
-                                print "operation detect previous values"
-                                print "old value"
-                                print _entry['values'][aggregation.field_to_compute]
+                                #print str((entry['values']['Var'],combination))
+                                #print "operation detect previous values"
+                                #print "old value"
+                                #print _entry['values'][aggregation.field_to_compute]
                                 _entry['values'][aggregation.field_to_compute] = float(_entry['values'][aggregation.field_to_compute])  +  float(entry['values'][aggregation.field_to_compute])
-                                print "new value"
-                                print _entry['values'][aggregation.field_to_compute]
+                                #print "new value"
+                                #print _entry['values'][aggregation.field_to_compute]
                             else:
-                                #print self.index_new_values.keys()
-                                #print str((entry['values']['Var'],combination)) + " not in self.index_new_values"
+                                
                                 _entry = copy.deepcopy(entry)
                                 if has_operations:
                                     _entry['values']['Name1'] = ''
                                     _entry['values']['Name2'] = ''
                                     _entry['values']['Value1'] = ''
                                     _entry['values']['Value2'] = ''
-                                #entry['values'] = {}
+                                
                                 _entry['values'][aggregation.field_to_compute] = _entry['values'][aggregation.field_to_compute]
                                 i = 0 
                                 for af in aggregation.aggregation_fields:
-                                    #print combination
-                                    #print i
-
+                                
                                     if af.ttype == "slug":
                                         _entry['values'][af.value] = combination[i]
                                         _entry['values'][af.key] = af.key 
-                                    else:
-                                        #print "af.value" + af.value +  combination[i]
-                                        #print "af.value" + af.value +  _entry['values'][af.value] 
+                                    elif af.ttype == "tsv":
+                                        
                                         _entry['values'][af.value] = str(combination[i])
-                                        if (af.key!=None):
-                                            _entry['values'][af.key] = entry['values'][af.key]
-
+                                        if (af.key!=None) and _entry['values'][af.value] != '':
+                                            # Should works, why not?
+                                            #_entry['values'][af.key] = entry['values'][af.name]
+                                            _entry['values'][af.key] = af.name
+                                    else:
+                                        raise "Error, type is not defined"
                                     i = i + 1
-                                #print "to store"
-                                #print _entry 
-                                #print id(_entry )
-                                #print self.index_new_values
+                                
                                 self.index_new_values[(entry['values']['Var'],combination)] = _entry
-                                #self.index_new_values[combination] = _entry
-                                #print self.index_new_values
                                 self.new_values.append(_entry)
                                 
                     #print "end combination"
