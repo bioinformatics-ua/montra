@@ -43,7 +43,12 @@
 <script type="text/javascript">
     var filter_dropdown;
     $(function(){
-        filter_dropdown = $("#filters_dropdown").dyndropdown({label: "Filter", dropup: false});
+        filter_dropdown = $("#filters_dropdown").dyndropdown({label: "Filter", dropup: false, 
+            onSelectionChanged: function(selection){
+                console.log('callback called');
+                console.log(selection);
+            }
+        });
 
         var json_structure = JSON.stringify({
             gender: {M: "male", F: "female", MF: "male/female"},

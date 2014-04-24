@@ -15,8 +15,17 @@
             single_choice: true,
             left_centered_dropdown: true,
             size: null,
-            button_dropdown: false
+            button_dropdown: false,
+            onSelectionChanged: null
         }, options);
+
+        // Validate that callbacks are functions
+        if(settings.onSelectionChanged != null){
+            if (typeof settings.onSelectionChanged !== 'function'){
+                console.error('You must define the onSelectionChanged callback as a function.');
+                return null;
+            }
+        }
 
         var api = {
             redraw: function() {
@@ -158,6 +167,10 @@
                     if (this.containsValue(key, value) === -1) {
                         if (settings.single_choice) {
                             selected_options[key] = [value];
+
+                            if(settings.onSelectionChanged != null)
+                                settings.onSelectionChanged(selected_options);
+
                             return false;
                         } else {
                             this_selection.push(value);
@@ -167,7 +180,8 @@
                 } else {
                     selected_options[key] = [value];
                 }
-
+                if(settings.onSelectionChanged != null)
+                    settings.onSelectionChanged(selected_options);
                 return true;
             },
             removeSelection: function(key, value) {
@@ -185,6 +199,8 @@
                 } catch (err) {
                     console.err('Removing invalid selection.');
                 }
+                if(settings.onSelectionChanged != null)
+                    settings.onSelectionChanged(selected_options);
             },
             containsValue: function(key, value) {
                 var this_selection = selected_options[key];
