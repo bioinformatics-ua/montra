@@ -35,9 +35,13 @@ function PCDraw(actualChart,chartType, e)
         
       
       
-      $("#pcBarContent").populationChartsBar('init', pc,this.actualChart.title.fixed_title,
+      $("#pcBarContent").populationChartsBar2('init', pc,this.actualChart.title.fixed_title,
         fingerprintID);
-      $("#pcBarContent").populationChartsBar('draw', pc);
+
+      console.log(pc);
+
+      $("#pcBarContent").populationChartsBar2('draw', pc);
+
 
     };
     this.draw = function(filters) {

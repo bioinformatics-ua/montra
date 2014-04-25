@@ -4,8 +4,6 @@
 {% load django_bootstrap_breadcrumbs %} 
 
 {% block headextra %}
-<script src="{{ STATIC_URL}}js/jquery.dyndropdown.js"></script>
-<link rel="stylesheet" href="{{ STATIC_URL }}css/jquery.dyndropdown.css">
 
 <link rel="stylesheet" href="{{ STATIC_URL }}css/vendor/style.css">
 
@@ -38,30 +36,6 @@
 {{fp}} 
 {%endfor%}
 </div>
-<div class="pull-right" id="filters_dropdown"></div>
-<button onclick="filter_dropdown.getSelection();">Teste</button>
-<script type="text/javascript">
-    var filter_dropdown;
-    $(function(){
-        filter_dropdown = $("#filters_dropdown").dyndropdown({label: "Filter", dropup: false, 
-            onSelectionChanged: function(selection){
-                console.log('callback called');
-                console.log(selection);
-            }
-        });
-
-        var json_structure = JSON.stringify({
-            gender: {M: "male", F: "female", MF: "male/female"},
-            location: {X:"xextenso", Y:"yextenso", Z:"zextenso", T:"textenso"},
-            year: {y1001:"1001", y1002: "1002", y1003: "1003"},
-            empty: {}
-        });
-
-        filter_dropdown.setStructure(json_structure);
-
-    })
-</script>
-
 {% include "population_characteristics.html" %}
 
 
