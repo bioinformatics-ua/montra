@@ -203,14 +203,17 @@ class PopulationCharacteristic(object):
                 dict_query = {'values.Var': chart.title.var,}
             if _filter.key != None:
                 dict_query['values.' + _filter.key]  = _filter.name
-            print _filter
-            print _filter.value
-            print dict_query
+            #print _filter
+            #print _filter.value
+            #print dict_query
             if comp:
-                values =  jerboa_aggregation_collection.find( dict_query ).distinct('values.' + _filter.value )
+                values =  jerboa_aggregation_collection.find( dict_query ).distinct('values.' + _filter.value )#
             else:
-                values =  jerboa_collection.find( dict_query ).distinct('values.' + _filter.value )
+                values =  jerboa_collection.find( dict_query ).distinct('values.' + _filter.value )#
+            
+            values = sorted(values)
             print values
+
             _filter.values = values
         return filters
 

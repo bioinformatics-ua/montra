@@ -47,18 +47,6 @@ class ConfAggregations(object):
         a.operation = Operation.SUM 
         a.field_to_compute = "Count"
 
-        af = AggregationField()
-        af.ttype = "slug"
-        af.name = "database_name_t"
-        af.key = "dbname"
-        af.value = "dbname_value"
-
-        af1 = AggregationField()
-
-        af1.ttype = "tsv"
-        af1.name = 'YEAR'
-        af1.key = 'Name1'
-        af1.value = 'Value1'
 
 
         fy2 = Filter()
@@ -66,7 +54,27 @@ class ConfAggregations(object):
         fy2.key = 'Name1'
         fy2.value = 'YEAR'
 
-        a.static_filters = [fy2 ]
+        fy3 = Filter()
+        fy3.name = 'Name2'
+        fy3.key = 'Name2'
+        fy3.value = ''
+
+
+        fy4 = Filter()
+        fy4.name = 'Value2'
+        fy4.key = 'Value2'
+        fy4.value = ''
+
+        a.static_filters = [fy2, fy3, fy4 ]
+
+
+        af = AggregationField()
+        af.ttype = "slug"
+        af.name = "database_name_t"
+        af.key = "dbname"
+        af.value = "dbname_value"
+
+
 
         af2 = AggregationField()
 
@@ -77,8 +85,8 @@ class ConfAggregations(object):
         af2.exclusive = True
 
 
-        #a.aggregation_fields = [af, af1, af2]
         a.aggregation_fields = [af, af2]
+        #a.aggregation_fields = [af, af2]
         result.append(a)
 
 
@@ -96,7 +104,13 @@ class ConfAggregations(object):
         fy2.key = 'Name1'
         fy2.value = 'YEAR'
 
-        a.static_filters = [fy2 ]
+        fy3 = Filter()
+        fy3.name = 'Name2'
+        fy3.key = 'Name2'
+        fy3.value = 'AGE'
+
+
+        a.static_filters = [fy2, fy3 ]
 
         af = AggregationField()
         af.ttype = "slug"
@@ -149,7 +163,18 @@ class ConfAggregations(object):
         fy2.key = 'Name1'
         fy2.value = 'YEAR'
 
-        a.static_filters = [fy2 ]
+        fy3 = Filter()
+        fy3.name = 'Name2'
+        fy3.key = 'Name2'
+        fy3.value = ''
+
+
+        fy4 = Filter()
+        fy4.name = 'Value2'
+        fy4.key = 'Value2'
+        fy4.value = ''
+
+        a.static_filters = [fy2, fy3,fy4 ]
 
         af = AggregationField()
         af.ttype = "slug"
@@ -157,12 +182,6 @@ class ConfAggregations(object):
         af.key = "location"
         af.value = "location_value"
 
-        af1 = AggregationField()
-
-        af1.ttype = "tsv"
-        af1.name = 'YEAR'
-        af1.key = 'Name1'
-        af1.value = 'Value1'
 
 
         af2 = AggregationField()
@@ -179,42 +198,7 @@ class ConfAggregations(object):
         result.append(a)
 
 
-        ### Overall Patient time per Location (in a) 
-        ###
-
-        a1 = Aggregation()
-        a1.var = "Observation time in a year"
-        a1.operation = Operation.SUM 
-        a1.field_to_compute = "Count"
-
-        af = AggregationField()
-        af.ttype = "slug"
-        af.name = "database_name_t"
-        af.key = "dbname"
-        af.value = "dbname_value"
-
-        af1 = AggregationField()
-
-        af1.ttype = "tsv"
-        af1.name = 'YEAR'
-        af1.key = 'Name1'
-        af1.value = 'Value1'
-
-
-
-        af2 = AggregationField()
-
-        af2.ttype = "tsv"
-        af2.name = None
-        af2.key = None
-        af2.value = 'Gender'
-        af2.exclusive = True
-
-
-        a1.aggregation_fields = [af, af1, af2]
-
-
-        result.append(a1)
+        
 
 
         ### Active Patients per database 
@@ -238,13 +222,25 @@ class ConfAggregations(object):
         af1.key = 'Name1'
         af1.value = 'Value1'
 
+        fy3 = Filter()
+        fy3.name = 'Name2'
+        fy3.key = 'Name2'
+        fy3.value = ''
+
+
+        fy4 = Filter()
+        fy4.name = 'Value2'
+        fy4.key = 'Value2'
+        fy4.value = ''
+
 
         fy2 = Filter()
         fy2.name = 'Name1'
         fy2.key = 'Name1'
         fy2.value = 'YEAR'
 
-        a.static_filters = [fy2 ]
+
+        a.static_filters = [fy2, fy3, fy4 ]
 
         af2 = AggregationField()
 
@@ -269,13 +265,6 @@ class ConfAggregations(object):
         a.operation = Operation.SUM 
         a.field_to_compute = "Count"
 
-        af = AggregationField()
-        af.ttype = "slug"
-        af.name = "database_name_t"
-        af.key = "dbname"
-        af.value = "dbname_value"
-
-
 
         fy2 = Filter()
         fy2.name = 'Name1'
@@ -288,6 +277,12 @@ class ConfAggregations(object):
         fy3.value = 'AGE'
 
         a.static_filters = [fy2, fy3]
+
+        af = AggregationField()
+        af.ttype = "slug"
+        af.name = "database_name_t"
+        af.key = "dbname"
+        af.value = "dbname_value"
 
 
         af1 = AggregationField()
