@@ -163,8 +163,6 @@ function GraphicChartC3D3(divArg, dataArg)
         // Check if it is only a value, i.e a value in the Y axis
         if($.type(actualChart.y_axis['var']) === "string") {
 
-
-           
             var _vv = parseFloat(row[actualChart.y_axis['var']]);
             _vv = +_vv || 0;
 
@@ -173,8 +171,6 @@ function GraphicChartC3D3(divArg, dataArg)
             {
               datasetYs[row[multivalue_stacked]].push(_vv);  
             }
-            //console.log("multivalue_comp");
-            //console.log(multivalue_comp[row[multivalue_stacked]]);
 
         } else { // More than a value. 
           actualChart.y_axis['var'].forEach(function(a){
