@@ -1,2 +1,2 @@
-mkdir -p /tmp/trash
-mongod --dbpath /tmp/trash
+mkdir -p /Volumes/EXT1/trash/mongodb
+mongod --dbpath /Volumes/EXT1/trash/mongodb
