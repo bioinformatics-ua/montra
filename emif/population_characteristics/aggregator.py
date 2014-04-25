@@ -23,6 +23,7 @@ from emif.settings import jerboa_collection, jerboa_aggregation_collection
 from pymongo.errors import OperationFailure
 import copy
 import json 
+import pprint
 
 from population_characteristics.conf_aggregations import *
 
@@ -32,14 +33,15 @@ import itertools
 from sets import Set
 
 
-
-
 # Aux functions 
-def check_filters(comb, aggr, entry):
+def verify_if_combination_matches_aggregation_field(comb, aggr, entry):
     result = False
     k = 0 
     for af in aggr.aggregation_fields:
-        if af.exclusive:
+
+        if af.ttype == "tsv":
+            #print "entry " + entry['values'][af.value]
+            #print "combo " + comb[k] 
             if entry['values'][af.value] == comb[k] and not result:
                 result = True
             else:
@@ -161,21 +163,16 @@ class AggregationPopulationCharacteristics(object):
 
                             
                             # Discard combination 
-                            if not check_filters(combination, aggregation, entry):
+                            if not verify_if_combination_matches_aggregation_field(combination, aggregation, entry):
                                 continue
 
                             if (entry['values']['Var'],combination) in self.index_new_values:
                                 _entry = self.index_new_values[(entry['values']['Var'],combination)]
-                                #_entry = self.index_new_values[combination]
                                 # TODO: Check the operation 
                                 # For now, only sums
-                                #print str((entry['values']['Var'],combination))
-                                #print "operation detect previous values"
-                                #print "old value"
-                                #print _entry['values'][aggregation.field_to_compute]
+       
                                 _entry['values'][aggregation.field_to_compute] = float(_entry['values'][aggregation.field_to_compute])  +  float(entry['values'][aggregation.field_to_compute])
-                                #print "new value"
-                                #print _entry['values'][aggregation.field_to_compute]
+                                
                             else:
                                 
                                 _entry = copy.deepcopy(entry)
@@ -210,6 +207,8 @@ class AggregationPopulationCharacteristics(object):
             #else:
                 #print "no"
         
+
+
 
 
         except:
@@ -252,5 +251,6 @@ class AggregationPopulationCharacteristics(object):
             import traceback
             traceback.print_exc()
         print "finishing aggregation"
+        pprint.pprint(self.index_new_values) 
         return self.new_values 
         

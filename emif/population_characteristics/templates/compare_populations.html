@@ -41,9 +41,11 @@
 <div class="pull-right" id="filters_dropdown"></div>
 <button onclick="filter_dropdown.getSelection();">Teste</button>
 <script type="text/javascript">
+
+    // This code will jump out of here!!
     var filter_dropdown;
     $(function(){
-        filter_dropdown = $("#filters_dropdown").dyndropdown({label: "Filter", dropup: false});
+        /*filter_dropdown = $("#filters_dropdown").dyndropdown({label: "Filter", dropup: false});
 
         var json_structure = JSON.stringify({
             gender: {M: "male", F: "female", MF: "male/female"},
@@ -52,7 +54,7 @@
             empty: {}
         });
 
-        filter_dropdown.setStructure(json_structure);
+        filter_dropdown.setStructure(json_structure);*/
 
     })
 </script>
