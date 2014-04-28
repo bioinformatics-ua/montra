@@ -93,6 +93,8 @@ $('#define_{{ question.number|removedots }}').click(function() {
             
             $('#error_{{ question.number|removedots }}').fadeOut('fast');
             $('[id="question_{{ question.number }}"]').change();
+            $('[id="answer_{{ question.number }}"] .dropdown-toggle').click();
+
         }
     }
 });
