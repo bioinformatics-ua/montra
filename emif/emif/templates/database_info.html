@@ -2,6 +2,7 @@
 {% load url from future %} 
 {% load extra_tags %} 
 {% load django_bootstrap_breadcrumbs %} 
+{% load comments %}
 
 {% block headextra %}
 
@@ -66,21 +67,21 @@
 {% endblock %} 
 {% block breadcrumbs %} 
 {{ block.super }} 
-    {% if search_old %}
-        {% breadcrumb "Search" "resultsdiff/1" %} 
-        {% breadcrumb breadcrumb_name "databases" %} 
-    {% elif style == '1' %} 
-        {% breadcrumb "My Databases" "databases" %} 
-        {% breadcrumb breadcrumb_name "databases" %} 
-    {% else %} 
-        {% breadcrumb "All Databases" "alldatabases" %} 
-        {% breadcrumb breadcrumb_name "databases" %} 
-    {% endif %}
+{% if search_old %}
+{% breadcrumb "Search" "resultsdiff/1" %} 
+{% breadcrumb breadcrumb_name "databases" %} 
+{% elif style == '1' %} 
+{% breadcrumb "My Databases" "databases" %} 
+{% breadcrumb breadcrumb_name "databases" %} 
+{% else %} 
+{% breadcrumb "All Databases" "alldatabases" %} 
+{% breadcrumb breadcrumb_name "databases" %} 
+{% endif %}
 
 {% endblock %}
 
 {% block toolbar %} 
-    {% include "menu_toolbar.html" with collapse=collapseall %} 
+{% include "menu_toolbar.html" with collapse=collapseall %} 
 {% endblock %} 
 
 {% block content %} 
@@ -99,15 +100,17 @@
                 <li  class="{%if activetab == 'docs'%}active{%endif%}">
                     <a href="#documents" data-toggle="tab"><i class="icon-folder-close"></i>&nbsp; Documents</a>
                 </li>
-                <!--
-                <li  class="{%if activetab == 'literature'%}active{%endif%}">
-                    <a href="#literature" data-toggle="tab">Literature</a>
+                
+                <li class="{%if activetab == 'literature'%}active{%endif%}">
+                    <a href="#literature" data-toggle="tab"><i class="icon-book"></i>&nbsp; Literature</a>
                 </li>
-                -->
                 
                 <li  class="{%if activetab == 'extra'%}active{%endif%}">
                     <a href="#apiinfo" data-toggle="tab"><i class="icon-download-alt"></i> &nbsp; Extra Information</a>
                 </li>
+
+                <li  class="{%if activetab == 'discussion'%}active{%endif%}">
+                    <a href="#discussion" data-toggle="tab"><i class="fa fa-comment"></i> &nbsp; Discussion</a>
             </ul>
             <div class="tab-content">
                 <div class="tab-pane {%if activetab == 'summary'%}active{%endif%}" id="metadata">
@@ -118,87 +121,111 @@
                         <div id="set_container"></div>
                     </div>
 
-                </div>
-
-
-                <div class="tab-pane {%if activetab == 'pc'%}active{%endif%}" id="populationcharacteristics" >
-
-                  {% include "population_characteristics.html" %}
 
                 </div>
 
-              <div class="tab-pane {%if activetab == 'docs'%}active{%endif%}" id="documents">
-                
-                    {% include "documents.html" %}
-            </div>
-
-
-
-                <div class="tab-pane {%if activetab == 'literature'%}active{%endif%}" id="literature">
-                    <div>
-                        <a id="collapseall_literature" class="btn pull-right" href=""><i class="icon-plus"></i>&nbsp; Expand all</a>
-                    </div>
-                    <div class="accordion pull-left " id="accordion2" style="margin-top: 10px;">
-                        <div class="accordion-group">
-                            <div class="accordion-heading">
-                                <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapseOne">
-                                    Upregulation of chemokines and their receptors in Duchenne muscular dystrophy: potential for attenuation of myofiber necrosis.
-                                </a>
-                            </div>
-                            <div id="collapseOne" class="accordion-body collapse in">
-                                <div class="accordion-inner">
-                                    <div id="becas-widget-text" class="widget-container"></div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="accordion-group">
-                            <div class="accordion-heading">
-                                <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapseTwo">
-                                    Upregulation of chemokines and their receptors in Duchenne muscular dystrophy: potential for attenuation of myofiber necrosis.
-                                </a>
-                            </div>
-                            <div id="collapseTwo" class="accordion-body collapse">
-                                <div class="accordion-inner">
-                                    <!-- Container to hold another widget -->
-                                    <div id="becas-widget-pmid" class="widget-container"></div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-
-                <div class="tab-pane {%if activetab == 'extra'%}active{%endif%}" id="apiinfo">
-                    <div>
-                        <a id="btn_pivot_table" class="btn pull-right hidden" href="">Pivot table</a>
-                    </div>
-                    <div class="">
-                        <div id="chart" class="span4" style="display:none;"></div>
-
-                        <div  class='span9' id="pivot_table_extra_information">
-
-                        </div>
-
-                    </div>
-                    <div class="span8"></div>
-                </div>
-
-            </div>
             
+
+
+            <div class="tab-pane {%if activetab == 'pc'%}active{%endif%}" id="populationcharacteristics" >
+
+              {% include "population_characteristics.html" %}
+
+          </div>
+
+          <div class="tab-pane {%if activetab == 'docs'%}active{%endif%}" id="documents">
+
+            {% include "documents.html" %}
+        </div>
+
+
+
+        <div class="tab-pane {%if activetab == 'literature'%}active{%endif%}" id="literature">
+            <h4 class="loadingsection pull-center">Loading...</h4>
+
+        </div>
+
+
+        <div class="tab-pane {%if activetab == 'extra'%}active{%endif%}" id="apiinfo">
+            <div>
+                <a id="btn_pivot_table" class="btn pull-right hidden" href="">Pivot table</a>
+            </div>
+            <div class="">
+                <div id="chart" class="span4" style="display:none;"></div>
+
+                <div  class='span9' id="pivot_table_extra_information">
+
+                </div>
+
+            </div>
+            <div class="span8"></div>
+        </div>
+
+        <div class="tab-pane {%if activetab == 'discussion'%}active{%endif%}" id="discussion">
+            <div class="container-fluid">
+
+                <div id="commentInserted" class="alert alert-success" style="display:none;">
+                  <button type="button" class="close" data-dismiss="alert">&times;</button>
+                  <strong>Comment sent!</strong> Your comment was posted successfully.
+              </div>
+              <div id="fillForm" class="alert" style="display:none;">
+                <button type="button" class="close" data-dismiss="alert" >&times;</button>
+                <strong><i class="fa fa-arrow-circle-o-down"></i></strong>&nbsp;You need to insert some words here
+            </div>
+
+            {% if user.is_authenticated %}
+            {% get_comment_form for fingerprint.fingerprint fingerprint_pk as form %}
+            <form id="comment_form" action="{% comment_form_target %}" method="POST">
+                <fieldset>
+                    {% csrf_token %}
+                    <textarea id="id_comment" rows="5" name="comment" class="span7" placeholder="Insert your comment or question here..." autofocus></textarea>
+                    {{ form.content_type }}
+                    {{ form.object_pk }}
+                    {{ form.timestamp }}
+                    {{ form.security_hash }}
+                    </br>
+                    <!--<input type="hidden" name="next" value="{{request.get_full_path}}" />-->
+                    <button id="submit_button" class="btn btn-primary" type="submit"  data-loading-text="Sending comment...">Post comment</button>
+                </fieldset>
+            </form>
+            {% else %}
+            <p>Please <a href="{% url 'auth_login' %}">log in</a> to leave a comment.</p>
+            {% endif %}
+            <br/>
+            {% get_comment_count for fingerprint.fingerprint fingerprint_pk as comment_count %}
+            <span id="comments_total">{{ comment_count }}</span> comment{{ comment_count|pluralize }}
+            <br/>
+            <br/>
+            {% get_comment_list for fingerprint.fingerprint fingerprint_pk as comment_list %}
+            <div id="newComments"></div>
+            {% for comment in comment_list reversed%}
+            <div id="comment_{{ comment.id }}">
+                <blockquote>
+                    <p style="font-size: 16px">{{ comment.comment }}</p>
+                    <small>{{ comment.name }} posted on {{ comment.submit_date }}</small>
+                </blockquote>
+            </div>
+            {% empty %}
+            <p>No comments yet.</p>
+            {% endfor %}
+            </div>
         </div>
     </div>
-    {% else %}
-    <div class="row">
-        <div class="span4">
-            <div class="alert">
-                <a class="close" data-dismiss="error">×</a>
-                <strong>Warning!</strong>
-                You don't have results.
-            </div>
+
+</div>
+</div>
+{% else %}
+<div class="row">
+    <div class="span4">
+        <div class="alert">
+            <a class="close" data-dismiss="error">×</a>
+            <strong>Warning!</strong>
+            You don't have results.
         </div>
     </div>
 </div>
-    {% endif %}
+</div>
+{% endif %}
 
 <!-- Display a message to users with Javascript deactivated -->
 <noscript>
@@ -207,39 +234,39 @@
 
         <h2>Please follow this instructions on how to
             <a href="http://www.enable-javascript.com/" target="_blank">enable JavaScript in your web browser</a>.</h2>
-    </div>
-</noscript>
-{% if isAdvanced %}
-<div id="bool_container"></div>
-{% endif %}
+        </div>
+    </noscript>
+    {% if isAdvanced %}
+    <div id="bool_container"></div>
+    {% endif %}
 
-{% endblock %} 
+    {% endblock %} 
 
-{% block scriptextraincludes %}
-<!-- Include the widget embedding script -->
-<script src="//bioinformatics.ua.pt/becas/embed-widget.js"></script>
+    {% block scriptextraincludes %}
+    <!-- Include the widget embedding script -->
+    <script src="//bioinformatics.ua.pt/becas/embed-widget.js"></script>
 
 
 <!--[if lte IE 8]>
     <script src="{{ STATIC_URL}}js/d3/r2d3.min.js" charset="utf-8"></script>
     <![endif]-->
-<!--[if gte IE 9]><!-->
+    <!--[if gte IE 9]><!-->
 
     <script src="{{ STATIC_URL}}js/d3/d3.v3.min.js" charset="utf-8"></script>
     <script src="{{ STATIC_URL}}js/d3/d3.layout.cloud.js"></script>
     <script src="{{ STATIC_URL}}js/c3.js"></script>   
-<!--<![endif]-->
+    <!--<![endif]-->
 
 
-<script src="{{ STATIC_URL}}js/database_info.js"></script>
-<script src="{{ STATIC_URL }}js/emif.database.delete.js"></script>
+    <script src="{{ STATIC_URL}}js/database_info.js"></script>
+    <script src="{{ STATIC_URL }}js/emif.database.delete.js"></script>
+    <script src="{{ STATIC_URL}}js/emif.discussion.js"></script>
 
-<!--[if gte IE 9]><!-->
-<script src="{{ STATIC_URL}}js/emif.populationcharacteristics.charts.js"></script>
+    <!--[if gte IE 9]><!-->
+    <script src="{{ STATIC_URL}}js/emif.populationcharacteristics.charts.js"></script>
 
-<script src="{{ STATIC_URL}}js/emif.populationcharacteristics.js"></script>
-<!--<![endif]-->
-
+    <script src="{{ STATIC_URL}}js/emif.populationcharacteristics.js"></script>
+    <!--<![endif]-->
 
 {% endblock %}
 
@@ -247,72 +274,79 @@
 var threads = {};
 function load_questionnary(){
 
-        console.log("Creating questionnary set containers (so they are in order)");
-        
-        var containers = [];
+console.log("Creating questionnary set containers (so they are in order)");
 
-        // We build the qs containers in memory and just do dom op, on the end, for speed
-        // on ie joins are significantly faster than concatenation
-        {% for k, qs in qsets.ordered_items %}
-            containers.push('<div class="accordion-group"><div class="accordion-heading"><a style="display: inline-block; width: 90%;" class="accordion-toggle" data-toggle="collapse" data-parent="#accordion1" href="#collapse{{ k|removespaces|safe|clean }}">{{ k|removeh1 }} </a><span class="accordion-icon">{% if qs.info %}<img title="This section has search keywords" class="markered" src="{{STATIC_URL}}/img/marker.png" />{% endif %}</span></div><div id="collapse{{ k|removespaces|safe|clean }}" class="accordion-body collapse"><div id="qs_{{ qs.sortid }}" class="accordion-inner"><h4 class="pull-center">Loading...</h4></div></div></div>');
-        
-            {% if qs.info %}
-                console.log("QS_DEBUG: {{qs.sortid}} : {{qs.info}}");
-            {% endif %}
+var containers = [];
 
-            
+// We build the qs containers in memory and just do dom op, on the end, for speed
+// on ie joins are significantly faster than concatenation
+{% for k, qs in qsets.ordered_items %}
+containers.push('<div class="accordion-group"><div class="accordion-heading"><a style="display: inline-block; width: 90%;" class="accordion-toggle" data-toggle="collapse" data-parent="#accordion1" href="#collapse{{ k|removespaces|safe|clean }}">{{ k|removeh1 }} </a><span class="accordion-icon">{% if qs.info %}<img title="This section has search keywords" class="markered" src="{{STATIC_URL}}/img/marker.png" />{% endif %}</span></div><div id="collapse{{ k|removespaces|safe|clean }}" class="accordion-body collapse"><div id="qs_{{ qs.sortid }}" class="accordion-inner"><h4 class="pull-center">Loading...</h4></div></div></div>');
 
-        {% endfor %}
+{% if qs.info %}
+console.log("QS_DEBUG: {{qs.sortid}} : {{qs.info}}");
+{% endif %}
 
-        $('#set_container').append(containers.join(''));
 
-        console.log( "Loading questionnary by parts, we have {{qsets|length}} sets");  
-        
-        var threadpool = new ThreadPool(20);
-        parts_missing = {{qsets|length}};
-        
 
-        // i dont everything on a single run, because i just add the containers all at once, not by parts
-        // only the constainers content are loaded by parts
+{% endfor %}
 
-        var priority=1;
-        {% for k, qs in qsets.ordered_items %}
-            var thread = new Runnable(loadqspart, priority++, {{qs.sortid}}, '{{fingerprint_id}}');
+$('#set_container').append(containers.join(''));
 
-            threadpool.run(thread);
-            threads['qs_{{ qs.sortid }}'] = thread;
-        {% endfor %}
+console.log( "Loading questionnary by parts, we have {{qsets|length}} sets");  
 
-        //  we add the triggers thread
-        threadpool.destroy();
+var threadpool = new ThreadPool(20);
+parts_missing = {{qsets|length}};
+
+
+// i dont everything on a single run, because i just add the containers all at once, not by parts
+// only the constainers content are loaded by parts
+
+var priority=1;
+{% for k, qs in qsets.ordered_items %}
+var thread = new Runnable(loadqspart, priority++, {{qs.sortid}}, '{{fingerprint_id}}');
+
+threadpool.run(thread);
+threads['qs_{{ qs.sortid }}'] = thread;
+{% endfor %}
+
+//  we add the triggers thread
+threadpool.destroy();
 }
 function loadqspart(sortid, pk){
-    $.get( "fingerprintqs/"+pk+"/"+sortid+"/", function( data ) {
-      $( "#qs_"+sortid ).html( data );
-        // Mark the tab as highlighted if there's any highlight inside it
+$.get( "fingerprintqs/"+pk+"/"+sortid+"/", function( data ) {
+$( "#qs_"+sortid ).html( data );
+// Mark the tab as highlighted if there's any highlight inside it
 
-        
-        /*var highlights = $("#qs_"+sortid).find('.highlight');
 
-        //console.dir(highlights);
+/*var highlights = $("#qs_"+sortid).find('.highlight');
 
-        if(highlights.length > 0){
-           var this_row = $( "#qs_"+sortid ).parent().siblings().find('.accordion-icon');
-           this_row.html('<img title="This section has search keywords" class="markered" src="{{STATIC_URL}}/img/marker.png" />');
-           $(".markered" ,this_row).tooltip({container: "body"});
-           $(".markered" ,this_row).click(function(){
-            this_row.parent().siblings().first().collapse('toggle');
-           });
-        }  */   
-    });    
+//console.dir(highlights);
 
-    threads['qs_'+sortid] = null;
-    parts_missing--;
-    this.complete();
+if(highlights.length > 0){
+var this_row = $( "#qs_"+sortid ).parent().siblings().find('.accordion-icon');
+this_row.html('<img title="This section has search keywords" class="markered" src="{{STATIC_URL}}/img/marker.png" />');
+$(".markered" ,this_row).tooltip({container: "body"});
+$(".markered" ,this_row).click(function(){
+this_row.parent().siblings().first().collapse('toggle');
+});
+}  */   
+});    
+
+threads['qs_'+sortid] = null;
+parts_missing--;
+this.complete();
 }
 <!-- This must be here because of dynamic code -->
 $(document).ready(function() {
 
+    bindPostCommentHandler('{{ request.user.first_name }}', '{{ request.user.last_name }}', '{{ request.user.username }}');
+load_questionnary();
+    $('.tabbable a[data-toggle="tab"]').on('shown', function (e) {
+        if(e.target.innerText == 'Population Characteristics'){
+          console.log("test");
+        }
+    });
     load_questionnary();
     // On expand event, we burst the priority of this thread to load before the others
     $('.accordion-heading').click(function(){
@@ -345,12 +379,28 @@ $(document).ready(function() {
         $("#pivot_table_extra_information").html(json_to_table(json2));
     }
 });
+    /* On tab change, to literature tab, lazy load literature tab */
+    $(document).on('shown', 'a[data-toggle="tab"]', function (e) {
+        if($(e.target).text().toLowerCase().indexOf('literature')!=-1){
+            // if not loaded yet
+            if($('#literature').find('.loadingsection').length != 0){
+                console.log("Loading literature, since it was not loaded yet.");
+                $.get( "literature/{{fingerprint_id}}", function( data ) {
+                    $( "#literature" ).html( data );
+                });
+            }
+
+        }
+    });
  {% if isAdvanced %}
  var bool_container;
 $(function(){
+
     bool_container = $('#bool_container').boolrelwidget({view_only: true, view_serialized_string: '{{request.session.serialization_query}}', link_back: $('#base_link').prop('href')+"advancedSearch/{{request.session.query_type}}/1/{{request.session.query_id}}"});
+
+
 });
-  {% endif %}
+{% endif %}
 
 {% endblock %}
 

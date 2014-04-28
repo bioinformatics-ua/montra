@@ -36,6 +36,9 @@ from django.conf import settings
 
 urlpatterns = patterns('',
 
+    # Comments
+    url(r'^comments/', include('django.contrib.comments.urls')),
+
     # Where to go when loggedin (according to Profile)
     url(r'^wherenext/$', 'emif.views.wherenext'),
 
@@ -247,6 +250,9 @@ urlpatterns = patterns('',
 
     # Docs Manager
     url(r'docsmanager/', include('docs_manager.urls')),
+
+    # Literature URLs
+    url(r'literature/', include('literature.urls')),
 )
 
 if settings.DEBUG:
