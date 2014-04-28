@@ -333,7 +333,7 @@ def convert_query_from_boolean_widget(query, q_id):
     #print query
     # I cant remove the symbol
     query = re.sub("_____[a-zA-Z0-9._()\[\]\/\-\+?!'@#$%&*=~^|\\<>;,\.\" ]+_____", "", query)
-    print query
+    #print query
 
     def check(m):
         q = None
@@ -374,12 +374,12 @@ def convert_query_from_boolean_widget(query, q_id):
     # how to escape everything but unescaped single quotes, very nice ref from : 
     # http://stackoverflow.com/questions/249791/regex-for-quoted-string-with-escaping-quotes
     # this is non-greedy, giving the smallest match possible (as we want)
-    r = re.sub("(question_nr_[10-9\\.]+)(:)( )?(\'(\\\.|[^\'])*\'|\[[0-9\.,\-a-zA-Z ]*\])", check, query)
+    r = re.sub("(question_nr_[10-9\\.]+)(:)( )?(\'(\\\.|[^\'])*\'|\[[0-9\.,\-a-zA-Z\* ]*\])", check, query)
     #r = re.sub('(question_nr_[10-9\\.]+)', check, query)
 
     r = r + " AND type_t:"+ttype
 
-    #print r
+    print r
 
     return r
 
