@@ -178,6 +178,9 @@ class PopulationCharacteristic(object):
 
         return r
 
+
+
+
     def filters(self, var, fingerprint_id):
 
         # Go to the rule matcher and ask for the filter for that particular case
@@ -212,15 +215,49 @@ class PopulationCharacteristic(object):
                 values =  jerboa_collection.find( dict_query ).distinct('values.' + _filter.value )#
             
             values = sorted(values)
-            print values
 
             _filter.values = values
         return filters
 
     def get_var(self):
         values =  jerboa_collection.distinct( 'values.Var' )
+        # Go to the rule matcher and ask for the filter for that particular case
+        comp = False
+        if fingerprint_id=="COMPARE":
+            comp=True
+        mrules = RuleMatcher(comp=comp)
+        filters = mrules.get_filter(var)
+        chart = mrules.get_chart(var)
+
+
+        # Generate the filters here.
+        for _filter in filters:
+
+            # Generate query
+
+            dict_query = {'fingerprint_id':fingerprint_id, 
+                'values.Var': chart.title.var,
+                
+                }
+            if comp:
+                dict_query = {'values.Var': chart.title.var,}
+            if _filter.key != None:
+                dict_query['values.' + _filter.key]  = _filter.name
+
+
+        if comp:
+            values =  jerboa_aggregation_collection.find( dict_query ).distinct('values.' + _filter.value )#
+        else:
+            values =  jerboa_collection.find( dict_query ).distinct('values.' + _filter.value )#
         
+        values = sorted(values)
+
+        _filter.values = values
+        return filters
         return values
+
+    def get_xs(self):
+        pass
 
     def get_x_y(self):
         pass
