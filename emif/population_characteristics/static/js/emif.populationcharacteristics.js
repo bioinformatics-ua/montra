@@ -32,7 +32,7 @@ var PAGE_TYPE = "PC";
 var PC_NORMAL = "PC_NORMAL"; // Population Characteristics for one database
 var PC_COMPARE = "PC_compare"; // Population Characteristics for many databases
 
-
+var filter_dropdown;
 
 function getPageType()
 {
@@ -146,6 +146,164 @@ function PCAPI (endpoint)
 };
 
 /********************************************************************
+**************** Population Characteristics - Bar (Jquery Plugin) v2 (using dyndropdown)
+*********************************************************************/
+
+ (function( $ )
+ {
+
+    /** Draft code */ 
+    function getFiltersSelected(){
+
+      return filtersMap;
+
+    };
+
+    
+    translations = {};
+    translationsBack = {};
+    
+
+    var methods = {
+        init : function( options, name, fingerprintId ) {
+
+            
+            /** Get a list of filters */
+            values = options.getFilter(name,fingerprintId);
+
+            if (values===undefined)
+            {
+                return;
+            };
+
+            filtersMap = {}
+            var self = this;
+            /*self.html('');*/
+
+
+            filters_tmp = [];
+            
+            JSON_OUTPUT = {};
+
+            values.values.forEach(function(_value){
+
+              var xFilter = JSON.parse(_value);
+
+              filters_tmp.push(xFilter);
+              if (!xFilter.show)
+                return;
+              
+              self.append(xFilter.name+": ");
+              var options = {};
+
+              //var tmpUl = $('<ul class="nav nav-pills nav-stacked">');
+
+              //self.append(tmpUl);
+
+              // This code is only for comparison mode 
+              //console.log(xFilter);
+              if (xFilter.name == "Gender")
+              {
+                  if (xFilter.translation.hasOwnProperty("ALL"))
+                  {
+                    xFilter.values.push("ALL");  
+                    options['ALL'] = 'ALL';               
+                  }
+                  
+              }
+
+
+              $.each(xFilter.values, function (data){
+                  
+                  if (xFilter.values[data]==="")
+                      return;
+
+
+                  var fType = xFilter.name;
+                  if (xFilter.key!= null)
+                  {
+                    fType = xFilter.value;
+
+                  }
+                  var originalValue = xFilter.values[data];
+                  //console.log("originalValue");
+                  //console.log(originalValue);
+                  if (xFilter['translation'] != null)
+                  {
+                    if (xFilter['translation'].hasOwnProperty(originalValue))
+                    {
+                        translations[originalValue] = xFilter['translation'][originalValue];
+                        translationsBack[xFilter['translation'][originalValue]] = originalValue;
+                        originalValue = xFilter['translation'][originalValue];
+                    }
+                      
+                  }
+                  
+                 
+                  //tmpUl.append('<li><a class="filterBar '+fType+'" id=_'+fType+'_'+xFilter.values[data]+' href="#" onclick="return false;"> '+originalValue+'</a></li>')
+                  options[xFilter.values[data]] = originalValue;                  
+                    
+              });
+              JSON_OUTPUT[xFilter.value] = {values: options, name: xFilter.name};
+            });
+            //console.log('JSON_OUTPOUT');
+            //console.log(JSON.stringify(JSON_OUTPUT));
+            
+
+            filter_dropdown = $(this).dyndropdown({
+                    label: "Filter", 
+                    dropup: false, 
+                    alwaysOneOption: true,
+                    onSelectionChanged: function(selection){
+                        //console.log('callback called');
+                        //console.log(selection);
+                        
+                        var charDraw = new PCDraw(actualChart, activeChart, null);
+
+                        for(filter in selection){
+                          var options_translated = [];
+
+                          for(var i=0;i<selection[filter].length;i++){
+                            var _value = selection[filter][i];
+                            
+                            options_translated.push(_value);
+
+                          }
+
+                          filtersMap['values.'+filter] = options_translated;
+                        }
+                        //console.log('NEW FILTERS:');
+                        //console.log(filtersMap);
+                        charDraw.refresh(filtersMap);
+                    }
+            });
+
+            filter_dropdown.setStructure(JSON.stringify(JSON_OUTPUT));
+
+            actualChart.filters = filters_tmp;
+
+            var match=false;
+
+        },
+        draw : function( options ) {
+            
+        }
+    };
+
+    $.fn.populationChartsBar2 = function(method) {
+        // Method calling logic
+        if ( methods[method] ) {
+        return methods[ method ].apply( this, Array.prototype.slice.call( arguments, 1 ));
+        } else if ( typeof method === 'object' || ! method ) {
+        return methods.init.apply( this, arguments );
+        } else {
+        $.error( 'Method ' + method + ' does not exist on jQuery.populationCharts2' );
+        }
+        return this;
+    };
+}( jQuery ));
+
+/********************************************************************
 **************** Population Characteristics - Bar (Jquery Plugin) 
 *********************************************************************/
 
@@ -186,6 +344,7 @@ function PCAPI (endpoint)
             values.values.forEach(function(_value){
 
               var xFilter = JSON.parse(_value);
+
               filters_tmp.push(xFilter);
               if (!xFilter.show)
                 return;
@@ -259,6 +418,8 @@ function PCAPI (endpoint)
                       var str = e.target.id;
                       var filterType =str.substring(str.indexOf("_")+1,str.lastIndexOf("_"));
 
+                      console.log('filterType:'+filterType);
+
                       var _value = e.target.innerHTML.trim();
                       if (translationsBack.hasOwnProperty(_value))
                       {
@@ -273,8 +434,8 @@ function PCAPI (endpoint)
                         filtersMap['values.'+filterType] = [_value];  
                       }*/
                       filtersMap['values.'+filterType] = [_value];  
-                      console.log("filterMap:");
-                      console.log(filtersMap);
+                      console.log("filtersSelected:");
+                      console.log(getFiltersSelected());
                       charDraw.refresh(getFiltersSelected());
                       
                       

@@ -1,4 +1,6 @@
 {% load url from future %}
+<script src="{{ STATIC_URL}}js/jquery.dyndropdown.js"></script>
+<link rel="stylesheet" href="{{ STATIC_URL }}css/jquery.dyndropdown.css">
 <!--[if gte IE 9]><!-->
 <script src="{{ STATIC_URL}}js/emif.charts.filters.js"></script>
 <script src="{{ STATIC_URL}}js/emif.charts.draw.js"></script>
@@ -203,12 +205,11 @@
     
 
     <div class="span3" id="pcBarContentRoot">
-        <div > Filter: </div>
+        <div class="pull-right" id="pcBarContent"></div>
 
-        <div id="pcBarContent" class="well">
+        <!--div id="pcBarContent" class="well">
 
-        </div>
-
+        </div-->
 
     </div>
 

@@ -16,7 +16,8 @@
             left_centered_dropdown: true,
             size: null,
             button_dropdown: false,
-            onSelectionChanged: null
+            onSelectionChanged: null,
+            alwaysOneOption: false
         }, options);
 
         // Validate that callbacks are functions
@@ -30,7 +31,6 @@
         var api = {
             redraw: function() {
                 var output = [];
-
                 output.push('<div class="btn-group');
                 if (settings.dropup) {
                     output.push(" dropup");
@@ -54,6 +54,7 @@
                 if (settings.left_centered_dropdown)
                     output.push(' pull-right');
                 output.push(' dropdown-menu-f">');
+                 
                 output.push('</ul></div>');
 
                 self.addClass('dyndropdown_container');
@@ -66,32 +67,52 @@
                 }
             },
             setStructure: function(json) {
+                $('.dyndropdown_options', self).html('');
                 var json = JSON.parse(json);
+                selected_options = {};
+
                 menu_entries = json;
+                var selected = '<i style="margin-top:2px;" class="dyndropdown-selected pull-right icon-ok"></i>';
 
                 var options = [];
+
+                if(settings.label != 'Action' && !settings.button_dropdown){
+                    options.push('<li style="text-align: center; font-weight: bold;">'+settings.label+'</li>');
+                }  
 
                 for (element in json) {
                     if (json.hasOwnProperty(element)) {
                         options.push('<li id="dyndropdownop_' + element + '" class="');
-                        if (this.size(json[element]) > 0) {
+                        if (this.size(json[element].values) > 0) {
                             options.push('dropdown-submenu');
                             if (settings.left_centered_dropdown)
                                 options.push(' pull-left');
                         } else {
                             options.push('dyndropdown-selectable');
+
+
+
                         }
                         options.push('"><a tabindex="-1" href="javascript: void(0)">');
-                        options.push(element);
-
+                        options.push(json[element].name);
+                        if(this.size(json[element]) == 0 && settings.alwaysOneOption){
+                            options.push(selected);
+                            api.addSelection(element, element);
+                        }
                         options.push('</a>');
                         options.push('<ul class="dropdown-menu dropdown-menu-f">');
-                        for (subelement in json[element]) {
-                            console.log(json[element][subelement])
-                            if (json[element].hasOwnProperty(subelement)) {
+                        var first = true;
+                        for (subelement in json[element].values) {
+                            console.log(json[element].values[subelement])
+                            if (json[element].values.hasOwnProperty(subelement)) {
                                 options.push('<li id="dyndropdownop_' + element + '___' + subelement + '" class="dyndropdown-selectable">');
                                 options.push('<a tabindex="-1" href="javascript: void(0)">');
-                                options.push(json[element][subelement]);
+                                options.push(json[element].values[subelement]);
+                                if(first && settings.alwaysOneOption){
+                                    options.push(selected);
+                                    first = false;
+                                    api.addSelection(element, subelement);
+                                }
                                 options.push('</a></li>');
                             }
                         }
@@ -102,13 +123,12 @@
                 }
 
 
-
+                
                 $('.dyndropdown_options', self).html(options.join(''));
 
                 if (settings.left_centered_dropdown)
                     $('.dropdown-submenu > a', self).addClass('dyndropdown_leftcaret');
 
-                var selected = '<i style="margin-top:2px;" class="dyndropdown-selected pull-right icon-ok"></i>';
                 $('.dropdown-menu').on('click', function(e) {
                     if ($(this).hasClass('dropdown-menu-f')) {
                         e.stopPropagation();
@@ -131,7 +151,14 @@
                     var selected_arrow = $(this).find('.dyndropdown-selected');
 
                     if (selected_arrow.length > 0) {
-                        selected_arrow.remove();
+                        if(!(settings.alwaysOneOption 
+                            && selected_options[key] != null
+                            && selected_options[key].length <=1)
+                            ){
+
+                            selected_arrow.remove();
+                        }
+                        
                         api.removeSelection(key, value);
 
                     } else {
@@ -189,7 +216,9 @@
 
                 try {
                     if (this_selection.length <= 1) {
-                        delete selected_options[key];
+                        if(!settings.alwaysOneOption){
+                            delete selected_options[key];
+                        }
                     } else {
                         var index = this.containsValue(key, value);
                         if (index != -1) {
