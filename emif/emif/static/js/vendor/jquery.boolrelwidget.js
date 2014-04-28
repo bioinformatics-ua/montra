@@ -888,9 +888,14 @@ BooleanTerminal.prototype = {
         return this.text;
     },
     toQuery: function() {
-        if (this.id && this.val)
-            return this.id + ": '" + this.val.replace(/'/g, "\\'") + "'";
-        else return '';
+        var suffix="]";
+        if (this.id && this.val){
+            if(this.val.lastIndexOf("[") == 0 && 
+                this.val.indexOf(suffix, this.val.length - suffix.length) !== -1)
+                return this.id + ": " + this.val.replace(/'/g, "\\'");
+            else 
+                return this.id + ": '" + this.val.replace(/'/g, "\\'") + "'";
+        } else return '';
     },
     serialize: function() {
         return 'T;;;;;' + encodeURI(this.id) + ';;;;;' + encodeURI(this.text) + ';;;;;' 

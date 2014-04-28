@@ -7,7 +7,8 @@ from django.utils.translation import ugettext as _
 from django.utils.simplejson import dumps
 import re
 
-regex = re.compile("\\d{1,3}(\\.\\d{3})*$")
+regex = re.compile("^\d{1,3}(\\'\d{3})*(\\.[0-9]+)?")
+regex2 = re.compile("^\d+")
 
 @question_proc('numeric')
 def question_(request, question):
@@ -31,13 +32,17 @@ def question_(request, question):
 def process_(question, ansdict):
     checkdict = question.getcheckdict()
     required = question.getcheckdict().get('required', 0)
-    ans = ansdict['ANSWER'] or ''
+    ans = str(ansdict['ANSWER']) or ''
     qtype = question.get_type()
 
     boo = regex.match(ans) == None
-    
-    if len(ans)!=0 and boo:
-        raise AnswerException(_(u'Must be a mumeric field. ex: 1.000.000.000 = 1 Million'))
+    boo2 = regex2.match(ans) == None
+
+    print("RESPOSTA:"+str(len(ans)))
+
+    if ans != None and ans.lower() != 'none':
+        if len(ans)!=0 and (boo and boo2):
+            raise AnswerException(_(u'Must be a numeric field. ex: 1.000.000.000 = 1 Million'))
 
     if ansdict.has_key('comment') and len(ansdict['comment']) > 0:
         return dumps([ans, [ansdict['comment']]])

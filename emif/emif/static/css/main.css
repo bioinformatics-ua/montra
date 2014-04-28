@@ -580,3 +580,15 @@ label input[type="radio"], label input[type="checkbox"]{
 .minwidth250{
   min-width: 250px;
 }
+
+.qspreference{
+  margin-top: 3px !important;
+}
+
+.privategroup{
+  background-color: #f8f8f8;
+}
+
+.accordion-body.in:hover { 
+   overflow: visible !important;
+}

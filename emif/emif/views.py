@@ -624,7 +624,6 @@ def render_one_questionset(request, q_id, qs_id, errors={}, aqid=None, fingerpri
     
 
     if fingerprint_id != None and not is_new:
-        print "HERY"
         c = CoreEngine()
 
         extra = {} 
@@ -672,8 +671,8 @@ def render_one_questionset(request, q_id, qs_id, errors={}, aqid=None, fingerpri
                 answer = str(question.number)
 
                 extra[question] = ans = extra.get(question, {})
-                if "[" in value:
-                    value = value.replace("]", "").replace("[", "")
+                if "[" in str(value):
+                    value = str(value).replace("]", "").replace("[", "")
                 request2.get_post()['question_%s' % question.number] = value
                 
                 
@@ -785,6 +784,14 @@ def render_one_questionset(request, q_id, qs_id, errors={}, aqid=None, fingerpri
         elif fingerprint_id != None and not is_new:
             (qlist_general, qlist, jstriggers, qvalues, jsinclude, cssinclude, extra_fields, hasErrors) = extract_answers(request2, q_id, question_set, qs_list)
 
+        #permissions = getPermissions(fingerprint_id, question_set)
+
+
+        advanced_search=False
+        if template_name == 'fingerprint_search_qs.html':
+            advanced_search = True
+
+
         r = r2r(template_name, request,
                 questionset=question_set,
                 questionsets=question_set.questionnaire.questionsets,
@@ -799,6 +806,7 @@ def render_one_questionset(request, q_id, qs_id, errors={}, aqid=None, fingerpri
                 async_progress=None,
                 async_url=None,
                 qs_list=qs_list,
+                advanced_search = advanced_search,
                 questions_list=qlist_general,
                 fingerprint_id=fingerprint_id,
                 breadcrumb=True,
@@ -1086,8 +1094,8 @@ def database_edit(request, fingerprint_id, questionnaire_id, template_name="data
         answer = str(question.number)
 
         extra[question] = ans = extra.get(question, {})
-        if "[" in value:
-            value = value.replace("]", "").replace("[", "")
+        if "[" in str(value):
+            value = str(value).replace("]", "").replace("[", "")
         request2.get_post()['question_%s' % question.number] = value
         
         
@@ -1983,7 +1991,7 @@ def createqsets(runcode, qsets=None, clean=True, highlights=None):
             if question_group != None and qhighlights != None and id_text in qhighlights and qs_text in qhighlights[id_text]:
                 question_group.info = True
 
-            value = clean_value(str(result[k].encode('utf-8')))
+            value = clean_value(str(result[k]).encode('utf-8'))
             
             try:
 
@@ -2138,7 +2146,7 @@ def createqset(runcode, qsid, qsets=None, clean=True, highlights=None):
                 except:
                     pass
 
-            value = clean_value(str(result[k].encode('utf-8')))
+            value = clean_value(str(result[k]).encode('utf-8'))
 
             qs_text = k[:-1] + "qs"
             id_text = "questionaire_"+str(fingerprint_ttype)
