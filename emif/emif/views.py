@@ -190,7 +190,7 @@ def results_fulltext(request, page=1, full_text=True,template_name='results.html
     return results_fulltext_aux(request, query, page, template_name, isAdvanced)
 
 
-def results_fulltext_aux(request, query, page=1, template_name='results.html', isAdvanced=False, force=False):
+def results_fulltext_aux(request, query, page=1, template_name='more_like_this.html', isAdvanced=False, force=False):
     
     rows = define_rows(request)
     if request.POST and "page" in request.POST and not force:
@@ -1370,13 +1370,37 @@ def get_databases_process_results(results):
 
     return list_databases
 
-def get_databases_from_solr_v2(request, query="*:*", sort="", rows=100, start=0):
+def get_databases_from_solr_v2(request, query="*:*", sort="", rows=100, start=0, fl='',post_process=None):
     c = CoreEngine()
-    results = c.search_fingerprint(query, sort=sort, rows=rows, start=start)
+    results = c.search_fingerprint(query, sort=sort, rows=rows, start=start, fl=fl)
     
     list_databases = get_databases_process_results(results)
+
+    if post_process:
+        list_databases = post_process(results, list_databases)
     
     return (list_databases,results.hits)
+
+def get_query_from_more_like_this(doc_id, maxx=100):
+    c = CoreEngine()
+    #results = c.search_fingerprint(query, sort=sort, rows=rows, start=start)
+    results = c.more_like_this(doc_id, maxx=maxx)
+    
+    queryString = "id:("
+    for r in results:
+        if "id" in r:
+            queryString = queryString + r["id"]+"^"+str(r["score"])+ " "
+
+    queryString = queryString + ")"
+
+    ## PY SOLR IS STUPID, OTHERWISE THIS WOULD BE AVOIDED
+    database_name = ""
+    results = c.search_fingerprint("id:"+doc_id, start=0, rows=1, fl="database_name_t")
+    for r in results:
+        if "database_name_t" in r:
+            database_name = r["database_name_t"]
+    
+    return (queryString, database_name)
 
 def get_databases_from_solr_with_highlight(request, query="*:*", sort="", rows=100, start=0):
     c = CoreEngine()
@@ -1533,7 +1557,7 @@ def databases(request, page=1, template_name='databases.html', force=False):
                                            'owner_fingerprint': False,
                                            'add_databases': True, "sort_params": sort_params, "page":page})
 
-def paginator_process_params(request, page, rows):
+def paginator_process_params(request, page, rows, default_mode={"database_name": "asc"}):
     sortFieldsLookup = {}
     sortFieldsLookup["database_name"] = "database_name_sort"
     sortFieldsLookup["last_update"] = "last_activity_sort"
@@ -1542,6 +1566,9 @@ def paginator_process_params(request, page, rows):
     sortFieldsLookup["institution"] = "institution_sort"
     sortFieldsLookup["location"] = "location_sort"
     sortFieldsLookup["nrpatients"] = "nrpatients_sort"
+
+    sortFieldsLookup["score"] = "score"
+    
 
     filterFieldsLookup = {}
     filterFieldsLookup["database_name_filter"] = "database_name_sort"
@@ -1563,7 +1590,7 @@ def paginator_process_params(request, page, rows):
     if "s" in request:
         mode = json.loads(request["s"])
     else:
-        mode = {"database_name": "asc"}
+        mode = default_mode
 
     for x in mode:
         if sortFieldsLookup.has_key(x):
@@ -1591,7 +1618,7 @@ def paginator_process_params(request, page, rows):
     if len(filterString) > 0:
         filterString = filterString[:-4]
 
-    for x in ["database_name", "last_update", "type", "institution", "location", "nrpatients"]:
+    for x in ["database_name", "last_update", "type", "institution", "location", "nrpatients", "score"]:
         if (x in sort_params) and ( "name" in sort_params[x]):
             sort_params["selected_name"] = x
             sort_params["selected_value"] = sort_params[x]["name"]
@@ -3226,6 +3253,162 @@ def sharedb_activation(request, activation_code, template_name="sharedb_invited.
 # Documentation
 def docs_api(request, template_name='docs/api.html'):
     return render(request, template_name, {'request': request, 'breadcrumb': True})
+
+def more_like_that(request, doc_id, mlt_query=None, page=1, template_name='more_like_this.html', force=False):
+    #first lets clean the query session log
+    if 'query' in request.session:
+        del request.session['query']
+        
+    if 'isAdvanced' in request.session:
+        del request.session['isAdvanced'] 
+    
+    if 'query_id' in request.session:
+        del request.session['query_id']
+    if 'query_type' in request.session:
+        del request.session['query_type']
+
+    database_name = ""
+
+    if mlt_query == None:
+        (_filter, database_name) = get_query_from_more_like_this(doc_id)
+    else:
+        _filter = mlt_query
+
+    rows = define_rows(request)
+    if request.POST and not force:
+        page = request.POST["page"]
+
+    if page == None:
+        page = 1   
+
+    (sortString, filterString, sort_params, range) = paginator_process_params(request.POST, page, rows, default_mode={"score":"desc"})    
+    sort_params["base_filter"] = _filter;
+
+    print filterString
+
+    if len(filterString) > 0:
+        _filter += " AND " + filterString
+
+    print _filter
+
+    def fn(res, lst):
+        m = {}
+        for r in res:
+            if "id" in r and "score" in r:
+                m[r["id"]] = r                
+
+        for d in lst:
+            if d.id in m:
+                d.score = str(round(float( m[d.id]["score"]), 3) )
+        return lst
+
+    (list_databases,hits) = get_databases_from_solr_v2(request, _filter, sort=sortString, rows=rows, start=range, fl="*, score", post_process=fn)
+    if range > hits and force < 2:
+        return databases(request, page=1, force=True)  
+
+    print "Range: "+str(range)
+    print "hits: "+str(hits)
+    print "len: "+str(len(list_databases))
+
+    list_databases = paginator_process_list(list_databases, hits, range) 
+    
+    print "len: "+str(len(list_databases))
+    ## Paginator ##
+    myPaginator = Paginator(list_databases, rows)
+    try:
+        pager =  myPaginator.page(page)
+    except PageNotAnInteger, e:
+        pager =  myPaginator.page(page)
+    ## End Paginator ##    #print list_databases
+    
+    return render(request, template_name, {'request': request,
+                                           'num_results': hits, 'page_obj': pager, 
+                                           'page_rows': rows,'breadcrumb': True, 
+                                           "breadcrumb_text": "More Like - "+database_name,
+                                           'database_name': database_name, 'isAdvanced': False, 
+                                           "sort_params": sort_params, "page":page})
+
+def generate_database_snipet(results, page=1, rows=5):
+    class ResultSnipet:
+        num_results = 0
+        list_results = []
+        paginator = None
+        paginator_url = None
+        paginator_kwargs = []
+
+        def setPage(self, pageN):
+            if self.paginator == None:
+                return
+            try:
+                self.list_results = self.paginator.page(pageN)
+            except PageNotAnInteger, e:
+                self.list_results = self.paginator.page(1)
+    
+    questionnaires_ids = {}
+    qqs = Questionnaire.objects.all()
+    for q in qqs:
+        questionnaires_ids[q.slug] = (q.pk, q.name)
+
+    list_results = ResultSnipet()
+
+    list_databases = []
+    if len(results) == 0:
+        return list_results
+
+    for r in results:
+        try:
+            database_aux = Database()
+
+            if (not r.has_key('database_name_t')):
+                database_aux.name = '(Unnamed)'
+            else:
+                database_aux.name = r['database_name_t']
+
+            if (not r.has_key('location_t')):
+                database_aux.location = ''
+            else:
+                database_aux.location = r['location_t']
+            if (not r.has_key('institution_name_t')):
+                database_aux.institution = ''
+            else:
+                database_aux.institution = r['institution_name_t']
+
+            if (not r.has_key('contact_administrative_t')):
+                database_aux.email_contact = ''
+            else:
+                database_aux.email_contact = r['contact_administrative_t']
+
+            if (not r.has_key('number_active_patients_jan2012_t')):
+                database_aux.number_patients = ''
+            else:
+                database_aux.number_patients = r['number_active_patients_jan2012_t']
+            if (not r.has_key('upload-image_t')):
+                database_aux.logo = 'nopic.gif'
+            else:
+                database_aux.logo = r['upload-image_t']
+            database_aux.id = r['id']
+            database_aux.date = convert_date(r['created_t'])
+            try:
+                database_aux.date_modification = convert_date(r['date_last_modification_t'])
+            except KeyError:
+                pass
+                
+            (ttype, type_name) = questionnaires_ids[r['type_t']]
+            database_aux.ttype = ttype
+            database_aux.type_name = type_name
+            list_databases.append(database_aux)
+        except:
+            raise
+
+    pp = Paginator(list_databases, rows)
+    
+    list_results.num_results = results.hits
+    list_results.paginator = pp
+
+    list_results.setPage(page)
+ 
+    return list_results
+    
 
 
 def clean_str_exp(s):
