@@ -91,6 +91,7 @@ $('#define_{{ question.number|removedots }}').click(function() {
             $('[id="question_{{ question.number }}"]').val(result);
             $('[id="question_{{ question.number }}"]').change();
             $('#error_{{ question.number|removedots }}').fadeOut('fast');
+            $('[id="answer_{{ question.number }}"] .dropdown-toggle').click();
         }
     }
 });
