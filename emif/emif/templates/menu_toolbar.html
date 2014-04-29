@@ -18,11 +18,16 @@
         More Like This
       </a>
       {% endif %}
+      {% if fingerprint_dump and not owner_fingerprint %}
+      <a class="btn btn " href="dbDetailed/{{fingerprint_id}}/{{fingerprint_ttype}}" id="detailed_list_toolbar" title="Detailed View of Database" title="Detailed View Database"> <i class="icon-eye-open icon"></i>
+        Detailed View
+      </a>
+      {% endif %}
       {% if fingerprint_dump and owner_fingerprint or fingerprint_dump and request.user.is_superuser %}
       <a class="btn btn " href="dbEdit/{{fingerprint_id}}/{{fingerprint_ttype}}" id="edit_list_toolbar" title="Edit Database" title="Share Database"> <i class="icon-pencil icon"></i>
         Edit
-        
       </a>
+
 
       <a class="btn btn sharedb" href="" id="share_list_toolbar" onclick="return false;"> <i class="icon-share icon"></i>
         Share

@@ -145,14 +145,16 @@
         <!-- First Questionset - Introduction -->
     </div>
     <div class="span2 text-right">
-        {% if questions_list.0.0.sortid != 0 %}
-        <input class="btn large btn-primary" name="submit" type="submit" value="{% trans 'Save' %}"/>
-        {% endif %}
-        {% if questions_list.0.0.sortid == 0 %}
-        {% endif %}
-        <!-- Last Questionset - Thank You -->
-        {% if questions_list.0.0.sortid == 99 %}
-        <!--<input class="btn large btn-primary" name="submit" type="submit" value="{% trans 'Save' %}" />-->
+        {% if not readonly %}
+            {% if questions_list.0.0.sortid != 0 %}
+            <input class="btn large btn-primary" name="submit" type="submit" value="{% trans 'Save' %}"/>
+            {% endif %}
+            {% if questions_list.0.0.sortid == 0 %}
+            {% endif %}
+            <!-- Last Questionset - Thank You -->
+            {% if questions_list.0.0.sortid == 99 %}
+            <!--<input class="btn large btn-primary" name="submit" type="submit" value="{% trans 'Save' %}" />-->
+            {% endif %}
         {% endif %}
     </div>
 </div>

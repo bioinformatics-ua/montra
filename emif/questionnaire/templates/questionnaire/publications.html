@@ -7,7 +7,9 @@
     <div class="control-group span12" >
         <label class="control-label span2">Pubmed id: </label>
         <input class="span5" type="text" id="question_{{ question.number|removedots }}_pubmedid" />
+        {% if not readonly %}
         <button id="loadpubbtn" style="margin-bottom:10px;" type="button" class="btn btn-primary disabled" ><i style="color:white;" class="icon-large icon-search icon-white"></i></button>
+        {% endif %}
     </div>
 
 
@@ -35,12 +37,13 @@
         <label class="control-label span2">Authors (last name initials):</label>
         <input class="span5" type="text" id="question_{{ question.number|removedots }}_pubauthors" />    
     </div>
-    
+    {% if not readonly %}
     <div class="control-group span12">
     <button id="addpub" type="button" class="btn btn-primary"><i class="icon-large icon-white icon-plus-sign"></i> Add Publication</button>
     <button id="cleanpub" type="button" class="btn btn-primary"><i class="fa fa-trash-o"></i> Clean </button>
     <input type="hidden"  id="question_{{ question.number }}" name="question_{{ question.number }}" value='{{qdict.value}}' />
     </div>
+    {% endif %}
 
     
     {% if qdict.value %}
