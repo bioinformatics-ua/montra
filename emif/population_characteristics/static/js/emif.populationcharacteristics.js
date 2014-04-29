@@ -596,7 +596,8 @@ $(document).ready(
         $("#pc_list").populationChartsTypes('draw', chartLayout); 
 
           $('.tabbable a[data-toggle="tab"]').on('shown', function (e) {
-            if(e.target.innerText == 'Population Characteristics'){
+            console.log(e.target.innerText);
+            if(e.target.innerText.indexOf('Population Characteristics')>-1){
               $(".graphTypes").first().click();
 
               $(".filterBar").first().click(); 

@@ -20,6 +20,12 @@
 # Django settings for emif project.
 import os.path
 
+import sys
+reload(sys)
+sys.setdefaultencoding('utf-8')
+
+
+
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 

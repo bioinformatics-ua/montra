@@ -528,10 +528,13 @@ box-shadow: inset 0 1px 0 rgba(255,255,255,0.2),0 1px 2px rgba(0,0,0,0.05);
   width: 18%;
   } 
 .sorter-institution{
-  width: 20%;
+  width: 19%;
 }
 .sorter-database_name{
-  width: 21%;
+  width: 20%;
+}
+.sorter-score{
+  width: 6%;  
 }
 label input[type="radio"], label input[type="checkbox"]{
   margin-top: -3px;
@@ -579,4 +582,24 @@ label input[type="radio"], label input[type="checkbox"]{
 
 .minwidth250{
   min-width: 250px;
+}
+
+
+.publication_details{
+  cursor: pointer;
+  color: #08c;
+}
+.publication_details:hover{
+  text-decoration:underline;
+}
+.qspreference{
+  margin-top: 3px !important;
+}
+
+.privategroup{
+  background-color: #f8f8f8;
+}
+
+.accordion-body.in:hover { 
+   overflow: visible !important;
 }
