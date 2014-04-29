@@ -584,6 +584,14 @@ label input[type="radio"], label input[type="checkbox"]{
   min-width: 250px;
 }
 
+
+.publication_details{
+  cursor: pointer;
+  color: #08c;
+}
+.publication_details:hover{
+  text-decoration:underline;
+}
 .qspreference{
   margin-top: 3px !important;
 }

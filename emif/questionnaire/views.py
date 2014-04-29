@@ -13,6 +13,7 @@ from datetime import datetime
 from django.utils import translation
 from django.utils.translation import ugettext_lazy as _
 from questionnaire import QuestionProcessors
+from questionnaire import Fingerprint_Summary
 from questionnaire import questionnaire_done
 from questionnaire import questionset_done
 from questionnaire import AnswerException

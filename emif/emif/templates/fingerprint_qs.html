@@ -14,7 +14,11 @@
 					<tr>
 						<!-- title="{{ t.tag|safe }}" -->
 						<td title="{{ t.tag|removehs|safe }}">{{ t.tag|removehs|safe }}</td>
-						<td title="{{ t.value }}">{{ t.value|safe }}
+						{% if t.ttype|captioned %}
+						<td title="{{ t.value|force_escape }}">{{ t.value|safe }}
+						{% else %}
+						<td>{{ t.value|safe }}
+						{% endif %}
 						<div class="pull-right">
 							{% if not t.comment|safe == None and not t.comment|safe == "" %}
 							<i class="comment_button icon-comment" data-container="body" data-toggle="popover" data-placement="left" data-title="Comment" data-content="{{ t.comment|safe }}"></i>
