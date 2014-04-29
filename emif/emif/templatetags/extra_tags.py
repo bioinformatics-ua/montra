@@ -29,7 +29,6 @@ register = template.Library()
 
 from django.conf import settings
 
-
 @register.filter(name='removeh1')
 @stringfilter
 def removeh1(value):

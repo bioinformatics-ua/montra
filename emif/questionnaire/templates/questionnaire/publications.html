@@ -266,6 +266,9 @@ function PublicationWidget ()
         }
 
         publications_counter++;
+            if (!(typeof formHasChanged === 'undefined')) {
+            formHasChanged = true;
+        }
         $('#question_{{ question.number|removedots }}_table > tbody:last').append('<tr id="pub_'+_pubmedid+'"><td><a class="deleteLink" href="#" ><img src="static/img/glyphicons_192_circle_remove.png"/></a></td><td>'+_pubmedid+'</td><td>'+_pubtitle+'</td><td>'+_pubjournal+'</td><td>'+_pubyear+'</td><td>'+_pubvolume+'</td><td>'+_pubpages+'</td><td>'+_pubauthors+'</td></tr>');
 
         // Add to boolean container if possible
@@ -289,6 +292,9 @@ function PublicationWidget ()
                     $('[id="answered_'+{{ question.number|removedots }}+'"]').hide();
                 }
 
+                if (!(typeof formHasChanged === 'undefined')) {
+                    formHasChanged = true;
+                }
 
                 pw{{ question.number|removedots }}.saveInformation();
 
@@ -360,6 +366,9 @@ function PublicationWidget ()
                     $('[id="answered_'+{{ question.number|removedots }}+'"]').hide();
                 }
 
+                if (!(typeof formHasChanged === 'undefined')) {
+                    formHasChanged = true;
+                }
                 pw{{ question.number|removedots }}.saveInformation();
 
                 return false;

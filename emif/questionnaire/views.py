@@ -29,6 +29,7 @@ import random
 import md5
 import re
 
+
 def r2r(tpl, request, **contextdict):
     "Shortcut to use RequestContext instead of Context in templates"
     contextdict['request'] = request

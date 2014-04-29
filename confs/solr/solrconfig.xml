@@ -1200,7 +1200,9 @@
        </lst>
     -->
   </requestHandler>
-
+<searchComponent name="mlt"       class="solr.MoreLikeThisComponent" />
+<requestHandler name="/mlt" class="solr.MoreLikeThisHandler">
+  </requestHandler>
   <!-- Search Components
 
        Search components are registered to SolrCore and used by 
