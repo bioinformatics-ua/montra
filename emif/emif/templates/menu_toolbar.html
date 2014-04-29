@@ -4,7 +4,7 @@
 	<div class="btn-group pull-right">
 
 
-        {% if  request.user|safe in users_db %}
+        {% if request.user|safe in users_db and not readonly %}
         <button type="button" class="btn btn active" onclick="edit_db_option();" title="Enable/Disabled edit option" data-toggle="button">
 			<i class="fa fa-pencil-square-o"></i> Edit
 		</button>
