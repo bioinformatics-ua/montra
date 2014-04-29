@@ -48,6 +48,7 @@ from django.conf import settings
 from django.template.defaultfilters import slugify
 
 import datetime
+from fingerprint.models import Fingerprint
 
 logger = logging.getLogger()
 
@@ -188,6 +189,12 @@ def index_answeres_from_qvalues(qvalues, questionnaire, subject, fingerprint_id,
     results = c.search_fingerprint("id:"+fingerprint_id)
     if (len(results)>0):
         d = results.docs[0]
+    else:
+        try:
+            fp = Fingerprint(fingerprint_hash=fingerprint_id)
+            fp.save()
+        except:
+            print(fingerprint_id + ' already in DB')
 
     text = ""
     ''' For god sake, i dont understand what this was doing here, since its not being used
