@@ -602,7 +602,14 @@ def database_edit_qs(request, fingerprint_id, questionnaire_id, sort_id):
 
     return response
 
-def render_one_questionset(request, q_id, qs_id, errors={}, aqid=None, fingerprint_id=None, is_new=True, template_name='fingerprint_add_qs.html'):
+def database_detailed_qs(request, fingerprint_id, questionnaire_id, sort_id):
+
+    response = render_one_questionset(request, questionnaire_id, sort_id, fingerprint_id = fingerprint_id, is_new=False, readonly=True,
+                                               template_name='fingerprint_add_qs.html')
+
+    return response
+
+def render_one_questionset(request, q_id, qs_id, errors={}, aqid=None, fingerprint_id=None, is_new=True, readonly = False, template_name='fingerprint_add_qs.html'):
     """
     Return the QuestionSet template
 
@@ -810,6 +817,7 @@ def render_one_questionset(request, q_id, qs_id, errors={}, aqid=None, fingerpri
                 questions_list=qlist_general,
                 fingerprint_id=fingerprint_id,
                 breadcrumb=True,
+                readonly=readonly
         )
         r['Cache-Control'] = 'no-cache'
         r['Expires'] = "Thu, 24 Jan 1980 00:00:00 GMT"
@@ -1036,8 +1044,11 @@ def extract_answers(request2, questionnaire_id, question_set, qs_list):
         raise
     return (qlist_general, qlist, jstriggers, qvalues, jsinclude, cssinclude, extra_fields, len(errors)!=0)
     
+def database_detailed_view(request, fingerprint_id, questionnaire_id, template_name="database_edit.html"):
 
-def database_edit(request, fingerprint_id, questionnaire_id, template_name="database_edit.html"):
+    return database_edit(request, fingerprint_id, questionnaire_id, template_name, readonly=True);
+
+def database_edit(request, fingerprint_id, questionnaire_id, template_name="database_edit.html", readonly=False):
     c = CoreEngine()
 
     results = c.search_fingerprint("id:" + fingerprint_id)
@@ -1172,7 +1183,8 @@ def database_edit(request, fingerprint_id, questionnaire_id, template_name="data
             id=fingerprint_id,
             users_db=users_db,
             created_date=created_date,
-            hide_add=True
+            hide_add=True,
+            readonly=readonly
     )
     r['Cache-Control'] = 'no-cache'
     r['Expires'] = "Thu, 24 Jan 1980 00:00:00 GMT"

@@ -3,11 +3,13 @@
 
 <div class="row" style="margin-top: 20px;">
 
-
+<div {% if readonly %} style="display: none;" {% endif %}>
     <div class="control-group span12" >
         <label class="control-label span2">Pubmed id: </label>
         <input class="span5" type="text" id="question_{{ question.number|removedots }}_pubmedid" />
-        <button id="loadpubbtn" style="margin-bottom:10px;" type="button" class="btn btn-primary disabled" ><i style="color:white;" class="icon-large icon-search icon-white"></i></button>
+        
+        <button {% if readonly %} style="display: none;" {% endif %} id="loadpubbtn" style="margin-bottom:10px;" type="button" class="btn btn-primary disabled" ><i style="color:white;" class="icon-large icon-search icon-white"></i></button>
+        
     </div>
 
 
@@ -41,6 +43,7 @@
     <button id="cleanpub" type="button" class="btn btn-primary"><i class="fa fa-trash-o"></i> Clean </button>
     <input type="hidden"  id="question_{{ question.number }}" name="question_{{ question.number }}" value='{{qdict.value}}' />
     </div>
+    
 
     
     {% if qdict.value %}
@@ -48,12 +51,14 @@
             $('[id="answered_'+{{ question.number|removedots }}+'"]').show();
         </script>
     {% endif %}
+    </div>
     <div class="control-group span8">
 
     <table id="question_{{ question.number|removedots }}_table" class="table table-hover">
         <thead>
             <tr>
-              <th>Select</th>
+
+              <th {% if readonly %} style="display: none;" {% endif %}>Select</th>
               <th>PubmedId</th>
               <th>Title</th>
               <th>Journal</th>
@@ -269,7 +274,7 @@ function PublicationWidget ()
             if (!(typeof formHasChanged === 'undefined')) {
             formHasChanged = true;
         }
-        $('#question_{{ question.number|removedots }}_table > tbody:last').append('<tr id="pub_'+_pubmedid+'"><td><a class="deleteLink" href="#" ><img src="static/img/glyphicons_192_circle_remove.png"/></a></td><td>'+_pubmedid+'</td><td>'+_pubtitle+'</td><td>'+_pubjournal+'</td><td>'+_pubyear+'</td><td>'+_pubvolume+'</td><td>'+_pubpages+'</td><td>'+_pubauthors+'</td></tr>');
+        $('#question_{{ question.number|removedots }}_table > tbody:last').append('<tr id="pub_'+_pubmedid+'"><td {% if readonly %} style="display: none;" {% endif %}><a class="deleteLink" href="#" ><img src="static/img/glyphicons_192_circle_remove.png"/></a></td><td>'+_pubmedid+'</td><td>'+_pubtitle+'</td><td>'+_pubjournal+'</td><td>'+_pubyear+'</td><td>'+_pubvolume+'</td><td>'+_pubpages+'</td><td>'+_pubauthors+'</td></tr>');
 
         // Add to boolean container if possible
         if (!(typeof bool_container === 'undefined')) {
@@ -351,7 +356,7 @@ function PublicationWidget ()
 
             if(_pubtitle != undefined){
                 publications_counter++;
-                 $('#question_{{ question.number|removedots }}_table > tbody:last').append('<tr id="pub_'+_pubmedid+'"><td><a class="deleteLink" href="#" ><img src="static/img/glyphicons_192_circle_remove.png"/></a></td><td>'+_pubmedid+'</td><td>'+_pubtitle+'</td><td>'+_pubjournal+'</td><td>'+_pubyear+'</td><td>'+_pubvolume+'</td><td>'+_pubpages+'</td><td>'+_pubauthors+'</td><td>'+_publink+'</td></tr>'); 
+                 $('#question_{{ question.number|removedots }}_table > tbody:last').append('<tr id="pub_'+_pubmedid+'"><td {% if readonly %} style="display: none;" {% endif %}><a class="deleteLink" href="#" ><img src="static/img/glyphicons_192_circle_remove.png"/></a></td><td>'+_pubmedid+'</td><td>'+_pubtitle+'</td><td>'+_pubjournal+'</td><td>'+_pubyear+'</td><td>'+_pubvolume+'</td><td>'+_pubpages+'</td><td>'+_pubauthors+'</td><td>'+_publink+'</td></tr>'); 
             }
 
         }
