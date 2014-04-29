@@ -8,7 +8,7 @@ if ( $("#edit_db_inputs").val() == '1' ) {
 }
 
 function edit_db_option(){
-
+    console.log('EDITING')
 //    console.log($("#edit_db_inputs").val());
     if ( $("#edit_db_inputs").val() == '0' ) {
         $('[id^="qform"] input').prop("disabled", true);
