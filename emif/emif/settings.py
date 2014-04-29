@@ -49,8 +49,7 @@ else:
 ADMINS = (
     ('Luis A. Bastiao Silva', 'bastiao@ua.pt'),
     ('José Luis Oliveira', 'jlo@ua.pt'),
-    ('Tiago Godinho', 'tmgodinh@ua.pt'),
-    ('Jose Melo', 'melojms@gmail.com'),
+    ('Tiago Godinho', 'tmgodinho@ua.pt'),
     ('Ricardo Ribeiro', 'ribeiro.r@ua.pt'),
 )
 
