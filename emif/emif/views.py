@@ -80,7 +80,8 @@ def list_questions():
 
 def index(request, template_name='index_new.html'):
     if request.user.is_authenticated():
-        return HttpResponseRedirect('/wherenext/')
+        #return HttpResponseRedirect('/wherenext/')
+        return HttpResponseRedirect(settings.BASE_URL + 'wherenext')
     else:
         return render(request, template_name, {'request': request})
 
