@@ -87,6 +87,7 @@ def handle_compare(request, template_name="compare_populations.html"):
 
     return render(request, template_name, {'request': request,  
         'owner_fingerprint':False,
+        'compare': True,
         'fingerprint_ids' : fingerprint_ids,
         'contains_population': True }) 
 

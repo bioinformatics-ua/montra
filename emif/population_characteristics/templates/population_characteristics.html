@@ -4,7 +4,9 @@
 <!--[if gte IE 9]><!-->
 <script src="{{ STATIC_URL}}js/emif.charts.filters.js"></script>
 <script src="{{ STATIC_URL}}js/emif.charts.draw.js"></script>
+
 <script src="{{ STATIC_URL}}js/emif.populationcharacteristics.comments.js"></script>
+
 <!--<![endif]-->
 
 <link rel="stylesheet" href="{{ STATIC_URL }}css/pc.css">
@@ -183,7 +185,7 @@
             </div>
             <div id='pc_comments_placeholder' class="pc_comment">
             </div>
-            {%if owner_fingerprint%}
+            {%if owner_fingerprint and not compare%}
                 <div id="pc_comment_id" class="pc_comment">
                 <form id="chartcomments" method="post" action="comments" >
                     {% csrf_token %}
