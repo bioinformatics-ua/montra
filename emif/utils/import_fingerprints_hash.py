@@ -29,10 +29,11 @@ results = c.search_fingerprint('*:*')
 for result in results:
 	fingerprint_id = result['id']
 	print fingerprint_id
-	try:
-		fp = Fingerprint(fingerprint_hash=fingerprint_id)
-		fp.save()
-	except:
-		print fingerprint_id + ' already in DB'
+	if not fingerprint_id.startswith("questionaire_"):
+		try:
+			fp = Fingerprint(fingerprint_hash=fingerprint_id)
+			fp.save()
+		except:
+			print fingerprint_id + ' already in DB'
 
 print '\nend!'
