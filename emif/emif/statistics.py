@@ -29,7 +29,8 @@ class Statistic(object):
         self.search = CoreEngine()
 
     def get_percentage(self):
-        slug = self.question.slug
+        #slug = self.question.slug
+        slug = self.question.slug_fk.slug1
         # print slug
         type_id = self.question.questionset.questionnaire.slug
 

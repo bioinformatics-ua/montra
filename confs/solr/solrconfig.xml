@@ -1200,7 +1200,9 @@
        </lst>
     -->
   </requestHandler>
-
+<searchComponent name="mlt"       class="solr.MoreLikeThisComponent" />
+<requestHandler name="/mlt" class="solr.MoreLikeThisHandler">
+  </requestHandler>
   <!-- Search Components
 
        Search components are registered to SolrCore and used by 
@@ -1574,8 +1576,8 @@
                  default="true"
                  class="solr.highlight.HtmlFormatter">
         <lst name="defaults">
-          <str name="hl.simple.pre"><![CDATA[<em>]]></str>
-          <str name="hl.simple.post"><![CDATA[</em>]]></str>
+          <str name="hl.simple.pre"><![CDATA[<span class=highlight>]]></str>
+          <str name="hl.simple.post"><![CDATA[</span>]]></str>
         </lst>
       </formatter>
 

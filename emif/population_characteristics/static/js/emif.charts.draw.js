@@ -44,17 +44,19 @@ function PCDraw(actualChart,chartType, e)
 
         tfilter = new TransformFilter(filters);
         filters = tfilter.transform();
+        console.log("output filters")
+        console.log(filters);
+
         valuesFromGraph = PC.getValuesRowWithFilters(this.actualChart.title.fixed_title, 
           this.actualChart.y_axis['var'],fingerprintID, filters );
       }
       var valueFilters = "";
       $.each(filters, function (data){
         var fV = filters[data];
-        console.log(translations);
-        console.log('do'+translations);
+        
         if (translations.hasOwnProperty(filters[data]))
         {
-          console.log('do'+filters[data]);
+          
             fV = translations[filters[data]];
         }
         if (fV=="Total") fV = "";

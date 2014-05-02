@@ -59,6 +59,8 @@ class Filter(object):
         self.value = None
         self.values = None
         self.translation = None
+        self.comparable = False
+        self.comparable_values = None
 
         
     def to_JSON(self):
@@ -97,6 +99,7 @@ class Chart(object):
         self.x_axis = None
         self.y_axis = None
         self.filters = None
+        self.uid = None
 
     def to_JSON(self):
         return json.dumps(self, default=lambda o: o.__dict__, sort_keys=True, indent=4)

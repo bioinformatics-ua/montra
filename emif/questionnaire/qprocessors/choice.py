@@ -26,7 +26,7 @@ def question_choice(request, question):
         choices.append( ( choice.value == val, choice, ) )
         hasValue = hasValue or choice.value == val
 
-    print "hasValue: "+str(hasValue)
+    #print "hasValue: "+str(hasValue)
 
     if question.type == 'choice-freeform':
         jstriggers.append('question_%s_comment' % question.number)
