@@ -245,7 +245,7 @@ function PublicationWidget ()
 
             for (var i = 0 ; i<_objs.length; i++)
             {
-                if(_objs[i]['pmid'] == pubmedid)
+                if(_objs[i]['pmid'] != "" && _objs[i]['pmid'] == pubmedid)
                     return false;
 
                 if( _objs[i]['title'].toLowerCase() == pubtitle.toLowerCase() && _objs[i]['journal'].toLowerCase() == pubjournal.toLowerCase() && _objs[i]['year'] == pubyear )
