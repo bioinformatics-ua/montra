@@ -95,12 +95,47 @@ NumericValidator.prototype ={
     }
 }
 
+function EmailValidator(context){
+    this.regex = /\S+@\S+\.\S/;
+    this.context = context;
+}
+EmailValidator.prototype ={
+    onInit : function(dom){
+        
+    },
+    validate : function(question_number, controllerDOM){
+        var draw_validator = this.context.draw_validator;        
+        question_number = question_number.replace(".","\\.");        
+        var validator = $('#email_validator_'+question_number);
+        //console.log(validator);
+
+        var text = $(controllerDOM).val();
+        if(text.length == 0){
+            draw_validator(validator, true, "");
+            return true;
+        }
+        var res = this.regex.test(text);
+
+        if(!res){
+            draw_validator(validator, false, "This Field must be an email");
+        }else{
+            draw_validator(validator, true, "");
+        }
+
+        return res;
+    },
+    controllerDOM : function(validatorDOM){
+        return $("input", validatorDOM);
+    }
+}
+
 function Fingerprint_Validator(searchMode){
     this.validators = [];
     this.fingerprint_name = new OpenButtonValidator(this);
 
     this.validators["open-button"] = { n: "open-button_validator", v: this.fingerprint_name};
     this.validators["numeric"] = { n: "numeric_validator", v: new NumericValidator(this)};
+    this.validators["email"] = { n: "email_validator", v: new EmailValidator(this)};
 }
 Fingerprint_Validator.prototype ={
     onInit : function(){
