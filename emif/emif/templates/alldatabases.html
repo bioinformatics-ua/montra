@@ -51,16 +51,28 @@ button {
     <thead>
         <tr>
             <!--<th class="sorter-false filter-false"></th>-->
-            <th class="sorter {%if "icon-minus" not in sort_params.database_name.icon %}selected-sorter{% endif %}"  onclick="a.onClick('database_name', '{{sort_params.database_name.next}}');">
-                <div class="pull-left">Name</div>
+            <th class="sorter-database_name sorter {%if "icon-minus" not in sort_params.database_name.icon %}selected-sorter{% endif %}"  onclick="a.onClick('database_name', '{{sort_params.database_name.next}}');">
+            <div class="pull-left">Acronym</div>
                  <div class="pull-right"><i class="{{sort_params.database_name.icon}}"></i></div>
             </th>
-            <!--<th>Creation Date</th>-->
-            <th class="sorter {%if "icon-minus" not in sort_params.last_update.icon %}selected-sorter{% endif %}" onclick="a.onClick('last_update', '{{sort_params.last_update.next}}');">
+            <th class="sorter-institution sorter {%if "icon-minus" not in sort_params.institution.icon %}selected-sorter{% endif %}"  onclick="a.onClick('institution', '{{sort_params.institution.next}}');">
+            <div class="pull-left">Institution Name</div>
+                 <div class="pull-right"><i class="{{sort_params.institution.icon}}"></i></div>
+            </th>            
+            <!--<th>Creation Date</th>-->            
+            <th class="sorter-location sorter {%if "icon-minus" not in sort_params.location.icon %}selected-sorter{% endif %}" onclick="a.onClick('location', '{{sort_params.location.next}}');">
+                <div class="pull-left">Location</div>
+                <div class="pull-right"><i class="{{sort_params.location.icon}}"></i></div> 
+            </th>             
+            <th class="sorter-nrpatients sorter {%if "icon-minus" not in sort_params.nrpatients.icon %}selected-sorter{% endif %}" onclick="a.onClick('nrpatients', '{{sort_params.nrpatients.next}}');">
+                <div class="pull-left">Nr. Patients</div>
+                <div class="pull-right"><i class="{{sort_params.nrpatients.icon}}"></i></div> 
+            </th>            
+            <th class="sorter-lastupdate sorter {%if "icon-minus" not in sort_params.last_update.icon %}selected-sorter{% endif %}" onclick="a.onClick('last_update', '{{sort_params.last_update.next}}');">
             <div class="pull-left">Last update</div>
                 <div class="pull-right"><i class="{{sort_params.last_update.icon}}"></i></div> 
             </th>
-            <th class="sorter {%if "icon-minus" not in sort_params.type.icon %}selected-sorter{% endif %}" style="width: 200px;" onclick="a.onClick('type', '{{sort_params.type.next}}');">
+            <th class="sorter-type sorter {%if "icon-minus" not in sort_params.type.icon %}selected-sorter{% endif %}" onclick="a.onClick('type', '{{sort_params.type.next}}');">
             <div class="pull-left">Type</div>
               <div class="pull-right"><i class="{{sort_params.type.icon}}"></i></div> 
             </th>
@@ -74,6 +86,15 @@ button {
                 <input class="filter_input" id="database_name_filter" type="text" value="{{sort_params.database_name.filter}}" placeholder="Filter">
           </td>
            <td class="table_filter">
+                 <input class="filter_input" id="institution_filter" type="text" value="{{sort_params.institution.filter}}" placeholder="Filter">
+          </td>
+          <td class="table_filter">
+                 <input class="filter_input" id="location_filter" type="text" value="{{sort_params.location.filter}}" placeholder="Filter">
+          </td>
+          <td class="table_filter">
+                 <input class="filter_input" id="nrpatients_filter" type="text" value="{{sort_params.nrpatients.filter}}" placeholder="Filter">
+          </td>
+          <td class="table_filter">
                  <input class="filter_input" id="last_update_filter" type="text" value="{{sort_params.last_update.filter}}" placeholder="Filter">
           </td>
            <td class="table_filter">
@@ -93,18 +114,10 @@ button {
           
           <td>
             <a href="fingerprint/{{ t.id }}/1">{{ t.name }}</a>
-
-            <div style="margin-left:20px">
-             Institution Name: {{t.institution}}
-            </div>
-
-            <div style="margin-left:20px">
-             Location: {{t.location}}
-            </div>
-            <div style="margin-left:20px">
-             Number of patients: {{t.number_patients}}
-            </div>
         </td>
+        <td>{{t.institution}}</td>
+        <td>{{t.location}}</td>
+        <td>{{t.number_patients}}</td>
           <!--<td style="min-width: 120px;">            
                  {{ t.date }}
 
@@ -128,20 +141,9 @@ button {
 var a;
 $(document).ready(function(){
     a = new PaginatorSorter("table_databases", '{{sort_params.base_filter}}', '{{sort_params.selected_name}}', '{{sort_params.selected_value}}');
-
-    paginator_via_post();
 });
 </script>
-{% load bootstrap_pagination %}
-
-{% bootstrap_paginate page_obj url_view_name="views.all_databases_user" range=10  show_prev_next="false" show_first_last="true"%}
-
-<form id="send2" method="POST" > 
-  <input id="page" type="hidden" name="page" value="{{page}}"></input>
-  <input id="s" type="hidden" name="s" value=""></input>  
-  <input id="submit_simulate" style="display:none" type="submit" value="Submit">
-{% csrf_token %}
-</form>
+{% include "post_paginator.html" %}
 
 {% else %}
 <div class="row">  

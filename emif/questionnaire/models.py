@@ -2,6 +2,7 @@ from django.db import models
 from transmeta import TransMeta
 from django.utils.translation import ugettext_lazy as _
 from questionnaire import QuestionChoices
+from searchengine.models import Slugs
 import re
 from utils import split_numal
 from django.utils import simplejson as json
@@ -82,6 +83,19 @@ class Questionnaire(models.Model):
             self.__qscache = \
               QuestionSet.objects.filter(questionnaire=self).order_by('sortid')
         return self.__qscache
+        
+    def questions(self):
+        if not hasattr(self, "__questionscache"):
+            questions = []
+
+            qsets = self.questionsets()
+
+            for qset in qsets:
+                questions = questions + qset.questions()
+
+            self.__questionscache = questions
+
+        return self.__questionscache        
 
     class Meta:
         permissions = (
@@ -99,7 +113,7 @@ class QuestionSet(models.Model):
     sortid = models.IntegerField() # used to decide which order to display in
     heading = models.CharField(max_length=255)
     checks = models.CharField(max_length=128, blank=True,
-        help_text = """Current options are 'femaleonly' or 'maleonly' and shownif="QuestionNumber,Answer" which takes the same format as <tt>requiredif</tt> for questions.""")
+    help_text = """Current options are 'femaleonly' or 'maleonly' and shownif="QuestionNumber,Answer" which takes the same format as <tt>requiredif</tt> for questions.""")
     text = models.TextField(help_text="This is interpreted as Textile: <a href='http://hobix.com/textile/quick.html'>http://hobix.com/textile/quick.html</a>")
     help_text = models.CharField(max_length=2255, blank=True, null=True)
     tooltip = models.BooleanField(default=False, help_text="If help text appears in a tooltip")
@@ -109,6 +123,16 @@ class QuestionSet(models.Model):
             self.__qcache = list(Question.objects.filter(questionset=self).order_by('number'))
             self.__qcache.sort()
         return self.__qcache
+
+    # Returns the serverside total and filled count for this questionset
+    def total_count(self):
+        if not hasattr(self, "__qcache"):
+            self.__qcache = list(Question.objects.filter(questionset=self).order_by('number'))
+            self.__qcache.sort()
+
+        questions = self.__qcache
+
+        return len(questions);
 
     def next(self):
         qs = self.questionnaire.questionsets()
@@ -274,6 +298,7 @@ class Question(models.Model):
         'eg. <tt>requiredif="Q1,A or Q2,B"</tt>')
     footer = models.TextField(u"Footer", help_text="Footer rendered below the question interpreted as textile", blank=True)
     slug = models.CharField(max_length=128)
+    slug_fk = models.ForeignKey(Slugs, blank=True, null=True)
     help_text = models.CharField(max_length=2255, blank=True, null=True)
     stats = models.BooleanField(default=False)
     category = models.BooleanField(default=False)

@@ -35,22 +35,23 @@ for r in results:
     if (r.keys()==None):
         continue
     for k in r.keys(): 
-        #print k
+        print k
         #print r[k]
         try:
             if 'yes' in r[k]:
-                slugs = Slugs.objects.filter(slug1=k)
+                slugs = Slugs.objects.filter(slug1=k[:-2])
                 to_append += slugs[0].question.text
-
-        except: 
+        except Exception, e:
+            print e 
             pass
     print to_append
-    r['text_t'] += ' '+to_append 
-    del r['_version_']
-    docs.append(r)
-    solr.delete(r['id'])
-    solr.optimize()
-    xml_answer = solr.add([r])
-    solr.optimize()
+    if len(to_append):
+        r['text_t'] += ' '+to_append 
+        del r['_version_']
+        docs.append(r)
+        solr.delete(r['id'])
+        solr.optimize()
+        xml_answer = solr.add([r])
+        solr.optimize()
 
 

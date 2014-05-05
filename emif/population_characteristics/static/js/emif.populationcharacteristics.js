@@ -37,7 +37,7 @@ function getFingerprintID(){
 
 };
 
-
+var filtersMap = {};
 var translations = {};
 var translationsBack = {};
 var activeChart='';
@@ -239,7 +239,7 @@ function PCAPI ()
 
     };
 
-    var filtersMap = {};
+    
     translations = {};
     translationsBack = {};
     
@@ -269,21 +269,19 @@ function PCAPI ()
               var tmpUl = $('<ul class="nav nav-pills nav-stacked">');
 
               self.append(tmpUl);
+
+              // This code is only for comparison mode 
               console.log(xFilter);
+              if (xFilter.name == "Gender")
+              {
+                  xFilter.values.push("ALL");                
+              }
+
+
               $.each(xFilter.values, function (data){
 
                   if (xFilter.values[data]==="")
                       return;
-                    /*if ('values.' + xFilter.name in filtersMap)
-                    {
-                      console.log(xFilter.name);
-                      filtersMap['values.' + xFilter.name].push(xFilter.values[data]);
-                    }
-                    else
-                    {
-                      console.log(xFilter.name);
-                      filtersMap['values.' + xFilter.name] = [xFilter.values[data]];
-                    }*/
 
 
                   var fType = xFilter.name;
@@ -302,8 +300,6 @@ function PCAPI ()
                         translationsBack[xFilter['translation'][originalValue]] = originalValue;
                         originalValue = xFilter['translation'][originalValue];
                     }
-                    
-
                       
                   }
                   
@@ -313,7 +309,10 @@ function PCAPI ()
                   
                     
               });
+
+
             });
+            
 
 
             /** The magic of the filters will happen here */ 
@@ -322,6 +321,7 @@ function PCAPI ()
                       e.preventDefault(); 
                       e.stopPropagation();
 
+                      console.log()
 
                       var charDraw = new PCDraw(actualChart, activeChart, null);
 
@@ -333,8 +333,19 @@ function PCAPI ()
                       {
                           _value = translationsBack[_value];
                       } 
-                      filtersMap['values.'+filterType] = [_value];
+                      /*if(filtersMap['values.'+filterType])
+                      {
+                        filtersMap['values.'+filterType] = [_value, filtersMap['values.'+filterType][0]];
+                      }
+                      else
+                      {
+                        filtersMap['values.'+filterType] = [_value];  
+                      }*/
+                      filtersMap['values.'+filterType] = [_value];  
+                      console.log("filterMap:");
+                      console.log(filtersMap);
                       charDraw.refresh(getFiltersSelected());
+                      
                       
                       $("." + filterType).closest('li').removeClass("active");
                       $(this.parentNode).closest('li').addClass("active");
@@ -386,6 +397,14 @@ function PCAPI ()
                     { 
                       e.preventDefault(); 
                       e.stopPropagation();
+
+                      // This code is needed for comparison zone
+                      filtersMap = {};
+                      translations = {};
+                      translationsBack = {};
+
+                      $("#pc_comments_placeholder").html("");
+
   
                       
                       // Anyone have a better suggestion to do it?
@@ -395,7 +414,7 @@ function PCAPI ()
                       $(this.parentNode).closest('li').addClass('active')
 
                       chartTypes.forEach(function(a){
-                          console.log();
+                          
                           if (a.title.fixed_title==e.target.innerHTML) 
                           {
                               actualChart = a;
@@ -407,12 +426,21 @@ function PCAPI ()
                           // do something here like an abort or shit! 
                       }
 
+                      // Comments ids
+                      var fid = getFingerprintID();
+                      $("#pc_chart_comment_id").val(actualChart.uid);
+                      $("#pc_chart_comment_fingerprint_id").val(fid);
+
+                      cm = new CommentsManager();
+                      cm.listComments(fid, actualChart.uid);
+                      
                       var charDraw = new PCDraw(actualChart, actualChart.title['var'], e);
                       var _filters = {};
                       charDraw.draw(_filters);
                       charDraw.drawBar();
                       $(".filterBar").last().click();   
                       $(".filterBar").first().click(); 
+
                       
                       return false;
                     });
@@ -476,12 +504,13 @@ $(document).ready(
         $("#pc_list").populationChartsTypes('draw', chartLayout); 
 
           $('.tabbable a[data-toggle="tab"]').on('shown', function (e) {
-            if(e.target.innerText == 'Population Characteristics'){
+            console.log(e.target.innerText);
+            if(e.target.innerText.indexOf('Population Characteristics')>-1){
               $(".graphTypes").first().click();
 
               $(".filterBar").first().click(); 
             }
-          })
+          });
 
         }
     

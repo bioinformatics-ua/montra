@@ -3,11 +3,13 @@
 
 <div class="row" style="margin-top: 20px;">
 
-
+<div {% if readonly %} style="display: none;" {% endif %}>
     <div class="control-group span12" >
         <label class="control-label span2">Pubmed id: </label>
         <input class="span5" type="text" id="question_{{ question.number|removedots }}_pubmedid" />
-        <button id="loadpubbtn" style="margin-bottom:10px;" type="button" class="btn btn-primary disabled" ><i style="color:white;" class="icon-large icon-search icon-white"></i></button>
+        
+        <button {% if readonly %} style="display: none;" {% endif %} id="loadpubbtn" style="margin-bottom:10px;" type="button" class="btn btn-primary disabled" ><i style="color:white;" class="icon-large icon-search icon-white"></i></button>
+        
     </div>
 
 
@@ -41,6 +43,7 @@
     <button id="cleanpub" type="button" class="btn btn-primary"><i class="fa fa-trash-o"></i> Clean </button>
     <input type="hidden"  id="question_{{ question.number }}" name="question_{{ question.number }}" value='{{qdict.value}}' />
     </div>
+    
 
     
     {% if qdict.value %}
@@ -48,12 +51,14 @@
             $('[id="answered_'+{{ question.number|removedots }}+'"]').show();
         </script>
     {% endif %}
+    </div>
     <div class="control-group span8">
 
     <table id="question_{{ question.number|removedots }}_table" class="table table-hover">
         <thead>
             <tr>
-              <th>Select</th>
+
+              <th {% if readonly %} style="display: none;" {% endif %}>Select</th>
               <th>PubmedId</th>
               <th>Title</th>
               <th>Journal</th>
@@ -76,6 +81,22 @@
 
 
 <script type="text/javascript">
+var publications_counter = 0;
+function pubcounterupdate(){
+    publications_counter--;
+
+    if(publications_counter == 0){
+        if (!(typeof questionSetsCounters === 'undefined')) {
+            var qId = parseInt("{{ question.number }}");
+
+                        //console.log(qId);
+            questionSetsCounters[qId]['filledQuestions'] = 0;
+
+            var ui = new CounterUI();
+            ui.updateCountersClean(qId);
+        }
+    }
+}
 function removePublication(id){
     $('#'+id).remove();
 }
@@ -122,6 +143,17 @@ function PublicationWidget ()
             
             pw{{ question.number|removedots }}.addPublication();
             $('[id="answered_'+{{ question.number|removedots }}+'"]').show();
+
+            if (!(typeof questionSetsCounters === 'undefined')) {
+                var qId = parseInt("{{ question.number }}");
+
+                //console.log(qId);
+                questionSetsCounters[qId]['filledQuestions'] = 1;
+
+                var ui = new CounterUI();
+                ui.updateCountersClean(qId);
+            }
+
         });
 
         $("#cleanpub" ).bind( "click", function() {
@@ -143,6 +175,8 @@ function PublicationWidget ()
 
         $( "#removepub" ).bind( "click", function() {
             pw{{ question.number|removedots }}.removeSelectedPublication();
+
+
         });
         
         
@@ -188,11 +222,11 @@ function PublicationWidget ()
         if(pubtitle.length == 0)
             return false;
         
-        if(pubjournal.length == 0)
-            return false;
+        //if(pubjournal.length == 0)
+        //    return false;
         
-        if(pubyear.length == 0)
-            return false;
+        //if(pubyear.length == 0)
+        //    return false;
         
         if(pubauthors.length == 0)
             return false;
@@ -236,7 +270,11 @@ function PublicationWidget ()
             return;
         }
 
-        $('#question_{{ question.number|removedots }}_table > tbody:last').append('<tr id="pub_'+_pubmedid+'"><td><a class="deleteLink" href="#" ><img src="static/img/glyphicons_192_circle_remove.png"/></a></td><td>'+_pubmedid+'</td><td>'+_pubtitle+'</td><td>'+_pubjournal+'</td><td>'+_pubyear+'</td><td>'+_pubvolume+'</td><td>'+_pubpages+'</td><td>'+_pubauthors+'</td></tr>');
+        publications_counter++;
+            if (!(typeof formHasChanged === 'undefined')) {
+            formHasChanged = true;
+        }
+        $('#question_{{ question.number|removedots }}_table > tbody:last').append('<tr id="pub_'+_pubmedid+'"><td {% if readonly %} style="display: none;" {% endif %}><a class="deleteLink" href="#" ><img src="static/img/glyphicons_192_circle_remove.png"/></a></td><td>'+_pubmedid+'</td><td>'+_pubtitle+'</td><td>'+_pubjournal+'</td><td>'+_pubyear+'</td><td>'+_pubvolume+'</td><td>'+_pubpages+'</td><td>'+_pubauthors+'</td></tr>');
 
         // Add to boolean container if possible
         if (!(typeof bool_container === 'undefined')) {
@@ -246,9 +284,11 @@ function PublicationWidget ()
         
         $(".deleteLink").click(function(e) {
                 e.preventDefault();
+
+                pubcounterupdate();
             
                 // Add to boolean container if possible
-                if(bool_container){
+                if (!(typeof bool_container === 'undefined')) {
                     bool_container.splice('pub_'+_pubmedid, 'pub #'+_pubmedid+': '+_pubtitle,_pubtitle);
                 }
                 $(this).closest('tr').remove();
@@ -257,6 +297,9 @@ function PublicationWidget ()
                     $('[id="answered_'+{{ question.number|removedots }}+'"]').hide();
                 }
 
+                if (!(typeof formHasChanged === 'undefined')) {
+                    formHasChanged = true;
+                }
 
                 pw{{ question.number|removedots }}.saveInformation();
 
@@ -312,18 +355,25 @@ function PublicationWidget ()
             var _publink = _objs[i]['link'];
 
             if(_pubtitle != undefined){
-                 $('#question_{{ question.number|removedots }}_table > tbody:last').append('<tr id="pub_'+_pubmedid+'"><td><a class="deleteLink" href="#" ><img src="static/img/glyphicons_192_circle_remove.png"/></a></td><td>'+_pubmedid+'</td><td>'+_pubtitle+'</td><td>'+_pubjournal+'</td><td>'+_pubyear+'</td><td>'+_pubvolume+'</td><td>'+_pubpages+'</td><td>'+_pubauthors+'</td><td>'+_publink+'</td></tr>'); 
+                publications_counter++;
+                 $('#question_{{ question.number|removedots }}_table > tbody:last').append('<tr id="pub_'+_pubmedid+'"><td {% if readonly %} style="display: none;" {% endif %}><a class="deleteLink" href="#" ><img src="static/img/glyphicons_192_circle_remove.png"/></a></td><td>'+_pubmedid+'</td><td>'+_pubtitle+'</td><td>'+_pubjournal+'</td><td>'+_pubyear+'</td><td>'+_pubvolume+'</td><td>'+_pubpages+'</td><td>'+_pubauthors+'</td><td>'+_publink+'</td></tr>'); 
             }
 
         }
         $(".deleteLink").click(function(e) {
                 e.preventDefault();
-                $(this).closest('tr').remove()
+
+                pubcounterupdate();
+
+                $(this).closest('tr').remove();
                 
                 if(pw{{ question.number|removedots }}.stringfy().length == 0) {
                     $('[id="answered_'+{{ question.number|removedots }}+'"]').hide();
                 }
 
+                if (!(typeof formHasChanged === 'undefined')) {
+                    formHasChanged = true;
+                }
                 pw{{ question.number|removedots }}.saveInformation();
 
                 return false;

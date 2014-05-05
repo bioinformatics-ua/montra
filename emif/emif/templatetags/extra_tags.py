@@ -29,7 +29,6 @@ register = template.Library()
 
 from django.conf import settings
 
-
 @register.filter(name='removeh1')
 @stringfilter
 def removeh1(value):
@@ -122,6 +121,13 @@ def truncate(value):
 
     return result
 
+@register.filter(name='captioned')
+@stringfilter
+def captioned(value):
+    exclusion_list = ['publication']
+
+    return value not in exclusion_list
+
 @register.filter
 def whitespacesplit(str):
     words = []
@@ -131,6 +137,15 @@ def whitespacesplit(str):
         str = str.replace(m.group(0), "")
 
     words = words + str.strip().split()
+
+    return words
+
+@register.filter(name='commasplit')
+@stringfilter
+def commasplit(str):
+    words = []
+
+    words = words + str.strip().split(',')
 
     return words
 
@@ -266,6 +281,10 @@ class GlobalVariableGetNode( template.Node ):
         except AttributeError:
             return ''
 
+@register.simple_tag()
+def multiply(a, b, *args, **kwargs):
+    # you would need to do any localization of the result here
+    return a * b
 
 def getglobal( parser, token ):
     try:
@@ -307,6 +326,7 @@ def get_version():
 def get_version_tag(parser, token):
     return VersionNode('')
 register.tag( 'get_version', get_version_tag )
+
 
 
 

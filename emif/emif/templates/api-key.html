@@ -33,7 +33,7 @@
         </div>
         <div class="span6 pull-right" style="text-align:right">
             <a class="btn right" href="docs/api"> <i class=" icon"></i>
-                API Doc
+                <i class="icon-book"></i>&nbsp; API Doc
             </a>
         </div>
     </div>
@@ -44,19 +44,35 @@
     <p><strong>Token:</strong> {{ token}}</p>
             </div>
     <!--<hr>-->
-    <p><strong>Fingerptints</strong></p>
+    <p><strong>Fingerprints</strong></p>
 
     {% if list_databases %}
-    <table class="table table-hover fingerprint_table table-striped" id="table_databases" data-provides="rowlink">
+    <table class="table table-bordered table-hover fingerprint_table table-striped" id="table_databases" data-provides="rowlink">
     <thead>
         <tr>
-            <th class="sorter {%if "icon-minus" not in sort_params.database_name.icon %}selected-sorter{% endif %}"  onclick="a.onClick('database_name', '{{sort_params.database_name.next}}');">Name
+            <th class="sorter-database_name sorter {%if "icon-minus" not in sort_params.database_name.icon %}selected-sorter{% endif %}"  onclick="a.onClick('database_name', '{{sort_params.database_name.next}}');">
+            <div class="pull-left">Acronym</div>
                  <div class="pull-right"><i class="{{sort_params.database_name.icon}}"></i></div>
             </th>
-            <th class="sorter {%if "icon-minus" not in sort_params.last_update.icon %}selected-sorter{% endif %}" onclick="a.onClick('last_update', '{{sort_params.last_update.next}}');">Last update
+            <th class="sorter-institution sorter {%if "icon-minus" not in sort_params.institution.icon %}selected-sorter{% endif %}"  onclick="a.onClick('institution', '{{sort_params.institution.next}}');">
+            <div class="pull-left">Institution Name</div>
+                 <div class="pull-right"><i class="{{sort_params.institution.icon}}"></i></div>
+            </th>            
+            <!--<th>Creation Date</th>-->            
+            <th class="sorter-location sorter {%if "icon-minus" not in sort_params.location.icon %}selected-sorter{% endif %}" onclick="a.onClick('location', '{{sort_params.location.next}}');">
+                <div class="pull-left">Location</div>
+                <div class="pull-right"><i class="{{sort_params.location.icon}}"></i></div> 
+            </th>             
+            <th class="sorter-nrpatients sorter {%if "icon-minus" not in sort_params.nrpatients.icon %}selected-sorter{% endif %}" onclick="a.onClick('nrpatients', '{{sort_params.nrpatients.next}}');">
+                <div class="pull-left">Nr. Patients</div>
+                <div class="pull-right"><i class="{{sort_params.nrpatients.icon}}"></i></div> 
+            </th>            
+            <th class="sorter-lastupdate sorter {%if "icon-minus" not in sort_params.last_update.icon %}selected-sorter{% endif %}" onclick="a.onClick('last_update', '{{sort_params.last_update.next}}');">
+            <div class="pull-left">Last update</div>
                 <div class="pull-right"><i class="{{sort_params.last_update.icon}}"></i></div> 
             </th>
-            <th class="sorter {%if "icon-minus" not in sort_params.type.icon %}selected-sorter{% endif %}" style="width: 200px;" onclick="a.onClick('type', '{{sort_params.type.next}}');">Type
+            <th class="sorter-type sorter {%if "icon-minus" not in sort_params.type.icon %}selected-sorter{% endif %}" onclick="a.onClick('type', '{{sort_params.type.next}}');">
+            <div class="pull-left">Type</div>
               <div class="pull-right"><i class="{{sort_params.type.icon}}"></i></div> 
             </th>
         </tr>
@@ -65,6 +81,15 @@
                 <input class="filter_input" id="database_name_filter" type="text" value="{{sort_params.database_name.filter}}" placeholder="Filter">
           </td>
            <td class="table_filter">
+                 <input class="filter_input" id="institution_filter" type="text" value="{{sort_params.institution.filter}}" placeholder="Filter">
+          </td>
+          <td class="table_filter">
+                 <input class="filter_input" id="location_filter" type="text" value="{{sort_params.location.filter}}" placeholder="Filter">
+          </td>
+          <td class="table_filter">
+                 <input class="filter_input" id="nrpatients_filter" type="text" value="{{sort_params.nrpatients.filter}}" placeholder="Filter">
+          </td>
+          <td class="table_filter">
                  <input class="filter_input" id="last_update_filter" type="text" value="{{sort_params.last_update.filter}}" placeholder="Filter">
           </td>
            <td class="table_filter">
@@ -83,18 +108,12 @@
             <!--<td><img class="db_logo" src="{{ STATIC_URL }}upload_images/{{t.logo}}" width="50px" height="50px" /></td>-->
           <td>
             <a href="fingerprint/{{ t.id }}/1">{{ t.name }}</a>
-
-            <div style="margin-left:20px">
-             Institution Name: {{t.institution}}
-            </div>
-
-            <div style="margin-left:20px">
-             Location: {{t.location}}
-            </div>
-            <div style="margin-left:20px">
-             Number of patients: {{t.number_patients}}
-            </div>
+            <br />
+              <small style="word-break:break-all;">ID: {{t.id}}</small>
         </td>
+        <td>{{t.institution}}</td>
+        <td>{{t.location}}</td>
+        <td>{{t.number_patients}}</td>
         <!--
           <td style="min-width: 120px;">
                  {{ t.date }}
@@ -119,14 +138,10 @@
     var a;
     $(document).ready(function(){
         a = new PaginatorSorter("table_databases", '{{sort_params.base_filter}}', '{{sort_params.selected_name}}', '{{sort_params.selected_value}}');
-
-        paginator_via_post();
-    });
+   });
     </script>
-
-    {% load bootstrap_pagination %}
-
-    {% bootstrap_paginate page_obj url_view_name="views.create_auth_token" range=10  show_prev_next="false" show_first_last="true"%}
+    
+    {% include "post_paginator.html" %}
 
     {% else %}
     <p><strong>Info: </strong> Currently, there are no databases in your account. You can add new ones through the
