@@ -1591,10 +1591,9 @@ def paginator_process_params(request, page, rows, default_mode={"database_name":
     filterFieldsLookup["institution_filter"] = "institution_name_t"#"institution_sort"
     filterFieldsLookup["location_filter"] = "location_sort"
     filterFieldsLookup["nrpatients_filter"] = "number_active_patients_jan2012_t"
-    prefixFilters = ["database_name_filter"
-                , "institution_filter", "location_filter"
-                ]
-    openTextFilters = ["institution_filter", "location_filter"]
+    
+    prefixFilters = []
+    openTextFilters = ["database_name_filter", "institution_filter", "location_filter"]
 
     sortString = ""
     filterString = ""
@@ -1620,7 +1619,7 @@ def paginator_process_params(request, page, rows, default_mode={"database_name":
                 str2 = re.sub(p, "", mode[x].lower())
                 filterString += "({!prefix f="+filterFieldsLookup[x]+"}"+str2+") AND "
             elif x in openTextFilters:
-                filterString += "("+filterFieldsLookup[x]+":"+mode[x] +") AND "
+                filterString += "("+filterFieldsLookup[x]+":*"+mode[x] +"*) AND "
             else:
                 filterString += filterFieldsLookup[x]+":'"+mode[x] +"' AND "
             if x[:-7] not in sort_params:
