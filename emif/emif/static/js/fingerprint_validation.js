@@ -19,7 +19,7 @@ OpenButtonValidator.prototype ={
         var text = $(controllerDOM).val();
         
         //getValidator
-        var validator = $('#open-button_validator_'+question_number);
+        var validator = $('[id="open-button_validator_'+question_number+'"]');
         //console.log(validator);
         var validated = false;
 
@@ -73,7 +73,7 @@ NumericValidator.prototype ={
     validate : function(question_number, controllerDOM){
         var draw_validator = this.context.draw_validator;        
         question_number = question_number.replace(".","\\.");        
-        var validator = $('#numeric_validator_'+question_number);
+        var validator = $('[id="numeric_validator_'+question_number+'"]');
         //console.log(validator);
 
         var text = $(controllerDOM).val();
@@ -106,7 +106,7 @@ EmailValidator.prototype ={
     validate : function(question_number, controllerDOM){
         var draw_validator = this.context.draw_validator;        
         question_number = question_number.replace(".","\\.");        
-        var validator = $('#email_validator_'+question_number);
+        var validator = $('[id="email_validator_'+question_number+'"]');
         //console.log(validator);
 
         var text = $(controllerDOM).val();
@@ -170,6 +170,7 @@ Fingerprint_Validator.prototype ={
         } else {        
             validator.removeClass("success");
             validator.addClass("error");
+            console.log($("span", validator));
             $("span", validator).text(feedback_message);
         }   
     },
