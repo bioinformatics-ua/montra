@@ -268,6 +268,9 @@
     <script src="{{ STATIC_URL}}js/emif.populationcharacteristics.js"></script>
     <!--<![endif]-->
 
+    <script src="{{ STATIC_URL}}js/vendor/patternrecognizer.js"></script>
+
+
 {% endblock %}
 
 {% block scriptextra %}
@@ -331,6 +334,16 @@ $(".markered" ,this_row).click(function(){
 this_row.parent().siblings().first().collapse('toggle');
 });
 }  */   
+
+    var erec = new EmailRecognizer("#qs_"+sortid+" td");
+    var results = erec.match();
+        if (results > 0)
+            erec.applyMasks();
+
+    var lrec = new LinkRecognizer("#qs_"+sortid+" td");
+    var results = lrec.match();
+        if (results > 0)
+            lrec.applyMasks();
 });    
 
 threads['qs_'+sortid] = null;
@@ -341,7 +354,7 @@ this.complete();
 $(document).ready(function() {
 
     bindPostCommentHandler('{{ request.user.first_name }}', '{{ request.user.last_name }}', '{{ request.user.username }}');
-load_questionnary();
+//load_questionnary();
     $('.tabbable a[data-toggle="tab"]').on('shown', function (e) {
         if(e.target.innerText == 'Population Characteristics'){
           console.log("test");
@@ -381,7 +394,7 @@ load_questionnary();
 });
     /* On tab change, to literature tab, lazy load literature tab */
     $(document).on('shown', 'a[data-toggle="tab"]', function (e) {
-        if(e.target.innerText.toLowerCase().indexOf('literature')!=-1){
+        if($(e.target).text().toLowerCase().indexOf('literature')!=-1){
             // if not loaded yet
             if($('#literature').find('.loadingsection').length != 0){
                 console.log("Loading literature, since it was not loaded yet.");

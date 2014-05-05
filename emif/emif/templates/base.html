@@ -45,6 +45,7 @@
         {% block styleextra %}
         {% endblock %}
         </style>
+        <script src="{{ STATIC_URL }}js/vendor/inheritance.js"></script>
         <script src="{{ STATIC_URL }}js/vendor/modernizr-2.6.2.min.js"></script>
         <script src="{{ STATIC_URL }}js/vendor/jquery-1.9.1.min.js"></script>
         <script src="{{ STATIC_URL }}js/vendor/jquery-ui-1.10.4.custom.min.js"></script>
@@ -275,7 +276,7 @@
 
                                     <li>
                                         <div class="btn-group">
-                                        <button class="btn dropdown-toggle" data-toggle="dropdown" style="margin-left: 2px;" tabindex="-1"><i class="fa fa-bars"></i></button>
+                                        <button class="btn dropdown-toggle" data-toggle="dropdown" style="margin-left: 2px;" tabindex="-1"><i class="icon-align-justify"></i></button>
                                         <ul class="dropdown-menu pull-right">
                                             {% if not request.user.is_authenticated %}
                                             <li id="li_signup">

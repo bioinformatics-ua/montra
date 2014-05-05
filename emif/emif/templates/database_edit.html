@@ -7,6 +7,7 @@
     {{ block.super }}
     {% breadcrumb "My Databases" "databases" %}
     {% breadcrumb name "fingerprint/"|add:fingerprint_id|add:"/1" %}
+    {% if not readonly %}
     {% with url_id="dbEdit/1" %}
         {% with url_id=url_id|add:id  %}
             {% with url_id=url_id|add:"/1" %}
@@ -14,6 +15,15 @@
             {% endwith %}
         {% endwith %}
     {% endwith %}
+    {% else %}
+    {% with url_id="dbDetailed/1" %}
+        {% with url_id=url_id|add:id  %}
+            {% with url_id=url_id|add:"/1" %}
+                {% breadcrumb "Detailed View" "databases" %}
+            {% endwith %}
+        {% endwith %}
+    {% endwith %}    
+    {% endif %}
 {% endblock %}
 
 {% block styleextra %}
@@ -54,6 +64,9 @@ text-decoration: none;
 <!--script type="text/javascript" src="{{ STATIC_URL }}jquery.min.js"></script-->
 <script type="text/javascript" src="{{ STATIC_URL }}questionset.js"></script>
 <script src="{{ STATIC_URL }}js/vendor/jquery.errornavigator.js"></script>
+
+
+<script type="text/javascript" src="{{ STATIC_URL }}js/fingerprint_edit.js"></script>
 
 <link rel="stylesheet" href="{{ STATIC_URL }}progressbar.css"></script>
 {% for x in jsinclude %}
@@ -123,6 +136,11 @@ Saving... please don't close this questionnary yet.</div>
 {% comment %}
 {% include "fingerprint_edit.html" %}
 {% endcomment %}
+{% if not readonly %}
+<input type="hidden" id="edit_db_inputs" value="0">
+{% else %}
+<input type="hidden" id="edit_db_inputs" value="1">
+{% endif %}
 <div class="span8" id="set_container"></div>
 
 </div>
@@ -199,6 +217,7 @@ function questionsets_handle(id_questionset)
 
       if(list_invalid.length == 0){
 
+        {% if not readonly %}
         if(formHasChanged){
           // If its not the first or last
           if(current_form.length != 0 && id[1] != '0' && id[1] != '99'){
@@ -213,6 +232,8 @@ function questionsets_handle(id_questionset)
             });
           }
         }
+        {% endif %}
+        
         $('.questionset').each(function(i, obj) {
 
           if (obj.id==id_questionset.id)
@@ -272,9 +293,16 @@ function generateStub(){
 function loadqspart(fingerprint, pk, sortid){
     
     //console.log("getting part from searchqs/"+pk+"/"+sortid+"/");
-        $.get( "editqs/"+fingerprint+"/"+pk+"/"+sortid+"/", function( data ) {
-          $( "#qs_"+sortid ).html( data );
-        });
+        {% if readonly %}
+          $.get( "detailedqs/"+fingerprint+"/"+pk+"/"+sortid+"/", function( data ) {
+            $( "#qs_"+sortid ).html( data );
+          });
+        {% else %}
+          $.get( "editqs/"+fingerprint+"/"+pk+"/"+sortid+"/", function( data ) {
+            $( "#qs_"+sortid ).html( data );
+          });
+        {% endif %}
+
 }
 var errornavigator;
 $(function(){

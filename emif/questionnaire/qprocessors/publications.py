@@ -1,11 +1,15 @@
 
 from questionnaire import *
-from questionnaire import Processors, QuestionProcessors
+from questionnaire import Processors, QuestionProcessors, Fingerprint_Summary
 from django.utils.translation import ugettext as _
 
 from questionnaire import *
 from django.utils.translation import ugettext as _
 from django.utils.simplejson import dumps
+
+from django.template.loader import render_to_string
+
+import json 
 
 @question_proc('publication')
 def question_pub(request, question):
@@ -52,6 +56,39 @@ def process_pub(question, ansdict):
     if ans:
         return dumps([ans])
     return dumps([])
+
+@show_summary('publication')
+def show_summ(value):
+    value = value.replace("'", '"')
+    pubs = json.loads(value)
+
+    if type(pubs) is not list:
+        pubs = [pubs]
+
+    #print "###########"
+    #print pubs[{\"pmid\":\"22874241\",
+    # \"title\":\"Dicoogle Mobile: a medical imaging platform for Android.\"
+    # ,\"journal\":\"Studies in health technology and informatics\"
+    # ,\"year\":\"2012\",
+    # \"pages\":\"180\",\"volume\":\"502-6\",
+    # \"authors\":\"Viana-Ferreira C,Ferreira D,Valente F,Monteiro E,Costa C,Oliveira JL\",\"link\":\"\"}]",
+        
+    return render_to_string('questionnaire/publications_summary.html', {'pubs': pubs})
+
+    ret = "<ul>"
+    for p in pubs:
+        title = p["title"]
+        authors = p["authors"]
+        year = p["year"]
+        journal = p["journal"]
+        pages = p["pages"]
+        volume = p["volume"]        
+        ret += "<li>" + authors + " - " + title + ". " + journal + ". " + year +" :" +pages +":"+ volume +"</li>"
+
+    ret += "</ul>"
+    #print "##########"
+    #print ret
+    return ret
 
 add_type('publication', 'Publication')
 

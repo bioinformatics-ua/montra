@@ -5,7 +5,6 @@ EMIF Platform - Fingerprint Browser
 
 
 
-
 #### Installation steps
 
 1. Checkout of the source code

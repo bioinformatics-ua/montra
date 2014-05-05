@@ -80,7 +80,8 @@ def list_questions():
 
 def index(request, template_name='index_new.html'):
     if request.user.is_authenticated():
-        return HttpResponseRedirect('/wherenext/')
+        #return HttpResponseRedirect('/wherenext/')
+        return HttpResponseRedirect(settings.BASE_URL + 'wherenext')
     else:
         return render(request, template_name, {'request': request})
 
@@ -602,7 +603,14 @@ def database_edit_qs(request, fingerprint_id, questionnaire_id, sort_id):
 
     return response
 
-def render_one_questionset(request, q_id, qs_id, errors={}, aqid=None, fingerprint_id=None, is_new=True, template_name='fingerprint_add_qs.html'):
+def database_detailed_qs(request, fingerprint_id, questionnaire_id, sort_id):
+
+    response = render_one_questionset(request, questionnaire_id, sort_id, fingerprint_id = fingerprint_id, is_new=False, readonly=True,
+                                               template_name='fingerprint_add_qs.html')
+
+    return response
+
+def render_one_questionset(request, q_id, qs_id, errors={}, aqid=None, fingerprint_id=None, is_new=True, readonly = False, template_name='fingerprint_add_qs.html'):
     """
     Return the QuestionSet template
 
@@ -624,7 +632,6 @@ def render_one_questionset(request, q_id, qs_id, errors={}, aqid=None, fingerpri
     
 
     if fingerprint_id != None and not is_new:
-        print "HERY"
         c = CoreEngine()
 
         extra = {} 
@@ -672,8 +679,8 @@ def render_one_questionset(request, q_id, qs_id, errors={}, aqid=None, fingerpri
                 answer = str(question.number)
 
                 extra[question] = ans = extra.get(question, {})
-                if "[" in value:
-                    value = value.replace("]", "").replace("[", "")
+                if "[" in str(value):
+                    value = str(value).replace("]", "").replace("[", "")
                 request2.get_post()['question_%s' % question.number] = value
                 
                 
@@ -785,6 +792,14 @@ def render_one_questionset(request, q_id, qs_id, errors={}, aqid=None, fingerpri
         elif fingerprint_id != None and not is_new:
             (qlist_general, qlist, jstriggers, qvalues, jsinclude, cssinclude, extra_fields, hasErrors) = extract_answers(request2, q_id, question_set, qs_list)
 
+        #permissions = getPermissions(fingerprint_id, question_set)
+
+
+        advanced_search=False
+        if template_name == 'fingerprint_search_qs.html':
+            advanced_search = True
+
+
         r = r2r(template_name, request,
                 questionset=question_set,
                 questionsets=question_set.questionnaire.questionsets,
@@ -799,9 +814,11 @@ def render_one_questionset(request, q_id, qs_id, errors={}, aqid=None, fingerpri
                 async_progress=None,
                 async_url=None,
                 qs_list=qs_list,
+                advanced_search = advanced_search,
                 questions_list=qlist_general,
                 fingerprint_id=fingerprint_id,
                 breadcrumb=True,
+                readonly=readonly
         )
         r['Cache-Control'] = 'no-cache'
         r['Expires'] = "Thu, 24 Jan 1980 00:00:00 GMT"
@@ -1028,8 +1045,11 @@ def extract_answers(request2, questionnaire_id, question_set, qs_list):
         raise
     return (qlist_general, qlist, jstriggers, qvalues, jsinclude, cssinclude, extra_fields, len(errors)!=0)
     
+def database_detailed_view(request, fingerprint_id, questionnaire_id, template_name="database_edit.html"):
 
-def database_edit(request, fingerprint_id, questionnaire_id, template_name="database_edit.html"):
+    return database_edit(request, fingerprint_id, questionnaire_id, template_name, readonly=True);
+
+def database_edit(request, fingerprint_id, questionnaire_id, template_name="database_edit.html", readonly=False):
     c = CoreEngine()
 
     results = c.search_fingerprint("id:" + fingerprint_id)
@@ -1086,8 +1106,8 @@ def database_edit(request, fingerprint_id, questionnaire_id, template_name="data
         answer = str(question.number)
 
         extra[question] = ans = extra.get(question, {})
-        if "[" in value:
-            value = value.replace("]", "").replace("[", "")
+        if "[" in str(value):
+            value = str(value).replace("]", "").replace("[", "")
         request2.get_post()['question_%s' % question.number] = value
         
         
@@ -1164,7 +1184,8 @@ def database_edit(request, fingerprint_id, questionnaire_id, template_name="data
             id=fingerprint_id,
             users_db=users_db,
             created_date=created_date,
-            hide_add=True
+            hide_add=True,
+            readonly=readonly
     )
     r['Cache-Control'] = 'no-cache'
     r['Expires'] = "Thu, 24 Jan 1980 00:00:00 GMT"
@@ -2010,7 +2031,7 @@ def createqsets(runcode, qsets=None, clean=True, highlights=None):
             if question_group != None and qhighlights != None and id_text in qhighlights and qs_text in qhighlights[id_text]:
                 question_group.info = True
 
-            value = clean_value(str(result[k].encode('utf-8')))
+            value = clean_value(str(result[k]).encode('utf-8'))
             
             try:
 
@@ -2165,7 +2186,8 @@ def createqset(runcode, qsid, qsets=None, clean=True, highlights=None):
                 except:
                     pass
 
-            value = clean_value(str(result[k].encode('utf-8')))
+            raw_value = str(result[k].encode('utf-8'))
+            value = clean_value(raw_value)
 
             qs_text = k[:-1] + "qs"
             id_text = "questionaire_"+str(fingerprint_ttype)
@@ -2180,10 +2202,16 @@ def createqset(runcode, qsid, qsets=None, clean=True, highlights=None):
                pass
             if clean:
                 t.value = value.replace("#", " ")
+                
                 if rHighlights != None and k in rHighlights:
                     t.value = rHighlights[k][0].encode('utf-8')
                     #if len(highlights["results"][k])>1:
                     #print t.value
+                
+                if t.ttype in Fingerprint_Summary:
+                    t.value = Fingerprint_Summary[t.ttype](raw_value)
+
+
             else:
                 t.value = value
             if k == "database_name_t":
