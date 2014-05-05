@@ -191,6 +191,8 @@ function next_questionset(id_questionset)
 function questionsets_handle(id_questionset)
 {
 
+    if (!e) var e = window.event;
+
     var idString = id_questionset.id
     var id = idString.split('_');
 
@@ -211,7 +213,7 @@ function questionsets_handle(id_questionset)
       errornavigator.hideErrorPage();
       errornavigator.reset();
 
-      var list_invalid = advValidator.validateFormContext(event, current_form);
+      var list_invalid = advValidator.validateFormContext(e, current_form);
       //console.log(list_invalid);
 
 
