@@ -14,7 +14,7 @@
 
 
     <div class="control-group span12">
-        <label class="control-label span2 ">Publication title:</label>
+        <label class="control-label span2 ">Publication title *:</label>
         <input class="span5" type="text" id="question_{{ question.number|removedots }}_pubtitle" cols="80" />    
     </div>
     <div class="control-group span12">
@@ -34,11 +34,16 @@
         <input class="span5" type="text" id="question_{{ question.number|removedots }}_pubpages" />    
     </div>
     <div class="control-group span12">
-        <label class="control-label span2">Authors (last name initials):</label>
+        <label class="control-label span2">Authors *:</label>
         <input class="span5" type="text" id="question_{{ question.number|removedots }}_pubauthors" />    
     </div>
+
+    <div class="span12" >
+        <span class="help-inline">* required fields, and the authors should be with last name initials</span>
+
+    </div>
     
-    <div class="control-group span12">
+    <div class="control-group span12" style="padding-top:10px;">
     <button id="addpub" type="button" class="btn btn-primary"><i class="icon-large icon-white icon-plus-sign"></i> Add Publication</button>
     <button id="cleanpub" type="button" class="btn btn-primary"><i class="fa fa-trash-o"></i> Clean </button>
     <input type="hidden"  id="question_{{ question.number }}" name="question_{{ question.number }}" value='{{qdict.value}}' />
@@ -245,7 +250,7 @@ function PublicationWidget ()
 
             for (var i = 0 ; i<_objs.length; i++)
             {
-                if(_objs[i]['pmid'] == pubmedid)
+                if(_objs[i]['pmid'] != "" && _objs[i]['pmid'] == pubmedid)
                     return false;
 
                 if( _objs[i]['title'].toLowerCase() == pubtitle.toLowerCase() && _objs[i]['journal'].toLowerCase() == pubjournal.toLowerCase() && _objs[i]['year'] == pubyear )
