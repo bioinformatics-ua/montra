@@ -148,7 +148,7 @@ function validateById(id_answered, id_answered_aux) {
     */
     var qc_id = $('[id="qc_' + id_answered + '"]');
 
-    if (qc_id.hasClass('type_open') ||
+    if (qc_id.hasClass('type_open') || qc_id.hasClass('type_email') ||
         qc_id.hasClass('type_numeric') 
         || qc_id.hasClass('type_open-button') || qc_id.hasClass('type_open-upload-image') || qc_id.hasClass('type_open-textfield') || qc_id.hasClass('type_publication')) {
         var myValue = $('[id="answered_' + id_answered_aux + '"]').parent().parent()[0].id;

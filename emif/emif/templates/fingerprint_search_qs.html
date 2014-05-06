@@ -142,7 +142,7 @@
 
                                     </a>
                             </div>
-                                    <div id="div_{{ iteratorQ.value }}" class="accordion-body in collapse">
+                                    <div style="overflow: visible;" id="div_{{ iteratorQ.value }}" class="accordion-body in collapse">
                                         <div class="accordion-inner">
                                  {% endif %}
                                 <div class="answer qtext_{{question.text|geths}}" id="answer_{{ question.number }}">
@@ -227,6 +227,14 @@ function add_triggers() {
              
 $(function(){
     tabindexer();
+
+
+    $(".accordion-group").on("shown",".collapse",function() {
+        $(this).css("overflow","visible");
+    });
+    $(".accordion-group").on("hidden",".collapse",function() {
+        $(this).css("overflow","hidden");
+    });    
 });    
     
 function tabindexer(){
@@ -281,6 +289,7 @@ function validate(question_number)
         e.stopPropagation();
 
        var div_id = 'accordion_{{ k.sortid }}';
+
        collapseAll($("#collapseall_qs_{{ k.sortid }}"), div_id);
 
        });
