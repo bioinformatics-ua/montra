@@ -77,6 +77,7 @@ def getListPublications(database):
             if string_publications != None:
                 # for some reason, json.loads returns a dict on no results
                 if type(publications) == type(json.loads(string_publications)):
+                    #print string_publications
                     publications = publications+json.loads(string_publications)      
 
     return publications
