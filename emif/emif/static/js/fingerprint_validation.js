@@ -182,7 +182,8 @@ Fingerprint_Validator.prototype ={
                 validator_id= validator_id.replace(self.validators[x].n+"_", "");
 
                 if( !self.validators[x].v.validate( validator_id, cDOM)){
-                    evnt.preventDefault();     
+                    if(evnt)
+                        evnt.preventDefault();     
 
                     var qs_id = validator_id.split(".")[0];
 

@@ -50,6 +50,8 @@ text-decoration: none;
 <script type="text/javascript" src="{{ STATIC_URL }}questionset.js"></script>
 <script src="{{ STATIC_URL }}js/vendor/jquery.errornavigator.js"></script>
 
+<script type="text/javascript" src="{{ STATIC_URL }}js/fingerprint_edit.js"></script>
+
 <link rel="stylesheet" href="{{ STATIC_URL }}progressbar.css"></script>
 {% for x in jsinclude %}
 <script type="text/javascript" src="{{ x }}"></script>
@@ -170,7 +172,9 @@ function next_questionset(id_questionset)
 
 function questionsets_handle(id_questionset)
 {
-    event.preventDefault();
+    if (!e) var e = window.event;
+
+    console.log(e);
 
     var idString = id_questionset.id
     var id = idString.split('_');
@@ -187,7 +191,7 @@ function questionsets_handle(id_questionset)
       errornavigator.hideErrorPage();
       errornavigator.reset();
 
-      var list_invalid = advValidator.validateFormContext(event, current_form);
+      var list_invalid = advValidator.validateFormContext(e, current_form);
       //console.log(list_invalid);
 
 

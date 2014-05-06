@@ -157,8 +157,11 @@ function clear_selection(question_name, response){
  - oscillate the sending class which does some fancy css transition trickery
 */
 function setsaveqs(id){
+      if (!e) var e = window.event;
+
         $('#'+id).submit(function(e) {
-            e.preventDefault();
+            if(e)
+              e.preventDefault();
 
             var self = $(this);
 
@@ -166,7 +169,7 @@ function setsaveqs(id){
       errornavigator.hideErrorPage();
       errornavigator.reset();
 
-      var list_invalid = advValidator.validateFormContext(event, self);
+      var list_invalid = advValidator.validateFormContext(e, self);
       //console.log(list_invalid);
 
 

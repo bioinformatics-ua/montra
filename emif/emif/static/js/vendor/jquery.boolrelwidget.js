@@ -892,9 +892,9 @@ BooleanTerminal.prototype = {
         if (this.id && this.val){
             if(this.val.lastIndexOf("[") == 0 && 
                 this.val.indexOf(suffix, this.val.length - suffix.length) !== -1)
-                return this.id + ": " + this.val.replace(/'/g, "\\'");
+                return this.id + ": " + this.val.replace(/"/g, '\\"');
             else 
-                return this.id + ": '" + this.val.replace(/'/g, "\\'") + "'";
+                return this.id + ': "' + this.val.replace(/"/g, '\\"') + '"';
         } else return '';
     },
     serialize: function() {
