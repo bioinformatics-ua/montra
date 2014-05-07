@@ -67,6 +67,8 @@ import base64
 from django.core.cache import cache
 from django.views.decorators.cache import cache_page
 
+import hashlib
+
 
 def list_questions():
     print "list_questions"
@@ -350,17 +352,23 @@ def results_diff(request, page=1, template_name='results_diff.html'):
                 # we get the current user
                 this_user = User.objects.get(username = request.user)
                 this_query = None
+
+                this_query_hash = hashlib.sha1(qserialization).hexdigest()
+
                 # we check if this query was already made before
                 try:
-                    # in case the query exists we just get the reference
-                    this_query =  AdvancedQuery.objects.get(user=this_user, serialized_query=qserialization, qid=qid)  
+                    # in case the query exists we just get the reference, we use a hash since the serialized query can get too big
+
+                    this_query = AdvancedQuery.objects.get(user=this_user, serialized_query_hash=this_query_hash, qid=qid)  
                     
                     print "This query is already on historic, just updating use time..."
                     this_query.save()
                 except AdvancedQuery.DoesNotExist:
                     # otherwise, we create it
                     print "This query is new, adding it and answers to it..."
-                    this_query = AdvancedQuery(user=this_user,name=("Query on "+time.strftime("%c")),serialized_query=qserialization, qid=qid)
+                    this_query = AdvancedQuery(user=this_user,name=("Query on "+time.strftime("%c")),
+                        serialized_query_hash=this_query_hash,
+                        serialized_query=qserialization, qid=qid)
                     this_query.save()   
                     # and we all so insert the answers in a specific table exactly as they were on the post request to be able to put it back at a later time
                     for k, v in request.POST.items():
