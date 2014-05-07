@@ -34,6 +34,8 @@ text-decoration: none;
 <link rel="stylesheet" href="{{ STATIC_URL }}css/vendor/chosen.css"></script>
 <link rel="stylesheet" href="{{ STATIC_URL }}progressbar.css"></script>
 <link rel="stylesheet" href="{{ STATIC_URL }}css/vendor/jquery.boolrelwidget.css"></script>
+<script src="{{ STATIC_URL }}js/vendor/jquery.errornavigator.js"></script>
+
 
 <script src="{{ STATIC_URL}}questionset.js"></script>
 <script src="{{ STATIC_URL}}js/vendor/threadpool.js"></script>
@@ -41,6 +43,7 @@ text-decoration: none;
 <script src="{{ STATIC_URL}}js/vendor/bootstrap-popover.js"></script>
 <script src="{{ STATIC_URL}}js/fingerprint_validation.js"></script>
 <script src="{{ STATIC_URL }}js/vendor/jquery.inputmask.bundle.min.js" type="text/javascript"></script>
+
 <script src="{{ STATIC_URL}}js/fingerprint.js"></script>
 <script src="{{ STATIC_URL}}js/vendor/jquery.boolrelwidget.js"></script>
 
@@ -68,6 +71,8 @@ text-decoration: none;
 {% endblock %}
 
 {% block content %}
+<div style="display: none;" id="errornavigator"></div>
+
 <div class="container">
     <h2 class="pull-center" >Advanced Search</h2>
 </div>
@@ -168,8 +173,47 @@ $( document ).ready(function() {
                         alert("It's not possible to search without specifying parameters first.");
                         return false;
                       }
-                        // Update hidden inputs (in case they are not updated because we are using the other buttons not in control by the plugin)
-                        bool_container.readyToSubmit(); 
+
+                          if (!(typeof errornavigator === 'undefined')) {
+                            errornavigator.hideErrorPage();
+                            errornavigator.reset();
+
+                            var previous_id = $('.questionset:not(.hide)').first().attr('id').split('_')[1];
+
+                            var current_form = $('#asform');
+
+                            console.log(current_form);
+
+                            var list_invalid = advValidator.validateFormContext(event, current_form);
+                            console.log(list_invalid);
+
+
+                            console.log(list_invalid);
+
+                            if(list_invalid.length == 0){
+                              // Update hidden inputs (in case they are not updated because we are using the other buttons not in control by the plugin)
+                              bool_container.readyToSubmit(); 
+
+
+                            } else {
+                              e.preventDefault();
+
+
+        console.log("Jump to errors and show error navigator.");
+
+          for(var i = 0;i<list_invalid.length;i++){
+            errornavigator.addError('qc_'+list_invalid[i]);
+          }
+          errornavigator.showErrorPager();
+
+          // jump to first problem
+          errornavigator.nextError();
+
+        
+
+                              return false;
+                            }
+                            }
                     }     
         );
     }
@@ -180,6 +224,9 @@ $( document ).ready(function() {
     {% else %}
       loadqspart("{{questionset.sortid}}", "{{q_id}}", "{{aqid}}");
     {% endif %}  
+
+  errornavigator = $('#errornavigator').errornavigator();
+
 });
 var threads = {};
 function load_questionnary(){
@@ -272,12 +319,30 @@ function next_questionset(id_questionset)
 
 function questionsets_handle(id_questionset)
 {
-
     var idString = id_questionset.id;
     var id = idString.split('_');
 
     $('#active_qs').val(id_questionset.id);
     $('#active_qs_sortid').val(id[1]);
+
+      if (!(typeof errornavigator === 'undefined')) {
+      errornavigator.hideErrorPage();
+      errornavigator.reset();
+
+      var previous_id = $('.questionset:not(.hide)').first().attr('id').split('_')[1];
+
+      var current_form = $('#asform');
+
+      console.log(current_form);
+
+      var list_invalid = advValidator.validateFormContext(event, current_form);
+      console.log(list_invalid);
+
+
+      console.log(list_invalid);
+
+      if(list_invalid.length == 0){
+
 
   $('.questionset').each(function(i, obj) {
 
@@ -318,6 +383,19 @@ function questionsets_handle(id_questionset)
 
   );
     document.body.scrollTop = document.documentElement.scrollTop = 0;
+          } else {
+        console.log("Jump to errors and show error navigator.");
+
+          for(var i = 0;i<list_invalid.length;i++){
+            errornavigator.addError('qc_'+list_invalid[i]);
+          }
+          errornavigator.showErrorPager();
+
+          // jump to first problem
+          errornavigator.nextError();
+
+        }
+          }
 };
     
     function collapseAll(element, div_id){
