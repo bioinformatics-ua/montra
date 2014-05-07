@@ -191,7 +191,7 @@ def results_fulltext(request, page=1, full_text=True,template_name='results.html
     return results_fulltext_aux(request, query, page, template_name, isAdvanced)
 
 
-def results_fulltext_aux(request, query, page=1, template_name='more_like_this.html', isAdvanced=False, force=False):
+def results_fulltext_aux(request, query, page=1, template_name='results.html', isAdvanced=False, force=False):
     
     rows = define_rows(request)
     if request.POST and "page" in request.POST and not force:
