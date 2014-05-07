@@ -50,7 +50,8 @@ urlpatterns = patterns('',
 
     # Index page
     url(r'^$', 'emif.views.index', name="home"),
-    
+    url(r'^index$', 'emif.views.index', name="home"),
+
     url(r'^about$', 'emif.views.about'),
 
     # must do this to be able to use custom paths on this css file

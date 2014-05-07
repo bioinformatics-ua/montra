@@ -1399,12 +1399,16 @@ def get_query_from_more_like_this(doc_id, maxx=100):
     #results = c.search_fingerprint(query, sort=sort, rows=rows, start=start)
     results = c.more_like_this(doc_id, maxx=maxx)
     
-    queryString = "id:("
-    for r in results:
-        if "id" in r:
-            queryString = queryString + r["id"]+"^"+str(r["score"])+ " "
 
-    queryString = queryString + ")"
+    if len(results)>0:
+        queryString = "id:("
+        for r in results:
+            if "id" in r:
+                queryString = queryString + r["id"]+"^"+str(r["score"])+ " "
+
+        queryString = queryString + ")"
+    else:
+        queryString = None
 
     ## PY SOLR IS STUPID, OTHERWISE THIS WOULD BE AVOIDED
     database_name = ""
@@ -1591,10 +1595,9 @@ def paginator_process_params(request, page, rows, default_mode={"database_name":
     filterFieldsLookup["institution_filter"] = "institution_name_t"#"institution_sort"
     filterFieldsLookup["location_filter"] = "location_sort"
     filterFieldsLookup["nrpatients_filter"] = "number_active_patients_jan2012_t"
-    prefixFilters = ["database_name_filter"
-                , "institution_filter", "location_filter"
-                ]
-    openTextFilters = ["institution_filter", "location_filter"]
+    
+    prefixFilters = []
+    openTextFilters = ["database_name_filter", "institution_filter", "location_filter"]
 
     sortString = ""
     filterString = ""
@@ -1620,7 +1623,7 @@ def paginator_process_params(request, page, rows, default_mode={"database_name":
                 str2 = re.sub(p, "", mode[x].lower())
                 filterString += "({!prefix f="+filterFieldsLookup[x]+"}"+str2+") AND "
             elif x in openTextFilters:
-                filterString += "("+filterFieldsLookup[x]+":"+mode[x] +") AND "
+                filterString += "("+filterFieldsLookup[x]+":*"+mode[x] +"*) AND "
             else:
                 filterString += filterFieldsLookup[x]+":'"+mode[x] +"' AND "
             if x[:-7] not in sort_params:
@@ -3293,6 +3296,14 @@ def more_like_that(request, doc_id, mlt_query=None, page=1, template_name='more_
         (_filter, database_name) = get_query_from_more_like_this(doc_id)
     else:
         _filter = mlt_query
+
+    if not _filter:
+        return render(request, template_name, {'request': request,
+                                       'num_results': 0, 'page_obj': None, 
+                                       'page_rows': 0,'breadcrumb': True, 
+                                       "breadcrumb_text": "More Like - "+database_name,
+                                       'database_name': database_name, 'isAdvanced': False, 
+                                       "sort_params": None, "page":None})
 
     rows = define_rows(request)
     if request.POST and not force:
