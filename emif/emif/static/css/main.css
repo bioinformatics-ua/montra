@@ -604,3 +604,7 @@ label input[type="radio"], label input[type="checkbox"]{
    overflow: visible !important;
 }
 
+.selectable{
+  cursor: pointer;
+}
+
