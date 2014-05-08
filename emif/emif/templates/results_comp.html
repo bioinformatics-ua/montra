@@ -126,7 +126,7 @@ th, td {
               <tbody>
                 {% for t in v.list_ordered_tags %}
                 <tr class="entry rowid_{{forloop.parentloop.counter}}_{{forloop.counter}}">
-                  <td style="background-color: white; height: 19px;" class="tooltippable" data-original-title="{{ t.tag|removehs }}" title="">
+                  <td style="background-color: white; font-size: 85%;" class="tooltippable" data-original-title="{{ t.tag|removehs }}" title="">
                   
                   
                   {{ t.tag|removehs }}
@@ -148,7 +148,7 @@ th, td {
   <div id="database_rows">                   
     {% for name, qset in results %}
                       
-    <div class="database_listing {%if forloop.counter == 2 %}database_listing_pointer{% endif %} {%if forloop.counter > 2 %}database_listing_away{% endif %}">
+    <div class="database_listing {%if forloop.counter == 2 or forloop.counter == 3 %}database_listing_pointer{% endif %} {%if forloop.counter > 3 %}database_listing_away{% endif %}">
     <div {% if forloop.first%}style="margin-left: 0px;"{% endif %}>
      <div data-clampedwidth=".database_listing" class="clearfix database_title btn-darkgrey">
       <div class="database_title_text pull-left">{{name}}</div>
@@ -161,9 +161,10 @@ th, td {
         </div>
     </div>   
       {% for k,v in qset.ordered_items %}
-      <div style="background-color: white" class="accordion-group">
-        <div class="accordion-heading">
-          <a id="a_collapse{{k|removespaces}}_{{name|removespaces}}" class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapse{{k|removespaces}}_{{name|removespaces}}">{{k|removeh1}}</a>
+      <div data-clampedwidth=".database_listing" style="background-color: white;" class="elips accordion-group">
+        <div title="{{k|removeh1}}" class="tooltippable accordion-heading">
+          <small><a id="a_collapse{{k|removespaces}}_{{name|removespaces}}" class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapse{{k|removespaces}}_{{name|removespaces}}">
+          <div class="linktoellipse">{{k|removeh1}}</div></a></small>
         </div>
         <div id="collapse{{k|removespaces}}_{{name|removespaces}}" class="accordion-body collapse">
           <div class="accordion-inner">
@@ -175,7 +176,7 @@ th, td {
                 {% for t in v.list_ordered_tags %}
                 <tr class="entry rowid_{{forloop.parentloop.counter}}_{{forloop.counter}}">
                   <td style="width:0px;" class="tooltippable" data-original-title="{{ t.tag|removehs }}" title="">{{ t.tag|removehs }}</td> 
-                   <td class="tooltippable" data-original-title="{{ t.value }}" title="">{{ t.value }}</td>
+                   <td style="font-size: 95%;" class="tooltippable" data-original-title="{{ t.value }}" title="">{{ t.value }}</td>
                 </tr>
                 {% endfor %}
               </tbody>
@@ -446,6 +447,18 @@ $('[data-clampedwidth]').each(function () {
     var resizeFn = function () {
         var sideBarNavWidth = $(parentPanel).width() - parseInt(elem.css('paddingLeft')) - parseInt(elem.css('paddingRight')) - parseInt(elem.css('marginLeft')) - parseInt(elem.css('marginRight')) - parseInt(elem.css('borderLeftWidth')) - parseInt(elem.css('borderRightWidth'));
         elem.css('width', sideBarNavWidth);
+
+        if(elem.hasClass('elips')){
+          elem.find('.linktoellipse').each(function(){
+            $(this).css({
+              overflow: 'hidden',
+              'text-overflow': 'ellipsis',
+              'white-space': 'nowrap',
+              display: 'block' 
+            });
+          });
+        }
+
     };
 
     resizeFn();

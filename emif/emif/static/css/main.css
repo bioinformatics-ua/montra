@@ -419,13 +419,13 @@ box-shadow: inset 0 3px 8px rgba(0,0,0,0.125);
 }
 .database_listing{
   padding:2px;
-  min-width: 300px; 
+  min-width: 200px; 
   display: table-cell;
 }
 
 .database_listing_names{
   padding:2px;
-  width: 250px; 
+  width: 200px; 
   display: table-cell;
 }
 
