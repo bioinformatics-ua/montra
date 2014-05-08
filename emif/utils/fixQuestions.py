@@ -43,8 +43,8 @@ choiceArr[3]=Choice(question=q, sortid=3,
 		value="Some", 
 		text_en="Some")
 choiceArr[4]=Choice(question=q, sortid=4, 
-		value="Dont know", 
-		text_en="Dont know")
+		value="Do not know", 
+		text_en="Do not know")
 
 for c in choices:
 	choiceArr[c.sortid] = c
@@ -62,6 +62,24 @@ questions = Question.objects.filter(id=6964)
 q = questions[0]
 q.text_en = "h3. Use of ice during collection? Specify how long it was stored on ice between collection and storage."
 q.save()
+
+#############################################################################
+### Fix for issue #288
+#############################################################################
+tempIDS = [{"id":5514, "num":"12.01"}, {"id":5515, "num":"12.02"},{"id":5516, "num":"12.03"} ,{"id":5517, "num":"12.04"} ,{"id":5518, "num":"12.05"} ,{"id":5519, "num":"12.06"}]
+for dic in tempIDS:
+	i = dic["id"]
+	num = dic["num"]
+
+	questions = Question.objects.filter(id=i)
+	q = questions[0]
+	q.number = num
+
+	print q
+
+	q.save()
+
+
 
 #############################################################################
 ###EMIF-AD Study Characteristics Data collection_45_V1.0_20140417_Memento	Memento	Number of Subjects			7	no entry for numbers of subjects older and younger than 65 years old
