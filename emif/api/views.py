@@ -107,6 +107,35 @@ class SearchView(APIView):
         return response
 
 
+############################################################
+##### Email Share - Web services
+############################################################
+
+
+class EmailCheckView(APIView):
+    def post(self, request, *args, **kw):
+        # first we get the email parameter
+        email = request.POST.get('email', '')
+        valid = False
+
+        # Verify if it is a valid email
+        if not (email == None or email==''):
+            # Verify if it is a valid user name
+            username = None
+
+            try: 
+                username = User.objects.get(email__exact=email)
+                valid = True  
+            except User.DoesNotExist:
+                pass             
+               
+        result = {
+            'email': email,
+            'valid': valid
+            }
+        response = Response(result, status=status.HTTP_200_OK)
+        return response
+
 
 ############################################################
 ##### Advanced Search - Web services
@@ -124,8 +153,6 @@ class AdvancedSearchView(APIView):
         result = {'myValue': 'lol', 'myValue2': 'lol', }
         response = Response(result, status=status.HTTP_200_OK)
         return response
-
-
 
 
 ############################################################

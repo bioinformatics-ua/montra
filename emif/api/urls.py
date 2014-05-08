@@ -22,6 +22,7 @@ from django.conf.urls import patterns, url
 from rest_framework.urlpatterns import format_suffix_patterns
 
 from api.views import SearchView
+from api.views import EmailCheckView
 from api.views import MetaDataView
 from api.views import StatsView
 from api.views import ValidateView
@@ -30,6 +31,7 @@ from api.views import PopulationView
 
 urlpatterns = patterns('api.views',
     url(r'^root/$', 'api_root'),
+    url(r'^emailcheck$', EmailCheckView.as_view(), name='emailcheck'),
     url(r'^search$', SearchView.as_view(), name='search'),
     url(r'^metadata', MetaDataView.as_view(), name='metadata'),
     url(r'^stats$', StatsView.as_view(), name='stats'),

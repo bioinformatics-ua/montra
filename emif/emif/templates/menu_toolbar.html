@@ -145,14 +145,23 @@
          <h3>Share Database</h3>
     </div>
     <div class="modal-body">
-        <p>What are the email address of your team member?</p>
+        <p>What is the email address of your team member? (must be a registered user)</p>
 
         <p id="debug-url"></p>
-        Email: <input type="text" id="share_email"/>
+        <div style="display: table-row;">
+          <label style="display: table-cell; padding: 5px;" class="control-label" for="inputEmail">Email: </label>
+          <div style="display: table-cell; padding: 5px;" class="controls">
+            <input style="margin-top:5px;" type="text" id="share_email"/>
+          </div>
+          <span style="display: table-cell; padding: 5px;" id="share_indicator">&nbsp;</span>
+        </div>
+        <div id="share_message"></div>
 
     </div>
     <div class="modal-footer">
-        <a href="share/ref" class="btn sharedb2" >Share</a>
+        <button class="btn sharedb2_shadow" disabled>Share</button>
+        <!--a style="display:none;" href="#" class="btn sharedb2">Share</a-->
+        <button style="display:none;" class="btn sharedb2">Share</button>
 
         <a href="#" onclick="$('#modal-from-dom-share').modal('hide'); return false;" class="btn btn-secondary">Cancel</a>
     </div>
@@ -222,10 +231,10 @@ function post_to_url(path, params, method) {
 ****************************************************************/
 $('#modal-from-dom-share').bind('show', function() {
     var id = $(this).data('id'),
-        removeBtn = $(this).find('.sharedb2'),
-        href = removeBtn.attr('href');
+        removeBtn = $(this).find('.sharedb2');
+        //href = removeBtn.attr('href');
     
-    removeBtn.attr('href', href.replace('ref', '' + id));
+    //removeBtn.attr('href', href.replace('ref', '' + id));
 });
 
 // This bind is handle the click in share button
@@ -233,21 +242,63 @@ $(".sharedb" ).click(function(e)
 {
   console.log("Share DB ");
   e.preventDefault();
-  var id = $(this).data('id');
+  var id = "{{fingerprint_id}}";
+
   $('#modal-from-dom-share').data('id', id).modal('show');
        
 });
-
+$("#share_email" ).change(function(e) 
+{
+  checkIfEmailExists();
+});
 // This bind will share the email. 
 $(".sharedb2" ).click(function(e) 
 {
   e.preventDefault();
   
-  post_to_url($(this).attr('href'), {"email": $("#share_email").val(), "csrfmiddlewaretoken": $('input[name="csrfmiddlewaretoken"]').prop('value')});
+  //post_to_url($(this).attr('href'), {"email": $("#share_email").val(), "csrfmiddlewaretoken": $('input[name="csrfmiddlewaretoken"]').prop('value')});
+  shareDatabase();
 
 });
+function checkIfEmailExists(){
+  $('#share_indicator').html('<i class="icon-refresh"></i>');
+  $('#share_message').html('<p class="text-info">Check if email is valid for share invitation.</p>');
+  $.post("api/emailcheck", { email: $("#share_email").val() })
+  .done(function(response) {
+    if(response.valid){
+      console.log('Email valid');
+      $('.sharedb2_shadow').hide();
+      $('.sharedb2').show();
+      $('#share_indicator').html('<i class="icon-ok text-success"></i>');
+        $('#share_message').html('<p class="text-success">Email is valid.</p>');
+    } else {
+      console.log('Email invalid');
+      $('.sharedb2').hide();
+      $('.sharedb2_shadow').show();
+      $('#share_indicator').html('<i class="icon-remove text-error"></i>');
+        $('#share_message').html('<p class="text-error">Email is invalid, doesn\'t belong to any registered user.</p>');
 
+    }
 
+  })
+  .fail(function(){
+        $('#share_indicator').html('<i class="icon-remove text-error"></i>');
+        $('#share_message').html('<p class="text-error">Look up failed, maybe the internet connection is down.</p>');
+  });
+}
 
+function shareDatabase(){
+  $('#share_indicator').html('<i class="icon-refresh"></i>');
+  $('#share_message').html('<p class="text-info">Trying to share.</p>');
+  $.post("share/{{fingerprint_id}}", { email: $("#share_email").val() })
+  .done(function(response) {
+    
+    $('#share_message').html('<p class="text-info">'+response+'.</p>');
 
+  })
+  .fail(function(){
+        $('#share_indicator').html('<i class="icon-remove text-error"></i>');
+        $('#share_message').html('<p class="text-error">Request failed, maybe the internet connection is down.</p>');
+  });
+}
 </script>
