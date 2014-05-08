@@ -138,7 +138,7 @@ function CounterUI() {
         var this_label0 = $('#counter0_' + qId);
         var this_label1 = $('#counter1_' + qId);
 
-        this_label0.html("&nbsp;(" + filled + "/" + total + ")");
+        this_label0.html("&nbsp;" + filled + "/" + total + "");
         this_label0.removeClass('hidden');
         this_label1.html(percentage + '%');
         this_label1.removeClass('hidden');
