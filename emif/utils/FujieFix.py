@@ -134,6 +134,7 @@ def q_7_03_10():
 		updateSlug(question)
 
 	print "QUITTING"
+	
 def q_8_02_12():
 
 	desiredQN = "8.01.12"
@@ -241,7 +242,6 @@ def q_16_01_01_10():
 
 	print "QUITTING"
 
-
 def q_16_01_02_08():
 
 	desiredQN = "16.01.02.08"
@@ -294,8 +294,6 @@ def q_16_01_02_08():
 		updateSlug(question)
 
 	print "QUITTING"
-
-
 
 def q_16_01_02_08():
 
@@ -953,22 +951,75 @@ def q_20_02_13():
 
 	print "QUITTING"
 
-q_5_02_04()
-q_7_03_10()
-q_8_02_12()
-q_16_01_01_10()
-q_16_01_02_08()
-q_16_01_03_06()
-q_16_01_04_06()
-q_16_01_05_06()
-q_16_01_06_05()
-q_16_01_07_07()
-q_16_01_08_04()
-q_9_01_06()
-q_11_01_10()
-q_12_01_10()
-q_15_01_06()
-q_20_02_13()
+# q_5_02_04()
+# q_7_03_10()
+# q_8_02_12()
+# q_16_01_01_10()
+# q_16_01_02_08()
+# q_16_01_03_06()
+# q_16_01_04_06()
+# q_16_01_05_06()
+# q_16_01_06_05()
+# q_16_01_07_07()
+# q_16_01_08_04()
+# q_9_01_06()
+# q_11_01_10()
+# q_12_01_10()
+# q_15_01_06()
+# q_20_02_13()
+
+#18.01.08
+def q_18_01_08():
+
+	desiredQN = "18.01.08"
+
+	def getQuestionObj(id):
+		arr = Question.objects.filter(questionset=id, number=desiredQN)
+		for x in arr:
+			return x
+		return Question()
+
+	def create_question(qset):
+		#Create Question;
+		q = getQuestionObj(qset.id)
+		q.questionset = qset
+		q.number = desiredQN
+		q.text_en = "h2. Specify any others"	
+		q.type = "open-textfield"
+		q.help_text = "Specify each examination in a separate line. Try to follow the above questions when possible.<br>Example.  Blood Pressure, Subgroup in participants with plasma and CSF, Repeated collection (more than once)."
+		q.slug = "Specify_any_other_examinations_18_01_08"
+		q.checks = "dependent=\"18.01,yes\""
+		return q
+
+	def updateSlug(qs):
+		arr = Slugs.objects.filter(question=qs)
+		if len(arr) == 0:
+			x = Slugs()
+			x.question = qs
+			x.slug1 = qs.slug
+			x.description = qs.text
+			print x
+			x.save()
+			return
+		for x in arr:
+			x.slug1 = qs.slug
+			x.description = qs.text
+			print x
+			x.save()
+		return
 
 
+	qsets = QuestionSet.objects.filter(heading="adcohort_Physical_Examination")
+	print qsets
+	print len(qsets)
+	for qs in qsets:
+	 	print "iterate questions"
+	 	print qs
+	 	question = create_question(qs)
+		question.save()
+		print "Saved Question"
+		updateSlug(question)
 
+	print "QUITTING"
+
+q_18_01_08()
