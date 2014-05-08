@@ -152,6 +152,8 @@ paint_table2 = function(table2, tag, nameClass) {
                 if (tag.indexOf($(this.childNodes[1].childNodes[0]).context.data) !== -1) {
 
                     $(this).addClass(nameClass);
+                    $('.database_listing_names .'+discoverRowId(this)).addClass(nameClass);
+
                 }
             } catch (err) {}
 
@@ -159,6 +161,16 @@ paint_table2 = function(table2, tag, nameClass) {
     });
 
 };
+
+function discoverRowId(element){
+    var classes = $(element).attr('class').split(' ');
+
+    for(var i=0; i < classes.length;i++){
+        if(classes[i].indexOf('rowid_') != -1){
+            return classes[i];
+        }
+    }
+}
 
 comparetable_two = function(table1, table2) {
     var empty_rows = 0;
@@ -353,6 +365,8 @@ function hideEmptyCells(list_tables, table_tmp, show_emptyrows) {
 */
 function filter_results(list_tables, word, show_match, show_unmatch, show_emptyrows, show_proximity) {
 
+    console.log(list_tables);
+    
     $(list_tables).each(function(table_tmp) {
         // First we reset
         $('#' + list_tables[table_tmp]).parent().parent().parent().show();

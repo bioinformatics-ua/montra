@@ -397,7 +397,8 @@ box-shadow: inset 0 3px 8px rgba(0,0,0,0.125);
   display: none;
 }
 .basetable{
-  background-color: #ECF3FF !important;
+  /*background-color: #ECF3FF !important; */
+  background-color: #dff0d8 !important;
 }
 .basetable:hover{
   background-color: #d7e0f0 !important;
@@ -418,9 +419,16 @@ box-shadow: inset 0 3px 8px rgba(0,0,0,0.125);
 }
 .database_listing{
   padding:2px;
-  min-width: 400px; 
+  min-width: 300px; 
   display: table-cell;
 }
+
+.database_listing_names{
+  padding:2px;
+  width: 250px; 
+  display: table-cell;
+}
+
 .database_listing_away{
   position: absolute;
   left: -19999px;
@@ -428,6 +436,8 @@ box-shadow: inset 0 3px 8px rgba(0,0,0,0.125);
   visibility: hidden;
 }
 .database_title{
+  width: auto;
+  z-index: 500;
   display: block;
   padding: 4px 12px;
   margin-bottom: 3px;
@@ -452,6 +462,9 @@ box-shadow: inset 0 1px 0 rgba(255,255,255,0.2),0 1px 2px rgba(0,0,0,0.05);
 .set_reference{
   width: 155px;
 }
+.database_title.affix {
+top: 50px;
+}  
 /* ==========================================================================
    My databases table
    ========================================================================== */

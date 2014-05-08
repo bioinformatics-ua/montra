@@ -85,7 +85,6 @@ th, td {
   {% endblock %}
 
 {% block content %}
-
 <div class="clearboth">
 <!--[if lte IE 8]>
 <div class="well">Currently IE 7 and 8 don't support this functionality. To use this functionality please update your browser to a modern browser, like IE 9 or better, Google Chrome, Firefox, Opera or Safari.</div>
@@ -106,14 +105,52 @@ th, td {
 </div>
 <div style="margin: 0px;" class="span12">
   <div style="overflow-x: auto;" class="well accordion" id="accordion2">
-  <div id="database_listings">
-  <div id="database_rows">
+       <div class="database_listing_names">
+    <div>
+     <div data-clampedwidth=".database_listing_names"  class="clearfix database_title btn-darkgrey">
+      <div style="height: 22px;" class="database_title_text pull-left"> &nbsp;
+      </div>
+    </div>   
+      {% for k,v in results.0.1.ordered_items %}
+      <div style="background-color: white" class="accordion-group">
+        <div title="{{k|removeh1}}" class="tooltippable accordion-heading">
+          <small><a id="a_collapse{{k|removespaces}}_{{name|removespaces}}" class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapse{{k|removespaces}}_{{name|removespaces}}">
+          <div style="width: 220px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{k|removeh1}}</div></a></small>
+        </div>
+        <div id="collapse{{k|removespaces}}_{{name|removespaces}}" class="accordion-body collapse">
+          <div class="accordion-inner">
 
+            <table id="HEADER_{{k|removespaces}}" class="table table-bordered table-hover table-striped">
+              <thead></thead>
+
+              <tbody>
+                {% for t in v.list_ordered_tags %}
+                <tr class="entry rowid_{{forloop.parentloop.counter}}_{{forloop.counter}}">
+                  <td style="background-color: white; height: 19px;" class="tooltippable" data-original-title="{{ t.tag|removehs }}" title="">
+                  
+                  
+                  {{ t.tag|removehs }}
+                  
+                  </td> 
+                  <td style="width: 0px;" class="tooltippable" data-original-title="{{ t.value }}" title="">{{ t.value }}</td>
+
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    </div>
+  <div style="display: table-cell;" id="database_listings">
+  <div id="database_rows">                   
     {% for name, qset in results %}
                       
     <div class="database_listing {%if forloop.counter == 2 %}database_listing_pointer{% endif %} {%if forloop.counter > 2 %}database_listing_away{% endif %}">
     <div {% if forloop.first%}style="margin-left: 0px;"{% endif %}>
-     <div class="clearfix database_title btn-darkgrey">
+     <div data-clampedwidth=".database_listing" class="clearfix database_title btn-darkgrey">
       <div class="database_title_text pull-left">{{name}}</div>
       <div>
         {%if database_to_compare|removespaces in name|removespaces %}
@@ -137,7 +174,7 @@ th, td {
               <tbody>
                 {% for t in v.list_ordered_tags %}
                 <tr class="entry rowid_{{forloop.parentloop.counter}}_{{forloop.counter}}">
-                  <td class="tooltippable" data-original-title="{{ t.tag|removehs }}" title="">{{ t.tag|removehs }}</td> 
+                  <td style="width:0px;" class="tooltippable" data-original-title="{{ t.tag|removehs }}" title="">{{ t.tag|removehs }}</td> 
                    <td class="tooltippable" data-original-title="{{ t.value }}" title="">{{ t.value }}</td>
                 </tr>
                 {% endfor %}
@@ -179,6 +216,7 @@ function applyFilters(){
             {% for k,v in qset.ordered_items %}
             filter_results([reference_table+'_{{k|removespaces}}'],filter_string, match, unmatch, emptyrows, proximity);
             filter_results([compared_table+'_{{k|removespaces}}'],filter_string, match, unmatch, emptyrows, proximity);
+            filter_results(['HEADER_{{k|removespaces}}'],filter_string, match, unmatch, emptyrows, proximity);
 
             {% endfor %}
           {% endfor %}
@@ -401,7 +439,24 @@ var isWebkit = (typeof window.webkitConvertPointFromNodeToPage === 'function');
   $('#compare_previous').prop('disabled', true);
   if(comparing_current == max_comparing)
      $('#compare_next').prop('disabled', true);
-   
+ 
+$('[data-clampedwidth]').each(function () {
+    var elem = $(this);
+    var parentPanel = elem.data('clampedwidth');
+    var resizeFn = function () {
+        var sideBarNavWidth = $(parentPanel).width() - parseInt(elem.css('paddingLeft')) - parseInt(elem.css('paddingRight')) - parseInt(elem.css('marginLeft')) - parseInt(elem.css('marginRight')) - parseInt(elem.css('borderLeftWidth')) - parseInt(elem.css('borderRightWidth'));
+        elem.css('width', sideBarNavWidth);
+    };
+
+    resizeFn();
+    $(window).resize(resizeFn);
+});
+  $('.database_title').affix({
+    offset: {
+      top: 150
+    }
+  })
+
 });
 var databases = [];
 
@@ -443,7 +498,7 @@ function compareDatabases(show_modal){
 
 function compareDatabase(base, other){
   tablediffall_two(base, [other]);
-
+  //console.log(base)
   this.complete();
 }
 
