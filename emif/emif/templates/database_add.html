@@ -102,7 +102,7 @@ Saving... please don't close this questionnary yet.</div>
               <td style="width: 80%; font-size: 93%;">
               {% if qs.sortid != 0 and qs.sortid != 99 %}{{ qs.sortid }}. {% endif %}{{ qs.text|removeh1 }}
               {% if qs.sortid != 0 and qs.sortid != 99 %}
-                <span id="counter0_{{ qs.sortid }}"> /{{answered}}/{{total_count}})</span>
+                <span id="counter0_{{ qs.sortid }}"> ({{answered}}/{{total_count}})</span>
               {%endif%}
               </td>
               <td style="width: 10%; text-align: right;">
