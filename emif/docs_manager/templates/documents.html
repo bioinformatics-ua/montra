@@ -13,14 +13,20 @@
           The documents that are available will be listed below. 
         </p>
     </div>
-
 {% else %}
+    {%if owner_fingerprint %}
     <div class="docs_not_available"> 
-        <p class="nodocs">There is no documents for this fingerprint.</p>
     </div>
     <p class="nodocs">You can upload documents to associate them to the fingerprint browser</p>
 
+    {% else %}
+
+        This database fingerprint does not have documents yet. Please contact the database owner to get more information.
     
+
+    {% endif %}
+{%endif %}
+{% if owner_fingerprint %}
 <form id="fileupload" method="post" action="." enctype="multipart/form-data">
 {% csrf_token %}
         <!-- Redirect browsers with JavaScript disabled to the origin page -->
@@ -58,10 +64,8 @@
         <table role="presentation" class="table table-striped"><tbody class="files"></tbody>
         </table>
     </form> 
-
-    <br>
-    <br>
-    <!-- The container for the uploaded files -->
+    {% endif %}    
+        <!-- The container for the uploaded files -->
     <!--<div class="row"> 
     <div id="files" class="span12 files"></div>
     </div>
@@ -80,6 +84,23 @@
     </tr-->
 
     </tbody>
+    <div style="display: none;">
+    <form id="downloadfile" action="api/getfile" method="post">
+        {% csrf_token %}
+        <input name="filename" value="" />
+        <input name="revision" value="" />
+        <input type="submit"  value="d"/>
+    </form>
+    </div>
     </table>
-
-{% endif %}
+    <script type="text/javascript">
+        $(document).ready(
+            function(){
+                {% if request.user.is_superuser or owner_fingerprint %}
+                    fillList(true);
+                {% else %}
+                    fillList(false);
+                {% endif %}         
+            }
+        );
+    </script>
