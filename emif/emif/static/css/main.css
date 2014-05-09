@@ -633,4 +633,7 @@ label input[type="radio"], label input[type="checkbox"]{
   background-color: transparent !important;
 }
 
+.tablesorter-blue .header, .tablesorter-blue .tablesorter-header{
+  background-color: #eee !important;
+}
 
