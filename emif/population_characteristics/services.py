@@ -90,16 +90,16 @@ class PopulationCharacteristic(object):
         for _f in c1.y_axis.static_filters:
             dict_query['values.'+_f.key] = _f.value
 
-        print "filters"
-        print filters
+        #print "filters"
+        #print filters
         # Apply filters in the query 
         dict_query_general=[]
         
         
         
         for ve in filters:
-            print "ve"
-            print ve
+            #print "ve"
+            #print ve
             
             if  isinstance(filters[ve], list):
                 #if not "$or" in dict_query:
@@ -115,7 +115,7 @@ class PopulationCharacteristic(object):
                 
         if dict_query_general != []:
             dict_query["$and"]= dict_query_general
-        print dict_query
+        #print dict_query
         values =  jerboa_collection.find(dict_query )
         
 
@@ -132,19 +132,19 @@ class PopulationCharacteristic(object):
                     y = float(values[_v])
                     new_y = eval(transformation)
                     values[_v] = new_y
-                    print values[_v]
+                    #print values[_v]
             return values
         values_app = None
         for v in values:
             if c1.y_axis.transformation != None:
                 try:
-                    print "transformation"
+                    #print "transformation"
                     values_app = transform(c1.y_axis.var, c1.y_axis.transformation,v[u'values'])
                     #y = float(v[u'values'][c1.y_axis.var])
                     #new_y = eval(c1.y_axis.transformation)
                     #v[u'values'][c1.y_axis.var] = new_y
                     v[u'values'] = values_app
-                    print values_app
+                    #print values_app
                 except:
                     #raise
                     print "bastard x error %s, %s " % (c1.y_axis.var, str(v[u'values']))
@@ -166,9 +166,9 @@ class PopulationCharacteristic(object):
     def generic_filter(self, filters):
         
         json_acceptable_string = filters.replace("'", "\"")
-        print json_acceptable_string
+        #print json_acceptable_string
         d = json.loads(json_acceptable_string)
-        print d
+        #print d
         values =  jerboa_collection.find(d)
         r = []
         for v in values:
@@ -197,11 +197,11 @@ class PopulationCharacteristic(object):
 
             if _filter.key != None:
                 dict_query['values.' + _filter.key]  = _filter.name
-            print _filter
-            print _filter.value
-            print dict_query
+            #print _filter
+            #print _filter.value
+            #print dict_query
             values =  jerboa_collection.find( dict_query ).distinct('values.' + _filter.value )
-            print values
+            #print values
             _filter.values = values
         return filters
 

@@ -326,8 +326,8 @@ function addTooltip(table_id) {
             declaring a tooltip instance every td...*/
         $('td', $(table_id)).each(function() {
             var content = $(this).text().replace(/\s+/gi, ' ');
-            if ($(this).textWidth() > $(this).width()) {
-                $(this).addClass('tooltipped');
+            if ($(this).textWidth() < $(this).width()) {
+                $(this).removeClass('tooltipped');
             }
         });
 
