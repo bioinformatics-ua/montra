@@ -629,4 +629,8 @@ label input[type="radio"], label input[type="checkbox"]{
   }
 }
 
+.breadcrumb{
+  background-color: transparent !important;
+}
+
 
