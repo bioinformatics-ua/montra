@@ -70,7 +70,8 @@ def _send_email(runinfo):
     "Send the email for a specific runinfo entry"
     subject = runinfo.subject
     translation.activate(subject.language)
-    tmpl = loader.get_template(settings.QUESTIONNAIRE_EMAIL_TEMPLATE)
+    #tmpl = loader.get_template(settings.QUESTIONNAIRE_EMAIL_TEMPLATE)
+    tmpl = loader.get_template('email_template.html')
     c = Context()
     c['last_name'] = subject.last_name
     c['first_name'] = subject.first_name
