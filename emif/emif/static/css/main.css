@@ -608,6 +608,11 @@ label input[type="radio"], label input[type="checkbox"]{
    overflow: visible !important;
 }
 
+
+.selectable{
+  cursor: pointer;
+}
+
 @media (min-width: 650px) {
   .popover-medium {
       max-width: 550px;
@@ -623,6 +628,5 @@ label input[type="radio"], label input[type="checkbox"]{
       max-width: 300px;
   }
 }
-
 
 
