@@ -67,6 +67,8 @@ import base64
 from django.core.cache import cache
 from django.views.decorators.cache import cache_page
 
+import hashlib
+
 
 def list_questions():
     print "list_questions"
@@ -191,7 +193,7 @@ def results_fulltext(request, page=1, full_text=True,template_name='results.html
     return results_fulltext_aux(request, query, page, template_name, isAdvanced)
 
 
-def results_fulltext_aux(request, query, page=1, template_name='more_like_this.html', isAdvanced=False, force=False):
+def results_fulltext_aux(request, query, page=1, template_name='results.html', isAdvanced=False, force=False):
     
     rows = define_rows(request)
     if request.POST and "page" in request.POST and not force:
@@ -350,17 +352,23 @@ def results_diff(request, page=1, template_name='results_diff.html'):
                 # we get the current user
                 this_user = User.objects.get(username = request.user)
                 this_query = None
+
+                this_query_hash = hashlib.sha1(qserialization).hexdigest()
+
                 # we check if this query was already made before
                 try:
-                    # in case the query exists we just get the reference
-                    this_query =  AdvancedQuery.objects.get(user=this_user, serialized_query=qserialization, qid=qid)  
+                    # in case the query exists we just get the reference, we use a hash since the serialized query can get too big
+
+                    this_query = AdvancedQuery.objects.get(user=this_user, serialized_query_hash=this_query_hash, qid=qid)  
                     
                     print "This query is already on historic, just updating use time..."
                     this_query.save()
                 except AdvancedQuery.DoesNotExist:
                     # otherwise, we create it
                     print "This query is new, adding it and answers to it..."
-                    this_query = AdvancedQuery(user=this_user,name=("Query on "+time.strftime("%c")),serialized_query=qserialization, qid=qid)
+                    this_query = AdvancedQuery(user=this_user,name=("Query on "+time.strftime("%c")),
+                        serialized_query_hash=this_query_hash,
+                        serialized_query=qserialization, qid=qid)
                     this_query.save()   
                     # and we all so insert the answers in a specific table exactly as they were on the post request to be able to put it back at a later time
                     for k, v in request.POST.items():
@@ -3151,7 +3159,7 @@ def create_auth_token(request, page=1, templateName='api-key.html', force=False)
 
 def sharedb(request, db_id, template_name="sharedb.html"):
     if not request.method == 'POST':
-        return HttpResponse('Invalid header found. The request need to be POST')
+        return HttpResponse("Service Unavailable")
 
     # Verify if it is a valid email
     email = request.POST.get('email', '')
@@ -3159,19 +3167,23 @@ def sharedb(request, db_id, template_name="sharedb.html"):
         return HttpResponse('Invalid email address.')
 
     # Verify if it is a valid user name
-    username_to_share = User.objects.get(email__exact=email)
-
-    if (username_to_share==None):
-        return HttpResponse('Invalid username.')
+    username_to_share = None
+    try:
+        username_to_share = User.objects.get(email__exact=email)
+    except Exception, e:
+        pass
+    
+    if not username_to_share:
+        return HttpResponse("Invalid email address.")
 
 
     # Verify if it is a valid database 
     if (db_id == None or db_id==''):
-        return HttpResponse('Invalid email address.')  
+        return HttpResponse('Service Unavailable')  
     c = CoreEngine()
     results = c.search_fingerprint('id:' + db_id)
     if (len(results)!=1):
-        return HttpResponse('Invalid database identifier.')  
+        return HttpResponse("Service Unavailable")  
 
     subject = "EMIF Catalogue: A new database has been shared with you."
     name = username_to_share.get_full_name()
@@ -3181,19 +3193,22 @@ def sharedb(request, db_id, template_name="sharedb.html"):
     # pdb.set_trace()
     __objs = SharePending.objects.filter(db_id=db_id, pending=True, user=username_to_share)
     if (len(__objs)>0):
-        return HttpResponse('Already contains databases')  
-
-    share_pending = SharePending()
-    share_pending.user = username_to_share
-    share_pending.db_id = db_id
-    share_pending.activation_code = generate_hash()
-    share_pending.pending = True
-    share_pending.user_invite = request.user 
-    share_pending.save()
+        share_pending = __objs[0]
+        success_msg = "You have already invited this user to start collaborating in your database. The invitation email was re-sent to his address."
+    else:
+        share_pending = SharePending()
+        share_pending.user = username_to_share
+        share_pending.db_id = db_id
+        share_pending.activation_code = generate_hash()
+        share_pending.pending = True
+        share_pending.user_invite = request.user 
+        share_pending.save()
+        success_msg = "An invitation has been sent to your co-worker start collaboration in your database. If you need further assistance, please do not hesitate to contact EMIF Catalogue team."
 
     link_activation = settings.BASE_URL + "share/activation/"+share_pending.activation_code
 
     emails_to_feedback = []
+    print settings.ADMINS
     for k, v in settings.ADMINS:
         emails_to_feedback.append(v)
 
@@ -3213,11 +3228,9 @@ def sharedb(request, db_id, template_name="sharedb.html"):
         send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [from_email])
 
     except BadHeaderError:
-        return HttpResponse('Invalid header found.')
+        return HttpResponse('Service Unavailable')
 
-
-
-    return render(request, template_name, {'request': request, 'breadcrumb': True})
+    return HttpResponse(success_msg)
 
 def sharedb_activation(request, activation_code, template_name="sharedb_invited.html"):
 

@@ -374,7 +374,7 @@ def assert_suffix(type):
     return None  
 
 def convertDate(value):
-    value = re.sub("'", "", value)
+    value = re.sub("\"", "", value)
     print (value)
     try:
         # First we try converting to normalized format, yyyy-mm-dd

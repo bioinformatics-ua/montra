@@ -536,8 +536,12 @@ box-shadow: inset 0 1px 0 rgba(255,255,255,0.2),0 1px 2px rgba(0,0,0,0.05);
 .sorter-score{
   width: 6%;  
 }
+
 label input[type="radio"], label input[type="checkbox"]{
   margin-top: -3px;
+}
+#signup_form label input[type="radio"], #signup_form label input[type="checkbox"]{
+  margin-top: 4px;
 }
 /* Styles for printing */
 @media print{
@@ -604,7 +608,25 @@ label input[type="radio"], label input[type="checkbox"]{
    overflow: visible !important;
 }
 
+
 .selectable{
   cursor: pointer;
 }
+
+@media (min-width: 650px) {
+  .popover-medium {
+      max-width: 550px;
+  }
+}
+@media (min-width: 1000px) {
+  .popover-medium {
+      max-width: 750px;
+  }
+}
+@media (max-width: 650px) {
+  .popover-medium {
+      max-width: 300px;
+  }
+}
+
 

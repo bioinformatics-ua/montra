@@ -131,7 +131,7 @@ function PublicationWidget ()
         information = pw{{ question.number|removedots }}.getPubmedInformation(_pubmedid);
         if (information==null)
         {
-            console.log("timeout");
+            //console.log("timeout");
             return;
         }
         $('#question_{{ question.number|removedots }}_pubtitle').val(information['title']); 
@@ -221,7 +221,7 @@ function PublicationWidget ()
     };
     this.isUpdate = function(pubmedid, pubtitle, pubjournal, pubyear, pubauthors) {
         var _aux = document.getElementById("question_{{ question.number }}").value;
-        console.log(_aux);
+        //console.log(_aux);
 
         if (!(_aux===undefined || _aux=="")){
             if (_aux[0] != "[")
@@ -238,12 +238,12 @@ function PublicationWidget ()
                 if(_objs[i]['pmid'] != "" && _objs[i]['pmid'] == pubmedid)
                     return true;
 
-                console.log(_objs[i]['title'].toLowerCase());
+                //console.log(_objs[i]['title'].toLowerCase());
 
                 if( _objs[i]['title'].toLowerCase() === pubtitle.toLowerCase() 
                     && _objs[i]['journal'].toLowerCase() === pubjournal.toLowerCase() 
                     && _objs[i]['year'] === pubyear ){
-                    console.log('FOUND ONE EXACTLY THE SAME');
+                    //console.log('FOUND ONE EXACTLY THE SAME');
                     return true;
                 }
            }

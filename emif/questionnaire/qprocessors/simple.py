@@ -71,10 +71,10 @@ def question_datepicker(request, question):
 
     a = re.compile("([0-9]{4})$")
     if a.match(value) != None:
-        print 'MATCH'
+        #print 'MATCH'
         value = value+'-01-01'
 
-    print "VALOR:["+value+"]"
+    #print "VALOR:["+value+"]"
 
     return {
         'required' : question.getcheckdict().get('required', False),
