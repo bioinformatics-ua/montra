@@ -608,3 +608,21 @@ label input[type="radio"], label input[type="checkbox"]{
    overflow: visible !important;
 }
 
+@media (min-width: 650px) {
+  .popover-medium {
+      max-width: 550px;
+  }
+}
+@media (min-width: 1000px) {
+  .popover-medium {
+      max-width: 750px;
+  }
+}
+@media (max-width: 650px) {
+  .popover-medium {
+      max-width: 300px;
+  }
+}
+
+
+
