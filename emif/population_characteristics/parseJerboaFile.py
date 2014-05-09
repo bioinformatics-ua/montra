@@ -53,7 +53,7 @@ def import_population_characteristics_data(fingerprint_id,filename='TEST_DataPro
         line_data = {}
         # parse input, assign values to variables
         values = line.split('\t')
-        print len(values)
+        #print len(values)
         if len(values) > 0:
             line_data['Var'] = clean_value(values[0])
         if len(values) > 1:
