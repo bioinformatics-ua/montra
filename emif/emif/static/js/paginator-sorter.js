@@ -151,52 +151,59 @@ PaginatorSorter.prototype = {
 
         var context = this;
 
-        $("#database_name_filter", this.innerTable).delayKeyup(function() {
+        var funct_handler = function() {
             if (context.plugin != undefined) {
                 context.plugin.clearSelection();
             }
-            context.onClick(context.selName, context.selValue);
-        }, 500);
+            // Save focus so we can return it after post request
+            if(supports_html5_storage()){
+                localStorage.setItem('listing_focus', $(':focus').attr('id'));
 
+                console.log($(':focus').attr('id'));
+            }
 
-        $("#last_update_filter", this.innerTable).delayKeyup(function() {
-            if (context.plugin != undefined) {
-                context.plugin.clearSelection();
-            }
             context.onClick(context.selName, context.selValue);
-        }, 500);
+        };
 
-        $("#type_filter", this.innerTable).change(function() {
-            if (context.plugin != undefined) {
-                context.plugin.clearSelection();
-            }
-            context.onClick(context.selName, context.selValue);
-        });
+        var timeout = 1000;
 
+        var remove_focus = function(){
+            if(supports_html5_storage()){
+                localStorage.removeItem('listing_focus');
+            }
+        };
 
-        $("#institution_filter", this.innerTable).delayKeyup(function() {
-            if (context.plugin != undefined) {
-                context.plugin.clearSelection();
-            }
-            context.onClick(context.selName, context.selValue);
-        }, 500);
-        $("#location_filter", this.innerTable).delayKeyup(function() {
-            if (context.plugin != undefined) {
-                context.plugin.clearSelection();
-            }
-            context.onClick(context.selName, context.selValue);
-        }, 500);
-        
-        $("#nrpatients_filter", this.innerTable).delayKeyup(function() {
-            if (context.plugin != undefined) {
-                context.plugin.clearSelection();
-            }
-            context.onClick(context.selName, context.selValue);
-        }, 500);
+        $("#database_name_filter", this.innerTable).delayKeyup(funct_handler, timeout);
+        $("#database_name_filter", this.innerTable).blur(remove_focus);
+
+        $("#last_update_filter", this.innerTable).delayKeyup(funct_handler, timeout);
+        $("#last_update_filter", this.innerTable).blur(remove_focus);
+
+        $("#type_filter", this.innerTable).change(funct_handler);
+        $("#type_filter", this.innerTable).blur(remove_focus);
+
+        $("#institution_filter", this.innerTable).delayKeyup(funct_handler, timeout);
+        $("#institution_filter", this.innerTable).blur(remove_focus);
+
+        $("#location_filter", this.innerTable).delayKeyup(funct_handler, timeout);
+        $("#location_filter", this.innerTable).blur(remove_focus);      
+
+        $("#nrpatients_filter", this.innerTable).delayKeyup(funct_handler, timeout);
+        $("#nrpatients_filter", this.innerTable).blur(remove_focus);
 
         $("#send2").submit(function() {
             context.updateForm();
         });
+
+        var focus_saved = localStorage.getItem('listing_focus');
+
+        if(focus_saved){
+            var focus_saved = $('#'+focus_saved);
+            if(focus_saved.length !== 0){
+                focus_saved.focus();
+                focus_saved.val(focus_saved.val());
+            }
+        }
     },
     updateForm: function(json) {
         //console.log("Setting Value!!!");
@@ -326,4 +333,11 @@ function paginator_via_post() {
         });
 
     });
+}
+function supports_html5_storage() {
+  try {
+    return 'localStorage' in window && window['localStorage'] !== null;
+  } catch (e) {
+    return false;
+  }
 }
