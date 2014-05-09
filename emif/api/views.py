@@ -128,6 +128,9 @@ class SearchView(APIView):
 
 
 class EmailCheckView(APIView):
+    authentication_classes = (SessionAuthentication, BasicAuthentication)
+    permission_classes = (IsAuthenticated,)
+        
     def post(self, request, *args, **kw):
         # first we get the email parameter
         email = request.POST.get('email', '')
