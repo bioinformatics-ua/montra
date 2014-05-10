@@ -10,7 +10,7 @@
 
 {% block content %}
 <div class="row">
-  <div class="span6 center">
+  <div style="position: relative;" class="span6 center">
     <form method="post" id="signup_form">
         {% csrf_token %}
         <fieldset>
@@ -30,13 +30,11 @@
 {% endblock %}
 
 {% block scriptextra %}
-<script>
   var focusFirstField = function () {
       $('#signup_form input:nth(1)').focus();
   };
   $('#signup_form input[type="text"], #signup_form input[type="password"], #signup_form select').addClass('span6');
   $('#signup_form button[type="reset"]').on('click', focusFirstField);
   focusFirstField();
-</script>
-{% endblock %}
+  {% endblock %}
   
