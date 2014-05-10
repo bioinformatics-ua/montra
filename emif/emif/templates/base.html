@@ -111,16 +111,74 @@
                             <div class="nav-collapse collapse">
                                 {% if request.user.is_authenticated %}
                                 <ul class="nav" style="margin-right: 0 !important;">
-                                    <li id="li_workspace" class="dropdown">
-                                        <a href="" class="dropdown-toggle" data-toggle="dropdown">Workspace
+                                        {% comment %}
+                                    <li id="li_search">
+                                        <a href="search">Quick Search</a>
+                                    </li>
+                                    {% endcomment %}
+
+
+                                    <!--li id="li_advanced_search" class="pull-left dropdown">
+                                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                                            Advanced Search <b class="caret"></b>
+                                        </a>
+                                        <ul class="dropdown-menu">{% show_fingerprints_for_search %}</ul>
+                                    </li-->
+
+                                    <li id="search_li" class="pull-left">
+                                        <form class="navbar-search pull-left" method="POST" action="resultsdiff/1">{% csrf_token %}
+                                            {% if isAdvanced %}
+                                            <input title="Enter the terms you wish to search for." class="search-query span2_5 form-text" placeholder="" type="text" id="edit-search-block-form--3" name="query" value="" size="25" maxlength="256">
+                                            {% else %}
+                                            <input title="Enter the terms you wish to search for." class="search-query span2_5 form-text" placeholder="" type="text" id="edit-search-block-form--3" name="query" value="{{search_old}}" size="25" maxlength="256">
+                                            {% endif %}
+                                            <input name='search_full' value='search_full' type='hidden'>
+                                        </form>
+                                    </li>
+                                </ul>
+                                {% endif %}
+                                <ul class="nav pull-right">
+                                    <!--{% if not request.user.is_authenticated %}
+                                    <li class="dropdown">
+                                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                                            <i class="icon-user "></i>
+                                            <i class="icon-chevron-down"></i>
+                                        </a>
+                                        <ul class="dropdown-menu">
+                                            <li id="li_signup">
+                                                <a href="accounts/signup/">Sign up</a>
+                                            </li>
+                                            <li class="divider"></li>
+                                            <li id="li_reset_password">
+                                                <a href="accounts/password/reset/">Forgot the password?</a>
+                                            </li>
+                                        </ul>
+
+                                    </li>
+                                    {% endif %}
+                                    {% if request.user.is_authenticated %}
+                                    <li id="li_history">
+                                        <a href="controlversion/history">History</a>
+                                    </li>
+                                    {%endif%}-->
+
+                                    <!--<li id="li_feedback">
+                                        <a href="feedback">Feedback</a>
+                                    </li>
+                                    <li id="li_about">
+                                        <a href="about">About</a>
+                                    </li>-->
+                                    
+                                        <li id="li_workspace" style="padding-right: 5px;" class="dropdown">
+                                        <a href="" class="dropdown-toggle" data-toggle="dropdown">Databases
                                             <b class="caret"></b>
                                         </a>
                                         <ul class="dropdown-menu">
                                             <li>
-                                                <a href="databases">My Databases</a>
+                                                <a href="databases">Personal</a>
                                             </li>
                                             <li>
-                                                <a href="alldatabases">All Databases</a>
+                                                <a href="alldatabases">All</a>
                                             </li>
 
 
@@ -169,7 +227,12 @@
                                                     {% endif %}
                                                 </ul>
                                             </li>
-                                            
+                                            <li class="dropdown-submenu">
+                                                <a href="" onclick="return false;">Search</a>
+                                                <ul class="dropdown-menu">
+                                                    {% show_fingerprints_for_search %}
+                                                </ul>
+                                            </li>
                                         {% comment %}
                                             <li class="divider"></li>
                                             <li>{% if request.user.is_superuser %}
@@ -180,67 +243,6 @@
                                             {% endcomment %}
                                         </ul>
                                     </li>
-
-
-                                        {% comment %}
-                                    <li id="li_search">
-                                        <a href="search">Quick Search</a>
-                                    </li>
-                                    {% endcomment %}
-
-
-                                    <li id="li_advanced_search" class="pull-left dropdown">
-                                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                                            Advanced Search <b class="caret"></b>
-                                        </a>
-                                        <ul class="dropdown-menu">{% show_fingerprints_for_search %}</ul>
-                                    </li>
-
-                                    <li id="search_li" class="pull-left">
-                                        <form class="navbar-search pull-left" method="POST" action="resultsdiff/1">{% csrf_token %}
-                                            {% if isAdvanced %}
-                                            <input title="Enter the terms you wish to search for." class="search-query span2_5 form-text" placeholder="" type="text" id="edit-search-block-form--3" name="query" value="" size="25" maxlength="256">
-                                            {% else %}
-                                            <input title="Enter the terms you wish to search for." class="search-query span2_5 form-text" placeholder="" type="text" id="edit-search-block-form--3" name="query" value="{{search_old}}" size="25" maxlength="256">
-                                            {% endif %}
-                                            <input name='search_full' value='search_full' type='hidden'>
-                                        </form>
-                                    </li>
-                                </ul>
-                                {% endif %}
-                                <ul class="nav pull-right">
-                                    <!--{% if not request.user.is_authenticated %}
-                                    <li class="dropdown">
-                                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                                            <i class="icon-user "></i>
-                                            <i class="icon-chevron-down"></i>
-                                        </a>
-                                        <ul class="dropdown-menu">
-                                            <li id="li_signup">
-                                                <a href="accounts/signup/">Sign up</a>
-                                            </li>
-                                            <li class="divider"></li>
-                                            <li id="li_reset_password">
-                                                <a href="accounts/password/reset/">Forgot the password?</a>
-                                            </li>
-                                        </ul>
-
-                                    </li>
-                                    {% endif %}
-                                    {% if request.user.is_authenticated %}
-                                    <li id="li_history">
-                                        <a href="controlversion/history">History</a>
-                                    </li>
-                                    {%endif%}-->
-
-                                    <!--<li id="li_feedback">
-                                        <a href="feedback">Feedback</a>
-                                    </li>
-                                    <li id="li_about">
-                                        <a href="about">About</a>
-                                    </li>-->
-                                    
-
 
 
                                     {% block headerlogin %} 
