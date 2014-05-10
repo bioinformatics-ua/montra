@@ -32,8 +32,6 @@
         <![endif]-->
         <style>
         body {
-            padding-top: 60px;
-            padding-bottom: 40px;
         }
         .navbar .nav.pull-right {
             margin-left: 5px;
@@ -86,6 +84,7 @@
         </head>
 
         <body>
+            <div class="wrapper">
             <div class="well not-supported">
                 <div class="navbar navbar-fixed-top">
                     <div class="navbar-inner">
@@ -305,7 +304,7 @@
                     </div>
                 </div>
                 </div>
-                <div class="container">
+                <div style="padding-top: 60px;" class="container">
 
                     {% if breadcrumb %}
                     {% block breadcrumbs %}
@@ -323,14 +322,12 @@
 
                     {% block content %}
                     {% endblock %}
-
-
-                    <hr>
-
-
+                    <div class="push"></div>
                 </div>
+                
             </div>     
-            <div class="row" style="clear: both; text-align:center">
+            <div class="footer" class="row" style="clear: both; text-align:center">
+                <hr />
                 <footer>
                     {% if request.user.is_authenticated %}
                      <a href="controlversion/history">History</a> · 
