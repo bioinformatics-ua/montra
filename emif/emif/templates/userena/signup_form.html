@@ -23,7 +23,7 @@
         <center>
           <button class="btn btn-primary" type="submit">Create Account</button>
           <button class="btn" type="reset">{% trans "Clear"%}</button>
-        <div>or <a href="{% url 'userena_signin' %}">sign in</a></div>
+        <div>or <a href="index">sign in</a></div>
         </center>
     </form>
   </div>
@@ -37,5 +37,21 @@
   $('#signup_form input[type="text"], #signup_form input[type="password"], #signup_form select').addClass('span6');
   $('#signup_form button[type="reset"]').on('click', focusFirstField);
   focusFirstField();
+    /* I swear, i can't seem to be able to edit the damn forms from django_userena other way 
+   * It's like they think people don't want to change the layout easily...
+   */
+  $('#signup_form .control-label').each(function(e){
+    var fore = '#'+$(this).attr('for');
+    var destiny = $(fore);
+
+    console.log(destiny);
+    if(destiny.get(0)){
+        var content = $(this).text().trim();
+
+        $(destiny).prop('placeholder', content);
+
+        $(this).hide();
+    }
+  }); 
   {% endblock %}
   
