@@ -39,13 +39,10 @@
     var fore = '#'+$(this).attr('for');
     var destiny = $(fore);
 
-    console.log(destiny);
     if(destiny.get(0)){
 
         var content = $(this).text().trim();
-        
-        console.log(content);
-        
+                
         $(destiny).prop('placeholder', content);
 
         $(this).hide();
