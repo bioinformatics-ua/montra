@@ -89,7 +89,10 @@ EMIF Platform - Fingerprint Browser
  * Ricardo Ribeiro <ribeiro.r@ua.pt>
  * José Melo <melojms@gmail.com>
 
- 
+#### Lead developer
+
+* Luís A. Bastião Silva <bastiao@ua.pt> (since 2013 until now)
+
 #### Project Leader
 
  * José Luis Oliveira <jlo@ua.pt>
