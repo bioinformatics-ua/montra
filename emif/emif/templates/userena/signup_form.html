@@ -13,17 +13,18 @@
   <div style="position: relative;" class="span6 center">
     <form method="post" id="signup_form">
         {% csrf_token %}
-        <fieldset>
-          <legend>{% trans "Sign up" %} <small class="pull-right">Already have an account? <a href="{% url 'userena_signin' %}">Sign in</a>.</small></legend>
+        <fieldset> 
+          <legend>Create Account (all fields are mandatory)</legend>
           <span class="help-block">
-            <em>Please fill in the form bellow to sign up for an account in the EMIF Catalogue.</em>
           </span>
           {{ form|crispy }}
         </fieldset>
-        <div class="form-actions">
-          <button class="btn btn-primary" type="submit">{% trans "Sign up"%}</button>
+        <br />
+        <center>
+          <button class="btn btn-primary" type="submit">Create Account</button>
           <button class="btn" type="reset">{% trans "Clear"%}</button>
-        </div>
+        <div>or <a href="{% url 'userena_signin' %}">sign in</a></div>
+        </center>
     </form>
   </div>
 </div>
