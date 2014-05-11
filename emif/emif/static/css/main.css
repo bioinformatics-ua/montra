@@ -301,7 +301,7 @@ box-shadow: inset 0 3px 8px rgba(0,0,0,0.125);
 
 #populationcharacteristics
 {
-  height: 600px;
+  /*height: 600px;*/
   padding-left: 30px;
 }
 
@@ -629,4 +629,24 @@ label input[type="radio"], label input[type="checkbox"]{
   }
 }
 
+.breadcrumb{
+  background-color: transparent !important;
+}
+.tablesorter-filter-row{
+  background-color: #eee !important;
 
+}
+
+html, body {
+height: 100% !important;
+padding: 0 !important;
+}
+.wrapper {
+min-height: 100%;
+height: auto !important;
+height: 100%;
+margin: 0 auto -6em;
+}
+.footer, .push {
+height: 6em;
+}

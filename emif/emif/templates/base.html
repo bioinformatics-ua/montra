@@ -32,8 +32,6 @@
         <![endif]-->
         <style>
         body {
-            padding-top: 60px;
-            padding-bottom: 40px;
         }
         .navbar .nav.pull-right {
             margin-left: 5px;
@@ -86,6 +84,7 @@
         </head>
 
         <body>
+            <div class="wrapper">
             <div class="well not-supported">
                 <div class="navbar navbar-fixed-top">
                     <div class="navbar-inner">
@@ -274,37 +273,38 @@
                                     </li>
                                     {% endif %}
 
-                                    <li>
+                                   
+                                        {% if not request.user.is_authenticated %}
+                                         <li>
                                         <div class="btn-group">
                                         <button class="btn dropdown-toggle" data-toggle="dropdown" style="margin-left: 2px;" tabindex="-1"><i class="icon-align-justify"></i></button>
                                         <ul class="dropdown-menu pull-right">
-                                            {% if not request.user.is_authenticated %}
+                                            
                                             <li id="li_signup">
                                                 <a href="accounts/signup/"><i class="fa fa-sign-in"></i>&nbsp;Sign up</a>
                                             </li>
                                             <li id="li_reset_password">
                                                 <a href="accounts/password/reset/"><i class="fa fa-question"></i>&nbsp;Forgot your password?</a>
                                             </li>
-                                            <li class="divider"></li>
-                                            {%endif%}
-                                            {% if request.user.is_authenticated %}
-                                            <li><a href="controlversion/history"><i class="fa fa-sign-in"></i>&nbsp;History</a></li>
-                                            {%endif%}
-                                            <li><a href="feedback"><i class="fa fa-bullhorn"></i>&nbsp;Feedback</a></li>
-                                            <li><a href="about"><i class="fa fa-question-circle"></i>&nbsp;About</a></li>
+                                            
                                         </ul>
+                                        
                                     </div>
+
                                     </li>
-                                    {% endblock %}
-                                </ul>
+                                    {%endif%}
+                                                                    </ul>
+
 
                             </div>
+                                    {% endblock %}
+
                             <!--/.nav-collapse -->
                         </div>
                     </div>
                 </div>
-
-                <div class="container">
+                </div>
+                <div style="padding-top: 60px;" class="container">
 
                     {% if breadcrumb %}
                     {% block breadcrumbs %}
@@ -322,16 +322,19 @@
 
                     {% block content %}
                     {% endblock %}
-
-
-                    <hr>
-
-
+                    <div class="push"></div>
                 </div>
+                
             </div>     
-            <div class="row" style="text-align:center">
+            <div class="footer" class="row" style="clear: both; text-align:center">
+                <hr />
                 <footer>
-                    <p>&copy; EMIF Catalogue v{% get_version %} <br/><small id="supportability">This website is optimised to Safari, Chrome, Firefox, Opera and IE9+. It runs in IE7-IE8, but it has low performance and no enhanced features.</small></p>
+                    {% if request.user.is_authenticated %}
+                     <a href="controlversion/history">History</a> · 
+                    {%endif%}
+                    <a href="feedback">Feedback</a> · 
+                    <a href="about">About</a><br />
+                    <p>&copy; EMIF Catalogue v{% get_version %}<br/><small id="supportability">This website is optimised to Safari, Chrome, Firefox, Opera and IE9+. It runs in IE7-IE8, but it has low performance and no enhanced features.</small></p>
 
                 </footer>
             </div>
