@@ -110,90 +110,6 @@
                             <div class="nav-collapse collapse">
                                 {% if request.user.is_authenticated %}
                                 <ul class="nav" style="margin-right: 0 !important;">
-                                    <li id="li_workspace" class="dropdown">
-                                        <a href="" class="dropdown-toggle" data-toggle="dropdown">Workspace
-                                            <b class="caret"></b>
-                                        </a>
-                                        <ul class="dropdown-menu">
-                                            <li>
-                                                <a href="databases">My Databases</a>
-                                            </li>
-                                            <li>
-                                                <a href="alldatabases">All Databases</a>
-                                            </li>
-
-
-                                        {% comment %}
-                                        <li>
-                                            <a href="databases">Edit Databases</a>
-                                        </li>
-                                        <li>
-                                            <a href="databases">Query History</a>
-                                        </li>
-                                        <li>
-                                            <a href="databases">Timeline</a>
-                                        </li>
-                                        {% endcomment %} 
-                                        
-                                        {% comment %} 
-                                        {% if request.user.is_superuser %}
-
-                                        <li class="divider"></li>
-                                        <li class="dropdown-submenu">
-                                            <a href="" onclick="return false;">Statistics</a>
-                                            <ul class="dropdown-menu">
-                                                {% show_fingerprints_for_statistics %}
-                                            </ul>
-                                        </li>
-                                        {% endif %} 
-                                        {% endcomment %} 
-                                        
-                                        {% comment %}
-                                            <li class="divider"></li>
-
-                                            <li>
-                                                <a href="databases">Subscribe interests</a>
-                                            </li>
-                                            {% endcomment %}
-                                            
-                                            <li class="divider"></li>
-
-                                            <li class="dropdown-submenu">
-                                                <a href="" onclick="return false;">Add new databases</a>
-                                                <ul class="dropdown-menu">
-                                                    {% if request.user.get_profile %}
-                                                    {% show_fingerprints_interests request.user %}
-                                                    {% else %}
-                                                    {% show_fingerprints %}
-                                                    {% endif %}
-                                                </ul>
-                                            </li>
-                                            
-                                        {% comment %}
-                                            <li class="divider"></li>
-                                            <li>{% if request.user.is_superuser %}
-                                                <a href="import-questionnaire">Import Questionnaire</a>
-                                                {% endif %}
-
-                                            </li>
-                                            {% endcomment %}
-                                        </ul>
-                                    </li>
-
-
-                                        {% comment %}
-                                    <li id="li_search">
-                                        <a href="search">Quick Search</a>
-                                    </li>
-                                    {% endcomment %}
-
-
-                                    <li id="li_advanced_search" class="pull-left dropdown">
-                                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                                            Advanced Search <b class="caret"></b>
-                                        </a>
-                                        <ul class="dropdown-menu">{% show_fingerprints_for_search %}</ul>
-                                    </li>
 
                                     <li id="search_li" class="pull-left">
                                         <form class="navbar-search pull-left" method="POST" action="resultsdiff/1">{% csrf_token %}
@@ -239,7 +155,80 @@
                                         <a href="about">About</a>
                                     </li>-->
                                     
+                                        <li id="li_workspace" style="padding-right: 5px;" class="dropdown">
+                                        <a href="" class="dropdown-toggle" data-toggle="dropdown">Databases
+                                            <b class="caret"></b>
+                                        </a>
+                                        <ul class="dropdown-menu">
+                                            <li>
+                                                <a href="databases">Personal</a>
+                                            </li>
+                                            <li>
+                                                <a href="alldatabases">All</a>
+                                            </li>
 
+
+                                        {% comment %}
+                                        <li>
+                                            <a href="databases">Edit Databases</a>
+                                        </li>
+                                        <li>
+                                            <a href="databases">Query History</a>
+                                        </li>
+                                        <li>
+                                            <a href="databases">Timeline</a>
+                                        </li>
+                                        {% endcomment %} 
+                                        
+                                        {% comment %} 
+                                        {% if request.user.is_superuser %}
+
+                                        <li class="divider"></li>
+                                        <li class="dropdown-submenu">
+                                            <a href="" onclick="return false;">Statistics</a>
+                                            <ul class="dropdown-menu">
+                                                {% show_fingerprints_for_statistics %}
+                                            </ul>
+                                        </li>
+                                        {% endif %} 
+                                        {% endcomment %} 
+                                        
+                                        {% comment %}
+                                            <li class="divider"></li>
+
+                                            <li>
+                                                <a href="databases">Subscribe interests</a>
+                                            </li>
+                                            {% endcomment %}
+                                            
+                                            <li class="divider"></li>
+
+                                            <li class="dropdown-submenu">
+                                                <a href="" onclick="return false;">New</a>
+                                                <ul class="dropdown-menu">
+                                                    {% if request.user.get_profile %}
+                                                    {% show_fingerprints_interests request.user %}
+                                                    {% else %}
+                                                    {% show_fingerprints %}
+                                                    {% endif %}
+                                                </ul>
+                                            </li>
+                                            <li class="dropdown-submenu">
+                                                <a href="" onclick="return false;">Search</a>
+                                                <ul class="dropdown-menu">
+                                                    {% show_fingerprints_for_search %}
+                                                </ul>
+                                            </li>
+                                        {% comment %}
+                                            <li class="divider"></li>
+                                            <li>{% if request.user.is_superuser %}
+                                                <a href="import-questionnaire">Import Questionnaire</a>
+                                                {% endif %}
+
+                                            </li>
+                                            {% endcomment %}
+                                        </ul>
+                                    </li>
 
 
                                     {% block headerlogin %} 
@@ -308,7 +297,7 @@
 
                     {% if breadcrumb %}
                     {% block breadcrumbs %}
-                    {% breadcrumb "Workspace" "databases" %}
+                    {% breadcrumb "Databases" "databases" %}
                     {% endblock %}
 
 

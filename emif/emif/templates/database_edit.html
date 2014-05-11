@@ -5,7 +5,7 @@
 
 {% block breadcrumbs %}
     {{ block.super }}
-    {% breadcrumb "My Databases" "databases" %}
+    {% breadcrumb "Personal" "databases" %}
     {% breadcrumb name "fingerprint/"|add:fingerprint_id|add:"/1" %}
     {% if not readonly %}
     {% with url_id="dbEdit/1" %}

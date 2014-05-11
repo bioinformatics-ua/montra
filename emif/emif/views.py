@@ -3262,7 +3262,7 @@ def sharedb_activation(request, activation_code, template_name="sharedb_invited.
         subject = "EMIF Catalogue: Accepted database shared"
         message = """Dear %s,\n\n
             \n\n
-            %s has been activated. You can access the new database in "Workspace" -> My Databases".
+            %s has been activated. You can access the new database in "Databases" -> Personal".
             \n\nSincerely,\nEMIF Catalogue
         """ % (request.user.get_full_name(), _aux['database_name_t'] )
 
