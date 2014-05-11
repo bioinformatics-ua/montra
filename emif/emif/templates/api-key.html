@@ -6,7 +6,7 @@
 {% block breadcrumbs %}
 {{ block.super }}
 
-{% breadcrumb "My Databases" "databases" %}
+{% breadcrumb "Personal" "databases" %}
 {% breadcrumb "API Info" "api-info" %}
 
 {% endblock %}
@@ -145,7 +145,7 @@
 
     {% else %}
     <p><strong>Info: </strong> Currently, there are no databases in your account. You can add new ones through the
-        option "Workspace -> Add new databases"</p>
+        option "Databases -> New"</p>
     {% endif %}
     <form id="send2" method="POST" > 
       <input id="page" type="hidden" name="page" value="{{page}}"></input>
