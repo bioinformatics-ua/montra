@@ -326,10 +326,10 @@ box-shadow: inset 0 3px 8px rgba(0,0,0,0.125);
 }
 
 .ns .not-supported{
-    display: none !important;
+    display: block !important;
 }
 .ns .supported {
-    display: block !important;
+    display: none !important;
 }
  #supportability{
     display: none;
