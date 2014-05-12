@@ -97,7 +97,8 @@ class SearchView(APIView):
     """
     Class to search and return fingerprint details, like Name, ID and structure
     """
-    authentication_classes = (TokenAuthentication,)
+    authentication_classes = (TokenAuthentication, SessionAuthentication, BasicAuthentication)
+    permission_classes = (IsAuthenticated,)
 
     def get(self, request, *args, **kw):
         
@@ -128,6 +129,8 @@ class SearchView(APIView):
 
 
 class EmailCheckView(APIView):
+    authentication_classes = (SessionAuthentication, BasicAuthentication)
+    permission_classes = (IsAuthenticated,)    
     def post(self, request, *args, **kw):
         # first we get the email parameter
         email = request.POST.get('email', '')
@@ -257,6 +260,9 @@ def respond_as_attachment(request, file_path, original_filename):
 
 
 class AdvancedSearchView(APIView):
+    authentication_classes = (SessionAuthentication, BasicAuthentication)
+    permission_classes = (IsAuthenticated,)  
+
     def get(self, request, *args, **kw):
         # Process any get params that you may need
         # If you don't need to process get params,
@@ -285,8 +291,8 @@ class MetaDataView(APIView):
 
     # Example request
     # curl -H "Content-Type: application/json" -X POST -d "{\"uid\":12,\"token\":\"asdert\"}" http://192.168.1.3:8000/api/metadata -H "Authorization: Token c6e25981c67ae45f98bdb380b0a9d8164e7ec4d1" -v
-
-    authentication_classes = (TokenAuthentication,)
+    authentication_classes = (TokenAuthentication,SessionAuthentication, BasicAuthentication,)
+    permission_classes = (IsAuthenticated,)  
     # permission_classes = (permissions.AllowAny,)
     # permission_classes = (permissions.IsAuthenticated,)
     parser_classes((JSONParser,))
@@ -329,6 +335,9 @@ class MetaDataView(APIView):
 
 
 class ValidateView(APIView):
+    authentication_classes = (SessionAuthentication, BasicAuthentication)
+    permission_classes = (IsAuthenticated,)
+
     def get(self, request, *args, **kw):
 
         database_name = request.GET['name']
@@ -364,6 +373,8 @@ class ValidateView(APIView):
 
 
 class StatsView(APIView):
+    authentication_classes = (SessionAuthentication, BasicAuthentication)
+    permission_classes = (IsAuthenticated,)    
     """
     Class that returns json values of answers to create stats (charts)
     """
@@ -452,7 +463,9 @@ class PublicationsView(APIView):
     """
     Class that returns the information of a publication 
     """
-
+    authentication_classes = (SessionAuthentication, BasicAuthentication)
+    permission_classes = (IsAuthenticated,)
+    
     def get(self, request, *args, **kw):
         results = dict()
         pmid = request.GET['pmid']
@@ -488,7 +501,8 @@ class PopulationView(APIView):
 
     """
     
-        
+    authentication_classes = (SessionAuthentication, BasicAuthentication)
+    permission_classes = (IsAuthenticated,)        
     def get(self, request, *args, **kw):
         """
         List the Jerboa documents 
