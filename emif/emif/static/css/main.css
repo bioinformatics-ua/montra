@@ -650,3 +650,7 @@ margin: 0 auto -6em;
 .footer, .push {
 height: 6em;
 }
+
+.qset_option{
+  margin-top: 3px !important;
+}
