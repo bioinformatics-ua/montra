@@ -412,13 +412,13 @@ function PublicationWidget ()
         
         for (var i = 0 ; i<_objs.length; i++)
         {
-            var _pubmedid = _objs[i]['pmid'].replace(/<(?:.|\n)*?>/gm, ''); 
-            var _pubtitle = _objs[i]['title'].replace(/<(?:.|\n)*?>/gm, '');
-            var _pubjournal = _objs[i]['journal'].replace(/<(?:.|\n)*?>/gm, '');
-            var _pubyear = _objs[i]['year'].replace(/<(?:.|\n)*?>/gm, '');
-            var _pubvolume = _objs[i]['volume'].replace(/<(?:.|\n)*?>/gm, '');
-            var _pubpages = _objs[i]['pages'].replace(/<(?:.|\n)*?>/gm, '');
-            var _pubauthors = _objs[i]['authors'].replace(/<(?:.|\n)*?>/gm, '');
+            var _pubmedid = cleanUp(_objs[i]['pmid']);
+            var _pubtitle = cleanUp(_objs[i]['title']);
+            var _pubjournal = cleanUp(_objs[i]['journal']);
+            var _pubyear = cleanUp(_objs[i]['year']);
+            var _pubvolume = cleanUp(_objs[i]['volume']);
+            var _pubpages = cleanUp(_objs[i]['pages']);
+            var _pubauthors = cleanUp(_objs[i]['authors']);
 
             var _publink = _objs[i]['link'];
 
