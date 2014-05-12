@@ -208,6 +208,7 @@ function questionsets_handle(id_questionset)
 
             posting.done(function(data) {
               $("#loading-message").fadeOut('fast');
+              formHasChanged = false;   
 
             });
           }
@@ -241,7 +242,6 @@ function questionsets_handle(id_questionset)
         );
         document.body.scrollTop = document.documentElement.scrollTop = 0; 
 
-        formHasChanged = false;   
         list_invalid = []; 
 
       } else {

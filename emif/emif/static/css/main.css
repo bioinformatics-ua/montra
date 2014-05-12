@@ -567,8 +567,8 @@ label input[type="radio"], label input[type="checkbox"]{
     height: auto !important;
   }
 }
-@media (min-width: 1200px) {.span2_5 {width: 300px !important;}}
-@media (max-width: 1200px) {.span2_5 {width: 130px !important;}}
+@media (min-width: 1200px) {.span2_5 {width: 350px !important;}}
+@media (max-width: 1200px) {.span2_5 {width: 280px !important;}}
 
 .commented{
   width: 55px;
@@ -649,4 +649,8 @@ margin: 0 auto -6em;
 }
 .footer, .push {
 height: 6em;
+}
+
+.qset_option{
+  margin-top: 3px !important;
 }
