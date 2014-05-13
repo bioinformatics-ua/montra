@@ -166,8 +166,8 @@
         </td>
         <td>{{t.institution}}</td>
         <td>{{t.location}}</td>
-        <td>{{t.number_patients}}</td>
-          <td class="date">            
+        <td style="text-align: right;">{{t.number_patients}}</td>
+          <td style="text-align: center;" class="date">            
                 {% if t.last_activity %}
                     {{t.last_activity|datehhmm}}
                 {% else %}
