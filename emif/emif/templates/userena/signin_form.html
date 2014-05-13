@@ -9,7 +9,9 @@
 {% endblock %}
 
 {% block content %}
-<div class="row">
+</div>
+</div>
+<div style="margin-top: 50px;" class="row">
   <div class="span6 center">
     <form method="post" id="signin_form">
         {% csrf_token %}
@@ -18,7 +20,7 @@
           {% if messages %}
           <span class="help-block">
             {% for message in messages %}
-            <em{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</em>
+            <em>{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</em>
             {% endfor %}
           </span>
           {% endif %}
@@ -34,16 +36,15 @@
 </div>
 <div class="span2 center">
     <a href="accounts/password/reset/">Forgot the password?</a>
-  </div>
+</div>
 
 {% endblock %}
 
 {% block scriptextra %}
-<script>
+
   var focusFirstField = function () {
       $('#signin_form input:nth(1)').focus();
   };
   $('#signin_form input[type="text"], #signin_form input[type="password"]').addClass('span6');
   focusFirstField();
-</script>
 {% endblock %}

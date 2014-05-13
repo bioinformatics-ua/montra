@@ -9,8 +9,10 @@
 {% endblock %}
 
 {% block content %}
-<div class="row">
-  <div style="position: relative;" class="span6 center">
+</div>
+</div>
+<div style="margin-top: 50px;" class="row">
+  <div class="span6 center">
     <form method="post" id="signup_form">
         {% csrf_token %}
         <fieldset> 
@@ -28,6 +30,7 @@
     </form>
   </div>
 </div>
+
 {% endblock %}
 
 {% block scriptextra %}
