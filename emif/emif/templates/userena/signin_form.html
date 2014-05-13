@@ -12,7 +12,7 @@
 </div>
 </div>
 <div style="margin-top: 50px;" class="row">
-  <div class="span6 center">
+  <div class="span4 center">
     <form method="post" id="signin_form">
         {% csrf_token %}
         <fieldset>
@@ -45,6 +45,6 @@
   var focusFirstField = function () {
       $('#signin_form input:nth(1)').focus();
   };
-  $('#signin_form input[type="text"], #signin_form input[type="password"]').addClass('span6');
+  $('#signin_form input[type="text"], #signin_form input[type="password"]').addClass('span4');
   focusFirstField();
 {% endblock %}
