@@ -213,7 +213,7 @@ def results_fulltext_aux(request, query, page=1, template_name='results.html', i
 
     #print query_filtered
 
-    (list_databases, hits, hi) = get_databases_from_solr_with_highlight(request, query, sort=sortString, rows=rows, start=range)
+    (list_databases, hits, hi) = get_databases_from_solr_with_highlight(request, query_filtered, sort=sortString, rows=rows, start=range)
     if not isAdvanced:
         hi = merge_highlight_results( request.session["query"] , hi)
     else:
