@@ -33,6 +33,26 @@ class Migration(DataMigration):
 
             return None
 
+        def fix_wrong_names_on_observational():
+            c = CoreEngine()
+            documents = c.search_fingerprint("type_t:observationaldatasources")
+            for doc in documents:
+                old = None
+                try:
+                    old = doc['If_yes_:_repeated_measurements__t']
+                    del doc['If_yes_:_repeated_measurements__t']
+                except:
+                    pass
+                try:
+                    old = doc['If_yes_:_repeated_measurements_t']
+                    del doc['If_yes_:_repeated_measurements_t']
+                except:
+                    pass
+                if old != None:
+                    print "Replacing"
+                    doc['If_yes__repeated_measurements_t'] = old
+                    c.update(doc)
+
         def convertAnswerToJson(question, value):
             ''' TYPES : TO DO
              open
@@ -82,6 +102,10 @@ class Migration(DataMigration):
             else:
                 return (owners[0], owners[1:])
 
+
+        # First we need to fix wrongly named fields on observational_data_sources
+        fix_wrong_names_on_observational()
+
         documents = c.search_fingerprint("*:*")
 
         for doc in documents:
@@ -115,7 +139,7 @@ class Migration(DataMigration):
                     for share in shared:
                         fingerprint_id.shared.add(share)
 
-                    #fingerprint_id.save()
+                    fingerprint_id.save()
 
                 questions_possible = fingerprint_id.questionnaire.questions()
                 for key in doc:
@@ -132,12 +156,12 @@ class Migration(DataMigration):
                         if question == None:
                             print "EMPTY KEY ON:"+key   
 
-                        #ans = Answer(question=question, data=data, comment=comment, fingerprint_id=fingerprint_id) 
-                        #ans.save()     
+                        ans = Answer(question=question, data=data, comment=comment, fingerprint_id=fingerprint_id) 
+                        ans.save()     
             print "---------------------------------------- "          
             print " "
         
-        raise RuntimeError("You can't stop the music...")
+        #raise RuntimeError("You can't stop the music...")
     
     def backwards(self, orm):
         raise RuntimeError("Cannot reverse this migration.")
