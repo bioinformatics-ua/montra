@@ -24,7 +24,7 @@ from django.db import models
 
 from django.core.validators import MaxLengthValidator
 
-from questionnaire.models import Question
+from questionnaire.models import *
 
 class Fingerprint(models.Model):
   fingerprint_hash =  models.CharField(max_length=255, unique=True, blank=False, null=False)
@@ -41,10 +41,9 @@ Answer of the Fingerprint
 class Answer(models.Model):
 
     question = models.ForeignKey(Question)
-    data = model.TextField() # Structure question 
-    comment = model.TextField() # Comment
+    data = models.TextField() # Structure question 
+    comment = models.TextField() # Comment
     fingerprint_id = models.ForeignKey(Fingerprint)
-
 
 
 class FingerprintDescription(object):
@@ -80,7 +79,6 @@ class FingerprintDescription(object):
         self.tec_phone = ''
 
     def __extract(self):
-        pass 
-        #Answer.objects.filter(fingerprint_hash=self.id).filter()
+        Answer.objects.filter(fingerprint_hash=self.id).filter()
 
 
