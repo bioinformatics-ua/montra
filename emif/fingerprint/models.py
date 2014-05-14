@@ -57,11 +57,13 @@ Developed in first EMIF Hackthon.
 class FingerprintDescription(object):
 
     def __init__(self, fingerprint_id):
+        
+        # Set default values 
         self.id = fingerprint_id
         self.type_name = ''
         self.type = ''
         
-        #Fingerprint SnipetFields
+        #Fingerprint SnipetFields 
         self.name = ''
         self.location = ''
         self.institution = ''
@@ -121,8 +123,3 @@ class FingerprintDescription(object):
         #self.date_modification = vmap["location"]
         self.number_patients = vmap["number_active_patients_jan2012"]
 
-'''
-fingerprint_description_slugs = ["database_name", "location", 
-            "institution_name", "contact_administrative", 
-            "number_active_patients_jan2012", "created", "type" ]
-'''
