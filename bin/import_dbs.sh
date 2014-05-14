@@ -1,5 +1,8 @@
 #### Change the variables here
-LOCATION_SQL="/Users/bastiao/GDrive/EMIF/backup.sql"
+ROOT_BACKUP=$1
+LOCATION_SQL=`ls $ROOT_BACKUP/home/sysadmin/backups_emif/backup*.sql`
+echo $LOCATION_SQL
+cp "$ROOT_BACKUP/tmp/fingerprints.pkl" emif/utils/
 
 
 # Also important staff to do: 
