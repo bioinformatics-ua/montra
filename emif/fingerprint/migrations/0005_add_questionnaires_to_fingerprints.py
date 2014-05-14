@@ -50,7 +50,7 @@ class Migration(DataMigration):
                     fingerprint = Fingerprint(fingerprint_hash=this_id)
 
                 quest = get_questionnaire(questionnaires, quest_type)
-
+                fingerprint.owner = User.objects.get(id=1)
                 if quest != None :
                     fingerprint.questionnaire = quest
 
