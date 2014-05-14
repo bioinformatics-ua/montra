@@ -8,12 +8,13 @@ from fingerprint.models import *
 
 class TestFingerprint(TestCase):
 
-    def set_up(self):
+    def setUp(self):
         pass
 
-    def list_all_databases(self):
+    def test_list_all_databases(self):
 
         fp = FingerprintDescription("66a47f694ffb676bf7676dfde24900e6")
+
         pass
 
 
