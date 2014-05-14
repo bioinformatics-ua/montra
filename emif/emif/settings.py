@@ -198,6 +198,8 @@ MIDDLEWARE_CLASSES = (
     # Uncomment the next line for simple clickjacking protection:
     # 'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'emif.middleware.LoginRequiredMiddleware',
+    'johnny.middleware.LocalStoreClearMiddleware',
+    'johnny.middleware.QueryCacheMiddleware',
 )
 
 ROOT_URLCONF = 'emif.urls'
@@ -488,8 +490,10 @@ REDIRECT_RESEARCHER = 'emif.views.all_databases_user'
 
 # MEMCACHED
 CACHES = {
-    'default': {
-        'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
-        'LOCATION': '127.0.0.1:11211',
-    }
+    'default' : dict(
+        BACKEND = 'johnny.backends.memcached.MemcachedCache',
+        LOCATION = ['127.0.0.1:11211'],
+        JOHNNY_CACHE = True,
+    )
 }
+JOHNNY_MIDDLEWARE_KEY_PREFIX='jc_myproj'
