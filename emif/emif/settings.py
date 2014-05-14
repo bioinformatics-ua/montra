@@ -496,4 +496,9 @@ CACHES = {
         JOHNNY_CACHE = True,
     )
 }
-JOHNNY_MIDDLEWARE_KEY_PREFIX='jc_myproj'
+
+JOHNNY_MIDDLEWARE_KEY_PREFIX='emif_'
+
+
+
+
