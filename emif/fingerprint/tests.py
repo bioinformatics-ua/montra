@@ -4,21 +4,16 @@ Execute tests
 
 from django.test import TestCase
 
+from fingerprint.models import * 
 
 class TestFingerprint(TestCase):
 
-    def setUp(self):
+    def set_up(self):
         pass
-        
 
-    def test_basic_addition(self):
-        def setUp(self):
-        Animal.objects.create(name="lion", sound="roar")
-        Animal.objects.create(name="cat", sound="meow")
+    def list_all_databases(self):
 
-    def test_animals_can_speak(self):
-        """Animals that can speak are correctly identified"""
-        lion = Animal.objects.get(name="lion")
-        cat = Animal.objects.get(name="cat")
-        self.assertEqual(lion.speak(), 'The lion says "roar"')
-        self.assertEqual(cat.speak(), 'The cat says "meow"')
+        fp = FingerprintDescription("66a47f694ffb676bf7676dfde24900e6")
+        pass
+
+

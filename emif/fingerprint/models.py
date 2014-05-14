@@ -28,6 +28,8 @@ from questionnaire.models import *
 from django.contrib.auth.models import User
 
 
+from description import fingerprint_description_slugs
+
 class Fingerprint(models.Model):
   fingerprint_hash =  models.CharField(max_length=255, unique=True, blank=False, null=False)
   description = models.TextField(blank=True, null=True, validators=[MaxLengthValidator(600)])
@@ -64,18 +66,24 @@ Developed in first EMIF Hackthon.
 """
 class FingerprintDescription(object):
 
-
     def __init__(self, fingerprint_id):
+        
+        # Set default values 
         self.id = fingerprint_id
-        self.name = ''
-        self.date = ''
-        self.date_modification = ''
-        self.institution = ''
-        self.location = ''
-        self.email_contact = ''
-        self.number_patients = ''
-        self.ttype = ''
         self.type_name = ''
+        self.type = ''
+        
+        #Fingerprint SnipetFields 
+        self.name = ''
+        self.location = ''
+        self.institution = ''
+        self.created_date = ''
+        self.date_modification = ''
+        self.number_patients = ''
+        
+        
+        self.email_contact = ''
+        
         self.logo = ''
         self.last_activity = ''
 
@@ -94,12 +102,34 @@ class FingerprintDescription(object):
         self.tec_email = ''
         self.tec_phone = ''
 
-        self. __extract_summary_answers()
+        self.__extract_summary_answers()
+
+    def __str__(self):
+        return str(self.id) + str(self.type_name) + str(self.type) + str(self.name)
 
     """ This function fill the values. Extract from the Answer table
     """
-    def __extract_summary_answers(self):
-        
-        pass#Answer.objects.filter(fingerprint_hash=self.id).filter(question.slug_fk.slug1__in=static_slugs)
+    def __extract_summary_answers(self):   
+        fingerprint = Fingerprint.objects.get(fingerprint_hash=self.id);
+        if fingerprint == None:
+            raise u'Could not find fingerprint with hash: '+self.id
+        self.type_name = fingerprint.questionnaire.name
+        self.type = fingerprint.questionnaire.slug
 
+        fingerprint_id = fingerprint.id
+        fingerprint = None
+
+        anss = Answer.objects.filter(fingerprint_id=fingerprint_id)#.filter(question__slug_fk__slug1__in=fingerprint_description_slugs).values("data", "question__slug_fk__slug1");
+        print "ANS: "+str(len(anss))
+
+        vmap = {}
+        for a in anss:
+            vmap[a["question__slug_fk__slug1"]] = a[data]
+
+        self.name = vmap["database_name"]
+        self.location = vmap["location"]
+        self.institution = vmap["institution_name"]
+        self.created_date = vmap["created"]
+        #self.date_modification = vmap["location"]
+        self.number_patients = vmap["number_active_patients_jan2012"]
 

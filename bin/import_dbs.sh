@@ -2,6 +2,10 @@
 LOCATION_SQL="/Users/bastiao/GDrive/EMIF/backup.sql"
 
 
+# Also important staff to do: 
+# cat ~/.pgpass
+# localhost:5432:*:bastiao:emif
+
 curl http://localhost:8983/solr/update --data '<delete><query>*:*</query></delete>' -H 'Content-type:text/xml; charset=utf-8'  
 curl http://localhost:8983/solr/update --data '<commit/>' -H 'Content-type:text/xml; charset=utf-8'
 
@@ -15,3 +19,5 @@ psql $PGDB --command "DROP TABLE IF EXISTS ${TABLES} CASCADE"
 
 
 psql $PGDB < $LOCATION_SQL
+
+
