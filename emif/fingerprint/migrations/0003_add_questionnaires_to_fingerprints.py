@@ -26,8 +26,19 @@ class Migration(DataMigration):
             # for each solr document
             for doc in documents:
                 # get id and question type
+                
+                quest_type = None 
                 this_id = doc['id']
-                quest_type = doc['type_t']
+
+                if "questionnaire_ " in this_id:
+                    print "Passing "+this_id
+                    continue
+
+                try: 
+                    quest_type = doc['type_t']
+                except:
+                    print "Found database "+this_id+" on solr without type_t"
+                    continue
 
                 # get fingerprint reference
 
@@ -47,8 +58,19 @@ class Migration(DataMigration):
 
                     fingerprint.save()
 
+
+
                 else:
-                    raise RuntimeError("-- ERROR: cant find quest_type "+quest_type)
+                    print "-- ERROR: cant find quest_type "+quest_type
+
+            # we need to check if there are dummy fingerprints ids on the table
+
+            fingerprints = Fingerprint.objects.all()
+
+            for f in fingerprints:
+                if f.questionnaire == None:
+                    print "Deleting, questionnaire not on "+f.fingerprint_hash
+                    f.delete()
 
             print "-----------------------------------------------"
             print " End"
