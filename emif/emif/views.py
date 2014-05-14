@@ -40,7 +40,7 @@ from searchengine.search_indexes import index_answeres_from_qvalues
 from searchengine.search_indexes import convert_text_to_slug
 from emif.utils import *
 from emif.models import *
-from questionnaire.models import Answer
+
 from api.models import *
 
 from geopy import geocoders 
@@ -95,41 +95,6 @@ def bootstrap_ie_compatibility(request, template_name='bootstrap_ie_compatibilit
 
 def quick_search(request, template_name='quick_search.html'):
     return render(request, template_name, {'request': request})
-
-
-def results_db(request, template_name='results.html'):
-    user = request.user
-    
-    class Database:
-        id = ''
-        name = ''
-        date = ''
-        last_activity = ''
-
-    class Results:
-        num_results = 0
-        list_results = []
-
-
-    list_databases = []
-    
-    for database in databases:
-        database_aux = Database()
-        database_aux.id = database.runid
-        database_aux.date = database.completed
-
-        answers = Answer.objects.filter(runid=database.runid)
-        text = clean_value(str(answers[1].answer))
-        info = text[:75] + (text[75:] and '..')
-        database_aux.name = info
-        list_databases.append(database_aux)
-
-    list_results = Results()
-    list_results.num_results = len(list_databases)
-    list_results.list_results = list_databases
-
-    return render(request, template_name, {'request': request,
-                                           'list_results': list_results})
 
 
 def results_comp(request, template_name='results_comp.html'):

@@ -20,7 +20,7 @@ from questionnaire import AnswerException
 from questionnaire import Processors
 from questionnaire.models import *
 from questionnaire.parsers import *
-from questionnaire.emails import _send_email, send_emails
+
 from questionnaire.utils import numal_sort, split_numal
 from questionnaire.request_cache import request_cache
 from questionnaire import profiler
@@ -937,15 +937,6 @@ def dep_check(expr, runinfo, answerdict):
     if check_answer.startswith("!"):
         return check_answer[1:].strip() != actual_answer.strip()
     return check_answer.strip() == actual_answer.strip()
-
-@permission_required("questionnaire.management")
-def send_email(request, runinfo_id):
-    if request.method != "POST":
-        return HttpResponse("This page MUST be called as a POST request.")
-    runinfo = get_object_or_404(RunInfo, pk=int(runinfo_id))
-    successful = _send_email(runinfo)
-    return r2r("emailsent.html", request, runinfo=runinfo, successful=successful)
-
 
 def generate_run(request, questionnaire_id):
     """

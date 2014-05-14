@@ -25,7 +25,7 @@
 from __future__ import print_function
 import pysolr
 
-from questionnaire.models import RunInfoHistory
+
 
 from django.db.models.signals import post_save
 from django.dispatch import receiver
@@ -456,99 +456,4 @@ def generateFreeText(d):
 
     return freetext.strip()
 
-def convert_answers_to_solr(runinfo):
-    c = CoreEngine()
-    
-    runid = runinfo.runid
-    answers = Answer.objects.filter(runid=runid)
-
-    #print(answers)
-    d = {}
-    text = ""
-    for a in answers:
-        print("Answer text: " + a.answer)
-        print("Q: " + a.question.text)
-        print("Slug:" + a.question.slug_fk.slug1)
-        #print("Slug:" + a.question.slug)
-
-        #slug = a.question.slug
-        slug = a.question.slug_fk.slug1 
-        
-        slug_aux = ""
-        #if len(slug)>2:
-        slug = a.question.slug_fk.slug1
-        #slug = a.question.slug
-        #else:
-        #    slug = convert_text_to_slug(a.question.text)
-        slug_final = slug+"_t"
-
-        results = Slugs.objects.filter(description=a.question.text)
-        
-        if results==None or len(results)==0:
-            slugs = Slugs()
-            slugs.slug1 = slug_final
-            slugs.description = a.question.text
-            slugs.question = a.question
-            slugs.save()
-
-        text_aux = ""
-        print(a.question.get_type() )
-        # Verify the question type
-
-        if a.question.get_type() == "open" or \
-        a.question.get_type() == "email" or \
-        a.question.get_type() == "open-button" \
-        or a.question.get_type() == "open-textfield" :
-            x = ast.literal_eval(a.answer)
-            text_aux = x[0]
-
-        elif a.question.get_type() == "choice-yesnocomment" or \
-        a.question.get_type() == "choice-yesnodontknow" or \
-        a.question.get_type() == "choice" or \
-        a.question.get_type() == "choice-freeform" or \
-        a.question.get_type() == "choice-multiple" or \
-        a.question.get_type() == "choice-multiple-freeform" or \
-        a.question.get_type() == "comment":
-
-            x = None 
-            if (len(text_aux)>0):
-                x = ast.literal_eval(text_aux)
-       
-                continue
-            if not x is None:
-                for v in x:
-                    print(get_slug_from_choice(v, a.question))
-                    text_aux += v + " "
-            
-        else:
-            text_aux = a.answer
-
-        d[slug_final] = text_aux
-        text += text_aux + " " 
-    print(d)
-    d['id']=runid
-    d['type_t']=runinfo.questionnaire.name.replace(" ", "").lower()
-
-    d['created_t']=str(runinfo.completed)
-    text += text_aux + runid + " " +str(runinfo.completed)
-    d['text_t']= text
-    c.index_fingerprint_as_json(d)
-
-
-@receiver(post_save, sender=RunInfoHistory)
-def index_handler(sender, **kwargs):
-    # Check if it is advanced search or not.
-    # If it is advanced search, it is not necessary to index
-    # Otherwise the index will be necessary
-
-    print("#### Indexing now ###############")
-    logger.debug(sender)
-    for key in kwargs:
-        logger.debug("another keyword arg: %s: %s" % (key, kwargs[key]))
-    runinfo = kwargs["instance"]
-    try:
-        convert_answers_to_solr(runinfo)
-    except:
-        print("Error, go here")
-        raise
 

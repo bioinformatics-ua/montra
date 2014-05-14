@@ -45,7 +45,12 @@ class Answer(models.Model):
     comment = models.TextField() # Comment
     fingerprint_id = models.ForeignKey(Fingerprint)
 
-
+"""
+This class wraps the Description of the Fingerprint.
+It will be used to list fingerprints, for instance.
+It is useful to centralized the code. 
+Developed in first EMIF Hackthon. 
+"""
 class FingerprintDescription(object):
 
 
@@ -78,7 +83,12 @@ class FingerprintDescription(object):
         self.tec_email = ''
         self.tec_phone = ''
 
-    def __extract(self):
-        Answer.objects.filter(fingerprint_hash=self.id).filter()
+        self. __extract_summary_answers()
+
+    """ This function fill the values. Extract from the Answer table
+    """
+    def __extract_summary_answers(self):
+        
+        pass#Answer.objects.filter(fingerprint_hash=self.id).filter(question.slug_fk.slug1__in=static_slugs)
 
 
