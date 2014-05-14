@@ -99,9 +99,7 @@ def quick_search(request, template_name='quick_search.html'):
 
 def results_db(request, template_name='results.html'):
     user = request.user
-    su = Subject.objects.filter(user=user)
-    databases = RunInfoHistory.objects.filter(subject=su)
-
+    
     class Database:
         id = ''
         name = ''
