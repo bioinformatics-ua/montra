@@ -25,6 +25,8 @@ from django.db import models
 from django.core.validators import MaxLengthValidator
 
 from questionnaire.models import *
+from django.contrib.auth.models import User
+
 
 from description import fingerprint_description_slugs
 
@@ -32,10 +34,18 @@ class Fingerprint(models.Model):
   fingerprint_hash =  models.CharField(max_length=255, unique=True, blank=False, null=False)
   description = models.TextField(blank=True, null=True, validators=[MaxLengthValidator(600)])
   questionnaire = models.ForeignKey(Questionnaire, null=True)
+
+  last_modification = models.DateTimeField(null=True)
+  created = models.DateTimeField(auto_now_add=True, null=True)
+  owner = models.ForeignKey(User, related_name="fingerprint_owner_fk")
+  shared = models.ManyToManyField(User, null=True, related_name="fingerprint_shared_fk") 
+
   removed = models.BooleanField(default=False, help_text="Remove logically the fingerprint")
   
   def __unicode__(self):
     return self.fingerprint_hash
+
+
 
 
 """
@@ -45,7 +55,7 @@ class Answer(models.Model):
 
     question = models.ForeignKey(Question)
     data = models.TextField() # Structure question 
-    comment = models.TextField() # Comment
+    comment = models.TextField(null=True) # Comment
     fingerprint_id = models.ForeignKey(Fingerprint)
 
 """
