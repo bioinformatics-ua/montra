@@ -485,3 +485,11 @@ except ConnectionFailure, e:
 REDIRECT_DATACUSTODIAN = 'emif.views.databases'
 REDIRECT_RESEARCHER = 'emif.views.all_databases_user'
 
+
+# MEMCACHED
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
+        'LOCATION': '127.0.0.1:11211',
+    }
+}

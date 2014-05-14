@@ -30,7 +30,8 @@ class Fingerprint(models.Model):
   fingerprint_hash =  models.CharField(max_length=255, unique=True, blank=False, null=False)
   description = models.TextField(blank=True, null=True, validators=[MaxLengthValidator(600)])
   questionnaire = models.ForeignKey(Questionnaire, null=True)
-
+  removed = models.BooleanField(default=False, help_text="Remove logically the fingerprint")
+  
   def __unicode__(self):
     return self.fingerprint_hash
 
