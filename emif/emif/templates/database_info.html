@@ -75,10 +75,10 @@
 {% breadcrumb breadcrumb_name "databases" %} 
 {% elif style == '1' %} 
 {% breadcrumb "Personal" "databases" %} 
-{% breadcrumb breadcrumb_name "databases" %} 
+{% breadcrumb breadcrumb_name|ellipsis:40 "databases" %} 
 {% else %} 
 {% breadcrumb "All" "alldatabases" %} 
-{% breadcrumb breadcrumb_name "databases" %} 
+{% breadcrumb breadcrumb_name|ellipsis:40 "databases" %} 
 {% endif %}
 
 {% endblock %}
@@ -90,7 +90,7 @@
 {% block content %} 
 {% if qsets %}
 
-<div class="span12">
+<div style="margin-left: 0px;" class="span12">
     <div class="row-fluid">
         <div class="tabbable">
             <ul class="nav nav-tabs">

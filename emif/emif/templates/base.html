@@ -145,12 +145,18 @@
                                         <b class="caret"></b>
                                         </a>
                                         <ul class="dropdown-menu">
-                                            <li>
-                                                <a href="databases">Personal</a>
+                                            <li class="dropdown-submenu">
+                                                <a href="" onclick="return false;">View</a>
+                                                <ul class="dropdown-menu">
+                                                    <li>
+                                                        <a href="databases">Personal</a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="alldatabases">All</a>
+                                                    </li>
+                                                </ul>
                                             </li>
-                                            <li>
-                                                <a href="alldatabases">All</a>
-                                            </li>
+                                            
                                             {% comment %}
                                             <li>
                                                 <a href="databases">Edit Databases</a>
@@ -184,7 +190,7 @@
                                             
                                             <li class="divider"></li>
                                             <li class="dropdown-submenu">
-                                                <a href="" onclick="return false;">New</a>
+                                                <a href="" onclick="return false;">Add New</a>
                                                 <ul class="dropdown-menu">
                                                     {% if request.user.get_profile %}
                                                     {% show_fingerprints_interests request.user %}
