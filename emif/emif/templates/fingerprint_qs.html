@@ -15,9 +15,9 @@
 						<!-- title="{{ t.tag|safe }}" -->
 						<td class="tooltipped" title="{{ t.tag|removehs|safe }}">{{ t.tag|removehs|safe }}</td>
 						{% if t.ttype|captioned %}
-						<td class="captioned_content" style="white-space: normal;" title="{{ t.value|force_escape }}">
+						<td class="value_content captioned_content" style="white-space: normal;" title="{{ t.value|force_escape }}">
 						{% else %}
-						<td style="white-space: normal;">
+						<td class="value_content" style="white-space: normal;">
 						{% endif %}
 						<span class="summary_content">
 						{{ t.value|safe }}

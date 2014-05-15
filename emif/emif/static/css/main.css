@@ -674,3 +674,6 @@ height: 6em;
 .breadcrumb{
   padding-left: 0px;
 }
+.hide_empty_content{
+  display: none;
+}
