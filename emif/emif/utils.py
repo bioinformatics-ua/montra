@@ -29,10 +29,12 @@ from questionnaire.models import Question, Questionnaire, QuestionSet
 
 import md5
 import random
+import time
 
 from django.conf import settings
 
-import re
+from django.core.mail import BadHeaderError, EmailMultiAlternatives
+from django.template.loader import render_to_string
 
 def generate_hash():
     hash = md5.new()
@@ -427,3 +429,19 @@ def escapeSolrArg(term):
         escaping special characters like : , etc"""
     term = term.replace('\\', r'\\')   # escape \ first
     return "".join([nextStr for nextStr in escapedSeq(term)])
+
+def send_custom_mail(title, description, from_mail, to_mail):
+    
+    email = render_to_string('email_template.html', {
+            'title': title,
+            'description': description.replace('\n','<br />'),
+            'from_mail': from_mail,
+            'to_mail': to_mail,
+            'current_date': time.strftime("%d/%m/%Y %H:%M:%S")
+        })
+
+    msg = EmailMultiAlternatives(title, description, from_mail, to_mail)
+    msg.attach_alternative(email, "text/html")
+
+    msg.send()
+
