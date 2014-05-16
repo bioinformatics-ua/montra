@@ -34,6 +34,8 @@ import uuid
 from dateutil.tz import tzutc
 
 UTC = tzutc()
+from django.db.models import Max
+
 
 def serialize_date(dt):
     """
@@ -107,14 +109,28 @@ def upload_file(request, fingerprint_id, template_name='documents_upload_form.ht
 def list_fingerprint_files(request, fingerprint):
 
     # List the Jerboa files for a particular fingerprint
-    jerboa_files = FingerprintDocuments.objects.filter(fingerprint_id=fingerprint)
+    jerboa_files = FingerprintDocuments.objects.filter(
+            fingerprint_id=fingerprint, 
+            removed=False
+        )
+
+    files_latest_version = jerboa_files.values('file_name').annotate(latest=Max('latest_date'))
+
+    file_records = []
+    for file in files_latest_version:
+        print file['file_name']
+        file_records.append(jerboa_files.get(file_name = file['file_name'], latest_date = file['latest']))
+
+    print file_records
+
     _data = []    
-    for f in jerboa_files:
+
+    for f in file_records:
         _doc = {'name': f.name, 
                 'comments': f.description,
                 'revision': f.revision,
                 'file_name': f.file_name,
-                'path': f.path.replace(settings.PROJECT_DIR_ROOT, ''),
+                #'path': f.path.replace(settings.PROJECT_DIR_ROOT, ''),
                 'fingerprint_id': f.fingerprint_id  ,
                 'latest_date': serialize_date(f.latest_date),
                 }

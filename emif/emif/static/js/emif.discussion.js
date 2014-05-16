@@ -7,7 +7,7 @@ function bindPostCommentHandler(firstname, lastname, username) {
             $.ajax({
                 type: "POST",
                 data: $('#comment_form').serialize(),
-                url: "/comments/post/",
+                url: "comments/post/",
                 cache: false,
                 dataType: "html",
                 success: function(html, textStatus) {

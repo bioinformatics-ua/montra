@@ -34,6 +34,8 @@ text-decoration: none;
 <link rel="stylesheet" href="{{ STATIC_URL }}css/vendor/chosen.css"></script>
 <link rel="stylesheet" href="{{ STATIC_URL }}progressbar.css"></script>
 <link rel="stylesheet" href="{{ STATIC_URL }}css/vendor/jquery.boolrelwidget.css"></script>
+<script src="{{ STATIC_URL }}js/vendor/jquery.errornavigator.js"></script>
+
 
 <script src="{{ STATIC_URL}}questionset.js"></script>
 <script src="{{ STATIC_URL}}js/vendor/threadpool.js"></script>
@@ -41,6 +43,7 @@ text-decoration: none;
 <script src="{{ STATIC_URL}}js/vendor/bootstrap-popover.js"></script>
 <script src="{{ STATIC_URL}}js/fingerprint_validation.js"></script>
 <script src="{{ STATIC_URL }}js/vendor/jquery.inputmask.bundle.min.js" type="text/javascript"></script>
+
 <script src="{{ STATIC_URL}}js/fingerprint.js"></script>
 <script src="{{ STATIC_URL}}js/vendor/jquery.boolrelwidget.js"></script>
 
@@ -68,6 +71,8 @@ text-decoration: none;
 {% endblock %}
 
 {% block content %}
+<div style="display: none;" id="errornavigator"></div>
+
 <div class="container">
     <h2 class="pull-center" >Advanced Search</h2>
 </div>
@@ -145,7 +150,8 @@ function add_triggers() {
 
 $('#li_advanced_search').addClass("active");
 var bool_container;
-$( document ).ready(function() {
+$( document ).ready(function(e) {
+
     var help_text = '<div style="overflow:auto; height: 30em;"><h3>What it does?</h3><p>This toolbar allows you to define the a boolean query of the databases that you are intested in. It involves the relationship between the concepts you are using in your search, in a visual and easy way through the drag-and-drop of thse concepts.</p>'+
     '<h3>What is a "Boolean Query"?</h3>'+
     '<p>A boolean query, is a query that has a relation between two or more concepts. </p><p>For example, if you want to search for books. This books are described by a myriad of concepts such as year of release, author and genre.</p><p>Thus, if you want to search for all the results that are from the genre \'medical\' or the genre \'informatics\' and have the author \'John\'.</p><p>The best way to do this, is by using a boolean query. The boolean query for answering this kind of questions are:</p><blockquote><p class="lead">(genre = \'medical\' OR genre = \'informatics\') AND author = \'John\'</p></blockquote><p>It was clearly define what is required in the results only by using the relations OR and AND, in conjunction with the concepts and using parentesis to separate the order of the relations (nested relation). This is the basic idea of the boolean queries.</p>'+
@@ -168,8 +174,47 @@ $( document ).ready(function() {
                         alert("It's not possible to search without specifying parameters first.");
                         return false;
                       }
-                        // Update hidden inputs (in case they are not updated because we are using the other buttons not in control by the plugin)
-                        bool_container.readyToSubmit(); 
+
+                          if (!(typeof errornavigator === 'undefined')) {
+                            errornavigator.hideErrorPage();
+                            errornavigator.reset();
+
+                            var previous_id = $('.questionset:not(.hide)').first().attr('id').split('_')[1];
+
+                            var current_form = $('#asform');
+
+                            console.log(current_form);
+
+                            var list_invalid = advValidator.validateFormContext(e, current_form);
+                            console.log(list_invalid);
+
+
+                            console.log(list_invalid);
+
+                            if(list_invalid.length == 0){
+                              // Update hidden inputs (in case they are not updated because we are using the other buttons not in control by the plugin)
+                              bool_container.readyToSubmit(); 
+
+
+                            } else {
+                              e.preventDefault();
+
+
+        console.log("Jump to errors and show error navigator.");
+
+          for(var i = 0;i<list_invalid.length;i++){
+            errornavigator.addError('qc_'+list_invalid[i]);
+          }
+          errornavigator.showErrorPager();
+
+          // jump to first problem
+          errornavigator.nextError();
+
+        
+
+                              return false;
+                            }
+                            }
                     }     
         );
     }
@@ -180,6 +225,9 @@ $( document ).ready(function() {
     {% else %}
       loadqspart("{{questionset.sortid}}", "{{q_id}}", "{{aqid}}");
     {% endif %}  
+
+  errornavigator = $('#errornavigator').errornavigator();
+
 });
 var threads = {};
 function load_questionnary(){
@@ -273,11 +321,32 @@ function next_questionset(id_questionset)
 function questionsets_handle(id_questionset)
 {
 
+    if (!e) var e = window.event;
+
     var idString = id_questionset.id;
     var id = idString.split('_');
 
     $('#active_qs').val(id_questionset.id);
     $('#active_qs_sortid').val(id[1]);
+
+      if (!(typeof errornavigator === 'undefined')) {
+      errornavigator.hideErrorPage();
+      errornavigator.reset();
+
+      var previous_id = $('.questionset:not(.hide)').first().attr('id').split('_')[1];
+
+      var current_form = $('#asform');
+
+      console.log(current_form);
+
+      var list_invalid = advValidator.validateFormContext(e, current_form);
+      console.log(list_invalid);
+
+
+      console.log(list_invalid);
+
+      if(list_invalid.length == 0){
+
 
   $('.questionset').each(function(i, obj) {
 
@@ -318,6 +387,19 @@ function questionsets_handle(id_questionset)
 
   );
     document.body.scrollTop = document.documentElement.scrollTop = 0;
+          } else {
+        console.log("Jump to errors and show error navigator.");
+
+          for(var i = 0;i<list_invalid.length;i++){
+            errornavigator.addError('qc_'+list_invalid[i]);
+          }
+          errornavigator.showErrorPager();
+
+          // jump to first problem
+          errornavigator.nextError();
+
+        }
+          }
 };
     
     function collapseAll(element, div_id){

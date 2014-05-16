@@ -59,11 +59,15 @@ def jerboa_list_values(request, var, row, fingerprint_id, template_name='documen
         # Get the filters to apply.
 
         filters = {}
-        print request.POST
+        
         myRq = dict(request.POST.lists())
         for i in myRq:
             filters[i[0:-2]] = myRq[i]
 
+            filters[i[0:-2]] = myRq[i]
+
+        
+    
 
     pc = PopulationCharacteristic(None)
     values = pc.get_variables(var, row, fingerprint_id, filters=filters)
@@ -74,7 +78,7 @@ def jerboa_list_values(request, var, row, fingerprint_id, template_name='documen
 
 
 def comments(request, fingerprint_id=None, chart_id=None, comment_id=None):
-    print request.method
+    
     if request.method=="POST":
         # Add new comment
 

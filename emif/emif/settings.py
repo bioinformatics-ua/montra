@@ -49,8 +49,7 @@ else:
 ADMINS = (
     ('Luis A. Bastiao Silva', 'bastiao@ua.pt'),
     ('José Luis Oliveira', 'jlo@ua.pt'),
-    ('Tiago Godinho', 'tmgodinh@ua.pt'),
-    ('Jose Melo', 'melojms@gmail.com'),
+    ('Tiago Godinho', 'tmgodinho@ua.pt'),
     ('Ricardo Ribeiro', 'ribeiro.r@ua.pt'),
 )
 
@@ -311,7 +310,7 @@ USERENA_REMEMBER_ME_DAYS = ('a day', 1)
 
 
 LOGIN_REDIRECT_URL = USERENA_SIGNIN_REDIRECT_URL
-LOGIN_URL = BASE_URL + 'accounts/signin/'
+LOGIN_URL = BASE_URL + 'index'
 LOGOUT_URL = BASE_URL + 'accounts/signout/'
 
 # A sample logging configuration. The only tangible logging

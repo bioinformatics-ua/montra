@@ -55,6 +55,9 @@
 {% load bootstrap_pagination %}
 
 {% block content %}
+{% if isAdvanced %}
+<div id="bool_container"></div>
+{% endif %}
   <div id="row_loading" class="row">
 
 
@@ -67,7 +70,7 @@
             {% if page_obj != None %}            
             {{num_results}} databases like {{database_name}}            
             {% else %}
-            No databases like {{database_name}} were found
+            No databases like {{database_name}} were found            
           {% endif %}
           </h4>
         </div>
@@ -161,9 +164,9 @@
             <a href="fingerprint/{{ t.id }}/1">{{ t.name }}</a>
         </td>
         <td>{{t.institution}}</td>
-        <td>{{t.location}}</td>
-        <td>{{t.number_patients}}</td>
-          <td class="date">            
+        <td >{{t.location}}</td>
+        <td style="text-align: right;">{{t.number_patients}}</td>
+          <td style="text-align: center;" class="date">            
                 {% if t.last_activity %}
                     {{t.last_activity|datehhmm}}
                 {% else %}

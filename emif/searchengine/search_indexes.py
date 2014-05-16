@@ -374,7 +374,7 @@ def assert_suffix(type):
     return None  
 
 def convertDate(value):
-    value = re.sub("'", "", value)
+    value = re.sub("\"", "", value)
     print (value)
     try:
         # First we try converting to normalized format, yyyy-mm-dd
@@ -496,6 +496,7 @@ def convert_answers_to_solr(runinfo):
         # Verify the question type
 
         if a.question.get_type() == "open" or \
+        a.question.get_type() == "email" or \
         a.question.get_type() == "open-button" \
         or a.question.get_type() == "open-textfield" :
             x = ast.literal_eval(a.answer)

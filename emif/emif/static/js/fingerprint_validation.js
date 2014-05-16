@@ -19,7 +19,7 @@ OpenButtonValidator.prototype ={
         var text = $(controllerDOM).val();
         
         //getValidator
-        var validator = $('#open-button_validator_'+question_number);
+        var validator = $('[id="open-button_validator_'+question_number+'"]');
         //console.log(validator);
         var validated = false;
 
@@ -73,7 +73,7 @@ NumericValidator.prototype ={
     validate : function(question_number, controllerDOM){
         var draw_validator = this.context.draw_validator;        
         question_number = question_number.replace(".","\\.");        
-        var validator = $('#numeric_validator_'+question_number);
+        var validator = $('[id="numeric_validator_'+question_number+'"]');
         //console.log(validator);
 
         var text = $(controllerDOM).val();
@@ -95,12 +95,84 @@ NumericValidator.prototype ={
     }
 }
 
+function EmailValidator(context){
+    this.regex = /\S+@\S+\.\S/;
+    this.context = context;
+}
+EmailValidator.prototype ={
+    onInit : function(dom){
+        
+    },
+    validate : function(question_number, controllerDOM){
+        var draw_validator = this.context.draw_validator;        
+        question_number = question_number.replace(".","\\.");        
+        var validator = $('[id="email_validator_'+question_number+'"]');
+        //console.log(validator);
+
+        var text = $(controllerDOM).val();
+        if(text.length == 0){
+            draw_validator(validator, true, "");
+            return true;
+        }
+        var res = this.regex.test(text);
+
+        if(!res){
+            draw_validator(validator, false, "This Field must be an email");
+        }else{
+            draw_validator(validator, true, "");
+        }
+
+        return res;
+    },
+    controllerDOM : function(validatorDOM){
+        return $("input", validatorDOM);
+    }
+}
+function UrlValidator(context){
+    /* I didnt make up this regex for url validation, Url validation well done is not trivial,
+    so im using Diego Perini well tested solution.
+    Ref from: http://pastebin.com/JUKSeB0v */
+    this.regex = /^(?:(?:https?|ftp):\/\/)(?:\S+(?::\S*)?@)?(?:(?!10(?:\.\d{1,3}){3})(?!127(?:\.\d{1,3}){3})(?!169\.254(?:\.\d{1,3}){2})(?!192\.168(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z\u00a1-\uffff0-9]+-?)*[a-z\u00a1-\uffff0-9]+)(?:\.(?:[a-z\u00a1-\uffff0-9]+-?)*[a-z\u00a1-\uffff0-9]+)*(?:\.(?:[a-z\u00a1-\uffff]{2,})))(?::\d{2,5})?(?:\/[^\s]*)?$/i;
+    this.context = context;
+}
+UrlValidator.prototype ={
+    onInit : function(dom){
+        
+    },
+    validate : function(question_number, controllerDOM){
+        var draw_validator = this.context.draw_validator;        
+        question_number = question_number.replace(".","\\.");        
+        var validator = $('[id="url_validator_'+question_number+'"]');
+        //console.log(validator);
+
+        var text = $(controllerDOM).val();
+        if(text.length == 0){
+            draw_validator(validator, true, "");
+            return true;
+        }
+        var res = this.regex.test(text);
+
+        if(!res){
+            draw_validator(validator, false, "This Field must be an url (starting with http://)");
+        }else{
+            draw_validator(validator, true, "");
+        }
+
+        return res;
+    },
+    controllerDOM : function(validatorDOM){
+        return $("input", validatorDOM);
+    }
+}
+
 function Fingerprint_Validator(searchMode){
     this.validators = [];
     this.fingerprint_name = new OpenButtonValidator(this);
 
     this.validators["open-button"] = { n: "open-button_validator", v: this.fingerprint_name};
     this.validators["numeric"] = { n: "numeric_validator", v: new NumericValidator(this)};
+    this.validators["email"] = { n: "email_validator", v: new EmailValidator(this)};
+    this.validators["url"] = { n: "url_validator", v: new UrlValidator(this)};
 }
 Fingerprint_Validator.prototype ={
     onInit : function(){
@@ -135,6 +207,7 @@ Fingerprint_Validator.prototype ={
         } else {        
             validator.removeClass("success");
             validator.addClass("error");
+            console.log($("span", validator));
             $("span", validator).text(feedback_message);
         }   
     },
@@ -182,7 +255,8 @@ Fingerprint_Validator.prototype ={
                 validator_id= validator_id.replace(self.validators[x].n+"_", "");
 
                 if( !self.validators[x].v.validate( validator_id, cDOM)){
-                    evnt.preventDefault();     
+                    if(evnt)
+                        evnt.preventDefault();     
 
                     var qs_id = validator_id.split(".")[0];
 

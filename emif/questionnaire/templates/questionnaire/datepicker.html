@@ -7,7 +7,9 @@
 <script type="text/javascript">
 $("#from_{{ question.number|removedots }}").inputmask("y-m-d",{ "placeholder": "yyyy-mm-dd" });
 $("#to_{{ question.number|removedots }}").inputmask("y-m-d",{ "placeholder": "yyyy-mm-dd" });
-$('[id="question_{{ question.number }}"]').inputmask("y-m-d",{ "placeholder": "yyyy-mm-dd" });
+{% if '[' not in qdict.value %}
+    $('[id="question_{{ question.number }}"]').inputmask("y-m-d",{ "placeholder": "yyyy-mm-dd" });
+{% endif %}
 
 // Reactive, in case we try to use range, but decided to erase the search, and use it as a simple value one
 $('[id="question_{{ question.number }}"]').change(function() {
@@ -76,15 +78,17 @@ $('#define_{{ question.number|removedots }}').click(function() {
                 end = to_val;
 
             if (end < start) {
-                var temp = start;
+                /*var temp = start;
                 start = end;
-                end = temp;
+                end = temp;*/
+                start = null;
+                end = null;
             }
         }
         //console.log("start: " + start);
         //console.log("end: " + end);
         if (start == null || end == null) {
-            $('#error_{{ question.number|removedots }}').text("You must specify range of valid date's.").fadeIn('fast');
+            $('#error_{{ question.number|removedots }}').html("You must specify range of valid date's.<br /> And the start date must be before the end date").fadeIn('fast');
         } else {
             var result = "[ " + start + " TO " + end + " ]";
             //console.log('result: '+result);

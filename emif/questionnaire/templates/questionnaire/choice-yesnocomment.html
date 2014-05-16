@@ -1,10 +1,12 @@
 {% load i18n %}
 {% load extra_tags %}
 <div class="clearfix">
+    {% if not readonly %}
     <div class="pull-right">
         <br />
     <button onclick="clear_selection('question_nr_{{ question.number }}', '{{ question.number }}. {{ question.text|removehs }}');" class="btn btn-small" type="button">Clear Selection</button>
     </div>
+    {% endif %}
     <div class="input">
         <ul class="inputs-list unstyled">
             

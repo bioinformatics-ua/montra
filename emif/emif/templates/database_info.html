@@ -8,6 +8,9 @@
 
 <script src="{{ STATIC_URL}}js/vendor/threadpool.js"></script>
 
+<script src="{{ STATIC_URL}}js/vendor/jquery.expander.min.js"></script>
+
+
 <link rel="stylesheet" href="{{ STATIC_URL}}css/database_info.css" />
 <link rel="stylesheet" href="{{ STATIC_URL }}css/vendor/jquery.boolrelwidget.css"></script>
 
@@ -71,10 +74,10 @@
 {% breadcrumb "Search" "resultsdiff/1" %} 
 {% breadcrumb breadcrumb_name "databases" %} 
 {% elif style == '1' %} 
-{% breadcrumb "My Databases" "databases" %} 
+{% breadcrumb "Personal" "databases" %} 
 {% breadcrumb breadcrumb_name "databases" %} 
 {% else %} 
-{% breadcrumb "All Databases" "alldatabases" %} 
+{% breadcrumb "All" "alldatabases" %} 
 {% breadcrumb breadcrumb_name "databases" %} 
 {% endif %}
 
@@ -112,7 +115,7 @@
                 <li  class="{%if activetab == 'discussion'%}active{%endif%}">
                     <a href="#discussion" data-toggle="tab"><i class="fa fa-comment"></i> &nbsp; Discussion</a>
             </ul>
-            <div class="tab-content">
+            <div style="margin-bottom: 50px;" class="tab-content">
                 <div class="tab-pane {%if activetab == 'summary'%}active{%endif%}" id="metadata">
                     <div>
                         <a id="collapseall_metadata" class="btn pull-right" href=""><i class="icon-plus"></i>&nbsp; Expand all</a>
@@ -123,10 +126,6 @@
 
 
                 </div>
-
-            
-
-
             <div class="tab-pane {%if activetab == 'pc'%}active{%endif%}" id="populationcharacteristics" >
 
               {% include "population_characteristics.html" %}
@@ -160,58 +159,55 @@
             </div>
             <div class="span8"></div>
         </div>
-
         <div class="tab-pane {%if activetab == 'discussion'%}active{%endif%}" id="discussion">
             <div class="container-fluid">
-
                 <div id="commentInserted" class="alert alert-success" style="display:none;">
-                  <button type="button" class="close" data-dismiss="alert">&times;</button>
-                  <strong>Comment sent!</strong> Your comment was posted successfully.
-              </div>
-              <div id="fillForm" class="alert" style="display:none;">
-                <button type="button" class="close" data-dismiss="alert" >&times;</button>
-                <strong><i class="fa fa-arrow-circle-o-down"></i></strong>&nbsp;You need to insert some words here
-            </div>
-
-            {% if user.is_authenticated %}
-            {% get_comment_form for fingerprint.fingerprint fingerprint_pk as form %}
-            <form id="comment_form" action="{% comment_form_target %}" method="POST">
-                <fieldset>
-                    {% csrf_token %}
-                    <textarea id="id_comment" rows="5" name="comment" class="span7" placeholder="Insert your comment or question here..." autofocus></textarea>
-                    {{ form.content_type }}
-                    {{ form.object_pk }}
-                    {{ form.timestamp }}
-                    {{ form.security_hash }}
-                    </br>
-                    <!--<input type="hidden" name="next" value="{{request.get_full_path}}" />-->
-                    <button id="submit_button" class="btn btn-primary" type="submit"  data-loading-text="Sending comment...">Post comment</button>
-                </fieldset>
-            </form>
-            {% else %}
-            <p>Please <a href="{% url 'auth_login' %}">log in</a> to leave a comment.</p>
-            {% endif %}
-            <br/>
-            {% get_comment_count for fingerprint.fingerprint fingerprint_pk as comment_count %}
-            <span id="comments_total">{{ comment_count }}</span> comment{{ comment_count|pluralize }}
-            <br/>
-            <br/>
-            {% get_comment_list for fingerprint.fingerprint fingerprint_pk as comment_list %}
-            <div id="newComments"></div>
-            {% for comment in comment_list reversed%}
-            <div id="comment_{{ comment.id }}">
-                <blockquote>
-                    <p style="font-size: 16px">{{ comment.comment }}</p>
-                    <small>{{ comment.name }} posted on {{ comment.submit_date }}</small>
-                </blockquote>
-            </div>
-            {% empty %}
-            <p>No comments yet.</p>
-            {% endfor %}
+                    <button type="button" class="close" data-dismiss="alert">&times;</button>
+                    <strong>Comment sent!</strong> Your comment was posted successfully.
+                </div>
+                <div id="fillForm" class="alert" style="display:none;">
+                    <button type="button" class="close" data-dismiss="alert" >&times;</button>
+                    <strong><i class="fa fa-arrow-circle-o-down"></i></strong>&nbsp;You need to insert some words here
+                </div>
+                {% if user.is_authenticated %}
+                {% get_comment_form for fingerprint.fingerprint fingerprint_pk as form %}
+                <form id="comment_form" action="{% comment_form_target %}" method="POST">
+                    <fieldset>
+                        {% csrf_token %}
+                        <textarea id="id_comment" rows="5" name="comment" class="span7" placeholder="Insert your comment or question here..." autofocus></textarea>
+                        {{ form.content_type }}
+                        {{ form.object_pk }}
+                        {{ form.timestamp }}
+                        {{ form.security_hash }}
+                        <br />
+                        <!--<input type="hidden" name="next" value="{{request.get_full_path}}" />-->
+                        <button id="submit_button" class="btn btn-primary" type="submit"  data-loading-text="Sending comment...">Post comment</button>
+                    </fieldset>
+                </form>
+                {% else %}
+                <p>Please <a href="{% url 'auth_login' %}">log in</a> to leave a comment.</p>
+                {% endif %}
+                <br/>
+                {% get_comment_count for fingerprint.fingerprint fingerprint_pk as comment_count %}
+                <span id="comments_total">{{ comment_count }}</span> comment{{ comment_count|pluralize }}
+                <br/>
+                <br/>
+                {% get_comment_list for fingerprint.fingerprint fingerprint_pk as comment_list %}
+                <div id="newComments"></div>
+                {% for comment in comment_list reversed%}
+                <div id="comment_{{ comment.id }}">
+                    <blockquote>
+                        <p style="font-size: 16px">{{ comment.comment }}</p>
+                        <small>{{ comment.name }} posted on {{ comment.submit_date }}</small>
+                    </blockquote>
+                </div>
+                {% empty %}
+                <p>No comments yet.</p>
+                {% endfor %}
             </div>
         </div>
     </div>
-
+</div>
 </div>
 </div>
 {% else %}
