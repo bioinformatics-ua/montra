@@ -31,32 +31,82 @@ from django.contrib.auth.models import User
 from description import fingerprint_description_slugs
 
 class Fingerprint(models.Model):
-  fingerprint_hash =  models.CharField(max_length=255, unique=True, blank=False, null=False)
-  description = models.TextField(blank=True, null=True, validators=[MaxLengthValidator(600)])
-  questionnaire = models.ForeignKey(Questionnaire, null=True)
+    fingerprint_hash =  models.CharField(max_length=255, unique=True, blank=False, null=False)
+    description = models.TextField(blank=True, null=True, validators=[MaxLengthValidator(600)])
+    questionnaire = models.ForeignKey(Questionnaire, null=True)
 
-  last_modification = models.DateTimeField(null=True)
-  created = models.DateTimeField(auto_now_add=True, null=True)
-  owner = models.ForeignKey(User, related_name="fingerprint_owner_fk")
-  shared = models.ManyToManyField(User, null=True, related_name="fingerprint_shared_fk") 
+    last_modification = models.DateTimeField(null=True)
+    created = models.DateTimeField(auto_now_add=True, null=True)
+    owner = models.ForeignKey(User, related_name="fingerprint_owner_fk")
+    shared = models.ManyToManyField(User, null=True, related_name="fingerprint_shared_fk") 
 
-  removed = models.BooleanField(default=False, help_text="Remove logically the fingerprint")
-  
-  def __unicode__(self):
-    return self.fingerprint_hash
+    removed = models.BooleanField(default=False, help_text="Remove logically the fingerprint")
 
+    def __unicode__(self):
+        return self.fingerprint_hash
 
+    # def get_answers(self):
+    #     if answers:
+    #         return self.answers
+
+    #     answers = Answer.objects.filter(fingerprint_id=self.id)
+    #     print "ANSEWRS: "+str(len(anss))
+    #     return self.answers
+
+    def __len__(self):
+        return Answer.objects.filter(fingerprint_id=self.id).count()
+
+    def __getitem__(self, key):
+        #answers = self.get_answers()
+        a = None
+        try:
+            a = Answer.objects.filter(fingerprint_id=self.id).filter(question__slug_fk__slug1=key).get()
+        except Exception, e:
+            raise IndexError
+
+        if a == None:
+            raise KeyError
+        return a
+
+    def __iter__(self):
+        #answers = self.get_answers()
+        anss = Answer.objects.filter(fingerprint_id=self.id).all()
+        for a in anss:
+            yield a
+
+    def keys(self):
+        keys = Answer.objects.filter(fingerprint_id=self.id).all().values_list("question__slug_fk__slug1", flat=True)
+        return keys
+
+    def iterkeys(self):
+        for x in keys:
+            yield x
+
+    def __contains__(self, key):
+        try:
+            a = Answer.objects.filter(fingerprint_id=self.id).filter(question__slug_fk__slug1=key).get()
+        except Exception, e:
+            return False
+        return a != None
+
+def FingerprintFromHash(hash):
+    return Fingerprint.objects.get(fingerprint_hash=hash);
+
+# def FingerprintFromHash():
+#     return Fingerprint.objects.all();
 
 
 """
 Answer of the Fingerprint 
 """
 class Answer(models.Model):
-
     question = models.ForeignKey(Question)
     data = models.TextField() # Structure question 
     comment = models.TextField(null=True) # Comment
     fingerprint_id = models.ForeignKey(Fingerprint)
+
+    def get_slug():
+        return question.slug_fk.slug1
 
 """
 This class wraps the Description of the Fingerprint.
@@ -64,72 +114,94 @@ It will be used to list fingerprints, for instance.
 It is useful to centralized the code. 
 Developed in first EMIF Hackthon. 
 """
-class FingerprintDescription(object):
+class FingerprintDescriptor(object):
+    static_attr = ["id", "date", "date_modification", "last_activity", "ttype", "type_name"] 
+    slug_dict = {"name":"database_name",
+                    "institution" : 'institution_name',
+                    "email_contact" : 'contact_administrative',
+                    "number_patients" : 'number_active_patients_jan2012',
+                    "logo" : 'upload-image',
+            }
+    observational_spec = {
+        "admin_name" : 'institution_name',
+        "admin_address" : 'Administrative_contact_address',
+        "admin_email" : 'Administrative_contact_email',
+        "admin_phone" : 'Administrative_contact_phone',
 
-    def __init__(self, fingerprint_id):
-        
-        # Set default values 
-        self.id = fingerprint_id
-        self.type_name = ''
-        self.type = ''
-        
-        #Fingerprint SnipetFields 
-        self.name = ''
-        self.location = ''
-        self.institution = ''
-        self.created_date = ''
-        self.date_modification = ''
-        self.number_patients = ''
-        
-        
-        self.email_contact = ''
-        
-        self.logo = ''
-        self.last_activity = ''
+        "scien_name" : 'Scientific_contact_name',
+        "scien_address" : 'Scientific_contact_address',
+        "scien_email" : 'Scientific_contact_email',
+        "scien_phone" : 'Scientific_contact_phone',
 
-        self.admin_name = ''
-        self.admin_address = ''
-        self.admin_email = ''
-        self.admin_phone = ''
+        "tec_name" : 'Technical_contact_/_data_manager_contact_name',
+        "tec_address" : 'Technical_contact_/_data_manager_contact_address',
+        "tec_email" : 'Technical_contact_/_data_manager_contact_email',
+        "tec_phone" : 'Technical_contact_/_data_manager_contact_phone',
+    }
+    ad_spec = {
+        "admin_name" : 'Administrative_Contact__AC___Name',
+        "admin_address" : 'AC__Address',
+        "admin_email" : 'AC__email',
+        "admin_phone" : 'AC__phone',
 
-        self.scien_name = ''
-        self.scien_address = ''
-        self.scien_email = ''
-        self.scien_phone = ''
+        "scien_name" : 'Scientific_Contact__SC___Name',
+        "scien_address" : 'SC__Address',
+        "scien_email" : 'SC__email',
+        "scien_phone" : 'SC__phone',
 
-        self.tec_name = ''
-        self.tec_address = ''
-        self.tec_email = ''
-        self.tec_phone = ''
+        "tec_name" : 'Technical_Contact_Data_manager__TC___Name',
+        "tec_address" : 'TC__Address',
+        "tec_email" : 'TC__email',
+        "tec_phone" : 'TC__phone',
+    }
 
-        self.__extract_summary_answers()
+    spec = ["location"]
+    def __init__(self, fingerprint):
+        self.obj = fingerprint
 
-    def __str__(self):
-        return str(self.id) + str(self.type_name) + str(self.type) + str(self.name)
+    def __getattr__(self, name):
+        try:
+            print name        
+            if name in self.static_attr:
+                return self.parse_static_args(name)
+            elif name in self.slug_dict:
+                return self.obj[self.slug_dict[name]].data
+            elif name in self.spec:
+                return self.parse_specific(name).data
+            elif name in self.observational_spec:
+                return self.parse_type_spec(name).data
+        except Exception, e:
+            pass
+        return ""
 
-    """ This function fill the values. Extract from the Answer table
-    """
-    def __extract_summary_answers(self):   
-        fingerprint = Fingerprint.objects.get(fingerprint_hash=self.id);
-        if fingerprint == None:
-            raise u'Could not find fingerprint with hash: '+self.id
-        self.type_name = fingerprint.questionnaire.name
-        self.type = fingerprint.questionnaire.slug
+    def parse_type_spec(self, name):
+        if self.type_name == "Observational Data Sources":
+            return self.obj[self.observational_spec[name]]
+        elif "AD Cohort" in self.type_name:
+            return self.obj[self.ad_spec[name]]
+    def parse_static_args(self,name):
+        print "FOUND STATIC ARG"
+        if name == "id":
+            print "FOUND ID"
+            return self.obj.fingerprint_hash
 
-        fingerprint_id = fingerprint.id
-        fingerprint = None
+        if name == "date":
+            return self.obj.created
 
-        anss = Answer.objects.filter(fingerprint_id=fingerprint_id)#.filter(question__slug_fk__slug1__in=fingerprint_description_slugs).values("data", "question__slug_fk__slug1");
-        print "ANS: "+str(len(anss))
+        if name == "date_last_modification" or name == "last_activity":
+            return self.obj.last_modification
 
-        vmap = {}
-        for a in anss:
-            vmap[a["question__slug_fk__slug1"]] = a[data]
+        if name == "ttype":
+            return self.obj.questionnaire.slug 
 
-        self.name = vmap["database_name"]
-        self.location = vmap["location"]
-        self.institution = vmap["institution_name"]
-        self.created_date = vmap["created"]
-        #self.date_modification = vmap["location"]
-        self.number_patients = vmap["number_active_patients_jan2012"]
+        if name == "type_name":
+            return self.obj.questionnaire.name
 
+    def parse_specific(self,name):
+        if name == "location":
+            if "city" in self.obj:
+                return self.obj['city']
+            if "location" in self.obj:
+                return self.obj['location']
+            if "PI:_Address" in self.obj:
+                return self.obj['PI:_Address']
