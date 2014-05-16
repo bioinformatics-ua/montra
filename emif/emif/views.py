@@ -44,7 +44,9 @@ from questionnaire.models import Answer
 from api.models import *
 
 from geopy import geocoders 
-from django.core.mail import send_mail, BadHeaderError
+from django.core.mail import BadHeaderError
+
+from emif.utils import send_custom_mail
 
 from modules.geo import *
 
@@ -2969,9 +2971,9 @@ def feedback(request, template_name='feedback.html'):
                 message_admin = "Name: " + str(name) + "\nEmail: " + from_email + "\n\nMessage:\n" + str(message)
                 message = "Dear " + name + ",\n\nThank you for giving us your feedback.\n\nYour message will be analyzed by EMIF Catalogue team.\n\nMessage sent:\n" + str(message) + "\n\nSincerely,\nEMIF Catalogue"
                 # Send email to admins
-                send_mail(subject, message_admin, settings.DEFAULT_FROM_EMAIL, emails_to_feedback)
+                send_custom_mail(subject, message_admin, settings.DEFAULT_FROM_EMAIL, emails_to_feedback)
                 # Send email to user with the copy of feedback message
-                send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [from_email])
+                send_custom_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [from_email])
 
             except BadHeaderError:
                 return HttpResponse('Invalid header found.')
@@ -3215,7 +3217,7 @@ def sharedb(request, db_id, template_name="sharedb.html"):
     try:
         
         message = """Dear %s,\n\n
-            \n\n
+            \n
             %s has shared a new database with you. 
             Now you're able to edit and manage the database. \n\n
             To activate the database in your account, please open this link:
@@ -3225,7 +3227,7 @@ def sharedb(request, db_id, template_name="sharedb.html"):
         # Send email to admins
         #send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, emails_to_feedback)
         # Send email to user with the copy of feedback message
-        send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [from_email])
+        send_custom_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [from_email])
 
     except BadHeaderError:
         return HttpResponse('Service Unavailable')
@@ -3275,9 +3277,9 @@ def sharedb_activation(request, activation_code, template_name="sharedb_invited.
         """ % (sp.user_invite.get_full_name(), request.user.get_full_name(), _aux['database_name_t'])
 
         # Send email to admins
-        send_mail(subject, message_to_inviter, settings.DEFAULT_FROM_EMAIL, [sp.user_invite.email])
+        send_custom_mail(subject, message_to_inviter, settings.DEFAULT_FROM_EMAIL, [sp.user_invite.email])
         # Send email to user with the copy of feedback message
-        send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [sp.user.email])
+        send_custom_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [sp.user.email])
 
     except BadHeaderError:
         return HttpResponse('Invalid header found.')

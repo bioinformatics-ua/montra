@@ -28,7 +28,8 @@ from searchengine.models import ContactForm
 from django.template import RequestContext, Context
 from django import forms
 
-from django.core.mail import send_mail, BadHeaderError
+from django.core.mail import BadHeaderError
+from emif.utils import send_custom_mail
 
 def contactview(request, email):
 		subject = request.POST.get('topic', '')
@@ -37,7 +38,7 @@ def contactview(request, email):
 
 		if subject and message and from_email:
 		        try:
-					send_mail(subject, message, "bioinformatics@ua.pt", [from_email, 'bastiao@ua.pt'])
+					send_custom_mail(subject, message, "bioinformatics@ua.pt", [from_email, 'bastiao@ua.pt'])
         		except BadHeaderError:
             			return HttpResponse('Invalid header found.')
         		return HttpResponseRedirect('http://bioinformatics.ua.pt/emif/contact/thankyou/')
