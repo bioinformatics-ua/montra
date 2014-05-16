@@ -654,3 +654,26 @@ height: 6em;
 .qset_option{
   margin-top: 3px !important;
 }
+
+
+.btn-group.btn {   border: 0;   padding: 0; }
+.btn-group.btn > .btn { border-radius: 0 }
+.btn-group.btn > .dropdown-menu {  text-align: left; }
+.btn-group.btn:first-child > .btn {
+  -webkit-border-radius: 4px 0 0 4px;
+     -moz-border-radius: 4px 0 0 4px;
+          border-radius: 4px 0 0 4px;
+}
+
+.btn-group.btn:last-child > .btn {
+  -webkit-border-radius: 0 4px 4px 0;
+     -moz-border-radius: 0 4px 4px 0;
+          border-radius: 0 4px 4px 0;
+}
+
+.breadcrumb{
+  padding-left: 0px;
+}
+.hide_empty_content{
+  display: none;
+}
