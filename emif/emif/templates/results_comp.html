@@ -132,7 +132,8 @@ th, td {
 
               <tbody>
                 {% for t in v.list_ordered_tags %}
-                <tr class="entry rowid_{{forloop.parentloop.counter}}_{{forloop.counter}}">
+                <tr data-fingerprintid="HEADER" 
+                data-rowid="{{forloop.parentloop.counter}}_{{forloop.counter}}" class="entry rowid_{{forloop.parentloop.counter}}_{{forloop.counter}}">
                   <td style="background-color: white; font-size: 85%;" class="tooltippable" data-original-title="{{ t.tag|removehs }}" title="">
                   
                   
@@ -177,7 +178,9 @@ th, td {
 
               <tbody>
                 {% for t in v.list_ordered_tags %}
-                <tr class="entry rowid_{{forloop.parentloop.counter}}_{{forloop.counter}}">
+                <tr data-fingerprintid="{{fingerprint_id}}" 
+                    data-rowid="{{forloop.parentloop.counter}}_{{forloop.counter}}"
+                class="entry rowid_{{forloop.parentloop.counter}}_{{forloop.counter}}">
                   <td style="width:0px;" class="tooltippable" data-original-title="{{ t.tag|removehs }}" title="">{{ t.tag|removehs }}</td> 
                    <td style="font-size: 95%;" class="tooltippable" data-original-title="{{ t.value }}" title="">{{ t.value }}</td>
                 </tr>
@@ -209,20 +212,16 @@ th, td {
 {% block scriptextra %}
 function applyFilters(){
   reset_empties();
-  var reference_table = $('.database_listing').eq(0).find('.set_reference').prop('id').substring(3);
-  var compared_table = $('.database_listing_pointer').find('.set_reference').prop('id').substring(3);
+      var others = [];
 
-  console.log('IDS TO COMPARE: '+reference_table +":"+compared_table);
+      for(var i=0;i<dbs.showing.length;i++){
+        if(dbs.showing[i] != dbs.reference){
+          others.push(dbs.showing[i]);
+        }
+      }
   var filter_string = $("#searchfilter").val();
 
-          {%for fingerprint_id, content in results.items|slice:":1" %}
-            {% for k,v in content.qset.ordered_items %}
-            filter_results([reference_table+'_{{k|removespaces}}'],filter_string, match, unmatch, emptyrows, proximity);
-            filter_results([compared_table+'_{{k|removespaces}}'],filter_string, match, unmatch, emptyrows, proximity);
-            filter_results(['HEADER_{{k|removespaces}}'],filter_string, match, unmatch, emptyrows, proximity);
-
-            {% endfor %}
-          {% endfor %}
+  filter_results(others, dbs.reference, filter_string, match, unmatch, emptyrows, proximity);
 
   doublecheck_expansions();
   check_empties();  
@@ -347,10 +346,12 @@ function compareDbsSelected(){
             $(".tooltippable").tooltip({container:"body"});
         }
       );
-
+      cleantablediff();
       $('.basetable').removeClass('basetable');
+      $('table[id^="'+ref+'_"] tr').addClass('basetable');
       $('table[id^="'+ref+'_"] td').addClass('basetable');
-    }
+
+}
 $(function(){
   $('#compare_information').popover({'html': true, 'trigger': 'hover',
   'container': 'body',

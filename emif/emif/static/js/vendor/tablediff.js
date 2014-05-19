@@ -363,43 +363,97 @@ function hideEmptyCells(list_tables, table_tmp, show_emptyrows) {
    It was getting hard to synchronize everything when we only have the information on the 
    	dom and all was separated 
 */
-function filter_results(list_tables, word, show_match, show_unmatch, show_emptyrows, show_proximity) {
+function reset_results(databases, reference){
+    var reference_table = $('table[id^="HEADER_"] ');
+    reference_table.each(function(){
+        $(this).parent().parent().parent().show();
+        $(this).find(" .entry").show();
+    });
+   var reference_table = $('table[id^="'+reference+'_"] ');
+    reference_table.each(function(){
+        $(this).parent().parent().parent().show();
+        $(this).find(" .entry").show();
+    });
+    for(var i=0;i<databases.length;i++){
+        var tables = $('table[id^="'+databases[i]+'_"] ');
 
-    //console.log(list_tables);
+        tables.each(function(){
+            $(this).parent().parent().parent().show();
+            $(this).find(" .entry").show();
+        });
+
+    }
+}
+/**
+ * We only can hide stuff if we dont have any ocurrence of the type on the showing databases
+
+ */
+function showMinimumDenominator(condition, class_to_check, table, databases){  
+
+    // Showing is additive
+    if(condition == true){
+        $(table).find('.'+class_to_check).show();
+    } 
+    // Adding requires the class_to_check to not appear in any of the lines.
+    else {
+        $(table).find('.entry').each(function(){
+            var row = $(this).data('rowid');
+
+            var fullfills_condition = true;
+            $('.rowid_'+row).each(function(){
+                // If the row is not the base table, nor the header, and is in the showing list
+                // we can consider it for the minimum denominator
+                if(
+                    !$(this).hasClass('basetable') && $(this).data('fingerprintid') != 'HEADER'
+
+                    && dbindexOf($(this).data('fingerprintid'), databases) != -1
+
+                    ){
+                    if(!$(this).hasClass(class_to_check)){
+                        fullfills_condition = false;
+                        return false;
+                    }
+                }
+            });
+
+            if(fullfills_condition)
+                $('.rowid_'+row).hide();
+        });
+    }
+}
+function dbindexOf(entry, array){
+    for(var i=0;i<array.length;i++){
+        if(array[i] == entry)
+            return i;
+    }
+    return -1;
+}
+function filter_results(databases, reference, word, show_match, show_unmatch, show_emptyrows, show_proximity) {
+    console.log('filtering unmatch: '+show_unmatch);
+    // reset results
+    reset_results(databases, reference);
+
+        var tables = $('table[id^="'+reference+'_"] ');
+
+        tables.each(function(){
+
+            // match
+            showMinimumDenominator(show_match,      'success',     this, databases);
+
+            // unmatch
+            showMinimumDenominator(show_unmatch,    'error',       this, databases);
+
+            // proximity
+            showMinimumDenominator(show_proximity,  'warning',     this, databases);
+
+            // emptyrows
+            showMinimumDenominator(show_emptyrows,  'emptycells',  this, databases);            
+
+        });
     
-    $(list_tables).each(function(table_tmp) {
-        // First we reset
-        $('#' + list_tables[table_tmp]).parent().parent().parent().show();
-        $('#' + list_tables[table_tmp] + " entry").show();
 
-        // match
-        if (show_match) {
-            $('#' + list_tables[table_tmp] + ' .success').show();
-        } else {
-            $('#' + list_tables[table_tmp] + ' .success').hide();
-        }
 
-        // unmatch
-        if (show_unmatch) {
-            $('#' + list_tables[table_tmp] + ' .error').show();
-        } else {
-            $('#' + list_tables[table_tmp] + ' .error').hide();
-        }
-
-        // proximity
-        if (show_proximity) {
-            $('#' + list_tables[table_tmp] + ' .warning').show();
-        } else {
-            $('#' + list_tables[table_tmp] + ' .warning').hide();
-        }
-
-        // emptyrows
-        //hideEmptyCells(list_tables, table_tmp, show_emptyrows);
-        if (show_emptyrows) {
-            $('#' + list_tables[table_tmp] + ' .emptycells').show();
-        } else {
-            $('#' + list_tables[table_tmp] + ' .emptycells').hide();
-        }
+    /*$(list_tables).each(function(table_tmp) {
 
         // filter
         hideTableCell(list_tables, table_tmp, word);
@@ -407,5 +461,5 @@ function filter_results(list_tables, word, show_match, show_unmatch, show_emptyr
         // remove unnecessary tables (empty)
         hide_uncessary_qs(list_tables, table_tmp);
 
-    });
+    });*/
 }
