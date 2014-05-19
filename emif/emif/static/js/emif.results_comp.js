@@ -208,7 +208,8 @@ function DatabaseSelector(container, num_visible, options){
 
   // optional configurations
   this.configs =  $.extend({
-                    dropdown_subcontainer: null
+                    dropdown_subcontainer: null,
+                    select_callback: null
                   }, options );
 }
 DatabaseSelector.prototype = {
@@ -259,7 +260,6 @@ DatabaseSelector.prototype = {
       } else if(new_fingerprint_id == this.reference){
         this.reference = old_fingerprint_id;
       }
-
     } 
 
   },
@@ -329,14 +329,14 @@ DatabaseSelector.prototype = {
       var old_fingerprint = $(this).data('old');
       var new_fingerprint = $(this).data('new');
 
-      console.log('INDEX OLD:'+new_fingerprint);
-      console.log('INDEX NEW:'+old_fingerprint);
-
       self.selectDatabase(old_fingerprint, new_fingerprint);
       self.draw();
 
       return false;
     });
+    if(this.configs.select_callback){
+        this.configs.select_callback();
+    }
   },
   changeVisible: function(count){
     if(isNaN(count)){
@@ -360,7 +360,7 @@ DatabaseSelector.prototype = {
       dropdown.push('<div class="btn-group"><a style="font-size: 12px; font-weight: normal;" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" href="#">');
       dropdown.push('Compared');
     }
-    dropdown.push('&nbsp;<span class="caret"></span></a><ul class="dropdown-menu">');
+    dropdown.push('&nbsp;<span class="caret"></span></a><ul class="pull-right dropdown-menu">');
 
 
     var tempkeys = Object.keys(temp);

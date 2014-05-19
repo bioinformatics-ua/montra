@@ -641,7 +641,10 @@ label input[type="radio"], label input[type="checkbox"]{
       max-width: 300px;
   }
 }
-
+  .popover-medium {
+      z-index: 9999;
+      text-align:justify;
+  }
 .breadcrumb{
   background-color: transparent !important;
 }

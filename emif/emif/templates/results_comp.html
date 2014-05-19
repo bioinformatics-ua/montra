@@ -94,10 +94,17 @@ th, td {
 <ul class="pager">
   <li class="pull-left"><input type="text" size="60" style="margin-left: 0px;" class="span9" id="searchfilter" placeholder="To filter type your keywords here" tabindex="1"></li>
   <li>
-    <div class="pull-right btn-group">
-      <button id="compare_previous" class="btn"><i class="icon-arrow-left"></i></button>
+    <div class="pull-right">
+      <!--button id="compare_previous" class="btn"><i class="icon-arrow-left"></i></button>
       <span id="compare_id" class="btn disabled">1/{{results|length|add:-1}}</span>
-      <button id="compare_next" class="btn"><i class="icon-arrow-right"></i></button>
+      <button id="compare_next" class="btn"><i class="icon-arrow-right"></i></button-->
+      <table><tr><td>Comparing {{results|length}} databases &nbsp; &nbsp;</td><td style="margin-top: -25px; "> 
+      <i style="font-size: 30px;" id="compare_information" class="icon-question-sign" data-toggle="popover" data-placement="bottom" data-content="This is the compare databases page. <br /><br/>In this page it is possible to compare several database by analysing responses to the same question across several databases. <br /><br />
+      By default, the first three selected databases are compared, having the first database being the reference.<br /><br /> 
+      If there are less than three databases, the user only will see two databases.<br /> <br />
+      If there are more than three databases, the user will see the first three, and the others will be available to replace the current showing selection, by using the dropdowns on the databases.<br /><br />
+      In any case, the database of reference can also be changed by using the dropdown." title="Compare Databases - Help"></i>
+      </td></tr></table>
     </div>
   </li>
 
@@ -165,7 +172,7 @@ th, td {
         <div id="collapse{{k|removespaces}}_{{content.name|removespaces}}" class="accordion-body collapse">
           <div class="accordion-inner">
 
-            <table id="{{content.name|removespaces}}_{{k|removespaces}}" class="table table-bordered table-hover table-striped">
+            <table id="{{fingerprint_id|removespaces}}_{{k|removespaces}}" class="table table-bordered table-hover table-striped">
               <thead></thead>
 
               <tbody>
@@ -313,8 +320,46 @@ $("#proximity").bind('click',function(e)
 var comparing_current=1;
 var max_comparing = {{results|length|add:-1}};
 var dbs = null;
+function compareDbsSelected(){
+      var ref = dbs.reference;
+
+      var others = [];
+
+      for(var i=0;i<dbs.showing.length;i++){
+        if(dbs.showing[i] != ref){
+          others.push(dbs.showing[i]);
+        }
+      }
+
+  var threadpool = new ThreadPool(20);
+  var priority=1;
+      var thread;
+      {%for fingerprint_id, content in results.items|slice:":1" %}
+        {% for k,v in content.qset.ordered_items %}
+          for( var i = 0; i < others.length;i++){
+            thread = new Runnable(compareDatabase, priority++, ref+'_{{k|removespaces}}', others[i]+'_{{k|removespaces}}'); 
+            threadpool.run(thread);  
+          }
+        {% endfor %}
+      {% endfor %}
+      threadpool.destroy(
+        function(){
+            $(".tooltippable").tooltip({container:"body"});
+        }
+      );
+
+      $('.basetable').removeClass('basetable');
+      $('table[id^="'+ref+'_"] td').addClass('basetable');
+    }
 $(function(){
-  options = {dropdown_subcontainer: '.dropdown_placer'};
+  $('#compare_information').popover({'html': true, 'trigger': 'hover',
+  'container': 'body',
+  'template': '<div class="popover popover-medium"><div class="arrow"></div><div class="popover-inner"><h3 class="popover-title"></h3><div class="popover-content"><p></p></div></div></div>'});
+
+  options = {
+    dropdown_subcontainer: '.dropdown_placer',
+    select_callback: compareDbsSelected
+  };
 
   {% if results.items|length == 2 %}
   dbs = new DatabaseSelector('#database_rows', 2, options);
@@ -332,6 +377,7 @@ $(function(){
 
   dbs.draw();  
 
+  compareDbsSelected();
 
   $('[id^="{{database_to_compare|removespaces}}"] td').addClass("basetable");
 
