@@ -111,7 +111,7 @@ th, td {
       <div style="height: 22px;" class="database_title_text pull-left"> &nbsp;
       </div>
     </div>   
-      {% for k,v in results.0.1.ordered_items %}
+      {% for k,v in results.items.0.1.qset.ordered_items %}
       <div style="background-color: white" class="accordion-group">
         <div title="{{k|removeh1}}" class="tooltippable accordion-heading">
           <small><a id="a_collapse{{k|removespaces}}_{{name|removespaces}}" class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapse{{k|removespaces}}_{{name|removespaces}}">
@@ -146,30 +146,26 @@ th, td {
     </div>
   <div style="display: table-cell;" id="database_listings">
   <div id="database_rows">                   
-    {% for name, qset in results %}
+    {% for fingerprint_id, content in results.items %}
                       
-    <div class="database_listing {%if forloop.counter == 2 or forloop.counter == 3 %}database_listing_pointer{% endif %} {%if forloop.counter > 3 %}database_listing_away{% endif %}">
+    <div id="db_{{fingerprint_id}}" class="database_listing database_listing_away">
     <div {% if forloop.first%}style="margin-left: 0px;"{% endif %}>
      <div data-clampedwidth=".database_listing" class="clearfix database_title btn-darkgrey">
-      <div class="database_title_text pull-left">{{name}}</div>
-      <div>
-        {%if database_to_compare|removespaces in name|removespaces %}
-          <button type="button" id="ref{{name|removespaces}}" class="pull-right set_reference btn btn-small btn-primary">Using as reference</button>
-        {% else %}
-          <button type="button" id="ref{{name|removespaces}}" class="pull-right set_reference btn btn-small btn-success">Set as reference</button>   
-        {% endif %}
-        </div>
+      <div class="database_title_text pull-left">{{content.name}}</div>
+      <div class="dropdown_placer pull-right">
+          ---
+      </div>
     </div>   
-      {% for k,v in qset.ordered_items %}
+      {% for k,v in content.qset.ordered_items %}
       <div data-clampedwidth=".database_listing" style="background-color: white;" class="elips accordion-group">
         <div title="{{k|removeh1}}" class="tooltippable accordion-heading">
-          <small><a id="a_collapse{{k|removespaces}}_{{name|removespaces}}" class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapse{{k|removespaces}}_{{name|removespaces}}">
+          <small><a id="a_collapse{{k|removespaces}}_{{content.name|removespaces}}" class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapse{{k|removespaces}}_{{content.name|removespaces}}">
           <div class="linktoellipse">{{k|removeh1}}</div></a></small>
         </div>
-        <div id="collapse{{k|removespaces}}_{{name|removespaces}}" class="accordion-body collapse">
+        <div id="collapse{{k|removespaces}}_{{content.name|removespaces}}" class="accordion-body collapse">
           <div class="accordion-inner">
 
-            <table id="{{name|removespaces}}_{{k|removespaces}}" class="table table-bordered table-hover table-striped">
+            <table id="{{content.name|removespaces}}_{{k|removespaces}}" class="table table-bordered table-hover table-striped">
               <thead></thead>
 
               <tbody>
@@ -204,7 +200,6 @@ th, td {
 {% endblock %}
 <!--[if gte IE 9]><!-->
 {% block scriptextra %}
-
 function applyFilters(){
   reset_empties();
   var reference_table = $('.database_listing').eq(0).find('.set_reference').prop('id').substring(3);
@@ -213,8 +208,8 @@ function applyFilters(){
   console.log('IDS TO COMPARE: '+reference_table +":"+compared_table);
   var filter_string = $("#searchfilter").val();
 
-          {%for name, qset in results|slice:":1" %}
-            {% for k,v in qset.ordered_items %}
+          {%for fingerprint_id, content in results.items|slice:":1" %}
+            {% for k,v in content.qset.ordered_items %}
             filter_results([reference_table+'_{{k|removespaces}}'],filter_string, match, unmatch, emptyrows, proximity);
             filter_results([compared_table+'_{{k|removespaces}}'],filter_string, match, unmatch, emptyrows, proximity);
             filter_results(['HEADER_{{k|removespaces}}'],filter_string, match, unmatch, emptyrows, proximity);
@@ -271,7 +266,6 @@ $("#unmatch").bind('click',function(e)
           return false;
 });
 
-
 $("#emptyrows").bind('click',function(e)
 { 
 
@@ -293,9 +287,6 @@ $("#emptyrows").bind('click',function(e)
           }
           return false;
 });
-
-
-
 
 $("#proximity").bind('click',function(e)
 { 
@@ -321,7 +312,27 @@ $("#proximity").bind('click',function(e)
 
 var comparing_current=1;
 var max_comparing = {{results|length|add:-1}};
+var dbs = null;
 $(function(){
+  options = {dropdown_subcontainer: '.dropdown_placer'};
+
+  {% if results.items|length == 2 %}
+  dbs = new DatabaseSelector('#database_rows', 2, options);
+  {% else %}
+  dbs = new DatabaseSelector('#database_rows', 3, options);
+  {% endif %}
+
+  {%for fingerprint_id, content in results.items %}
+  dbs.addDatabase(
+    '{{fingerprint_id}}', 
+    {
+      label: '{{content.name}}'
+    });
+  {% endfor %}
+
+  dbs.draw();  
+
+
   $('[id^="{{database_to_compare|removespaces}}"] td').addClass("basetable");
 
   $('#compare_previous').click(function(){
@@ -491,8 +502,8 @@ function compareDatabases(show_modal){
     compared_table = $('.database_listing_pointer').find('.set_reference').prop('id').substring(3);  
   }catch(err){}
 
-  {%for name, qset in results|slice:":1" %}
-    {% for k,v in qset.ordered_items %}
+  {%for fingerprint_id, content in results.items|slice:":1" %}
+    {% for k,v in content.qset.ordered_items %}
       var thread = new Runnable(compareDatabase, priority++, reference_table+'_{{k|removespaces}}', compared_table+'_{{k|removespaces}}'); threadpool.run(thread);  
     {% endfor %}
   {% endfor %}
@@ -501,7 +512,7 @@ function compareDatabases(show_modal){
     function(){
         $(".tooltippable").tooltip({container:"body"});
 
-        applyFilters();
+        //applyFilters();
 
         if(show_modal)        
           loading_modal.hidePleaseWait();
@@ -516,5 +527,6 @@ function compareDatabase(base, other){
 }
 
 compareDatabases(false);
+
 {% endblock %}
 <!--<![endif]-->

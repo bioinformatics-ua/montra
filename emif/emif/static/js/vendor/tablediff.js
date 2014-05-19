@@ -365,7 +365,7 @@ function hideEmptyCells(list_tables, table_tmp, show_emptyrows) {
 */
 function filter_results(list_tables, word, show_match, show_unmatch, show_emptyrows, show_proximity) {
 
-    console.log(list_tables);
+    //console.log(list_tables);
     
     $(list_tables).each(function(table_tmp) {
         // First we reset
