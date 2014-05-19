@@ -239,38 +239,28 @@ DatabaseSelector.prototype = {
 
     var index_old = this.indexOfShowing(old_fingerprint_id);
 
-    /* If the database to remove from showing is on the showing list, and
-     * if the new fingerprint isnt already showing and is on the list of possible databases*/
-    if( index_old != -1 && 
-        (index_new == -1 && index_list != null)){
-      this.showing.splice(index_old, 1,  new_fingerprint_id);
+    /* If the database to remove from showing is on the showing list */
+    if( index_old != -1){
+      /* if the new fingerprint isnt already showing and is on the list of possible databases*/
+      if((index_new == -1 && index_list != null)){
 
-      /*if(old_fingerprint_id == this.reference){
-        this.setAsReference(new_fingerprint_id);
-      }*/
+        this.showing.splice(index_old, 1,  new_fingerprint_id);
 
-    }
+      } 
+      /* If the fingerprint is already showing and we just want to swap places */
+      else if (index_new != -1 && index_list != null) {
+        var temp = this.showing[index_old];
+        this.showing[index_old] = this.showing[index_new];
+        this.showing[index_new] = temp;        
+      }
 
-  },
-  setAsReference: function(new_fingerprint_id){
-    var is_new = this.indexOfShowing(new_fingerprint_id);
+      if(old_fingerprint_id == this.reference){
+        this.reference = new_fingerprint_id;
+      } else if(new_fingerprint_id == this.reference){
+        this.reference = old_fingerprint_id;
+      }
 
-    /* If the database is new to the showing display, 
-     * we must first add it to the showing display and remove the old reference */
-    if(is_new == -1){
-      this.selectDatabase(this.reference, new_fingerprint_id);
-    }
-    /* Otherwise, we must make it swap places with the old reference without removing anything */
-    else {
-      // swap places
-      var old_reference_index = this.indexOfShowing(old_fingerprint_id);
-      var new_reference_index = this.indexOfShowing(new_fingerprint_id);
-
-      var temp = this.showing[old_reference_index];
-      this.showing[old_reference_index] = this.showing[new_reference_index];
-      this.showing[new_reference_index] = temp;
-    }
-    this.reference = new_fingerprint_id;
+    } 
 
   },
 
@@ -348,17 +338,28 @@ DatabaseSelector.prototype = {
       return false;
     });
   },
+  changeVisible: function(count){
+    if(isNaN(count)){
+      console.error('-- Error: You must pass a number to visibility');
+    }
+    this.visible = count;
+
+    this.showing = this.showing.splice(0,count);
+
+    this.draw();
+  },
   __inverseintersectDropdown: function(not_fingerprint_id, reference){
     var temp = $.extend({}, this.list);
     delete temp[not_fingerprint_id];
 
     var dropdown=[];
-    dropdown.push('<div class="btn-group"><a style="font-size: 12px; font-weight: normal;" class="btn btn-info dropdown-toggle" data-toggle="dropdown" href="#">');
-    if(reference)
+    if(reference){
+      dropdown.push('<div class="btn-group"><a style="font-size: 12px; font-weight: normal;" class="btn btn-success dropdown-toggle" data-toggle="dropdown" href="#">');
       dropdown.push('Reference');
-    else
+    } else{
+      dropdown.push('<div class="btn-group"><a style="font-size: 12px; font-weight: normal;" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" href="#">');
       dropdown.push('Compared');
-
+    }
     dropdown.push('&nbsp;<span class="caret"></span></a><ul class="dropdown-menu">');
 
 
