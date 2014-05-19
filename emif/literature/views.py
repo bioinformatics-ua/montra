@@ -27,7 +27,7 @@ from django.http import *
 
 from searchengine.search_indexes import CoreEngine
 
-from questionnaire.models import Questionnaire
+from questionnaire.models import Question
 
 from literature.utils import dict_union
 
@@ -58,21 +58,9 @@ def literature_database_info(request, fingerprint_id, template_name='literature_
 def getListPublications(database):
 
 
-    # first we find the questionnaire type
-    qtype = None
-    pubquestions = []
+    # first we find the questionnaire type 
+    pubquestions = Question.objects.filter(type='publication')
 
-    qqs = Questionnaire.objects.all()
-    for q in qqs:
-        if q.slug == database['type_t']:
-            qtype = q
-
-    if qtype != None:
-        # We get all questionset's questions with publication type
-        for question in qtype.questions():
-            if question.type == 'publication':
-                pubquestions.append(question)
-            
     # we then get the field values themselves
     publications = []
     for pubq in pubquestions:
@@ -89,6 +77,7 @@ def getListPublications(database):
             if string_publications != None:
                 # for some reason, json.loads returns a dict on no results
                 if type(publications) == type(json.loads(string_publications)):
+                    #print string_publications
                     publications = publications+json.loads(string_publications)      
 
     return publications

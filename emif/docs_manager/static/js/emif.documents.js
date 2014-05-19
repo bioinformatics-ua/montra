@@ -19,6 +19,9 @@
 ***********************************************************************/
 
 var eventToCatch = 'click';
+// This is just for interface propuses, the validation is done serverside but we dont
+// obviously want to show the button anyway
+var isadmin;
 
 /* Population Characteristics */
 
@@ -63,13 +66,13 @@ function PopulationCharacteristics (type)
 
 };
 
+function fillList(admin){
+        if(isadmin == undefined){
+            isadmin=admin;
+        }
+          $('#files').html('');
 
-
-
-$(document).ready(
-    function(){
-
-        var result = {}
+          var result = {}
 
         $.ajax({
           dataType: "json",
@@ -81,18 +84,57 @@ $(document).ready(
         console.log(result);
         result.conf.forEach(function(d){
             //var context = $('<tr>').appendTo('#files');
-            var node = $('<tr>').html("<td>File name: " + d.file_name
-                            + "</td><td>Description: " + d.comments 
-                            + "</td><td>Last update: " + d.latest_date +"</td>");
+
+            var content = "<td>File name: <button class=\"btn btn-link\" onclick=\"requestFile('"+
+                d.file_name+"','"+d.revision+"')\">" + d.file_name
+                            + "</button></td><td>Description: " + d.comments 
+                            + "</td><td>Last update: " + d.latest_date +"</td>";
+
+            if(admin == true)
+                content += '<td style="width: 50px;"><button class="btn btn-link" '
+    + 'onclick="deleteFile(\''+d.file_name+'\',\''+d.revision+'\')">'
+    + '<img src="static/img/glyphicons_192_circle_remove.png"/></button></td>';
+
+
+            var node = $('<tr>').html(content);
             node.appendTo('#files');
             //node.appendTo(context);    
-        });
-        
+        });  
+}
+function requestFile(filename, revision){
+    /*$.post( "api/getfile", { filename: filename, revision: revision })
+      .done(function(result) {
+        console.log(result);
+      })
+      .fail(function() {
+        console.log( "error getting file" );
+      });
+    */
+    var df = $('#downloadfile');
+    $('[name="filename"]').val(filename);
+    $('[name="revision"]').val(revision);
 
-    }
-);
+    df.submit();
+}
+function deleteFile(filename, revision){
+    $.post( "api/deletefile", 
+        {   fingerprint_id: getFingerprintID_new(), 
+            filename: filename, 
+            revision: revision 
+        })
+      .done(function(result) {
+        if(result.result){
+            alert('Document deleted.');
+            fillList(isadmin);
 
-
+        } else {
+            alert('It was impossible to delete the document.');
+        }
+      })
+      .fail(function() {
+        alert( "Error Deleting File" );
+      });
+}
 /********************************************************
 **************** Document Manager - Uploads, etc 
 *********************************************************/
@@ -240,6 +282,9 @@ $(function () {
             var td = $(data.context.children()[index]);
             td.wrapInner(link);
         });
+
+        fillList(isadmin);
+
     }).on('fileuploadfail', function (e, data) {
         $.each(data.result.files, function (index, file) {
             var error = $('<span/>').text(file.error);

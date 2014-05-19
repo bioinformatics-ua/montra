@@ -5,7 +5,7 @@
 
 {% block breadcrumbs %}
     {{ block.super }}
-    {% breadcrumb "My Databases" "databases" %}
+    {% breadcrumb "Personal" "databases" %}
     {% breadcrumb name "fingerprint/"|add:fingerprint_id|add:"/1" %}
     {% if not readonly %}
     {% with url_id="dbEdit/1" %}
@@ -114,7 +114,7 @@ Saving... please don't close this questionnary yet.</div>
               <td style="width: 80%; font-size: 93%;">
               {% if qs.sortid != 0 and qs.sortid != 99 %}{{ qs.sortid }}. {% endif %}{{ qs.text|removeh1 }}
               {% if qs.sortid != 0 and qs.sortid != 99 %}
-                <span id="counter0_{{ qs.sortid }}"> {{answered}}/{{total_count}}</span>
+                <span id="counter0_{{ qs.sortid }}"> ({{answered}}/{{total_count}})</span>
               {%endif%}
               </td>
               <td style="width: 10%; text-align: right;">
@@ -231,6 +231,7 @@ function questionsets_handle(id_questionset)
 
             posting.done(function(data) {
               $("#loading-message").fadeOut('fast');
+              formHasChanged = false; 
             });
           }
         }
@@ -263,7 +264,7 @@ function questionsets_handle(id_questionset)
         );
         document.body.scrollTop = document.documentElement.scrollTop = 0; 
 
-        formHasChanged = false;   
+          
         list_invalid = []; 
 
       } else {

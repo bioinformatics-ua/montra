@@ -18,6 +18,8 @@ $('.confirm-delete').click(function(e) {
     $('#modal-from-dom').data('id', id).modal('show');
 });
 
+/* WHAT IN THE HELL, THIS DOESNT BELONG HERE THIS IS FROM SHARE WIDGET
+
 
 $('#modal-from-dom-share').bind('show', function() {
     var id = $(this).data('id'),
@@ -40,3 +42,5 @@ $(".sharedb2" ).click(function(e)
   post_to_url($(this).attr('href'), {"email": $("#share_email").val(), "csrfmiddlewaretoken": $('input[name="csrfmiddlewaretoken"]').prop('value')});
 
 });
+
+*/

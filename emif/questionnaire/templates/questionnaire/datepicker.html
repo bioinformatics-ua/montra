@@ -7,7 +7,9 @@
 <script type="text/javascript">
 $("#from_{{ question.number|removedots }}").inputmask("y-m-d",{ "placeholder": "yyyy-mm-dd" });
 $("#to_{{ question.number|removedots }}").inputmask("y-m-d",{ "placeholder": "yyyy-mm-dd" });
-$('[id="question_{{ question.number }}"]').inputmask("y-m-d",{ "placeholder": "yyyy-mm-dd" });
+{% if '[' not in qdict.value %}
+    $('[id="question_{{ question.number }}"]').inputmask("y-m-d",{ "placeholder": "yyyy-mm-dd" });
+{% endif %}
 
 // Reactive, in case we try to use range, but decided to erase the search, and use it as a simple value one
 $('[id="question_{{ question.number }}"]').change(function() {

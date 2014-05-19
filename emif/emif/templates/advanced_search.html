@@ -150,7 +150,8 @@ function add_triggers() {
 
 $('#li_advanced_search').addClass("active");
 var bool_container;
-$( document ).ready(function() {
+$( document ).ready(function(e) {
+
     var help_text = '<div style="overflow:auto; height: 30em;"><h3>What it does?</h3><p>This toolbar allows you to define the a boolean query of the databases that you are intested in. It involves the relationship between the concepts you are using in your search, in a visual and easy way through the drag-and-drop of thse concepts.</p>'+
     '<h3>What is a "Boolean Query"?</h3>'+
     '<p>A boolean query, is a query that has a relation between two or more concepts. </p><p>For example, if you want to search for books. This books are described by a myriad of concepts such as year of release, author and genre.</p><p>Thus, if you want to search for all the results that are from the genre \'medical\' or the genre \'informatics\' and have the author \'John\'.</p><p>The best way to do this, is by using a boolean query. The boolean query for answering this kind of questions are:</p><blockquote><p class="lead">(genre = \'medical\' OR genre = \'informatics\') AND author = \'John\'</p></blockquote><p>It was clearly define what is required in the results only by using the relations OR and AND, in conjunction with the concepts and using parentesis to separate the order of the relations (nested relation). This is the basic idea of the boolean queries.</p>'+
@@ -184,7 +185,7 @@ $( document ).ready(function() {
 
                             console.log(current_form);
 
-                            var list_invalid = advValidator.validateFormContext(event, current_form);
+                            var list_invalid = advValidator.validateFormContext(e, current_form);
                             console.log(list_invalid);
 
 
@@ -319,6 +320,9 @@ function next_questionset(id_questionset)
 
 function questionsets_handle(id_questionset)
 {
+
+    if (!e) var e = window.event;
+
     var idString = id_questionset.id;
     var id = idString.split('_');
 
@@ -335,7 +339,7 @@ function questionsets_handle(id_questionset)
 
       console.log(current_form);
 
-      var list_invalid = advValidator.validateFormContext(event, current_form);
+      var list_invalid = advValidator.validateFormContext(e, current_form);
       console.log(list_invalid);
 
 

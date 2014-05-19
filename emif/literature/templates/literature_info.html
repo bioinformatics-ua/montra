@@ -10,13 +10,14 @@
         <a id="collapseall_literature" class="btn pull-right" href=""><i class="icon-plus"></i>&nbsp; Expand all</a>
     <div class="accordion fullwidth pull-left" id="accordion2" style="margin-top: 10px;">
         {% for publication in publications %}
+        {% if publication.pmid %}
         <div class="accordion-group">
             <div class="accordion-heading">
-                <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapse{{publication.pmid}}">
+                <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapse{{forloop.counter}}">
                     {{publication.title}}
                 </a>
             </div>
-            <div id="collapse{{publication.pmid}}" class="accordion-body collapse">
+            <div id="collapse{{forloop.counter}}" class="accordion-body collapse">
                 <div class="accordion-inner">
                     <div id="becas-widget-{{publication.pmid}}" class="widget-container fullwidth"></div>
                 </div>
@@ -24,7 +25,21 @@
                         initializeBecas({{publication.pmid}}, "becas-widget-{{publication.pmid}}");
                     </script>
             </div>
-        </div>  
+        </div> 
+        {% else %}
+            <div class="accordion-group">
+                <div class="accordion-heading">
+                    <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapse{{forloop.counter}}">
+                        {{publication.title}}
+                    </a>
+                </div>
+                <div id="collapse{{forloop.counter}}" class="accordion-body collapse">
+                    <div class="accordion-inner">
+                        This article has no pubmed identification, so it can't be annotated.
+                        </div>
+                </div>
+            </div>             
+        {% endif %}
         {% endfor %}
         <!--div class="accordion-group">
             <div class="accordion-heading">

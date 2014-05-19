@@ -79,15 +79,25 @@
                             <p class="lead">Your medical research data everywhere!</p>
                             <form action="accounts/signin/" id="signin_form" class="margin-base-vertical" method="post">
                                 {% csrf_token %}
-                                <p>Sign in or <a href="{% url 'userena_signup' %}">create a new account</a></p>
-                                <div class="control-group">
+                                
+
+
+                                <div style="position: relative; float: none; margin: auto;" class="span6">
+                                <table style="width: 100%;">
+                                    <tr><td style="text-align: left;"><h3>Sign in</h3></td>
+                                    <td style="text-align: right;"> <small><a href="{% url 'userena_signup' %}">create a new account</a></small></td></tr>
+
+                                </table>
+                                </div>
+                                
+                                <div style="clear: both;" class="control-group">
                                     <div class="controls">
-                                        <input name="identification" class="signin-header-form-email" type="text" placeholder="Email">
+                                        <input class="span6" name="identification" class="signin-header-form-email" type="text" placeholder="Email">
                                     </div>
                                 </div>
                                 <div class="control-group">
                                     <div class="controls">
-                                      <input name="password" class="signin-header-form-pass" type="password" placeholder="Password">
+                                      <input class="span6" name="password" class="signin-header-form-pass" type="password" placeholder="Password">
                                   </div>
                               </div>
                               <div class="control-group">
@@ -101,7 +111,7 @@
                       <!--<label class="checkbox">
                         <input type="checkbox"> Remember me
                     </label>-->
-                    <button type="submit" class="btn btn-success btn-large">Sign in</button>
+                    <button style="position: relative; float: none; margin: auto;" type="submit" class="span6 btn btn-success btn-large">Sign in</button>
                 </div>
             </div>
             {% if next %}<input type="hidden" name="next" value="{{ next }}" />{% endif %}

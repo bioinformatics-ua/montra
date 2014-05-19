@@ -337,15 +337,15 @@ def convert_query_from_boolean_widget(query, q_id):
     # I cant remove the symbol
     query = re.sub("_____[a-zA-Z0-9._()\[\]\/\-\+?!'@#$%&*=~^|\\<>;,\.\" ]+_____", "", query)
     
-    print query
-    print "------------------"
+    #print query
+    #print "------------------"
 
     def check(m):
         q = None
         try:
             
             question_id = m.group(1)
-            print "QUESTION_ID: "+question_id
+            #print "QUESTION_ID: "+question_id
             question_id = question_id.replace('question_nr_', '')
             question_answer = m.group(4)
 

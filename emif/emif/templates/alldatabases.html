@@ -117,12 +117,12 @@ button {
         </td>
         <td>{{t.institution}}</td>
         <td>{{t.location}}</td>
-        <td>{{t.number_patients}}</td>
+        <td style="text-align: right;">{{t.number_patients}}</td>
           <!--<td style="min-width: 120px;">            
                  {{ t.date }}
 
           </td>-->
-          <td class="date">            
+          <td style="text-align: center;" class="date">            
                 {% if t.last_activity %}
                     {{t.last_activity|datehhmm}}
                 {% else %}
@@ -150,7 +150,7 @@ $(document).ready(function(){
 <div class="span4">  
 <div class="alert">  
   <a class="close" data-dismiss="error">×</a>  
-  <strong>Info</strong> Please add a new database, like for instance a Cohort or Observation. You can find this option in the menu "Workspace -> Add -> Research Cohort or Observation Study"
+  <strong>Info</strong> Please add a new database, like for instance a Cohort or Observation. You can find this option in the menu "Database -> Add -> Research Cohort or Observation Study"
 </div>  
 </div>  
 </div>  
@@ -159,10 +159,6 @@ $(document).ready(function(){
 {% comment %}
   <a class="btn btn-large btn-success" href="advancedSearch/1">Add new database</a>
 {% endcomment %}
-</div>
-
-
-
 <div id="modal-from-dom" class="modal hide fade" style="display:none"  >
     <div class="modal-header">
         <a href="#" class="close">&times;</a>
