@@ -191,3 +191,26 @@ loading_modal = loading_modal || (function () {
 })();
 
 $('#database_listings .database_listing').sort(CustomSort).appendTo('#database_rows');
+
+
+function DatabaseSelector(num_visible){
+
+  if(isNan(num_visible)){
+    console.error('You must pass the number of visible databases at a time to the DatabaseSelector');
+  }
+
+  this.list = {};
+  this.showing = [];
+  this.visible = num_visible;
+}
+DatabaseSelector.prototype = {
+  addDatabase: function(fingerprint_id, identificator){
+    this.list[fingerprint_id] = identificator;
+  }
+  deleteDatabase: function(fingerprint_id){
+    try {
+    del this.list[fingerprint_id];
+    } catch(err) {
+      console.warn('There was no database with id '+fingerprint_id+' to delete.');
+    }
+};
