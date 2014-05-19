@@ -809,7 +809,6 @@ def render_one_questionset(request, q_id, qs_id, errors={}, aqid=None, fingerpri
         if template_name == 'fingerprint_search_qs.html':
             advanced_search = True
 
-
         r = r2r(template_name, request,
                 questionset=question_set,
                 questionsets=question_set.questionnaire.questionsets,
@@ -892,15 +891,14 @@ def extract_answers(request2, questionnaire_id, question_set, qs_list):
     extra_fields = {}
     # this will ensure that each question will be processed, even if we did not receive
     # any fields for it. Also works to ensure the user doesn't add extra fields in
-    for x in expected:
+    '''for x in expected:
         items.append((u'question_%s_Trigger953' % x.number, None))
-
+    '''
     # generate the answer_dict for each question, and place in extra
     for item in items:
         key, value = item[0], item[1]
         if key.startswith('comment_question_'):
             continue
-            
         if key.startswith('question_'):
             answer = key.split("_", 2)
             question = get_question(answer[1], questionnaire)
@@ -955,7 +953,8 @@ def extract_answers(request2, questionnaire_id, question_set, qs_list):
         
         '''if u"Trigger953" not in ans:
             logging.warn("User attempted to insert extra question (or it's a bug)")
-            continue'''
+            continue
+        '''
         try:
             cd = question.getcheckdict()
             
@@ -1053,6 +1052,27 @@ def extract_answers(request2, questionnaire_id, question_set, qs_list):
             qlist_general.append((qs_aux, qlist))
     except:
         raise
+
+        ## HOT FIX for qvalues to work properly, THIS SHOULD BE FIXED IN THE CODE ABOVE
+
+    qvalues = {}
+    for question, qdict in qlist_general:
+        for k, v in qdict:
+            try:
+                qval = v['qvalue']
+
+                print str(k.number)+" - "+qval
+                if qval != None and qval != '':
+
+                    try: 
+                        cutzone = qval.index('#');
+                        qvalues[k.number] = qval[0:cutzone]
+                    except ValueError:
+                        qvalues[k.number] = qval
+                        
+            except KeyError:
+                pass
+
     return (qlist_general, qlist, jstriggers, qvalues, jsinclude, cssinclude, extra_fields, len(errors)!=0)
     
 def database_detailed_view(request, fingerprint_id, questionnaire_id, template_name="database_edit.html"):

@@ -130,6 +130,7 @@
     </div>
 </div>
 {% endif %}
+
 </div>  <!-- div accordion2 -->
 <!--{% if questions_list.0.0.sortid != 99 and questions_list.0.0.sortid != 0%}-->
 <!--<span>* Required</span>-->
@@ -170,19 +171,20 @@
 
 <script type="text/javascript">
 {% block scriptextra %}
-function add_triggers() {
-
+function add_triggers{{ questions_list.0.0.sortid }}() {
+console.log('Adding triggers for qs {{ questions_list.0.0.sortid }}');
 {% for trigger in triggers %}
 addtrigger("{{trigger}}");
 {% endfor %}
 
 {% for k,v in qvalues.items %}
-qvalues['{{ k|escapejs }}'] = '{{ v|escapejs }}';
+qvalues['question_{{ k|escapejs }}'] = '{{ v|escapejs }}';
 {% endfor %}
 
-for(key in qvalues) {
-valchanged(key, qvalues[key], this);
-}
+    /* qvalues is supposed to give us the parents that open the childs ??*/
+    for(key in qvalues) {
+    valchanged(key, qvalues[key], this);
+    }      
 }
 
 $(function(){
@@ -240,8 +242,11 @@ collapseAll($("#collapseall_qs_{{ k.sortid }}"), div_id);
 
 {% endif %}
 {% endfor %}
-add_triggers();
-setsaveqs("qform{{ questions_list.0.0.sortid }}");
+$(function(){
+    add_triggers{{ questions_list.0.0.sortid }}();
+    setsaveqs("qform{{ questions_list.0.0.sortid }}");
+});
+
 
 {% endblock %}
 </script>
