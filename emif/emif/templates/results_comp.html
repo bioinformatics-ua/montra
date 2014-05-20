@@ -119,8 +119,8 @@ th, td {
       </div>
     </div>   
       {% for k,v in results.items.0.1.qset.ordered_items %}
-      <div class="accordion-group">
-        <div title="{{k|removeh1}}" class="tooltippable accordion-heading">
+      <div class="block_{{forloop.counter}} accordion-group">
+        <div style="background-color: white;" title="{{k|removeh1}}" class="tooltippable accordion-heading">
           <small><a id="a_collapse{{k|removespaces}}_{{name|removespaces}}" class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapse{{k|removespaces}}_{{name|removespaces}}">
           <div style="width: 220px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{k|removeh1}}</div></a></small>
         </div>
@@ -164,7 +164,7 @@ th, td {
       </div>
     </div>   
       {% for k,v in content.qset.ordered_items %}
-      <div data-clampedwidth=".database_listing" style="background-color: white;" class="elips accordion-group">
+      <div data-clampedwidth=".database_listing" style="background-color: white;" data-block="{{forloop.counter}}" class="block_{{forloop.counter}} elips accordion-group">
         <div title="{{k|removeh1}}" class="tooltippable accordion-heading">
           <small><a id="a_collapse{{k|removespaces}}_{{content.name|removespaces}}" class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapse{{k|removespaces}}_{{content.name|removespaces}}">
           <div class="linktoellipse">{{k|removeh1}}</div></a></small>
@@ -180,7 +180,7 @@ th, td {
                 <tr data-fingerprintid="{{fingerprint_id}}" 
                     data-rowid="{{forloop.parentloop.counter}}_{{forloop.counter}}"
                 class="entry rowid_{{forloop.parentloop.counter}}_{{forloop.counter}}">
-                  <td style="width:0px;" class="tooltippable" data-original-title="{{ t.tag|removehs }}" title="">{{ t.tag|removehs }}</td> 
+                  <td style="width:0 !important;" class="tooltippable" data-original-title="{{ t.tag|removehs }}" title="">{{ t.tag|removehs }}</td> 
                    <td style="font-size: 95%;" class="tooltippable" data-original-title="{{ t.value }}" title="">{{ t.value }}</td>
                 </tr>
                 {% endfor %}
