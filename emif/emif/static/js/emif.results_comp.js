@@ -3,6 +3,17 @@ var unmatch=true;
 var emptyrows=true;
 var proximity=true;
 
+function hasFilters(){
+  if(match == false || unmatch  == false|| emptyrows == false || proximity == false)
+    return true;
+
+  if($('#searchfilter').val().trim() != '')
+    return true;
+
+  // else 
+  return false;
+}
+
 $("#collapseall").bind('click',function(e)
         { 
           //e.preventDefault(); 
@@ -41,19 +52,6 @@ function doublecheck_expansions(){
               $(".collapse.in:visible").collapse("hide");
           } 
 }
-function check_empties(){
-  var dbs_visible = $('#database_listings .database_listing:not(.database_listing_away) .accordion-group:visible').length;
-
-  if(dbs_visible == 0){
-    $('#database_listings').hide();
-    $('#no_results').show();
-
-  } else {
-    $('#database_listings').show();
-    $('#no_results').hide();
-
-  }
-}
 function reset_empties(){
   $('#database_listings').show();
   $('#no_results').hide();
@@ -84,7 +82,6 @@ function reset_empties(){
 
 $("#searchfilter").delayKeyup(
     function(){
-
       applyFilters();
 
       return false;
@@ -135,25 +132,6 @@ $("div[id^='collapse']").filter(function(){
 };
 $('body').on('click', '.accordion-toggle', myFunc);
 
-/*
-
-function highlight(text, text_to_highlight)
-{
-    inputText = document.getElementById("inputText")
-    var innerHTML = inputText.innerHTML
-    var index = innerHTML.indexOf(text);
-    if ( index >= 0 )
-    { 
-        innerHTML = innerHTML.substring(0,index) + "
-<span class='highlight'>" + innerHTML.substring(index,index+text.length) + "</span>
-" + innerHTML.substring(index + text.length);
-        inputText.innerHTML = innerHTML 
-    }
-
-}
-
-*/
-
 $.fn.textWidth = function() {
   var node, original, width;
   original = $(this).html();
@@ -164,34 +142,6 @@ $.fn.textWidth = function() {
   node.remove();
   return width;
 };
-
-function CustomSort( a ,b ){
-
-     if($(a).find('.set_reference').first().hasClass('btn-primary'))
-      return -1;
-     if($(b).find('.set_reference').first().hasClass('btn-primary'))
-      return 1;  
-
-     else return 0;
-}
-
-// Ref from : http://dotnetspeak.com/2013/05/creating-simple-please-wait-dialog-with-twitter-bootstrap/comment-page-1
-var loading_modal;
-loading_modal = loading_modal || (function () {
-    var pleaseWaitDiv = $('<div class="modal hide" id="pleaseWaitDialog" data-backdrop="static" data-keyboard="false"><div class="modal-header"><h3>Comparing databases, please wait...</h3></div><div class="modal-body"><div class="progress progress-striped active"><div class="bar" style="width: 100%;"></div></div></div></div>');
-    return {
-        showPleaseWait: function() {
-            pleaseWaitDiv.modal();
-        },
-        hidePleaseWait: function () {
-            pleaseWaitDiv.modal('hide');
-        },
-
-    };
-})();
-
-$('#database_listings .database_listing').sort(CustomSort).appendTo('#database_rows');
-
 
 function DatabaseSelector(container, num_visible, options){
 
@@ -259,6 +209,9 @@ DatabaseSelector.prototype = {
         this.reference = new_fingerprint_id;
       } else if(new_fingerprint_id == this.reference){
         this.reference = old_fingerprint_id;
+      }
+      if(this.configs.select_callback){
+        this.configs.select_callback();
       }
     } 
 
@@ -334,9 +287,6 @@ DatabaseSelector.prototype = {
 
       return false;
     });
-    if(this.configs.select_callback){
-        this.configs.select_callback();
-    }
   },
   changeVisible: function(count){
     if(isNaN(count)){

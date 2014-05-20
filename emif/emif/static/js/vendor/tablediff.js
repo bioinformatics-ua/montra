@@ -308,7 +308,7 @@ cleantablediff = function() {
     $('.database_listing .success').removeClass('success');
     $('.database_listing .warning').removeClass('warning');
     $('.database_listing .emptycells').removeClass('emptycells');
-    $('.database_listing .hide_me').removeClass('hide_me');
+    $('.database_listing .entry').show();    
 }
 
 function hideTableCell(list_tables, table_tmp, word) {

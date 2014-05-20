@@ -112,7 +112,7 @@ th, td {
 </div>
 <div style="margin: 0px;" class="span12">
   <div style="overflow-x: auto;" class="well accordion" id="accordion2">
-       <div class="database_listing_names">
+       <div style="opacity: 0;" class="database_listing_names">
     <div>
      <div data-clampedwidth=".database_listing_names"  class="clearfix database_title btn-darkgrey">
       <div style="height: 26px;" class="database_title_text pull-left"> &nbsp;
@@ -195,7 +195,8 @@ th, td {
     {% endfor %}
     </div>
     </div>
-    <div id="no_results" class="pull-center">No results found, for this filtering parameters.</div>
+    <div id="no_results" class="pull-center"><h4>No results found, for this filtering parameters.</h4></div>
+    <div id="comparingwait" class="pull-center"><h4>Comparing results, please wait</h4></div>
   </div>
 </div>
 
@@ -218,13 +219,11 @@ function applyFilters(){
           others.push(dbs.showing[i]);
         }
       }
-  var filter_string = $("#searchfilter").val();
+  var filter_string = $("#searchfilter").val().trim();
 
   filter_results(others, dbs.reference, filter_string, match, unmatch, emptyrows, proximity);
 
   doublecheck_expansions();
-  check_empties();  
-
 }
 
 
@@ -318,8 +317,14 @@ $("#proximity").bind('click',function(e)
 var comparing_current=1;
 var max_comparing = {{results|length|add:-1}};
 var dbs = null;
-function compareDbsSelected(){
+function compareDbsSelected(initial){
   cleantablediff();
+  console.log('initial:'+initial);
+    if(!initial && hasFilters()){
+      $('.database_listing_names').fadeOut('fast');
+      $('.database_listing').fadeOut('fast');
+      $('#comparingwait').fadeIn('fast');
+    }
       var ref = dbs.reference;
 
       var others = [];
@@ -343,14 +348,22 @@ function compareDbsSelected(){
       {% endfor %}
       threadpool.destroy(
         function(){
+            if(!initial && hasFilters()){
+            $('#comparingwait').fadeOut('fast');
+            
+            $('.database_listing_names').fadeIn('fast');
+            $('.database_listing').fadeIn('fast');
+            }
             $(".tooltippable").tooltip({container:"body"});
-
             applyFilters();
         }
       );
       $('.basetable').removeClass('basetable');
       $('table[id^="'+ref+'_"] tr').addClass('basetable');
 
+}
+function compareDbsSelectedAfter(){
+  compareDbsSelected(false);
 }
 $(function(){
   $('#compare_information').popover({'html': true, 'trigger': 'hover',
@@ -359,7 +372,7 @@ $(function(){
 
   options = {
     dropdown_subcontainer: '.dropdown_placer',
-    select_callback: compareDbsSelected
+    select_callback: compareDbsSelectedAfter
   };
 
   {% if results.items|length == 2 %}
@@ -376,124 +389,11 @@ $(function(){
     });
   {% endfor %}
 
-  dbs.draw();  
-
-  compareDbsSelected();
+  dbs.draw(); 
+  $('.database_listing_names').fadeTo( "fast", 1); 
+  compareDbsSelected(true);
 
   $('[id^="{{database_to_compare|removespaces}}"] td').addClass("basetable");
-
-  $('#compare_previous').click(function(){
-    $('#compare_next').prop('disabled', false);
-    
-    comparing_current--;
-    if(comparing_current == 1)
-      $(this).prop('disabled', true);
-
-    $('#compare_id').text(comparing_current+'/'+max_comparing);
-
-    $('.database_listing_pointer').first().removeClass("database_listing_pointer").addClass("database_listing_away");
-
-    var newreference = $('.database_listing_away').eq(comparing_current-1);
-
-    newreference.removeClass("database_listing_away").addClass("database_listing_pointer");
-    newreference.hide();
-    newreference.fadeIn(1000);
-
-      compareDatabases(true);
-
-    newreference.css('display','table-cell');      
-  });
-
-  $('#compare_next').click(function(){
-    $('#compare_previous').prop('disabled', false);
-
-    comparing_current++;
-    if(comparing_current == max_comparing)
-      $(this).prop('disabled', true);
-    $('#compare_id').text(comparing_current+'/'+max_comparing);
-  
-    $('.database_listing_pointer').first().removeClass("database_listing_pointer").addClass("database_listing_away"); 
-
-    var newreference = $('.database_listing_away').eq(comparing_current-1);
-
-    newreference.removeClass("database_listing_away").addClass("database_listing_pointer");
-    newreference.hide();
-    newreference.fadeIn(1000);
-
-      compareDatabases(true);
-
-     newreference.css('display','table-cell');
-     });
-
-  $('.set_reference').click(function(){
-    var self_parent = $(this).closest('.database_listing');
-
-
-    var identity = $(this).prop('id').substring(3);
-    
-    console.log(identity);
-
-    // If not is reference
-    if(!$(this).hasClass('btn-primary')){
-      $('.database_listing_pointer').first().removeClass("database_listing_pointer"); 
-      
-      $('.set_reference').each(function(){
-        if($(this).hasClass('btn-primary')){
-          $(this).removeClass('btn-primary');
-          $(this).addClass('btn-success');
-          $(this).text('Set as reference'); 
-
-          $(this).closest('.database_listing').addClass('database_listing_pointer'); 
-        }
-
-        
-      });
-      $(this).removeClass('btn-success');
-      $(this).addClass('btn-primary');
-      $(this).text('Using as reference');
-
-      // Clean all status
-      $('.basetable').removeClass("basetable");
-      $('.success').removeClass("success");
-      $('.warning').removeClass("warning");
-      $('.error').removeClass("error");
-      $('.emptycells').removeClass("emptycells");
-
-
-      $('[id^="'+identity+'"] td').addClass("basetable");
-      $('#database_listings .database_listing').sort(CustomSort).appendTo('#database_rows');
-
-
-// Ref from: http://stackoverflow.com/questions/18625321/detect-webkit-browser-in-javascript
-// For some reason gecko and presto dont understand the animation i wanted correctly, only webkit browsers,
-// so i do it only on webkit, on others i have a fallback
-var isWebkit = (typeof window.webkitConvertPointFromNodeToPage === 'function');
-
-  if(isWebkit){
-
-      self_parent.hide("drop", {direction: "right"}, 900);
-      $('.database_listing_pointer').hide("drop", {direction: "left"}, 900);
-
-      self_parent.show("drop", {direction: "right"}, 900);
-      $('.database_listing_pointer').show("drop", {direction: "left"}, 900);
-
-} else {
-      self_parent.fadeOut(900);
-      $('.database_listing_pointer').fadeOut(900);      
-
-      self_parent.fadeIn(900);
-      $('.database_listing_pointer').fadeIn(900);    
-}
-
-
-      compareDatabases(false);
-
-
-      self_parent.css('display','table-cell'); 
-      $('.database_listing_pointer').css('display','table-cell');  
-    } 
-
-  });
 
   $('#compare_previous').prop('disabled', true);
   if(comparing_current == max_comparing)
@@ -530,42 +430,6 @@ $('[data-clampedwidth]').each(function () {
 
 });
 var databases = [];
-
-function compareDatabases(show_modal){
-
-  if(show_modal)
-    loading_modal.showPleaseWait();
-
-  if(show_modal)
-    cleantablediff();
-
-  var threadpool = new ThreadPool(20);
-  var priority=1;
-
-  var reference_table;
-  var compared_table;
-  try{
-    reference_table = $('.database_listing').eq(0).find('.set_reference').prop('id').substring(3);
-    compared_table = $('.database_listing_pointer').find('.set_reference').prop('id').substring(3);  
-  }catch(err){}
-
-  {%for fingerprint_id, content in results.items|slice:":1" %}
-    {% for k,v in content.qset.ordered_items %}
-      var thread = new Runnable(compareDatabase, priority++, reference_table+'_{{k|removespaces}}', compared_table+'_{{k|removespaces}}'); threadpool.run(thread);  
-    {% endfor %}
-  {% endfor %}
-
-  threadpool.destroy(
-    function(){
-        $(".tooltippable").tooltip({container:"body"});
-
-        //applyFilters();
-
-        if(show_modal)        
-          loading_modal.hidePleaseWait();
-    }
-  );
-}
 
 function compareDatabase(base, other){
   tablediffall_two(base, [other]);
