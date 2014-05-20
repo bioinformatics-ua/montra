@@ -213,9 +213,12 @@ function questionsets_handle(id_questionset)
       errornavigator.hideErrorPage();
       errornavigator.reset();
 
+      {% if not readonly %}
       var list_invalid = advValidator.validateFormContext(e, current_form);
       //console.log(list_invalid);
-
+      {% else %}
+      var list_invalid =[];
+      {% endif %}
 
       if(list_invalid.length == 0){
 
@@ -318,7 +321,9 @@ $(function(){
 
   // Clearly identify database name before the edition
   advValidator.setDatabase("{{name}}");
-
+  {% if readonly %}
+  advValidator.searchMode(true);
+  {% endif %}
   initialCounterSetup();
 });
 
