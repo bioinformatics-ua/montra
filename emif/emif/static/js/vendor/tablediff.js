@@ -202,10 +202,11 @@ comparetable_two = function(table1, table2) {
 
                         //$('#' + table2).childNodes[1].childNodes[0]).addClass("success")
                         //$($('#' + table2).childNodes[1].childNodes[0]).addClass("success");
-                        $(this).addClass("success");
+                        /*$(this).addClass("success"); */
                     } else if (result == 2) {
                         //$($('#' + table2).childNodes[1].childNodes[0]).addClass("warning");
-                        $(this).addClass("warning");
+                        
+                        /*$(this).addClass("warning");*/
 
                         paint_table2(table2, question.context.data, "warning");
                     } else if (result == 3) {
@@ -214,7 +215,7 @@ comparetable_two = function(table1, table2) {
 
                     } else {
                         //$($('#' + table2).childNodes[1].childNodes[0]).addClass("error");
-                        $(this).addClass("error");
+                        /*$(this).addClass("error");*/
 
                         paint_table2(table2, question.context.data, "error");
                     }
@@ -307,7 +308,7 @@ cleantablediff = function() {
     $('.database_listing .success').removeClass('success');
     $('.database_listing .warning').removeClass('warning');
     $('.database_listing .emptycells').removeClass('emptycells');
-    $('.database_listing .entry').show();
+    $('.database_listing .hide_me').removeClass('hide_me');
 }
 
 function hide_uncessary_qs(list_tables, table_tmp) {
@@ -364,25 +365,8 @@ function hideEmptyCells(list_tables, table_tmp, show_emptyrows) {
    	dom and all was separated 
 */
 function reset_results(databases, reference){
-    var reference_table = $('table[id^="HEADER_"] ');
-    reference_table.each(function(){
-        $(this).parent().parent().parent().show();
-        $(this).find(" .entry").show();
-    });
-   var reference_table = $('table[id^="'+reference+'_"] ');
-    reference_table.each(function(){
-        $(this).parent().parent().parent().show();
-        $(this).find(" .entry").show();
-    });
-    for(var i=0;i<databases.length;i++){
-        var tables = $('table[id^="'+databases[i]+'_"] ');
 
-        tables.each(function(){
-            $(this).parent().parent().parent().show();
-            $(this).find(" .entry").show();
-        });
-
-    }
+    $('.hide_me').removeClass('hide_me');
 }
 /**
  * We only can hide stuff if we dont have any ocurrence of the type on the showing databases
@@ -390,34 +374,21 @@ function reset_results(databases, reference){
  */
 function showMinimumDenominator(condition, class_to_check, table, databases){  
 
+
     // Showing is additive
     if(condition == true){
-        $(table).find('.'+class_to_check).show();
+        $(table).find('.'+class_to_check).removeClass('hide_me');
     } 
     // Adding requires the class_to_check to not appear in any of the lines.
     else {
         $(table).find('.entry').each(function(){
             var row = $(this).data('rowid');
 
-            var fullfills_condition = true;
-            $('.rowid_'+row).each(function(){
-                // If the row is not the base table, nor the header, and is in the showing list
-                // we can consider it for the minimum denominator
-                if(
-                    !$(this).hasClass('basetable') && $(this).data('fingerprintid') != 'HEADER'
-
-                    && dbindexOf($(this).data('fingerprintid'), databases) != -1
-
-                    ){
-                    if(!$(this).hasClass(class_to_check)){
-                        fullfills_condition = false;
-                        return false;
-                    }
-                }
-            });
-
-            if(fullfills_condition)
-                $('.rowid_'+row).hide();
+            var fullfills_condition = checkConditions('.rowid_'+row, class_to_check, databases);
+            if(fullfills_condition){
+                $('.rowid_'+row).addClass('hide_me');
+            }
+           
         });
     }
 }
@@ -428,14 +399,38 @@ function dbindexOf(entry, array){
     }
     return -1;
 }
+function checkConditions(context, class_to_check, databases){
+    var fullfills_condition = true;
+
+    $(context).each(function(){
+                // If the row is not the base table, nor the header, and is in the showing list
+                // we can consider it for the minimum denominator
+                if(!$(this).hasClass('basetable') && $(this).data('fingerprintid') != 'HEADER'
+
+                    && dbindexOf($(this).data('fingerprintid'), databases) != -1
+
+                    ){
+                    if(!$(this).hasClass(class_to_check)){
+                        fullfills_condition = false;
+                        return false;
+                    }
+                }
+    });
+
+    return fullfills_condition;
+}
 function filter_results(databases, reference, word, show_match, show_unmatch, show_emptyrows, show_proximity) {
-    console.log('filtering unmatch: '+show_unmatch);
+    console.log('filtering show_match, show_unmatch, show_emptyrows, show_proximity');
+    console.log(show_match+" - "+show_unmatch+" - "+show_emptyrows+" - "+show_proximity);
     // reset results
     reset_results(databases, reference);
 
         var tables = $('table[id^="'+reference+'_"] ');
 
         tables.each(function(){
+
+            // emptyrows
+            showMinimumDenominator(show_emptyrows,  'emptycells',  this, databases);    
 
             // match
             showMinimumDenominator(show_match,      'success',     this, databases);
@@ -446,8 +441,7 @@ function filter_results(databases, reference, word, show_match, show_unmatch, sh
             // proximity
             showMinimumDenominator(show_proximity,  'warning',     this, databases);
 
-            // emptyrows
-            showMinimumDenominator(show_emptyrows,  'emptycells',  this, databases);            
+        
 
         });
     

@@ -119,7 +119,7 @@ th, td {
       </div>
     </div>   
       {% for k,v in results.items.0.1.qset.ordered_items %}
-      <div style="background-color: white" class="accordion-group">
+      <div class="accordion-group">
         <div title="{{k|removeh1}}" class="tooltippable accordion-heading">
           <small><a id="a_collapse{{k|removespaces}}_{{name|removespaces}}" class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapse{{k|removespaces}}_{{name|removespaces}}">
           <div style="width: 220px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{k|removeh1}}</div></a></small>
@@ -127,7 +127,7 @@ th, td {
         <div id="collapse{{k|removespaces}}_{{name|removespaces}}" class="accordion-body collapse">
           <div class="accordion-inner">
 
-            <table id="HEADER_{{k|removespaces}}" class="table table-bordered table-hover table-striped">
+            <table id="HEADER_{{k|removespaces}}" class="table table-bordered table-hover">
               <thead></thead>
 
               <tbody>
@@ -140,7 +140,6 @@ th, td {
                   {{ t.tag|removehs }}
                   
                   </td> 
-                  <td style="width: 0px;" class="tooltippable" data-original-title="{{ t.value }}" title="">{{ t.value }}</td>
 
                 </tr>
                 {% endfor %}
@@ -173,7 +172,7 @@ th, td {
         <div id="collapse{{k|removespaces}}_{{content.name|removespaces}}" class="accordion-body collapse">
           <div class="accordion-inner">
 
-            <table id="{{fingerprint_id|removespaces}}_{{k|removespaces}}" class="table table-bordered table-hover table-striped">
+            <table id="{{fingerprint_id|removespaces}}_{{k|removespaces}}" class="table table-bordered table-hover">
               <thead></thead>
 
               <tbody>
@@ -320,6 +319,7 @@ var comparing_current=1;
 var max_comparing = {{results|length|add:-1}};
 var dbs = null;
 function compareDbsSelected(){
+  cleantablediff();
       var ref = dbs.reference;
 
       var others = [];
@@ -344,12 +344,12 @@ function compareDbsSelected(){
       threadpool.destroy(
         function(){
             $(".tooltippable").tooltip({container:"body"});
+
+            applyFilters();
         }
       );
-      cleantablediff();
       $('.basetable').removeClass('basetable');
       $('table[id^="'+ref+'_"] tr').addClass('basetable');
-      $('table[id^="'+ref+'_"] td').addClass('basetable');
 
 }
 $(function(){
