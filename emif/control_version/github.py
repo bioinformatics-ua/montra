@@ -23,7 +23,7 @@ from github3 import login
 from control_version.models import *
 from django.shortcuts import render
 from django.conf import settings
-from django.core.mail import send_mail, BadHeaderError
+from emif.utils import send_custom_mail
 
 
 """
@@ -58,7 +58,7 @@ def report_bug(request):
             issue.create(title, description)
             
             try:
-                send_mail(title, description, settings.DEFAULT_FROM_EMAIL, [from_email])
+                send_custom_mail(title, description, settings.DEFAULT_FROM_EMAIL, [from_email])
             except:
                 pass
             return feedback_thankyou(request)
@@ -66,7 +66,6 @@ def report_bug(request):
     else:
         form = BugReportForm()  # An unbound form
     return render(request, 'bugreport.html', {'form': form, 'request': request, 'breadcrumb': True})
-
 
 def issues_handler(request):
     issue = IssueManager(settings.GITHUB_USERNAME, settings.GITHUB_PASSWD)

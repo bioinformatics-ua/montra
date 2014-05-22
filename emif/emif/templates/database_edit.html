@@ -6,7 +6,7 @@
 {% block breadcrumbs %}
     {{ block.super }}
     {% breadcrumb "Personal" "databases" %}
-    {% breadcrumb name "fingerprint/"|add:fingerprint_id|add:"/1" %}
+    {% breadcrumb name|ellipsis:40 "fingerprint/"|add:fingerprint_id|add:"/1" %}
     {% if not readonly %}
     {% with url_id="dbEdit/1" %}
         {% with url_id=url_id|add:id  %}

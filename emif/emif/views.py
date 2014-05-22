@@ -44,7 +44,9 @@ from questionnaire.models import Answer
 from api.models import *
 
 from geopy import geocoders 
-from django.core.mail import send_mail, BadHeaderError
+from django.core.mail import BadHeaderError
+
+from emif.utils import send_custom_mail
 
 from modules.geo import *
 
@@ -810,7 +812,6 @@ def render_one_questionset(request, q_id, qs_id, errors={}, aqid=None, fingerpri
         if template_name == 'fingerprint_search_qs.html':
             advanced_search = True
 
-
         r = r2r(template_name, request,
                 questionset=question_set,
                 questionsets=question_set.questionnaire.questionsets,
@@ -893,15 +894,14 @@ def extract_answers(request2, questionnaire_id, question_set, qs_list):
     extra_fields = {}
     # this will ensure that each question will be processed, even if we did not receive
     # any fields for it. Also works to ensure the user doesn't add extra fields in
-    for x in expected:
+    '''for x in expected:
         items.append((u'question_%s_Trigger953' % x.number, None))
-
+    '''
     # generate the answer_dict for each question, and place in extra
     for item in items:
         key, value = item[0], item[1]
         if key.startswith('comment_question_'):
             continue
-            
         if key.startswith('question_'):
             answer = key.split("_", 2)
             question = get_question(answer[1], questionnaire)
@@ -956,7 +956,8 @@ def extract_answers(request2, questionnaire_id, question_set, qs_list):
         
         '''if u"Trigger953" not in ans:
             logging.warn("User attempted to insert extra question (or it's a bug)")
-            continue'''
+            continue
+        '''
         try:
             cd = question.getcheckdict()
             
@@ -1054,6 +1055,27 @@ def extract_answers(request2, questionnaire_id, question_set, qs_list):
             qlist_general.append((qs_aux, qlist))
     except:
         raise
+
+        ## HOT FIX for qvalues to work properly, THIS SHOULD BE FIXED IN THE CODE ABOVE
+
+    qvalues = {}
+    for question, qdict in qlist_general:
+        for k, v in qdict:
+            try:
+                qval = v['qvalue']
+
+                print str(k.number)+" - "+qval
+                if qval != None and qval != '':
+
+                    try: 
+                        cutzone = qval.index('#');
+                        qvalues[k.number] = qval[0:cutzone]
+                    except ValueError:
+                        qvalues[k.number] = qval
+                        
+            except KeyError:
+                pass
+
     return (qlist_general, qlist, jstriggers, qvalues, jsinclude, cssinclude, extra_fields, len(errors)!=0)
     
 def database_detailed_view(request, fingerprint_id, questionnaire_id, template_name="database_edit.html"):
@@ -2972,9 +2994,9 @@ def feedback(request, template_name='feedback.html'):
                 message_admin = "Name: " + str(name) + "\nEmail: " + from_email + "\n\nMessage:\n" + str(message)
                 message = "Dear " + name + ",\n\nThank you for giving us your feedback.\n\nYour message will be analyzed by EMIF Catalogue team.\n\nMessage sent:\n" + str(message) + "\n\nSincerely,\nEMIF Catalogue"
                 # Send email to admins
-                send_mail(subject, message_admin, settings.DEFAULT_FROM_EMAIL, emails_to_feedback)
+                send_custom_mail(subject, message_admin, settings.DEFAULT_FROM_EMAIL, emails_to_feedback)
                 # Send email to user with the copy of feedback message
-                send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [from_email])
+                send_custom_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [from_email])
 
             except BadHeaderError:
                 return HttpResponse('Invalid header found.')
@@ -3218,7 +3240,7 @@ def sharedb(request, db_id, template_name="sharedb.html"):
     try:
         
         message = """Dear %s,\n\n
-            \n\n
+            \n
             %s has shared a new database with you. 
             Now you're able to edit and manage the database. \n\n
             To activate the database in your account, please open this link:
@@ -3228,7 +3250,7 @@ def sharedb(request, db_id, template_name="sharedb.html"):
         # Send email to admins
         #send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, emails_to_feedback)
         # Send email to user with the copy of feedback message
-        send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [from_email])
+        send_custom_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [from_email])
 
     except BadHeaderError:
         return HttpResponse('Service Unavailable')
@@ -3278,9 +3300,9 @@ def sharedb_activation(request, activation_code, template_name="sharedb_invited.
         """ % (sp.user_invite.get_full_name(), request.user.get_full_name(), _aux['database_name_t'])
 
         # Send email to admins
-        send_mail(subject, message_to_inviter, settings.DEFAULT_FROM_EMAIL, [sp.user_invite.email])
+        send_custom_mail(subject, message_to_inviter, settings.DEFAULT_FROM_EMAIL, [sp.user_invite.email])
         # Send email to user with the copy of feedback message
-        send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [sp.user.email])
+        send_custom_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [sp.user.email])
 
     except BadHeaderError:
         return HttpResponse('Invalid header found.')

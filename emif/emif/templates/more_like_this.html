@@ -5,7 +5,7 @@
 
 {% block breadcrumbs %}
     {{ block.super }}
-    {% breadcrumb breadcrumb_text "" %}
+    {% breadcrumb breadcrumb_text|ellipsis:40 "" %}
 {% endblock %}
 
 

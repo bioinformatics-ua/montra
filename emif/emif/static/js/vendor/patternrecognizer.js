@@ -39,7 +39,7 @@ var PatternRecognizer = function(pattern, target){
 
 /* Plugin for email recognizing */ 
 var EmailRecognizer = function(target){
-    EmailRecognizer._base.apply(this, [/([\w-.]+@[\w.]+)/g, target]);
+    EmailRecognizer._base.apply(this, [/([\w_\-.]+@[\w_\-.]+)/g, target]);
 }.inherit(PatternRecognizer).addToPrototype({
     // override mask
     "mask": function(element){
@@ -48,7 +48,7 @@ var EmailRecognizer = function(target){
 });
 /* Plugin for link recognizing */ 
 var LinkRecognizer = function(target){
-    LinkRecognizer._base.apply(this, [/(http:\/\/[\w.\/]+)/g, target]);
+    LinkRecognizer._base.apply(this, [/(http:\/\/[\w_\-.\/]+)/g, target]);
 }.inherit(PatternRecognizer).addToPrototype({
     // override mask
     "mask": function(element){
