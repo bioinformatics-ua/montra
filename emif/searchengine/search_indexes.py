@@ -329,7 +329,11 @@ def index_answeres_from_qvalues(qvalues, questionnaire, subject, fingerprint_id,
     else:
         d['created_t'] = created_date
     d['date_last_modification_t']= now.strftime('%Y-%m-%d %H:%M:%S.%f')
-    d['user_t']= subject
+
+    # We dont want to reset share's... only set field if there isnt already one
+
+    if d.get('user_t') == None:
+        d['user_t']= subject
     # since its now by parts, we have absolutely no idea what was already there and what is new, 
     # to this must be done again from scratch
     d['text_t']= generateFreeText(d)
