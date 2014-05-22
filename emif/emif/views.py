@@ -158,17 +158,20 @@ def results_comp(request, template_name='results_comp.html'):
         date = ''
         fields = None
 
-    list_qsets = []
+    first_name = None
+    list_qsets = {}
     for db_id in list_fingerprint_to_compare:
         qsets, name, db_owners, fingerprint_ttype = createqsets(db_id)
 
-        list_qsets.append((name, qsets))
-    first_name = None
-    if len(list_qsets) > 0:
-        (first_name, discard) = list_qsets[0]
+        list_qsets[db_id] = { 'name': name, 'qset': qsets}
 
-    #print "list_qsets: " + str(list_qsets)
+        if(first_name == None):
+            first_name = name
 
+    '''for fingerprint_id, (name, qset) in list_qsets.items:
+        print "--------------------------------"
+        print content['name']
+    '''
 
     return render(request, template_name, {'request': request, 'breadcrumb': True,
                                            'results': list_qsets, 'database_to_compare': first_name})
