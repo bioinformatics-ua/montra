@@ -91,7 +91,7 @@ function fillList(admin){
                             + "</td><td>Last update: " + d.latest_date +"</td>";
 
             if(admin == true)
-                content += '<td style="width: 50px;"><button class="btn btn-link" '
+                content += '<td class="btn_delete" style="width: 50px;"><button class="btn btn-link" '
     + 'onclick="deleteFile(\''+d.file_name+'\',\''+d.revision+'\')">'
     + '<img src="static/img/glyphicons_192_circle_remove.png"/></button></td>';
 

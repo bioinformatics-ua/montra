@@ -1938,6 +1938,7 @@ def all_databases_data_table(request, template_name='alldatabases_data_table.htm
     return render(request, template_name, {'request': request, 'export_all_answers': True, 'titles': titles,
                                            'answers': answers, 'breadcrumb': True, 'collapseall': False, 'geo': True,
                                            'list_databases': list_databases,
+                                           'no_print': True,
                                            'databases_types': databases_types
                                            })
 
