@@ -189,12 +189,13 @@ def index_answeres_from_qvalues(qvalues, questionnaire, subject, fingerprint_id,
     results = c.search_fingerprint("id:"+fingerprint_id)
     if (len(results)>0):
         d = results.docs[0]
-    else:
+    '''else:
         try:
             fp = Fingerprint(fingerprint_hash=fingerprint_id)
             fp.save()
         except:
             print(fingerprint_id + ' already in DB')
+    '''
 
     text = ""
     ''' For god sake, i dont understand what this was doing here, since its not being used
@@ -329,7 +330,8 @@ def index_answeres_from_qvalues(qvalues, questionnaire, subject, fingerprint_id,
     else:
         d['created_t'] = created_date
     d['date_last_modification_t']= now.strftime('%Y-%m-%d %H:%M:%S.%f')
-    d['user_t']= subject
+    if d.get('user_t') == None:
+        d['user_t']= subject
     # since its now by parts, we have absolutely no idea what was already there and what is new, 
     # to this must be done again from scratch
     d['text_t']= generateFreeText(d)
@@ -337,7 +339,7 @@ def index_answeres_from_qvalues(qvalues, questionnaire, subject, fingerprint_id,
     if extra_fields!=None:
         d = dict(d.items() + extra_fields.items())
     
-    print(d)
+    #print(d)
 
     # We only delete right before adding, so we dont lose what is on the database 
     # in case anything fails on the process above

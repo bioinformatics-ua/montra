@@ -80,6 +80,8 @@ text-decoration: none;
 <div style="display: none; z-index: 2000; position:fixed; bottom:20px; right: 20px;" class="alert alert-info" id="loading-message">
 Saving... please don't close this questionnary yet.</div>
 
+<div style="display: none; z-index: 2000; position:fixed; bottom:20px; right: 20px;" class="alert alert-danger" id="loading-error-message">
+It was not possible to save this questionnary. Please try again in a few seconds.</div>
 
 <div class="cleared_separator"></div>
         <hr >
@@ -189,6 +191,8 @@ function questionsets_handle(id_questionset)
 
       if (!(typeof errornavigator === 'undefined')) {
       errornavigator.hideErrorPage();
+      $("#loading-message").fadeOut('fast');
+      $("#loading-error-message").fadeOut('fast');
       errornavigator.reset();
 
       var list_invalid = advValidator.validateFormContext(e, current_form);
@@ -210,6 +214,12 @@ function questionsets_handle(id_questionset)
               $("#loading-message").fadeOut('fast');
               formHasChanged = false;   
 
+            });
+            posting.fail(function(data){
+              $("#loading-message").fadeOut('fast');
+
+              $("#loading-error-message").fadeIn('fast');
+               
             });
           }
         }

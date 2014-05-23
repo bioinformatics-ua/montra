@@ -108,6 +108,9 @@ class Answer(models.Model):
     def get_slug():
         return question.slug_fk.slug1
 
+    def __str__(self):
+     return "ANSWER{id="+str(self.id)+", question_slug="+self.question.slug_fk.slug1+", data="+self.data+", comment="+str(self.comment)+"}"
+
 """
 This class wraps the Description of the Fingerprint.
 It will be used to list fingerprints, for instance.

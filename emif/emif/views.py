@@ -41,6 +41,8 @@ from searchengine.search_indexes import convert_text_to_slug
 from emif.utils import *
 from emif.models import *
 
+from fingerprint.services import *
+
 from api.models import *
 
 from geopy import geocoders 
@@ -2636,6 +2638,9 @@ def check_database_add_conditions(request, questionnaire_id, sortid, saveid,
 
         if not hasErrors:
             add_city(qlist_general)
+
+            saveFingerprintAnswers(qlist_general, fingerprint_id, question_set2.questionnaire, users_db, extra_fields=extra_fields, created_date=created_date)
+
             index_answeres_from_qvalues(qlist_general, question_set2.questionnaire, users_db,
                                         fingerprint_id, extra_fields=extra_fields, created_date=created_date)
 
