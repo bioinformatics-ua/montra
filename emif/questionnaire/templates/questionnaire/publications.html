@@ -34,7 +34,7 @@
         <input class="span5" type="text" id="question_{{ question.number|removedots }}_pubpages" />    
     </div>
     <div class="control-group span12">
-        <label class="control-label span2">Authors *:</label>
+        <label class="control-label span2">Authors:</label>
         <input class="span5" type="text" id="question_{{ question.number|removedots }}_pubauthors" />    
     </div>
 
@@ -267,8 +267,8 @@ function PublicationWidget ()
         //if(pubyear.length == 0)
         //    return false;
         
-        if(pubauthors.length == 0)
-            return false;
+        //if(pubauthors.length == 0)
+        //    return false;
 
         return true;
     }
