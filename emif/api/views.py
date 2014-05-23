@@ -344,7 +344,21 @@ class ValidateView(APIView):
         
         c = CoreEngine()
         results = c.search_fingerprint("database_name_t:\"" +database_name+'"')
-        result = {'contains': len(results) != 0}
+
+        contain = len(results) != 0
+        # Dirty hack: check if the database name is really equals
+        if contain:
+            for r in results:
+                try:
+                    if database_name != r['database_name_t']:
+                        contain = False
+
+                except:
+                    raise
+                    contain = True
+
+
+        result = {'contains': contain}
 
         response = Response(result, status=status.HTTP_200_OK)
         return response
