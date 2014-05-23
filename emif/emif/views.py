@@ -2195,7 +2195,8 @@ def createqset(runcode, qsid, qsets=None, clean=True, highlights=None):
             #     '''    
             question_ = Question.objects.filter(slug_fk__slug1=k[:-2], questionset__questionnaire=q_aux[0].pk)
             if len(question_) > 0:
-                text = question_[0].slug_fk.description
+                #text = question_[0].slug_fk.description
+                text = question_[0].text
                 qs = question_[0].questionset.text
                 q_number = qs = question_[0].number
                 if qsets.has_key(question_[0].questionset.text):
