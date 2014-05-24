@@ -1,0 +1,22 @@
+{% extends 'common_email.html' %}
+
+{% load i18n %}{% load url from future %}
+{% autoescape off %}
+
+{% block email_content %}
+{% if not without_usernames %}{% blocktrans with user.username as username %}Dear {{ username }},{% endblocktrans %}<br /><br />
+{% endif %}
+{% blocktrans with site.name as site %}Thank you for signing up at {{ site }}.{% endblocktrans %}<br /><br />
+
+{% trans "To activate your account you should click on the link below:" %}<br /><br />
+
+{{ protocol }}://{{ site.domain }}{% url 'userena_activate' activation_key %}<br /><br />
+
+{% trans "Thanks for using our site!" %}<br /><br />
+
+{% trans "Sincerely" %},<br />
+{{ site.name }}<br />
+{% endblock %}
+
+{% endautoescape %}
+
