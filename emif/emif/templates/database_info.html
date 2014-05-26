@@ -352,7 +352,7 @@ this.complete();
 <!-- This must be here because of dynamic code -->
 $(document).ready(function() {
 
-    bindPostCommentHandler('{{ request.user.first_name }}', '{{ request.user.last_name }}', '{{ request.user.username }}');
+        bindPostCommentHandler('{{ request.user.first_name }}', '{{ request.user.last_name }}', '{{ request.user.username }}', '{{owners}}', '{{fingerprint_id}}', '{{breadcrumb_name}}');
 //load_questionnary();
     $('.tabbable a[data-toggle="tab"]').on('shown', function (e) {
         if(e.target.textContent == 'Population Characteristics'){
