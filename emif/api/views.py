@@ -573,7 +573,7 @@ class NotifyOwnerView(APIView):
                             'base_url': settings.BASE_URL,
                             'user_commented': user_commented
                         }), 
-                     settings.DEFAULT_FROM_EMAIL, ['longinus525@gmail.com']);
+                     settings.DEFAULT_FROM_EMAIL, [owner]);
 
                     return Response({}, status=status.HTTP_200_OK)
 
