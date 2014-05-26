@@ -71,6 +71,7 @@ from django.views.decorators.cache import cache_page
 
 import hashlib
 
+from emif.utils import escapeSolrArg
 
 def list_questions():
     print "list_questions"
@@ -186,12 +187,10 @@ def results_fulltext(request, page=1, full_text=True,template_name='results.html
     if not in_post:
         query = request.session.get("query","")
 
-    if isAdvanced == False:
-        query = "'"+re.sub("['\"']","\\'",query)+"'"  
-        query = "text_t:"+query
+    if isAdvanced == False: 
+        query = "text_t:"+escapeSolrArg(query)
+        print query
 
-    if not full_text:
-        return results_fulltext_aux(request, query, page, template_name, isAdvanced)
     return results_fulltext_aux(request, query, page, template_name, isAdvanced)
 
 
@@ -217,7 +216,7 @@ def results_fulltext_aux(request, query, page=1, template_name='results.html', i
 
     (list_databases, hits, hi) = get_databases_from_solr_with_highlight(request, query_filtered, sort=sortString, rows=rows, start=range)
     if not isAdvanced:
-        hi = merge_highlight_results( request.session["query"] , hi)
+        hi = merge_highlight_results( '"'+request.session["query"]+'"' , hi)
     else:
         hi = merge_highlight_results( None , hi)
     
@@ -391,7 +390,12 @@ def results_diff(request, page=1, template_name='results_diff.html'):
     in_post = True
     try:
         query = request.POST['query']
+
+        
+        query = '"'+escapeSolrArg(query)+'"'
+
         request.session['query'] = query
+
         request.session['isAdvanced'] = False
         request.session['query_id'] = -1
         request.session['query_type'] = -1
@@ -435,6 +439,7 @@ def geo(request, template_name='geo.html'):
         if(request.session.get('query') != None):
             query = "'"+re.sub("['\"']","\\'",request.session.get('query'))+"'"  
             query = "text_t:"+query
+
         else:
             query = "*:*"
 
