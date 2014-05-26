@@ -145,7 +145,47 @@ UrlValidator.prototype ={
         var validator = $('[id="url_validator_'+question_number+'"]');
         //console.log(validator);
 
-        var text = $(controllerDOM).val();
+        var text = $(controllerDOM).val().trim();
+        if(text.length == 0){
+            draw_validator(validator, true, "");
+            return true;
+        }
+        var res = this.regex.test(text);
+
+        if(!res){
+            draw_validator(validator, false, "This Field must be an url (starting with http://)");
+        }else{
+            draw_validator(validator, true, "");
+        }
+
+        return res;
+    },
+    controllerDOM : function(validatorDOM){
+        return $("input", validatorDOM);
+    }
+}
+/* To validate urls inside publication, 
+ * in the future could be expanded to do other kinds of validations on publciations too 
+ */
+function PublicationsValidator(context){
+    /* I didnt make up this regex for url validation, Url validation well done is not trivial,
+    so im using Diego Perini well tested solution.
+    Ref from: http://pastebin.com/JUKSeB0v */
+    this.regex = /^(?:(?:https?|ftp):\/\/)(?:\S+(?::\S*)?@)?(?:(?!10(?:\.\d{1,3}){3})(?!127(?:\.\d{1,3}){3})(?!169\.254(?:\.\d{1,3}){2})(?!192\.168(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z\u00a1-\uffff0-9]+-?)*[a-z\u00a1-\uffff0-9]+)(?:\.(?:[a-z\u00a1-\uffff0-9]+-?)*[a-z\u00a1-\uffff0-9]+)*(?:\.(?:[a-z\u00a1-\uffff]{2,})))(?::\d{2,5})?(?:\/[^\s]*)?$/i;
+    this.context = context;
+}
+PublicationsValidator.prototype ={
+    onInit : function(dom){
+        
+    },
+    validate : function(question_number, controllerDOM){
+        var draw_validator = this.context.draw_validator;        
+        question_number = question_number.replace(".","\\.");        
+        var validator = $('[id="url_validator_'+question_number+'"]');
+        //console.log(validator);
+        console.error('cDom:controllerDOM');
+        console.log(controllerDOM)
+        var text = $(controllerDOM).val().trim();
         if(text.length == 0){
             draw_validator(validator, true, "");
             return true;
@@ -173,6 +213,7 @@ function Fingerprint_Validator(searchMode){
     this.validators["numeric"] = { n: "numeric_validator", v: new NumericValidator(this)};
     this.validators["email"] = { n: "email_validator", v: new EmailValidator(this)};
     this.validators["url"] = { n: "url_validator", v: new UrlValidator(this)};
+    this.validators["publication"] = { n: "publication", v: new PublicationsValidator(this)};
 }
 Fingerprint_Validator.prototype ={
     onInit : function(){

@@ -339,10 +339,11 @@ this_row.parent().siblings().first().collapse('toggle');
         if (results > 0)
             erec.applyMasks();
 
-    var lrec = new LinkRecognizer("#qs_"+sortid+" td");
+    var lrec = new LinkRecognizer("#qs_"+sortid+" td.captioned_content");
     var results = lrec.match();
         if (results > 0)
             lrec.applyMasks();
+
 });    
 
 threads['qs_'+sortid] = null;

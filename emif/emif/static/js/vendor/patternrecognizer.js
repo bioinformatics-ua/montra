@@ -52,6 +52,7 @@ var LinkRecognizer = function(target){
 }.inherit(PatternRecognizer).addToPrototype({
     // override mask
     "mask": function(element){
-        $(element).html($(element).html().replace(this.pattern, "<a href=\"$1\">$1</a>"));
+        if(!$(element).is('a'))
+            $(element).html($(element).html().replace(this.pattern, "<a href=\"$1\">$1</a>"));
     }
 });

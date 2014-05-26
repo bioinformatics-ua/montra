@@ -727,3 +727,8 @@ height: 6em;
 .database_listing .accordion-inner{
   padding: 0px !important;
 }
+
+.link_pubmed a{
+  color: #08c !important;
+  text-decoration: none !important;
+}

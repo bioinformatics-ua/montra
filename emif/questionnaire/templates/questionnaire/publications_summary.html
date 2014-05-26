@@ -27,9 +27,11 @@
 {% if pub.year %}
 <small><strong>Year: </strong>{{pub.year}}</small><br />
 {% endif %}
+{% if pub.link %}
+<small><strong>Link: </strong><a href="{{pub.link}}">{{pub.link}}</a></small><br />
+{% endif %}
 </div>'>{{pub.title}}</li>
         {% endfor %}
-
         <script type="text/javascript">
         $(function (){
             $('.publication_details').popover({trigger: 'hover', html: 'true'});    
