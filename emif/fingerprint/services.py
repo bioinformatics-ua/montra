@@ -2,6 +2,8 @@ from fingerprint.models import Fingerprint, Answer
 from questionnaire.models import Questionnaire
 from django.contrib.auth.models import User
 
+from searchengine.search_indexes import generateFreeText, setProperFields, CoreEngine
+
 from django.utils import timezone    
 
 
@@ -193,3 +195,57 @@ def updateFingerprint(fingerprint_id, questionnaire, user):
             fingerprint.save()
 
     return fingerprint
+
+def indexFingerprint(fingerprint_id):
+    try:
+        fingerprint = Fingerprint.objects.get(fingerprint_hash=fingerprint_id)
+
+
+        d = {}
+
+        # Get parameters that are only on fingerprint
+        # type_t
+        d['id']=fingerprint_id
+        d['type_t'] = fingerprint.questionnaire.slug
+        d['date_last_modification_t'] = fingerprint.last_modification.strftime('%Y-%m-%d %H:%M:%S.%f')
+        d['created_t'] = fingerprint.created.strftime('%Y-%m-%d %H:%M:%S.%f')
+
+        # user_t (owner + shared)
+        # i don't know if the user is
+        users = set()
+        users.add(fingerprint.owner.email)
+        for share in fingerprint.shared.all():
+            users.add(share.email)
+
+        users = list(users)
+        users_string = users[0]
+
+        for i in xrange(1, len(users)):
+            users_string+= ' \\ ' + users[i]
+
+        d['user_t'] = users_string
+
+        # Add answers
+        answers = Answer.objects.filter(fingerprint_id=fingerprint)
+
+        for answer in answers:
+            setProperFields(d, answer.question, answer.question.slug_fk.slug1, answer.data)
+            if answer.comment != None:
+                d['comment_question_'+answer.question.slug_fk.slug1+'_t'] = answer.comment
+            
+        
+        d['text_t']= generateFreeText(d)
+        
+        c = CoreEngine()
+
+        results = c.search_fingerprint("id:"+fingerprint_id)
+        if len(results) == 1:
+            # Delete old entry if any
+            c.delete(results.docs[0]['id'])
+        
+        c.index_fingerprint_as_json(d)
+
+    # In case is a new one, create it
+    except Fingerprint.DoesNotExist:
+        print "-- ERROR: Can't find the fingerprint with hash "+fingerprint_id+" to export."
+

@@ -82,7 +82,7 @@ class CoreEngine:
         """Index fingerprint as json
         """
         # index document
-        #print(d)
+
         xml_answer = self.solr.add([d])
         #print(xml_answer)
         self.optimize()
@@ -377,7 +377,7 @@ def assert_suffix(type):
 
 def convertDate(value):
     value = re.sub("\"", "", value)
-    print (value)
+
     try:
         # First we try converting to normalized format, yyyy-mm-dd
         date = datetime.datetime.strptime(value, '%Y-%m-%d')
