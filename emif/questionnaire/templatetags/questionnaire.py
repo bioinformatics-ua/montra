@@ -32,3 +32,32 @@ def qtesturl(question):
         args=("test:%s" % qset.questionnaire.id,
          qset.sortid))
 
+@register.filter(name="rangeleft")
+def rangeleft(value):
+    returnable = None
+
+    if value.startwith('[') and value.endwith(']'):
+        value = value.replace('[', '')
+        value = value.replace(']', '')
+
+        broken = value.split(" TO ")
+
+        if len(broken) == 2:
+            returnable=broken[0].trim()
+
+    return returnable
+
+@register.filter(name="rangeright")
+def rangeright(value):
+    returnable = None
+
+    if value.startwith('[') and value.endwith(']'):
+        value = value.replace('[', '')
+        value = value.replace(']', '')
+
+        broken = value.split("TO")
+
+        if len(broken) == 2:
+            returnable=broken[1].trim()
+
+    return returnable

@@ -11,13 +11,13 @@
             <!-- If Questionset is not the first (Introduction) or the final (Thank you) -->
 
                 {% if questions_list.0.0.prev %}
-                    <a href="add/{{ questionset.questionnaire.pk }}/{{ questions_list.0.0.prev.sortid }}" class="btn large primary" onclick="questionsets_handle(qs_{{ questions_list.0.0.prev.sortid }});  return false;">{% trans "Previous" %}</a>
+                    <a href="add/{{ questionset.questionnaire.pk }}/{{ questions_list.0.0.prev.sortid }}" class="btn large primary" onclick="questionsets_handle(qs_{{ questions_list.0.0.prev.sortid }});  return false;"><i class="icon-chevron-left"></i> &nbsp;{% trans "Previous" %}</a>
                 {% endif %}
                 {% if questions_list.0.0.prev and questions_list.0.0.next %}
 
                 {% endif %}
-                {% if questions_list.0.0.next %}
-                    <a href="advancedSearch/{{ questionset.questionnaire.pk }}/{{ questions_list.0.0.next.sortid }}" class="btn large primary" onclick="questionsets_handle(qs_{{ questions_list.0.0.next.sortid }});  return false;">{% trans "Next" %}</a>
+                {% if questions_list.0.0.next and questions_list.0.0.next.sortid != 99 %}
+                    <a href="advancedSearch/{{ questionset.questionnaire.pk }}/{{ questions_list.0.0.next.sortid }}" class="btn large primary" onclick="questionsets_handle(qs_{{ questions_list.0.0.next.sortid }});  return false;">{% trans "Next" %} &nbsp;<i class="icon-chevron-right"></i></a>
                 {% endif %}
 
 
@@ -26,13 +26,17 @@
             </div>
             <div class="span2 text-right">
                 {% if questions_list.0.0.sortid != 0 %}
-                    <input type="submit" class="search_button btn btn-inverse" value="Search" >
+                    <!--input type="submit" class="search_button btn btn-inverse" value="Search" -->
+                    <button type="submit" class="btn btn-primary">
+                      <i class="icon-search icon-white"></i> &nbsp;Search
+                    </button>
                 {% endif %}
                 {% if questions_list.0.0.sortid == 0 %}
                 {% endif %}
                     <!-- Last Questionset - Thank You -->
                 {% if questions_list.0.0.sortid == 99 %}
                     <!--<input class="btn large btn-primary" name="submit" type="submit" value="{% trans 'Save' %}" />-->
+
                 {% endif %}
             </div>    
         </div>    
@@ -138,7 +142,7 @@
 
                                     </a>
                             </div>
-                                    <div id="div_{{ iteratorQ.value }}" class="accordion-body in collapse">
+                                    <div style="overflow: visible;" id="div_{{ iteratorQ.value }}" class="accordion-body in collapse">
                                         <div class="accordion-inner">
                                  {% endif %}
                                 <div class="answer qtext_{{question.text|geths}}" id="answer_{{ question.number }}">
@@ -174,13 +178,13 @@
             <!-- If Questionset is not the first (Introduction) or the final (Thank you) -->
 
                 {% if questions_list.0.0.prev %}
-                    <a href="add/{{ questionset.questionnaire.pk }}/{{ questions_list.0.0.prev.sortid }}" class="btn large primary" onclick="questionsets_handle(qs_{{ questions_list.0.0.prev.sortid }});  return false;">{% trans "Previous" %}</a>
+                    <a href="add/{{ questionset.questionnaire.pk }}/{{ questions_list.0.0.prev.sortid }}" class="btn large primary" onclick="questionsets_handle(qs_{{ questions_list.0.0.prev.sortid }});  return false;"><i class="icon-chevron-left"></i>&nbsp; {% trans "Previous" %}</a>
                 {% endif %}
                 {% if questions_list.0.0.prev and questions_list.0.0.next %}
 
                 {% endif %}
-                {% if questions_list.0.0.next %}
-                    <a href="advancedSearch/{{ questionset.questionnaire.pk }}/{{ questions_list.0.0.next.sortid }}" class="btn large primary" onclick="questionsets_handle(qs_{{ questions_list.0.0.next.sortid }});  return false;">{% trans "Next" %}</a>
+                {% if questions_list.0.0.next and questions_list.0.0.next.sortid != 99 %}
+                    <a href="advancedSearch/{{ questionset.questionnaire.pk }}/{{ questions_list.0.0.next.sortid }}" class="btn large primary" onclick="questionsets_handle(qs_{{ questions_list.0.0.next.sortid }});  return false;">{% trans "Next" %} &nbsp;<i class="icon-chevron-right"></i></a>
                 {% endif %}
 
 
@@ -189,7 +193,10 @@
             </div>
             <div class="span2 text-right">
                 {% if questions_list.0.0.sortid != 0 %}
-                    <input type="submit" class="search_button btn btn-inverse" value="Search" >
+                    <!--input type="submit" class="search_button btn btn-inverse" value="Search" -->
+                    <button type="submit" class="btn btn-primary">
+                      <i class="icon-search icon-white"></i> &nbsp;Search
+                    </button>
                 {% endif %}
                 {% if questions_list.0.0.sortid == 0 %}
                 {% endif %}
@@ -209,7 +216,7 @@ function add_triggers() {
             {% endfor %}
             
             {% for k,v in qvalues.items %}
-                qvalues['{{ k|escapejs }}'] = '{{ v|escapejs }}';
+                qvalues['question_{{ k|escapejs }}'] = '{{ v|escapejs }}';
             {% endfor %}
             
             for(key in qvalues) {
@@ -220,6 +227,14 @@ function add_triggers() {
              
 $(function(){
     tabindexer();
+
+
+    $(".accordion-group").on("shown",".collapse",function() {
+        $(this).css("overflow","visible");
+    });
+    $(".accordion-group").on("hidden",".collapse",function() {
+        $(this).css("overflow","hidden");
+    });    
 });    
     
 function tabindexer(){
@@ -274,6 +289,7 @@ function validate(question_number)
         e.stopPropagation();
 
        var div_id = 'accordion_{{ k.sortid }}';
+
        collapseAll($("#collapseall_qs_{{ k.sortid }}"), div_id);
 
        });

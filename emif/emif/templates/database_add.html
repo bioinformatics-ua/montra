@@ -5,7 +5,7 @@
 
 {% block breadcrumbs %}
 {{ block.super }}
-{% breadcrumb "My Databases" "databases" %}
+{% breadcrumb "Personal" "databases" %}
 {% breadcrumb "Add" "" %}
 
 {% endblock %}
@@ -50,6 +50,8 @@ text-decoration: none;
 <script type="text/javascript" src="{{ STATIC_URL }}questionset.js"></script>
 <script src="{{ STATIC_URL }}js/vendor/jquery.errornavigator.js"></script>
 
+<script type="text/javascript" src="{{ STATIC_URL }}js/fingerprint_edit.js"></script>
+
 <link rel="stylesheet" href="{{ STATIC_URL }}progressbar.css"></script>
 {% for x in jsinclude %}
 <script type="text/javascript" src="{{ x }}"></script>
@@ -83,10 +85,11 @@ Saving... please don't close this questionnary yet.</div>
         <hr >
 <div class="row">
 <div class="span3">
-  <div class="well" style="max-width: 340px; padding: 8px 0;">
+  <div class="qslist well" style="max-width: 340px; padding: 8px 0;">
 
     <ul class="nav nav-list nav-pills nav-stacked ">
       <li class="nav-header">Step-by-Step</li>
+
 
       {% for qs, answered, total_count, percentage in questionsets %}
      
@@ -99,7 +102,7 @@ Saving... please don't close this questionnary yet.</div>
               <td style="width: 80%; font-size: 93%;">
               {% if qs.sortid != 0 and qs.sortid != 99 %}{{ qs.sortid }}. {% endif %}{{ qs.text|removeh1 }}
               {% if qs.sortid != 0 and qs.sortid != 99 %}
-                <span id="counter0_{{ qs.sortid }}"> {{answered}}/{{total_count}}</span>
+                <span id="counter0_{{ qs.sortid }}"> ({{answered}}/{{total_count}})</span>
               {%endif%}
               </td>
               <td style="width: 10%; text-align: right;">
@@ -113,6 +116,7 @@ Saving... please don't close this questionnary yet.</div>
       </a>
       
     </li>
+
     {% endfor %}
   </ul>
 
@@ -168,7 +172,9 @@ function next_questionset(id_questionset)
 
 function questionsets_handle(id_questionset)
 {
-    event.preventDefault();
+    if (!e) var e = window.event;
+
+    console.log(e);
 
     var idString = id_questionset.id
     var id = idString.split('_');
@@ -185,7 +191,7 @@ function questionsets_handle(id_questionset)
       errornavigator.hideErrorPage();
       errornavigator.reset();
 
-      var list_invalid = advValidator.validateFormContext(event, current_form);
+      var list_invalid = advValidator.validateFormContext(e, current_form);
       //console.log(list_invalid);
 
 
@@ -202,6 +208,7 @@ function questionsets_handle(id_questionset)
 
             posting.done(function(data) {
               $("#loading-message").fadeOut('fast');
+              formHasChanged = false;   
 
             });
           }
@@ -235,7 +242,6 @@ function questionsets_handle(id_questionset)
         );
         document.body.scrollTop = document.documentElement.scrollTop = 0; 
 
-        formHasChanged = false;   
         list_invalid = []; 
 
       } else {

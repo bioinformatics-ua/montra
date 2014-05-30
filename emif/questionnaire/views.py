@@ -13,6 +13,7 @@ from datetime import datetime
 from django.utils import translation
 from django.utils.translation import ugettext_lazy as _
 from questionnaire import QuestionProcessors
+from questionnaire import Fingerprint_Summary
 from questionnaire import questionnaire_done
 from questionnaire import questionset_done
 from questionnaire import AnswerException
@@ -27,6 +28,7 @@ import logging
 import random
 import md5
 import re
+
 
 def r2r(tpl, request, **contextdict):
     "Shortcut to use RequestContext instead of Context in templates"

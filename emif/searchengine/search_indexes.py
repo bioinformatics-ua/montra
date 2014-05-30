@@ -48,6 +48,8 @@ from django.conf import settings
 from django.template.defaultfilters import slugify
 
 import datetime
+from fingerprint.models import Fingerprint
+
 logger = logging.getLogger()
 
 def generate_hash():
@@ -80,7 +82,7 @@ class CoreEngine:
         """Index fingerprint as json
         """
         # index document
-        print(d)
+        #print(d)
         xml_answer = self.solr.add([d])
         #print(xml_answer)
         self.optimize()
@@ -120,8 +122,38 @@ class CoreEngine:
                 })
         return results
 
-    def more_like_this(self, id_doc):
-        similar = self.solr.more_like_this(q='id:doc_2', mltfl='text')
+    def search_highlight(self, query, start=0, rows=100, fl='', sort='', hlfl=""):
+        """search the fingerprint
+        """
+        #hl=true&hl.fl=text_t
+        results = self.solr.search(query,**{
+                'rows': rows,
+                'start': start,
+                'fl': fl,
+                'sort': sort,
+                'hl':"true",
+                'hl.fl': hlfl, "hl.fragsize":0
+                })
+        return results
+
+    def highlight_questions(self, query, start=0, rows=1000, fl='id', sort='', hlfl="*"):
+        """search the fingerprint
+        """
+        #hl=true&hl.fl=text_t
+        query = "qs_all:"+query
+        print(query)
+        results = self.solr.search(query,**{
+                'rows': rows,
+                'start': start,
+                'fl': fl,
+                'sort': sort,
+                'hl':"true",
+                'hl.fl': hlfl
+                })
+        return results
+
+    def more_like_this(self, id_doc, start=0, fl='id, score', maxx=100):
+        similar = self.solr.more_like_this(q='id:'+id_doc,start=start, rows=maxx, mltcount=maxx, mltfl='text_t', mltmintf=2, mltmindf=2, mltminwl=4, fl=fl)
         return similar
 
 
@@ -157,9 +189,12 @@ def index_answeres_from_qvalues(qvalues, questionnaire, subject, fingerprint_id,
     results = c.search_fingerprint("id:"+fingerprint_id)
     if (len(results)>0):
         d = results.docs[0]
-        del d['_version_']
-        c.delete(results.docs[0]['id'])
-
+    else:
+        try:
+            fp = Fingerprint(fingerprint_hash=fingerprint_id)
+            fp.save()
+        except:
+            print(fingerprint_id + ' already in DB')
 
     text = ""
     ''' For god sake, i dont understand what this was doing here, since its not being used
@@ -263,7 +298,8 @@ def index_answeres_from_qvalues(qvalues, questionnaire, subject, fingerprint_id,
                 #     slug = question.slug
                 # else:
                 #     slug = convert_text_to_slug(question.text)
-                slug_final = slug+"_t"
+                #slug_final = slug+"_t"
+
                 #results = Slugs.objects.filter(description=question.text)
                 
                 #if slugs_dict==None or len(results)==0:
@@ -274,7 +310,10 @@ def index_answeres_from_qvalues(qvalues, questionnaire, subject, fingerprint_id,
                 #     slugsAux.question = question
                 #     slugsAux.save()
 
-                d[slug_final] = value
+                setProperFields(d, question, slug, value)
+                #print(d)
+
+                #d[slug_final] = value
                 if value!=None:
                     text += value + " " 
             except:
@@ -290,14 +329,136 @@ def index_answeres_from_qvalues(qvalues, questionnaire, subject, fingerprint_id,
     else:
         d['created_t'] = created_date
     d['date_last_modification_t']= now.strftime('%Y-%m-%d %H:%M:%S.%f')
-    d['user_t']= subject
-    d['text_t']= text + " " + appending_text
+
+    # We dont want to reset share's... only set field if there isnt already one
+
+    if d.get('user_t') == None:
+        d['user_t']= subject
+    # since its now by parts, we have absolutely no idea what was already there and what is new, 
+    # to this must be done again from scratch
+    d['text_t']= generateFreeText(d)
 
     if extra_fields!=None:
         d = dict(d.items() + extra_fields.items())
     
+    print(d)
+
+    # We only delete right before adding, so we dont lose what is on the database 
+    # in case anything fails on the process above
+    if(len(results) > 0):
+        c.delete(results.docs[0]['id'])
+        del d['_version_']
+
     c.index_fingerprint_as_json(d)
 
+# Set all proper fields for this question (this has in attention question types and such)
+# P.e., for dates, it will date *_t and *_dt and for numeric *_t and *_d
+def setProperFields(d, question, field, value):
+
+    # We always set the text one
+    #print (field+"_t" + " = "+value)
+    d[field+"_t"] = value
+
+
+    # Check and also apply the correct type, if any
+    suffix = assert_suffix(str(question.type))
+    if suffix != None:
+        val = convert_value(value, str(question.type))
+        if val != None:
+            d[field+suffix] = val
+
+    return d
+
+def assert_suffix(type):
+    if type.lower() == "numeric":
+        return "_d"
+    elif type.lower() == "datepicker":
+        return "_dt"
+    # else
+    return None  
+
+def convertDate(value):
+    value = re.sub("\"", "", value)
+    print (value)
+    try:
+        # First we try converting to normalized format, yyyy-mm-dd
+        date = datetime.datetime.strptime(value, '%Y-%m-%d')
+        return date
+    except ValueError:
+        #print('failed 1')
+        pass
+
+    try:
+        # We try yyyy/mm/dd
+        date = datetime.datetime.strptime(value, '%Y/%m/%d')
+        return date
+    except ValueError:
+        #print('failed 2')
+        pass
+
+    try:
+        # We try just the year, yyyy
+        date = datetime.datetime.strptime(value, '%Y')
+        return date
+    except ValueError:
+        #print('failed 3')
+        pass
+
+    # failed conversion        
+    return None
+
+def replaceDate(m):
+    group = m.group(0)
+
+    converted_date = convertDate(group)
+    if converted_date == None:
+        return '*'
+    return converted_date.isoformat()+'T00:00:00Z'
+
+def convert_value(value, type, search=False):
+
+    if type == "numeric":
+        #print("type numeric")
+        try:
+            # remove separators if they exist on representation
+            value = re.sub("[^0-9.,]", "", value)
+            print ("value:"+value)
+            # replace usual mistake , to .
+            value = re.sub("[,]", ".", value)
+            value = float(value)
+            return value
+        except ValueError:
+            pass            
+
+    elif type == "datepicker":
+        if (value.startswith('[') and value.endswith(']')):
+            temp = value
+            temp = re.sub("[0-9/-]+", replaceDate, temp)
+
+            return temp
+        else:           
+            # for some weird reason, single date queries to solr returns error, 
+            # they must be in a range format always ? wth i just do a range query on the same date
+            result = convertDate(value)
+            if (result != None):
+                result = result.isoformat()
+                if search:
+                    return "["+result+"T00:00:00Z TO "+result+"T23:59:59Z]"
+                else:
+                    return result+"T00:00:00Z"
+
+    return None
+
+# Generates the freetext field, from current parameters       
+def generateFreeText(d):
+    freetext = ''
+    dont_index = ['text_t', 'created_t','date_last_modification_t','type_t', 'user_t']
+ 
+    for q in d:
+        if(q.endswith('_t') and q not in dont_index and d[q] != None and len(d[q]) > 0):
+            freetext += (d[q] + ' ')
+
+    return freetext.strip()
 
 def convert_answers_to_solr(runinfo):
     c = CoreEngine()
@@ -339,6 +500,7 @@ def convert_answers_to_solr(runinfo):
         # Verify the question type
 
         if a.question.get_type() == "open" or \
+        a.question.get_type() == "email" or \
         a.question.get_type() == "open-button" \
         or a.question.get_type() == "open-textfield" :
             x = ast.literal_eval(a.answer)

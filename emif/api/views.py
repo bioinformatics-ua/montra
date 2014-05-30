@@ -20,13 +20,18 @@
 
 from django.http import HttpResponse
 
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group
+
 from questionnaire.models import *
 from questionnaire.parsers import *
 from questionnaire.views import *
 from rest_framework import permissions
 from rest_framework import renderers
 from rest_framework.authentication import TokenAuthentication
+
+from rest_framework.authentication import SessionAuthentication, BasicAuthentication
+from rest_framework.permissions import IsAuthenticated
+
 from rest_framework.decorators import api_view, parser_classes
 from rest_framework.response import Response
 from rest_framework.reverse import reverse
@@ -36,6 +41,8 @@ from rest_framework import status
 from rest_framework.renderers import JSONRenderer
 from rest_framework.parsers import JSONParser
 from django.utils import simplejson
+from django.conf import settings
+
 # import json
 import md5
 from django.views.decorators.csrf import csrf_exempt
@@ -50,6 +57,12 @@ from api.models import *
 # Import pubmed object
 from utils.pubmed import PubMedObject
 #from emif.literature import fetch_by_pmid_by_becas
+
+from docs_manager.storage_handler import *
+from docs_manager.models import *
+
+import os
+import mimetypes
 
 class JSONResponse(HttpResponse):
     """
@@ -66,6 +79,8 @@ class JSONResponse(HttpResponse):
 def api_root(request, format=None):
     return Response({
         'search': reverse('search', request=request),
+        'getfile': reverse('getfile', request=request),
+        'deletefile': reverse('deletefile', request=request),
         'metadata': reverse('metadata', request=request),
         'stats': reverse('stats', request=request),
         'validate': reverse('validate', request=request),
@@ -82,7 +97,8 @@ class SearchView(APIView):
     """
     Class to search and return fingerprint details, like Name, ID and structure
     """
-    authentication_classes = (TokenAuthentication,)
+    authentication_classes = (TokenAuthentication, SessionAuthentication, BasicAuthentication)
+    permission_classes = (IsAuthenticated,)
 
     def get(self, request, *args, **kw):
         
@@ -107,6 +123,136 @@ class SearchView(APIView):
         return response
 
 
+############################################################
+##### Email Share - Web services
+############################################################
+
+
+class EmailCheckView(APIView):
+    authentication_classes = (SessionAuthentication, BasicAuthentication)
+    permission_classes = (IsAuthenticated,)    
+    def post(self, request, *args, **kw):
+        # first we get the email parameter
+        email = request.POST.get('email', '')
+        valid = False
+
+        # Verify if it is a valid email
+        if not (email == None or email==''):
+            # Verify if it is a valid user name
+            username = None
+
+            try: 
+                username = User.objects.get(email__exact=email)
+                valid = True  
+            except User.DoesNotExist:
+                pass             
+               
+        result = {
+            'email': email,
+            'valid': valid
+            }
+        response = Response(result, status=status.HTTP_200_OK)
+        return response
+
+############################################################
+##### Get File - Web services
+############################################################
+
+
+class GetFileView(APIView):
+
+    authentication_classes = (SessionAuthentication, BasicAuthentication)
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request, *args, **kw):
+        if request.user.is_authenticated():
+            # first we get the email parameter
+            name = request.POST.get('filename', '')
+            revision = request.POST.get('revision', '')
+
+            # Verify if we have name and revision
+            if not (name == None or name=='' or revision == None or revision == ''):
+
+                print name 
+                print revision
+
+                path_to_file = os.path.join(os.path.abspath(PATH_STORE_FILES), revision+name)
+                print path_to_file
+                return respond_as_attachment(request, path_to_file, name)
+
+        return Response({}, status=status.HTTP_400_BAD_REQUEST)
+
+############################################################
+##### Delete File - Web services
+############################################################
+
+class DeleteFileView(APIView):
+
+    authentication_classes = (SessionAuthentication, BasicAuthentication)
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request, *args, **kw):
+        # first we get the email parameter
+        name = request.POST.get('filename', '')
+        revision = request.POST.get('revision', '')
+        fingerprint_id = request.POST.get('fingerprint_id', '')
+        success = False
+
+        # Verify if we have name and revision
+        if not (fingerprint_id == None or fingerprint_id =='' or 
+            name == None or name=='' or revision == None or revision == ''):
+            
+            user = request.user
+
+            try:
+                # We are setting as removed all revisions (not just the last one)
+                files = FingerprintDocuments.objects.filter(
+                        fingerprint_id=fingerprint_id, 
+                        file_name=name)
+
+                # we only allow deleting for the owner of this file, or the administrators
+                if files != None and (user.is_superuser or user == files[0].user):
+
+                    for f in files:
+                        f.removed = True
+                        
+                        f.save()
+                    
+                    success = True
+
+            except FingerprintDocuments.DoesNotExist:
+                pass
+
+
+        return Response({'result': success}, status=status.HTTP_200_OK)
+
+# Ref from https://djangosnippets.org/snippets/1710/
+
+def respond_as_attachment(request, file_path, original_filename):
+    fp = open(file_path, 'rb')
+    response = HttpResponse(fp.read())
+    fp.close()
+    type, encoding = mimetypes.guess_type(original_filename)
+    if type is None:
+        type = 'application/octet-stream'
+    response['Content-Type'] = type
+    response['Content-Length'] = str(os.stat(file_path).st_size)
+    if encoding is not None:
+        response['Content-Encoding'] = encoding
+
+    # To inspect details for the below code, see http://greenbytes.de/tech/tc2231/
+    if u'WebKit' in request.META['HTTP_USER_AGENT']:
+        # Safari 3.0 and Chrome 2.0 accepts UTF-8 encoded string directly.
+        filename_header = 'filename=%s' % original_filename.encode('utf-8')
+    elif u'MSIE' in request.META['HTTP_USER_AGENT']:
+        # IE does not support internationalized filename at all.
+        # It can only recognize internationalized URL, so we do the trick via routing rules.
+        filename_header = ''
+    else:
+        # For others like Firefox, we follow RFC2231 (encoding extension in HTTP headers).
+        filename_header = 'filename*=UTF-8\'\'%s' % urllib.quote(original_filename.encode('utf-8'))
+    response['Content-Disposition'] = 'attachment; ' + filename_header
+    return response
 
 ############################################################
 ##### Advanced Search - Web services
@@ -114,6 +260,9 @@ class SearchView(APIView):
 
 
 class AdvancedSearchView(APIView):
+    authentication_classes = (SessionAuthentication, BasicAuthentication)
+    permission_classes = (IsAuthenticated,)  
+
     def get(self, request, *args, **kw):
         # Process any get params that you may need
         # If you don't need to process get params,
@@ -124,8 +273,6 @@ class AdvancedSearchView(APIView):
         result = {'myValue': 'lol', 'myValue2': 'lol', }
         response = Response(result, status=status.HTTP_200_OK)
         return response
-
-
 
 
 ############################################################
@@ -144,8 +291,8 @@ class MetaDataView(APIView):
 
     # Example request
     # curl -H "Content-Type: application/json" -X POST -d "{\"uid\":12,\"token\":\"asdert\"}" http://192.168.1.3:8000/api/metadata -H "Authorization: Token c6e25981c67ae45f98bdb380b0a9d8164e7ec4d1" -v
-
-    authentication_classes = (TokenAuthentication,)
+    authentication_classes = (TokenAuthentication,SessionAuthentication, BasicAuthentication,)
+    permission_classes = (IsAuthenticated,)  
     # permission_classes = (permissions.AllowAny,)
     # permission_classes = (permissions.IsAuthenticated,)
     parser_classes((JSONParser,))
@@ -188,13 +335,30 @@ class MetaDataView(APIView):
 
 
 class ValidateView(APIView):
+    authentication_classes = (SessionAuthentication, BasicAuthentication)
+    permission_classes = (IsAuthenticated,)
+
     def get(self, request, *args, **kw):
 
         database_name = request.GET['name']
         
         c = CoreEngine()
         results = c.search_fingerprint("database_name_t:\"" +database_name+'"')
-        result = {'contains': len(results) != 0}
+
+        contain = len(results) != 0
+        # Dirty hack: check if the database name is really equals
+        if contain:
+            for r in results:
+                try:
+                    if database_name != r['database_name_t']:
+                        contain = False
+
+                except:
+                    raise
+                    contain = True
+
+
+        result = {'contains': contain}
 
         response = Response(result, status=status.HTTP_200_OK)
         return response
@@ -223,6 +387,8 @@ class ValidateView(APIView):
 
 
 class StatsView(APIView):
+    authentication_classes = (SessionAuthentication, BasicAuthentication)
+    permission_classes = (IsAuthenticated,)    
     """
     Class that returns json values of answers to create stats (charts)
     """
@@ -311,7 +477,9 @@ class PublicationsView(APIView):
     """
     Class that returns the information of a publication 
     """
-
+    authentication_classes = (SessionAuthentication, BasicAuthentication)
+    permission_classes = (IsAuthenticated,)
+    
     def get(self, request, *args, **kw):
         results = dict()
         pmid = request.GET['pmid']
@@ -347,7 +515,8 @@ class PopulationView(APIView):
 
     """
     
-        
+    authentication_classes = (SessionAuthentication, BasicAuthentication)
+    permission_classes = (IsAuthenticated,)        
     def get(self, request, *args, **kw):
         """
         List the Jerboa documents 
@@ -359,7 +528,6 @@ class PopulationView(APIView):
         Upload Jerboa files
         """
         pass
-
 
 
 ############################################################

@@ -44,7 +44,9 @@ from questionnaire.models import Answer
 from api.models import *
 
 from geopy import geocoders 
-from django.core.mail import send_mail, BadHeaderError
+from django.core.mail import BadHeaderError
+
+from emif.utils import send_custom_mail
 
 from modules.geo import *
 
@@ -67,6 +69,8 @@ import base64
 from django.core.cache import cache
 from django.views.decorators.cache import cache_page
 
+import hashlib
+
 
 def list_questions():
     print "list_questions"
@@ -78,8 +82,12 @@ def list_questions():
     return results
 
 
-def index(request, template_name='index.html'):
-    return render(request, template_name, {'request': request})
+def index(request, template_name='index_new.html'):
+    if request.user.is_authenticated():
+        #return HttpResponseRedirect('/wherenext/')
+        return HttpResponseRedirect(settings.BASE_URL + 'wherenext')
+    else:
+        return render(request, template_name, {'request': request})
 
 def about(request, template_name='about.html'):
     return render(request, template_name, {'request': request, 'breadcrumb': True})
@@ -179,6 +187,7 @@ def results_fulltext(request, page=1, full_text=True,template_name='results.html
         query = request.session.get("query","")
 
     if isAdvanced == False:
+        query = "'"+re.sub("['\"']","\\'",query)+"'"  
         query = "text_t:"+query
 
     if not full_text:
@@ -206,9 +215,17 @@ def results_fulltext_aux(request, query, page=1, template_name='results.html', i
 
     #print query_filtered
 
-    (list_databases, hits) = get_databases_from_solr_v2(request, query_filtered, sort=sortString, rows=rows, start=range)    
+    (list_databases, hits, hi) = get_databases_from_solr_with_highlight(request, query_filtered, sort=sortString, rows=rows, start=range)
+    if not isAdvanced:
+        hi = merge_highlight_results( request.session["query"] , hi)
+    else:
+        hi = merge_highlight_results( None , hi)
+    
+
     if range > hits and not force:
         return results_fulltext_aux(request, query, 1, isAdvanced=isAdvanced, force=True)  
+    
+    request.session["highlight_results"] = hi
 
     if len(list_databases) == 0 :
         query_old = request.session.get('query', "")
@@ -324,17 +341,11 @@ def results_diff(request, page=1, template_name='results_diff.html'):
                 response.status_code = 500
                 return response
                 
-            #print "--------------------------------------------------------------"
-            #print qserialization
-            #print "--------------------------------------------------------------\n"
 
             query = convert_qvalues_to_query(qvalues, qid, qexpression)
             query = convert_query_from_boolean_widget(qexpression, qid)
             #print "Query: " + query
 
-            #print "--------------------------------------------------------------"
-            #print query
-            #print "--------------------------------------------------------------\n"
 
             request.session['query'] = query
             
@@ -343,17 +354,23 @@ def results_diff(request, page=1, template_name='results_diff.html'):
                 # we get the current user
                 this_user = User.objects.get(username = request.user)
                 this_query = None
+
+                this_query_hash = hashlib.sha1(qserialization).hexdigest()
+
                 # we check if this query was already made before
                 try:
-                    # in case the query exists we just get the reference
-                    this_query =  AdvancedQuery.objects.get(user=this_user, serialized_query=qserialization, qid=qid)  
+                    # in case the query exists we just get the reference, we use a hash since the serialized query can get too big
+
+                    this_query = AdvancedQuery.objects.get(user=this_user, serialized_query_hash=this_query_hash, qid=qid)  
                     
                     print "This query is already on historic, just updating use time..."
                     this_query.save()
                 except AdvancedQuery.DoesNotExist:
                     # otherwise, we create it
                     print "This query is new, adding it and answers to it..."
-                    this_query = AdvancedQuery(user=this_user,name=("Query on "+time.strftime("%c")),serialized_query=qserialization, qid=qid)
+                    this_query = AdvancedQuery(user=this_user,name=("Query on "+time.strftime("%c")),
+                        serialized_query_hash=this_query_hash,
+                        serialized_query=qserialization, qid=qid)
                     this_query.save()   
                     # and we all so insert the answers in a specific table exactly as they were on the post request to be able to put it back at a later time
                     for k, v in request.POST.items():
@@ -384,7 +401,6 @@ def results_diff(request, page=1, template_name='results_diff.html'):
     if not in_post:
         query = request.session.get('query', "")
         
-    #print "query_@" + query
     if query == "":
         return render(request, "results.html", {'request': request,
                                                 'num_results': 0, 'page_obj': None, 'breadcrumb': True})
@@ -417,7 +433,8 @@ def geo(request, template_name='geo.html'):
         isAdvanced = True
     else:
         if(request.session.get('query') != None):
-            query = "text_t:"+request.session.get('query')
+            query = "'"+re.sub("['\"']","\\'",request.session.get('query'))+"'"  
+            query = "text_t:"+query
         else:
             query = "*:*"
 
@@ -596,7 +613,14 @@ def database_edit_qs(request, fingerprint_id, questionnaire_id, sort_id):
 
     return response
 
-def render_one_questionset(request, q_id, qs_id, errors={}, aqid=None, fingerprint_id=None, is_new=True, template_name='fingerprint_add_qs.html'):
+def database_detailed_qs(request, fingerprint_id, questionnaire_id, sort_id):
+
+    response = render_one_questionset(request, questionnaire_id, sort_id, fingerprint_id = fingerprint_id, is_new=False, readonly=True,
+                                               template_name='fingerprint_add_qs.html')
+
+    return response
+
+def render_one_questionset(request, q_id, qs_id, errors={}, aqid=None, fingerprint_id=None, is_new=True, readonly = False, template_name='fingerprint_add_qs.html'):
     """
     Return the QuestionSet template
 
@@ -665,8 +689,8 @@ def render_one_questionset(request, q_id, qs_id, errors={}, aqid=None, fingerpri
                 answer = str(question.number)
 
                 extra[question] = ans = extra.get(question, {})
-                if "[" in value:
-                    value = value.replace("]", "").replace("[", "")
+                if "[" in str(value):
+                    value = str(value).replace("]", "").replace("[", "")
                 request2.get_post()['question_%s' % question.number] = value
                 
                 
@@ -780,6 +804,13 @@ def render_one_questionset(request, q_id, qs_id, errors={}, aqid=None, fingerpri
 
         permissions = getPermissions(fingerprint_id, question_set)
 
+        #permissions = getPermissions(fingerprint_id, question_set)
+
+
+        advanced_search=False
+        if template_name == 'fingerprint_search_qs.html':
+            advanced_search = True
+
         r = r2r(template_name, request,
                 questionset=question_set,
                 questionsets=question_set.questionnaire.questionsets,
@@ -794,10 +825,12 @@ def render_one_questionset(request, q_id, qs_id, errors={}, aqid=None, fingerpri
                 async_progress=None,
                 async_url=None,
                 qs_list=qs_list,
+                advanced_search = advanced_search,
                 questions_list=qlist_general,
                 fingerprint_id=fingerprint_id,
                 breadcrumb=True,
                 permissions=permissions
+                readonly=readonly
         )
         r['Cache-Control'] = 'no-cache'
         r['Expires'] = "Thu, 24 Jan 1980 00:00:00 GMT"
@@ -882,15 +915,14 @@ def extract_answers(request2, questionnaire_id, question_set, qs_list):
     extra_fields = {}
     # this will ensure that each question will be processed, even if we did not receive
     # any fields for it. Also works to ensure the user doesn't add extra fields in
-    for x in expected:
+    '''for x in expected:
         items.append((u'question_%s_Trigger953' % x.number, None))
-
+    '''
     # generate the answer_dict for each question, and place in extra
     for item in items:
         key, value = item[0], item[1]
         if key.startswith('comment_question_'):
             continue
-            
         if key.startswith('question_'):
             answer = key.split("_", 2)
             question = get_question(answer[1], questionnaire)
@@ -945,7 +977,8 @@ def extract_answers(request2, questionnaire_id, question_set, qs_list):
         
         '''if u"Trigger953" not in ans:
             logging.warn("User attempted to insert extra question (or it's a bug)")
-            continue'''
+            continue
+        '''
         try:
             cd = question.getcheckdict()
             
@@ -1043,10 +1076,34 @@ def extract_answers(request2, questionnaire_id, question_set, qs_list):
             qlist_general.append((qs_aux, qlist))
     except:
         raise
+
+        ## HOT FIX for qvalues to work properly, THIS SHOULD BE FIXED IN THE CODE ABOVE
+
+    qvalues = {}
+    for question, qdict in qlist_general:
+        for k, v in qdict:
+            try:
+                qval = v['qvalue']
+
+                print str(k.number)+" - "+qval
+                if qval != None and qval != '':
+
+                    try: 
+                        cutzone = qval.index('#');
+                        qvalues[k.number] = qval[0:cutzone]
+                    except ValueError:
+                        qvalues[k.number] = qval
+                        
+            except KeyError:
+                pass
+
     return (qlist_general, qlist, jstriggers, qvalues, jsinclude, cssinclude, extra_fields, len(errors)!=0)
     
+def database_detailed_view(request, fingerprint_id, questionnaire_id, template_name="database_edit.html"):
 
-def database_edit(request, fingerprint_id, questionnaire_id, template_name="database_edit.html"):
+    return database_edit(request, fingerprint_id, questionnaire_id, template_name, readonly=True);
+
+def database_edit(request, fingerprint_id, questionnaire_id, template_name="database_edit.html", readonly=False):
     c = CoreEngine()
 
     results = c.search_fingerprint("id:" + fingerprint_id)
@@ -1103,8 +1160,8 @@ def database_edit(request, fingerprint_id, questionnaire_id, template_name="data
         answer = str(question.number)
 
         extra[question] = ans = extra.get(question, {})
-        if "[" in value:
-            value = value.replace("]", "").replace("[", "")
+        if "[" in str(value):
+            value = str(value).replace("]", "").replace("[", "")
         request2.get_post()['question_%s' % question.number] = value
         
         
@@ -1181,7 +1238,8 @@ def database_edit(request, fingerprint_id, questionnaire_id, template_name="data
             id=fingerprint_id,
             users_db=users_db,
             created_date=created_date,
-            hide_add=True
+            hide_add=True,
+            readonly=readonly
     )
     r['Cache-Control'] = 'no-cache'
     r['Expires'] = "Thu, 24 Jan 1980 00:00:00 GMT"
@@ -1292,10 +1350,9 @@ def __get_scientific_contact(db, db_solr, type_name):
             db.tec_phone = db_solr['TC__phone_t']
 
     return db
-
-def get_databases_from_solr_v2(request, query="*:*", sort="", rows=100, start=0):
-    c = CoreEngine()
-    results = c.search_fingerprint(query, sort=sort, rows=rows, start=start)
+    
+    
+def get_databases_process_results(results):
     print "Solr"
     list_databases = []
     questionnaires_ids = {}
@@ -1377,9 +1434,63 @@ def get_databases_from_solr_v2(request, query="*:*", sort="", rows=100, start=0)
         except Exception, e:
             print e
             pass
-            #raise
+
+    return list_databases
+
+def get_databases_from_solr_v2(request, query="*:*", sort="", rows=100, start=0, fl='',post_process=None):
+    c = CoreEngine()
+    results = c.search_fingerprint(query, sort=sort, rows=rows, start=start, fl=fl)
+    
+    list_databases = get_databases_process_results(results)
+
+    if post_process:
+        list_databases = post_process(results, list_databases)
+    
     return (list_databases,results.hits)
 
+def get_query_from_more_like_this(doc_id, maxx=100):
+    c = CoreEngine()
+    #results = c.search_fingerprint(query, sort=sort, rows=rows, start=start)
+    results = c.more_like_this(doc_id, maxx=maxx)
+    
+
+    if len(results)>0:
+        queryString = "id:("
+        for r in results:
+            if "id" in r:
+                queryString = queryString + r["id"]+"^"+str(r["score"])+ " "
+
+        queryString = queryString + ")"
+    else:
+        queryString = None
+
+    ## PY SOLR IS STUPID, OTHERWISE THIS WOULD BE AVOIDED
+    database_name = ""
+    results = c.search_fingerprint("id:"+doc_id, start=0, rows=1, fl="database_name_t")
+    for r in results:
+        if "database_name_t" in r:
+            database_name = r["database_name_t"]
+    
+    return (queryString, database_name)
+
+def get_databases_from_solr_with_highlight(request, query="*:*", sort="", rows=100, start=0):
+    c = CoreEngine()
+    results = c.search_highlight(query, sort=sort, rows=rows, start=start, hlfl="*")
+    
+    list_databases = get_databases_process_results(results)
+    
+    return (list_databases,results.hits, results.highlighting)
+
+def merge_highlight_results(query, resultHighlights):
+    c = CoreEngine()
+    h = {}
+    h["results"] = resultHighlights
+    
+    if query:
+        qresults = c.highlight_questions(query)
+        h["questions"] = qresults.highlighting
+
+    return h  
 
 def delete_fingerprint(request, id):
     user = request.user
@@ -1517,16 +1628,30 @@ def databases(request, page=1, template_name='databases.html', force=False):
                                            'owner_fingerprint': False,
                                            'add_databases': True, "sort_params": sort_params, "page":page})
 
-def paginator_process_params(request, page, rows):
+def paginator_process_params(request, page, rows, default_mode={"database_name": "asc"}):
     sortFieldsLookup = {}
     sortFieldsLookup["database_name"] = "database_name_sort"
     sortFieldsLookup["last_update"] = "last_activity_sort"
     sortFieldsLookup["type"] = "type_name_sort"
 
+    sortFieldsLookup["institution"] = "institution_sort"
+    sortFieldsLookup["location"] = "location_sort"
+    sortFieldsLookup["nrpatients"] = "nrpatients_sort"
+
+    sortFieldsLookup["score"] = "score"
+    
+
     filterFieldsLookup = {}
     filterFieldsLookup["database_name_filter"] = "database_name_sort"
     filterFieldsLookup["last_update_filter"] = ""
     filterFieldsLookup["type_filter"] = "type_t"
+
+    filterFieldsLookup["institution_filter"] = "institution_name_t"#"institution_sort"
+    filterFieldsLookup["location_filter"] = "location_sort"
+    filterFieldsLookup["nrpatients_filter"] = "number_active_patients_jan2012_t"
+    
+    prefixFilters = []
+    openTextFilters = ["database_name_filter", "institution_filter", "location_filter"]
 
     sortString = ""
     filterString = ""
@@ -1535,7 +1660,7 @@ def paginator_process_params(request, page, rows):
     if "s" in request:
         mode = json.loads(request["s"])
     else:
-        mode = {"database_name": "asc"}
+        mode = default_mode
 
     for x in mode:
         if sortFieldsLookup.has_key(x):
@@ -1544,13 +1669,15 @@ def paginator_process_params(request, page, rows):
                 if x not in sort_params:
                     sort_params[x] = {}
                 sort_params[x]["name"] = mode[x]
-        elif filterFieldsLookup.has_key(x):
+        elif len(mode[x])>0 and filterFieldsLookup.has_key(x):
             if x == "last_update_filter":
                 filterString += "(created_t:\""+mode[x] + "\" OR date_last_modification_t:\""+mode[x] + "\") AND "
-            elif x== "database_name_filter":
+            elif x in prefixFilters:
                 p = re.compile("([^a-z])")
                 str2 = re.sub(p, "", mode[x].lower())
                 filterString += "({!prefix f="+filterFieldsLookup[x]+"}"+str2+") AND "
+            elif x in openTextFilters:
+                filterString += "("+filterFieldsLookup[x]+":*"+mode[x] +"*) AND "
             else:
                 filterString += filterFieldsLookup[x]+":'"+mode[x] +"' AND "
             if x[:-7] not in sort_params:
@@ -1561,7 +1688,7 @@ def paginator_process_params(request, page, rows):
     if len(filterString) > 0:
         filterString = filterString[:-4]
 
-    for x in ["database_name", "last_update", "type"]:
+    for x in ["database_name", "last_update", "type", "institution", "location", "nrpatients", "score"]:
         if (x in sort_params) and ( "name" in sort_params[x]):
             sort_params["selected_name"] = x
             sort_params["selected_value"] = sort_params[x]["name"]
@@ -1835,11 +1962,12 @@ def all_databases_data_table(request, template_name='alldatabases_data_table.htm
     return render(request, template_name, {'request': request, 'export_all_answers': True, 'titles': titles,
                                            'answers': answers, 'breadcrumb': True, 'collapseall': False, 'geo': True,
                                            'list_databases': list_databases,
+                                           'no_print': True,
                                            'databases_types': databases_types
                                            })
 
 
-def createqsets(runcode, qsets=None, clean=True):
+def createqsets(runcode, qsets=None, clean=True, highlights=None):
     #print "createqsets"
     c = CoreEngine()
     results = c.search_fingerprint('id:' + runcode)
@@ -1861,6 +1989,13 @@ def createqsets(runcode, qsets=None, clean=True):
     for q in qqs:
         questionnaires_ids[q.slug] = (q.pk, q.name)
 
+    rHighlights = None
+    qhighlights = None
+    if highlights != None:
+        if "results" in highlights and runcode in highlights["results"]:
+            rHighlights = highlights["results"][runcode]
+        if "questions" in highlights:
+            qhighlights = highlights["questions"]
 
     for result in results:
 
@@ -1944,14 +2079,18 @@ def createqsets(runcode, qsets=None, clean=True):
             info = text
             t.tag = info
             #print t.tag
-
             if question_group != None and question_group.list_ordered_tags != None:
                 try:
                     t = question_group.list_ordered_tags[question_group.list_ordered_tags.index(t)]
                 except:
                     pass
 
-            value = clean_value(str(result[k].encode('utf-8')))
+            qs_text = k[:-1] + "qs"
+            id_text = "questionaire_"+str(fingerprint_ttype)
+            if question_group != None and qhighlights != None and id_text in qhighlights and qs_text in qhighlights[id_text]:
+                question_group.info = True
+
+            value = clean_value(str(result[k]).encode('utf-8'))
             
             try:
 
@@ -1961,6 +2100,8 @@ def createqsets(runcode, qsets=None, clean=True):
                pass
             if clean:
                 t.value = value.replace("#", " ")
+                if question_group != None and rHighlights != None and k in rHighlights:
+                    question_group.info = True
             else:
                 t.value = value
 
@@ -1980,13 +2121,15 @@ def createqsets(runcode, qsets=None, clean=True):
 
     return (qsets, name, db_owners, fingerprint_ttype)
 
-def createqset(runcode, qsid, qsets=None, clean=True):
+def createqset(runcode, qsid, qsets=None, clean=True, highlights=None):
     qsid = int(qsid) 
-    print "Got into createqset!!"
+    print "Got into createqset!!" + str(qsid)
     #print "createqsets"
     c = CoreEngine()
     results = c.search_fingerprint('id:' + runcode)
-
+    #print len(results)    
+    #results = c.search_highlight('id:' + runcode, hlfl="text_t")
+    
     if qsets == None:
         qsets = ordered_dict()
     name = ""
@@ -1997,14 +2140,20 @@ def createqset(runcode, qsid, qsets=None, clean=True):
     fingerprint_ttype = ""
 
     db_owners = "" 
-
-
+    
     questionnaires_ids = {}
     qqs = Questionnaire.objects.all()
     for q in qqs:
         questionnaires_ids[q.slug] = (q.pk, q.name)
 
-
+    rHighlights = None
+    qhighlights = None
+    if highlights != None:
+        if "results" in highlights and runcode in highlights["results"]:
+            rHighlights = highlights["results"][runcode]
+        if "questions" in highlights:
+            qhighlights = highlights["questions"]
+        
     for result in results:
 
 
@@ -2044,12 +2193,12 @@ def createqset(runcode, qsid, qsets=None, clean=True):
                 break
 
         for k in result:
-            #print k
             if k in blacklist:
                 continue
+            
             if k.startswith("comment_question_"):
                 continue
-
+                
             t = Tag()
 
             #aux_results = Slugs.objects.filter(slug1=k[:-2], question__questionset__questionnaire=q_aux[0].pk)
@@ -2071,7 +2220,8 @@ def createqset(runcode, qsid, qsets=None, clean=True):
             #     '''    
             question_ = Question.objects.filter(slug_fk__slug1=k[:-2], questionset__questionnaire=q_aux[0].pk)
             if len(question_) > 0:
-                text = question_[0].slug_fk.description
+                #text = question_[0].slug_fk.description
+                text = question_[0].text
                 qs = question_[0].questionset.text
                 q_number = qs = question_[0].number
                 if qsets.has_key(question_[0].questionset.text):
@@ -2090,15 +2240,20 @@ def createqset(runcode, qsid, qsets=None, clean=True):
             info = text
             t.tag = info
             #print t.tag
-
             if question_group != None and question_group.list_ordered_tags != None:
                 try:
-                    t = question_group.list_ordered_tags[question_group.list_ordered_tags.index(t)]
+                    t = question_group.list_ordered_tags[question_group.list_ordered_tags.index(t)]                   
                 except:
                     pass
 
-            value = clean_value(str(result[k].encode('utf-8')))
-            
+            raw_value = str(result[k].encode('utf-8'))
+            value = clean_value(raw_value)
+
+            qs_text = k[:-1] + "qs"
+            id_text = "questionaire_"+str(fingerprint_ttype)
+            if qhighlights != None and id_text in qhighlights and qs_text in qhighlights[id_text]:
+                t.tag = qhighlights[id_text][qs_text][0].encode('utf-8')
+
             try:
 
                t.comment = result['comment_question_'+k]
@@ -2107,11 +2262,21 @@ def createqset(runcode, qsid, qsets=None, clean=True):
                pass
             if clean:
                 t.value = value.replace("#", " ")
+                
+                if rHighlights != None and k in rHighlights:
+                    t.value = rHighlights[k][0].encode('utf-8')
+                    #if len(highlights["results"][k])>1:
+                    #print t.value
+                
+                if t.ttype in Fingerprint_Summary:
+                    t.value = Fingerprint_Summary[t.ttype](raw_value)
+
+
             else:
                 t.value = value
-
             if k == "database_name_t":
-                name = t.value
+                name = t.value           
+
             list_values.append(t)
             if question_group != None:
                 try:
@@ -2890,9 +3055,9 @@ def feedback(request, template_name='feedback.html'):
                 message_admin = "Name: " + str(name) + "\nEmail: " + from_email + "\n\nMessage:\n" + str(message)
                 message = "Dear " + name + ",\n\nThank you for giving us your feedback.\n\nYour message will be analyzed by EMIF Catalogue team.\n\nMessage sent:\n" + str(message) + "\n\nSincerely,\nEMIF Catalogue"
                 # Send email to admins
-                send_mail(subject, message_admin, settings.DEFAULT_FROM_EMAIL, emails_to_feedback)
+                send_custom_mail(subject, message_admin, settings.DEFAULT_FROM_EMAIL, emails_to_feedback)
                 # Send email to user with the copy of feedback message
-                send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [from_email])
+                send_custom_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [from_email])
 
             except BadHeaderError:
                 return HttpResponse('Invalid header found.')
@@ -3080,7 +3245,7 @@ def create_auth_token(request, page=1, templateName='api-key.html', force=False)
 
 def sharedb(request, db_id, template_name="sharedb.html"):
     if not request.method == 'POST':
-        return HttpResponse('Invalid header found. The request need to be POST')
+        return HttpResponse("Service Unavailable")
 
     # Verify if it is a valid email
     email = request.POST.get('email', '')
@@ -3088,19 +3253,23 @@ def sharedb(request, db_id, template_name="sharedb.html"):
         return HttpResponse('Invalid email address.')
 
     # Verify if it is a valid user name
-    username_to_share = User.objects.get(email__exact=email)
-
-    if (username_to_share==None):
-        return HttpResponse('Invalid username.')
+    username_to_share = None
+    try:
+        username_to_share = User.objects.get(email__exact=email)
+    except Exception, e:
+        pass
+    
+    if not username_to_share:
+        return HttpResponse("Invalid email address.")
 
 
     # Verify if it is a valid database 
     if (db_id == None or db_id==''):
-        return HttpResponse('Invalid email address.')  
+        return HttpResponse('Service Unavailable')  
     c = CoreEngine()
     results = c.search_fingerprint('id:' + db_id)
     if (len(results)!=1):
-        return HttpResponse('Invalid database identifier.')  
+        return HttpResponse("Service Unavailable")  
 
     subject = "EMIF Catalogue: A new database has been shared with you."
     name = username_to_share.get_full_name()
@@ -3110,26 +3279,29 @@ def sharedb(request, db_id, template_name="sharedb.html"):
     # pdb.set_trace()
     __objs = SharePending.objects.filter(db_id=db_id, pending=True, user=username_to_share)
     if (len(__objs)>0):
-        return HttpResponse('Already contains databases')  
-
-    share_pending = SharePending()
-    share_pending.user = username_to_share
-    share_pending.db_id = db_id
-    share_pending.activation_code = generate_hash()
-    share_pending.pending = True
-    share_pending.user_invite = request.user 
-    share_pending.save()
+        share_pending = __objs[0]
+        success_msg = "You have already invited this user to start collaborating in your database. The invitation email was re-sent to his address."
+    else:
+        share_pending = SharePending()
+        share_pending.user = username_to_share
+        share_pending.db_id = db_id
+        share_pending.activation_code = generate_hash()
+        share_pending.pending = True
+        share_pending.user_invite = request.user 
+        share_pending.save()
+        success_msg = "An invitation has been sent to your co-worker start collaboration in your database. If you need further assistance, please do not hesitate to contact EMIF Catalogue team."
 
     link_activation = settings.BASE_URL + "share/activation/"+share_pending.activation_code
 
     emails_to_feedback = []
+    print settings.ADMINS
     for k, v in settings.ADMINS:
         emails_to_feedback.append(v)
 
     try:
         
         message = """Dear %s,\n\n
-            \n\n
+            \n
             %s has shared a new database with you. 
             Now you're able to edit and manage the database. \n\n
             To activate the database in your account, please open this link:
@@ -3139,14 +3311,12 @@ def sharedb(request, db_id, template_name="sharedb.html"):
         # Send email to admins
         #send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, emails_to_feedback)
         # Send email to user with the copy of feedback message
-        send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [from_email])
+        send_custom_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [from_email])
 
     except BadHeaderError:
-        return HttpResponse('Invalid header found.')
+        return HttpResponse('Service Unavailable')
 
-
-
-    return render(request, template_name, {'request': request, 'breadcrumb': True})
+    return HttpResponse(success_msg)
 
 def sharedb_activation(request, activation_code, template_name="sharedb_invited.html"):
 
@@ -3178,7 +3348,7 @@ def sharedb_activation(request, activation_code, template_name="sharedb_invited.
         subject = "EMIF Catalogue: Accepted database shared"
         message = """Dear %s,\n\n
             \n\n
-            %s has been activated. You can access the new database in "Workspace" -> My Databases".
+            %s has been activated. You can access the new database in "Databases" -> Personal".
             \n\nSincerely,\nEMIF Catalogue
         """ % (request.user.get_full_name(), _aux['database_name_t'] )
 
@@ -3191,9 +3361,9 @@ def sharedb_activation(request, activation_code, template_name="sharedb_invited.
         """ % (sp.user_invite.get_full_name(), request.user.get_full_name(), _aux['database_name_t'])
 
         # Send email to admins
-        send_mail(subject, message_to_inviter, settings.DEFAULT_FROM_EMAIL, [sp.user_invite.email])
+        send_custom_mail(subject, message_to_inviter, settings.DEFAULT_FROM_EMAIL, [sp.user_invite.email])
         # Send email to user with the copy of feedback message
-        send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [sp.user.email])
+        send_custom_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [sp.user.email])
 
     except BadHeaderError:
         return HttpResponse('Invalid header found.')
@@ -3205,6 +3375,170 @@ def sharedb_activation(request, activation_code, template_name="sharedb_invited.
 # Documentation
 def docs_api(request, template_name='docs/api.html'):
     return render(request, template_name, {'request': request, 'breadcrumb': True})
+
+def more_like_that(request, doc_id, mlt_query=None, page=1, template_name='more_like_this.html', force=False):
+    #first lets clean the query session log
+    if 'query' in request.session:
+        del request.session['query']
+        
+    if 'isAdvanced' in request.session:
+        del request.session['isAdvanced'] 
+    
+    if 'query_id' in request.session:
+        del request.session['query_id']
+    if 'query_type' in request.session:
+        del request.session['query_type']
+
+    database_name = ""
+
+    if mlt_query == None:
+        (_filter, database_name) = get_query_from_more_like_this(doc_id)
+    else:
+        _filter = mlt_query
+
+    if not _filter:
+        return render(request, template_name, {'request': request,
+                                       'num_results': 0, 'page_obj': None, 
+                                       'page_rows': 0,'breadcrumb': True, 
+                                       "breadcrumb_text": "More Like - "+database_name,
+                                       'database_name': database_name, 'isAdvanced': False, 
+                                       "sort_params": None, "page":None})
+
+    rows = define_rows(request)
+    if request.POST and not force:
+        page = request.POST["page"]
+
+    if page == None:
+        page = 1   
+
+    (sortString, filterString, sort_params, range) = paginator_process_params(request.POST, page, rows, default_mode={"score":"desc"})    
+    sort_params["base_filter"] = _filter;
+
+    print filterString
+
+    if len(filterString) > 0:
+        _filter += " AND " + filterString
+
+    print _filter
+
+    def fn(res, lst):
+        m = {}
+        for r in res:
+            if "id" in r and "score" in r:
+                m[r["id"]] = r                
+
+        for d in lst:
+            if d.id in m:
+                d.score = str(round(float( m[d.id]["score"]), 3) )
+        return lst
+
+    (list_databases,hits) = get_databases_from_solr_v2(request, _filter, sort=sortString, rows=rows, start=range, fl="*, score", post_process=fn)
+    if range > hits and force < 2:
+        return databases(request, page=1, force=True)  
+
+    print "Range: "+str(range)
+    print "hits: "+str(hits)
+    print "len: "+str(len(list_databases))
+
+    list_databases = paginator_process_list(list_databases, hits, range) 
+    
+    print "len: "+str(len(list_databases))
+    ## Paginator ##
+    myPaginator = Paginator(list_databases, rows)
+    try:
+        pager =  myPaginator.page(page)
+    except PageNotAnInteger, e:
+        pager =  myPaginator.page(page)
+    ## End Paginator ##    #print list_databases
+    
+    return render(request, template_name, {'request': request,
+                                           'num_results': hits, 'page_obj': pager, 
+                                           'page_rows': rows,'breadcrumb': True, 
+                                           "breadcrumb_text": "More Like - "+database_name,
+                                           'database_name': database_name, 'isAdvanced': False, 
+                                           "sort_params": sort_params, "page":page})
+
+def generate_database_snipet(results, page=1, rows=5):
+    class ResultSnipet:
+        num_results = 0
+        list_results = []
+        paginator = None
+        paginator_url = None
+        paginator_kwargs = []
+
+        def setPage(self, pageN):
+            if self.paginator == None:
+                return
+            try:
+                self.list_results = self.paginator.page(pageN)
+            except PageNotAnInteger, e:
+                self.list_results = self.paginator.page(1)
+    
+    questionnaires_ids = {}
+    qqs = Questionnaire.objects.all()
+    for q in qqs:
+        questionnaires_ids[q.slug] = (q.pk, q.name)
+
+    list_results = ResultSnipet()
+
+    list_databases = []
+    if len(results) == 0:
+        return list_results
+
+    for r in results:
+        try:
+            database_aux = Database()
+
+            if (not r.has_key('database_name_t')):
+                database_aux.name = '(Unnamed)'
+            else:
+                database_aux.name = r['database_name_t']
+
+            if (not r.has_key('location_t')):
+                database_aux.location = ''
+            else:
+                database_aux.location = r['location_t']
+            if (not r.has_key('institution_name_t')):
+                database_aux.institution = ''
+            else:
+                database_aux.institution = r['institution_name_t']
+
+            if (not r.has_key('contact_administrative_t')):
+                database_aux.email_contact = ''
+            else:
+                database_aux.email_contact = r['contact_administrative_t']
+
+            if (not r.has_key('number_active_patients_jan2012_t')):
+                database_aux.number_patients = ''
+            else:
+                database_aux.number_patients = r['number_active_patients_jan2012_t']
+            if (not r.has_key('upload-image_t')):
+                database_aux.logo = 'nopic.gif'
+            else:
+                database_aux.logo = r['upload-image_t']
+            database_aux.id = r['id']
+            database_aux.date = convert_date(r['created_t'])
+            try:
+                database_aux.date_modification = convert_date(r['date_last_modification_t'])
+            except KeyError:
+                pass
+                
+            (ttype, type_name) = questionnaires_ids[r['type_t']]
+            database_aux.ttype = ttype
+            database_aux.type_name = type_name
+            list_databases.append(database_aux)
+        except:
+            raise
+
+    pp = Paginator(list_databases, rows)
+    
+    list_results.num_results = results.hits
+    list_results.paginator = pp
+
+    list_results.setPage(page)
+ 
+    return list_results
+    
 
 
 def clean_str_exp(s):

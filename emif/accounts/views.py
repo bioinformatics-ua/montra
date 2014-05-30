@@ -41,13 +41,13 @@ class SignupFormExtra(SignupForm):
                                    max_length=255,
                                    required=True)
 
-    profiles = forms.ModelMultipleChoiceField(label=_('Profiles'),
+    profiles = forms.ModelMultipleChoiceField(label=_('I am a (select all that apply):'),
                                                 required=True,
                                                 queryset=Profile.objects.all(),
                                                 widget=forms.CheckboxSelectMultiple())
 
 
-    interests = forms.ModelMultipleChoiceField(label=_('Interests'),
+    interests = forms.ModelMultipleChoiceField(label=_('I am interested in (select all that apply):'),
                                                 required=True,
                                                 queryset=Questionnaire.objects.filter(disable='False'),
                                                 widget=forms.CheckboxSelectMultiple())
@@ -129,12 +129,12 @@ class SignupFormExtra(SignupForm):
 
 class EditProfileFormExtra(EditProfileForm):
 
-    profiles = forms.ModelMultipleChoiceField(label=_('Profiles'),
+    profiles = forms.ModelMultipleChoiceField(label=_('I am a (select all that apply):'),
                                                 required=True,
                                                 queryset=Profile.objects.all(),
                                                 widget=forms.CheckboxSelectMultiple())
 
-    interests = forms.ModelMultipleChoiceField(label=_('Interests'),
+    interests = forms.ModelMultipleChoiceField(label=_('I am interested in (select all that apply):'),
                                                 required=True,
                                                 queryset=Questionnaire.objects.filter(disable='False'),
                                                 widget=forms.CheckboxSelectMultiple())

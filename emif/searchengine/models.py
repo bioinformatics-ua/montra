@@ -21,9 +21,6 @@ from django.db import models
 
 from django import forms
 
-from django.core.mail import send_mail, BadHeaderError
-
-
 class Slugs(models.Model):
     slug1 = models.CharField(max_length=1256, blank=False)
     # TODO: delete 

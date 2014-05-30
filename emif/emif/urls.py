@@ -36,6 +36,9 @@ from django.conf import settings
 
 urlpatterns = patterns('',
 
+    # Comments
+    url(r'^comments/', include('django.contrib.comments.urls')),
+
     # Where to go when loggedin (according to Profile)
     url(r'^wherenext/$', 'emif.views.wherenext'),
 
@@ -47,7 +50,8 @@ urlpatterns = patterns('',
 
     # Index page
     url(r'^$', 'emif.views.index', name="home"),
-    
+    url(r'^index$', 'emif.views.index', name="home"),
+
     url(r'^about$', 'emif.views.about'),
 
     # must do this to be able to use custom paths on this css file
@@ -71,7 +75,9 @@ urlpatterns = patterns('',
     
     # Database Edit
     url(r'^dbEdit/(?P<fingerprint_id>[^/]+)/(?P<questionnaire_id>[0-9]+)$', 'emif.views.database_edit'),
+    url(r'^dbDetailed/(?P<fingerprint_id>[^/]+)/(?P<questionnaire_id>[0-9]+)$', 'emif.views.database_detailed_view'),
     url(r'^editqs/(?P<fingerprint_id>[^/]+)/(?P<questionnaire_id>[0-9]+)/(?P<sort_id>[0-9]+)/$', 'emif.views.database_edit_qs'),
+    url(r'^detailedqs/(?P<fingerprint_id>[^/]+)/(?P<questionnaire_id>[0-9]+)/(?P<sort_id>[0-9]+)/$', 'emif.views.database_detailed_qs'),
     #url(r'^dbEdit/(?P<questionnaire_id>[0-9]+)/$$', 'emif.views.database_edit'),
     url(r'^q3/(?P<runcode>[^/]+)/$', questionaries_with_sets, name='questionaries_with_sets'),
     url(r'^q3/(?P<runcode>[^/]+)/(?P<qs>[-]{0,1}\d+)/$',
@@ -118,6 +124,8 @@ urlpatterns = patterns('',
     url(r'^delete-questionnaire/(?P<qId>[0-9]+)/$', 'utils.delete_questionnaire.delete'),
     # Documentation
     url(r'^docs/api$', 'emif.views.docs_api'),
+    #more like this    
+    url(r'^mlt/(?P<doc_id>[^/]+)/(?P<page>[-]{0,1}\d+)?$', 'emif.views.more_like_that'),
 
 
     url(r'^rm/(?P<id>[^/]+)', 'emif.views.delete_fingerprint'),
@@ -247,6 +255,9 @@ urlpatterns = patterns('',
 
     # Docs Manager
     url(r'docsmanager/', include('docs_manager.urls')),
+
+    # Literature URLs
+    url(r'literature/', include('literature.urls')),
 )
 
 if settings.DEBUG:

@@ -50,7 +50,7 @@ def question_yesno(request, question):
         'template' : 'questionnaire/choice-yesnocomment.html',
     }
 
-@question_proc('open', 'open-textfield', 'open-button', 'open-upload-image')
+@question_proc('open', 'email', 'url', 'open-textfield', 'open-button', 'open-upload-image')
 def question_open(request, question):
     key = "question_%s" % question.number
     value = question.getcheckdict().get('default','')
@@ -71,10 +71,10 @@ def question_datepicker(request, question):
 
     a = re.compile("([0-9]{4})$")
     if a.match(value) != None:
-        print 'MATCH'
+        #print 'MATCH'
         value = value+'-01-01'
 
-    print "VALOR:["+value+"]"
+    #print "VALOR:["+value+"]"
 
     return {
         'required' : question.getcheckdict().get('required', False),
@@ -83,7 +83,7 @@ def question_datepicker(request, question):
         'template' : 'questionnaire/datepicker.html',
     }
 
-@answer_proc('open', 'open-textfield', 'choice-yesno', 'choice-yesnocomment', 'choice-yesnodontknow',  'open-button', 'open-upload-image')
+@answer_proc('open', 'email', 'url' 'open-textfield', 'choice-yesno', 'choice-yesnocomment', 'choice-yesnodontknow',  'open-button', 'open-upload-image')
 def process_simple(question, ansdict):
     checkdict = question.getcheckdict()
     required = question.getcheckdict().get('required', 0)
@@ -116,6 +116,9 @@ add_type('choice-yesno', 'Yes/No Choice [radio]')
 add_type('choice-yesnocomment', 'Yes/No Choice with optional comment [radio, input]')
 add_type('choice-yesnodontknow', 'Yes/No/Don\'t know Choice [radio]')
 add_type('datepicker', 'Date choice')
+add_type('email', 'Email Address [input]')
+add_type('url', 'Url Address [input]')
+
 
 
 @answer_proc('comment')

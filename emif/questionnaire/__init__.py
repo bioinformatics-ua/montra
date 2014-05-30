@@ -12,13 +12,14 @@ from django.dispatch import Signal
 import os, os.path
 import imp
 
-__all__ = [ 'question_proc', 'answer_proc', 'add_type', 'AnswerException',
-            'questionset_done', 'questionnaire_done', ]
+__all__ = [  'show_summary', 'question_proc', 'answer_proc', 'add_type', 'AnswerException',
+            'questionset_done', 'questionnaire_done',]
 
 QuestionChoices = []
 QuestionProcessors = {} # supply additional information to the templates
 Processors = {} # for processing answers
-
+Fingerprint_Summary = {} # for summaries
+ 
 questionset_done = Signal(providing_args=["runinfo", "questionset"])
 questionnaire_done = Signal(providing_args=["runinfo", "questionnaire"])
 
@@ -60,6 +61,24 @@ def answer_proc(*names):
             Processors[name] = func
         return func
     return decorator
+
+def show_summary(*names):
+    """
+    Decorator to create an answer processor for one or more
+    question types.
+    
+    Usage:
+    @question_proc('typename1', 'typename2')
+    def qproc_blah(request, question):
+        ...
+    """
+    def decorator(func):
+        global Fingerprint_Summary
+        for name in names:
+            Fingerprint_Summary[name] = func
+        return func
+    return decorator
+
 
 def add_type(id, name):
     """

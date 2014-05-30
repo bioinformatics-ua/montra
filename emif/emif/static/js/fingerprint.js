@@ -148,28 +148,43 @@ function validateById(id_answered, id_answered_aux) {
     */
     var qc_id = $('[id="qc_' + id_answered + '"]');
 
-    if (qc_id.hasClass('type_open') || qc_id.hasClass('type_open-button') || qc_id.hasClass('type_open-upload-image') || qc_id.hasClass('type_open-textfield') || qc_id.hasClass('type_publication')) {
+    if (qc_id.hasClass('type_open') || qc_id.hasClass('type_email') || qc_id.hasClass('type_url') ||
+        qc_id.hasClass('type_numeric') 
+        || qc_id.hasClass('type_open-button') || qc_id.hasClass('type_open-upload-image') || qc_id.hasClass('type_open-textfield') || qc_id.hasClass('type_publication')) {
         var myValue = $('[id="answered_' + id_answered_aux + '"]').parent().parent()[0].id;
 
+        var old_value;
 
         if (myValue != undefined) {
             myValue = myValue.replace('acc_qc_', '');
             myValue = myValue.replace('qc_', '');
 
             var val = $(':input[name="question_' + myValue.replace(/\./g, '\\.') + '"]');
+
             var r = validate1(val, id_answered_aux, id_answered);
             if (r)
                 valueCounter = 1;
             else
                 valueCounter = -1;
+
         }
 
     } else if (qc_id.hasClass('type_datepicker') || qc_id.hasClass('type_range') || qc_id.hasClass('type_timeperiod')) {
+
         var myValue = $('[id="answered_' + id_answered_aux + '"]').parent().parent()[0].id;
+
+
 
         if (myValue != undefined) {
             myValue = myValue.replace('acc_qc_', '');
 
+            if(qc_id.hasClass('type_datepicker')){
+                var value = $('[id="question_'+myValue+'"]').val();
+                value = value.replace('mm','01');
+                value = value.replace(/y/g,'0');
+                value = value.replace('dd','01');
+                $('[id="question_'+myValue+'"]').val(value);
+            }
             var val = $(':input[name="question_' + myValue.replace(/\./g, '\\.') + '"]');
 
             var r = validate1(val, id_answered_aux, id_answered);
@@ -252,6 +267,7 @@ $(document).ready(function() {
     $(document).on('change', '.answer input,.answer select,.answer textarea', function(e) {
         e.preventDefault();
 
+
         if (endsWith($(this).attr('id'), "_opt"))
             return false;
 
@@ -261,7 +277,6 @@ $(document).ready(function() {
         var toSum = $('[id="answered_' + id_answered_aux + '"]').hasClass('hasValue');
 
         var qId = parseInt(id_answered);
-
 
         //Detects widget class and sends it to the advanced validator.
         try{

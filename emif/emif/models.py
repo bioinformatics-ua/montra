@@ -57,7 +57,8 @@ class AdvancedQuery(models.Model):
     id = AutoField(primary_key=True)
     user = models.ForeignKey(User, unique=False, blank=False, null=False)
     name = models.TextField(unique=True)
-    serialized_query = models.TextField(unique=True)
+    serialized_query_hash = models.TextField(unique=True)
+    serialized_query = models.TextField(unique=False)
     date = models.DateTimeField(auto_now=True)
     qid = models.IntegerField(unique=False, blank=False, null=False)
     

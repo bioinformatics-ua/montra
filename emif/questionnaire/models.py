@@ -83,6 +83,19 @@ class Questionnaire(models.Model):
             self.__qscache = \
               QuestionSet.objects.filter(questionnaire=self).order_by('sortid')
         return self.__qscache
+        
+    def questions(self):
+        if not hasattr(self, "__questionscache"):
+            questions = []
+
+            qsets = self.questionsets()
+
+            for qset in qsets:
+                questions = questions + qset.questions()
+
+            self.__questionscache = questions
+
+        return self.__questionscache        
 
     class Meta:
         permissions = (

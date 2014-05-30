@@ -20,6 +20,12 @@
 # Django settings for emif project.
 import os.path
 
+import sys
+reload(sys)
+sys.setdefaultencoding('utf-8')
+
+
+
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
@@ -43,8 +49,7 @@ else:
 ADMINS = (
     ('Luis A. Bastiao Silva', 'bastiao@ua.pt'),
     ('José Luis Oliveira', 'jlo@ua.pt'),
-    ('Tiago Godinho', 'tmgodinh@ua.pt'),
-    ('Jose Melo', 'melojms@gmail.com'),
+    ('Tiago Godinho', 'tmgodinho@ua.pt'),
     ('Ricardo Ribeiro', 'ribeiro.r@ua.pt'),
 )
 
@@ -72,31 +77,31 @@ if not DEBUG:
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': DATABASE_PATH_SQLITE3,                      # Or path to database file if using sqlite3.
-        'USER': '',                      # Not used with sqlite3.
-        'PASSWORD': '',                  # Not used with sqlite3.
-        'HOST': '',                      # Set to empty string for localhost. Not used with sqlite3.
-        'PORT': '',                      # Set to empty string for default. Not used with sqlite3.
+    'ENGINE': 'django.db.backends.sqlite3', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
+    'NAME': DATABASE_PATH_SQLITE3,                      # Or path to database file if using sqlite3.
+    'USER': '',                      # Not used with sqlite3.
+    'PASSWORD': '',                  # Not used with sqlite3.
+    'HOST': '',                      # Set to empty string for localhost. Not used with sqlite3.
+    'PORT': '',                      # Set to empty string for default. Not used with sqlite3.
     }
 }
 
-# DATABASES = {
-#     'default': {
-#         #        'ENGINE': 'django.db.backends.mysql', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
-#         'ENGINE': 'django.db.backends.postgresql_psycopg2', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
-#         'NAME': 'emif_dev', # Or path to database file if using sqlite3.
-#         'USER': 'postgres', # Not used with sqlite3.
-#         'PASSWORD': 'ieeta123IEETA', # Not used with sqlite3.
-#         'HOST': 'localhost', # Set to empty string for localhost. Not used with sqlite3.
-#         'PORT': '', # Set to empty string for default. Not used with sqlite3.
-#         'AUTOCOMMIT': True,
-#         'autocommit': True,
-#         'OPTIONS': {
-#             'autocommit': True,
-#         },
-#     },
-# }
+#DATABASES = {
+#    'default': {
+#        #        'ENGINE': 'django.db.backends.mysql', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
+#        'ENGINE': 'django.db.backends.postgresql_psycopg2', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
+#        'NAME': 'emif_dev', # Or path to database file if using sqlite3.
+#        'USER': 'postgres', # Not used with sqlite3.
+#        'PASSWORD': 'admin', # Not used with sqlite3.
+#        'HOST': 'localhost', # Set to empty string for localhost. Not used with sqlite3.
+#        'PORT': '', # Set to empty string for default. Not used with sqlite3.
+#        'AUTOCOMMIT': True,
+#        'autocommit': True,
+#        'OPTIONS': {
+#            'autocommit': True,
+#        },
+#    },
+#}
 
 # Hosts/domain names that are valid for this site; required if DEBUG is False
 # See https://docs.djangoproject.com/en/1.4/ref/settings/#allowed-hosts
@@ -159,6 +164,7 @@ STATICFILES_DIRS = (
     os.path.abspath(PROJECT_DIR_ROOT + MIDDLE_DIR + 'emif/static'),
     os.path.abspath(PROJECT_DIR_ROOT + MIDDLE_DIR + 'questionnaire/static/'),
     os.path.abspath(PROJECT_DIR_ROOT + MIDDLE_DIR + 'population_characteristics/static'),
+    os.path.abspath(PROJECT_DIR_ROOT + MIDDLE_DIR + 'literature/static'),
     os.path.abspath(PROJECT_DIR_ROOT + MIDDLE_DIR + 'docs_manager/static'),
 )
 
@@ -206,6 +212,7 @@ TEMPLATE_DIRS = (
     os.path.abspath(PROJECT_DIR_ROOT + MIDDLE_DIR + 'apps/seantis-questionnaire/questionnaire/templates'),
     os.path.abspath(PROJECT_DIR_ROOT + MIDDLE_DIR + 'emif/templates'),
     os.path.abspath(PROJECT_DIR_ROOT + MIDDLE_DIR + 'population_characteristics/templates'),
+    os.path.abspath(PROJECT_DIR_ROOT + MIDDLE_DIR + 'literature/templates'),
     os.path.abspath(PROJECT_DIR_ROOT + MIDDLE_DIR + 'control_version/templates'),
     os.path.abspath(PROJECT_DIR_ROOT + MIDDLE_DIR + 'docs_manager/templates'),
 )
@@ -218,6 +225,7 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.markup',
+    'django.contrib.comments',
 
     # Admin area
     'django_admin_bootstrapped',
@@ -248,9 +256,11 @@ INSTALLED_APPS = (
 
     'searchengine',
     'api',
+    'fingerprint',
     'control_version',
     'docs_manager',
     'population_characteristics',
+    'literature',
     'django_bootstrap_breadcrumbs',
     'bootstrap-pagination',
     'django_jenkins',
@@ -299,7 +309,7 @@ USERENA_REMEMBER_ME_DAYS = ('a day', 1)
 
 
 LOGIN_REDIRECT_URL = USERENA_SIGNIN_REDIRECT_URL
-LOGIN_URL = BASE_URL + 'accounts/signin/'
+LOGIN_URL = BASE_URL + ''
 LOGOUT_URL = BASE_URL + 'accounts/signout/'
 
 # A sample logging configuration. The only tangible logging

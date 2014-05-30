@@ -22,17 +22,19 @@ import logging
 import re
 from searchengine.models import Nomenclature
 from datetime import datetime
-from searchengine.search_indexes import CoreEngine
+from searchengine.search_indexes import CoreEngine, assert_suffix, convert_value
 from searchengine.models import Slugs
 
 from questionnaire.models import Question, Questionnaire, QuestionSet
 
 import md5
 import random
+import time
 
 from django.conf import settings
 
-import re
+from django.core.mail import BadHeaderError, EmailMultiAlternatives
+from django.template.loader import render_to_string
 
 def generate_hash():
     hash = md5.new()
@@ -172,6 +174,7 @@ class QuestionGroup:
         self.name = ""
         self.sortid = ""
         self.qsid = -1
+        self.info = False
 
     def __eq__(self, other):
         return other.name == self.name
@@ -325,33 +328,68 @@ def convert_query_from_boolean_widget(query, q_id):
     # Example of output
     # ..
 
+    print "PARA CONVERTER: "
+    #print query
+
     questionnarie = Questionnaire.objects.filter(id=q_id)[0]
     ttype = questionnarie.slug
 
     questionsets = QuestionSet.objects.filter(questionnaire=q_id)
     print "convert_query_from_boolean_widget"
-    print query
+    #print query
     # I cant remove the symbol
     query = re.sub("_____[a-zA-Z0-9._()\[\]\/\-\+?!'@#$%&*=~^|\\<>;,\.\" ]+_____", "", query)
-    print query
+    
+    #print query
+    #print "------------------"
 
     def check(m):
+        q = None
         try:
-            print m
-            question_id = m.group(0)
+            
+            question_id = m.group(1)
+            #print "QUESTION_ID: "+question_id
             question_id = question_id.replace('question_nr_', '')
+            question_answer = m.group(4)
+
+            #print "T:"+m.group(0)
+            #print "Q: "+question_id + " A:"+question_answer
+
             q = Question.objects.filter(number=question_id, questionset__in=questionsets)
-            print q
+
+
         except:
             raise
             return 'null'
-        temp = q[0].slug + '_t'
-        # setting name as literal, and after escaping the literal definer
-        return escapeSolrArg(temp)
-    
 
-    r = re.sub('question_nr_[10-9\\.]+', check, query)
+        suffix = assert_suffix(q[0].type)
+        if suffix != None:    
+            temp = q[0].slug + suffix
+        else:
+            temp = q[0].slug + '_t'
+
+        convert = convert_value(question_answer, q[0].type, True)
+
+        #print "CONVERT*:"+convert
+        # setting name as literal, and after escaping the literal definer
+        if convert == None:
+            if question_answer.startswith('[') and question_answer.endswith(']'):
+                question_answer = question_answer
+
+            return escapeSolrArg(temp)+":"+question_answer
+        # else
+        return escapeSolrArg(temp)+":"+str(convert)
+    
+    # how to escape everything but unescaped single quotes, very nice ref from : 
+    # http://stackoverflow.com/questions/249791/regex-for-quoted-string-with-escaping-quotes
+    # this is non-greedy, giving the smallest match possible (as we want)
+    r = re.sub("(question_nr_[10-9\\.]+)(:)( )?(\"(\\\.|[^\"])*\"|\[[0-9\.,\-a-zA-Z\* ]*\])", check, query)
+    #r = re.sub('(question_nr_[10-9\\.]+)', check, query)
+
     r = r + " AND type_t:"+ttype
+
+    print r
+
     return r
 
 ## Reference on how to escape this efficiently from: 
@@ -374,7 +412,7 @@ escapeRules = {'+': r'\+',
                '*': r'\*',
                '?': r'\?',
                ':': r'\:',
-               '"': r'\"',
+               #'"': r'\"',
                ';': r'\;',
                ' ': r'\ '}
 
@@ -392,3 +430,19 @@ def escapeSolrArg(term):
         escaping special characters like : , etc"""
     term = term.replace('\\', r'\\')   # escape \ first
     return "".join([nextStr for nextStr in escapedSeq(term)])
+
+def send_custom_mail(title, description, from_mail, to_mail):
+    
+    email = render_to_string('email_template.html', {
+            'title': title,
+            'description': description.replace('\n','<br />'),
+            'from_mail': from_mail,
+            'to_mail': to_mail,
+            'current_date': time.strftime("%d/%m/%Y %H:%M:%S")
+        })
+
+    msg = EmailMultiAlternatives(title, description, from_mail, to_mail)
+    msg.attach_alternative(email, "text/html")
+
+    msg.send()
+

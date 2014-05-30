@@ -13,13 +13,24 @@
 					{% for t in qs.list_ordered_tags %}
 					<tr>
 						<!-- title="{{ t.tag|safe }}" -->
-						<td title="{{ t.tag|safe|removehs }}">{{ t.tag|removehs }}</td>
-						<td title="{{ t.value|safe }}">{{ t.value|safe }}
+						<td class="tooltipped" title="{{ t.tag|removehs|safe }}">{{ t.tag|removehs|safe }}</td>
+						{% if t.ttype|captioned %}
+						<td class="value_content captioned_content" style="white-space: normal;" title="{{ t.value|force_escape }}">
+						{% else %}
+						<td class="value_content" style="white-space: normal;">
+						{% endif %}
+						<span class="summary_content">
+						{{ t.value|safe }}
+						</span>
+
+						{% if not t.comment|safe == None and not t.comment|safe == "" %}
 						<div class="pull-right">
-							{% if not t.comment|safe == None and not t.comment|safe == "" %}
 							<i class="comment_button icon-comment" data-container="body" data-toggle="popover" data-placement="left" data-title="Comment" data-content="{{ t.comment|safe }}"></i>
-							{% endif %}
-							</div>
+						</div>
+						<div class="comment-print">
+							<strong>Comment: </strong>{{ t.comment|safe }}
+						</div>
+						{% endif %}
 						</td>
 					</tr>
 					{% endfor %}
@@ -27,16 +38,19 @@
 			</table>
 <script type="text/javascript">
 	addTooltip('#t2_{{qs.sortid}}');
+	$('.captioned_content .summary_content', $('#t2_{{qs.sortid}}')).expander({slicePoint: 68, expandText: 'more', userCollapseText: 'less'});
 	// Add highlighting
-	{% if request.session.query and not isAdvanced %}
+	/*{% if request.session.query and not isAdvanced %}
 
 		{% for word in request.session.query|whitespacesplit %}
 			$('#set_container, .tooltip').highlight('{{word}}');
 		{% endfor %}
-	{% endif %}
+	{% endif %}*/
   /*$('.comment_button', '#t2_{{qs.sortid}}').click(function(){
   	$(this).parent().find('.comment_text').toggle('fast');
   });*/
-	$('.comment_button', '#t2_{{qs.sortid}}').popover({trigger: 'hover', html: true});
+	$('.comment_button', '#t2_{{qs.sortid}}').popover({trigger: 'hover', html: true,
+            template: '<div class="popover popover-medium"><div class="arrow"></div><div class="popover-inner"><h3 class="popover-title"></h3><div class="popover-content"><p></p></div></div></div>'
+});
 </script>
 {% endfor %}

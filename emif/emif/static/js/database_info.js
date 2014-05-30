@@ -1,69 +1,3 @@
-/******* Database info specific Javascript ****/
-//<!--&lt;!&ndash; Use the widgets &ndash;&gt;-->
-// Initialize widget
-var becasWidget;
-var becasWidget2;
-// We must check becas exists, because the import the way it exists, may fail
-if (!(typeof becas === 'undefined')) {
-    becasWidget = new becas.Widget({
-        container: 'becas-widget-text'
-    });
-    // Request text annotation
-    becasWidget.annotateText({
-        // required parameter
-        text: 'In Duchenne muscular dystrophy (DMD), the infiltration of skeletal muscle by immune cells aggravates disease, yet the precise mechanisms behind these inflammatory responses remain poorly understood. Chemotactic cytokines, or chemokines, are considered essential recruiters of inflammatory cells to the tissues.\nWe assayed chemokine and chemokine receptor expression in DMD muscle biopsies (n = 9, average age 7 years) using immunohistochemistry, immunofluorescence, and in situ hybridization.\nCXCL1, CXCL2, CXCL3, CXCL8, and CXCL11, absent from normal muscle fibers, were induced in DMD myofibers. CXCL11, CXCL12, and the ligand-receptor couple CCL2-CCR2 were upregulated on the blood vessel endothelium of DMD patients. CD68(+) macrophages expressed high levels of CXCL8, CCL2, and CCL5.\nOur data suggest a possible beneficial role for CXCR1/2/4 ligands in managing muscle fiber damage control and tissue regeneration. Upregulation of endothelial chemokine receptors and CXCL8, CCL2, and CCL5 expression by cytotoxic macrophages may regulate myofiber necrosis.',
-        // optional parameters
-        groups: {
-            "SPEC": true,
-            "ANAT": true,
-            "DISO": true,
-            "PATH": true,
-            "CHED": true,
-            "ENZY": true,
-            "MRNA": true,
-            "PRGE": true,
-            "COMP": true,
-            "FUNC": true,
-            "PROC": true
-        },
-        success: function() {
-            // Everything went fine, widget is rendered.
-        },
-        error: function(err) {
-            // An error prevented annotation, an error message has rendered.
-        }
-    });
-
-    // Initialize another widget
-    becasWidget2 = new becas.Widget({
-        container: 'becas-widget-pmid'
-    });
-    // Request abstract annotation by PMID
-    becasWidget2.annotatePublication({
-        // required parameter
-        pmid: 23225384,
-        // optional parameters
-        groups: {
-            "SPEC": true,
-            "ANAT": true,
-            "DISO": true,
-            "PATH": true,
-            "CHED": true,
-            "ENZY": true,
-            "MRNA": true,
-            "PRGE": true,
-            "COMP": true,
-            "FUNC": true,
-            "PROC": true
-        },
-        success: function() {
-            // Everything went fine, widget is rendered.
-        },
-        error: function(err) {
-            // An error prevented annotation, an error message has rendered.
-        }
-    });
-}
 $('#li_workspace').addClass("active");
 
 $("#btn_pivot_table").bind('click', function(e) {
@@ -85,24 +19,16 @@ $("#collapseall_metadata").bind('click', function(e) {
 
     return false;
 });
-$("#collapseall_literature").bind('click', function(e) {
-    //e.preventDefault(); 
-    //e.stopPropagation();
-
-    collapse_expand(this);
-
-    return false;
-});
 
 function collapse_expand(context) {
     if ($(context).text().indexOf('Collapse') !== -1) {
-        $(context).text('Expand all');
+        $(context).html('<i class="icon-plus"></i>&nbsp; Expand all');
         //change_name_collapse(false);
 
         $(".collapse:visible").collapse("hide");
 
     } else {
-        $(context).text('Collapse all');
+        $(context).html('<i class="icon-minus"></i>&nbsp; Collapse all');
         //change_name_collapse(true);
         $(".collapse:visible").collapse("show");
     }
@@ -400,8 +326,8 @@ function addTooltip(table_id) {
             declaring a tooltip instance every td...*/
         $('td', $(table_id)).each(function() {
             var content = $(this).text().replace(/\s+/gi, ' ');
-            if ($(this).textWidth() > $(this).width()) {
-                $(this).addClass('tooltipped');
+            if ($(this).textWidth() < $(this).width()) {
+                $(this).removeClass('tooltipped');
             }
         });
 

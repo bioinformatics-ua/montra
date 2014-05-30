@@ -594,13 +594,36 @@
                 return select.join('');
             },
             reset: function() {
-                if (mastergroup != 'null') {
-                    var simples = mastergroup.extractAllSimple();
-                    mastergroup = null;
-                    used_blocks = [];
-                    for (var i = 0; i < simples.length; i++)
-                        this.pushBooleanGroup(simples[i]);
+                if (settings.hide_concepts) {
+                    if(mastergroup != null){
+                        var contained = mastergroup.extractAllSimple();
+
+                        for (var j = 0; j < contained.length; j++) {
+                            if (settings.hide_concepts)
+                                contained[j].callDelegate();
+                            else
+                                this.pushBooleanGroup(contained[j].copy());
+
+                            var other_id = this.getUsedIndex(contained[j].variables[0]);
+                            if (other_id > -1) {
+                                used_blocks.splice(other_id, 1);
+                            }
+                        }
+                        this.draw();
+                    }
+                } else {
+                    if (mastergroup != 'null') {
+                        var simples = mastergroup.extractAllSimple();
+                        mastergroup = null;
+                        used_blocks = [];
+                        for (var i = 0; i < simples.length; i++)
+                            this.pushBooleanGroup(simples[i]);
+                    }
                 }
+
+                console.log(mastergroup);
+                console.log(basic_blocks);
+                console.log(used_blocks);
             },
             opAll: function(func) {
                 if (!isBool(func)) {
@@ -703,7 +726,7 @@
                 return false;
             },
             readyToSubmit: function() {
-                if (mastergroup != 'null') {
+                if (mastergroup != null && mastergroup != 'null') {
                     $('#boolrelwidget-boolean-representation').val(mastergroup.toQuery());
                     $('#boolrelwidget-boolean-serialization').val(mastergroup.serialize());
                 } else {
@@ -791,9 +814,9 @@
         $('#boolrelwidget-andall').click(function() {
             funcs.opAll(BOOL['AND']);
         });
-        if (settings.hide_concepts) {
-            $('#boolrelwidget-clear').fadeOut('fast');
-        }
+        //if (settings.hide_concepts) {
+        //    $('#boolrelwidget-clear').fadeOut('fast');
+        //}
         $('#boolrelwidget-clear').click(function() {
             funcs.reset();
         });
@@ -888,9 +911,14 @@ BooleanTerminal.prototype = {
         return this.text;
     },
     toQuery: function() {
-        if (this.id && this.val)
-            return this.id + ": '" + this.val.replace(/'/g, "\\'") + "'";
-        else return '';
+        var suffix="]";
+        if (this.id && this.val){
+            if(this.val.lastIndexOf("[") == 0 && 
+                this.val.indexOf(suffix, this.val.length - suffix.length) !== -1)
+                return this.id + ": " + this.val.replace(/"/g, '\\"');
+            else 
+                return this.id + ': "' + this.val.replace(/"/g, '\\"') + '"';
+        } else return '';
     },
     serialize: function() {
         return 'T;;;;;' + encodeURI(this.id) + ';;;;;' + encodeURI(this.text) + ';;;;;' 

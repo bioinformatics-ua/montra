@@ -173,13 +173,13 @@
             <!-- If Questionset is not the first (Introduction) or the final (Thank you) -->
 
                 {% if k.prev %}
-                    <a href="dbEdit/{{ fingerprint_id }}/{{ k.prev.sortid }}" class="btn large primary" onclick="questionsets_handle(qs_{{ k.prev.sortid }});  return false;">{% trans "Previous" %}</a>
+                    <a href="dbEdit/{{ fingerprint_id }}/{{ k.prev.sortid }}" class="btn large primary" onclick="questionsets_handle(qs_{{ k.prev.sortid }});  return false;"><i class="icon-chevron-left"></i> &nbsp;{% trans "Previous" %}</a>
                 {% endif %}
                 {% if k.prev and k.next %}
 
                 {% endif %}
-                {% if k.next %}
-                    <a href="dbEdit/{{ fingerprint_id }}/{{ k.next.sortid }}" class="btn large primary" onclick="questionsets_handle(qs_{{ k.next.sortid }});  return false;">{% trans "Next" %}</a>
+                {% if k.next and k.next.sortid != 99 %}
+                    <a href="dbEdit/{{ fingerprint_id }}/{{ k.next.sortid }}" class="btn large primary" onclick="questionsets_handle(qs_{{ k.next.sortid }});  return false;">{% trans "Next" %} &nbsp;<i class="icon-chevron-right"></i></a>
                 {% endif %}
 
 
@@ -190,7 +190,10 @@
             </div>
             <div class="span2 text-right">
                 {% if k.sortid != 0 %}
-                    <input class="btn large btn-primary" name="submit" type="submit" value="{% trans 'Save' %}" />
+                    <!--input class="btn large btn-primary" name="submit" type="submit" value="{% trans 'Save' %}" /-->
+                    <button type="submit" class="btn btn-primary">
+                      <i class="icon-file icon-white"></i>&nbsp; {% trans 'Save' %}
+                    </button>
                 {% endif %}
                 {% if k.sortid == 0 %}
                 {% endif %}
