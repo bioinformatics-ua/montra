@@ -2725,85 +2725,46 @@ def show_fingerprint_page_read_only(request, q_id, qs_id, SouMesmoReadOnly=False
     else:
         hide_add = False
     
-    serialized_query = None;
+    serialized_query = None
     
     if template_name == 'advanced_search.html' and aqid != None:
         this_query = AdvancedQuery.objects.get(id=aqid)  
         serialized_query = this_query.serialized_query
         
     try:
-
         
         qs_list = QuestionSet.objects.filter(questionnaire=q_id).order_by('sortid')
 
-        #print "Q_id: " + q_id
-        #print "Qs_id: " + qs_id
-        #print "QS List: " + str(qs_list)
         if (int(qs_id) == 99):
             qs_id = len(qs_list) - 1
 
         question_set = qs_list[int(qs_id)]
-        #questions = Question.objects.filter(questionset=qs_id)
 
         questions = question_set.questions()
-        #print "Questions: " + str(questions)
-        #print "QuestionSet: " + str(question_set)
 
         questions_list = {}
         for qset_aux in qs_list:
-            #questions_aux = Question.objects.filter(questionset=qset_aux)
             questions_list[qset_aux.id] = qset_aux.questions()
-            #print "here"
-        
-        qlist = []
-        jsinclude = []      # js files to include
-        cssinclude = []     # css files to include
-        jstriggers = []
-        qvalues = {}
-        qexpression = None  # boolean expression
-        qserialization = None   # boolean expression serialization to show on results
-        
-        qlist_general = []
-
-        errors = {}
+                
         fingerprint_id = generate_hash()
 
-
         #### Find out about the number of answers serverside 
-
-        #c = CoreEngine()
-
-        #this_document = c.search_fingerprint('id:' + db_id)
-
         qreturned = []
-
         for x in question_set.questionnaire.questionsets():
             ttct = x.total_count()
             ans = 0
-            try:
-                percentage = (ans * 100) / ttct
-            except ZeroDivisionError:
-                percentage = 0
+            percentage = 0
             qreturned.append([x, ans, ttct, percentage])
-
-        print qreturned
         #### End of finding out about the number of answers serverside
 
         r = r2r(template_name, request,
                         questionset=question_set,
                         questionsets=qreturned,
                         runinfo=None,
-                        errors=errors,
-                        qlist=qlist,
                         progress=None,
-                        triggers=jstriggers,
-                        qvalues=qvalues,
-                        jsinclude=jsinclude,
-                        cssinclude=cssinclude,
                         async_progress=None,
                         async_url=None,
                         qs_list=qs_list,
-                        questions_list=qlist_general,
                         fingerprint_id=fingerprint_id,
                         breadcrumb=True,
                         hide_add=hide_add,
