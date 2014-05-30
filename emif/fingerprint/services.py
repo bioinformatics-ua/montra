@@ -210,20 +210,7 @@ def indexFingerprint(fingerprint_id):
         d['date_last_modification_t'] = fingerprint.last_modification.strftime('%Y-%m-%d %H:%M:%S.%f')
         d['created_t'] = fingerprint.created.strftime('%Y-%m-%d %H:%M:%S.%f')
 
-        # user_t (owner + shared)
-        # i don't know if the user is
-        users = set()
-        users.add(fingerprint.owner.email)
-        for share in fingerprint.shared.all():
-            users.add(share.email)
-
-        users = list(users)
-        users_string = users[0]
-
-        for i in xrange(1, len(users)):
-            users_string+= ' \\ ' + users[i]
-
-        d['user_t'] = users_string
+        d['user_t'] = unique_users_string(fingerprint)
 
         # Add answers
         answers = Answer.objects.filter(fingerprint_id=fingerprint)
@@ -249,3 +236,18 @@ def indexFingerprint(fingerprint_id):
     except Fingerprint.DoesNotExist:
         print "-- ERROR: Can't find the fingerprint with hash "+fingerprint_id+" to export."
 
+def unique_users_string(fingerprint):
+    # user_t (owner + shared)
+    # i don't know if the user is
+    users = set()
+    users.add(fingerprint.owner.email)
+    for share in fingerprint.shared.all():
+        users.add(share.email)
+
+    users = list(users)
+    users_string = users[0]
+
+    for i in xrange(1, len(users)):
+        users_string+= ' \\ ' + users[i]
+
+    return users_string

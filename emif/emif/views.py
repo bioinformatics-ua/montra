@@ -42,6 +42,7 @@ from emif.utils import *
 from emif.models import *
 
 from fingerprint.services import *
+from fingerprint.models import *
 
 from api.models import *
 
@@ -1001,163 +1002,87 @@ def database_detailed_view(request, fingerprint_id, questionnaire_id, template_n
     return database_edit(request, fingerprint_id, questionnaire_id, template_name, readonly=True);
 
 def database_edit(request, fingerprint_id, questionnaire_id, template_name="database_edit.html", readonly=False):
-    c = CoreEngine()
+    try: 
+        this_fingerprint = Fingerprint.objects.get(fingerprint_hash=fingerprint_id)
+        
+        users_db = unique_users_string(this_fingerprint)        
+        created_date = this_fingerprint.created
 
-    results = c.search_fingerprint("id:" + fingerprint_id)
-    items = None
-    for r in results:
-        items = r
-        break
-    fingerprint_id = r['id']
+        qs_list = QuestionSet.objects.filter(questionnaire=questionnaire_id)
 
-    users_db = r['user_t']
+        question_set = qs_list[0]
+        answers = Answer.objects.filter(fingerprint_id=this_fingerprint)
 
-    created_date = r['created_t']
+        print answers
 
-    try:
-        fingerprint_name = r['database_name_t']
-    except:
-        fingerprint_name = 'unnamed'        
+        # well this doesnt scale well, we should have the database name on the fingerprint
+        # it probably will be mitigated by using the descriptor that should be updated on save...
+        fingerprint_name = 'unnamed' 
 
-    extra = {} 
-    # Render page first time.
+        for answer in answers:
+            print answer
+            slug = answer.question.slug_fk.slug1
+            if answer.question.slug_fk.slug1 == 'database_name':
+                fingerprint_name = answer.data
+                break
 
-    request2 = RequestMonkeyPatch()
+        # count questionset filled answers
+        qreturned = []
 
-    request2.method = request.method
-    for item in items:
-        key = item
-        value = items[key]
-        if item.startswith("comment_question_"):
+        for x in question_set.questionnaire.questionsets():
+            ttct = x.total_count()
+            ans = len(intersect(answers, x))
+            try:
+                percentage = (ans * 100) / ttct
+            except ZeroDivisionError:
+                percentage = 0
+
+            qreturned.append([x, ans, ttct, percentage])
+
+
+        r = r2r(template_name, request,
+                questionset=question_set,
+                questionsets=qreturned,
+                runinfo=None,
+                errors=None,
+                progress=None,
+                fingerprint_id=fingerprint_id,
+                q_id = questionnaire_id,
+                async_progress=None,
+                async_url=None,
+                qs_list=qs_list,
+                breadcrumb=True,
+                name=fingerprint_name.encode('utf-8'),
+                id=fingerprint_id,
+                users_db=users_db,
+                created_date=created_date,
+                hide_add=True,
+                readonly=readonly
+        )
+        r['Cache-Control'] = 'no-cache'
+        r['Expires'] = "Thu, 24 Jan 1980 00:00:00 GMT"
             
-            slug = item.split("comment_question_")[1]
-            # results = Slugs.objects.filter(slug1=slug[:-2], question__questionset__questionnaire=questionnaire_id)
-            # if results == None or len(results) == 0:
-            #     continue
-            # question = results[0].question
-            results = Question.objects.filter(slug_fk__slug1=slug[:-2], questionset__questionnaire=questionnaire_id)
-            if results == None or len(results) == 0:
-                continue
-            question = results[0]
-            request2.get_post()['comment_question_%s' % question.number] = value
-            continue
+        return r
 
-        if item == '_version_':
-            continue
+    except Fingerprint.DoesNotExist:
+        print "-- Error obtaining fingerprint "+str(fingerprint_id)    
 
-        # results = Slugs.objects.filter(slug1=str(item)[:-2],question__questionset__questionnaire=questionnaire_id )
-        # print len(results)
-        # if results == None or len(results) == 0:
-        #     continue
-        # question = results[0].question
-        results = Question.objects.filter(slug_fk__slug1=str(item)[:-2], questionset__questionnaire=questionnaire_id)
-        if results == None or len(results) == 0:
-            continue
-        question = results[0]
-        answer = str(question.number)
+    # Something is really wrong if we get here...
+    return HttpResponse('Error open edit for fingerprint '+str(fingerprint_id), status=500)
 
-        extra[question] = ans = extra.get(question, {})
-        if "[" in str(value):
-            value = str(value).replace("]", "").replace("[", "")
-        request2.get_post()['question_%s' % question.number] = value
-        
-        
-        ans['ANSWER'] = value
-        
-        extra[question] = ans
+def intersect(answers, questionset):
 
-    errors = {}
+    # i know, this would be simpler if we just had the __in query, but we could only do this
+    # if we deleted entries on Answer, and i don't want to do that because of the versioning
+    # (on field can be empty, be filled, be empty and be filled again), the version has a pointer to the answer
+    # we can't go around deleting entries... is preferable to do the process of checking for emptyness in this query
 
-    q_id = questionnaire_id
-    qs_id = 1
+    non_empty = []
+    for ans in answers.filter(question__in=questionset.questions()):
+        if ans.data != None and ans.data != '':
+            non_empty.append(ans)
 
-    qs_list = QuestionSet.objects.filter(questionnaire=questionnaire_id)
-
-    question_set = qs_list[int(qs_id)]
-    '''if request.POST:
-        (qlist_general, qlist, jstriggers, qvalues, jsinclude, cssinclude, extra_fields, hasErrors) = extract_answers(request, questionnaire_id, question_set, qs_list)
-    else:
-        (qlist_general, qlist, jstriggers, qvalues, jsinclude, cssinclude, extra_fields, hasErrors) = extract_answers(request2, questionnaire_id, question_set, qs_list)
-
-    print hasErrors
-    '''
-    if (question_set.sortid == 99 or request.POST):
-        # Index on Solr
-        try:
-            if not hasErrors:
-                add_city(qlist_general)
-                index_answeres_from_qvalues(qlist_general, question_set.questionnaire, users_db,
-                                        fingerprint_id, extra_fields=extra_fields, created_date=created_date)
-        except:
-            raise
-
-    #import pdb
-    #pdb.set_trace()
-    #### Find out about the number of answers serverside 
-
-    c = CoreEngine()
-
-    this_document = c.search_fingerprint('id:' + fingerprint_id).docs[0]
-
-    qreturned = []
-
-    for x in question_set.questionnaire.questionsets():
-        ttct = x.total_count()
-        ans = len(intersect(this_document, x))
-        try:
-            percentage = (ans * 100) / ttct
-        except ZeroDivisionError:
-            percentage = 0
-
-        qreturned.append([x, ans, ttct, percentage])
-
-    #### End of finding out about the number of answers serverside
-
-    r = r2r(template_name, request,
-            questionset=question_set,
-            questionsets=qreturned,
-            runinfo=None,
-            errors=errors,
-            #qlist=qlist,
-            progress=None,
-            #triggers=jstriggers,
-            #qvalues=qvalues,
-            #jsinclude=jsinclude,
-            #cssinclude=cssinclude,
-            fingerprint_id=fingerprint_id,
-            q_id = q_id,
-            async_progress=None,
-            async_url=None,
-            qs_list=qs_list,
-            #questions_list=qlist_general,
-            breadcrumb=True,
-            name=fingerprint_name.encode('utf-8'),
-            id=fingerprint_id,
-            users_db=users_db,
-            created_date=created_date,
-            hide_add=True,
-            readonly=readonly
-    )
-    r['Cache-Control'] = 'no-cache'
-    r['Expires'] = "Thu, 24 Jan 1980 00:00:00 GMT"
-        
-    return r
-
-#class Database:
-#    id = ''
-#    name = ''
-#    date = ''
-#    last_activity = ''
-    
-
-def intersect(this_document, questionset):
-    intersection = []
-
-    for question in questionset.questions():
-        if this_document.has_key(question.slug+"_t"):
-            intersection.append(question.slug+"_t")
-
-    return intersection
+    return non_empty
 
 def get_databases_from_db(request):
     user = request.user
