@@ -605,61 +605,39 @@ def render_one_questionset(request, q_id, qs_id, errors={}, aqid=None, fingerpri
     
 
     if fingerprint_id != None and not is_new:
-        c = CoreEngine()
 
-        extra = {} 
+        try: 
+            this_fingerprint = Fingerprint.objects.get(fingerprint_hash=fingerprint_id)
 
-        results = c.search_fingerprint("id:" + fingerprint_id)
-        items = None
+            this_answers = Answer.objects.filter(fingerprint_id=this_fingerprint)
 
-        for r in results:
-            items = r
-            break
+            extra = {}
 
-        request2 = RequestMonkeyPatch()
+            request2 = RequestMonkeyPatch()
 
-        request2.method = request.method
-        if items != None:
-            for item in items:
-                key = item
-                value = items[key]
-                if item.startswith("comment_question_"):
-                    
-                    slug = item.split("comment_question_")[1]
-                    # results = Slugs.objects.filter(slug1=slug[:-2], question__questionset__questionnaire=questionnaire_id)
-                    # if results == None or len(results) == 0:
-                    #     continue
-                    # question = results[0].question
-                    results = Question.objects.filter(slug_fk__slug1=slug[:-2], questionset__questionnaire=q_id)
-                    if results == None or len(results) == 0:
-                        continue
-                    question = results[0]
-                    request2.get_post()['comment_question_%s' % question.number] = value
-                    continue
+            request2.method = request.method
 
-                if item == '_version_':
-                    continue
+            for answer in this_answers:
+                this_q  = answer.question
+                value   = answer.data
 
-                # results = Slugs.objects.filter(slug1=str(item)[:-2],question__questionset__questionnaire=questionnaire_id )
-                # print len(results)
-                # if results == None or len(results) == 0:
-                #     continue
-                # question = results[0].question
-                results = Question.objects.filter(slug_fk__slug1=str(item)[:-2], questionset__questionnaire=q_id)
-                if results == None or len(results) == 0:
-                    continue
-                question = results[0]
-                answer = str(question.number)
-
-                extra[question] = ans = extra.get(question, {})
                 if "[" in str(value):
                     value = str(value).replace("]", "").replace("[", "")
-                request2.get_post()['question_%s' % question.number] = value
-                
-                
-                ans['ANSWER'] = value
-                
-                extra[question] = ans
+
+                request2.get_post()['question_%s' % this_q.number] = value
+
+                if answer.comment != None:
+                    request2.get_post()['comment_question_%s' % this_q.number] = value
+
+                # This "extra" field was on the old solr version, i will admit, i have no clue wth this does...
+                # it doesn't seem to make any difference as far as i could check, anyway i left it here commented
+                # in case we need it after all
+                #extra[this_q] = ans = extra.get(this_q, {})
+                #ans['ANSWER'] = value
+                #extra[this_q] = ans
+
+        except Fingerprint.DoesNotExist:
+            print "-Error fingerprint "+fingerprint_id + " does not exist but we think it does."
 
     try:
 
