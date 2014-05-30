@@ -97,7 +97,7 @@ def FingerprintFromHash(hash):
 
 
 """
-Answer of the Fingerprint 
+    Answer of the Fingerprint 
 """
 class Answer(models.Model):
     question = models.ForeignKey(Question)
@@ -110,6 +110,25 @@ class Answer(models.Model):
 
     def __str__(self):
      return "ANSWER{id="+str(self.id)+", question_slug="+self.question.slug_fk.slug1+", data="+self.data+", comment="+str(self.comment)+"}"
+
+'''
+    Fingerprint answers tracked change - a simple revision system
+
+        Each time a already existing fingerprint has answers modified, there's a new object 
+        from this model, and one answer change for each answer change
+'''
+class FingerprintHead(models.Model):
+    fingerprint_id = models.ForeignKey(Fingerprint)
+    revision       = models.IntegerField()
+    date           = models.DateTimeField(auto_now_add=True)
+
+class AnswerChange(models.Model):
+    revision_head = models.ForeignKey(FingerprintHead)
+    answer        = models.ForeignKey(Answer)
+    old_value     = models.TextField(null=True)
+    new_value     = models.TextField(null=True)
+    old_comment   = models.TextField(null=True)
+    new_comment   = models.TextField(null=True)
 
 """
 This class wraps the Description of the Fingerprint.
