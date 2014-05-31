@@ -28,11 +28,10 @@ from .serialize import serialize
 from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import user_passes_test, login_required
 
-from emif.views import createqsets, createqset, get_api_info, getPermissions, attachPermissions
+from emif.views import createqsets, createqset, get_api_info, getPermissions, attachPermissions, merge_highlight_results
 
 from questionnaire.models import QuestionSet
 
-from emif.views import createqsets, createqset, get_api_info, merge_highlight_results
 from django.shortcuts import render
 
 import os

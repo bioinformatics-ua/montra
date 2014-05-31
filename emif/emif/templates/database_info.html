@@ -276,7 +276,7 @@ var threads = {};
 function load_questionnary(){
 
 console.log("Creating questionnary set containers (so they are in order)");
-
+        containers = []
         // We build the qs containers in memory and just do dom op, on the end, for speed
         // on ie joins are significantly faster than concatenation
         // tuple = k, qs
@@ -295,10 +295,9 @@ console.log("Creating questionnary set containers (so they are in order)");
         
         {% endfor %}
 
-// We build the qs containers in memory and just do dom op, on the end, for speed
-// on ie joins are significantly faster than concatenation
-{% for k, qs in qsets.ordered_items %}
-containers.push('<div class="accordion-group"><div class="accordion-heading"><a style="display: inline-block; width: 90%;" class="accordion-toggle" data-toggle="collapse" data-parent="#accordion1" href="#collapse{{ k|removespaces|safe|clean }}">{{ k|removeh1 }} </a><span class="accordion-icon">{% if qs.info %}<img title="This section has search keywords" class="markered" src="{{STATIC_URL}}/img/marker.png" />{% endif %}</span></div><div id="collapse{{ k|removespaces|safe|clean }}" class="accordion-body collapse"><div id="qs_{{ qs.sortid }}" class="accordion-inner"><h4 class="pull-center">Loading...</h4></div></div></div>');
+        var threadpool = new ThreadPool(20);
+        parts_missing = {{qsets|length}};
+
 
 {% if qs.info %}
 console.log("QS_DEBUG: {{qs.sortid}} : {{qs.info}}");

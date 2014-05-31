@@ -308,6 +308,11 @@ collapseAll($("#collapseall_qs_{{ k.sortid }}"), div_id);
 $(function(){
     add_triggers{{ questions_list.0.0.sortid }}();
     setsaveqs("qform{{ questions_list.0.0.sortid }}");
+    $('.dropdown-menu').on('click', function(e) {
+        if($(this).hasClass('dropdown-menu-form')) {
+            e.stopPropagation();
+        }
+    });
 });
 
 

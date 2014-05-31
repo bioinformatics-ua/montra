@@ -804,9 +804,6 @@ def render_one_questionset(request, q_id, qs_id, errors={}, aqid=None, fingerpri
 
         permissions = getPermissions(fingerprint_id, question_set)
 
-        #permissions = getPermissions(fingerprint_id, question_set)
-
-
         advanced_search=False
         if template_name == 'fingerprint_search_qs.html':
             advanced_search = True
@@ -829,7 +826,7 @@ def render_one_questionset(request, q_id, qs_id, errors={}, aqid=None, fingerpri
                 questions_list=qlist_general,
                 fingerprint_id=fingerprint_id,
                 breadcrumb=True,
-                permissions=permissions
+                permissions=permissions,
                 readonly=readonly
         )
         r['Cache-Control'] = 'no-cache'
