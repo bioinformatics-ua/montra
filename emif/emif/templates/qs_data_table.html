@@ -18,7 +18,11 @@
             <tr class="">
                 <td>{{ ans.0 }}</td>
                 {% for a in ans.1 %}
-                    <td title="{{a}}"> {{ a|truncate  }}</td>
+                    {% if a.1|captioned %}
+                    <td title="{{a.0}}"> {{ a.0|truncate  }}</td>
+                    {% else %}
+                      <td> {{a.0}}</td> 
+                    {% endif %}
                 {% endfor %}
                 </tr>
             {% endfor %}
