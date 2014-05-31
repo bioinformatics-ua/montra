@@ -1944,171 +1944,135 @@ def createqsets(runcode, qsets=None, clean=True, highlights=None):
 def createqset(runcode, qsid, qsets=None, clean=True, highlights=None):
     qsid = int(qsid) 
     print "Got into createqset!!" + str(qsid)
-    #print "createqsets"
-    c = CoreEngine()
-    results = c.search_fingerprint('id:' + runcode)
-    #print len(results)    
-    #results = c.search_highlight('id:' + runcode, hlfl="text_t")
-    
-    if qsets == None:
-        qsets = ordered_dict()
-    name = ""
-    list_values = []
-    blacklist = ['created_t', 'type_t', '_version_', 'date_last_modification_t']
-    name = "Not defined."
-    users = ""
-    fingerprint_ttype = ""
 
-    db_owners = "" 
-    
-    questionnaires_ids = {}
-    qqs = Questionnaire.objects.all()
-    for q in qqs:
-        questionnaires_ids[q.slug] = (q.pk, q.name)
+    try:
+        fingerprint = Fingerprint.objects.get(fingerprint_hash=runcode)
 
-    rHighlights = None
-    qhighlights = None
-    if highlights != None:
-        if "results" in highlights and runcode in highlights["results"]:
-            rHighlights = highlights["results"][runcode]
-        if "questions" in highlights:
-            qhighlights = highlights["questions"]
-        
-    for result in results:
+        if qsets == None:
+            qsets = ordered_dict()
 
+        name = ""
+        list_values = []
 
-        (fingerprint_ttype, type_name) = questionnaires_ids[result['type_t']]
+        name = "Not defined."
+        fingerprint_ttype = ""
 
-        # Get the slug of fingerprint type
-        q_aux = Questionnaire.objects.filter(slug=result['type_t'])
+        db_owners = ""      
+
+        rHighlights = None
+        qhighlights = None
+
+        if highlights != None:
+            if "results" in highlights and runcode in highlights["results"]:
+                rHighlights = highlights["results"][runcode]
+            if "questions" in highlights:
+                qhighlights = highlights["questions"]
+            
+        fingerprint_ttype = fingerprint.questionnaire.pk 
+        type_name = fingerprint.questionnaire.name
+
+        db_owners = unique_users_string(fingerprint)
 
         try:
-            users = result['user_t']
-            db_owners = result['user_t']
-        except:
-            pass
-
-        list_qsets = QuestionSet.objects.filter(questionnaire=q_aux[0]).order_by('sortid')
-
-        
-        for qset in list_qsets:
-            if (qset.sortid == qsid):
-                question_group = QuestionGroup()
-                question_group.sortid = qset.sortid
-                
-                qsets[qset.text] = question_group
-                qset.sortid
-                list_questions = Question.objects.filter(questionset=qset).order_by('number')
-                for question in list_questions:
-                    t = Tag()
-                    t.tag = question.text.encode('utf-8')
-                    t.value = ""
-                    t.number = question.number
-                    t.ttype = question.type
-                    question_group.list_ordered_tags.append(t)
-
-
-                qsets[qset.text] = question_group
-
-                break
-
-        for k in result:
-            if k in blacklist:
-                continue
+            qset = QuestionSet.objects.get(questionnaire=fingerprint.questionnaire, sortid=qsid)
             
-            if k.startswith("comment_question_"):
-                continue
-                
-            t = Tag()
+            question_group = QuestionGroup()
+            question_group.sortid = qset.sortid
+            
+            qsets[qset.text] = question_group
+            # questions() already gives us questions ordered by number
+            list_questions = qset.questions()
 
-            #aux_results = Slugs.objects.filter(slug1=k[:-2], question__questionset__questionnaire=q_aux[0].pk)
-            qs = None
-            question_group = None
-            q_number = None
-            # if len(aux_results) > 0:
-            #     text = aux_results[0].description
-            #     qs = aux_results[0].question.questionset.text
-            #     q_number = qs = aux_results[0].question.number
-            #     if qsets.has_key(aux_results[0].question.questionset.text):
-            #         # Add the Tag to the QuestionGroup
-            #         question_group = qsets[aux_results[0].question.questionset.text]
-            #     '''else:
-            #         # Add a new QuestionGroup
-            #         question_group = QuestionGroup()
-            #         qsets[aux_results[0].question.questionset.text] = question_group
-            #         print aux_results[0].question.questionset.text
-            #     '''    
-            question_ = Question.objects.filter(slug_fk__slug1=k[:-2], questionset__questionnaire=q_aux[0].pk)
-            if len(question_) > 0:
-                text = question_[0].slug_fk.description
-                qs = question_[0].questionset.text
-                q_number = qs = question_[0].number
-                if qsets.has_key(question_[0].questionset.text):
-                    # Add the Tag to the QuestionGroup
-                    question_group = qsets[question_[0].questionset.text]
-                '''else:
-                    # Add a new QuestionGroup
-                    question_group = QuestionGroup()
-                    qsets[question_.questionset.text] = question_group
-                    print question_.questionset.text
-                 '''   
+            for question in list_questions:
+                t = Tag()
+                t.tag = question.text.encode('utf-8')
+                t.value = ""
+                t.number = question.number
+                t.ttype = question.type
+                question_group.list_ordered_tags.append(t)
 
-            else:
-                text = k
+            qsets[qset.text] = question_group
 
-            info = text
-            t.tag = info
-            #print t.tag
-            if question_group != None and question_group.list_ordered_tags != None:
-                try:
-                    t = question_group.list_ordered_tags[question_group.list_ordered_tags.index(t)]                   
-                except:
-                    pass
+            answers = Answer.objects.filter(fingerprint_id=fingerprint)
 
-            raw_value = str(result[k].encode('utf-8'))
-            value = clean_value(raw_value)
+            for answer in answers:
+                slug = answer.question.slug_fk.slug1
 
-            qs_text = k[:-1] + "qs"
-            id_text = "questionaire_"+str(fingerprint_ttype)
-            if qhighlights != None and id_text in qhighlights and qs_text in qhighlights[id_text]:
-                t.tag = qhighlights[id_text][qs_text][0].encode('utf-8')
+                t = Tag()
 
-            try:
+                qs = None
+                question_group = None
+                q_number = None          
 
-               t.comment = result['comment_question_'+k]
-               #print t.comment
-            except KeyError:
-               pass
-            if clean:
-                t.value = value.replace("#", " ")
-                
-                if rHighlights != None and k in rHighlights:
-                    t.value = rHighlights[k][0].encode('utf-8')
-                    #if len(highlights["results"][k])>1:
-                    #print t.value
-                
-                if t.ttype in Fingerprint_Summary:
-                    t.value = Fingerprint_Summary[t.ttype](raw_value)
+                question = answer.question
+                if question != None:
+                    text = question.slug_fk.description
+                    qs = question.questionset.text
+                    q_number = qs = question.number
+                    if qsets.has_key(question.questionset.text):
+                        # Add the Tag to the QuestionGroup
+                        question_group = qsets[question.questionset.text]
+
+                else:
+                    text = (slug, answer.data)
+
+                info = text
+                t.tag = info
+                #print t.tag
+                if question_group != None and question_group.list_ordered_tags != None:
+                    try:
+                        t = question_group.list_ordered_tags[question_group.list_ordered_tags.index(t)]                   
+                    except:
+                        pass
+
+                raw_value = str(answer.data.encode('utf-8'))
+                value = clean_value(raw_value)
+
+                qs_text = slug + "qs"
+                id_text = "questionaire_"+str(fingerprint_ttype)
+                if qhighlights != None and id_text in qhighlights and qs_text in qhighlights[id_text]:
+                    t.tag = qhighlights[id_text][qs_text][0].encode('utf-8')
+
+                if answer.comment != None:
+                    t.comment = answer.comment
+
+                if clean:
+                    t.value = value.replace("#", " ")
+                    
+                    if rHighlights != None and slug+'_t' in rHighlights:
+                        t.value = rHighlights[slug+'_t'][0].encode('utf-8')
+                        #if len(highlights["results"][k])>1:
+                        #print t.value
+                    
+                    if t.ttype in Fingerprint_Summary:
+                        t.value = Fingerprint_Summary[t.ttype](raw_value)
+
+                else:
+                    t.value = value
+
+                if answer.data == "database_name":
+                    name = t.value           
+
+                list_values.append(t)
+                if question_group != None:
+                    try:
+                        question_group.list_ordered_tags[question_group.list_ordered_tags.index(t)] = t
+                    except:
+                        pass
+
+        except QuestionSet.DoesNotExist:
+            print "-- Error: The questionset you want does not exist"
+        except QuestionSet.MultipleObjectsReturned:
+            print "-- Error: Multiple objects returned, sortid ar supposed to be unique"
+
+        return (qsets, name, db_owners, fingerprint_ttype)
+
+    except Fingerprint.DoesNotExist:
+        print "-- Error on createqset: Fingerprint "+str(runcode)+" does not exist"
 
 
-            else:
-                t.value = value
-            if k == "database_name_t":
-                name = t.value           
-
-            list_values.append(t)
-            if question_group != None:
-                try:
-                    question_group.list_ordered_tags[question_group.list_ordered_tags.index(t)] = t
-                except:
-                    pass
-        break
-    # What should I do with this code?
-    # I know that it actually do nothing    
-    if (users!=""):
-        users.split(" \\ ")
-
-    return (qsets, name, db_owners, fingerprint_ttype)
+    # Something is really wrong if it gets here
+    return HttpResponse('Something is wrong on creating qset '+qsid, 500)
 
    
 # TODO: move to another place, maybe API? 
@@ -2544,8 +2508,8 @@ def check_database_add_conditions(request, questionnaire_id, sortid, saveid,
 
             saveFingerprintAnswers(qlist_general, fingerprint_id, question_set2.questionnaire, users_db, extra_fields=extra_fields, created_date=created_date)
 
-            index_answeres_from_qvalues(qlist_general, question_set2.questionnaire, users_db,
-                                        fingerprint_id, extra_fields=extra_fields, created_date=created_date)
+            # new version that just serializes the created fingerprint object (this eventually can be done using celery)
+            indexFingerprint(fingerprint_id)
 
     r = r2r(template_name, request,
                 questionset=question_set2,
