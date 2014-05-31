@@ -1941,6 +1941,7 @@ def all_databases_data_table(request, template_name='alldatabases_data_table.htm
     return render(request, template_name, {'request': request, 'export_all_answers': True, 'titles': titles,
                                            'answers': answers, 'breadcrumb': True, 'collapseall': False, 'geo': True,
                                            'list_databases': list_databases,
+                                           'no_print': True,
                                            'databases_types': databases_types
                                            })
 
@@ -2197,7 +2198,8 @@ def createqset(runcode, qsid, qsets=None, clean=True, highlights=None):
             #     '''    
             question_ = Question.objects.filter(slug_fk__slug1=k[:-2], questionset__questionnaire=q_aux[0].pk)
             if len(question_) > 0:
-                text = question_[0].slug_fk.description
+                #text = question_[0].slug_fk.description
+                text = question_[0].text
                 qs = question_[0].questionset.text
                 q_number = qs = question_[0].number
                 if qsets.has_key(question_[0].questionset.text):

@@ -41,7 +41,7 @@
             Expand all
          </a>
         {% endif %}
-        {% if list_databases|length > 0 %}
+        {% if list_databases|length > 0 and not no_print %}
 		<button type="button" class="btn btn" onclick="window.print();" title="Print">
 			<i class="icon-print"></i> Print
 		</button>

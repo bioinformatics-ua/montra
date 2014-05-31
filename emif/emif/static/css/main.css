@@ -557,12 +557,15 @@ label input[type="radio"], label input[type="checkbox"]{
 #signup_form label input[type="radio"], #signup_form label input[type="checkbox"]{
   margin-top: 4px;
 }
+.comment-print{
+  display: none;
+}
 /* Styles for printing */
 @media print{
   .visible-print  { display: inherit !important; }
-  .hidden-print  .navbar, .btn-group, .pagination,
-  .btn, .select_line,
-  .table_filter
+  .hidden-print  .navbar, .btn-group, .pagination, .pagination-centered,
+  .btn, .select_line, .nav, .comment_button, #pc_comment_id, #fileupload, .btn_delete, 
+  .deleteLink, .qslist, .table_filter, .publications-form, #comment_form
   { display: none !important; }
   a:link, 
   a:visited { 
@@ -579,6 +582,38 @@ label input[type="radio"], label input[type="checkbox"]{
   }
   .tabbable .collapse, #database_listings .collapse{
     height: auto !important;
+  }
+  .brand{
+    margin-left: 10px !important;
+  }
+  .container{
+    padding: 0 !important;
+  }
+  .push{
+    height: 0px !important;
+  }
+  .tab-content{
+    clear: both;
+  }
+  .comment-print{
+    display: block;
+    font-size: 10px;
+  }
+  .btn-link{
+    display: initial !important;
+  }
+  th, td{
+    white-space: normal !important;
+  }
+  div[id*='comments_']{
+    display: block !important;
+  }
+  .dataTables_scrollBody{
+    overflow: visible !important;
+    width: 100% !important;
+  }  
+  .tablesorter-filter{
+    display: none !important;
   }
 }
 @media (min-width: 1200px) {.span2_5 {width: 350px !important;}}
@@ -717,3 +752,4 @@ height: 6em;
   padding: 0px !important;
 
 }
+
