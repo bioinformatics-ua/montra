@@ -1,0 +1,9 @@
+{% extends 'common_email.html' %}
+
+{% load i18n %}
+
+{% block email_content %}
+
+{% blocktrans with site.name as site %}Registration Approved at {{ site }}.{% endblocktrans %}
+
+{% endblock %}

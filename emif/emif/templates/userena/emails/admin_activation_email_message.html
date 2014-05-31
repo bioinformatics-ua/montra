@@ -1,0 +1,25 @@
+{% extends 'common_email.html' %}
+
+{% load i18n %}{% autoescape off %}{% load url from future %}
+
+{% block email_content %}
+
+{% blocktrans with site.name as site %}A new user has been registered at {{ site }}.{% endblocktrans %}<br /><br />
+
+{% blocktrans with user.username as username %} Username: {{ username }} {% endblocktrans %}<br />
+
+Name: {% blocktrans with user.first_name as fname %} {{ fname }} {% endblocktrans %} {% blocktrans with user.last_name as lname %} {{ lname }} {% endblocktrans %}<br />
+Organization: {{ organization }}<br /><br />
+{% trans "To activate his account you should click on the link below:" %}<br />
+
+{{ protocol }}://{{ site.domain }}{% url 'userena_activate' activation_key %}<br /><br />
+
+{% blocktrans with user.email as email %}An email has been sent to {{ email }}! {% endblocktrans %}<br /><br />
+
+{% trans "Sincerely" %},<br />
+{{ site.name }}
+
+
+{% endblock %}
+
+{% endautoescape %}
