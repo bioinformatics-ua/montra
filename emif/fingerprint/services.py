@@ -1,4 +1,4 @@
-from fingerprint.models import Fingerprint, Answer
+from fingerprint.models import Fingerprint, Answer, FingerprintHead, AnswerChange
 from questionnaire.models import Questionnaire
 from django.contrib.auth.models import User
 
@@ -23,6 +23,8 @@ def saveFingerprintAnswers(qlist_general, fingerprint_id, questionnaire, user, e
         print "Updating answers "+fingerprint_id
         # For each response in qlist_general
 
+        versionhead = None
+
         print "TO:"
         for qs_aux, qlist in qlist_general:
             for question, qdict in qlist:
@@ -37,6 +39,9 @@ def saveFingerprintAnswers(qlist_general, fingerprint_id, questionnaire, user, e
                     try:
                         this_ans = Answer.objects.get(fingerprint_id=fingerprint, question=question)
 
+                        current_value = this_ans.data
+                        current_comment = this_ans.comment
+
                         # update existing answers
                         this_ans.data=value;
 
@@ -46,6 +51,28 @@ def saveFingerprintAnswers(qlist_general, fingerprint_id, questionnaire, user, e
                         print "UPDATE: "
                         print this_ans
                         this_ans.save()
+
+                        # if value or comment changed
+                        if current_value != value or current_comment != comment:
+                            # create version head if not any yet
+                            if versionhead == None:
+                                # find out if we already have other revisions, if not revision starts at 1
+                                revision = None
+                                
+                                try: 
+                                    last_revision = FingerprintHead.objects.filter(fingerprint_id=fingerprint).order_by('-id')[0]
+
+                                    revision = last_revision.revision+1
+                                except:
+                                    revision = 1                                    
+
+                                versionhead = FingerprintHead(fingerprint_id=fingerprint, revision=revision)
+
+                                versionhead.save()
+
+                            # save answerchange
+                            answerchange = AnswerChange(revision_head=versionhead, answer=this_ans, old_value=current_value, new_value=value, old_comment=current_comment, new_comment=comment)
+                            answerchange.save()
 
                     except Answer.DoesNotExist:
                         # new ,create new answer
