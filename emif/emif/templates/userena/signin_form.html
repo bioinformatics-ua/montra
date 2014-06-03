@@ -4,6 +4,8 @@
 {% load i18n %}
 {% load crispy_forms_tags %}
 
+{% with STATIC_URL=STATIC_URL BASE_URL=BASE_URL %}
+
 <!DOCTYPE html>
 <!--[if lt IE 7]>      <html class="no-js ns lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
 <!--[if IE 7]>         <html class="no-js ns lt-ie9 lt-ie8"> <![endif]-->
@@ -197,3 +199,5 @@ $(function(){
 </script>
 </body>
 </html>
+
+{% endwith %}
