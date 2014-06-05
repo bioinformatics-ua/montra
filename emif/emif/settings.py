@@ -313,7 +313,7 @@ USERENA_REMEMBER_ME_DAYS = ('a day', 1)
 
 
 LOGIN_REDIRECT_URL = USERENA_SIGNIN_REDIRECT_URL
-LOGIN_URL = BASE_URL + 'index'
+LOGIN_URL = BASE_URL + ''
 LOGOUT_URL = BASE_URL + 'accounts/signout/'
 
 # A sample logging configuration. The only tangible logging

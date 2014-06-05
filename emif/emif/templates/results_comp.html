@@ -85,7 +85,6 @@ th, td {
   {% endblock %}
 
 {% block content %}
-
 <div class="clearboth">
 <!--[if lte IE 8]>
 <div class="well">Currently IE 7 and 8 don't support this functionality. To use this functionality please update your browser to a modern browser, like IE 9 or better, Google Chrome, Firefox, Opera or Safari.</div>
@@ -93,12 +92,19 @@ th, td {
 <!--[if gte IE 9]><!-->
 
 <ul class="pager">
-  <li class="pull-left"><input type="text" size="60" style="margin-left: 0px;" class="span9" id="searchfilter" placeholder="To filter type here" tabindex="1"></li>
+  <li class="pull-left"><input type="text" size="60" style="margin-left: 0px;" class="span9" id="searchfilter" placeholder="To filter type your keywords here" tabindex="1"></li>
   <li>
-    <div class="pull-right btn-group">
-      <button id="compare_previous" class="btn"><i class="icon-arrow-left"></i></button>
+    <div class="pull-right">
+      <!--button id="compare_previous" class="btn"><i class="icon-arrow-left"></i></button>
       <span id="compare_id" class="btn disabled">1/{{results|length|add:-1}}</span>
-      <button id="compare_next" class="btn"><i class="icon-arrow-right"></i></button>
+      <button id="compare_next" class="btn"><i class="icon-arrow-right"></i></button-->
+      <table><tr><td>Comparing {{results|length}} databases &nbsp; &nbsp;</td><td style="margin-top: -25px; "> 
+      <i style="font-size: 30px;" id="compare_information" class="icon-question-sign" data-toggle="popover" data-placement="bottom" data-content="This is the compare databases page. <br /><br/>In this page it is possible to compare several database by analysing responses to the same question across several databases. <br /><br />
+      By default, the first three selected databases are compared, having the first database being the reference.<br /><br /> 
+      If there are less than three databases, the user only will see two databases.<br /> <br />
+      If there are more than three databases, the user will see the first three, and the others will be available to replace the current showing selection, by using the dropdowns on the databases.<br /><br />
+      In any case, the database of reference can also be changed by using the dropdown." title="Compare Databases - Help"></i>
+      </td></tr></table>
     </div>
   </li>
 
@@ -106,39 +112,76 @@ th, td {
 </div>
 <div style="margin: 0px;" class="span12">
   <div style="overflow-x: auto;" class="well accordion" id="accordion2">
-  <div id="database_listings">
-  <div id="database_rows">
-
-    {% for name, qset in results %}
-                      
-    <div class="database_listing {%if forloop.counter == 2 %}database_listing_pointer{% endif %} {%if forloop.counter > 2 %}database_listing_away{% endif %}">
-    <div {% if forloop.first%}style="margin-left: 0px;"{% endif %}>
-     <div class="clearfix database_title btn-darkgrey">
-      <div class="database_title_text pull-left">{{name}}</div>
-      <div>
-        {%if database_to_compare|removespaces in name|removespaces %}
-          <button type="button" id="ref{{name|removespaces}}" class="pull-right set_reference btn btn-small btn-primary">Using as reference</button>
-        {% else %}
-          <button type="button" id="ref{{name|removespaces}}" class="pull-right set_reference btn btn-small btn-success">Set as reference</button>   
-        {% endif %}
-        </div>
+       <div style="opacity: 0;" class="database_listing_names">
+    <div>
+     <div data-clampedwidth=".database_listing_names"  class="clearfix database_title btn-darkgrey">
+      <div style="height: 26px;" class="database_title_text pull-left"> &nbsp;
+      </div>
     </div>   
-      {% for k,v in qset.ordered_items %}
-      <div style="background-color: white" class="accordion-group">
-        <div class="accordion-heading">
-          <a id="a_collapse{{k|removespaces}}_{{name|removespaces}}" class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapse{{k|removespaces}}_{{name|removespaces}}">{{k|removeh1}}</a>
+      {% for k,v in results.items.0.1.qset.ordered_items %}
+      <div class="block_{{forloop.counter}} accordion-group">
+        <div style="background-color: white;" title="{{k|removeh1}}" class="tooltippable accordion-heading">
+          <small><a id="a_collapse{{k|removespaces}}_{{name|removespaces}}" class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapse{{k|removespaces}}_{{name|removespaces}}">
+          <div style="width: 220px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{k|removeh1}}</div></a></small>
         </div>
         <div id="collapse{{k|removespaces}}_{{name|removespaces}}" class="accordion-body collapse">
           <div class="accordion-inner">
 
-            <table id="{{name|removespaces}}_{{k|removespaces}}" class="table table-bordered table-hover table-striped">
+            <table id="HEADER_{{k|removespaces}}" class="table table-bordered table-hover">
               <thead></thead>
 
               <tbody>
                 {% for t in v.list_ordered_tags %}
-                <tr class="entry rowid_{{forloop.parentloop.counter}}_{{forloop.counter}}">
-                  <td class="tooltippable" data-original-title="{{ t.tag|removehs }}" title="">{{ t.tag|removehs }}</td> 
-                   <td class="tooltippable" data-original-title="{{ t.value }}" title="">{{ t.value }}</td>
+                <tr data-fingerprintid="HEADER" 
+                data-rowid="{{forloop.parentloop.counter}}_{{forloop.counter}}" class="entry rowid_{{forloop.parentloop.counter}}_{{forloop.counter}}">
+                  <td style="background-color: white; font-size: 85%;" class="tooltippable" data-original-title="{{ t.tag|removehs }}" title="">
+                  
+                  
+                  {{ t.tag|removehs }}
+                  
+                  </td> 
+
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    </div>
+  <div style="display: table-cell;" id="database_listings">
+  <div id="database_rows">                   
+    {% for fingerprint_id, content in results.items %}
+                      
+    <div id="db_{{fingerprint_id}}" class="database_listing database_listing_away">
+    <div {% if forloop.first%}style="margin-left: 0px;"{% endif %}>
+     <div data-clampedwidth=".database_listing" class="clearfix database_title btn-darkgrey">
+      <div class="database_title_text pull-left">{{content.name}}</div>
+      <div class="dropdown_placer pull-right">
+          ---
+      </div>
+    </div>   
+      {% for k,v in content.qset.ordered_items %}
+      <div data-clampedwidth=".database_listing" style="background-color: white;" data-block="{{forloop.counter}}" class="block_{{forloop.counter}} elips accordion-group">
+        <div title="{{k|removeh1}}" class="tooltippable accordion-heading">
+          <small><a id="a_collapse{{k|removespaces}}_{{content.name|removespaces}}" class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapse{{k|removespaces}}_{{content.name|removespaces}}">
+          <div class="linktoellipse">{{k|removeh1}}</div></a></small>
+        </div>
+        <div id="collapse{{k|removespaces}}_{{content.name|removespaces}}" class="accordion-body collapse">
+          <div class="accordion-inner">
+
+            <table id="{{fingerprint_id|removespaces}}_{{k|removespaces}}" class="table table-bordered table-hover">
+              <thead></thead>
+
+              <tbody>
+                {% for t in v.list_ordered_tags %}
+                <tr data-fingerprintid="{{fingerprint_id}}" 
+                    data-rowid="{{forloop.parentloop.counter}}_{{forloop.counter}}"
+                class="entry rowid_{{forloop.parentloop.counter}}_{{forloop.counter}}">
+                  <td style="width:0 !important;" class="tooltippable" data-original-title="{{ t.tag|removehs }}" title="">{{ t.tag|removehs }}</td> 
+                   <td style="font-size: 95%;" class="tooltippable" data-original-title="{{ t.value }}" title="">{{ t.value }}</td>
                 </tr>
                 {% endfor %}
               </tbody>
@@ -152,7 +195,8 @@ th, td {
     {% endfor %}
     </div>
     </div>
-    <div id="no_results" class="pull-center">No results found, for this filtering parameters.</div>
+    <div id="no_results" class="pull-center"><h4>No results found, for this filtering parameters.</h4></div>
+    <div id="comparingwait" class="pull-center"><h4>Comparing results, please wait</h4></div>
   </div>
 </div>
 
@@ -166,26 +210,20 @@ th, td {
 {% endblock %}
 <!--[if gte IE 9]><!-->
 {% block scriptextra %}
-
 function applyFilters(){
   reset_empties();
-  var reference_table = $('.database_listing').eq(0).find('.set_reference').prop('id').substring(3);
-  var compared_table = $('.database_listing_pointer').find('.set_reference').prop('id').substring(3);
+      var others = [];
 
-  console.log('IDS TO COMPARE: '+reference_table +":"+compared_table);
-  var filter_string = $("#searchfilter").val();
+      for(var i=0;i<dbs.showing.length;i++){
+        if(dbs.showing[i] != dbs.reference){
+          others.push(dbs.showing[i]);
+        }
+      }
+  var filter_string = $("#searchfilter").val().trim();
 
-          {%for name, qset in results|slice:":1" %}
-            {% for k,v in qset.ordered_items %}
-            filter_results([reference_table+'_{{k|removespaces}}'],filter_string, match, unmatch, emptyrows, proximity);
-            filter_results([compared_table+'_{{k|removespaces}}'],filter_string, match, unmatch, emptyrows, proximity);
-
-            {% endfor %}
-          {% endfor %}
+  filter_results(others, dbs.reference, filter_string, match, unmatch, emptyrows, proximity);
 
   doublecheck_expansions();
-  check_empties();  
-
 }
 
 
@@ -232,7 +270,6 @@ $("#unmatch").bind('click',function(e)
           return false;
 });
 
-
 $("#emptyrows").bind('click',function(e)
 { 
 
@@ -254,9 +291,6 @@ $("#emptyrows").bind('click',function(e)
           }
           return false;
 });
-
-
-
 
 $("#proximity").bind('click',function(e)
 { 
@@ -282,171 +316,128 @@ $("#proximity").bind('click',function(e)
 
 var comparing_current=1;
 var max_comparing = {{results|length|add:-1}};
-$(function(){
-  $('[id^="{{database_to_compare|removespaces}}"] td').addClass("basetable");
+var dbs = null;
+function compareDbsSelected(initial){
+  cleantablediff();
+  console.log('initial:'+initial);
+    if(!initial && hasFilters()){
+      $('.database_listing_names').fadeOut('fast');
+      $('.database_listing').fadeOut('fast');
+      $('#comparingwait').fadeIn('fast');
+    }
+      var ref = dbs.reference;
 
-  $('#compare_previous').click(function(){
-    $('#compare_next').prop('disabled', false);
-    
-    comparing_current--;
-    if(comparing_current == 1)
-      $(this).prop('disabled', true);
+      var others = [];
 
-    $('#compare_id').text(comparing_current+'/'+max_comparing);
-
-    $('.database_listing_pointer').first().removeClass("database_listing_pointer").addClass("database_listing_away");
-
-    var newreference = $('.database_listing_away').eq(comparing_current-1);
-
-    newreference.removeClass("database_listing_away").addClass("database_listing_pointer");
-    newreference.hide();
-    newreference.fadeIn(1000);
-
-      compareDatabases(true);
-
-    newreference.css('display','table-cell');      
-  });
-
-  $('#compare_next').click(function(){
-    $('#compare_previous').prop('disabled', false);
-
-    comparing_current++;
-    if(comparing_current == max_comparing)
-      $(this).prop('disabled', true);
-    $('#compare_id').text(comparing_current+'/'+max_comparing);
-  
-    $('.database_listing_pointer').first().removeClass("database_listing_pointer").addClass("database_listing_away"); 
-
-    var newreference = $('.database_listing_away').eq(comparing_current-1);
-
-    newreference.removeClass("database_listing_away").addClass("database_listing_pointer");
-    newreference.hide();
-    newreference.fadeIn(1000);
-
-      compareDatabases(true);
-
-     newreference.css('display','table-cell');
-     });
-
-  $('.set_reference').click(function(){
-    var self_parent = $(this).closest('.database_listing');
-
-
-    var identity = $(this).prop('id').substring(3);
-    
-    console.log(identity);
-
-    // If not is reference
-    if(!$(this).hasClass('btn-primary')){
-      $('.database_listing_pointer').first().removeClass("database_listing_pointer"); 
-      
-      $('.set_reference').each(function(){
-        if($(this).hasClass('btn-primary')){
-          $(this).removeClass('btn-primary');
-          $(this).addClass('btn-success');
-          $(this).text('Set as reference'); 
-
-          $(this).closest('.database_listing').addClass('database_listing_pointer'); 
+      for(var i=0;i<dbs.showing.length;i++){
+        if(dbs.showing[i] != ref){
+          others.push(dbs.showing[i]);
         }
+      }
 
-        
-      });
-      $(this).removeClass('btn-success');
-      $(this).addClass('btn-primary');
-      $(this).text('Using as reference');
+  var threadpool = new ThreadPool(20);
+  var priority=1;
+      var thread;
+      {%for fingerprint_id, content in results.items|slice:":1" %}
+        {% for k,v in content.qset.ordered_items %}
+          for( var i = 0; i < others.length;i++){
+            thread = new Runnable(compareDatabase, priority++, ref+'_{{k|removespaces}}', others[i]+'_{{k|removespaces}}'); 
+            threadpool.run(thread);  
+          }
+        {% endfor %}
+      {% endfor %}
+      threadpool.destroy(
+        function(){
+            if(!initial && hasFilters()){
+            $('#comparingwait').fadeOut('fast');
+            
+            $('.database_listing_names').fadeIn('fast');
+            $('.database_listing').fadeIn('fast');
+            }
+            $(".tooltippable").tooltip({container:"body"});
+            applyFilters();
+        }
+      );
+      $('.basetable').removeClass('basetable');
+      $('table[id^="'+ref+'_"] tr').addClass('basetable');
 
-      // Clean all status
-      $('.basetable').removeClass("basetable");
-      $('.success').removeClass("success");
-      $('.warning').removeClass("warning");
-      $('.error').removeClass("error");
-      $('.emptycells').removeClass("emptycells");
-
-
-      $('[id^="'+identity+'"] td').addClass("basetable");
-      $('#database_listings .database_listing').sort(CustomSort).appendTo('#database_rows');
-
-
-// Ref from: http://stackoverflow.com/questions/18625321/detect-webkit-browser-in-javascript
-// For some reason gecko and presto dont understand the animation i wanted correctly, only webkit browsers,
-// so i do it only on webkit, on others i have a fallback
-var isWebkit = (typeof window.webkitConvertPointFromNodeToPage === 'function');
-
-  if(isWebkit){
-
-      self_parent.hide("drop", {direction: "right"}, 900);
-      $('.database_listing_pointer').hide("drop", {direction: "left"}, 900);
-
-      self_parent.show("drop", {direction: "right"}, 900);
-      $('.database_listing_pointer').show("drop", {direction: "left"}, 900);
-
-} else {
-      self_parent.fadeOut(900);
-      $('.database_listing_pointer').fadeOut(900);      
-
-      self_parent.fadeIn(900);
-      $('.database_listing_pointer').fadeIn(900);    
 }
+function compareDbsSelectedAfter(){
+  compareDbsSelected(false);
+}
+$(function(){
+  $('#compare_information').popover({'html': true, 'trigger': 'hover',
+  'container': 'body',
+  'template': '<div class="popover popover-medium"><div class="arrow"></div><div class="popover-inner"><h3 class="popover-title"></h3><div class="popover-content"><p></p></div></div></div>'});
 
+  options = {
+    dropdown_subcontainer: '.dropdown_placer',
+    select_callback: compareDbsSelectedAfter
+  };
 
-      compareDatabases(false);
+  {% if results.items|length == 2 %}
+  dbs = new DatabaseSelector('#database_rows', 2, options);
+  {% else %}
+  dbs = new DatabaseSelector('#database_rows', 3, options);
+  {% endif %}
 
+  {%for fingerprint_id, content in results.items %}
+  dbs.addDatabase(
+    '{{fingerprint_id}}', 
+    {
+      label: '{{content.name}}'
+    });
+  {% endfor %}
 
-      self_parent.css('display','table-cell'); 
-      $('.database_listing_pointer').css('display','table-cell');  
-    } 
+  dbs.draw(); 
+  $('.database_listing_names').fadeTo( "fast", 1); 
+  compareDbsSelected(true);
 
-  });
+  $('[id^="{{database_to_compare|removespaces}}"] td').addClass("basetable");
 
   $('#compare_previous').prop('disabled', true);
   if(comparing_current == max_comparing)
      $('#compare_next').prop('disabled', true);
-   
+ 
+$('[data-clampedwidth]').each(function () {
+    var elem = $(this);
+    var parentPanel = elem.data('clampedwidth');
+    var resizeFn = function () {
+        var sideBarNavWidth = $(parentPanel).width() - parseInt(elem.css('paddingLeft')) - parseInt(elem.css('paddingRight')) - parseInt(elem.css('marginLeft')) - parseInt(elem.css('marginRight')) - parseInt(elem.css('borderLeftWidth')) - parseInt(elem.css('borderRightWidth'));
+        elem.css('width', sideBarNavWidth);
+
+        if(elem.hasClass('elips')){
+          elem.find('.linktoellipse').each(function(){
+            $(this).css({
+              overflow: 'hidden',
+              'text-overflow': 'ellipsis',
+              'white-space': 'nowrap',
+              display: 'block' 
+            });
+          });
+        }
+
+    };
+
+    resizeFn();
+    $(window).resize(resizeFn);
+});
+  $('.database_title').affix({
+    offset: {
+      top: 150
+    }
+  })
+
 });
 var databases = [];
 
-function compareDatabases(show_modal){
-
-  if(show_modal)
-    loading_modal.showPleaseWait();
-
-  if(show_modal)
-    cleantablediff();
-
-  var threadpool = new ThreadPool(20);
-  var priority=1;
-
-  var reference_table;
-  var compared_table;
-  try{
-    reference_table = $('.database_listing').eq(0).find('.set_reference').prop('id').substring(3);
-    compared_table = $('.database_listing_pointer').find('.set_reference').prop('id').substring(3);  
-  }catch(err){}
-
-  {%for name, qset in results|slice:":1" %}
-    {% for k,v in qset.ordered_items %}
-      var thread = new Runnable(compareDatabase, priority++, reference_table+'_{{k|removespaces}}', compared_table+'_{{k|removespaces}}'); threadpool.run(thread);  
-    {% endfor %}
-  {% endfor %}
-
-  threadpool.destroy(
-    function(){
-        $(".tooltippable").tooltip({container:"body"});
-
-        applyFilters();
-
-        if(show_modal)        
-          loading_modal.hidePleaseWait();
-    }
-  );
-}
-
 function compareDatabase(base, other){
   tablediffall_two(base, [other]);
-
+  //console.log(base)
   this.complete();
 }
 
 compareDatabases(false);
+
 {% endblock %}
 <!--<![endif]-->

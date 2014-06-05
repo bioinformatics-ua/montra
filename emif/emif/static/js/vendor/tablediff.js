@@ -152,6 +152,8 @@ paint_table2 = function(table2, tag, nameClass) {
                 if (tag.indexOf($(this.childNodes[1].childNodes[0]).context.data) !== -1) {
 
                     $(this).addClass(nameClass);
+                    $('.database_listing_names .'+discoverRowId(this)).addClass(nameClass);
+
                 }
             } catch (err) {}
 
@@ -159,6 +161,16 @@ paint_table2 = function(table2, tag, nameClass) {
     });
 
 };
+
+function discoverRowId(element){
+    var classes = $(element).attr('class').split(' ');
+
+    for(var i=0; i < classes.length;i++){
+        if(classes[i].indexOf('rowid_') != -1){
+            return classes[i];
+        }
+    }
+}
 
 comparetable_two = function(table1, table2) {
     var empty_rows = 0;
@@ -190,10 +202,11 @@ comparetable_two = function(table1, table2) {
 
                         //$('#' + table2).childNodes[1].childNodes[0]).addClass("success")
                         //$($('#' + table2).childNodes[1].childNodes[0]).addClass("success");
-                        $(this).addClass("success");
+                        /*$(this).addClass("success"); */
                     } else if (result == 2) {
                         //$($('#' + table2).childNodes[1].childNodes[0]).addClass("warning");
-                        $(this).addClass("warning");
+                        
+                        /*$(this).addClass("warning");*/
 
                         paint_table2(table2, question.context.data, "warning");
                     } else if (result == 3) {
@@ -202,7 +215,7 @@ comparetable_two = function(table1, table2) {
 
                     } else {
                         //$($('#' + table2).childNodes[1].childNodes[0]).addClass("error");
-                        $(this).addClass("error");
+                        /*$(this).addClass("error");*/
 
                         paint_table2(table2, question.context.data, "error");
                     }
@@ -295,16 +308,7 @@ cleantablediff = function() {
     $('.database_listing .success').removeClass('success');
     $('.database_listing .warning').removeClass('warning');
     $('.database_listing .emptycells').removeClass('emptycells');
-    $('.database_listing .entry').show();
-}
-
-function hide_uncessary_qs(list_tables, table_tmp) {
-    var visibles_left = $('#' + list_tables[table_tmp] + ' tr:visible').length;
-
-
-    if (visibles_left <= 0) {
-        $('#' + list_tables[table_tmp]).parent().parent().parent().hide();
-    }
+    $('.database_listing .entry').show();    
 }
 
 function hideTableCell(list_tables, table_tmp, word) {
@@ -351,41 +355,150 @@ function hideEmptyCells(list_tables, table_tmp, show_emptyrows) {
    It was getting hard to synchronize everything when we only have the information on the 
    	dom and all was separated 
 */
-function filter_results(list_tables, word, show_match, show_unmatch, show_emptyrows, show_proximity) {
+function reset_results(databases, reference){
 
-    $(list_tables).each(function(table_tmp) {
-        // First we reset
-        $('#' + list_tables[table_tmp]).parent().parent().parent().show();
-        $('#' + list_tables[table_tmp] + " entry").show();
+    //$('.hide_me').removeClass('hide_me');
 
-        // match
-        if (show_match) {
-            $('#' + list_tables[table_tmp] + ' .success').show();
-        } else {
-            $('#' + list_tables[table_tmp] + ' .success').hide();
-        }
+    var reference_table = $('table[id^="HEADER_"] ');
+    reference_table.each(function(){
+        $(this).parent().parent().parent().show();
+         $(this).find(" .entry").show();
+     });
+    var reference_table = $('table[id^="'+reference+'_"] ');
+     reference_table.each(function(){
+         $(this).parent().parent().parent().show();
+         $(this).find(" .entry").show();
+     });
+     for(var i=0;i<databases.length;i++){
+         var tables = $('table[id^="'+databases[i]+'_"] ');
+  
+         tables.each(function(){
+             $(this).parent().parent().parent().show();
+             $(this).find(" .entry").show();
+         });
+ 
+     }
 
-        // unmatch
-        if (show_unmatch) {
-            $('#' + list_tables[table_tmp] + ' .error').show();
-        } else {
-            $('#' + list_tables[table_tmp] + ' .error').hide();
-        }
+}
+/**
+ * We only can hide stuff if we dont have any ocurrence of the type on the showing databases
 
-        // proximity
-        if (show_proximity) {
-            $('#' + list_tables[table_tmp] + ' .warning').show();
-        } else {
-            $('#' + list_tables[table_tmp] + ' .warning').hide();
-        }
+ */
+function showMinimumDenominator(condition, class_to_check, table, databases){  
 
-        // emptyrows
-        //hideEmptyCells(list_tables, table_tmp, show_emptyrows);
-        if (show_emptyrows) {
-            $('#' + list_tables[table_tmp] + ' .emptycells').show();
-        } else {
-            $('#' + list_tables[table_tmp] + ' .emptycells').hide();
-        }
+
+    // Showing is additive
+    if(condition == true){
+        $(table).find('.'+class_to_check).show();
+    } 
+    // Adding requires the class_to_check to not appear in any of the lines.
+    else {
+        $(table).find('.entry').each(function(){
+            var row = $(this).data('rowid');
+
+            var fullfills_condition = checkConditions('.rowid_'+row, class_to_check, databases);
+            if(fullfills_condition){
+                $('.rowid_'+row).hide();
+            }
+           
+        });
+    }
+}
+function showMinimumDenominatorWord(word, table, databases){  
+
+        $(table).find('.entry').each(function(){
+            var row = $(this).data('rowid');
+
+            var fullfills_condition = checkWords('.rowid_'+row, word, databases);
+            if(fullfills_condition){
+                $('.rowid_'+row).hide();
+            }
+           
+        });
+    
+}
+function dbindexOf(entry, array){
+    for(var i=0;i<array.length;i++){
+        if(array[i] == entry)
+            return i;
+    }
+    return -1;
+}
+function checkConditions(context, class_to_check, databases){
+    var fullfills_condition = true;
+
+    $(context).each(function(){
+                // If the row is not the base table, nor the header, and is in the showing list
+                // we can consider it for the minimum denominator
+                if(!$(this).hasClass('basetable') && $(this).data('fingerprintid') != 'HEADER'
+
+                    && dbindexOf($(this).data('fingerprintid'), databases) != -1
+
+                    ){
+                    if(!$(this).hasClass(class_to_check)){
+                        fullfills_condition = false;
+                        return false;
+                    }
+                }
+    });
+
+    return fullfills_condition;
+}
+function checkWords(context, word, databases){
+    var fullfills_condition = true;
+
+    $(context).each(function(){
+                // If the row is not the base table, nor the header, and is in the showing list
+                // we can consider it for the minimum denominator
+                if(!$(this).hasClass('basetable') && $(this).data('fingerprintid') != 'HEADER'
+
+                    && dbindexOf($(this).data('fingerprintid'), databases) != -1
+
+                    ){
+                        var cell = $.trim($($(this).find('td')[0]).text()).toLowerCase();
+                        //console.log(cell + "==" + word +"?");
+                        if (cell.indexOf(word.toLowerCase()) != -1)
+                            fullfills_condition = false;
+                        return false;
+                    }
+    });
+
+    return fullfills_condition;
+}
+function filter_results(databases, reference, word, show_match, show_unmatch, show_emptyrows, show_proximity) {
+    console.log('filtering show_match, show_unmatch, show_emptyrows, show_proximity');
+    console.log(show_match+" - "+show_unmatch+" - "+show_emptyrows+" - "+show_proximity);
+    // reset results
+    reset_results(databases, reference);
+
+        var tables = $('table[id^="'+reference+'_"] ');
+
+        tables.each(function(){
+
+            // emptyrows
+            showMinimumDenominator(show_emptyrows,  'emptycells',  this, databases);    
+
+            // match
+            showMinimumDenominator(show_match,      'success',     this, databases);
+
+            // unmatch
+            showMinimumDenominator(show_unmatch,    'error',       this, databases);
+
+            // proximity
+            showMinimumDenominator(show_proximity,  'warning',     this, databases);
+
+            // filter by word
+            showMinimumDenominatorWord(word, this, databases);
+
+            // remove empty containers (not necessary)
+            hide_uncessary_qs(this, databases);
+
+        });
+    
+        // remove unnecessary tables (empty)
+        
+
+    /*$(list_tables).each(function(table_tmp) {
 
         // filter
         hideTableCell(list_tables, table_tmp, word);
@@ -393,5 +506,20 @@ function filter_results(list_tables, word, show_match, show_unmatch, show_emptyr
         // remove unnecessary tables (empty)
         hide_uncessary_qs(list_tables, table_tmp);
 
-    });
+    });*/
+}
+function hide_uncessary_qs(table, databases) {
+    var visibles_left = $(table).find('tr:visible').length;
+
+    console.log('visibles_left: '+visibles_left);
+
+    if (visibles_left <= 0) {
+        var super_parent = $(table).parent().parent().parent();
+
+        var block = super_parent.data('block');
+
+        console.log(block);
+
+        $('.block_'+block).hide();
+    }
 }

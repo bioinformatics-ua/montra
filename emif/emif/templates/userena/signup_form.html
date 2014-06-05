@@ -12,19 +12,19 @@
 </div>
 </div>
 <div style="margin-top: 50px;" class="row">
-  <div class="span6 center">
+  <div class="span4 center">
     <form method="post" id="signup_form">
         {% csrf_token %}
         <fieldset> 
-          <legend>Create Account (all fields are mandatory)</legend>
+          <legend>Create Account <small>(all fields are mandatory)</small></legend>
           <span class="help-block">
           </span>
           {{ form|crispy }}
         </fieldset>
         <br />
         <center>
-          <button class="btn btn-primary" type="submit">Create Account</button>
           <button class="btn" type="reset">{% trans "Clear"%}</button>
+          <button class="btn btn-primary" type="submit">Create Account</button> 
         <div>or <a href="index">sign in</a></div>
         </center>
     </form>
@@ -37,7 +37,7 @@
   var focusFirstField = function () {
       $('#signup_form input:nth(1)').focus();
   };
-  $('#signup_form input[type="text"], #signup_form input[type="password"], #signup_form select').addClass('span6');
+  $('#signup_form input[type="text"], #signup_form input[type="password"], #signup_form select').addClass('span4');
   $('#signup_form button[type="reset"]').on('click', focusFirstField);
   focusFirstField();
     /* I swear, i can't seem to be able to edit the damn forms from django_userena other way 

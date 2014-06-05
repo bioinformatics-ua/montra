@@ -393,16 +393,14 @@ box-shadow: inset 0 3px 8px rgba(0,0,0,0.125);
   width: 226px;
 }
 }
-#no_results, #comparingwait{
+#no_results{
   display: none;
 }
-.basetable td{
-  /*background-color: #ECF3FF !important; */
-  background-color: #dff0d8;
+.basetable{
+  background-color: #ECF3FF !important;
 }
-
-.basetable td:hover{
-  background-color: #d0e9c6;
+.basetable:hover{
+  background-color: #d7e0f0 !important;
 }
 
 .help_selectresults{
@@ -420,16 +418,9 @@ box-shadow: inset 0 3px 8px rgba(0,0,0,0.125);
 }
 .database_listing{
   padding:2px;
-  min-width: 200px; 
+  min-width: 400px; 
   display: table-cell;
 }
-
-.database_listing_names{
-  padding:2px;
-  width: 200px; 
-  display: table-cell;
-}
-
 .database_listing_away{
   position: absolute;
   left: -19999px;
@@ -437,8 +428,6 @@ box-shadow: inset 0 3px 8px rgba(0,0,0,0.125);
   visibility: hidden;
 }
 .database_title{
-  width: auto;
-  z-index: 500;
   display: block;
   padding: 4px 12px;
   margin-bottom: 3px;
@@ -463,9 +452,6 @@ box-shadow: inset 0 1px 0 rgba(255,255,255,0.2),0 1px 2px rgba(0,0,0,0.05);
 .set_reference{
   width: 155px;
 }
-.database_title.affix {
-top: 50px;
-}  
 /* ==========================================================================
    My databases table
    ========================================================================== */
@@ -557,15 +543,12 @@ label input[type="radio"], label input[type="checkbox"]{
 #signup_form label input[type="radio"], #signup_form label input[type="checkbox"]{
   margin-top: 4px;
 }
-.comment-print{
-  display: none;
-}
 /* Styles for printing */
 @media print{
   .visible-print  { display: inherit !important; }
-  .hidden-print  .navbar, .btn-group, .pagination, .pagination-centered,
-  .btn, .select_line, .nav, .comment_button, #pc_comment_id, #fileupload, .btn_delete, 
-  .deleteLink, .qslist, .table_filter, .publications-form, #comment_form
+  .hidden-print  .navbar, .btn-group, .pagination,
+  .btn, .select_line,
+  .table_filter
   { display: none !important; }
   a:link, 
   a:visited { 
@@ -582,38 +565,6 @@ label input[type="radio"], label input[type="checkbox"]{
   }
   .tabbable .collapse, #database_listings .collapse{
     height: auto !important;
-  }
-  .brand{
-    margin-left: 10px !important;
-  }
-  .container{
-    padding: 0 !important;
-  }
-  .push{
-    height: 0px !important;
-  }
-  .tab-content{
-    clear: both;
-  }
-  .comment-print{
-    display: block;
-    font-size: 10px;
-  }
-  .btn-link{
-    display: initial !important;
-  }
-  th, td{
-    white-space: normal !important;
-  }
-  div[id*='comments_']{
-    display: block !important;
-  }
-  .dataTables_scrollBody{
-    overflow: visible !important;
-    width: 100% !important;
-  }  
-  .tablesorter-filter{
-    display: none !important;
   }
 }
 @media (min-width: 1200px) {.span2_5 {width: 350px !important;}}
@@ -677,16 +628,7 @@ label input[type="radio"], label input[type="checkbox"]{
       max-width: 300px;
   }
 }
-  .popover-medium {
-      z-index: 9999;
-      text-align:justify;
-  }
-  .hide_me td{
-    display: none !important;
-  }
-  .emptycells td{
-    background-color: white !important;
-  }
+
 .breadcrumb{
   background-color: transparent !important;
 }
@@ -712,44 +654,3 @@ height: 6em;
 .qset_option{
   margin-top: 3px !important;
 }
-
-
-.btn-group.btn {   border: 0;   padding: 0; }
-.btn-group.btn > .btn { border-radius: 0 }
-.btn-group.btn > .dropdown-menu {  text-align: left; }
-.btn-group.btn:first-child > .btn {
-  -webkit-border-radius: 4px 0 0 4px;
-     -moz-border-radius: 4px 0 0 4px;
-          border-radius: 4px 0 0 4px;
-}
-
-.btn-group.btn:last-child > .btn {
-  -webkit-border-radius: 0 4px 4px 0;
-     -moz-border-radius: 0 4px 4px 0;
-          border-radius: 0 4px 4px 0;
-}
-
-.breadcrumb{
-  padding-left: 0px;
-}
-.hide_empty_content{
-  display: none;
-
-}
-
-.database_listing_names .table, .database_listing .table{
-  border:0px !important;
-  margin:0px !important;
-}
-.database_listing_names .table tr,.database_listing .table tr{
-  border:0px !important;
-}
-
-.database_listing_names .table tr td,.database_listing .table tr td{
-  border:0px !important;
-}
-.database_listing_names .accordion-inner, .database_listing .accordion-inner{
-  padding: 0px !important;
-
-}
-

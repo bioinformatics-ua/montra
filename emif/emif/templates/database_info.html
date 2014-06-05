@@ -35,11 +35,7 @@
 
 <link rel="stylesheet" href="{{ STATIC_URL }}css/c3.css">
 
-
-
-
 <script src="{{ STATIC_URL}}js/emif.documents.js"></script>
-
 
 <script src="{{ STATIC_URL}}js/emif.jerboa.upload.js"></script>
 
@@ -75,10 +71,10 @@
 {% breadcrumb breadcrumb_name "databases" %} 
 {% elif style == '1' %} 
 {% breadcrumb "Personal" "databases" %} 
-{% breadcrumb breadcrumb_name "databases" %} 
+{% breadcrumb breadcrumb_name|ellipsis:40 "databases" %} 
 {% else %} 
 {% breadcrumb "All" "alldatabases" %} 
-{% breadcrumb breadcrumb_name "databases" %} 
+{% breadcrumb breadcrumb_name|ellipsis:40 "databases" %} 
 {% endif %}
 
 {% endblock %}
@@ -90,7 +86,7 @@
 {% block content %} 
 {% if qsets %}
 
-<div class="span12">
+<div style="margin-left: 0px;" class="span12">
     <div class="row-fluid">
         <div class="tabbable">
             <ul class="nav nav-tabs">
@@ -118,7 +114,12 @@
             <div style="margin-bottom: 50px;" class="tab-content">
                 <div class="tab-pane {%if activetab == 'summary'%}active{%endif%}" id="metadata">
                     <div>
-                        <a id="collapseall_metadata" class="btn pull-right" href=""><i class="icon-plus"></i>&nbsp; Expand all</a>
+                        <div class="pull-right btn-group">
+                            <button style="display: none;" type="button" class="btn" id="show_hide_button">Hide Empty</button>
+
+                            <a id="collapseall_metadata" class="btn" href=""><i class="icon-plus"></i>&nbsp; Expand all</a>
+                        </div> 
+                        
                     </div>
                     <div class="accordion fullwidth pull-left " id="accordion1" style="margin-top: 10px;">
                         <div id="set_container"></div>
@@ -310,7 +311,9 @@ threads['qs_{{ qs.sortid }}'] = thread;
 {% endfor %}
 
 //  we add the triggers thread
-threadpool.destroy();
+threadpool.destroy(function(){
+    $('#show_hide_button').fadeIn();
+});
 }
 function loadqspart(sortid, pk){
 $.get( "fingerprintqs/"+pk+"/"+sortid+"/", function( data ) {
@@ -352,7 +355,7 @@ $(document).ready(function() {
     bindPostCommentHandler('{{ request.user.first_name }}', '{{ request.user.last_name }}', '{{ request.user.username }}');
 //load_questionnary();
     $('.tabbable a[data-toggle="tab"]').on('shown', function (e) {
-        if(e.target.innerText == 'Population Characteristics'){
+        if(e.target.textContent == 'Population Characteristics'){
           console.log("test");
         }
     });
@@ -387,7 +390,39 @@ $(document).ready(function() {
         update(root = json);
         $("#pivot_table_extra_information").html(json_to_table(json2));
     }
-});
+
+        $('#show_hide_button').click(function(){
+           if($(this).hasClass('hiding_empty')){
+            $(this).removeClass('hiding_empty');
+            $(this).text('Hide Empty');
+
+            // Show empty
+            $('.hide_empty_content').removeClass('hide_empty_content');
+
+            // double check expansions
+            //$("#collapseall_metadata").click();
+            //$("#collapseall_metadata").click();
+
+           } else {
+            $(this).addClass('hiding_empty');
+            $(this).text('Show Empty');
+
+            // Hide empty
+            $('.value_content').each(function(){
+                if( $(this).text().trim().length == 0){
+                    $(this).parent().addClass('hide_empty_content');
+                }
+            });
+
+            $('.hide_empty_content').parent().parent().each(function(){
+                var visible = $(this).find('tr:visible').length;
+                if (visible === 1){
+                    $(this).parent().parent().parent().addClass('hide_empty_content');
+                }
+            });
+           }
+        });
+    });
     /* On tab change, to literature tab, lazy load literature tab */
     $(document).on('shown', 'a[data-toggle="tab"]', function (e) {
         if($(e.target).text().toLowerCase().indexOf('literature')!=-1){

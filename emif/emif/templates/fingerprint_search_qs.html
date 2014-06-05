@@ -216,7 +216,7 @@ function add_triggers() {
             {% endfor %}
             
             {% for k,v in qvalues.items %}
-                qvalues['{{ k|escapejs }}'] = '{{ v|escapejs }}';
+                qvalues['question_{{ k|escapejs }}'] = '{{ v|escapejs }}';
             {% endfor %}
             
             for(key in qvalues) {

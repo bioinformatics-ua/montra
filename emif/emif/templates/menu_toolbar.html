@@ -11,7 +11,7 @@
          {% endif %}
 
 		{% if request.user.is_authenticated %} 
-		<div class="btn-group" id="group_toolbar">
+		<!--div class="btn-group" id="group_toolbar"-->
 
       {% if fingerprint_dump %}
       <a class="btn btn morelikethis" href="mlt/{{fingerprint_id}}" id="morelikethis_toolbar"> <i class="icon-search icon"></i>
@@ -19,49 +19,31 @@
       </a>
       {% endif %}
       {% if fingerprint_dump and not owner_fingerprint %}
-      <a class="btn btn " href="dbDetailed/{{fingerprint_id}}/{{fingerprint_ttype}}" id="detailed_list_toolbar" title="Detailed View of Database" title="Detailed View Database"> <i class="icon-eye-open icon"></i>
-        Detailed View
-      </a>
-      {% endif %}
-      {% if fingerprint_dump and owner_fingerprint or fingerprint_dump and request.user.is_superuser %}
-      <a class="btn btn " href="dbEdit/{{fingerprint_id}}/{{fingerprint_ttype}}" id="edit_list_toolbar" title="Edit Database" title="Share Database"> <i class="icon-pencil icon"></i>
-        Edit
-      </a>
-
-
-      <a class="btn btn sharedb" href="" id="share_list_toolbar" onclick="return false;"> <i class="icon-share icon"></i>
-        Share
-        
-      </a>
-
-      <a class="btn btn confirm-delete" href="" id="delete_list_toolbar" onclick="return false;"data-id="{{ fingerprint_id }}"  title="Remove Database"> <i class="icon-trash icon"></i>
-        Delete
-        
+      <a class="btn" href="dbDetailed/{{fingerprint_id}}/{{fingerprint_ttype}}" id="detailed_list_toolbar" title="Detailed View of Database" title="Detailed View Database"> <i class="icon-eye-open icon"></i>
+        Detailed
       </a>
       {% endif %}
       {% if add_databases or not hide_add %}
-			
-      <a class="btn dropdown-toggle" data-toggle="dropdown" href="#" id="add_list_toolbar"> <i class="icon-plus icon"></i>
-				Add
-				<span class="caret" ></span>
-			</a>
-			<ul class="dropdown-menu pull-right">
-				
-				<!--{% show_fingerprints %}-->
-        {% show_fingerprints_interests request.user %}
-
-			</ul>
+	      <div class="btn btn-group">
+        <a class="btn dropdown-toggle" data-toggle="dropdown" href="#" id="add_list_toolbar">
+         <i class="icon-plus icon"></i> Add
+          <span class="caret"></span>
+        </a>
+        <ul class="pull-right dropdown-menu">
+           {% show_fingerprints_interests request.user %}
+        </ul>
+      </div> 
       {% endif %}
-		</div>
+		<!--/div-->
 		{% endif %}
         {% if  collapse %}
 		 <a id="collapseall" class="btn" href="#" >
             Expand all
          </a>
         {% endif %}
-        {% if list_databases|length > 0 %}
-		<button type="button" class="btn" onclick="window.print();" title="Print">
-			<i class="icon-print"></i>
+        {% if list_databases|length > 0 and not no_print %}
+		<button type="button" class="btn btn" onclick="window.print();" title="Print">
+			<i class="icon-print"></i> Print
 		</button>
         {% endif  %}
 	  {% if  geo %}
@@ -84,7 +66,7 @@
 
 
       {% if export_bd_answers and request.user.is_superuser %}
-      <a class="btn" href="export_bd_answers/{{ fingerprint_id }}" onclick="" > <i class="icon-file"></i>
+      <a class="btn" href="export_bd_answers/{{ fingerprint_id }}" onclick="" > <i class="fa fa-upload"></i>
         Export
       </a>
       {% endif %}
@@ -102,7 +84,33 @@
                 </a>
             {% endif %}
       {% endif %}
-
+      {% if fingerprint_dump and owner_fingerprint or fingerprint_dump and request.user.is_superuser %}
+      <div class="btn btn-group">
+        <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
+          <i class="fa fa-cogs"></i> Manage
+          <span class="caret"></span>
+        </a>
+        <ul class="pull-right dropdown-menu">
+        <li>
+          <a href="dbEdit/{{fingerprint_id}}/{{fingerprint_ttype}}" id="edit_list_toolbar" title="Edit Database" title="Share Database"> <i class="icon-pencil icon"></i>
+        Edit
+      </a>
+      </li>
+      <li>
+      <a class="sharedb" href="" id="share_list_toolbar" onclick="return false;"> <i class="icon-share icon"></i>
+        Share
+        
+      </a>
+      </li>
+      <li>
+      <a class="confirm-delete" href="" id="delete_list_toolbar" onclick="return false;"data-id="{{ fingerprint_id }}"  title="Remove Database"> <i class="icon-trash icon"></i>
+        Delete
+        
+      </a> 
+      </li>     
+        </ul>
+      </div>      
+      {% endif %}
 		
 
 	</div>

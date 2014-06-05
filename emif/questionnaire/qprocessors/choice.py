@@ -1,6 +1,7 @@
 from questionnaire import *
 from django.utils.translation import ugettext as _, ungettext
 from django.utils.simplejson import dumps
+from django.template.loader import render_to_string
 
 import re
 
@@ -289,6 +290,30 @@ def process_multiple_options(question, answer):
         multiple.append(multiple_freeform)
     #print "Multiple" + str(multiple)
     return dumps(multiple)
+
+
+
+@show_summary('choice','choice-freeform','choice-multiple', 'choice-multiple-freeform', 'choice-multiple-freeform-options')
+def show_summ(value):
+
+    choices = value.split('#')
+
+    multiple_choices = {}
+
+    for choice in choices[1:]:
+        
+        if '{' in choice and '}' in choice:
+            values = choice.split('{')
+            key = values[0]
+            comment = values[1].replace('}','')
+
+            multiple_choices[key] = comment
+        else:
+            multiple_choices[choice] = ''
+
+
+    #return value   
+    return render_to_string('questionnaire/choice_summary.html', {'choices':multiple_choices})
 
 add_type('choice-multiple', 'Multiple-Choice, Multiple-Answers [checkbox]')
 add_type('choice-multiple-freeform', 'Multiple-Choice, Multiple-Answers, plus freeform [checkbox, input]')

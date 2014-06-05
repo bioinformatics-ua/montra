@@ -6,7 +6,7 @@
 {% block breadcrumbs %}
     {{ block.super }}
     {% breadcrumb "Personal" "databases" %}
-    {% breadcrumb name "fingerprint/"|add:fingerprint_id|add:"/1" %}
+    {% breadcrumb name|ellipsis:40 "fingerprint/"|add:fingerprint_id|add:"/1" %}
     {% if not readonly %}
     {% with url_id="dbEdit/1" %}
         {% with url_id=url_id|add:id  %}
@@ -102,7 +102,7 @@ It was not possible to save this questionnary. Please try again in a few seconds
 <hr>
 <div class="row">
 <div class="span3">
-  <div class="well" style="max-width: 340px; padding: 8px 0;">
+  <div class="qslist well" style="max-width: 340px; padding: 8px 0;">
 
     <ul class="nav nav-list nav-pills nav-stacked ">
       <li class="nav-header">Step-by-Step</li>
@@ -219,9 +219,12 @@ function questionsets_handle(id_questionset)
       $("#loading-error-message").fadeOut('fast');
       errornavigator.reset();
 
+      {% if not readonly %}
       var list_invalid = advValidator.validateFormContext(e, current_form);
       //console.log(list_invalid);
-
+      {% else %}
+      var list_invalid =[];
+      {% endif %}
 
       if(list_invalid.length == 0){
 
@@ -330,7 +333,9 @@ $(function(){
 
   // Clearly identify database name before the edition
   advValidator.setDatabase("{{name}}");
-
+  {% if readonly %}
+  advValidator.searchMode(true);
+  {% endif %}
   initialCounterSetup();
 });
 
