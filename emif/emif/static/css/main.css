@@ -393,14 +393,16 @@ box-shadow: inset 0 3px 8px rgba(0,0,0,0.125);
   width: 226px;
 }
 }
-#no_results{
+#no_results, #comparingwait{
   display: none;
 }
-.basetable{
-  background-color: #ECF3FF !important;
+.basetable td{
+  /*background-color: #ECF3FF !important; */
+  background-color: #dff0d8;
 }
-.basetable:hover{
-  background-color: #d7e0f0 !important;
+
+.basetable td:hover{
+  background-color: #d0e9c6;
 }
 
 .help_selectresults{
@@ -418,9 +420,16 @@ box-shadow: inset 0 3px 8px rgba(0,0,0,0.125);
 }
 .database_listing{
   padding:2px;
-  min-width: 400px; 
+  min-width: 200px; 
   display: table-cell;
 }
+
+.database_listing_names{
+  padding:2px;
+  width: 200px; 
+  display: table-cell;
+}
+
 .database_listing_away{
   position: absolute;
   left: -19999px;
@@ -428,6 +437,8 @@ box-shadow: inset 0 3px 8px rgba(0,0,0,0.125);
   visibility: hidden;
 }
 .database_title{
+  width: auto;
+  z-index: 500;
   display: block;
   padding: 4px 12px;
   margin-bottom: 3px;
@@ -452,6 +463,9 @@ box-shadow: inset 0 1px 0 rgba(255,255,255,0.2),0 1px 2px rgba(0,0,0,0.05);
 .set_reference{
   width: 155px;
 }
+.database_title.affix {
+top: 50px;
+}  
 /* ==========================================================================
    My databases table
    ========================================================================== */
@@ -663,7 +677,16 @@ label input[type="radio"], label input[type="checkbox"]{
       max-width: 300px;
   }
 }
-
+  .popover-medium {
+      z-index: 9999;
+      text-align:justify;
+  }
+  .hide_me td{
+    display: none !important;
+  }
+  .emptycells td{
+    background-color: white !important;
+  }
 .breadcrumb{
   background-color: transparent !important;
 }
@@ -711,19 +734,22 @@ height: 6em;
 }
 .hide_empty_content{
   display: none;
+
 }
 
-.database_listing .table{
+.database_listing_names .table, .database_listing .table{
   border:0px !important;
   margin:0px !important;
 }
-.database_listing .table tr{
+.database_listing_names .table tr,.database_listing .table tr{
   border:0px !important;
 }
 
-.database_listing .table tr td{
+.database_listing_names .table tr td,.database_listing .table tr td{
   border:0px !important;
 }
-.database_listing .accordion-inner{
+.database_listing_names .accordion-inner, .database_listing .accordion-inner{
   padding: 0px !important;
+
 }
+
