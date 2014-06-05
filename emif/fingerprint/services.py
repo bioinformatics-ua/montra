@@ -223,6 +223,45 @@ def updateFingerprint(fingerprint_id, questionnaire, user):
 
     return fingerprint
 
+def deleteFingerprint(fingerprint_id, username):
+    user= str(username)
+
+    try:
+        fingerprint = Fingerprint.objects.get(fingerprint_hash=fingerprint_id)
+
+        should_delete = belongsUser(fingerprint, user)
+
+
+        if username.is_superuser or should_delete == True:
+            print "Should be deleted"
+            fingerprint.removed=True
+            fingerprint.save()
+            unindexFingerprint(fingerprint_id)
+
+    except Fingerprint.DoesNotExist:
+        print "Tried to delete fingerprint who doesnt exist"
+
+def belongsUser(fingerprint, username):
+
+    print "username: "+username
+
+    print "owner: "+fingerprint.owner.email
+
+    if fingerprint.owner.email == username:
+        return True
+
+    for share in fingerprint.shared.all():
+        print "shared: "+share.email
+        if share.email == username:
+            return True
+
+    return False
+
+def unindexFingerprint(fingerprint_id):
+    c = CoreEngine()
+    c.delete(fingerprint_id)
+
+
 def indexFingerprint(fingerprint_id):
     try:
         fingerprint = Fingerprint.objects.get(fingerprint_hash=fingerprint_id)

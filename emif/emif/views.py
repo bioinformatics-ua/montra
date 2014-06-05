@@ -20,7 +20,7 @@
 import csv
 from pprint import pprint
 
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.http import HttpResponse, HttpResponseRedirect
 from django.core.urlresolvers import reverse
 from django.db import transaction
@@ -1315,17 +1315,14 @@ def merge_highlight_results(query, resultHighlights):
     return h  
 
 def delete_fingerprint(request, id):
-    user = request.user
 
-    c = CoreEngine()
-    results = c.search_fingerprint('user_t:' + '"' + user.username + '"')
-    
-    for result in results:
-        if (id == result['id']):
-            c.delete(id)
-            break
+    deleteFingerprint(id, request.user)
 
-    return databases(request)
+    # i dont like this, it should redirect to databases, not show the url of the removal
+    # so i changed it from:
+    #return databases(request)
+    #to:
+    return redirect('databases')
 
 def force_delete_fingerprint(request, id):
     if not request.user.is_superuser:
