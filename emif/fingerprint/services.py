@@ -1,5 +1,5 @@
 from fingerprint.models import Fingerprint, Answer, FingerprintHead, AnswerChange
-from questionnaire.models import Questionnaire
+from questionnaire.models import Questionnaire, QuestionSet, Question, QuestionSetPermissions
 from django.contrib.auth.models import User
 
 from searchengine.search_indexes import generateFreeText, setProperFields, CoreEngine
@@ -278,13 +278,19 @@ def indexFingerprint(fingerprint_id):
 
         d['user_t'] = unique_users_string(fingerprint)
 
+
+
         # Add answers
         answers = Answer.objects.filter(fingerprint_id=fingerprint)
 
         for answer in answers:
-            setProperFields(d, answer.question, answer.question.slug_fk.slug1, answer.data)
-            if answer.comment != None:
-                d['comment_question_'+answer.question.slug_fk.slug1+'_t'] = answer.comment
+            # We try to get permissions preferences for this question
+            permissions = getPermissions(fingerprint_id, QuestionSet.objects.get(id=answer.question.questionset.id))
+
+            if permissions.allow_indexing:
+                setProperFields(d, answer.question, answer.question.slug_fk.slug1, answer.data)
+                if answer.comment != None:
+                    d['comment_question_'+answer.question.slug_fk.slug1+'_t'] = answer.comment
             
         
         d['text_t']= generateFreeText(d)
@@ -317,3 +323,25 @@ def unique_users_string(fingerprint):
         users_string+= ' \\ ' + users[i]
 
     return users_string
+
+# GET permissions model
+def getPermissions(fingerprint_id, question_set):
+
+    if fingerprint_id == None or question_set == None:
+        return None
+
+
+    permissions = None
+    try:
+        permissions = QuestionSetPermissions.objects.get(fingerprint_id=fingerprint_id, qs=question_set)
+
+    except QuestionSetPermissions.DoesNotExist:
+        print "Does not exist yet, creating a new permissions object."
+        permissions = QuestionSetPermissions(fingerprint_id=fingerprint_id, qs=question_set, visibility=0,
+         allow_printing=True, allow_indexing=True, allow_exporting=True)
+        permissions.save()
+            
+    except QuestionSetPermissions.MultipleObjectsReturned:
+        print "Error retrieved several models for this questionset, its impossible, so something went very wrong."    
+
+    return permissions

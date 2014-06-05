@@ -784,28 +784,6 @@ def render_one_questionset(request, q_id, qs_id, errors={}, aqid=None, fingerpri
         raise
     return r
 
-# GET permissions model
-def getPermissions(fingerprint_id, question_set):
-
-    if fingerprint_id == None or question_set == None:
-        return None
-
-
-    permissions = None
-    try:
-        permissions = QuestionSetPermissions.objects.get(fingerprint_id=fingerprint_id, qs=question_set)
-
-    except QuestionSetPermissions.DoesNotExist:
-        print "Does not exist yet, creating a new permissions object."
-        permissions = QuestionSetPermissions(fingerprint_id=fingerprint_id, qs=question_set, visibility=0,
-         allow_printing=True, allow_indexing=True, allow_exporting=True)
-        permissions.save()
-            
-    except QuestionSetPermissions.MultipleObjectsReturned:
-        print "Error retrieved several models for this questionset, its impossible, so something went very wrong."    
-
-    return permissions
-
 class RequestMonkeyPatch(object):
     POST = {}
 
