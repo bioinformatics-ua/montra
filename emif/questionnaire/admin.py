@@ -6,9 +6,6 @@ from models import *
 
 adminsite = admin.site
 
-class SubjectAdmin(admin.ModelAdmin):
-    search_fields = ['last_name', 'first_name', 'email']
-    list_display = ['last_name', 'first_name', 'email']
 
 class ChoiceAdmin(admin.ModelAdmin):
     list_display = ['sortid', 'text', 'value', 'question']
@@ -38,23 +35,7 @@ class QuestionAdmin(admin.ModelAdmin):
 class QuestionnaireAdmin(admin.ModelAdmin):
     pass
 
-class RunInfoAdmin(admin.ModelAdmin):
-    list_display = ['random', 'runid', 'subject', 'created', 'emailsent', 'lastemailerror']
-    pass
-
-class RunInfoHistoryAdmin(admin.ModelAdmin):
-    pass
-
-class AnswerAdmin(admin.ModelAdmin):
-    search_fields = ['subject', 'runid', 'question', 'answer']
-    list_display = ['runid', 'subject', 'question']
-    list_filter = ['subject', 'runid']
-    ordering = [ 'subject', 'runid', 'question', ]
 
 adminsite.register(Questionnaire, QuestionnaireAdmin)
 adminsite.register(Question, QuestionAdmin)
 adminsite.register(QuestionSet, QuestionSetAdmin)
-adminsite.register(Subject, SubjectAdmin)
-adminsite.register(RunInfo, RunInfoAdmin) 
-adminsite.register(RunInfoHistory, RunInfoHistoryAdmin) 
-adminsite.register(Answer, AnswerAdmin)

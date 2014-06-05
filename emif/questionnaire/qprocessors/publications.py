@@ -59,6 +59,10 @@ def process_pub(question, ansdict):
 
 @show_summary('publication')
 def show_summ(value):
+
+    if value== "":
+        return ""
+
     value = value.replace("'", '"')
     pubs = json.loads(value)
 

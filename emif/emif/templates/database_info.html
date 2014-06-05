@@ -282,10 +282,10 @@ console.log("Creating questionnary set containers (so they are in order)");
         // tuple = k, qs
         {% for tuple, permissions in qsets %}
 
-            {% if permissions.visibility == 0 or owner_fingerprint %}
+            {% if permissions.visibility == 0 or owner_fingerprint or request.user.is_superuser %}
                 containers.push('<div class="{% if not permissions.allow_printing %}noprinting {% endif %}'+
                 '{% if not permissions.allow_exporting %}noexporting {% endif %}'+
-                '{%if permissions.visibility == 1 and owner_fingerprint %}privategroup {% endif %}accordion-group">'
+                '{%if permissions.visibility == 1 %}{% if owner_fingerprint or request.user.is_superuser %} privategroup{% endif %}{% endif %} accordion-group">'
                 +'<div class="accordion-heading"><a style="display: inline-block; width: 90%;" class="accordion-toggle" data-toggle="collapse" data-parent="#accordion1" href="#collapse{{ tuple.0|removespaces|safe|clean }}">{{ tuple.0|removeh1 }} </a>'+
                 '{% if permissions.visibility == 1 and owner_fingerprint %}<i class="tooltipit icon-eye-close" title="This questionset is private, only the data custodian can see it." ></i>{% endif %}'+
                 '{% if not permissions.allow_printing %}<img class="tooltipit" title="The data custodian doesn\'t allow this section to be printed." src="{{ STATIC_URL}}img/noprint.png"/>{% endif %}'+
@@ -306,7 +306,7 @@ console.log("QS_DEBUG: {{qs.sortid}} : {{qs.info}}");
 
         var priority=1;
         {% for tuple, permissions in qsets %}
-            {% if permissions.visibility == 0 or owner_fingerprint %}
+            {% if permissions.visibility == 0 or owner_fingerprint or request.user.is_superuser %}
                 var thread = new Runnable(loadqspart, priority++, {{tuple.1.sortid}}, '{{fingerprint_id}}');
 
                 threadpool.run(thread);

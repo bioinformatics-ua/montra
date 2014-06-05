@@ -198,6 +198,8 @@ MIDDLEWARE_CLASSES = (
     # Uncomment the next line for simple clickjacking protection:
     # 'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'emif.middleware.LoginRequiredMiddleware',
+    'johnny.middleware.LocalStoreClearMiddleware',
+    'johnny.middleware.QueryCacheMiddleware',
 )
 
 ROOT_URLCONF = 'emif.urls'
@@ -231,6 +233,8 @@ INSTALLED_APPS = (
     'django_admin_bootstrapped',
     'django.contrib.admin',
     'django.contrib.admindocs',
+
+    
 
     # Questionnaires
     'transmeta',
@@ -484,4 +488,19 @@ except ConnectionFailure, e:
 # REDIRECT USER ACCORDING TO PROFILE
 REDIRECT_DATACUSTODIAN = 'emif.views.databases'
 REDIRECT_RESEARCHER = 'emif.views.all_databases_user'
+
+
+# MEMCACHED
+CACHES = {
+    'default' : dict(
+        BACKEND = 'johnny.backends.memcached.MemcachedCache',
+        LOCATION = ['127.0.0.1:11211'],
+        JOHNNY_CACHE = True,
+    )
+}
+
+JOHNNY_MIDDLEWARE_KEY_PREFIX='emif_'
+
+
+
 
