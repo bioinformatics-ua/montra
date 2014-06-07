@@ -59,9 +59,8 @@
       {% endif %}
 
       {% if export_all_answers and request.user.is_superuser %}
-      <a class="btn" href="export_all_answers" onclick="" > <i class="icon-file"></i>
-        Export
-      </a>
+      
+        <button id="exportdatatable" class="btn"> <i class="icon-file"></i> Export </button>
       {% endif %}
 
 
@@ -115,9 +114,6 @@
 
 	</div>
 </div>
-
-
-
 <!-- **********************************************************************
 ***** Model to delete the fingerprint. It will show a window to confirm the
 ***** deletion of the fingerprint

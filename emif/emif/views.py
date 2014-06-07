@@ -1725,95 +1725,139 @@ def all_databases(request, page=1, template_name='alldatabases.html'):
                                             'hide_add': True})
 
 def qs_data_table(request, template_name='qs_data_table.html'):
-    db_type = request.POST.get("db_type")
-    qset = request.POST.getlist("qsets[]")
+    db_type = int(request.POST.get("db_type"))
+    qset_post = request.POST.getlist("qsets[]")
 
-    answers = []
-    # get only databases with correct type
-    list_databases = get_databases_from_solr(request, "type_t:"+re.sub(r'\s+', '', db_type.lower()))
-    titles = []
-    
-    for t in list_databases:
+    qset_int = []
+    for qs in qset_post:
+        qset_int.append(int(qs))
 
-        if t.type_name == db_type:
-            qsets, name, _d, _c = createqsets(t.id)
-            
-            q_list = []
-            a_list = []            
-            for group in qsets.ordered_items():
+    qset = QuestionSet.objects.filter(id__in=qset_int)
 
-                (k, qs) = group    
-              
-                if k in qset:
-                    for q in qs.list_ordered_tags:
-                        q_list.append(q)
-                        a_list.append([q.value, q.ttype])
-                continue
-            titles = ('Name', (q_list))
-            
+    # answers = []
+    # # get only databases with correct type
 
-            answers.append((name, (a_list)))
-                # print answers
-            
+    fingerprints = Fingerprint.objects.filter(questionnaire__id=db_type)
+
+    (titles, answers) = creatematrixqsets(db_type, fingerprints, qset)
+
+    # titles = []
+    # iterfingerprints = iter(fingerprints)
+
+    # # get titles from first iteration (are all the same anyways)
+    # if len(fingerprints) > 0:
+    #     qsets, name, _d, _c = createqsets(fingerprints[0], choosenqsets=qset, fullmode=False)
+    #     q_list = []
+    #     a_list = []            
+    #     for name, group in qsets.ordered_items(): 
+    #         for q in group.list_ordered_tags:
+    #             q_list.append(q)
+    #             a_list.append([q.value, q.ttype])
+
+    #     titles = ('Name', (q_list))
+    #     answers.append((name, (a_list))) 
+
+    #     next(iterfingerprints)
+
+    # for fingerprint in iterfingerprints:
+    #     qsets, name, _d, _c = createqsets(fingerprint, choosenqsets=qset, fullmode=False)
+    #     a_list = []         
+
+    #     for n, group in qsets.ordered_items(): 
+    #         for q in group.list_ordered_tags:
+    #             a_list.append([q.value, q.ttype])
+
+    #     answers.append((name, (a_list)))            
             
     return render(request, template_name, {'request': request, 'export_all_answers': True, 'breadcrumb': False, 'collapseall': False, 'geo': False, 'titles': titles, 'answers': answers})
 
 def all_databases_data_table(request, template_name='alldatabases_data_table.html'):
-    answers = []
-    list_databases = get_databases_from_solr(request, "*:*")
-    titles = []
-    
     #dictionary of database types
-    databases_types = {}
+    databases_types = {}     
+    
+    # There's no need to show all, we just need the one's with fingerprints
+    questionnaires = Questionnaire.objects.filter(fingerprint__pk__isnull=False).distinct()
 
-    if list_databases:
-        # Creating list of database types
-        for t in list_databases:
-            if not t.type_name in databases_types:
-                qsets, name, _d, _e,  = createqsets(t.id)
-                
-                databases_types[t.type_name] = qsets.ordered_items()  
+    # Creating list of database types
+    for questionnaire in questionnaires:
+        qsets = createhollowqsets(questionnaire.id)
             
-            '''    this code was loading all the qsets of all the dbs etc etctera
-            id = t.id
-            qsets, name, db_owners, fingerprint_ttype = createqsets(id)
-            q_list = []
-            for group in qsets.ordered_items():
-                (k, qs) = group
-                for q in qs.list_ordered_tags:
-                    q_list.append(q)
-            titles = ('Name', (q_list))
-            a_list = []
-            for group in qsets.ordered_items():
-                (k, qs) = group
-                for q in qs.list_ordered_tags:
-                    a_list.append(q.value)
-            answers.append((name, (a_list)))
-                # print answers
+        databases_types[questionnaire] = qsets.ordered_items()  
 
-        # since we dont have access to the structure directly (?)
-        # i use a random id for each type to get the qset types ?
-        if databases_types:
-            #print databases_types['adcohort'][0].id
-            for type in databases_types:
-                qsets, name = createqsets(databases_types[type][0].id)
-                
-                qsets_by_type[type] = qsets.ordered_items()
- '''           
-    # print titles
-    # print answers
-
-    return render(request, template_name, {'request': request, 'export_all_answers': True, 'titles': titles,
-                                           'answers': answers, 'breadcrumb': True, 'collapseall': False, 'geo': True,
-                                           'list_databases': list_databases,
+    return render(request, template_name, {'request': request, 'export_all_answers': True,
+                                           'breadcrumb': True, 'collapseall': False, 'geo': True,
+                                           'list_databases': databases_types,
                                            'no_print': True,
                                            'databases_types': databases_types
                                            })
 
 
-def createqsets(runcode, qsets=None, clean=True, highlights=None, getAnswers=True):
+# since createqset estructure isnt tippically made to be used in a row, i decided to implement it 
+# separated since the purpose is different, and this way we try to reduce at a maximum the number of repeated procedures
+def creatematrixqsets(db_type, fingerprints, qsets):
+    ans = []
+
+    # questions stay in memory, are the same for all fingerprints
+
+    qs_mem = []
+    name_question = None # source for the name of fingerprint
+    # first we get the questionsets questions and titles in place
+    q_list = ['Name']
+    for qset in qsets:
+        questions = qset.questions()
+        qs_mem.extend(questions)
+
+        for question in questions:
+            if question.slug_fk.slug1 == "database_name":
+                name_question = question
+            q_list.append(question.text)
+
+    for fingerprint in fingerprints:
+        answers = Answer.objects.filter(fingerprint_id=fingerprint)
+        
+        a_list = []
+        name = None
+        for question in qs_mem:
+            try:
+                answer = answers.get(question=question)
+
+                
+                if question.type in Fingerprint_Summary:
+                    a_list.append([Fingerprint_Summary[question.type](answer.data), question.type])
+                else:
+                    a_list.append([answer.data, question.type])
+            except Answer.DoesNotExist:
+                a_list.append("")
+
+        name = "Unnamed"
+
+        # if we dont get name_question naturally, we must take the time (this is a bother) to look for it...
+        if name_question == None:
+            try:
+                n = answers.get(question__slug_fk__slug1='database_name')
+                name_question = n.question
+            except Answer.DoesNotExist:
+                print "There's no database_name slugged answer for "+fingerprint.fingerprint_hash+" (maybe this questionnaire is a draft still)."
+
+        if name_question != None:
+            try:
+                name_answers = answers.get(question=name_question)
+
+                name = name_answers.data
+
+            except Answer.DoesNotExist:
+                pass
+
+        ans.append((name, (a_list)))
+
+    return (q_list, ans)
+
+def createqsets(runcode, qsets=None, clean=True, highlights=None, getAnswers=True, choosenqsets=None, fullmode=True):
     try:
-        fingerprint = Fingerprint.objects.get(fingerprint_hash=runcode)
+        if fullmode:
+            fingerprint = Fingerprint.objects.get(fingerprint_hash=runcode)
+        else:
+            fingerprint = runcode
 
         if qsets == None:
             qsets = ordered_dict()
@@ -1831,13 +1875,16 @@ def createqsets(runcode, qsets=None, clean=True, highlights=None, getAnswers=Tru
 
         db_owners = unique_users_string(fingerprint)
 
+        qsets_query = None
+        if choosenqsets != None:
+            qsets_query = choosenqsets
+        else:
+            qsets_query = QuestionSet.objects.filter(questionnaire=fingerprint.questionnaire).order_by('sortid')
         
-        qsets_query = QuestionSet.objects.filter(questionnaire=fingerprint.questionnaire).order_by('sortid')
         answers = Answer.objects.filter(fingerprint_id=fingerprint)
-
+        name = None
         for qset in qsets_query:
             if qset.sortid != 0 and qset.sortid != 99:
-
                 (qsets, name) = handle_qset(fingerprint, clean, qsets, qset, answers, fingerprint_ttype, rHighlights, qhighlights, getAnswers)
 
         return (qsets, name, db_owners, fingerprint_ttype)
@@ -1847,6 +1894,37 @@ def createqsets(runcode, qsets=None, clean=True, highlights=None, getAnswers=Tru
 
     # Something is really wrong if it gets here
     return HttpResponse('Something is wrong on creating qsets', 500)    
+
+# Creates a hollow shell that is similar to the one created by createqset, but doesnt have all the
+# questions and answers (so is a lot faster to create), essentially a useful shell for pages that allow questionset selection
+def createhollowqsets(questionnaire, qsets=None, highlights=None):
+
+    
+
+    if qsets == None:
+        qsets = ordered_dict()
+
+    rHighlights = None
+    qhighlights = None
+
+    if highlights != None:
+        if "results" in highlights and runcode in highlights["results"]:
+            rHighlights = highlights["results"][runcode]
+        if "questions" in highlights:
+            qhighlights = highlights["questions"]
+    
+    qsets_query = QuestionSet.objects.filter(questionnaire=questionnaire).order_by('sortid')
+
+    for qset in qsets_query:
+        if qset.sortid != 0 and qset.sortid != 99:
+            question_group = QuestionGroup()
+            question_group.sortid = qset.sortid
+            question_group.qsid = qset.id
+
+            qsets[qset.text] = question_group
+    
+    return qsets   
+
 
 def createqset(runcode, qsid, qsets=None, clean=True, highlights=None):
     qsid = int(qsid) 
@@ -1896,6 +1974,7 @@ def handle_qset(fingerprint, clean, qsets, qset, answers, fingerprint_ttype, rHi
     name = ""
     question_group = QuestionGroup()
     question_group.sortid = qset.sortid
+    question_group.qsid = qset.id
     
     qsets[qset.text] = question_group
     # questions() already gives us questions ordered by number
@@ -1903,7 +1982,7 @@ def handle_qset(fingerprint, clean, qsets, qset, answers, fingerprint_ttype, rHi
 
     for question in list_questions:
         t = Tag()
-        t.tag = question.text.encode('utf-8')
+        t.tag = question.text
         t.value = ""
         t.number = question.number
         t.ttype = question.type
@@ -1913,7 +1992,9 @@ def handle_qset(fingerprint, clean, qsets, qset, answers, fingerprint_ttype, rHi
 
     if getAnswers:
         for answer in answers:
-            slug = answer.question.slug_fk.slug1
+            question = answer.question
+
+            slug = question.slug_fk.slug1
 
             t = Tag()
 
@@ -1921,14 +2002,14 @@ def handle_qset(fingerprint, clean, qsets, qset, answers, fingerprint_ttype, rHi
             question_group = None
             q_number = None          
 
-            question = answer.question
+            
             if question != None:
                 text = question.slug_fk.description
-                qs = question.questionset.text
+                qs = qset.text
                 q_number = qs = question.number
-                if qsets.has_key(question.questionset.text):
+                if qsets.has_key(qset.text):
                     # Add the Tag to the QuestionGroup
-                    question_group = qsets[question.questionset.text]
+                    question_group = qsets[qset.text]
 
             else:
                 text = (slug, answer.data)
@@ -1977,7 +2058,7 @@ def handle_qset(fingerprint, clean, qsets, qset, answers, fingerprint_ttype, rHi
                     pass
 
     return (qsets, name)
-   
+
 # TODO: move to another place, maybe API? 
 def get_api_info(fingerprint_id):
     """This is an auxiliar method to get the API Info
@@ -3190,6 +3271,22 @@ def save_answers_to_csv(list_databases, filename):
             writer.writerow([id, name, "System", "Type Identifier", "99.3", t.ttype])
 
     return response
+
+
+def export_datatable(request):
+
+    db_type = request.POST.get("db_type")
+    qset = request.POST.getlist("qsets[]")
+
+    print db_type
+    print qset
+
+    """
+    Method to export all databases answers to a csv file
+    """
+
+    # list_databases = get_databases_from_solr(request, "*:*")
+    # return save_answers_to_csv(list_databases, "DBs")
 
 
 def export_all_answers(request):
