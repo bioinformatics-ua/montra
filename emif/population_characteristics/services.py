@@ -17,7 +17,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
         
-from emif.settings import jerboa_collection
+from emif.settings import jerboa_collection, jerboa_aggregation_collection
 from pymongo.errors import OperationFailure
 from .parseJerboaFile import * 
 import json 
@@ -61,6 +61,7 @@ class PopulationCharacteristic(object):
             print "Sucess "
         except OperationFailure:
             print "Failure"
+        return json_data
 
 
     def get_variables(self, var, row, fingerprint_id='abcd', filters=[], vars_that_should_exists=[]):
@@ -177,10 +178,16 @@ class PopulationCharacteristic(object):
 
         return r
 
+
+
+
     def filters(self, var, fingerprint_id):
 
         # Go to the rule matcher and ask for the filter for that particular case
-        mrules = RuleMatcher()
+        comp = False
+        if fingerprint_id=="COMPARE":
+            comp=True
+        mrules = RuleMatcher(comp=comp)
         filters = mrules.get_filter(var)
         chart = mrules.get_chart(var)
         #_filter = charts_conf.
@@ -190,25 +197,69 @@ class PopulationCharacteristic(object):
         for _filter in filters:
 
             # Generate query
+
             dict_query = {'fingerprint_id':fingerprint_id, 
                 'values.Var': chart.title.var,
                 
                 }
-
+            if comp:
+                dict_query = {'values.Var': chart.title.var,}
             if _filter.key != None:
                 dict_query['values.' + _filter.key]  = _filter.name
             #print _filter
             #print _filter.value
             #print dict_query
-            values =  jerboa_collection.find( dict_query ).distinct('values.' + _filter.value )
+            if comp:
+                values =  jerboa_aggregation_collection.find( dict_query ).distinct('values.' + _filter.value )#
+            else:
+                values =  jerboa_collection.find( dict_query ).distinct('values.' + _filter.value )#
+            
+            values = sorted(values)
+
+            #values =  jerboa_collection.find( dict_query ).distinct('values.' + _filter.value )
             #print values
             _filter.values = values
         return filters
 
     def get_var(self):
         values =  jerboa_collection.distinct( 'values.Var' )
+        # Go to the rule matcher and ask for the filter for that particular case
+        comp = False
+        if fingerprint_id=="COMPARE":
+            comp=True
+        mrules = RuleMatcher(comp=comp)
+        filters = mrules.get_filter(var)
+        chart = mrules.get_chart(var)
+
+
+        # Generate the filters here.
+        for _filter in filters:
+
+            # Generate query
+
+            dict_query = {'fingerprint_id':fingerprint_id, 
+                'values.Var': chart.title.var,
+                
+                }
+            if comp:
+                dict_query = {'values.Var': chart.title.var,}
+            if _filter.key != None:
+                dict_query['values.' + _filter.key]  = _filter.name
+
+
+        if comp:
+            values =  jerboa_aggregation_collection.find( dict_query ).distinct('values.' + _filter.value )#
+        else:
+            values =  jerboa_collection.find( dict_query ).distinct('values.' + _filter.value )#
         
+        values = sorted(values)
+
+        _filter.values = values
+        return filters
         return values
+
+    def get_xs(self):
+        pass
 
     def get_x_y(self):
         pass

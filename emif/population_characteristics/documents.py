@@ -42,6 +42,7 @@ from population_characteristics.models import *
 from fingerprint.models import Fingerprint
 
 from docs_manager.views import get_revision
+from population_characteristics.tasks import aggregation
 
 from api.models import FingerprintAPI
 
@@ -88,9 +89,10 @@ def document_form_view_upload(request, fingerprint_id, template_name='documents_
     #_json = import_population_characteristics_data(fingerprint_id,filename=path_file)
 
     pc = PopulationCharacteristic()
-    pc.submit_new_revision(fingerprint_id, path_file)
+    data_jerboa = pc.submit_new_revision(fingerprint_id, path_file)
 
 
+    aggregation.apply_async([fingerprint_id, data_jerboa])
     response = JSONResponse(data, mimetype=response_mimetype(request))
     response['Content-Disposition'] = 'inline; filename=files.json'
     return response

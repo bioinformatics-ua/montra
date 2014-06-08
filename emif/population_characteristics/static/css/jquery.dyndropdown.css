@@ -1,0 +1,11 @@
+.dyndropdown_container .navbar .dropdown-menu:after, .navbar .dropdown-menu:before {
+    display:none;
+}
+.dyndropdown_leftcaret:after {
+    float: left !important;
+    margin-right: 5px !important;
+    border-right-color: #cccccc !important;
+    border-style: solid !important;
+    border-width: 5px 5px 5px 0 !important;
+    content: " " !important;
+}

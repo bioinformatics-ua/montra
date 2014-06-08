@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2013 Luís A. Bastião Silva and Universidade de Aveiro
+# Copyright (C) 2014 Luís A. Bastião Silva and Universidade de Aveiro
 #
 # Authors: Luís A. Bastião Silva <bastiao@ua.pt>
 #
@@ -18,9 +18,28 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
+
 from __future__ import absolute_import
 
-# This will make sure the app is always imported when
-# Django starts so that shared_task will use this app.
-from .celery import app as celery_app
+from celery import shared_task
+import time
+
+from population_characteristics.aggregator import *
+
+@shared_task
+def aggregation(fingerprint_id, values):
+    # Operations
+    print "start aggregation"
+    #print values 
+    try:
+        ac = AggregationPopulationCharacteristics(values,fingerprint_id, None)
+        print "created object"
+        new_values = ac.run()
+    except:
+        print "Exception!!!!!!!"
+        import traceback
+        traceback.print_exc()
+        
+    print "ends aggregation"
+    return fingerprint_id
 

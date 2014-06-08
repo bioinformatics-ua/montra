@@ -58,7 +58,6 @@ function ChartLayout ()
         return charts_titles;
     };
 
-
     this.getFilters = function(graph_type, fingerprintId){
         // TODO
         return null;

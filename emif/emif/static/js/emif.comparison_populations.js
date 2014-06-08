@@ -1,5 +1,4 @@
-# -*- coding: utf-8 -*-
-
+/**********************************************************************
 # Copyright (C) 2013 Luís A. Bastião Silva and Universidade de Aveiro
 #
 # Authors: Luís A. Bastião Silva <bastiao@ua.pt>
@@ -17,10 +16,30 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
+***********************************************************************/
 
-from __future__ import absolute_import
 
-# This will make sure the app is always imported when
-# Django starts so that shared_task will use this app.
-from .celery import app as celery_app
+function postComparisonPopulations(){
+    
+    $('#compare_form').attr('action', 'population/compare');
+    postComparison();
 
+   return true; 
+};
+
+
+
+
+$(document).ready(function(){
+
+    $("#comparabtnPC").bind('click',function(e)
+        { 
+
+                event.preventDefault();
+
+
+          postComparisonPopulations();
+          return false;
+        });
+
+});

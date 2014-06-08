@@ -21,7 +21,7 @@
 import json
 
 from django.utils import simplejson
-
+from population_characteristics.charts.operations import * 
 json.dumps = simplejson.dumps
 
 """
@@ -29,42 +29,6 @@ The goal of this class is to generate the configurations files/templates
 for the charts library
 """
 
-
-class Operation:
-    SUM = 'sum'
-    UNIQUE = 'unique'
-    LIST = 'list'
-    MIN = 'min'
-    MAX = 'max'
-    COUNT = 'count'
-    MEAN = 'mean'
-    PERC25 = 'Perc25'
-    PERC75 = 'Perc75'
-    SD = 'SD'
-    CONCAT = 'concat'
-
-class Scale(object):
-    def __init__(self):
-        self.unit = None
-        self.bins = None
-        self.start = 0
-        
-    def to_JSON(self):
-        return json.dumps(self, default=lambda o: o.__dict__, sort_keys=True, indent=4)
-
-class Filter(object):
-    def __init__(self):
-        self.name = None
-        self.key = None
-        self.value = None
-        self.values = None
-        self.translation = None
-        self.comparable = False
-        self.comparable_values = None
-
-        
-    def to_JSON(self):
-        return json.dumps(self, default=lambda o: o.__dict__, sort_keys=True, indent=4)
 
 class Title(object):
     def __init__(self):
@@ -88,6 +52,7 @@ class Axis(object):
         self.sort_func = None
         self.label = None
         self.legend = False
+        self.stacked = False 
         
     def to_JSON(self):
         return json.dumps(self, default=lambda o: o.__dict__, sort_keys=True, indent=4)

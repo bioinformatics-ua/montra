@@ -22,6 +22,7 @@ from .services import *
 from .response import JSONResponse, response_mimetype
 from .comments import *
 from .serialize import serialize
+from .comparison import * 
 
 from population_characteristics.models import *
 
@@ -61,7 +62,8 @@ def jerboa_list_values(request, var, row, fingerprint_id, template_name='documen
         
         myRq = dict(request.POST.lists())
         for i in myRq:
-            
+            filters[i[0:-2]] = myRq[i]
+
             filters[i[0:-2]] = myRq[i]
 
         
@@ -152,6 +154,9 @@ def generic_filter(request, param, template_name='documents_upload_form.html'):
     return response
 
 def get_settings(request, runcode):
+    
+    if (runcode=="COMPARE"):
+        return get_compare_settings(request)
     pc = PopulationCharacteristic(None)
     values = pc.get_settings()
     data = {'conf': values.to_JSON()}
@@ -159,8 +164,6 @@ def get_settings(request, runcode):
     response = JSONResponse(data, mimetype=response_mimetype(request))
     response['Content-Disposition'] = 'inline; filename=files.json'
     return response
-
-
 
 def list_jerboa_files(request, fingerprint):
 
@@ -183,5 +186,9 @@ def list_jerboa_files(request, fingerprint):
     response['Content-Disposition'] = 'inline; filename=files.json'
     return response
 
+def compare(request):
+    return handle_compare(request)
 
+def compare_values(request,  var, row, fingerprint_id):
+    return handle_compare_values(request, var, row, fingerprint_id)
 

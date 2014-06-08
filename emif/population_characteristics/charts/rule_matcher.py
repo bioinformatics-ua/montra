@@ -24,12 +24,15 @@ from population_characteristics.conf_charts import *
 
 class RuleMatcher(object):
 
-    def __init__(self):
+    def __init__(self, comp=False):
+        self.comp = comp
         
-        pass
 
     def get_filter(self, var):
-        charts = conf.get_main_settings().charts
+        if self.comp:
+            charts = conf.get_compare_settings().charts
+        else:
+            charts = conf.get_main_settings().charts
         filters = None 
         for c in charts:
             if c.title.fixed_title==var:
@@ -38,7 +41,10 @@ class RuleMatcher(object):
         return filters
 
     def get_chart(self, var):
-        charts = conf.get_main_settings().charts
+        if self.comp:
+            charts = conf.get_compare_settings().charts
+        else:
+            charts = conf.get_main_settings().charts
         result = None 
         for c in charts:
             if c.title.fixed_title==var:

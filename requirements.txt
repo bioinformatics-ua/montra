@@ -30,3 +30,5 @@ request==1.2.3
 biopython==1.63
 django_nvd3==0.6.0
 python-dateutil==2.2
+celery==3.1.0
+django-celery==3.1.0

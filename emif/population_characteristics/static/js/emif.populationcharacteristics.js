@@ -23,6 +23,36 @@
 **************** Population Characteristics API 
 *********************************************************/
 
+
+
+
+// This is the mode 
+var PAGE_TYPE = "PC";
+// This is the mode that exists right now
+var PC_NORMAL = "PC_NORMAL"; // Population Characteristics for one database
+var PC_COMPARE = "PC_compare"; // Population Characteristics for many databases
+
+var filter_dropdown;
+
+function getPageType()
+{
+  var url = document.URL;
+  if (url.indexOf("compare")!=-1)
+  {
+    PAGE_TYPE =PC_COMPARE;
+  }
+  else
+  {
+    PAGE_TYPE = PC_NORMAL;
+  }
+};
+
+getPageType();
+var defaultFingerprintID = "NONE";
+if (PAGE_TYPE==PC_COMPARE)
+{
+  defaultFingerprintID = "COMPARE"
+}
 function getFingerprintID(){
   var url = document.URL;
   var fingerprint_id='abcd';
@@ -31,7 +61,7 @@ function getFingerprintID(){
     fingerprint_id = url.split("fingerprint/")[1].split("/1")[0];
   }
   catch(err){
-    fingerprint_id='abcde'
+    fingerprint_id=defaultFingerprintID;
   };
   return fingerprint_id;
 
@@ -47,8 +77,17 @@ var actualChart = null;
 
 /** TODO: there are a lot of static and hardcore parameters in this function
   * This need to be fixed */ 
-function PCAPI () 
+function PCAPI (endpoint) 
 {
+
+    if (endpoint==null)
+    {
+      this.endpoint="population/jerboalistvalues";  
+    }
+    else {
+      this.endpoint=endpoint;
+    }
+    
     // This was already globally defined, but ie8, for some obscure reason cant find it...
     $.ajaxSetup({
                 crossDomain: false, // obviates need for sameOrigin test
@@ -58,130 +97,14 @@ function PCAPI ()
                     }
                 }
     });
-    this.getGender = function(){
-        var result = {}
-          
-        $.ajax({
-          dataType: "json",
-          url: "population/jerboalistvalues/Active patients/Gender/abcd",
-          async: false,
-          data: result,
-          success: function (data){result=data;}
-        });
-        return result;
-    };
-
-    this.getName1 = function(){
-          var result = {}
-          
-        $.ajax({
-          dataType: "json",
-          url: "population/jerboalistvalues/Active patients/Name1/abcd",
-          async: false,
-          data: result,
-          success: function (data){result=data;}
-        });
-        return result;
-    };
-
-    this.getName2 = function(){
-          var result = {}
-          
-        $.ajax({
-          dataType: "json",
-          url: "population/jerboalistvalues/Active patients/Name2/abcd",
-          async: false,
-          data: result,
-          success: function (data){result=data;}
-        });
-        return result;
-    };
-
-
-    this.getValue1 = function(){
-          var result = {}
-          
-        $.ajax({
-          dataType: "json",
-          url: "population/jerboalistvalues/Active patients/Value1/abcd",
-          async: false,
-          data: result,
-          success: function (data){result=data;}
-        });
-        return result;
-    };
-
-
-    this.getValue2 = function(){
-          var result = {}
-          
-        $.ajax({
-          dataType: "json",
-          url: "population/jerboalistvalues/Active patients/Name2/abcd",
-          async: false,
-          data: result,
-          success: function (data){result=data;}
-        });
-        return result;
-    };
-
-    this.getNameN = function(nameN){
-          var result = {}
-          
-        $.ajax({
-          dataType: "json",
-          url: "population/jerboalistvalues/" + nameN,
-          async: false,
-          data: result,
-          success: function (data){result=data;}
-        });
-        return result;
-    };
-
-    this.getValueN = function(valueN){
-          var result = {}
-          
-        $.ajax({
-          dataType: "json",
-          url: "population/jerboalistvalues/" + valueN,
-          async: false,
-          data: result,
-          success: function (data){result=data;}
-        });
-        return result;
-    };
-
-    this.getVar = function(){
-        var result = {}
-          
-        $.ajax({
-          dataType: "json",
-          url: "population/jerboalistvalues/Var",
-          async: false,
-          data: result,
-          success: function (data){result=data;}
-        });
-        return result;
-    };
-
-    this.getChart = function(){
-        var result = {}
-          
-        $.ajax({
-          dataType: "json",
-          url: "population/jerboalistvalues/Var",
-          async: false,
-          data: result,
-          success: function (data){result=data;}
-        });
-        return result;
-    };
+    
     this.getValuesRow = function(Var, Row, fingerprintID){
         var result = {}
           
         $.ajax({
           dataType: "json",
-          url: "population/jerboalistvalues/"+Var+"/"+Row+"/" + fingerprintID,
+          url: this.endpoint+"/"+Var+"/"+Row+"/" + fingerprintID,
+
           async: false,
           data: result,
           success: function (data){result=data;}
@@ -194,7 +117,7 @@ function PCAPI ()
 
         $.ajax({
           dataType: "json",
-          url: "population/jerboalistvalues/"+Var+"/"+Row+"/" + fingerprintID,
+          url: this.endpoint+"/"+Var+"/"+Row+"/" + fingerprintID,
           async: false,
           type: "POST",
           data: filters,
@@ -223,14 +146,169 @@ function PCAPI ()
 };
 
 /********************************************************************
-**************** Population Characteristics - Bar (Jquery Plugin) 
+**************** Population Characteristics - Bar (Jquery Plugin) v2 (using dyndropdown)
 *********************************************************************/
-
 
  (function( $ )
  {
 
+    /** Draft code */ 
+    function getFiltersSelected(){
 
+      return filtersMap;
+
+    };
+
+    
+    translations = {};
+    translationsBack = {};
+    
+
+    var methods = {
+        init : function( options, name, fingerprintId ) {
+
+            
+            /** Get a list of filters */
+            values = options.getFilter(name,fingerprintId);
+
+            if (values===undefined)
+            {
+                return;
+            };
+
+            filtersMap = {}
+            var self = this;
+            /*self.html('');*/
+
+
+            filters_tmp = [];
+            
+            JSON_OUTPUT = {};
+
+            values.values.forEach(function(_value){
+
+              var xFilter = JSON.parse(_value);
+
+              filters_tmp.push(xFilter);
+              if (!xFilter.show)
+                return;
+              
+              self.append(xFilter.name+": ");
+              var options = {};
+
+              //var tmpUl = $('<ul class="nav nav-pills nav-stacked">');
+
+              //self.append(tmpUl);
+
+              // This code is only for comparison mode 
+              //console.log(xFilter);
+              if (xFilter.name == "Gender")
+              {
+                  if (xFilter.translation.hasOwnProperty("ALL"))
+                  {
+                    xFilter.values.push("ALL");  
+                    options['ALL'] = 'ALL';               
+                  }
+                  
+              }
+
+
+              $.each(xFilter.values, function (data){
+                  
+                  if (xFilter.values[data]==="")
+                      return;
+
+
+                  var fType = xFilter.name;
+                  if (xFilter.key!= null)
+                  {
+                    fType = xFilter.value;
+
+                  }
+                  var originalValue = xFilter.values[data];
+                  //console.log("originalValue");
+                  //console.log(originalValue);
+                  if (xFilter['translation'] != null)
+                  {
+                    if (xFilter['translation'].hasOwnProperty(originalValue))
+                    {
+                        translations[originalValue] = xFilter['translation'][originalValue];
+                        translationsBack[xFilter['translation'][originalValue]] = originalValue;
+                        originalValue = xFilter['translation'][originalValue];
+                    }
+                      
+                  }
+                  
+                 
+                  //tmpUl.append('<li><a class="filterBar '+fType+'" id=_'+fType+'_'+xFilter.values[data]+' href="#" onclick="return false;"> '+originalValue+'</a></li>')
+                  options[xFilter.values[data]] = originalValue;                  
+                    
+              });
+              JSON_OUTPUT[xFilter.value] = {values: options, name: xFilter.name};
+            });
+            //console.log('JSON_OUTPOUT');
+            //console.log(JSON.stringify(JSON_OUTPUT));
+            
+
+            filter_dropdown = $(this).dyndropdown({
+                    label: "Filter", 
+                    dropup: false, 
+                    alwaysOneOption: true,
+                    onSelectionChanged: function(selection){
+                        //console.log('callback called');
+                        //console.log(selection);
+                        
+                        var charDraw = new PCDraw(actualChart, activeChart, null);
+
+                        for(filter in selection){
+                          var options_translated = [];
+
+                          for(var i=0;i<selection[filter].length;i++){
+                            var _value = selection[filter][i];
+                            
+                            options_translated.push(_value);
+
+                          }
+
+                          filtersMap['values.'+filter] = options_translated;
+                        }
+                        //console.log('NEW FILTERS:');
+                        //console.log(filtersMap);
+                        charDraw.refresh(filtersMap);
+                    }
+            });
+
+            filter_dropdown.setStructure(JSON.stringify(JSON_OUTPUT));
+
+            actualChart.filters = filters_tmp;
+
+            var match=false;
+
+        },
+        draw : function( options ) {
+            
+        }
+    };
+
+    $.fn.populationChartsBar2 = function(method) {
+        // Method calling logic
+        if ( methods[method] ) {
+        return methods[ method ].apply( this, Array.prototype.slice.call( arguments, 1 ));
+        } else if ( typeof method === 'object' || ! method ) {
+        return methods.init.apply( this, arguments );
+        } else {
+        $.error( 'Method ' + method + ' does not exist on jQuery.populationCharts2' );
+        }
+        return this;
+    };
+}( jQuery ));
+
+/********************************************************************
+**************** Population Characteristics - Bar (Jquery Plugin) 
+*********************************************************************/
+
+ (function( $ )
+ {
 
     /** Draft code */ 
     function getFiltersSelected(){
@@ -260,10 +338,16 @@ function PCAPI ()
             var self = this;
             self.html('');
 
+
+            filters_tmp = [];
+            
             values.values.forEach(function(_value){
 
               var xFilter = JSON.parse(_value);
 
+              filters_tmp.push(xFilter);
+              if (!xFilter.show)
+                return;
               
               self.append(xFilter.name+": ");
               var tmpUl = $('<ul class="nav nav-pills nav-stacked">');
@@ -274,12 +358,16 @@ function PCAPI ()
               console.log(xFilter);
               if (xFilter.name == "Gender")
               {
-                  xFilter.values.push("ALL");                
+                  if (xFilter.translation.hasOwnProperty("ALL"))
+                  {
+                    xFilter.values.push("ALL");                  
+                  }
+                  
               }
 
 
               $.each(xFilter.values, function (data){
-
+                  
                   if (xFilter.values[data]==="")
                       return;
 
@@ -291,7 +379,8 @@ function PCAPI ()
 
                   }
                   var originalValue = xFilter.values[data];
-
+                  console.log("originalValue");
+                  console.log(originalValue);
                   if (xFilter['translation'] != null)
                   {
                     if (xFilter['translation'].hasOwnProperty(originalValue))
@@ -313,6 +402,7 @@ function PCAPI ()
 
             });
             
+            actualChart.filters = filters_tmp;
 
 
             /** The magic of the filters will happen here */ 
@@ -328,6 +418,8 @@ function PCAPI ()
                       var str = e.target.id;
                       var filterType =str.substring(str.indexOf("_")+1,str.lastIndexOf("_"));
 
+                      console.log('filterType:'+filterType);
+
                       var _value = e.target.innerHTML.trim();
                       if (translationsBack.hasOwnProperty(_value))
                       {
@@ -342,8 +434,8 @@ function PCAPI ()
                         filtersMap['values.'+filterType] = [_value];  
                       }*/
                       filtersMap['values.'+filterType] = [_value];  
-                      console.log("filterMap:");
-                      console.log(filtersMap);
+                      console.log("filtersSelected:");
+                      console.log(getFiltersSelected());
                       charDraw.refresh(getFiltersSelected());
                       
                       
