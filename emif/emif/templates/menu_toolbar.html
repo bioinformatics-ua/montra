@@ -175,6 +175,12 @@
 <form id="send" method="POST" > {% csrf_token %}
 </form>
 
+<form id="senddatatablemodel" method="POST" >
+{% csrf_token %}
+</form>
+<form id="senddatatable" action="export_datatable" method="POST" >
+{% csrf_token %}
+</form>
 
 <script>
 

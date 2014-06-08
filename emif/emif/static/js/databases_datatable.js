@@ -79,7 +79,15 @@ $(document).ready(function() {
                 }
             }); 
 
-            console.log(selected_options); 
+            console.log(selected_options);  
+            var dtform = $('#senddatatable');
+            dtform.html($('#senddatatablemodel').html());
+            dtform.append('<input type="hidden" name="db_type" value="'+type_selected+'">');
+            for(var i=0;i<selected_options.length;i++){
+                dtform.append('<input type="hidden" name="qsets[]" value="'+selected_options[i]+'">');
+            }
+            dtform.submit();
+
 
         } else {
             alert('Please, choose a database type and questionsets, before trying to export.')

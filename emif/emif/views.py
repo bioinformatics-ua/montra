@@ -57,6 +57,8 @@ from rest_framework.authtoken.models import Token
 
 from django.contrib.auth.decorators import login_required
 
+from django.utils.html import strip_tags
+
 import json
 import logging
 import re
@@ -3266,15 +3268,72 @@ def save_answers_to_csv(list_databases, filename):
 
 def export_datatable(request):
 
-    db_type = request.POST.get("db_type")
-    qset = request.POST.getlist("qsets[]")
+    db_type = int(request.POST.get("db_type"))
+    qset_post = request.POST.getlist("qsets[]")
 
-    print db_type
-    print qset
+    # generate a mumbo jumbo digest for this combination of parameters, to be used as key for caching purposes
+    string_to_be_hashed = "dbtype"+str(db_type)
+
+    for post in qset_post:
+        string_to_be_hashed+="qs"+post
+
+    hashed = hashlib.sha256(string_to_be_hashed).hexdigest()
+
+    titles = None
+    answers = None
+
+    cached = cache.get(hashed)
+
+    if cached != None:
+        print "cache hit"
+        (titles, answers) = cached
+
+    else :
+        print "need for cache"
+        qset_int = []
+        for qs in qset_post:
+            qset_int.append(int(qs))
+
+
+        qset = QuestionSet.objects.filter(id__in=qset_int)
+
+        fingerprints = Fingerprint.objects.filter(questionnaire__id=db_type)
+
+        (titles, answers) = creatematrixqsets(db_type, fingerprints, qset)
+
+        cache.set(hashed, (titles, answers), 720) # 12 hours of cache
 
     """
     Method to export all databases answers to a csv file
     """
+    def clean_str_exp(s):
+        s2 = s.replace("\n", "|").replace(";", ",").replace("\t", "    ").replace("\r","").replace("^M","").replace("|", "")
+        
+        return re.sub("\s\s+" , " ", s2)
+
+
+
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="'+str(hashed)+'.csv"'
+
+    writer = csv.writer(response)
+
+    titles_clean = []
+    for title in titles:
+        titles_clean.append(title.replace('h0. ','').replace('h1. ','').replace('h2. ','').replace('h3. ','').replace('h4. ','').replace('h5. ','').replace('h6. ','').replace('h7. ',''))
+    
+    writer.writerow(titles_clean)
+
+    for title, ans in answers:
+        line = [title]
+        for a in ans:
+            if a != '':
+                line.append(clean_str_exp(strip_tags(a[0])))
+            else:
+                line.append('')
+        writer.writerow(line)
+
+    return response
 
     # list_databases = get_databases_from_solr(request, "*:*")
     # return save_answers_to_csv(list_databases, "DBs")
