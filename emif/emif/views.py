@@ -70,6 +70,7 @@ import time
 import base64
 
 from django.core.cache import cache
+
 from django.views.decorators.cache import cache_page
 
 import hashlib
@@ -1728,48 +1729,40 @@ def qs_data_table(request, template_name='qs_data_table.html'):
     db_type = int(request.POST.get("db_type"))
     qset_post = request.POST.getlist("qsets[]")
 
-    qset_int = []
-    for qs in qset_post:
-        qset_int.append(int(qs))
+    # generate a mumbo jumbo digest for this combination of parameters, to be used as key for caching purposes
+    string_to_be_hashed = "dbtype"+str(db_type)
 
-    qset = QuestionSet.objects.filter(id__in=qset_int)
+    for post in qset_post:
+        string_to_be_hashed+="qs"+post
 
-    # answers = []
-    # # get only databases with correct type
+    hashed = hashlib.sha256(string_to_be_hashed).hexdigest()
 
-    fingerprints = Fingerprint.objects.filter(questionnaire__id=db_type)
+    titles = None
+    answers = None
 
-    (titles, answers) = creatematrixqsets(db_type, fingerprints, qset)
+    cached = cache.get(hashed)
 
-    # titles = []
-    # iterfingerprints = iter(fingerprints)
+    if cached != None:
+        print "cache hit"
+        (titles, answers) = cached
 
-    # # get titles from first iteration (are all the same anyways)
-    # if len(fingerprints) > 0:
-    #     qsets, name, _d, _c = createqsets(fingerprints[0], choosenqsets=qset, fullmode=False)
-    #     q_list = []
-    #     a_list = []            
-    #     for name, group in qsets.ordered_items(): 
-    #         for q in group.list_ordered_tags:
-    #             q_list.append(q)
-    #             a_list.append([q.value, q.ttype])
+    else :
+        print "need for cache"
+        qset_int = []
+        for qs in qset_post:
+            qset_int.append(int(qs))
 
-    #     titles = ('Name', (q_list))
-    #     answers.append((name, (a_list))) 
 
-    #     next(iterfingerprints)
+        qset = QuestionSet.objects.filter(id__in=qset_int)
 
-    # for fingerprint in iterfingerprints:
-    #     qsets, name, _d, _c = createqsets(fingerprint, choosenqsets=qset, fullmode=False)
-    #     a_list = []         
+        fingerprints = Fingerprint.objects.filter(questionnaire__id=db_type)
 
-    #     for n, group in qsets.ordered_items(): 
-    #         for q in group.list_ordered_tags:
-    #             a_list.append([q.value, q.ttype])
+        (titles, answers) = creatematrixqsets(db_type, fingerprints, qset)
 
-    #     answers.append((name, (a_list)))            
-            
-    return render(request, template_name, {'request': request, 'export_all_answers': True, 'breadcrumb': False, 'collapseall': False, 'geo': False, 'titles': titles, 'answers': answers})
+        cache.set(hashed, (titles, answers), 720) # 12 hours of cache
+
+
+    return render(request, template_name, {'request': request,'hash': hashed, 'export_all_answers': True, 'breadcrumb': False, 'collapseall': False, 'geo': False, 'titles': titles, 'answers': answers})
 
 def all_databases_data_table(request, template_name='alldatabases_data_table.html'):
     #dictionary of database types
@@ -1899,8 +1892,6 @@ def createqsets(runcode, qsets=None, clean=True, highlights=None, getAnswers=Tru
 # questions and answers (so is a lot faster to create), essentially a useful shell for pages that allow questionset selection
 def createhollowqsets(questionnaire, qsets=None, highlights=None):
 
-    
-
     if qsets == None:
         qsets = ordered_dict()
 
@@ -1911,8 +1902,8 @@ def createhollowqsets(questionnaire, qsets=None, highlights=None):
         if "results" in highlights and runcode in highlights["results"]:
             rHighlights = highlights["results"][runcode]
         if "questions" in highlights:
-            qhighlights = highlights["questions"]
-    
+            qhighlights = highlights["questions"]   
+
     qsets_query = QuestionSet.objects.filter(questionnaire=questionnaire).order_by('sortid')
 
     for qset in qsets_query:
