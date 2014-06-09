@@ -177,7 +177,7 @@ def results_fulltext_aux(request, query, page=1, template_name='results.html', i
         page = 1
 
     if query == "" or query.strip()=="text_t:*" :
-        return render(request, "results.html", {'request': request, 'breadcrumb': True,
+        return render(request, "results.html", {'request': request, 'breadcrumb': True,  'isSearch': True,
                                                 'num_results': 0, 'page_obj': None})
     (sortString, filterString, sort_params, range) = paginator_process_params(request.POST, page, rows)   
     sort_params["base_filter"] = query;
@@ -202,10 +202,10 @@ def results_fulltext_aux(request, query, page=1, template_name='results.html', i
     if len(list_databases) == 0 :
         query_old = request.session.get('query', "")
         if isAdvanced == True:
-            return render(request, "results.html", {'request': request, 'breadcrumb': True,
+            return render(request, "results.html", {'request': request, 'breadcrumb': True,  'isSearch': True,
                                                 'num_results': 0, 'page_obj': None, 'isAdvanced': True})
         else:
-            return render(request, "results.html", {'request': request, 'breadcrumb': True,
+            return render(request, "results.html", {'request': request, 'breadcrumb': True, 'isSearch': True,
                                                 'num_results': 0, 'page_obj': None, 'search_old': query_old, 'isAdvanced': False})
     
     list_databases = paginator_process_list(list_databases, hits, range)   
@@ -220,10 +220,10 @@ def results_fulltext_aux(request, query, page=1, template_name='results.html', i
         
     if isAdvanced == True:
         return render(request, template_name, {'request': request,
-                                           'num_results': hits, 'page_obj': pager, 'page_rows': rows,
+                                           'num_results': hits, 'page_obj': pager, 'page_rows': rows, 'isSearch': True,
                                             'breadcrumb': True, 'isAdvanced': True, "sort_params": sort_params, "page":page})
     else :
-        return render(request, template_name, {'request': request,
+        return render(request, template_name, {'request': request, 'isSearch': True,
                                            'num_results': hits, 'page_obj': pager, 'page_rows': rows,'breadcrumb': True, 'search_old': query_old, 'isAdvanced': False, "sort_params": sort_params, "page":page})
 
 
@@ -1763,7 +1763,6 @@ def qs_data_table(request, template_name='qs_data_table.html'):
 
         cache.set(hashed, (titles, answers), 720) # 12 hours of cache
 
-
     return render(request, template_name, {'request': request,'hash': hashed, 'export_all_answers': True, 'breadcrumb': False, 'collapseall': False, 'geo': False, 'titles': titles, 'answers': answers})
 
 def all_databases_data_table(request, template_name='alldatabases_data_table.html'):
@@ -1779,7 +1778,7 @@ def all_databases_data_table(request, template_name='alldatabases_data_table.htm
             
         databases_types[questionnaire] = qsets.ordered_items()  
 
-    return render(request, template_name, {'request': request, 'export_all_answers': True,
+    return render(request, template_name, {'request': request, 'export_datatable': True,
                                            'breadcrumb': True, 'collapseall': False, 'geo': True,
                                            'list_databases': databases_types,
                                            'no_print': True,
@@ -3245,7 +3244,9 @@ def save_answers_to_csv(list_databases, filename):
         for t in list_databases:
             id = t.id
 
-            qsets, name, db_owners, fingerprint_ttype = createqsets(id, clean=False)
+            returned = createqsets(id, clean=False)
+
+            qsets, name, db_owners, fingerprint_ttype  = returned
 
             for group in qsets.ordered_items():
                 (k, qs) = group
@@ -3357,6 +3358,26 @@ def export_my_answers(request):
     list_databases = get_databases_from_solr(request, "user_t:" + '"' + user.username + '"')
 
     return save_answers_to_csv(list_databases, "MyDBs")
+
+def export_search_answers(request):
+    """
+    Method to export search databases answers to a csv file
+    """
+
+    user = request.user
+
+    query = None
+    isadvanced = request.session.get('isAdvanced')
+    value = request.session.get('query')
+
+    if(isadvanced):
+        query = value
+    else:
+        query = "text_t:"+str(value)
+
+    list_databases = get_databases_from_solr(request, query)
+
+    return save_answers_to_csv(list_databases, "search_results")
 
 
 def export_bd_answers(request, runcode):

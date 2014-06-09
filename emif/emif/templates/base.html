@@ -285,7 +285,11 @@
                     <div class="pull-right">
                         {% block toolbar %} {% endblock %}
                     </div>
+
+                        
+<div style="display: none; z-index: 2000; position:fixed; bottom:20px; right: 20px;" class="alert alert-info" id="exporting-message">Databases of the current view are being exported, please wait.</div>
                     {% block content %}
+
                     {% endblock %}
                     
                 </div>
