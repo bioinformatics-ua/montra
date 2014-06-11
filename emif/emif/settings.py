@@ -217,6 +217,7 @@ TEMPLATE_DIRS = (
     os.path.abspath(PROJECT_DIR_ROOT + MIDDLE_DIR + 'literature/templates'),
     os.path.abspath(PROJECT_DIR_ROOT + MIDDLE_DIR + 'control_version/templates'),
     os.path.abspath(PROJECT_DIR_ROOT + MIDDLE_DIR + 'docs_manager/templates'),
+    os.path.abspath(PROJECT_DIR_ROOT + MIDDLE_DIR + 'public/templates'),
 )
 
 INSTALLED_APPS = (
@@ -426,7 +427,10 @@ LOGIN_EXEMPT_URLS = (
     r'^import-questionnaire',
     r'^delete-questionnaire',
     r'^bootstrap_ie_compatibility',
-    
+    # public shares
+    r'^public',
+    r'^public/fingerprint',
+    r'^public/fingerprint/(?P<fingerprint_id>[^/]+)'    
 )
 
 #Set session idle timeout (seconds)
@@ -501,6 +505,7 @@ CACHES = {
 
 JOHNNY_MIDDLEWARE_KEY_PREFIX='emif_'
 
-
+PUBLIC_LINK_MAX_VIEWS = 5; # number of views
+PUBLIC_LINK_MAX_TIME = 10; # hours
 
 

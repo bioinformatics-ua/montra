@@ -258,6 +258,9 @@ urlpatterns = patterns('',
 
     # Literature URLs
     url(r'literature/', include('literature.urls')),
+
+    # Public links URLs
+    url(r'public/', include('public.urls')),
 )
 
 if settings.DEBUG:
