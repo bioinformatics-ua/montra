@@ -75,7 +75,7 @@ DATABASE_PATH_SQLITE3 = "emif.db"
 if not DEBUG:
     DATABASE_PATH_SQLITE3 = PROJECT_DIR_ROOT + "emif/" + DATABASE_PATH_SQLITE3
 
-DATABASES = {
+'''DATABASES = {
     'default': {
     'ENGINE': 'django.db.backends.sqlite3', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
     'NAME': DATABASE_PATH_SQLITE3,                      # Or path to database file if using sqlite3.
@@ -85,23 +85,23 @@ DATABASES = {
     'PORT': '',                      # Set to empty string for default. Not used with sqlite3.
     }
 }
-
-#DATABASES = {
-#    'default': {
-#        #        'ENGINE': 'django.db.backends.mysql', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
-#        'ENGINE': 'django.db.backends.postgresql_psycopg2', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
-#        'NAME': 'emif_dev', # Or path to database file if using sqlite3.
-#        'USER': 'postgres', # Not used with sqlite3.
-#        'PASSWORD': 'admin', # Not used with sqlite3.
-#        'HOST': 'localhost', # Set to empty string for localhost. Not used with sqlite3.
-#        'PORT': '', # Set to empty string for default. Not used with sqlite3.
-#        'AUTOCOMMIT': True,
-#        'autocommit': True,
-#        'OPTIONS': {
-#            'autocommit': True,
-#        },
-#    },
-#}
+'''
+DATABASES = {
+    'default': {
+        #        'ENGINE': 'django.db.backends.mysql', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
+        'ENGINE': 'django.db.backends.postgresql_psycopg2', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
+        'NAME': 'emif_dev', # Or path to database file if using sqlite3.
+        'USER': 'ribeiro', # Not used with sqlite3.
+        'PASSWORD': '', # Not used with sqlite3.
+        'HOST': 'localhost', # Set to empty string for localhost. Not used with sqlite3.
+        'PORT': '', # Set to empty string for default. Not used with sqlite3.
+        'AUTOCOMMIT': True,
+        'autocommit': True,
+        'OPTIONS': {
+            'autocommit': True,
+        },
+    },
+}
 
 # Hosts/domain names that are valid for this site; required if DEBUG is False
 # See https://docs.djangoproject.com/en/1.4/ref/settings/#allowed-hosts
@@ -166,6 +166,7 @@ STATICFILES_DIRS = (
     os.path.abspath(PROJECT_DIR_ROOT + MIDDLE_DIR + 'population_characteristics/static'),
     os.path.abspath(PROJECT_DIR_ROOT + MIDDLE_DIR + 'literature/static'),
     os.path.abspath(PROJECT_DIR_ROOT + MIDDLE_DIR + 'docs_manager/static'),
+    os.path.abspath(PROJECT_DIR_ROOT + MIDDLE_DIR + 'public/static'),
 )
 
 # List of finder classes that know how to find static files in
@@ -274,6 +275,8 @@ INSTALLED_APPS = (
     'django_nvd3',
     #'djangobower',
 
+    # public links
+    'public',
 )
 
 # Userena settings
@@ -428,9 +431,7 @@ LOGIN_EXEMPT_URLS = (
     r'^delete-questionnaire',
     r'^bootstrap_ie_compatibility',
     # public shares
-    r'^public',
-    r'^public/fingerprint',
-    r'^public/fingerprint/(?P<fingerprint_id>[^/]+)'    
+    r'^public/fingerprint/(?P<fingerprint_id>[^/]+)',  
 )
 
 #Set session idle timeout (seconds)

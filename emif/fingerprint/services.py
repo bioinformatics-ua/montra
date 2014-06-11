@@ -6,7 +6,6 @@ from searchengine.search_indexes import generateFreeText, setProperFields, CoreE
 
 from django.utils import timezone    
 
-
 def saveFingerprintAnswers(qlist_general, fingerprint_id, questionnaire, user, extra_fields=None, created_date=None):
 
     # Update or create fingerprint entry
@@ -317,3 +316,16 @@ def unique_users_string(fingerprint):
         users_string+= ' \\ ' + users[i]
 
     return users_string
+
+def findName(fingerprint):
+    name = ""
+    try:
+        name_ans = Answer.objects.get(question__slug_fk__slug1='database_name', fingerprint_id=fingerprint) 
+
+        name = name_ans.data
+
+    except Answer.DoesNotExist:
+        name ="Unnamed"
+
+    return name
+

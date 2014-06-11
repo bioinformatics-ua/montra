@@ -24,6 +24,9 @@ from fingerprint.models import Fingerprint
 
 class PublicFingerprintShare(models.Model):
     fingerprint = models.ForeignKey(Fingerprint)
-    user = models.ForeignKey(user)
+    user = models.ForeignKey(User)
+    hash = models.CharField(max_length=255, blank=False, null=False)
     expiration_date = models.DateTimeField()
     remaining_views = models.IntegerField()
+    def __str__(self):
+        return str(self.expiration_date)

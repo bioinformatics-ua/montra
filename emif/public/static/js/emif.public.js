@@ -1,3 +1,4 @@
+/*
 # -*- coding: utf-8 -*-
 # Copyright (C) 2014 Ricardo F. Gonçalves Ribeiro and Universidade de Aveiro
 #
@@ -15,19 +16,10 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-#
-from django.conf.urls.defaults import *
-from views import *
+#*/
 
-urlpatterns = patterns('',
-   
-    # Public database info view
-    url(r'^fingerprint/(?P<fingerprint_id>[^/]+)$', 'public.views.fingerprint'),  
-    
-    # Public links create new
-    url(r'^fingerprint/create/(?P<fingerprint_id>[^/]+)$', 'public.views.fingerprint_create'),   
-    url(r'^fingerprint/delete/(?P<share_id>[^/]+)$', 'public.views.fingerprint_delete'),  
+$(function(){
 
-    # Public links listing
-    url(r'^fingerprint$', 'public.views.fingerprint_list'),   
-)
+    $(".alert").alert();
+
+});

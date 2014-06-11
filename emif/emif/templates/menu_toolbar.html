@@ -23,6 +23,23 @@
         Detailed
       </a>
       {% endif %}
+      {% if create_public and own_dbs|length > 0 %}
+        <div class="btn-group">
+        <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
+          Create Public Link
+          <span class="caret"></span>
+        </a>
+        <ul class="dropdown-menu">
+          {% for fg in own_dbs %}
+            <li>
+              <a href="public/fingerprint/create/{{fg.fingerprint}}">{{fg.name}}</a>
+            </li>
+          {% endfor %}
+          
+        </ul>
+        </div>
+      {% endif %}
+
       {% if add_databases or not hide_add %}
 	      <div class="btn btn-group">
         <a class="btn dropdown-toggle" data-toggle="dropdown" href="#" id="add_list_toolbar">
