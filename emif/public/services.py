@@ -21,16 +21,19 @@ from fingerprint.models import Fingerprint
 
 from public.models import PublicFingerprintShare
 from django.utils import timezone
-from datetime import timedelta
+from datetime import timedelta, date
 
 from emif.settings import PUBLIC_LINK_MAX_VIEWS, PUBLIC_LINK_MAX_TIME
+import uuid
 
 def createFingerprintShare(fingerprint_id, user):
     try: 
         fingerprint = Fingerprint.objects.get(fingerprint_hash=fingerprint_id)
         expiration_date = timezone.now() + timedelta(hours=PUBLIC_LINK_MAX_TIME)
 
-        new_share = PublicFingerprintShare(fingerprint=fingerprint, user=user, expiration_date=expiration_date, remaining_views=PUBLIC_LINK_MAX_VIEWS)
+        new_share = PublicFingerprintShare(fingerprint=fingerprint, user=user, 
+            hash=uuid.uuid4(),
+            expiration_date=expiration_date, remaining_views=PUBLIC_LINK_MAX_VIEWS)
 
         new_share.save()
 
@@ -51,3 +54,15 @@ def deleteFingerprintShare(share_id):
         print "Impossible to delete a share that doesn't exist"
 
     return False   
+
+def shouldDelete(fingerprintshare):
+
+    if fingerprintshare.remaining_views <= 0:
+        print "No more views remaining"
+        return True
+
+    if timezone.now() > fingerprintshare.expiration_date:
+        print "Time of share is up"
+        return True
+
+    return False

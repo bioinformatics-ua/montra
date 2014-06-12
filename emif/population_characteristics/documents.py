@@ -130,7 +130,7 @@ def single_qset_view(request, runcode, qsid, template_name='fingerprint_qs.html'
     
     return render(request, template_name,{'request': request, 'qset': qset})   
 
-def document_form_view(request, runcode, qs, activetab='summary',
+def document_form_view(request, runcode, qs, activetab='summary', readOnly=False,
     template_name='documents_upload_form.html'):
     
     h = None
@@ -190,6 +190,7 @@ def document_form_view(request, runcode, qs, activetab='summary',
                     'search_old': query_old,
                     'isAdvanced': isAdvanced,
                     'activetab': activetab,
+                    'readOnly': readOnly,
                     })
 
 

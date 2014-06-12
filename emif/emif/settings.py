@@ -506,7 +506,7 @@ CACHES = {
 
 JOHNNY_MIDDLEWARE_KEY_PREFIX='emif_'
 
-PUBLIC_LINK_MAX_VIEWS = 5; # number of views
-PUBLIC_LINK_MAX_TIME = 10; # hours
+PUBLIC_LINK_MAX_VIEWS = 50; # number of views
+PUBLIC_LINK_MAX_TIME = 24; # hours
 
 

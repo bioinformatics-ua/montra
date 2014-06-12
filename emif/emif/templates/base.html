@@ -97,6 +97,7 @@
                             <span class="icon-bar"></span>
                             </a>
                             <a class="brand" href="">EMIF Catalogue</a>
+                            {% if not readOnly %}
                             <div class="nav-collapse collapse">
                                 {% if request.user.is_authenticated %}
                                 <ul class="nav" style="margin-right: 0 !important;">
@@ -272,6 +273,8 @@
                                 </ul>
                             </div>
                             {% endblock %}
+                            {% endif %}
+
                             <!--/.nav-collapse -->
                         </div>
                     </div>

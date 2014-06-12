@@ -22,7 +22,7 @@ from views import *
 urlpatterns = patterns('',
    
     # Public database info view
-    url(r'^fingerprint/(?P<fingerprint_id>[^/]+)$', 'public.views.fingerprint'),  
+    url(r'^fingerprint/(?P<fingerprintshare_id>[^/]+)$', 'public.views.fingerprint'),  
     
     # Public links create new
     url(r'^fingerprint/create/(?P<fingerprint_id>[^/]+)$', 'public.views.fingerprint_create'),   

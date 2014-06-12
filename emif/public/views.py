@@ -27,9 +27,15 @@ from django.http import *
 from public.models import *
 from fingerprint.models import Answer
 from fingerprint.services import findName
-from public.services import createFingerprintShare, deleteFingerprintShare
+from public.services import createFingerprintShare, deleteFingerprintShare, shouldDelete
+from django.http import Http404 
+
+from population_characteristics.documents import document_form_view
 
 def fingerprint_list(request, template_name='fingerprints.html', added=False):
+
+    if not request.user.is_authenticated():
+        raise Http404
 
     alink = request.session.get('created_public_link')
     dlink = request.session.get('deleted_public_link')
@@ -49,7 +55,15 @@ def fingerprint_list(request, template_name='fingerprints.html', added=False):
     # This is a bother, must find names since they are not readily available anywhere... I reiterate i think the name
     # should be linked somehow to the fingerprint object directly...
     for link in links_query:
+        remove = shouldDelete(link)
+
+        if remove:
+            link.delete()
+            continue
+
         this_fingerprint = link.fingerprint
+
+
 
         linkedfingerprints.append(this_fingerprint.id)
 
@@ -70,11 +84,31 @@ def fingerprint_list(request, template_name='fingerprints.html', added=False):
     return render(request, template_name, {'request': request, 'links': links, 'create_public': True, 
         'own_dbs': intersection_wnames, 'hide_add': True, 'breadcrumb': True, 'added': alink, 'deleted': dlink})
 
-def fingerprint(request, fingerprint_id, template_name='fingerprint_summary.html'):
+def fingerprint(request, fingerprintshare_id, template_name='fingerprint_summary.html'):
 
-    return render(request, template_name, {'request': request})
+    try:
+        fingerprintshare = PublicFingerprintShare.objects.get(hash = fingerprintshare_id)
+
+        remove = shouldDelete(fingerprintshare)
+
+        if remove:
+            fingerprintshare.delete()
+            raise Http404
+
+        fingerprintshare.remaining_views=fingerprintshare.remaining_views-1;
+
+        fingerprintshare.save()
+
+        return document_form_view(request, fingerprintshare.fingerprint.fingerprint_hash, 1, readOnly=True)
+    
+    except PublicFingerprintShare.DoesNotExist:
+        print "Fingerprint with id "+str(fingerprintshare_id) + " does not exist."
+
+    raise Http404
 
 def fingerprint_create(request, fingerprint_id):
+    if not request.user.is_authenticated():
+        raise Http404
 
     createFingerprintShare(fingerprint_id, request.user)
 
@@ -82,7 +116,9 @@ def fingerprint_create(request, fingerprint_id):
     return redirect('public.views.fingerprint_list')
 
 def fingerprint_delete(request, share_id):
-
+    if not request.user.is_authenticated():
+        raise Http404
+        
     deleteFingerprintShare(share_id)
 
     request.session['deleted_public_link'] = True
