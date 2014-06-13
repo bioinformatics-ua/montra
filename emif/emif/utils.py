@@ -413,7 +413,8 @@ escapeRules = {'+': r'\+',
                ':': r'\:',
                #'"': r'\"',
                ';': r'\;',
-               ' ': r'\ '}
+               ' ': r'\ ',
+               '"': r'\"'}
 
 def escapedSeq(term):
     """ Yield the next string based on the

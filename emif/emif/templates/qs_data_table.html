@@ -2,13 +2,13 @@
 
 
 
-<div class="dataTables_scrollBody" style="overflow-y: auto; position: relative; width: 100%; height: 470px;">
-    <table cellpadding="0" cellspacing="0" border="1" class="display dataTable table table-hover tablesorter "  data-provides="rowlink" id="table_databases" style="margin: 0px;">
+<div class="dataTables_scrollBody" style="border: 1px solid #aaaaaa; overflow-y: auto; position: relative; width: 100%; height: 470px;">
+    <table style="margin: -1px;" cellpadding="0" cellspacing="0" border="1" class="display dataTable table table-hover tablesorter "  data-provides="rowlink" id="table_databases" style="margin: 0px;">
 	<thead>
 		<tr>
-			<th class="minwidth250">{{ titles.0 }}</th>
+			<th data-pos="0" class="pos0 minwidth250">{{ titles.0 }}</th>
             {% for t in titles.1 %}
-               <th class="minwidth250" title="{{ t.tag|removehs }}">{{t.tag|truncate|removehs}} </th>
+               <th data-pos="{{forloop.counter}}" class="pos{{forloop.counter}} minwidth250 resizable" title="{{ t.tag|removehs }}">{{t.tag|truncate|removehs}} </th>
             {% endfor %}
 		</tr>
 	</thead>
@@ -36,12 +36,11 @@ $(function() {
     sortList: [[0,0],[2,0]],
 
     // hidden filter input/selects will resize the columns, so try to minimize the change
-    widthFixed : true,
+    //widthFixed : true,
 
     // initialize zebra striping and filter widgets
-    widgets: ["zebra",  'stickyHeaders', "filter"],
+    widgets: ["zebra", 'stickyHeaders', "filter"],
     widgetOptions: {
-
       // extra class name added to the sticky header row
       stickyHeaders : '',
       // number or jquery selector targeting the position:fixed element
@@ -66,6 +65,25 @@ $(function() {
     }
     
   });
+  // I also need to resize the sticky header conterpart... damn it
+  // tablesorter-stickyHeader
+  $( ".tablesorter-header" ).resizable({ handles: "e", 
+    resizableCallback: function(source, sizes){
+      console.log('Callback called ');
+      
+      var pos = source.data('pos');
+      console.log(pos);
+      if (pos !== undefined){
+        console.log('haspos');
+        $('.pos'+pos).each(function(){
+          console.log('cycle')
+          $(this).css(sizes);
+        });
+        
+      }
+    }
+  });
+
 //$("#table_databases").stickyTableHeaders({container: ".dataTables_scrollBody"});
 
 	

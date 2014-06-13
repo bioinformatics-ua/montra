@@ -1,0 +1,23 @@
+{% extends 'common_email.html' %}
+
+{% load i18n %}{% autoescape off %}{% load url from future %}
+
+{% block email_content %}
+
+{% if not without_usernames %}{% blocktrans with user.username as username %}Dear {{ username }},{% endblocktrans %}<br /><br />
+{% endif %}
+{% blocktrans with site.name as site %}Thank you for signing up at {{ site }}.{% endblocktrans %}<br /><br />
+
+{% trans "An administrator has to approve your registration." %}<br /><br />
+
+{% trans "When your account is activated, you will receive an email." %}<br /><br />
+
+{% trans "Thanks for using our site!" %}<br /><br />
+
+{% trans "Sincerely" %},<br />
+{{ site.name }}<br />
+
+
+{% endblock %}
+
+{% endautoescape %}
