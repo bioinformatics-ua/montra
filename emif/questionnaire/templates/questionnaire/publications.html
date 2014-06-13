@@ -37,10 +37,14 @@
         <label class="control-label span2">Authors:</label>
         <input class="span5" type="text" id="question_{{ question.number|removedots }}_pubauthors" />    
     </div>
-
+    <div style="margin-left: 30px;" class="control-group span12 url_validator" id='url_validator_{{question.number}}'>
+        <label class="control-label span2">Url:</label>
+        <input class="span5" type="text" name="question_{{ question.number }}_publink" id="question_{{ question.number }}_publink" /><br />
+        <label class="control-label span2"> </label>
+        <span class="help-inline"></span>    
+    </div>
     <div class="span12" >
         <span class="help-inline">* required fields, and the authors should be with last name initials</span>
-
     </div>
     
     <div class="control-group span12" style="padding-top:10px;">
@@ -59,7 +63,7 @@
     </div>
     <div class="control-group span8">
 
-    <table style="width: 96%; font-size: 90%;" id="question_{{ question.number|removedots }}_table" class="table table-hover">
+    <table style="width: 96%; font-size: 85%;" id="question_{{ question.number|removedots }}_table" class="table table-hover">
         <thead>
             <tr>
 
@@ -71,7 +75,7 @@
               <th>Volume</th>
               <th>Pages</th>
               <th>Authors</th>
-              
+              <th>Link</th>
             </tr>
         </thead>
 
@@ -119,7 +123,7 @@ function PublicationWidget ()
         $('#question_{{ question.number|removedots }}_pubvolume').val("");   
         $('#question_{{ question.number|removedots }}_pubpages').val(""); 
         $('#question_{{ question.number|removedots }}_pubauthors').val(""); 
-        $('#question_{{ question.number|removedots }}_publink').val(""); 
+        $('[id="question_{{ question.number }}_publink"]').val(""); 
     }
 
     this.updateInformationFromPubMed = function()
@@ -140,7 +144,7 @@ function PublicationWidget ()
         $('#question_{{ question.number|removedots }}_pubvolume').val(information['volume']);  
         $('#question_{{ question.number|removedots }}_pubpages').val(information['pages']);  
         $('#question_{{ question.number|removedots }}_pubauthors').val(information['authors']);  
-        $('#question_{{ question.number|removedots }}_publink').val(information['pubmed_url']);
+        $('[id="question_{{ question.number }}_publink"]').val(information['pubmed_url']);
     };
 
     this.bindElements = function() 
@@ -172,7 +176,7 @@ function PublicationWidget ()
                 $('#question_{{ question.number|removedots }}_pubvolume').val(''); 
                 $('#question_{{ question.number|removedots }}_pubpages').val(''); 
                 $('#question_{{ question.number|removedots }}_pubauthors').val(''); 
-                $('#question_{{ question.number|removedots }}_publink').val(''); 
+                $('[id="question_{{ question.number }}_publink"]').val(''); 
                 $('[id*="pub_"]').removeClass('success');
                 selected_row = null;
         });
@@ -219,7 +223,7 @@ function PublicationWidget ()
             }
         });
     };
-    this.isUpdate = function(pubmedid, pubtitle, pubjournal, pubyear, pubauthors) {
+    this.isUpdate = function(pubmedid, pubtitle, pubjournal, pubyear, pubauthors, publink) {
         var _aux = document.getElementById("question_{{ question.number }}").value;
         //console.log(_aux);
 
@@ -250,7 +254,7 @@ function PublicationWidget ()
         }
         return false;
     }
-    this.validate_form = function(pubmedid, pubtitle, pubjournal, pubyear, pubauthors) {
+    this.validate_form = function(pubmedid, pubtitle, pubjournal, pubyear, pubauthors, publink) {
         pw{{ question.number|removedots }}.saveInformation();   
         // The pubmed id is not really necessary. It is because might be publications
         // without pubmed id, right? That's the reason I'm uncommenting.
@@ -270,6 +274,12 @@ function PublicationWidget ()
         //if(pubauthors.length == 0)
         //    return false;
 
+        var url_validator = /^(?:(?:https?|ftp):\/\/)(?:\S+(?::\S*)?@)?(?:(?!10(?:\.\d{1,3}){3})(?!127(?:\.\d{1,3}){3})(?!169\.254(?:\.\d{1,3}){2})(?!192\.168(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z\u00a1-\uffff0-9]+-?)*[a-z\u00a1-\uffff0-9]+)(?:\.(?:[a-z\u00a1-\uffff0-9]+-?)*[a-z\u00a1-\uffff0-9]+)*(?:\.(?:[a-z\u00a1-\uffff]{2,})))(?::\d{2,5})?(?:\/[^\s]*)?$/i;
+
+        if(!(publink.trim() == '' || url_validator.test(publink))){
+            return false
+        }
+
         return true;
     }
 
@@ -282,13 +292,14 @@ function PublicationWidget ()
         var _pubvolume = cleanUp($('#question_{{ question.number|removedots }}_pubvolume').val());  
         var _pubpages = cleanUp($('#question_{{ question.number|removedots }}_pubpages').val());  
         var _pubauthors = cleanUp($('#question_{{ question.number|removedots }}_pubauthors').val());  
-        var _publink = cleanUp($('#question_{{ question.number|removedots }}_publink').val());  
+        var _publink = cleanUp($('[id="question_{{ question.number }}_publink"]').val());  
 
-        if( !pw{{ question.number|removedots }}.validate_form(_pubmedid, _pubtitle, _pubjournal, _pubyear, _pubauthors) ){
+        if( !pw{{ question.number|removedots }}.validate_form(_pubmedid, _pubtitle, _pubjournal, _pubyear, _pubauthors, _publink) ){
+            alert('Error validating publication. You must fill the mandatory fields.');
             return;
         }
         //selected_row != null && $('#'+selected_row).length !== 0 
-        if(pw{{ question.number|removedots }}.isUpdate(_pubmedid, _pubtitle, _pubjournal, _pubyear, _pubauthors)){  
+        if(pw{{ question.number|removedots }}.isUpdate(_pubmedid, _pubtitle, _pubjournal, _pubyear, _pubauthors, _publink)){  
             console.log('updating');
             var children = $('#'+selected_row).children();
 
@@ -298,6 +309,7 @@ function PublicationWidget ()
             $(children[5]).text(_pubvolume);
             $(children[6]).text(_pubpages);
             $(children[7]).text(_pubauthors);
+            $(children[8]).html('<a href="'+_publink+'">Link</a>');
 
         } else {
 
@@ -305,7 +317,14 @@ function PublicationWidget ()
                 if (!(typeof formHasChanged === 'undefined')) {
                 formHasChanged = true;
             }
-            $('#question_{{ question.number|removedots }}_table > tbody:last').append('<tr id="pub_'+publications_counter+'"><td {% if readonly %} style="display: none;" {% endif %}><a class="deleteLink" href="#" ><img src="static/img/glyphicons_192_circle_remove.png"/></a></td><td class="selectable">'+_pubmedid+'</td><td class="selectable">'+_pubtitle+'</td><td class="selectable">'+_pubjournal+'</td><td class="selectable">'+_pubyear+'</td><td class="selectable">'+_pubvolume+'</td><td class="selectable">'+_pubpages+'</td><td class="selectable">'+_pubauthors+'</td></tr>');
+                var returnable = '<tr id="pub_'+publications_counter+'"><td {% if readonly %} style="display: none;" {% endif %}><a class="deleteLink" href="#" ><img src="static/img/glyphicons_192_circle_remove.png"/></a></td><td>'+_pubmedid+'</td><td class="selectable">'+_pubtitle+'</td><td class="selectable">'+_pubjournal+'</td><td class="selectable">'+_pubyear+'</td><td class="selectable">'+_pubvolume+'</td><td class="selectable">'+_pubpages+'</td><td class="selectable">'+_pubauthors+'</td>';
+                if(_publink){
+                    returnable+='<td class="link_pubmed"><a href="'+_publink+'">Link</a></td>';
+                } else {
+                    returnable+='<td class="selectable"></td>';
+                }
+                returnable += '</tr>';            
+            $('#question_{{ question.number|removedots }}_table > tbody:last').append(returnable);
 
             // Add to boolean container if possible
             if (!(typeof bool_container === 'undefined')) {
@@ -338,12 +357,11 @@ function PublicationWidget ()
                     return false;
                     
             });
-            setEvents();
-
-            pw{{ question.number|removedots }}.saveInformation();
-            refreshSelection('pub_'+publications_counter);
-
         }
+        setEvents();
+
+        pw{{ question.number|removedots }}.saveInformation();
+        refreshSelection('pub_'+publications_counter);
     };
     function setEvents(){
           $('.selectable').click(function(e){
@@ -363,6 +381,12 @@ function PublicationWidget ()
             $('[id="question_{{ question.number|removedots }}_pubvolume"]').val(children[5].textContent);
             $('[id="question_{{ question.number|removedots }}_pubpages"]').val(children[6].textContent);
             $('[id="question_{{ question.number|removedots }}_pubauthors"]').val(children[7].textContent);
+
+            try{
+                $('[id="question_{{ question.number }}_publink"]').val($(children[8]).find('a').get(0).href);
+            } catch(except){
+                $('[id="question_{{ question.number }}_publink"]').val('');
+            }
         });      
     }
     function refreshSelection(selected){
@@ -420,11 +444,18 @@ function PublicationWidget ()
             var _pubpages = cleanUp(_objs[i]['pages']);
             var _pubauthors = cleanUp(_objs[i]['authors']);
 
-            var _publink = _objs[i]['link'];
+            var _publink = cleanUp(_objs[i]['link']);
 
             if(_pubtitle != undefined){
                 publications_counter++;
-                 $('#question_{{ question.number|removedots }}_table > tbody:last').append('<tr id="pub_'+publications_counter+'"><td {% if readonly %} style="display: none;" {% endif %}><a class="deleteLink" href="#" ><img src="static/img/glyphicons_192_circle_remove.png"/></a></td><td>'+_pubmedid+'</td><td class="selectable">'+_pubtitle+'</td><td class="selectable">'+_pubjournal+'</td><td class="selectable">'+_pubyear+'</td><td class="selectable">'+_pubvolume+'</td><td class="selectable">'+_pubpages+'</td><td class="selectable">'+_pubauthors+'</td><td class="selectable">'+_publink+'</td></tr>'); 
+                var returnable = '<tr id="pub_'+publications_counter+'"><td {% if readonly %} style="display: none;" {% endif %}><a class="deleteLink" href="#" ><img src="static/img/glyphicons_192_circle_remove.png"/></a></td><td>'+_pubmedid+'</td><td class="selectable">'+_pubtitle+'</td><td class="selectable">'+_pubjournal+'</td><td class="selectable">'+_pubyear+'</td><td class="selectable">'+_pubvolume+'</td><td class="selectable">'+_pubpages+'</td><td class="selectable">'+_pubauthors+'</td>';
+                if(_publink){
+                    returnable+='<td class="link_pubmed"><a href="'+_publink+'">Link</a></td>';
+                } else {
+                    returnable+='<td class="selectable"></td>';
+                }
+                returnable += '</tr>';
+                 $('#question_{{ question.number|removedots }}_table > tbody:last').append(returnable); 
             }
 
         }
@@ -472,7 +503,7 @@ function PublicationWidget ()
                 $('#question_{{ question.number|removedots }}_pubvolume').val(information['volume']);  
                 $('#question_{{ question.number|removedots }}_pubpages').val(information['pages']);  
                 $('#question_{{ question.number|removedots }}_pubauthors').val(information['authors']);  
-                $('#question_{{ question.number|removedots }}_publink').val(information['pubmed_url']);
+                $('[id="question_{{ question.number }}_publink"]').val(information['pubmed_url']);
             }
 
         });
@@ -491,6 +522,7 @@ function PublicationWidget ()
             _aux = _aux.replace('<td>', '');
 
             _aux2 = _aux.split("</td>");
+            console.log(_aux);
             _pub = {}
             for (var i = 1 ; i<_aux2.length; i++)
             {
@@ -527,7 +559,16 @@ function PublicationWidget ()
                 }
                 else if (i==8)
                 {
-                    _pub['link'] = _aux2[i];    
+                    var publi;
+                    try {
+                        console.log(_aux2[i]);
+                        publi = $(_aux2[i]).find('a').get(0).href;
+                    } catch(except){
+                        publi="";
+                    }
+                    console.log(publi);
+
+                    _pub['link'] = publi;    
                 }
             }
             result.push(_pub); 
