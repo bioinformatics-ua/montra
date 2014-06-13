@@ -555,7 +555,7 @@ class NotifyOwnerView(APIView):
             if fingerprint_id != '' and owner != '' and comment != '' and user_commented != '':
 
                 try:
-                    this_user = User.objects.get(email__exact=owner)
+                    this_user = User.objects.get(username__exact=owner)
 
 
                     user_fullname = None
