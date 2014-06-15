@@ -1,0 +1,14 @@
+{% load extra_tags %}
+
+Dear {{owner}}, <br /><br />
+
+You've just received the following new comment on your database <a href="{{base_url}}/fingerprint/{{fingerprint_id}}/1/">{{fingerprint_name}}</a>, in the EMIF Catalogue.
+<blockquote>
+  <p style="text-align:justify;
+text-justify:inter-word;">{{comment}}</p>
+  <small>By {{user_commented}}</small>
+</blockquote>
+To check the discussion section on your database, please click <a href="{{base_url}}/fingerprint/{{fingerprint_id}}/1/discussion">here</a>
+                            
+                            
+                            
