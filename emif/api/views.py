@@ -64,6 +64,10 @@ from docs_manager.models import *
 import os
 import mimetypes
 
+from django.template.loader import render_to_string
+
+from emif.utils import send_custom_mail
+
 class JSONResponse(HttpResponse):
     """
     An HttpResponse that renders it's content into JSON.
@@ -529,6 +533,55 @@ class PopulationView(APIView):
         """
         pass
 
+##############################################################
+##### Notify owner about comment on discussion - Web services
+##############################################################
+
+
+class NotifyOwnerView(APIView):
+
+    authentication_classes = (SessionAuthentication, BasicAuthentication)
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request, *args, **kw):
+        if request.user.is_authenticated():
+            # first we get the email parameter
+            fingerprint_id = request.POST.get('fingerprint_id', '')
+            fingerprint_name = request.POST.get('fingerprint_name', '')
+            owner = request.POST.get('owner', '')
+            comment = request.POST.get('comment', '')
+            user_commented = request.POST.get('user_commented', '')
+
+            if fingerprint_id != '' and owner != '' and comment != '' and user_commented != '':
+
+                try:
+                    this_user = User.objects.get(username__exact=owner)
+
+
+                    user_fullname = None
+                    if(this_user.first_name != '' and this_user.last_name != ''):
+                        user_fullname = this_user.first_name + ' ' + this_user.last_name
+                    else:
+                        user_fullname = this_user.username
+
+                    send_custom_mail('Emif Catalogue: There\'s a new comment on one of your databases',
+                     render_to_string('emails/new_db_comment.html', {
+                            'fingerprint_id': fingerprint_id,
+                            'fingerprint_name': fingerprint_name,
+                            'owner': user_fullname,
+                            'comment': comment,
+                            'base_url': settings.BASE_URL,
+                            'user_commented': user_commented
+                        }), 
+                     settings.DEFAULT_FROM_EMAIL, [owner]);
+
+                    return Response({}, status=status.HTTP_200_OK)
+
+                except User.DoesNotExist:
+                    print "Tried to send email to invalid user "+str(owner)
+                    pass
+
+        return Response({}, status=status.HTTP_400_BAD_REQUEST)
 
 ############################################################
 ############ Auxiliar functions ############################
