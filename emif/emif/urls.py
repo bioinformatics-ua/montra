@@ -260,7 +260,7 @@ urlpatterns = patterns('',
     url(r'literature/', include('literature.urls')),
 
     # AdvancedSearch URLs
-    url(r'advancedsearch/', include('advancedsearch.urls')),
+    url(r'advsearch/', include('advancedsearch.urls')),
 )
 
 if settings.DEBUG:

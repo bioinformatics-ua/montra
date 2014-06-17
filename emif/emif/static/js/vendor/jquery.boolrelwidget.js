@@ -25,7 +25,8 @@
             view_only: false,
             view_serialized_string: null,
             help: null,
-            link_back: null
+            link_back: null,
+            inplace: false
         }, options);
 
         var funcs = {
@@ -50,9 +51,6 @@
                         mastergroup = new BooleanGroup(sliced.copy());
                     else mastergroup.addById(mastergroup.id, sliced.copy(), settings.default_relation);
                 }
-                console.error("--dsd");
-                console.error(used_blocks);
-                console.error("--dsd");
 
                 this.draw();
 
@@ -250,14 +248,14 @@
                     }
 
                     if (little_boxes.length == 0) {
-                        $('#boolrelwidget-basicblocks').html("This box shows unused terms that have a value filled but are not being used on the query (when any).");
+                        $('#boolrelwidget-basicblocks', self).html("This box shows unused terms that have a value filled but are not being used on the query (when any).");
                     } else {
-                        $('#boolrelwidget-basicblocks').html(little_boxes.join(''));
+                        $('#boolrelwidget-basicblocks', self).html(little_boxes.join(''));
                         // Make them draggable
 
                         if (!settings.view_only) {
                             // Clone makes ie7 crash and burn
-                            $(".boolrelwidget-block-inner").draggable({
+                            $(".boolrelwidget-block-inner", self).draggable({
                                 containment: "#boolrelwidget-panel",
                                 revert: true,
                                 opacity: 0.9,
@@ -271,7 +269,7 @@
                         }
                     }
                 } else {
-                    $('#boolrelwidget-basicblocks-out').fadeOut('fast');
+                    $('#boolrelwidget-basicblocks-out', self).fadeOut('fast');
                 }
 
                 // Drawing query itself(if any already)                
@@ -280,14 +278,14 @@
                     var i = 0;
                     this.harvest(mastergroup, big_box, 0);
 
-                    $('#boolrelwidget-query').html(big_box.join(''));
+                    $('#boolrelwidget-query', self).html(big_box.join(''));
 
                     var master = this;
                     if (!settings.view_only) {
-                        $(".boolrelwidget-query-dropper").droppable({
+                        $(".boolrelwidget-query-dropper", self).droppable({
                             hoverClass: "boolrelwidget-query-hover",
                             drop: function(event, ui) {
-                                $(".boolrelwidget-query-dropper").tooltip('disable');
+                                $(".boolrelwidget-query-dropper", self).tooltip('disable');
                                 var drag = ui.draggable.attr('id');
                                 // If coming from basic blocks
                                 if (typeof drag != 'undefined' && drag.lastIndexOf('boolrelwidget-bb-', 0) === 0) {
@@ -321,13 +319,13 @@
                                     }
 
                                 }
-                                $(".tooltip").remove();
+                                $(".tooltip", self).remove();
 
                                 master.draw();
 
                             }
                         });
-                        $(".boolrelwidget-query-dropper").tooltip({
+                        $(".boolrelwidget-query-dropper", self).tooltip({
                             container: 'body',
                             delay: {
                                 show: 500,
@@ -339,7 +337,7 @@
                     /* Firefox has a problem with the container if its not cloned ... */
                     if (!settings.view_only) {
                         if (navigator.userAgent.indexOf("Firefox") != -1) {
-                            $(".boolrelwidget-query-box > .boolrelwidget-simple").parent().draggable({
+                            $(".boolrelwidget-query-box > .boolrelwidget-simple", self).parent().draggable({
                                 containment: "#boolrelwidget-panel",
                                 revert: true,
                                 opacity: 0.9,
@@ -351,7 +349,7 @@
                                 helper: 'clone'
                             });
                         } else {
-                            $(".boolrelwidget-query-box > .boolrelwidget-simple").parent().draggable({
+                            $(".boolrelwidget-query-box > .boolrelwidget-simple", self).parent().draggable({
                                 containment: "#boolrelwidget-panel",
                                 revert: true,
                                 opacity: 0.9,
@@ -365,7 +363,7 @@
                     }
 
                     // Add 
-                    $(".boolrelwidget-query-delete").click(function() {
+                    $(".boolrelwidget-query-delete", self).click(function() {
                         var removed = Number($(this).attr('id').replace('boolrelwidget-dl-', ''));
 
                         var removed_bool = mastergroup.removeById(removed);
@@ -386,7 +384,7 @@
                         }
                         master.draw();
                     });
-                    $(".boolrelwidget-select").change(function() {
+                    $(".boolrelwidget-select", self).change(function() {
                         console.log(mastergroup);
 
                         var changed = $(this).attr('id').replace('boolrelwidget-query-sl-', '');
@@ -402,21 +400,21 @@
                             console.error('Impossible to select correctly a relation');
                         }
                     });
-                    $(".boolrelwidget-collapser").click(function() {
+                    $(".boolrelwidget-collapser", self).click(function() {
 
                         var collapsing = Number($(this).attr('id').replace('boolrelwidget-cl-', ''));
                         if ($(this).hasClass("boolrelwidget-collapsed")) {
                             $(this).removeClass('boolrelwidget-collapsed');
                             $(this).addClass('boolrelwidget-expanded');
                             $(this).html('<i class="icon-zoom-in"></i>Expand');
-                            $("#" + $(this).parent().attr('id') + ' > .boolrelwidget-expandable').fadeOut('fast');
+                            $("#" + $(this).parent().attr('id') + ' > .boolrelwidget-expandable', self).fadeOut('fast');
                             master.removeExpandedContainer($(this).parent().attr('id'));
                         } else {
                             $(this).removeClass('boolrelwidget-expanded');
                             $(this).addClass('boolrelwidget-collapsed');
                             $(this).html('<i class="icon-zoom-out"></i> Collapse');
-                            $("#" + $(this).parent().attr('id') + ' > .boolrelwidget-expandable').fadeIn('fast');
-                            $("#" + $(this).parent().attr('id') + ' > .boolrelwidget-expandable').css("display", "table-cell");
+                            $("#" + $(this).parent().attr('id') + ' > .boolrelwidget-expandable', self).fadeIn('fast');
+                            $("#" + $(this).parent().attr('id') + ' > .boolrelwidget-expandable', self).css("display", "table-cell");
                             master.addExpandedContainer($(this).parent().attr('id'));
                         }
                     });
@@ -425,9 +423,9 @@
                 } else {
                     var master = this;
                     mastergroup = null;
-                    $('#boolrelwidget-query').html('<div class="boolrelwidget-first-droppable">' + settings.query_text + '</div>');
+                    $('#boolrelwidget-query', self).html('<div class="boolrelwidget-first-droppable">' + settings.query_text + '</div>');
                     if (!settings.view_only) {
-                        $(".boolrelwidget-first-droppable").droppable({
+                        $(".boolrelwidget-first-droppable", self).droppable({
                             hoverClass: "boolrelwidget-query-hover",
                             drop: function(event, ui) {
 
@@ -449,7 +447,7 @@
                         });
                     }
                 }
-                $(".boolrelwidget-simple").tooltip({
+                $(".boolrelwidget-simple", self).tooltip({
                     container: 'body',
                     delay: {
                         show: 500,
@@ -460,9 +458,9 @@
                 // If we have collapsing preferences, apply them
                 if (this.getCookie('boolrelwidget-collapse-preferences')) {
                     if (this.getCookie('boolrelwidget-collapse-preferences') == 'expanded') {
-                        var context = $('boolrelwidget-collapseall');
-                        $('#boolrelwidget-collapseall').text('Collapse All');
-                        $('#boolrelwidget-collapseall').addClass('boolrelwidget-all-expanded');
+                        var context = $('boolrelwidget-collapseall', self);
+                        $('#boolrelwidget-collapseall', self).text('Collapse All');
+                        $('#boolrelwidget-collapseall', self).addClass('boolrelwidget-all-expanded');
 
                         this.collapseAll(context);
                     }
@@ -662,8 +660,8 @@
 
                 if ($(context).hasClass('boolrelwidget-all-expanded')) {
 
-                    $('.boolrelwidget-expandable').fadeOut('fast');
-                    $("#" + $('.boolrelwidget-expandable').parent().attr('id') + ' > .boolrelwidget-collapser').html('<i class="icon-zoom-in"></i> Expand');
+                    $('.boolrelwidget-expandable', self).fadeOut('fast');
+                    $("#" + $('.boolrelwidget-expandable', self).parent().attr('id') + ' > .boolrelwidget-collapser').html('<i class="icon-zoom-in"></i> Expand');
 
                     $(context).text('Expand All');
                     $(context).removeClass('boolrelwidget-all-expanded');
@@ -671,8 +669,8 @@
                     funcs.setCookie('boolrelwidget-collapse-preferences', 'collapsed');
                 } else {
 
-                    $('.boolrelwidget-expandable').fadeIn('fast').css('display', 'table-cell');
-                    $("#" + $('.boolrelwidget-expandable').parent().attr('id') + ' > .boolrelwidget-collapser').html('<i class="icon-zoom-out"></i> Collapse');
+                    $('.boolrelwidget-expandable', self).fadeIn('fast').css('display', 'table-cell');
+                    $("#" + $('.boolrelwidget-expandable', self).parent().attr('id') + ' > .boolrelwidget-collapser').html('<i class="icon-zoom-out"></i> Collapse');
                     $(context).text('Collapse All');
                     $(context).addClass('boolrelwidget-all-expanded');
 
@@ -681,15 +679,15 @@
 
             },
             expandPanel: function() {
-                $('#boolrelwidget-expand').toggle();
-                $('#boolrelwidget-collapse').toggle();
-                $('#boolrelwidget-panel').toggle();
+                $('#boolrelwidget-expand', self).toggle();
+                $('#boolrelwidget-collapse', self).toggle();
+                $('#boolrelwidget-panel', self).toggle();
                 funcs.setCookie('boolrelwidget-panel-open', 'true');
             },
             collapsePanel: function() {
-                $('#boolrelwidget-expand').toggle();
-                $('#boolrelwidget-collapse').toggle();
-                $('#boolrelwidget-panel').toggle();
+                $('#boolrelwidget-expand', self).toggle();
+                $('#boolrelwidget-collapse', self).toggle();
+                $('#boolrelwidget-panel', self).toggle();
 
                 funcs.setCookie('boolrelwidget-panel-open', 'false');
             },
@@ -714,8 +712,8 @@
                     if (!this.containerExists(expanded_containers[j]))
                         expanded_containers.splice(j, 1);
                     else {
-                        $("#" + expanded_containers[j] + ' > .boolrelwidget-expandable').fadeIn('fast');
-                        $("#" + expanded_containers[j] + ' > .boolrelwidget-expandable').css("display", "table-cell");
+                        $("#" + expanded_containers[j] + ' > .boolrelwidget-expandable', self).fadeIn('fast');
+                        $("#" + expanded_containers[j] + ' > .boolrelwidget-expandable', self).css("display", "table-cell");
                     }
                 }
             },
@@ -727,11 +725,11 @@
             },
             readyToSubmit: function() {
                 if (mastergroup != null && mastergroup != 'null') {
-                    $('#boolrelwidget-boolean-representation').val(mastergroup.toQuery());
-                    $('#boolrelwidget-boolean-serialization').val(mastergroup.serialize());
+                    $('#boolrelwidget-boolean-representation', self).val(mastergroup.toQuery());
+                    $('#boolrelwidget-boolean-serialization', self).val(mastergroup.serialize());
                 } else {
-                    $('#boolrelwidget-boolean-representation').val('');
-                    $('#boolrelwidget-boolean-serialization').val('');
+                    $('#boolrelwidget-boolean-representation', self).val('');
+                    $('#boolrelwidget-boolean-serialization', self).val('');
                 }
             }
         };
@@ -744,7 +742,9 @@
         // If its a div lets prepare the widget and add functions to it
 
         // Lets style the div properly
-        self = self.addClass('boolrelwidget-container');
+        if(!settings.inplace)
+            self = self.addClass('boolrelwidget-container');
+
         // Let it be empty
         self = self.html('');
 
@@ -780,8 +780,8 @@
 
             toolbar_content += '<button id="boolrelwidget-collapseall" class="btn">Expand All</button><button class="btn" id="boolrelwidget-orall">Or All Concepts</button><button class="btn" id="boolrelwidget-andall">And All Concepts</button><button class="btn" id="boolrelwidget-clear">Reset</button></div>';
         } else {
-
-            toolbar_content += '<button onclick="window.location.replace(\'' + settings.link_back + '\'); return false;" class="pull-right btn">Refine Search</button>';
+            if(!settings.norefine)
+                toolbar_content += '<button onclick="window.location.replace(\'' + settings.link_back + '\'); return false;" class="pull-right btn">Refine Search</button>';
         }
         toolbar_content += '</div><div id="boolrelwidget-query" class="well well-small">Loading...</div></div>';
 
@@ -790,36 +790,39 @@
         self = self.append(toolbar_content);
 
         // Lets add the event handlersx
-        $('#boolrelwidget-expand').click(function() {
+        $('#boolrelwidget-expand', self).click(function() {
             funcs.expandPanel();
         });
-        $('#boolrelwidget-collapse').click(function() {
+        $('#boolrelwidget-collapse', self).click(function() {
             funcs.collapsePanel();
         });
-
-        if (funcs.getCookie('boolrelwidget-panel-open') == 'true') {
+        if (funcs.getCookie('boolrelwidget-panel-open') == 'true' || settings.inplace == true) {
             funcs.expandPanel();
         }
-        $('#boolrelwidget-search').click(function() {
+        $('#boolrelwidget-search', self).click(function() {
             funcs.readyToSubmit();
 
             $(settings.form_anchor).submit();
         });
-        $('#boolrelwidget-collapseall').click(function() {
+        $('#boolrelwidget-collapseall', self).click(function() {
             funcs.collapseAll(this);
         });
-        $('#boolrelwidget-orall').click(function() {
+        $('#boolrelwidget-orall', self).click(function() {
             funcs.opAll(BOOL['OR']);
         });
-        $('#boolrelwidget-andall').click(function() {
+        $('#boolrelwidget-andall', self).click(function() {
             funcs.opAll(BOOL['AND']);
         });
         //if (settings.hide_concepts) {
         //    $('#boolrelwidget-clear').fadeOut('fast');
         //}
-        $('#boolrelwidget-clear').click(function() {
+        $('#boolrelwidget-clear', self).click(function() {
             funcs.reset();
         });
+
+        if(settings.inplace === true){
+            $('#boolrelwidget-collapse', self).hide();
+        }
 
         if (settings.view_serialized_string) {
             var temp = new BooleanGroup(null).deserialize(settings.view_serialized_string);

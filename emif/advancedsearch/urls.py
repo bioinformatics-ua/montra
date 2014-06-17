@@ -22,5 +22,6 @@ from views import *
 urlpatterns = patterns('',
    
     # Literature tab, on database info view
-    url(r'^(history)$', 'advancedsearch.views.history'),    
+    url(r'^history$', 'advancedsearch.views.history_defer'),  
+    url(r'^history/(?P<page>[0-9]+)$', 'advancedsearch.views.history'),    
 )

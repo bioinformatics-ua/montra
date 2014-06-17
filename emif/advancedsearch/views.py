@@ -20,8 +20,37 @@
 ##
 #   See user history of queries
 ##
-def history(request, template_name='history.html'):
+from django.shortcuts import render
 
-    queries = AdvancedQuery.objects.filter(request.user)
+from emif.models import AdvancedQuery, AdvancedQueryAnswer
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
-    return render(request, template_name, {'request': request, 'queries': queries})
+def history_defer(request, template_name='history.html'):
+    return history(request, 1)
+
+def history(request, page, page_rows=10, template_name='history.html'):
+
+    queries = AdvancedQuery.objects.filter(user=request.user).order_by('-date')
+
+        ## Paginator ##
+    if(request.method == 'POST'):
+        try:
+            page_rows = int(request.POST.get('paginator_rows', 10))
+
+            request.session['paginator_rows'] = page_rows
+        except: 
+            pass
+    else:
+        try:
+            page_rows = int(request.session['paginator_rows'])
+        except:
+            pass
+    
+    myPaginator = Paginator(queries, page_rows)
+    try:
+        pager =  myPaginator.page(page)
+    except PageNotAnInteger, e:
+        pager =  myPaginator.page(1)
+    ## End Paginator ##
+
+    return render(request, template_name, {'request': request, 'queries': pager, 'page_rows':page_rows})
