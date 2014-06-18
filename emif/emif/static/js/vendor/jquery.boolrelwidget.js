@@ -725,11 +725,11 @@
             },
             readyToSubmit: function() {
                 if (mastergroup != null && mastergroup != 'null') {
-                    $('#boolrelwidget-boolean-representation', self).val(mastergroup.toQuery());
-                    $('#boolrelwidget-boolean-serialization', self).val(mastergroup.serialize());
+                    $('#boolrelwidget-boolean-representation').val(mastergroup.toQuery());
+                    $('#boolrelwidget-boolean-serialization').val(mastergroup.serialize());
                 } else {
-                    $('#boolrelwidget-boolean-representation', self).val('');
-                    $('#boolrelwidget-boolean-serialization', self).val('');
+                    $('#boolrelwidget-boolean-representation').val('');
+                    $('#boolrelwidget-boolean-serialization').val('');
                 }
             }
         };
@@ -783,7 +783,11 @@
             if(!settings.norefine)
                 toolbar_content += '<button onclick="window.location.replace(\'' + settings.link_back + '\'); return false;" class="pull-right btn">Refine Search</button>';
         }
-        toolbar_content += '</div><div id="boolrelwidget-query" class="well well-small">Loading...</div></div>';
+        if(settings.inplace){
+            toolbar_content += '</div><div id="boolrelwidget-query">Loading...</div></div>';
+        } else {
+            toolbar_content += '</div><div id="boolrelwidget-query" class="well well-small">Loading...</div></div>';
+        }
 
         toolbar_content += '<!-- Modal --><div id="boolrelwidgethelper" class="boolrelwidgethelpercontainer modal hide fade" tabindex="-1" role="dialog" aria-labelledby="boolrelwidgethelperLabel" aria-hidden="true">  <div class="modal-header">    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>    <h3 id="boolrelwidgethelperLabel">Help</h3>  </div>  <div class="boolrelwidgethelper modal-body">' + settings.help + '</div>  <div class="modal-footer">    <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button></div></div>'
 
@@ -822,6 +826,7 @@
 
         if(settings.inplace === true){
             $('#boolrelwidget-collapse', self).hide();
+            $('#boolrelwidget-panel', self).css('background-color', 'transparent');
         }
 
         if (settings.view_serialized_string) {

@@ -342,7 +342,6 @@ def results_diff(request, page=1, template_name='results_diff.html'):
                 response = HttpResponse()
                 response.status_code = 500
                 return response
-                
 
             query = convert_qvalues_to_query(qvalues, qid, qexpression)
             query = convert_query_from_boolean_widget(qexpression, qid)
@@ -355,6 +354,7 @@ def results_diff(request, page=1, template_name='results_diff.html'):
             try:
                 # we get the current user
                 this_user = User.objects.get(username = request.user)
+
                 this_query = None
 
                 this_query_hash = hashlib.sha1(qserialization).hexdigest()
@@ -366,13 +366,33 @@ def results_diff(request, page=1, template_name='results_diff.html'):
                     this_query = AdvancedQuery.objects.get(user=this_user, serialized_query_hash=this_query_hash, qid=qid)  
                     
                     print "This query is already on historic, just updating use time..."
+
+                    try:
+                        advrep = AdvancedQueryAnswer.objects.get(refquery=this_query, question="boolrelwidget-boolean-representation")
+
+                        advrep.answer = qexpression
+
+                        advrep.save()
+                    
+                    except AdvancedQueryAnswer.DoesNotExist:
+                        advrep = AdvancedQueryAnswer(refquery=this_query, question="boolrelwidget-boolean-representation", answer=qexpression)
+
+                        advrep.save()
+
                     this_query.save()
                 except AdvancedQuery.DoesNotExist:
                     # otherwise, we create it
                     print "This query is new, adding it and answers to it..."
+                    
+                    quest = None
+                    try:
+                        quest = Questionnaire.objects.get(id = qid)
+                    except Questionnaire.DoesNotExist:
+                        print "Questionnaire doesnt exist..."
+
                     this_query = AdvancedQuery(user=this_user,name=("Query on "+time.strftime("%c")),
                         serialized_query_hash=this_query_hash,
-                        serialized_query=qserialization, qid=qid)
+                        serialized_query=qserialization, qid=quest)
                     this_query.save()   
                     # and we all so insert the answers in a specific table exactly as they were on the post request to be able to put it back at a later time
                     for k, v in request.POST.items():
@@ -380,8 +400,11 @@ def results_diff(request, page=1, template_name='results_diff.html'):
                             aqa = AdvancedQueryAnswer(refquery=this_query,question=k, answer=v)
                             aqa.save()
 
+                    serialization_a = AdvancedQueryAnswer(refquery=this_query, question="boolrelwidget-boolean-representation", answer=qexpression)
+                    serialization_a.save()
+
                 request.session['query_id'] = this_query.id
-                request.session['query_type'] = this_query.qid            
+                request.session['query_type'] = this_query.qid.id         
                 
             except User.DoesNotExist:
                 return HttpResponse("Invalid username")
@@ -849,14 +872,51 @@ def render_one_questionset(request, q_id, qs_id, errors={}, aqid=None, fingerpri
 class RequestMonkeyPatch(object):
     POST = {}
 
+    GET = {}
+
+    session = {}
+
+    META = None
+
+    COOKIES = None
+
     method = POST
 
+    user = None
+
+    is_secure = False
+
+    host = None
     def __init__(self):
         self.POST = {}
 
     def get_post(self):
         return self.POST
 
+    def get_session(self):
+        return self.session
+
+    def set_session(self, session_params):
+        self.session = session_params
+
+    def set_user(self, user):
+        self.user = user
+
+    def set_meta(self, meta):
+        self.META = meta
+
+    def set_cookies(self, cookies):
+        self.COOKIES = cookies
+
+    def set_host(self, host):
+        self.host = host
+
+    # mock methods
+    def is_secure(self):
+        return False
+
+    def get_host(self):
+        return self.host
 
 def extract_answers(request2, questionnaire_id, question_set, qs_list):
 

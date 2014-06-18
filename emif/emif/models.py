@@ -26,6 +26,7 @@ from django.db.models.fields import *
 #
 from django import forms
 
+from questionnaire.models import Questionnaire
 
 class QueryLog(models.Model):
     id = AutoField(primary_key=True)
@@ -60,7 +61,18 @@ class AdvancedQuery(models.Model):
     serialized_query_hash = models.TextField(unique=False) #only unique for each user, not unique between users
     serialized_query = models.TextField(unique=False)
     date = models.DateTimeField(auto_now=True)
-    qid = models.IntegerField(unique=False, blank=False, null=False)
+    qid = models.ForeignKey(Questionnaire, unique=False, blank=False, null=False)
+
+    def has_representation(self):
+        try:
+            advrep = AdvancedQueryAnswer.objects.get(refquery=self, question="boolrelwidget-boolean-representation")
+
+            return True
+            
+        except AdvancedQueryAnswer.DoesNotExist:
+            return False
+
+
     
 class AdvancedQueryAnswer(models.Model):
     id = AutoField(primary_key=True)

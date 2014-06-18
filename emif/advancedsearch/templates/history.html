@@ -16,16 +16,23 @@
         <th>
             Query
         </th>
+        <th style="width:80px;">Date</th>
+        <th style="width:70px;">Type</th>
         <th style="width:100px;">Manage</th>
     </tr>
 </thead>
 <tbody>
 {% for query in queries%}
     <tr>
-        <td>
+        <td style="padding:0px;">
             <div id="queryhistory{{forloop.counter}}"></div>
         </td>
-        <td><a href="advancedSearch/{{query.qid}}/1/{{query.id}}" class="btn btn-block">Refine Search</a><button class="btn btn-block btn-info">Search Again</button></td>
+        <td>{{query.date|date:"Y-m-d H:i:s"}}</td>
+        <td>{{query.qid}}</td>
+        <td><a href="advancedSearch/{{query.qid.id}}/1/{{query.id}}" class="btn btn-block">Refine</a>
+        {% if query.has_representation %}
+        <a href="advsearch/results/{{query.id}}" class="btn btn-block btn-info">Results</a></td>
+        {% endif %}
     </tr>
 {% endfor %}
 </tbody>

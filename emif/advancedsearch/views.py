@@ -23,6 +23,7 @@
 from django.shortcuts import render
 
 from emif.models import AdvancedQuery, AdvancedQueryAnswer
+from emif.views import results_diff, RequestMonkeyPatch
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 def history_defer(request, template_name='history.html'):
@@ -54,3 +55,42 @@ def history(request, page, page_rows=10, template_name='history.html'):
     ## End Paginator ##
 
     return render(request, template_name, {'request': request, 'queries': pager, 'page_rows':page_rows})
+
+
+def resultsdiff_history(request, query_id, template_name='history.html'):
+
+    # monkey patch answers into query
+    request2 = RequestMonkeyPatch()
+    
+    request2.method = request.method    
+    query = None
+    try:
+        query = AdvancedQuery.objects.get(id=query_id)
+    except:
+        print '-- Error: Cant find advanced query with id '+str(query_id)
+        pass
+
+    this_answers = AdvancedQueryAnswer.objects.filter(refquery=query)
+
+    # Theres probably a better way to clone and change an httprequest, but i dont know none
+    # not could i find them, i needed to create a monkeypatch to send to the results_diff, but this monkey
+    # patch had to be like a real httprequest...
+
+    request2.get_post()['qid'] = str(query.qid.id)
+
+    request2.get_post()['boolrelwidget-boolean-serialization'] = query.serialized_query
+
+    request2.set_session(request.session)
+
+    request2.set_user(request.user)
+
+    request2.set_meta(request.META)
+
+    request2.set_cookies(request.COOKIES)
+
+    request2.set_host(request.get_host())
+
+    for answer in this_answers:
+        request2.get_post()[answer.question] = answer.answer
+
+    return results_diff(request2)

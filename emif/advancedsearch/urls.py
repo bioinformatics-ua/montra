@@ -24,4 +24,5 @@ urlpatterns = patterns('',
     # Literature tab, on database info view
     url(r'^history$', 'advancedsearch.views.history_defer'),  
     url(r'^history/(?P<page>[0-9]+)$', 'advancedsearch.views.history'),    
+    url(r'^results/(?P<query_id>[0-9]+)$', 'advancedsearch.views.resultsdiff_history'), 
 )
