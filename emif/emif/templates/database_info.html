@@ -339,10 +339,11 @@ this_row.parent().siblings().first().collapse('toggle');
         if (results > 0)
             erec.applyMasks();
 
-    var lrec = new LinkRecognizer("#qs_"+sortid+" td");
+    var lrec = new LinkRecognizer("#qs_"+sortid+" td.captioned_content");
     var results = lrec.match();
         if (results > 0)
             lrec.applyMasks();
+
 });    
 
 threads['qs_'+sortid] = null;
@@ -352,7 +353,7 @@ this.complete();
 <!-- This must be here because of dynamic code -->
 $(document).ready(function() {
 
-    bindPostCommentHandler('{{ request.user.first_name }}', '{{ request.user.last_name }}', '{{ request.user.username }}');
+        bindPostCommentHandler('{{ request.user.first_name }}', '{{ request.user.last_name }}', '{{ request.user.username }}', '{{owners}}', '{{fingerprint_id}}', '{{breadcrumb_name}}');
 //load_questionnary();
     $('.tabbable a[data-toggle="tab"]').on('shown', function (e) {
         if(e.target.textContent == 'Population Characteristics'){

@@ -753,3 +753,8 @@ height: 6em;
 
 }
 
+.link_pubmed a{
+  color: #08c !important;
+  text-decoration: none !important;
+}
+

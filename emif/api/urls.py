@@ -30,6 +30,7 @@ from api.views import StatsView
 from api.views import ValidateView
 from api.views import PublicationsView
 from api.views import PopulationView
+from api.views import NotifyOwnerView
 
 urlpatterns = patterns('api.views',
     url(r'^root/$', 'api_root'),
@@ -42,6 +43,7 @@ urlpatterns = patterns('api.views',
     url(r'^validate$', ValidateView.as_view(), name='validate'),
     url(r'^pubmed$', PublicationsView.as_view(), name='pubmed'),
     url(r'^population$', PopulationView.as_view(), name='population'),
+    url(r'^notify_owner$', NotifyOwnerView.as_view(), name='notify_owner'),
 
 )
 

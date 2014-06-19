@@ -4,15 +4,22 @@
 {% load django_bootstrap_breadcrumbs %}
 
 {% block breadcrumbs %}
-    {{ block.super }}
+  {{ block.super }}
+
+  {% if results %}
     {% breadcrumb "Search" "resultsdiff/1" %}
-{% if not isAdvanced %}
-    {% if search_old == None %}
-        {% breadcrumb "None" "" %}
-    {% else %}
-        {% breadcrumb search_old "" %}
+    {% if not isAdvanced %}
+        {% if search_old == None %}
+            {% breadcrumb "None" "" %}
+        {% else %}
+            {% breadcrumb search_old "" %}
+        {% endif %}
     {% endif %}
-{% endif %}
+  {% elif alldatabases %}
+    {% breadcrumb "All databases" "alldatabases" %}
+  {% elif databases %}
+    {% breadcrumb "Personal" "databases" %}
+  {% endif %}
 {% endblock %}
 
 
@@ -42,26 +49,12 @@
 {% endblock %}
 
 {% block toolbar %}
-{% if page_obj != None %}
-  <div class="span6">
 
-    <div class="btn-group pull-right">
-      <div class="btn-group"></div>
-      <span id="selected_databases" class="btn disabled"> <strong>Type Selected:</strong> <span id="selected_dbstype">---</span> &nbsp; &nbsp; <strong>Selected databases:</strong> <span id="selected_dbscount">0</span></span>      
-      <a id="comparabtn" class="btn "  href=""  rel="tooltip" data-container="body" data-placement="bottom" data-original-title="This allows to compare databases.<br /> It is only possible to compare databases of the same type. <br /> When a database is selected, the type is defined automatically, and databases of other types can't be choosen. <br /> To be able to select other type, you must unselect all the databases." class="help_selectresults icon-question-sign" disabled> <i  class=" icon"></i>
-        <i class="icon-retweet"></i> Compare</a>
-      <a id="comparabtnPC" class="btn "  href=""  rel="tooltip" data-container="body" data-placement="bottom" data-original-title="Compare Populations: Compare for instance the patient time across the databases."> <i  class=" icon"></i>
-        <i class="icon-retweet"></i> Compare Populations</a>
-          
-    <button type="button" class="btn" onclick="window.print();" title="Print">
-      <i class="icon-print"></i>
-    </button>
-      <a class="btn" href="geo" onclick="" ><i class="icon-globe"></i> Geolocation</a>
+  {% if page_obj != None %}
+    {% include "menu_toolbar.html" with collapse=collapseall %}
+  {% endif %}
+{% endblock %}
 
-    </div>
-  </div>
-         {% endif %}
-  {% endblock %}
 
 {% load bootstrap_pagination %}
 
@@ -73,6 +66,7 @@
   <div id="row_loading" class="row">
 
 
+  {% if results %}
     <div class="span12 clearboth" style="text-align:center">
       <div class="navbar" id="loading">
         <div class="navbar-inner">
@@ -91,6 +85,7 @@
         </div>
       </div>
     </div>
+    {% endif %}
     </div>
     {% if page_obj != None %}
     <form id="compare_form" action="resultscomp" method="POST">

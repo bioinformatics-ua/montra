@@ -134,6 +134,8 @@ def results_db(request, template_name='results.html'):
     list_results.list_results = list_databases
 
     return render(request, template_name, {'request': request,
+                                           'results': True,
+                                           'hide_add': True,
                                            'list_results': list_results})
 
 
@@ -208,6 +210,7 @@ def results_fulltext_aux(request, query, page=1, template_name='results.html', i
 
     if query == "" or query.strip()=="text_t:*" :
         return render(request, "results.html", {'request': request, 'breadcrumb': True,
+                                                'results': True, 'hide_add': True,
                                                 'num_results': 0, 'page_obj': None})
     (sortString, filterString, sort_params, range) = paginator_process_params(request.POST, page, rows)   
     sort_params["base_filter"] = query;
@@ -233,9 +236,11 @@ def results_fulltext_aux(request, query, page=1, template_name='results.html', i
         query_old = request.session.get('query', "")
         if isAdvanced == True:
             return render(request, "results.html", {'request': request, 'breadcrumb': True,
+                                                'results': True, 'hide_add': True,
                                                 'num_results': 0, 'page_obj': None, 'isAdvanced': True})
         else:
             return render(request, "results.html", {'request': request, 'breadcrumb': True,
+                                                'results': True, 'hide_add': True,
                                                 'num_results': 0, 'page_obj': None, 'search_old': query_old, 'isAdvanced': False})
     
     list_databases = paginator_process_list(list_databases, hits, range)   
@@ -251,10 +256,13 @@ def results_fulltext_aux(request, query, page=1, template_name='results.html', i
     if isAdvanced == True:
         return render(request, template_name, {'request': request,
                                            'num_results': hits, 'page_obj': pager, 'page_rows': rows,
+                                           'results': True, 'hide_add': True,
                                             'breadcrumb': True, 'isAdvanced': True, "sort_params": sort_params, "page":page})
     else :
         return render(request, template_name, {'request': request,
-                                           'num_results': hits, 'page_obj': pager, 'page_rows': rows,'breadcrumb': True, 'search_old': query_old, 'isAdvanced': False, "sort_params": sort_params, "page":page})
+                                           'num_results': hits, 'page_obj': pager, 'page_rows': rows,
+                                           'results': True, 'hide_add': True,
+                                           'breadcrumb': True, 'search_old': query_old, 'isAdvanced': False, "sort_params": sort_params, "page":page})
 
 
 def store_query(user_request, query_executed):
@@ -1546,7 +1554,7 @@ def query_solr(request, page=1):
 
 
 
-def databases(request, page=1, template_name='databases.html', force=False):
+def databases(request, page=1, template_name='results.html', force=False):
 
      #first lets clean the query session log
     if 'query' in request.session:
@@ -1610,6 +1618,7 @@ def databases(request, page=1, template_name='databases.html', force=False):
                                            'page_obj': pager, 'page_rows': rows,
                                            'api_token': True, 
                                            'owner_fingerprint': False,
+                                           'databases': True,
                                            'add_databases': True, "sort_params": sort_params, "page":page})
 
 def paginator_process_params(request, page, rows, default_mode={"database_name": "asc"}):
@@ -1764,7 +1773,7 @@ def define_rows(request):
 
     return rows
 # GET ALL DATABASES ACCORDING TO USER INTERESTS
-def all_databases_user(request, page=1, template_name='alldatabases.html', force=False):
+def all_databases_user(request, page=1, template_name='results.html', force=False):
     
     rows = define_rows(request)
 
@@ -1824,6 +1833,7 @@ def all_databases_user(request, page=1, template_name='alldatabases.html', force
                                             'breadcrumb': True, 'collapseall': False, 
                                             'geo': True,
                                             'page_obj': pager, "page_rows": rows,
+                                            'alldatabases': True,
                                             'add_databases': True, "sort_params": sort_params, "page":page})
 
 def all_databases(request, page=1, template_name='alldatabases.html'):
@@ -1858,6 +1868,7 @@ def all_databases(request, page=1, template_name='alldatabases.html'):
     return render(request, template_name, {'request': request, 'export_all_answers': True, 'data_table': True,
                                            'list_databases': list_databases,
                                             'breadcrumb': True, 'collapseall': False, 
+                                            'alldatabases': True,
                                             'geo': True,
                                             'page_obj': pager,
                                             'page_rows': rows,
@@ -3347,7 +3358,8 @@ def more_like_that(request, doc_id, mlt_query=None, page=1, template_name='more_
                                        'num_results': 0, 'page_obj': None, 
                                        'page_rows': 0,'breadcrumb': True, 
                                        "breadcrumb_text": "More Like - "+database_name,
-                                       'database_name': database_name, 'isAdvanced': False, 
+                                       'database_name': database_name, 'isAdvanced': False,
+                                       'hide_add': True, 'more_like_this': True, 
                                        "sort_params": None, "page":None})
 
     rows = define_rows(request)
@@ -3402,6 +3414,7 @@ def more_like_that(request, doc_id, mlt_query=None, page=1, template_name='more_
                                            'page_rows': rows,'breadcrumb': True, 
                                            "breadcrumb_text": "More Like - "+database_name,
                                            'database_name': database_name, 'isAdvanced': False, 
+                                           'hide_add': True, 'more_like_this': True, 
                                            "sort_params": sort_params, "page":page})
 
 def generate_database_snipet(results, page=1, rows=5):
