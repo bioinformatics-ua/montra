@@ -99,7 +99,7 @@
                                 {% if request.user.is_authenticated %}
                                 <ul class="nav" style="margin-right: 0 !important;">
                                     <li id="search_li" class="pull-left">
-                                        <form class="navbar-search pull-left" method="POST" action="resultsdiff/1">{% csrf_token %}
+                                        <form id="quicksearch" class="navbar-search pull-left" method="POST" action="resultsdiff/1">{% csrf_token %}
                                             {% if isAdvanced %}
                                             <input title="Enter the terms you wish to search for." class="search-query span2_5 form-text" placeholder="Search" type="text" id="edit-search-block-form--3" name="query" value="" size="25" maxlength="256">
                                             {% else %}

@@ -34,23 +34,10 @@
 {% endblock %}
 
 {% block toolbar %}
-{% if page_obj != None %}
-  <div class="span6">
-
-    <div class="btn-group pull-right">
-      <div class="btn-group"></div>
-      <span id="selected_databases" class="btn disabled"> <strong>Type Selected:</strong> <span id="selected_dbstype">---</span> &nbsp; &nbsp; <strong>Selected databases:</strong> <span id="selected_dbscount">0</span></span>      
-      <a id="comparabtn" class="btn "  href=""  rel="tooltip" data-container="body" data-placement="bottom" data-original-title="This allows to compare databases.<br /> It is only possible to compare databases of the same type. <br /> When a database is selected, the type is defined automatically, and databases of other types can't be choosen. <br /> To be able to select other type, you must unselect all the databases." class="help_selectresults icon-question-sign" disabled> <i  class=" icon"></i>
-        <i class="icon-retweet"></i> Compare</a>
-    <button type="button" class="btn" onclick="window.print();" title="Print">
-      <i class="icon-print"></i>
-    </button>
-      <a class="btn" href="geo" onclick="" ><i class="icon-globe"></i> Geolocation</a>
-
-    </div>
-  </div>
-         {% endif %}
-  {% endblock %}
+  {% if page_obj != None %}
+    {% include "menu_toolbar.html" with collapse=collapseall %}
+  {% endif %}
+{% endblock %}
 
 {% load bootstrap_pagination %}
 
