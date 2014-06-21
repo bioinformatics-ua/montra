@@ -365,6 +365,10 @@ def results_diff(request, page=1, template_name='results_diff.html'):
 
                     this_query = AdvancedQuery.objects.get(user=this_user, serialized_query_hash=this_query_hash, qid=qid)  
                     
+                    this_query.removed = False
+
+                    this_query.save()
+
                     print "This query is already on historic, just updating use time..."
 
                     try:

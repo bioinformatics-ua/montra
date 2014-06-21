@@ -62,6 +62,7 @@ class AdvancedQuery(models.Model):
     serialized_query = models.TextField(unique=False)
     date = models.DateTimeField(auto_now=True)
     qid = models.ForeignKey(Questionnaire, unique=False, blank=False, null=False)
+    removed = models.BooleanField(default=False)
 
     def has_representation(self):
         try:

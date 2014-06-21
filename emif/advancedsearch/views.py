@@ -20,7 +20,7 @@
 ##
 #   See user history of queries
 ##
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 
 from emif.models import AdvancedQuery, AdvancedQueryAnswer
 from emif.views import results_diff, RequestMonkeyPatch
@@ -31,7 +31,7 @@ def history_defer(request, template_name='history.html'):
 
 def history(request, page, page_rows=10, template_name='history.html'):
 
-    queries = AdvancedQuery.objects.filter(user=request.user).order_by('-date')
+    queries = AdvancedQuery.objects.filter(user=request.user, removed=False).order_by('-date')
 
         ## Paginator ##
     if(request.method == 'POST'):
@@ -94,3 +94,35 @@ def resultsdiff_history(request, query_id, template_name='history.html'):
         request2.get_post()[answer.question] = answer.answer
 
     return results_diff(request2)
+
+def remove(request, query_id):
+    if not request.user.is_authenticated():
+        raise Http404
+        
+    try:
+        query = AdvancedQuery.objects.get(id=query_id)
+
+        query.removed = True
+
+        query.save()
+
+    except:
+        print '-- Error: Cant find advanced query with id '+str(query_id)
+        pass
+
+    request.session['deleted_query_id'] = True
+    return redirect('advancedsearch.views.history_defer')
+
+def remove_all(request):
+    if not request.user.is_authenticated():
+        raise Http404
+        
+    queries = AdvancedQuery.objects.filter(user=request.user)
+
+    for query in queries:
+        query.removed = True
+
+        query.save()
+
+    request.session['deleted_query_id'] = True
+    return redirect('advancedsearch.views.history_defer')

@@ -25,4 +25,6 @@ urlpatterns = patterns('',
     url(r'^history$', 'advancedsearch.views.history_defer'),  
     url(r'^history/(?P<page>[0-9]+)$', 'advancedsearch.views.history'),    
     url(r'^results/(?P<query_id>[0-9]+)$', 'advancedsearch.views.resultsdiff_history'), 
+    url(r'^history/remove/(?P<query_id>[0-9]+)$', 'advancedsearch.views.remove'), 
+    url(r'^history/remove_all$', 'advancedsearch.views.remove_all'), 
 )
