@@ -113,12 +113,22 @@
         Edit
       </a>
       </li>
+      <li class="divider"></li>
+      <li style="margin-top: -10px;"><small style="margin-left: 20px; color: grey;">Share</small></li>
       <li>
-      <a class="sharedb" href="" id="share_list_toolbar" onclick="return false;"> <i class="icon-share icon"></i>
-        Share
+
+      <a class="sharedb" href="" id="share_list_toolbar" onclick="return false;"> <i class="fa fa-users"></i>
+        Invite Other Users
         
       </a>
       </li>
+      <li>
+
+      <a class="publiclink" href="" id="publiclink_toolbar" onclick="return false;"> <i class="fa fa-share"></i>
+        Create Public Link  
+      </a>
+      </li>
+      <li class="divider"></li>
       <li>
       <a class="confirm-delete" href="" id="delete_list_toolbar" onclick="return false;"data-id="{{ fingerprint_id }}"  title="Remove Database"> <i class="icon-trash icon"></i>
         Delete
@@ -167,7 +177,7 @@
 <div id="modal-from-dom-share" class="modal hide fade" style="display:none"  >
     <div class="modal-header">
         <a href="#" onclick="$('#modal-from-dom-share').modal('hide'); return false;" class="close">&times;</a>
-         <h3>Share Database</h3>
+         <h3>Invite Other Users to This Database</h3>
     </div>
     <div class="modal-body">
         <p>What is the email address of your team member? (must be a registered user)</p>
@@ -192,6 +202,34 @@
     </div>
 </div>
 
+<div id="modal-from-dom-publiclink" class="modal hide fade" style="display:none"  >
+    <div class="modal-header">
+        <a href="#" onclick="$('#modal-from-dom-publiclink').modal('hide'); return false;" class="close">&times;</a>
+         <h3>Create a public link to share this Database</h3>
+    </div>
+    <div class="modal-body">
+        <p>It's possible to publicly share your database through a public link.</p>
+
+        <legend>Public link <small><a class="pull-right" href="public/fingerprint">Manage Public Links</a></small></legend>
+        <div class="publiclink_container">
+          {% if public_link %}
+            Public link already exists! <br />
+            <center><h3><a href="public/fingerprint/{{public_link.hash}}">Click to open public link</a></h3>
+
+            <button onclick="deletePublicLink({{public_link.id}});" class="btn btn-link">Delete Public Link</button>
+            </center>
+          {% else %}
+            There's no public link yet. Click below on "Create Public Link", to generate a public link for this
+            database.
+          {% endif %}
+        </div>
+      </div>
+    <div class="modal-footer">
+        <button id="createpubliclink" {% if public_link %} style="display: none;" {% endif %} class="btn">Create Public Link</button>
+
+        <a href="#" onclick="$('#modal-from-dom-publiclink').modal('hide'); return false;" class="btn btn-secondary">Cancel</a>
+    </div>
+</div>
 
 <form id="send" method="POST" > {% csrf_token %}
 </form>
@@ -272,10 +310,23 @@ $(".sharedb" ).click(function(e)
   $('#modal-from-dom-share').data('id', id).modal('show');
        
 });
+$(".publiclink" ).click(function(e) 
+{
+  e.preventDefault();
+  var id = "{{fingerprint_id}}";
+
+  $('#modal-from-dom-publiclink').data('id', id).modal('show');
+       
+});
 $("#share_email" ).change(function(e) 
 {
   checkIfEmailExists();
 });
+
+$("#createpubliclink").click(function(){
+  createPublicLink();
+});
+
 // This bind will share the email. 
 $(".sharedb2" ).click(function(e) 
 {
@@ -309,6 +360,46 @@ function checkIfEmailExists(){
   .fail(function(){
         $('#share_indicator').html('<i class="icon-remove text-error"></i>');
         $('#share_message').html('<p class="text-error">Look up failed, maybe the internet connection is down.</p>');
+  });
+}
+
+function createPublicLink(){
+  var fingerprint = "{{fingerprint_id}}";
+
+  $.post("api/addpubliclink", { fingerprint_id: fingerprint })
+  .done(function(response) {
+    if(response.id){
+      console.log(response.id);
+      $(".publiclink_container").html('Public link already exists! <br /><center><h3><a href="public/fingerprint/'+response.hash+'">Click to open public link</a></h3><button onclick="deletePublicLink('+response.id+');" class="btn btn-link">Delete Public Link</a></center>');
+
+      $("#createpubliclink").hide();
+
+    } else {
+      console.log('Error');
+    }
+
+  })
+  .fail(function(){
+    console.log('Failed creating public link');
+  });
+}
+function deletePublicLink(share_id){
+
+  $.post("api/deletepubliclink", { share_id: share_id })
+  .done(function(response) {
+    if(response.deleted){
+      console.log(response.deleted);
+      $(".publiclink_container").text("There's no public link yet. Click below on \"Create Public Link\", to generate a public link for this database.");
+
+      $("#createpubliclink").show();
+
+    } else {
+      console.log('Error');
+    }
+
+  })
+  .fail(function(){
+    console.log('Failed creating public link');
   });
 }
 

@@ -45,6 +45,8 @@ from docs_manager.views import get_revision
 
 from api.models import FingerprintAPI
 
+from public.models import PublicFingerprintShare
+
 def document_form_view_upload(request, fingerprint_id, template_name='documents_upload_form.html'):
     """Store the files at the backend 
     """
@@ -143,8 +145,10 @@ def document_form_view(request, runcode, qs, activetab='summary', readOnly=False
 
     apiinfo = json.dumps(get_api_info(runcode))
     owner_fingerprint = False
+
+    print request.user.username
+
     for owner in db_owners.split(" "):
-        #print owner
         #print request.user.username
         if (owner == request.user.username):
             owner_fingerprint = True
@@ -169,6 +173,8 @@ def document_form_view(request, runcode, qs, activetab='summary', readOnly=False
         isAdvanced = False    
         
     # GET fingerprint primary key (for comments)
+    fingerprint = None
+
     try:
         fingerprint = Fingerprint.objects.get(fingerprint_hash=runcode)
         fingerprint_pk = fingerprint.id
@@ -177,6 +183,24 @@ def document_form_view(request, runcode, qs, activetab='summary', readOnly=False
 
     jerboa_files = Characteristic.objects.filter(fingerprint_id=runcode)
     contains_population = len(jerboa_files)!=0
+
+    # Find if user has public links for this db.
+
+    public_link = None
+
+    print "owner ?"+str(owner_fingerprint)
+    print "fingerprint? "+str(fingerprint)
+
+    if owner_fingerprint and fingerprint != None:
+        try:
+             public_link = PublicFingerprintShare.objects.get(user=request.user, fingerprint=fingerprint)
+
+        except PublicFingerprintShare.DoesNotExist:
+            print "no public link for this fingerprint."
+
+        except PublicFingerprintShare.MultipleObjectsReturned:
+            print "- Error, there are multiple shares for this user/key, can't be."
+
     return render(request, template_name, 
         {'request': request, 'qsets': qsets, 'export_bd_answers': True, 
         'apiinfo': apiinfo, 'fingerprint_id': runcode, 'fingerprint_pk': fingerprint_pk,
@@ -191,6 +215,7 @@ def document_form_view(request, runcode, qs, activetab='summary', readOnly=False
                     'isAdvanced': isAdvanced,
                     'activetab': activetab,
                     'readOnly': readOnly,
+                    'public_link': public_link,
                     })
 
 

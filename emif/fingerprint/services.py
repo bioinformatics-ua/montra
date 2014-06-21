@@ -305,9 +305,9 @@ def unique_users_string(fingerprint):
     # user_t (owner + shared)
     # i don't know if the user is
     users = set()
-    users.add(fingerprint.owner.email)
+    users.add(fingerprint.owner.username)
     for share in fingerprint.shared.all():
-        users.add(share.email)
+        users.add(share.username)
 
     users = list(users)
     users_string = users[0]
