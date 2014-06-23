@@ -174,6 +174,8 @@ class QuestionGroup:
         self.name = ""
         self.sortid = ""
         self.qsid = ""
+        #self.qsid = -1
+
         self.info = False
 
     def __eq__(self, other):
