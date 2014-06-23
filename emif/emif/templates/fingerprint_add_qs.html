@@ -10,8 +10,71 @@
     <input type="hidden" name="active_qs" id="active_qs" value="0" />
     <input type="hidden" name="active_qs_sortid" id="active_qs_sortid" value="0" />
     <input type="hidden" name="fingerprint_id" value="{{ fingerprint_id }}" />
+    <input type="hidden" name="_qs_perm" value="{{ permissions.id }}" />
     {% if questions_list.0.0.sortid != 0 and questions_list.0.0.sortid != 99 %}
-    <div><a id="collapseall_qs_{{ questions_list.0.0.sortid }}"  class="btn pull-right" href="#">Collapse all </a></div>
+
+    <div class="pull-right btn-group">
+      <a id="collapseall_qs_{{ questions_list.0.0.sortid }}"  class="btn" href="#">Collapse all </a>
+      <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
+        Permissions
+        <span class="caret"></span>
+      </a>
+      <ul class="dropdown-menu dropdown-menu-form">
+        <table style="margin-bottom: 0px;" class="table table-striped">
+            <tr>
+                <td>Visibility</td>
+                <td>
+                <label class="radio">
+                  <input class="qspreference" type="radio" name="_qs_visibility" value="0" {% if permissions.visibility == 0 %}checked{% endif %}>
+                  Public
+                </label>
+                <label class="radio">
+                  <input class="qspreference" type="radio" name="_qs_visibility" value="1" {% if permissions.visibility == 1 %}checked{% endif %}>
+                  Private
+                </label>
+                </td>
+            </tr>
+            <tr>
+                <td>Allow printing ?</td>
+                <td> 
+                    <label class="radio">
+                        <input class="qspreference" type="radio" name="_qs_printing" value="true" {% if permissions.allow_printing %}checked{% endif %}>
+                        Yes
+                    </label>
+                    <label class="radio">
+                        <input class="qspreference" type="radio" name="_qs_printing" value="false" {% if not permissions.allow_printing %}checked{% endif %}>
+                        No
+                    </label>
+                </td>
+            </tr>
+            <tr>
+                <td>Allow indexing ?</td>
+                <td>
+                <label class="radio">
+                    <input class="qspreference" type="radio" name="_qs_indexing" value="true" {% if permissions.allow_indexing %}checked{% endif %}>
+                    Yes
+                </label>
+                <label class="radio">
+                    <input class="qspreference" type="radio" name="_qs_indexing" value="false" {% if not permissions.allow_indexing %}checked{% endif %}>
+                    No
+                </label>
+                </td>
+            </tr>
+            <tr>
+                <td>Allow exporting ?</td>
+                <td>
+                    <label class="radio">
+                        <input class="qspreference" type="radio" name="_qs_exporting" value="true" {% if permissions.allow_exporting %}checked{% endif %}>
+                        Yes
+                    </label>
+                    <label class="qspreference" class="radio">
+                        <input type="radio" name="_qs_exporting" value="false" {% if not permissions.allow_exporting %}checked{% endif %}> &nbsp; No
+                    </label>
+                </td>
+            </tr>
+        </table>
+      </ul>
+    </div>
     {% endif %}
     
     <div class="questionset-title" style="font-size:6px">
@@ -245,6 +308,11 @@ collapseAll($("#collapseall_qs_{{ k.sortid }}"), div_id);
 $(function(){
     add_triggers{{ questions_list.0.0.sortid }}();
     setsaveqs("qform{{ questions_list.0.0.sortid }}");
+    $('.dropdown-menu').on('click', function(e) {
+        if($(this).hasClass('dropdown-menu-form')) {
+            e.stopPropagation();
+        }
+    });
 });
 
 

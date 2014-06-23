@@ -749,8 +749,7 @@ def render_one_questionset(request, q_id, qs_id, errors={}, aqid=None, fingerpri
         elif fingerprint_id != None and not is_new:
             (qlist_general, qlist, jstriggers, qvalues, jsinclude, cssinclude, extra_fields, hasErrors) = extract_answers(request2, q_id, question_set, qs_list)
 
-        #permissions = getPermissions(fingerprint_id, question_set)
-
+        permissions = getPermissions(fingerprint_id, question_set)
 
         advanced_search=False
         if template_name == 'fingerprint_search_qs.html':
@@ -774,6 +773,7 @@ def render_one_questionset(request, q_id, qs_id, errors={}, aqid=None, fingerpri
                 questions_list=qlist_general,
                 fingerprint_id=fingerprint_id,
                 breadcrumb=True,
+                permissions=permissions,
                 readonly=readonly
         )
         r['Cache-Control'] = 'no-cache'
@@ -783,7 +783,6 @@ def render_one_questionset(request, q_id, qs_id, errors={}, aqid=None, fingerpri
 
         raise
     return r
-    
 
 class RequestMonkeyPatch(object):
     POST = {}
@@ -1896,6 +1895,7 @@ def handle_qset(fingerprint, clean, qsets, qset, answers, fingerprint_ttype, rHi
     name = ""
     question_group = QuestionGroup()
     question_group.sortid = qset.sortid
+    question_group.qsid = qset.id
     
     qsets[qset.text] = question_group
     # questions() already gives us questions ordered by number
@@ -2409,6 +2409,11 @@ def check_database_add_conditions(request, questionnaire_id, sortid, saveid,
         if not hasErrors:
             add_city(qlist_general)
 
+            if request.POST:
+                setNewPermissions(request)
+            else:
+                setNewPermissions(request2)
+
             saveFingerprintAnswers(qlist_general, fingerprint_id, question_set2.questionnaire, users_db, extra_fields=extra_fields, created_date=created_date)
 
             # new version that just serializes the created fingerprint object (this eventually can be done using celery)
@@ -2437,6 +2442,37 @@ def check_database_add_conditions(request, questionnaire_id, sortid, saveid,
     r['Expires'] = "Thu, 24 Jan 1980 00:00:00 GMT"
 
     return r
+
+# Set new permissions for a questionset, based on a post request
+def setNewPermissions(request):
+
+    if(request == None or not request.POST):
+        return False
+
+    id = request.POST['_qs_perm']
+
+    if(id != None):
+
+        try:
+            this_permissions                = QuestionSetPermissions.objects.get(id=id)
+
+            this_permissions.visibility     = int(request.POST['_qs_visibility'])
+            this_permissions.allow_printing = (request.POST['_qs_printing'] == 'true')
+            this_permissions.allow_indexing = (request.POST['_qs_indexing'] == 'true')
+            this_permissions.allow_exporting= (request.POST['_qs_exporting'] == 'true')
+
+            this_permissions.save()
+
+            return True
+
+        except QuestionSetPermissions.DoesNotExist:
+            print "Can't save this since, there's no permissions object to this questionset yet."
+        except QuestionSetPermissions.MultipleObjectsReturned:
+            print "Can't save this since there's several objects for this questionset permissions (should be only one)"
+
+
+    return False
+
 ## ###############
 ##  STIL MIGHT BE USEFULL FOR DEBUG PORPOSES
 ## #######################
@@ -3173,24 +3209,48 @@ def save_answers_to_csv(list_databases, filename):
 
             qsets, name, db_owners, fingerprint_ttype = createqsets(id, clean=False)
 
-            for group in qsets.ordered_items():
-                (k, qs) = group
-                if (qs!=None and qs.list_ordered_tags!= None):
-                    list_aux = sorted(qs.list_ordered_tags)
-                    #import pdb
-                    #pdb.set_trace()
-                    for q in list_aux:
-                        _answer = clean_str_exp(str(q.value))
-                        if (_answer == "" and q.ttype=='comment'):
-                            _answer = "-"
-                        writer.writerow([id, name, k.replace('h1. ', ''), clean_str_exp(str(q.tag)), str(q.number), _answer])
-            writer.writerow([id, name, "System", "Date", "99.0", t.date])
-            writer.writerow([id, name, "System", "Date Modification", "99.1", t.date_modification])
-            writer.writerow([id, name, "System", "Type", "99.2", t.type_name])
-            writer.writerow([id, name, "System", "Type Identifier", "99.3", t.ttype])
+            qsets = attachPermissions(id, qsets)
 
+            for (k, qs), permissions in qsets:
+                if permissions.visibility == 0 and permissions.allow_exporting == True:
+                    writeGroup(id, k, qs, writer, name, t)
+
+        writer.writerow([id, name, "System", "Date", "99.0", t.date])
+        writer.writerow([id, name, "System", "Date Modification", "99.1", t.date_modification])
+        writer.writerow([id, name, "System", "Type", "99.2", t.type_name])
+        writer.writerow([id, name, "System", "Type Identifier", "99.3", t.ttype])
     return response
 
+def attachPermissions(fingerprint_id, qsets):
+    zipper = qsets
+    zipee = []
+
+    #print type(zipper)
+
+    for q, v in qsets.ordered_items():
+        print "-----"
+        print q
+        print v.qsid
+        print "-----"
+
+    for q, v in zipper.ordered_items():
+        print "STUFF:"+str(v)
+        qpermissions = getPermissions(fingerprint_id, QuestionSet.objects.get(id=v.qsid))
+        zipee.append(qpermissions)
+
+    merged = zip(zipper.ordered_items(), zipee)
+
+    return merged
+
+def writeGroup(id, k, qs, writer, name, t):
+    if (qs!=None and qs.list_ordered_tags!= None):
+        list_aux = sorted(qs.list_ordered_tags)
+
+        for q in list_aux:
+            _answer = clean_str_exp(str(q.value))
+            if (_answer == "" and q.ttype=='comment'):
+                _answer = "-"
+            writer.writerow([id, name, k.replace('h1. ', ''), clean_str_exp(str(q.tag)), str(q.number), _answer])
 
 def export_all_answers(request):
     """
