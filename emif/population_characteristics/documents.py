@@ -28,7 +28,10 @@ from .serialize import serialize
 from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import user_passes_test, login_required
 
-from emif.views import createqsets, createqset, get_api_info, merge_highlight_results
+from emif.views import createqsets, createqset, get_api_info, getPermissions, attachPermissions, merge_highlight_results
+
+from questionnaire.models import QuestionSet
+
 from django.shortcuts import render
 
 import os
@@ -132,6 +135,7 @@ def single_qset_view(request, runcode, qsid, template_name='fingerprint_qs.html'
     
     return render(request, template_name,{'request': request, 'qset': qset})   
 
+
 def document_form_view(request, runcode, qs, activetab='summary', readOnly=False,
     template_name='documents_upload_form.html'):
     
@@ -141,7 +145,7 @@ def document_form_view(request, runcode, qs, activetab='summary', readOnly=False
     qsets, name, db_owners, fingerprint_ttype = createqsets(runcode, highlights=h)
 
     if fingerprint_ttype == "":
-        raise "There is missing ttype of questionarie, something is really wrong"
+        raise "There is a missing type of questionnarie, something is really wrong"
 
     apiinfo = json.dumps(get_api_info(runcode))
     owner_fingerprint = False
@@ -172,6 +176,7 @@ def document_form_view(request, runcode, qs, activetab='summary', readOnly=False
     else:
         isAdvanced = False    
         
+    qsets = attachPermissions(runcode, qsets)
     # GET fingerprint primary key (for comments)
     fingerprint = None
 

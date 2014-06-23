@@ -92,6 +92,7 @@
 {% endblock %} 
 
 {% block content %} 
+
 {% if qsets %}
 
 <div style="margin-left: 0px;" class="span12">
@@ -286,21 +287,43 @@ var threads = {};
 function load_questionnary(){
 
 console.log("Creating questionnary set containers (so they are in order)");
+        containers = []
+        // We build the qs containers in memory and just do dom op, on the end, for speed
+        // on ie joins are significantly faster than concatenation
+        // tuple = k, qs
+        {% for tuple, permissions in qsets %}
 
-var containers = [];
+            {% if permissions.visibility == 0 or owner_fingerprint or request.user.is_superuser %}
+                containers.push('<div class="{% if not permissions.allow_printing %}noprinting {% endif %}'+
+                '{% if not permissions.allow_exporting %}noexporting {% endif %}'+
+                '{%if permissions.visibility == 1 %}{% if owner_fingerprint or request.user.is_superuser %} privategroup{% endif %}{% endif %} accordion-group">'
+                +'<div class="accordion-heading"><a style="display: inline-block; width: 90%;" class="accordion-toggle" data-toggle="collapse" data-parent="#accordion1" href="#collapse{{ tuple.0|removespaces|safe|clean }}">{{ tuple.0|removeh1 }} </a>'+
+                '{% if permissions.visibility == 1 and owner_fingerprint %}<i class="tooltipit icon-eye-close" title="This questionset is private, only the data custodian can see it." ></i>{% endif %}'+
+                '{% if not permissions.allow_printing %}<img class="tooltipit" title="The data custodian doesn\'t allow this section to be printed." src="{{ STATIC_URL}}img/noprint.png"/>{% endif %}'+
+                '{% if not permissions.allow_exporting %}<img class="tooltipit" title="The data custodian doesn\'t allow this section to be exported." src="{{ STATIC_URL}}img/noexport.png"/>{% endif %}'+
+                '<span class="accordion-icon"></span></div><div id="collapse{{ tuple.0|removespaces|safe|clean }}" class="accordion-body collapse"><div id="qs_{{ tuple.1.sortid }}" class="accordion-inner"><h4 class="pull-center">Loading...</h4></div></div></div>');
+            {% endif %}
+        
+        {% endfor %}
 
-// We build the qs containers in memory and just do dom op, on the end, for speed
-// on ie joins are significantly faster than concatenation
-{% for k, qs in qsets.ordered_items %}
-containers.push('<div class="accordion-group"><div class="accordion-heading"><a style="display: inline-block; width: 90%;" class="accordion-toggle" data-toggle="collapse" data-parent="#accordion1" href="#collapse{{ k|removespaces|safe|clean }}">{{ k|removeh1 }} </a><span class="accordion-icon">{% if qs.info %}<img title="This section has search keywords" class="markered" src="{{STATIC_URL}}/img/marker.png" />{% endif %}</span></div><div id="collapse{{ k|removespaces|safe|clean }}" class="accordion-body collapse"><div id="qs_{{ qs.sortid }}" class="accordion-inner"><h4 class="pull-center">Loading...</h4></div></div></div>');
+        var threadpool = new ThreadPool(20);
+        parts_missing = {{qsets|length}};
+
 
 {% if qs.info %}
 console.log("QS_DEBUG: {{qs.sortid}} : {{qs.info}}");
 {% endif %}
 
 
+        var priority=1;
+        {% for tuple, permissions in qsets %}
+            {% if permissions.visibility == 0 or owner_fingerprint or request.user.is_superuser %}
+                var thread = new Runnable(loadqspart, priority++, {{tuple.1.sortid}}, '{{fingerprint_id}}');
 
-{% endfor %}
+                threadpool.run(thread);
+                threads['qs_{{ tuple.1.sortid }}'] = thread;
+            {% endif %}
+        {% endfor %}
 
 $('#set_container').append(containers.join(''));
 
@@ -371,6 +394,9 @@ $(document).ready(function() {
         }
     });
     load_questionnary();
+
+    $(".tooltipit").tooltip({container: "body"});
+
     // On expand event, we burst the priority of this thread to load before the others
     $('.accordion-heading').click(function(){
         var load_faster = $('.accordion-inner', $(this).parent()).attr('id');

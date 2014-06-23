@@ -115,6 +115,22 @@ class QuestionSet(models.Model):
     class Meta:
         translate = ('text',)
 
+VISIBILITY_CHOICES = (
+    (0, 'public'),
+    (1, 'private')
+)
+### This models, keeps the permissions for a questionset, relative to a fingerprint
+class QuestionSetPermissions(models.Model):
+
+    id = models.AutoField(primary_key=True)
+    fingerprint_id = models.CharField(max_length=32)
+    qs = models.ForeignKey(QuestionSet)
+    visibility = models.IntegerField(choices=VISIBILITY_CHOICES)
+    allow_printing = models.BooleanField(default=True)
+    allow_indexing = models.BooleanField(default=True)
+    allow_exporting = models.BooleanField(default=True)
+
+
 
 class Question(models.Model):
     __metaclass__ = TransMeta
