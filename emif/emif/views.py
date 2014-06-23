@@ -57,6 +57,8 @@ from rest_framework.authtoken.models import Token
 
 from django.contrib.auth.decorators import login_required
 
+from django.utils.html import strip_tags
+
 import json
 import logging
 import re
@@ -70,6 +72,7 @@ import time
 import base64
 
 from django.core.cache import cache
+
 from django.views.decorators.cache import cache_page
 
 import hashlib
@@ -174,7 +177,7 @@ def results_fulltext_aux(request, query, page=1, template_name='results.html', i
         page = 1
 
     if query == "" or query.strip()=="text_t:*" :
-        return render(request, "results.html", {'request': request, 'breadcrumb': True,
+        return render(request, "results.html", {'request': request, 'breadcrumb': True,  'isSearch': True,
                                                 'num_results': 0, 'page_obj': None})
     (sortString, filterString, sort_params, range) = paginator_process_params(request.POST, page, rows)   
     sort_params["base_filter"] = query;
@@ -199,10 +202,10 @@ def results_fulltext_aux(request, query, page=1, template_name='results.html', i
     if len(list_databases) == 0 :
         query_old = request.session.get('query', "")
         if isAdvanced == True:
-            return render(request, "results.html", {'request': request, 'breadcrumb': True,
+            return render(request, "results.html", {'request': request, 'breadcrumb': True,  'isSearch': True,
                                                 'num_results': 0, 'page_obj': None, 'isAdvanced': True})
         else:
-            return render(request, "results.html", {'request': request, 'breadcrumb': True,
+            return render(request, "results.html", {'request': request, 'breadcrumb': True, 'isSearch': True,
                                                 'num_results': 0, 'page_obj': None, 'search_old': query_old, 'isAdvanced': False})
     
     list_databases = paginator_process_list(list_databases, hits, range)   
@@ -217,10 +220,10 @@ def results_fulltext_aux(request, query, page=1, template_name='results.html', i
         
     if isAdvanced == True:
         return render(request, template_name, {'request': request,
-                                           'num_results': hits, 'page_obj': pager, 'page_rows': rows,
+                                           'num_results': hits, 'page_obj': pager, 'page_rows': rows, 'isSearch': True,
                                             'breadcrumb': True, 'isAdvanced': True, "sort_params": sort_params, "page":page})
     else :
-        return render(request, template_name, {'request': request,
+        return render(request, template_name, {'request': request, 'isSearch': True,
                                            'num_results': hits, 'page_obj': pager, 'page_rows': rows,'breadcrumb': True, 'search_old': query_old, 'isAdvanced': False, "sort_params": sort_params, "page":page})
 
 
@@ -1724,95 +1727,130 @@ def all_databases(request, page=1, template_name='alldatabases.html'):
                                             'hide_add': True})
 
 def qs_data_table(request, template_name='qs_data_table.html'):
-    db_type = request.POST.get("db_type")
-    qset = request.POST.getlist("qsets[]")
+    db_type = int(request.POST.get("db_type"))
+    qset_post = request.POST.getlist("qsets[]")
 
-    answers = []
-    # get only databases with correct type
-    list_databases = get_databases_from_solr(request, "type_t:"+re.sub(r'\s+', '', db_type.lower()))
-    titles = []
-    
-    for t in list_databases:
+    # generate a mumbo jumbo digest for this combination of parameters, to be used as key for caching purposes
+    string_to_be_hashed = "dbtype"+str(db_type)
 
-        if t.type_name == db_type:
-            qsets, name, _d, _c = createqsets(t.id)
-            
-            q_list = []
-            a_list = []            
-            for group in qsets.ordered_items():
+    for post in qset_post:
+        string_to_be_hashed+="qs"+post
 
-                (k, qs) = group    
-              
-                if k in qset:
-                    for q in qs.list_ordered_tags:
-                        q_list.append(q)
-                        a_list.append([q.value, q.ttype])
-                continue
-            titles = ('Name', (q_list))
-            
+    hashed = hashlib.sha256(string_to_be_hashed).hexdigest()
 
-            answers.append((name, (a_list)))
-                # print answers
-            
-            
-    return render(request, template_name, {'request': request, 'export_all_answers': True, 'breadcrumb': False, 'collapseall': False, 'geo': False, 'titles': titles, 'answers': answers})
+    titles = None
+    answers = None
+
+    cached = cache.get(hashed)
+
+    if cached != None:
+        print "cache hit"
+        (titles, answers) = cached
+
+    else :
+        print "need for cache"
+        qset_int = []
+        for qs in qset_post:
+            qset_int.append(int(qs))
+
+
+        qset = QuestionSet.objects.filter(id__in=qset_int)
+
+        fingerprints = Fingerprint.objects.filter(questionnaire__id=db_type)
+
+        (titles, answers) = creatematrixqsets(db_type, fingerprints, qset)
+
+        cache.set(hashed, (titles, answers), 720) # 12 hours of cache
+
+    return render(request, template_name, {'request': request,'hash': hashed, 'export_all_answers': True, 'breadcrumb': False, 'collapseall': False, 'geo': False, 'titles': titles, 'answers': answers})
 
 def all_databases_data_table(request, template_name='alldatabases_data_table.html'):
-    answers = []
-    list_databases = get_databases_from_solr(request, "*:*")
-    titles = []
-    
     #dictionary of database types
-    databases_types = {}
+    databases_types = {}     
+    
+    # There's no need to show all, we just need the one's with fingerprints
+    questionnaires = Questionnaire.objects.filter(fingerprint__pk__isnull=False).distinct()
 
-    if list_databases:
-        # Creating list of database types
-        for t in list_databases:
-            if not t.type_name in databases_types:
-                qsets, name, _d, _e,  = createqsets(t.id)
-                
-                databases_types[t.type_name] = qsets.ordered_items()  
+    # Creating list of database types
+    for questionnaire in questionnaires:
+        qsets = createhollowqsets(questionnaire.id)
             
-            '''    this code was loading all the qsets of all the dbs etc etctera
-            id = t.id
-            qsets, name, db_owners, fingerprint_ttype = createqsets(id)
-            q_list = []
-            for group in qsets.ordered_items():
-                (k, qs) = group
-                for q in qs.list_ordered_tags:
-                    q_list.append(q)
-            titles = ('Name', (q_list))
-            a_list = []
-            for group in qsets.ordered_items():
-                (k, qs) = group
-                for q in qs.list_ordered_tags:
-                    a_list.append(q.value)
-            answers.append((name, (a_list)))
-                # print answers
+        databases_types[questionnaire] = qsets.ordered_items()  
 
-        # since we dont have access to the structure directly (?)
-        # i use a random id for each type to get the qset types ?
-        if databases_types:
-            #print databases_types['adcohort'][0].id
-            for type in databases_types:
-                qsets, name = createqsets(databases_types[type][0].id)
-                
-                qsets_by_type[type] = qsets.ordered_items()
- '''           
-    # print titles
-    # print answers
-
-    return render(request, template_name, {'request': request, 'export_all_answers': True, 'titles': titles,
-                                           'answers': answers, 'breadcrumb': True, 'collapseall': False, 'geo': True,
-                                           'list_databases': list_databases,
+    return render(request, template_name, {'request': request, 'export_datatable': True,
+                                           'breadcrumb': True, 'collapseall': False, 'geo': True,
+                                           'list_databases': databases_types,
                                            'no_print': True,
                                            'databases_types': databases_types
                                            })
 
 
-def createqsets(runcode, qsets=None, clean=True, highlights=None, getAnswers=True):
+# since createqset estructure isnt tippically made to be used in a row, i decided to implement it 
+# separated since the purpose is different, and this way we try to reduce at a maximum the number of repeated procedures
+def creatematrixqsets(db_type, fingerprints, qsets):
+    ans = []
+
+    # questions stay in memory, are the same for all fingerprints
+
+    qs_mem = []
+    name_question = None # source for the name of fingerprint
+    # first we get the questionsets questions and titles in place
+    q_list = ['Name']
+    for qset in qsets:
+        questions = qset.questions()
+        qs_mem.extend(questions)
+
+        for question in questions:
+            if question.slug_fk.slug1 == "database_name":
+                name_question = question
+            q_list.append(question.text)
+
+    for fingerprint in fingerprints:
+        answers = Answer.objects.filter(fingerprint_id=fingerprint)
+        
+        a_list = []
+        name = None
+        for question in qs_mem:
+            try:
+                answer = answers.get(question=question)
+
+                
+                if question.type in Fingerprint_Summary:
+                    a_list.append([Fingerprint_Summary[question.type](answer.data), question.type])
+                else:
+                    a_list.append([answer.data, question.type])
+            except Answer.DoesNotExist:
+                a_list.append("")
+
+        name = "Unnamed"
+
+        # if we dont get name_question naturally, we must take the time (this is a bother) to look for it...
+        if name_question == None:
+            try:
+                n = answers.get(question__slug_fk__slug1='database_name')
+                name_question = n.question
+            except Answer.DoesNotExist:
+                print "There's no database_name slugged answer for "+fingerprint.fingerprint_hash+" (maybe this questionnaire is a draft still)."
+
+        if name_question != None:
+            try:
+                name_answers = answers.get(question=name_question)
+
+                name = name_answers.data
+
+            except Answer.DoesNotExist:
+                pass
+
+        ans.append((name, (a_list)))
+
+    return (q_list, ans)
+
+def createqsets(runcode, qsets=None, clean=True, highlights=None, getAnswers=True, choosenqsets=None, fullmode=True):
     try:
-        fingerprint = Fingerprint.objects.get(fingerprint_hash=runcode)
+        if fullmode:
+            fingerprint = Fingerprint.objects.get(fingerprint_hash=runcode)
+        else:
+            fingerprint = runcode
 
         if qsets == None:
             qsets = ordered_dict()
@@ -1830,13 +1868,16 @@ def createqsets(runcode, qsets=None, clean=True, highlights=None, getAnswers=Tru
 
         db_owners = unique_users_string(fingerprint)
 
+        qsets_query = None
+        if choosenqsets != None:
+            qsets_query = choosenqsets
+        else:
+            qsets_query = QuestionSet.objects.filter(questionnaire=fingerprint.questionnaire).order_by('sortid')
         
-        qsets_query = QuestionSet.objects.filter(questionnaire=fingerprint.questionnaire).order_by('sortid')
         answers = Answer.objects.filter(fingerprint_id=fingerprint)
-
+        name = None
         for qset in qsets_query:
             if qset.sortid != 0 and qset.sortid != 99:
-
                 (qsets, name) = handle_qset(fingerprint, clean, qsets, qset, answers, fingerprint_ttype, rHighlights, qhighlights, getAnswers)
 
         return (qsets, name, db_owners, fingerprint_ttype)
@@ -1846,6 +1887,35 @@ def createqsets(runcode, qsets=None, clean=True, highlights=None, getAnswers=Tru
 
     # Something is really wrong if it gets here
     return HttpResponse('Something is wrong on creating qsets', 500)    
+
+# Creates a hollow shell that is similar to the one created by createqset, but doesnt have all the
+# questions and answers (so is a lot faster to create), essentially a useful shell for pages that allow questionset selection
+def createhollowqsets(questionnaire, qsets=None, highlights=None):
+
+    if qsets == None:
+        qsets = ordered_dict()
+
+    rHighlights = None
+    qhighlights = None
+
+    if highlights != None:
+        if "results" in highlights and runcode in highlights["results"]:
+            rHighlights = highlights["results"][runcode]
+        if "questions" in highlights:
+            qhighlights = highlights["questions"]   
+
+    qsets_query = QuestionSet.objects.filter(questionnaire=questionnaire).order_by('sortid')
+
+    for qset in qsets_query:
+        if qset.sortid != 0 and qset.sortid != 99:
+            question_group = QuestionGroup()
+            question_group.sortid = qset.sortid
+            question_group.qsid = qset.id
+
+            qsets[qset.text] = question_group
+    
+    return qsets   
+
 
 def createqset(runcode, qsid, qsets=None, clean=True, highlights=None):
     qsid = int(qsid) 
@@ -1903,7 +1973,7 @@ def handle_qset(fingerprint, clean, qsets, qset, answers, fingerprint_ttype, rHi
 
     for question in list_questions:
         t = Tag()
-        t.tag = question.text.encode('utf-8')
+        t.tag = question.text
         t.value = ""
         t.number = question.number
         t.ttype = question.type
@@ -1913,7 +1983,9 @@ def handle_qset(fingerprint, clean, qsets, qset, answers, fingerprint_ttype, rHi
 
     if getAnswers:
         for answer in answers:
-            slug = answer.question.slug_fk.slug1
+            question = answer.question
+
+            slug = question.slug_fk.slug1
 
             t = Tag()
 
@@ -1921,14 +1993,14 @@ def handle_qset(fingerprint, clean, qsets, qset, answers, fingerprint_ttype, rHi
             question_group = None
             q_number = None          
 
-            question = answer.question
+            
             if question != None:
                 text = question.slug_fk.description
-                qs = question.questionset.text
+                qs = qset.text
                 q_number = qs = question.number
-                if qsets.has_key(question.questionset.text):
+                if qsets.has_key(qset.text):
                     # Add the Tag to the QuestionGroup
-                    question_group = qsets[question.questionset.text]
+                    question_group = qsets[qset.text]
 
             else:
                 text = (slug, answer.data)
@@ -1977,7 +2049,7 @@ def handle_qset(fingerprint, clean, qsets, qset, answers, fingerprint_ttype, rHi
                     pass
 
     return (qsets, name)
-   
+
 # TODO: move to another place, maybe API? 
 def get_api_info(fingerprint_id):
     """This is an auxiliar method to get the API Info
@@ -3207,7 +3279,9 @@ def save_answers_to_csv(list_databases, filename):
         for t in list_databases:
             id = t.id
 
-            qsets, name, db_owners, fingerprint_ttype = createqsets(id, clean=False)
+            returned = createqsets(id, clean=False)
+
+            qsets, name, db_owners, fingerprint_ttype  = returned
 
             qsets = attachPermissions(id, qsets)
 
@@ -3252,6 +3326,79 @@ def writeGroup(id, k, qs, writer, name, t):
                 _answer = "-"
             writer.writerow([id, name, k.replace('h1. ', ''), clean_str_exp(str(q.tag)), str(q.number), _answer])
 
+def export_datatable(request):
+
+    db_type = int(request.POST.get("db_type"))
+    qset_post = request.POST.getlist("qsets[]")
+
+    # generate a mumbo jumbo digest for this combination of parameters, to be used as key for caching purposes
+    string_to_be_hashed = "dbtype"+str(db_type)
+
+    for post in qset_post:
+        string_to_be_hashed+="qs"+post
+
+    hashed = hashlib.sha256(string_to_be_hashed).hexdigest()
+
+    titles = None
+    answers = None
+
+    cached = cache.get(hashed)
+
+    if cached != None:
+        print "cache hit"
+        (titles, answers) = cached
+
+    else :
+        print "need for cache"
+        qset_int = []
+        for qs in qset_post:
+            qset_int.append(int(qs))
+
+
+        qset = QuestionSet.objects.filter(id__in=qset_int)
+
+        fingerprints = Fingerprint.objects.filter(questionnaire__id=db_type)
+
+        (titles, answers) = creatematrixqsets(db_type, fingerprints, qset)
+
+        cache.set(hashed, (titles, answers), 720) # 12 hours of cache
+
+    """
+    Method to export all databases answers to a csv file
+    """
+    def clean_str_exp(s):
+        s2 = s.replace("\n", "|").replace(";", ",").replace("\t", "    ").replace("\r","").replace("^M","").replace("|", "")
+        
+        return re.sub("\s\s+" , " ", s2)
+
+
+
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="'+str(hashed)+'.csv"'
+
+    writer = csv.writer(response)
+
+    titles_clean = []
+    for title in titles:
+        titles_clean.append(title.replace('h0. ','').replace('h1. ','').replace('h2. ','').replace('h3. ','').replace('h4. ','').replace('h5. ','').replace('h6. ','').replace('h7. ',''))
+    
+    writer.writerow(titles_clean)
+
+    for title, ans in answers:
+        line = [title]
+        for a in ans:
+            if a != '':
+                line.append(clean_str_exp(strip_tags(a[0])))
+            else:
+                line.append('')
+        writer.writerow(line)
+
+    return response
+
+    # list_databases = get_databases_from_solr(request, "*:*")
+    # return save_answers_to_csv(list_databases, "DBs")
+
+
 def export_all_answers(request):
     """
     Method to export all databases answers to a csv file
@@ -3270,6 +3417,26 @@ def export_my_answers(request):
     list_databases = get_databases_from_solr(request, "user_t:" + '"' + user.username + '"')
 
     return save_answers_to_csv(list_databases, "MyDBs")
+
+def export_search_answers(request):
+    """
+    Method to export search databases answers to a csv file
+    """
+
+    user = request.user
+
+    query = None
+    isadvanced = request.session.get('isAdvanced')
+    value = request.session.get('query')
+
+    if(isadvanced):
+        query = value
+    else:
+        query = "text_t:"+str(value)
+
+    list_databases = get_databases_from_solr(request, query)
+
+    return save_answers_to_csv(list_databases, "search_results")
 
 
 def export_bd_answers(request, runcode):

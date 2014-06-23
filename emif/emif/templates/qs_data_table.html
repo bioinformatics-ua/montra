@@ -1,33 +1,10 @@
 {% load extra_tags %}
-
-
-
 <div class="dataTables_scrollBody" style="overflow-y: auto; position: relative; width: 100%; height: 470px;">
     <table cellpadding="0" cellspacing="0" border="1" class="display dataTable table table-hover tablesorter "  data-provides="rowlink" id="table_databases" style="margin: 0px;">
 	<thead>
-		<tr>
-			<th class="minwidth250">{{ titles.0 }}</th>
-            {% for t in titles.1 %}
-               <th class="minwidth250" title="{{ t.tag|removehs }}">{{t.tag|truncate|removehs}} </th>
-            {% endfor %}
-		</tr>
+		<tr>{% for t in titles %}<th class="minwidth250" title="{{ t|removehs }}">{{t|truncate|removehs}} </th>{% endfor %}</tr>
 	</thead>
-    <tbody>
-
-            {% for ans in answers %}
-            <tr class="">
-                <td>{{ ans.0 }}</td>
-                {% for a in ans.1 %}
-                    {% if a.1|captioned %}
-                    <td title="{{a.0}}"> {{ a.0|truncate  }}</td>
-                    {% else %}
-                      <td> {{a.0}}</td> 
-                    {% endif %}
-                {% endfor %}
-                </tr>
-            {% endfor %}
-    </tbody>
-</table>
+    <tbody>{% for ans in answers %}<tr><td>{{ ans.0 }}</td>{% for a in ans.1 %}{% if a.1|captioned %}<td title="{{a.0}}"> {{ a.0|truncate }}</td>{% else %}<td>{{a.0}}</td>{% endif %}{% endfor %}</tr>{% endfor %}</tbody></table>
 </div>
 <script type="application/javascript">
 $(function() {
@@ -71,8 +48,5 @@ $(function() {
     
   });
 //$("#table_databases").stickyTableHeaders({container: ".dataTables_scrollBody"});
-
-	
 });
-
 </script>

@@ -75,25 +75,33 @@
       </a>
       {% endif %}
 
+      {% if export_datatable and request.user.is_superuser %}
+      
+        <button id="exportdatatable" class="btn" onclick="showExportMessage();"> <i class="fa fa-upload"></i> Export </button>
+      {% endif %}
+
       {% if export_all_answers and request.user.is_superuser %}
-      <a class="btn" href="export_all_answers" onclick="" > <i class="icon-file"></i>
+      <a class="btn" href="export_all_answers" onclick="showExportMessage();" > <i class="fa fa-upload"></i>
         Export
       </a>
       {% endif %}
 
-
       {% if export_bd_answers and request.user.is_superuser %}
-      <a class="btn" href="export_bd_answers/{{ fingerprint_id }}" onclick="" > <i class="fa fa-upload"></i>
+      <a class="btn" href="export_bd_answers/{{ fingerprint_id }}" onclick="showExportMessage();" > <i class="fa fa-upload"></i>
         Export
       </a>
       {% endif %}
 
       {% if export_my_answers and request.user.is_superuser %}
-      <a class="btn" href="export_my_answers" onclick="" > <i class="icon-file"></i>
+      <a class="btn" href="export_my_answers" onclick="showExportMessage();" > <i class="fa fa-upload"></i>
         Export
       </a>
+      {% if isSearch and request.user.is_superuser %}
+      <a class="btn" href="export_search_answers" onclick="showExportMessage();" > <i class="fa fa-upload"></i>
+        Export
+      </a>
+      {% endif %}     
       {% endif %}
-
       {% if request.user.is_superuser %}
             {% if  api_token %}
                 <a class="btn" href="api-info"> <i class=" icon"></i>
@@ -142,9 +150,6 @@
 
 	</div>
 </div>
-
-
-
 <!-- **********************************************************************
 ***** Model to delete the fingerprint. It will show a window to confirm the
 ***** deletion of the fingerprint
@@ -234,6 +239,12 @@
 <form id="send" method="POST" > {% csrf_token %}
 </form>
 
+<form id="senddatatablemodel" method="POST" >
+{% csrf_token %}
+</form>
+<form id="senddatatable" action="export_datatable" method="POST" >
+{% csrf_token %}
+</form>
 
 <script>
 

@@ -173,7 +173,9 @@ class QuestionGroup:
         self.list_ordered_tags = []
         self.name = ""
         self.sortid = ""
-        self.qsid = -1
+        self.qsid = ""
+        #self.qsid = -1
+
         self.info = False
 
     def __eq__(self, other):
