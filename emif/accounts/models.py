@@ -16,6 +16,13 @@ class Profile(models.Model):
          return self.name
 
 class EmifProfile(UserenaBaseProfile):
+    options = (
+        (5, '5'),
+        (10, '10'),
+        (25, '25'),
+        (50, '50'),
+        (-1, 'All'),
+    )
     user = models.OneToOneField(User,
                                 unique=True,
                                 verbose_name=_('user'),
@@ -31,3 +38,7 @@ class EmifProfile(UserenaBaseProfile):
     interests = models.ManyToManyField(Questionnaire,
                                        verbose_name=_('interests'),
                                        related_name='emif_profile')
+
+    paginator = models.IntegerField(max_length=2,
+                                      choices=options,
+                                      default=5)
