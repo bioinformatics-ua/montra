@@ -889,7 +889,7 @@ class RequestMonkeyPatch(object):
     user = None
 
     is_secure = False
-
+    path = "None"
     host = None
     def __init__(self):
         self.POST = {}
