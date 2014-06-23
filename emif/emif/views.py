@@ -3196,6 +3196,45 @@ def create_auth_token(request, page=1, templateName='api-key.html', force=False)
     return render_to_response(templateName, {'list_databases': list_databases, 'token': token, 'user': user,
                               'request': request, 'breadcrumb': True, 'page_obj': pager, 'page_rows': rows, "sort_params": sort_params, "page":page}, RequestContext(request))
 
+def invitedb(request, db_id, template_name="sharedb.html"):
+
+    email = request.POST.get('email', '')
+
+    if (email == None or email==''):
+        return HttpResponse('Invalid email address.')
+
+    fingerprint = None
+    try:
+        fingerprint = Fingerprint.objects.get(fingerprint_hash=db_id)
+    except Fingerprint.DoesNotExist:
+        print "Fingerprint with id "+db_id+" does not exist."
+        return HttpResponse("Service Unavailable")
+
+    subject = "EMIF Catalogue: A new database is trying to be shared with you."
+    link_invite = settings.BASE_URL + "accounts/signup/"
+
+    message = """Dear %s,\n\n
+            \n
+            %s is trying to share a new database with you on Emif Catalogue. 
+            But first you must register on the EMIF Catalogue. Please follow the link below to do so: \n\n
+            %s 
+            \n\nSincerely,\nEMIF Catalogue
+    """ % (email,request.user.get_full_name(), link_invite)
+
+    send_custom_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [email])
+
+    pend = None
+
+    try:
+        pend = InvitePending.objects.get(fingerprint=fingerprint, email=email)
+        return HttpResponse("User already has been invited to join catalogue")
+    except:
+        pass
+
+    pend = InvitePending(fingerprint=fingerprint, email=email)
+    pend.save()
+
+    return HttpResponse("An invitation has been sent to the user email so he can signup on catalogue.")
 
 def sharedb(request, db_id, template_name="sharedb.html"):
     if not request.method == 'POST':
