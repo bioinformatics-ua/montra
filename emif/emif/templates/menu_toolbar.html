@@ -296,7 +296,7 @@ $(".sharedb_invite" ).click(function(e)
 
 function checkIfEmailExists(){
   $('#share_indicator').html('<i class="icon-refresh"></i>');
-  $('#share_message').html('<p class="text-info">Check if email is valid for share invitation.</p>');
+  $('#share_message').html('<p class="text-info">Checking if email is valid for share invitation.</p>');
   $.post("api/emailcheck", { email: $("#share_email").val() })
   .done(function(response) {
     if(response.valid){

@@ -3215,8 +3215,8 @@ def invitedb(request, db_id, template_name="sharedb.html"):
 
     message = """Dear %s,\n\n
             \n
-            %s is trying to share a new database with you on Emif Catalogue. 
-            But first you must register on the EMIF Catalogue. Please follow the link below to do so: \n\n
+            %s is sharing a new database with you on Emif Catalogue. 
+            First you must register on the EMIF Catalogue. Please follow the link below: \n\n
             %s 
             \n\nSincerely,\nEMIF Catalogue
     """ % (email,request.user.get_full_name(), link_invite)
@@ -3296,7 +3296,7 @@ def sharedb(request, db_id, template_name="sharedb.html"):
         
         message = """Dear %s,\n\n
             \n
-            %s has shared a new database with you. And left you the following message:\n\n
+            %s is sharing a new database with you. And left you the following message:\n\n
 
             \"%s\"
 
