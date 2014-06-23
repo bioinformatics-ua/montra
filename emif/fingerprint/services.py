@@ -6,7 +6,6 @@ from searchengine.search_indexes import generateFreeText, setProperFields, CoreE
 
 from django.utils import timezone    
 
-
 def saveFingerprintAnswers(qlist_general, fingerprint_id, questionnaire, user, extra_fields=None, created_date=None):
 
     # Update or create fingerprint entry
@@ -312,9 +311,9 @@ def unique_users_string(fingerprint):
     # user_t (owner + shared)
     # i don't know if the user is
     users = set()
-    users.add(fingerprint.owner.email)
+    users.add(fingerprint.owner.username)
     for share in fingerprint.shared.all():
-        users.add(share.email)
+        users.add(share.username)
 
     users = list(users)
     users_string = users[0]
@@ -323,6 +322,20 @@ def unique_users_string(fingerprint):
         users_string+= ' \\ ' + users[i]
 
     return users_string
+
+
+def findName(fingerprint):
+    name = ""
+    try:
+        name_ans = Answer.objects.get(question__slug_fk__slug1='database_name', fingerprint_id=fingerprint) 
+
+        name = name_ans.data
+
+    except Answer.DoesNotExist:
+        name ="Unnamed"
+
+    return name
+
 
 # GET permissions model
 def getPermissions(fingerprint_id, question_set):
@@ -345,3 +358,4 @@ def getPermissions(fingerprint_id, question_set):
         print "Error retrieved several models for this questionset, its impossible, so something went very wrong."    
 
     return permissions
+

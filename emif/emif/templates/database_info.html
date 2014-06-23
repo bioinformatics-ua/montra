@@ -65,19 +65,27 @@
 
 {% endblock %} 
 {% block breadcrumbs %} 
-{{ block.super }} 
-{% if search_old %}
-{% breadcrumb "Search" "resultsdiff/1" %} 
-{% breadcrumb breadcrumb_name "databases" %} 
-{% elif style == '1' %} 
-{% breadcrumb "Personal" "databases" %} 
-{% breadcrumb breadcrumb_name|ellipsis:40 "databases" %} 
-{% else %} 
-{% breadcrumb "All" "alldatabases" %} 
-{% breadcrumb breadcrumb_name|ellipsis:40 "databases" %} 
+
+{% if readOnly %}
+    {% breadcrumb breadcrumb_name|ellipsis:40|add:" - Public View Link" "" %} 
+{% else %}
+
+    {{ block.super }} 
+    {% if search_old %}
+    {% breadcrumb "Search" "resultsdiff/1" %} 
+    {% breadcrumb breadcrumb_name "databases" %} 
+    {% elif style == '1' %} 
+    {% breadcrumb "Personal" "databases" %} 
+    {% breadcrumb breadcrumb_name|ellipsis:40 "databases" %} 
+    {% else %} 
+    {% breadcrumb "All" "alldatabases" %} 
+    {% breadcrumb breadcrumb_name|ellipsis:40 "databases" %} 
+    {% endif %}
+
 {% endif %}
 
 {% endblock %}
+
 
 {% block toolbar %} 
 {% include "menu_toolbar.html" with collapse=collapseall %} 
@@ -171,23 +179,26 @@
                     <button type="button" class="close" data-dismiss="alert" >&times;</button>
                     <strong><i class="fa fa-arrow-circle-o-down"></i></strong>&nbsp;You need to insert some words here
                 </div>
-                {% if user.is_authenticated %}
-                {% get_comment_form for fingerprint.fingerprint fingerprint_pk as form %}
-                <form id="comment_form" action="{% comment_form_target %}" method="POST">
-                    <fieldset>
-                        {% csrf_token %}
-                        <textarea id="id_comment" rows="5" name="comment" class="span7" placeholder="Insert your comment or question here..." autofocus></textarea>
-                        {{ form.content_type }}
-                        {{ form.object_pk }}
-                        {{ form.timestamp }}
-                        {{ form.security_hash }}
-                        <br />
-                        <!--<input type="hidden" name="next" value="{{request.get_full_path}}" />-->
-                        <button id="submit_button" class="btn btn-primary" type="submit"  data-loading-text="Sending comment...">Post comment</button>
-                    </fieldset>
-                </form>
-                {% else %}
-                <p>Please <a href="{% url 'auth_login' %}">log in</a> to leave a comment.</p>
+                {% if not readOnly %}
+                    {% if user.is_authenticated %}
+                    {% get_comment_form for fingerprint.fingerprint fingerprint_pk as form %}
+
+                    <form id="comment_form" action="{% comment_form_target %}" method="POST">
+                        <fieldset>
+                            {% csrf_token %}
+                            <textarea id="id_comment" rows="5" name="comment" class="span7" placeholder="Insert your comment or question here..." autofocus></textarea>
+                            {{ form.content_type }}
+                            {{ form.object_pk }}
+                            {{ form.timestamp }}
+                            {{ form.security_hash }}
+                            <br />
+                            <!--<input type="hidden" name="next" value="{{request.get_full_path}}" />-->
+                            <button id="submit_button" class="btn btn-primary" type="submit"  data-loading-text="Sending comment...">Post comment</button>
+                        </fieldset>
+                    </form>
+                    {% else %}
+                    <p>Please <a href="{% url 'auth_login' %}">log in</a> to leave a comment.</p>
+                    {% endif %}
                 {% endif %}
                 <br/>
                 {% get_comment_count for fingerprint.fingerprint fingerprint_pk as comment_count %}
