@@ -166,6 +166,7 @@ STATICFILES_DIRS = (
     os.path.abspath(PROJECT_DIR_ROOT + MIDDLE_DIR + 'population_characteristics/static'),
     os.path.abspath(PROJECT_DIR_ROOT + MIDDLE_DIR + 'literature/static'),
     os.path.abspath(PROJECT_DIR_ROOT + MIDDLE_DIR + 'docs_manager/static'),
+    os.path.abspath(PROJECT_DIR_ROOT + MIDDLE_DIR + 'advancedsearch/static'),
 )
 
 # List of finder classes that know how to find static files in
@@ -215,6 +216,7 @@ TEMPLATE_DIRS = (
     os.path.abspath(PROJECT_DIR_ROOT + MIDDLE_DIR + 'literature/templates'),
     os.path.abspath(PROJECT_DIR_ROOT + MIDDLE_DIR + 'control_version/templates'),
     os.path.abspath(PROJECT_DIR_ROOT + MIDDLE_DIR + 'docs_manager/templates'),
+    os.path.abspath(PROJECT_DIR_ROOT + MIDDLE_DIR + 'advancedsearch/templates'),
 )
 
 INSTALLED_APPS = (
@@ -269,6 +271,7 @@ INSTALLED_APPS = (
     'django_nvd3',
     'djcelery',
     #'djangobower',
+    'advancedsearch',
 
 )
 

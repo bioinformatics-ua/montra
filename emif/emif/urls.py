@@ -258,6 +258,9 @@ urlpatterns = patterns('',
 
     # Literature URLs
     url(r'literature/', include('literature.urls')),
+
+    # AdvancedSearch URLs
+    url(r'advsearch/', include('advancedsearch.urls')),
 )
 
 if settings.DEBUG:
