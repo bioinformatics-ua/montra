@@ -3121,9 +3121,11 @@ def sharedb(request, db_id, template_name="sharedb.html"):
     # Verify if it is a valid database 
     if (db_id == None or db_id==''):
         return HttpResponse('Service Unavailable')  
-    c = CoreEngine()
-    results = c.search_fingerprint('id:' + db_id)
-    if (len(results)!=1):
+
+    fingerprint = None
+    try: 
+        fingerprint = Fingerprint.objects.get(fingerprint_hash=db_id)
+    except Fingerprint.DoesNotExist:
         return HttpResponse("Service Unavailable")  
 
     subject = "EMIF Catalogue: A new database has been shared with you."
@@ -3188,27 +3190,30 @@ def sharedb_activation(request, activation_code, template_name="sharedb_invited.
         return HttpResponse('An error has occured. Contact the EMIF Catalogue Team.')
     
     sp = __objs[0]
-    c = CoreEngine()
-    results = c.search_fingerprint('id:' + sp.db_id)
-    for r in results:
-        _aux = r
-        break
-    
-    _aux['user_t'] =  _aux['user_t'] + " \\ " + sp.user.username
-    print _aux['user_t']
 
-    c.update(r)
+    fingerprint = None
+    try:
+        fingerprint = Fingerprint.objects.get(fingerprint_hash=sp.db_id)
+
+    except:
+        return HttpResponse("And error has occurred. Contact the EMIF Catalogue Team.")
+    
+    fingerprint.shared.add(request.user)
+
+    fingerprint.save()
+
+    indexFingerprint(fingerprint.fingerprint_hash)
+
     sp.pending = False
     sp.save()
-
-
+    finger_name = findName(fingerprint)
     try:
         subject = "EMIF Catalogue: Accepted database shared"
         message = """Dear %s,\n\n
             \n\n
             %s has been activated. You can access the new database in "Databases" -> Personal".
             \n\nSincerely,\nEMIF Catalogue
-        """ % (request.user.get_full_name(), _aux['database_name_t'] )
+        """ % (request.user.get_full_name(), finger_name)
 
 
         message_to_inviter = """Dear %s,\n\n
@@ -3216,7 +3221,7 @@ def sharedb_activation(request, activation_code, template_name="sharedb_invited.
             %s has accepted to work with you in database %s. 
             
             \n\nSincerely,\nEMIF Catalogue
-        """ % (sp.user_invite.get_full_name(), request.user.get_full_name(), _aux['database_name_t'])
+        """ % (sp.user_invite.get_full_name(), request.user.get_full_name(), finger_name)
 
         # Send email to admins
         send_custom_mail(subject, message_to_inviter, settings.DEFAULT_FROM_EMAIL, [sp.user_invite.email])
