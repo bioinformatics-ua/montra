@@ -136,6 +136,8 @@ urlpatterns = patterns('',
     url(r'^share/activation/(?P<activation_code>[^/]+)', 'emif.views.sharedb_activation'),
     url(r'^share/(?P<db_id>[^/]+)', 'emif.views.sharedb'),
 
+    url(r'^invite/(?P<db_id>[^/]+)', 'emif.views.invitedb'),
+
     # API
     url(r'^api/', include('api.urls')),
 

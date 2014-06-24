@@ -3040,6 +3040,45 @@ def create_auth_token(request, page=1, templateName='api-key.html', force=False)
     return render_to_response(templateName, {'list_databases': list_databases, 'token': token, 'user': user,
                               'request': request, 'breadcrumb': True, 'page_obj': pager, 'page_rows': rows, "sort_params": sort_params, "page":page}, RequestContext(request))
 
+def invitedb(request, db_id, template_name="sharedb.html"):
+
+    email = request.POST.get('email', '')
+
+    if (email == None or email==''):
+        return HttpResponse('Invalid email address.')
+
+    fingerprint = None
+    try:
+        fingerprint = Fingerprint.objects.get(fingerprint_hash=db_id)
+    except Fingerprint.DoesNotExist:
+        print "Fingerprint with id "+db_id+" does not exist."
+        return HttpResponse("Service Unavailable")
+
+    subject = "EMIF Catalogue: A new database is trying to be shared with you."
+    link_invite = settings.BASE_URL + "accounts/signup/"
+
+    message = """Dear %s,\n\n
+            \n
+            %s is sharing a new database with you on Emif Catalogue. 
+            First you must register on the EMIF Catalogue. Please follow the link below: \n\n
+            %s 
+            \n\nSincerely,\nEMIF Catalogue
+    """ % (email,request.user.get_full_name(), link_invite)
+
+    send_custom_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [email])
+
+    pend = None
+
+    try:
+        pend = InvitePending.objects.get(fingerprint=fingerprint, email=email)
+        return HttpResponse("User already has been invited to join catalogue")
+    except:
+        pass
+
+    pend = InvitePending(fingerprint=fingerprint, email=email)
+    pend.save()
+
+    return HttpResponse("An invitation has been sent to the user email so he can signup on catalogue")
 
 def sharedb(request, db_id, template_name="sharedb.html"):
     if not request.method == 'POST':
@@ -3047,6 +3086,7 @@ def sharedb(request, db_id, template_name="sharedb.html"):
 
     # Verify if it is a valid email
     email = request.POST.get('email', '')
+    message = request.POST.get('message', '')
     if (email == None or email==''):
         return HttpResponse('Invalid email address.')
 
@@ -3100,12 +3140,15 @@ def sharedb(request, db_id, template_name="sharedb.html"):
         
         message = """Dear %s,\n\n
             \n
-            %s has shared a new database with you. 
+            %s is sharing a new database with you. And left you the following message:\n\n
+
+            \"%s\"
+
             Now you're able to edit and manage the database. \n\n
             To activate the database in your account, please open this link:
             %s 
             \n\nSincerely,\nEMIF Catalogue
-        """ % (name,request.user.get_full_name(), link_activation)
+        """ % (name,request.user.get_full_name(), message,link_activation)
         # Send email to admins
         #send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, emails_to_feedback)
         # Send email to user with the copy of feedback message
