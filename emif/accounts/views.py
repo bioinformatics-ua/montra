@@ -105,7 +105,10 @@ class SignupFormExtra(SignupForm):
         user_profile = new_user.get_profile()
         user_profile.country = self.cleaned_data['country']
         user_profile.organization = self.cleaned_data['organization']
-        
+        try:
+            user_profile.paginator = int(self.cleaned_data['paginator'])
+        except KeyError:
+            user_profile.paginator = 5
 
         # Add selected profiles
         if (Profile.objects.all().count()):
@@ -126,7 +129,13 @@ class SignupFormExtra(SignupForm):
         # Userena expects to get the new user from this form, so return the new
         # user.
         return new_user
-
+options = (
+        (5, '5'),
+        (10, '10'),
+        (25, '25'),
+        (50, '50'),
+        (-1, 'All'),
+)
 class EditProfileFormExtra(EditProfileForm):
 
     profiles = forms.ModelMultipleChoiceField(label=_('I am a (select all that apply):'),
@@ -139,17 +148,22 @@ class EditProfileFormExtra(EditProfileForm):
                                                 queryset=Questionnaire.objects.filter(disable='False'),
                                                 widget=forms.CheckboxSelectMultiple())
 
+    paginator = forms.ChoiceField(label=_('Select default value for paginations:'),
+                                        choices = options
+                                    )
+
+
     def __init__(self, *args, **kw):
         super(EditProfileFormExtra, self).__init__(*args, **kw)
         del self.fields['mugshot']
         del self.fields['privacy']
 
         if Profile.objects.all().count() and Questionnaire.objects.all().count():
-            self.fields.keyOrder = ['first_name', 'last_name', 'country', 'organization', 'profiles', 'interests']
+            self.fields.keyOrder = ['first_name', 'last_name', 'country', 'organization', 'profiles', 'interests', 'paginator']
         elif Profile.objects.all().count():
-            self.fields.keyOrder = ['first_name', 'last_name', 'country', 'organization', 'profiles']
+            self.fields.keyOrder = ['first_name', 'last_name', 'country', 'organization', 'profiles', 'paginator']
         elif Questionnaire.objects.all().count():
-            self.fields.keyOrder = ['first_name', 'last_name', 'country', 'organization', 'interests']
+            self.fields.keyOrder = ['first_name', 'last_name', 'country', 'organization', 'interests', 'paginator']
         else:
             self.fields.keyOrder = ['first_name', 'last_name', 'country', 'organization']
 

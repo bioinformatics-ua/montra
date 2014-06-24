@@ -1694,10 +1694,27 @@ def paginator_process_list(list_databases, hits, start):
 def define_rows(request):
     if request.POST and "page_rows" in request.POST:
         rows = int(request.POST["page_rows"])
+
+        profile = request.user.get_profile()
+
+        profile.paginator = rows
+        
+        profile.save()
+
         if rows == -1:
             rows = 99999
     else:
+        # Otherwise get number of rows from preferences
         rows = 5
+
+        try:
+            profile = request.user.get_profile()
+
+            rows = profile.paginator
+
+        except:
+            pass
+
 
     return rows
 # GET ALL DATABASES ACCORDING TO USER INTERESTS
