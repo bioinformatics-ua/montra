@@ -26,6 +26,12 @@ from django.db.models.fields import *
 #
 from django import forms
 
+from fingerprint.models import Fingerprint
+
+from django.dispatch import receiver
+from userena.signals import signup_complete
+
+from searchengine.search_indexes import CoreEngine
 
 class QueryLog(models.Model):
     id = AutoField(primary_key=True)
@@ -46,6 +52,10 @@ class SharePending(models.Model):
     db_id = models.TextField()
     activation_code = models.TextField()
     pending = models.BooleanField()
+
+class InvitePending(models.Model):
+    fingerprint = models.ForeignKey(Fingerprint)
+    email = models.TextField()
 
 class City(models.Model):
     id = AutoField(primary_key=True)
@@ -74,4 +84,35 @@ class ContactForm(forms.Form):
     message = forms.CharField(label='Message', widget=forms.Textarea(attrs={'cols': 30, 'rows': 10, 'class': 'span6'}))
     topic = forms.CharField()
 
+@receiver(signup_complete)
+def add_invited(user, sender, **kwargs):
+
+    sps = InvitePending.objects.filter(email=user.email)
+    
+    c = CoreEngine()
+    
+    for sp in sps:
+        runcode = sp.fingerprint.fingerprint_hash
+
+        # This will change on dev branch, but since i must do it on master, i have to do it on the searchengine and then change
+        results = c.search_fingerprint("id:" + runcode)
+
+        for result in results:
+            old_users = ""
+            d = result
+            try:
+                old_users = d['user_t']
+            except KeyError:
+                pass
+
+            d['user_t']  = old_users+" \\ "+user.username
+
+            del d['_version_']
+
+            c.index_fingerprint_as_json(d)
+
+            break
+
+
+    print "Added invited user databases to+"+str(user.email)+"!"
 

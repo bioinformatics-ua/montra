@@ -144,15 +144,17 @@ class EmailCheckView(APIView):
         if not (email == None or email==''):
             # Verify if it is a valid user name
             username = None
-
+            fullname = ""
             try: 
                 username = User.objects.get(email__exact=email)
+                fullname=username.get_full_name()
                 valid = True  
             except User.DoesNotExist:
                 pass             
                
         result = {
             'email': email,
+            'username': fullname,
             'valid': valid
             }
         response = Response(result, status=status.HTTP_200_OK)
