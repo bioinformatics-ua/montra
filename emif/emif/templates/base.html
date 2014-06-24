@@ -97,6 +97,7 @@
                             <span class="icon-bar"></span>
                             </a>
                             <a class="brand" href="">EMIF Catalogue</a>
+                            {% if not readOnly %}
                             <div class="nav-collapse collapse">
                                 {% if request.user.is_authenticated %}
                                 <ul class="nav" style="margin-right: 0 !important;">
@@ -112,7 +113,8 @@
                                     </li>
                                 </ul>
                                 {% endif %}
-                                <ul class="nav pull-right">
+                                <div class="pull-right">
+                                <ul class="nav">
                                     <!--{% if not request.user.is_authenticated %}
                                     <li class="dropdown">
                                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">
@@ -155,6 +157,10 @@
                                                     </li>
                                                     <li>
                                                         <a href="alldatabases">All</a>
+                                                    </li>
+                                                    <li class="divider"></li>
+                                                    <li>
+                                                        <a href="public/fingerprint">Public Links</a>
                                                     </li>
                                                 </ul>
                                             </li>
@@ -269,8 +275,11 @@
                                     </li>
                                     {%endif%}
                                 </ul>
+                                </div>
                             </div>
                             {% endblock %}
+                            {% endif %}
+
                             <!--/.nav-collapse -->
                         </div>
                     </div>
@@ -287,7 +296,11 @@
                     <div class="pull-right">
                         {% block toolbar %} {% endblock %}
                     </div>
+
+                        
+<div style="display: none; z-index: 2000; position:fixed; bottom:20px; right: 20px;" class="alert alert-info" id="exporting-message">Databases of the current view are being exported, please wait.</div>
                     {% block content %}
+
                     {% endblock %}
                     
                 </div>

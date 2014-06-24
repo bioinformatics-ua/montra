@@ -31,6 +31,9 @@ from api.views import ValidateView
 from api.views import PublicationsView
 from api.views import PopulationView
 from api.views import NotifyOwnerView
+from api.views import AddPublicLinkView
+from api.views import DeletePublicLinkView
+
 
 urlpatterns = patterns('api.views',
     url(r'^root/$', 'api_root'),
@@ -44,6 +47,8 @@ urlpatterns = patterns('api.views',
     url(r'^pubmed$', PublicationsView.as_view(), name='pubmed'),
     url(r'^population$', PopulationView.as_view(), name='population'),
     url(r'^notify_owner$', NotifyOwnerView.as_view(), name='notify_owner'),
+    url(r'^addpubliclink$', AddPublicLinkView.as_view(), name='addpubliclink'),
+    url(r'^deletepubliclink$', DeletePublicLinkView.as_view(), name='addpubliclink'),
 
 )
 

@@ -87,7 +87,7 @@ def parsejerboa(request, template_name='documents_upload_form.html'):
 
 def document_form_view(request, runcode, qs, template_name='documents_upload_form.html'):
 
-    qsets, name, db_owners, fingerprint_ttype = createqsets(runcode)
+    qsets, name, db_owners, fingerprint_ttype = createqsets(runcode, getAnswers=False)
 
     if fingerprint_ttype == "":
         raise "There is missing ttype of questionarie, something is really wrong"

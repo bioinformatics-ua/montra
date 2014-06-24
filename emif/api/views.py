@@ -68,6 +68,12 @@ from django.template.loader import render_to_string
 
 from emif.utils import send_custom_mail
 
+from fingerprint.models import Fingerprint
+
+from public.views import PublicFingerprintShare
+from public.services import deleteFingerprintShare, createFingerprintShare
+
+
 class JSONResponse(HttpResponse):
     """
     An HttpResponse that renders it's content into JSON.
@@ -278,6 +284,61 @@ class AdvancedSearchView(APIView):
         response = Response(result, status=status.HTTP_200_OK)
         return response
 
+############################################################
+##### AddPublic Link Webservice
+############################################################
+
+class AddPublicLinkView(APIView):
+
+    authentication_classes = (SessionAuthentication, BasicAuthentication)
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request, *args, **kw):
+        if request.user.is_authenticated():
+            # first we get the email parameter
+            fingerprint_id = request.POST.get('fingerprint_id', '')
+
+
+            try:
+                fingerprint = Fingerprint.objects.get(fingerprint_hash=fingerprint_id)
+
+                # add only if necessary, try to get first...
+                share = None
+                try:
+                    share = PublicFingerprintShare.objects.get(fingerprint=fingerprint, user=request.user)
+
+                except PublicFingerprintShare.DoesNotExist:
+                    share = createFingerprintShare(fingerprint_id, request.user)
+
+                return Response({
+                                    'hash': str(share.hash),
+                                    'id'  : share.id
+                                }, status=status.HTTP_200_OK)
+
+            except Fingerprint.DoesNotExist:
+                print "-- Error, tried to create link to fingerprint hash that does not exist."
+
+        return Response({}, status=status.HTTP_400_BAD_REQUEST)
+
+############################################################
+##### DeletePublic Link Webservice
+############################################################
+
+class DeletePublicLinkView(APIView):
+
+    authentication_classes = (SessionAuthentication, BasicAuthentication)
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request, *args, **kw):
+        if request.user.is_authenticated():
+            # first we get the email parameter
+            share_id = request.POST.get('share_id', '')
+
+            deleted = deleteFingerprintShare(share_id)
+
+            return Response({'deleted': deleted}, status=status.HTTP_200_OK)
+
+        return Response({}, status=status.HTTP_400_BAD_REQUEST)
 
 ############################################################
 ##### Metadata - Managemnt (Extra Information) Web services

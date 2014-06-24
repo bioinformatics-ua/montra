@@ -20,7 +20,7 @@
 import csv
 from pprint import pprint
 
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.http import HttpResponse, HttpResponseRedirect
 from django.core.urlresolvers import reverse
 from django.db import transaction
@@ -40,7 +40,10 @@ from searchengine.search_indexes import index_answeres_from_qvalues
 from searchengine.search_indexes import convert_text_to_slug
 from emif.utils import *
 from emif.models import *
-from questionnaire.models import Answer
+
+from fingerprint.services import *
+from fingerprint.models import *
+
 from api.models import *
 
 from geopy import geocoders 
@@ -53,6 +56,8 @@ from modules.geo import *
 from rest_framework.authtoken.models import Token
 
 from django.contrib.auth.decorators import login_required
+
+from django.utils.html import strip_tags
 
 import json
 import logging
@@ -67,6 +72,7 @@ import time
 import base64
 
 from django.core.cache import cache
+
 from django.views.decorators.cache import cache_page
 
 import hashlib
@@ -99,44 +105,6 @@ def bootstrap_ie_compatibility(request, template_name='bootstrap_ie_compatibilit
 def quick_search(request, template_name='quick_search.html'):
     return render(request, template_name, {'request': request})
 
-
-def results_db(request, template_name='results.html'):
-    user = request.user
-    su = Subject.objects.filter(user=user)
-    databases = RunInfoHistory.objects.filter(subject=su)
-
-    class Database:
-        id = ''
-        name = ''
-        date = ''
-        last_activity = ''
-
-    class Results:
-        num_results = 0
-        list_results = []
-
-
-    list_databases = []
-    
-    for database in databases:
-        database_aux = Database()
-        database_aux.id = database.runid
-        database_aux.date = database.completed
-
-        answers = Answer.objects.filter(runid=database.runid)
-        text = clean_value(str(answers[1].answer))
-        info = text[:75] + (text[75:] and '..')
-        database_aux.name = info
-        list_databases.append(database_aux)
-
-    list_results = Results()
-    list_results.num_results = len(list_databases)
-    list_results.list_results = list_databases
-
-    return render(request, template_name, {'request': request,
-                                           'results': True,
-                                           'hide_add': True,
-                                           'list_results': list_results})
 
 
 def results_comp(request, template_name='results_comp.html'):
@@ -209,7 +177,7 @@ def results_fulltext_aux(request, query, page=1, template_name='results.html', i
         page = 1
 
     if query == "" or query.strip()=="text_t:*" :
-        return render(request, "results.html", {'request': request, 'breadcrumb': True,
+        return render(request, "results.html", {'request': request, 'breadcrumb': True,  'isSearch': True,
                                                 'results': True, 'hide_add': True,
                                                 'num_results': 0, 'page_obj': None})
     (sortString, filterString, sort_params, range) = paginator_process_params(request.POST, page, rows)   
@@ -235,11 +203,11 @@ def results_fulltext_aux(request, query, page=1, template_name='results.html', i
     if len(list_databases) == 0 :
         query_old = request.session.get('query', "")
         if isAdvanced == True:
-            return render(request, "results.html", {'request': request, 'breadcrumb': True,
+            return render(request, "results.html", {'request': request, 'breadcrumb': True,  'isSearch': True,
                                                 'results': True, 'hide_add': True,
                                                 'num_results': 0, 'page_obj': None, 'isAdvanced': True})
         else:
-            return render(request, "results.html", {'request': request, 'breadcrumb': True,
+            return render(request, "results.html", {'request': request, 'breadcrumb': True, 'isSearch': True,
                                                 'results': True, 'hide_add': True,
                                                 'num_results': 0, 'page_obj': None, 'search_old': query_old, 'isAdvanced': False})
     
@@ -255,15 +223,13 @@ def results_fulltext_aux(request, query, page=1, template_name='results.html', i
         
     if isAdvanced == True:
         return render(request, template_name, {'request': request,
-                                           'num_results': hits, 'page_obj': pager, 'page_rows': rows,
+                                           'num_results': hits, 'page_obj': pager, 'page_rows': rows, 'isSearch': True,
                                            'results': True, 'hide_add': True,
-                                            'breadcrumb': True, 'isAdvanced': True, "sort_params": sort_params, "page":page})
+                                           'breadcrumb': True, 'isAdvanced': True, "sort_params": sort_params, "page":page})
     else :
-        return render(request, template_name, {'request': request,
-                                           'num_results': hits, 'page_obj': pager, 'page_rows': rows,
+        return render(request, template_name, {'request': request, 'isSearch': True,
                                            'results': True, 'hide_add': True,
-                                           'breadcrumb': True, 'search_old': query_old, 'isAdvanced': False, "sort_params": sort_params, "page":page})
-
+                                           'num_results': hits, 'page_obj': pager, 'page_rows': rows,'breadcrumb': True, 'search_old': query_old, 'isAdvanced': False, "sort_params": sort_params, "page":page})
 
 def store_query(user_request, query_executed):
     print user_request.user.is_authenticated()
@@ -685,61 +651,39 @@ def render_one_questionset(request, q_id, qs_id, errors={}, aqid=None, fingerpri
     
 
     if fingerprint_id != None and not is_new:
-        c = CoreEngine()
 
-        extra = {} 
+        try: 
+            this_fingerprint = Fingerprint.objects.get(fingerprint_hash=fingerprint_id)
 
-        results = c.search_fingerprint("id:" + fingerprint_id)
-        items = None
+            this_answers = Answer.objects.filter(fingerprint_id=this_fingerprint)
 
-        for r in results:
-            items = r
-            break
+            extra = {}
 
-        request2 = RequestMonkeyPatch()
+            request2 = RequestMonkeyPatch()
 
-        request2.method = request.method
-        if items != None:
-            for item in items:
-                key = item
-                value = items[key]
-                if item.startswith("comment_question_"):
-                    
-                    slug = item.split("comment_question_")[1]
-                    # results = Slugs.objects.filter(slug1=slug[:-2], question__questionset__questionnaire=questionnaire_id)
-                    # if results == None or len(results) == 0:
-                    #     continue
-                    # question = results[0].question
-                    results = Question.objects.filter(slug_fk__slug1=slug[:-2], questionset__questionnaire=q_id)
-                    if results == None or len(results) == 0:
-                        continue
-                    question = results[0]
-                    request2.get_post()['comment_question_%s' % question.number] = value
-                    continue
+            request2.method = request.method
 
-                if item == '_version_':
-                    continue
+            for answer in this_answers:
+                this_q  = answer.question
+                value   = answer.data
 
-                # results = Slugs.objects.filter(slug1=str(item)[:-2],question__questionset__questionnaire=questionnaire_id )
-                # print len(results)
-                # if results == None or len(results) == 0:
-                #     continue
-                # question = results[0].question
-                results = Question.objects.filter(slug_fk__slug1=str(item)[:-2], questionset__questionnaire=q_id)
-                if results == None or len(results) == 0:
-                    continue
-                question = results[0]
-                answer = str(question.number)
-
-                extra[question] = ans = extra.get(question, {})
                 if "[" in str(value):
                     value = str(value).replace("]", "").replace("[", "")
-                request2.get_post()['question_%s' % question.number] = value
-                
-                
-                ans['ANSWER'] = value
-                
-                extra[question] = ans
+
+                request2.get_post()['question_%s' % this_q.number] = value
+
+                if answer.comment != None:
+                    request2.get_post()['comment_question_%s' % this_q.number] = value
+
+                # This "extra" field was on the old solr version, i will admit, i have no clue wth this does...
+                # it doesn't seem to make any difference as far as i could check, anyway i left it here commented
+                # in case we need it after all
+                #extra[this_q] = ans = extra.get(this_q, {})
+                #ans['ANSWER'] = value
+                #extra[this_q] = ans
+
+        except Fingerprint.DoesNotExist:
+            print "-Error fingerprint "+fingerprint_id + " does not exist but we think it does."
 
     try:
 
@@ -845,8 +789,7 @@ def render_one_questionset(request, q_id, qs_id, errors={}, aqid=None, fingerpri
         elif fingerprint_id != None and not is_new:
             (qlist_general, qlist, jstriggers, qvalues, jsinclude, cssinclude, extra_fields, hasErrors) = extract_answers(request2, q_id, question_set, qs_list)
 
-        #permissions = getPermissions(fingerprint_id, question_set)
-
+        permissions = getPermissions(fingerprint_id, question_set)
 
         advanced_search=False
         if template_name == 'fingerprint_search_qs.html':
@@ -870,6 +813,7 @@ def render_one_questionset(request, q_id, qs_id, errors={}, aqid=None, fingerpri
                 questions_list=qlist_general,
                 fingerprint_id=fingerprint_id,
                 breadcrumb=True,
+                permissions=permissions,
                 readonly=readonly
         )
         r['Cache-Control'] = 'no-cache'
@@ -879,7 +823,6 @@ def render_one_questionset(request, q_id, qs_id, errors={}, aqid=None, fingerpri
 
         raise
     return r
-    
 
 class RequestMonkeyPatch(object):
     POST = {}
@@ -1160,163 +1103,87 @@ def database_detailed_view(request, fingerprint_id, questionnaire_id, template_n
     return database_edit(request, fingerprint_id, questionnaire_id, template_name, readonly=True);
 
 def database_edit(request, fingerprint_id, questionnaire_id, template_name="database_edit.html", readonly=False):
-    c = CoreEngine()
+    try: 
+        this_fingerprint = Fingerprint.objects.get(fingerprint_hash=fingerprint_id)
+        
+        users_db = unique_users_string(this_fingerprint)        
+        created_date = this_fingerprint.created
 
-    results = c.search_fingerprint("id:" + fingerprint_id)
-    items = None
-    for r in results:
-        items = r
-        break
-    fingerprint_id = r['id']
+        qs_list = QuestionSet.objects.filter(questionnaire=questionnaire_id)
 
-    users_db = r['user_t']
+        question_set = qs_list[0]
+        answers = Answer.objects.filter(fingerprint_id=this_fingerprint)
 
-    created_date = r['created_t']
+        print answers
 
-    try:
-        fingerprint_name = r['database_name_t']
-    except:
-        fingerprint_name = 'unnamed'        
+        # well this doesnt scale well, we should have the database name on the fingerprint
+        # it probably will be mitigated by using the descriptor that should be updated on save...
+        fingerprint_name = 'unnamed' 
 
-    extra = {} 
-    # Render page first time.
+        for answer in answers:
+            print answer
+            slug = answer.question.slug_fk.slug1
+            if answer.question.slug_fk.slug1 == 'database_name':
+                fingerprint_name = answer.data
+                break
 
-    request2 = RequestMonkeyPatch()
+        # count questionset filled answers
+        qreturned = []
 
-    request2.method = request.method
-    for item in items:
-        key = item
-        value = items[key]
-        if item.startswith("comment_question_"):
+        for x in question_set.questionnaire.questionsets():
+            ttct = x.total_count()
+            ans = len(intersect(answers, x))
+            try:
+                percentage = (ans * 100) / ttct
+            except ZeroDivisionError:
+                percentage = 0
+
+            qreturned.append([x, ans, ttct, percentage])
+
+
+        r = r2r(template_name, request,
+                questionset=question_set,
+                questionsets=qreturned,
+                runinfo=None,
+                errors=None,
+                progress=None,
+                fingerprint_id=fingerprint_id,
+                q_id = questionnaire_id,
+                async_progress=None,
+                async_url=None,
+                qs_list=qs_list,
+                breadcrumb=True,
+                name=fingerprint_name.encode('utf-8'),
+                id=fingerprint_id,
+                users_db=users_db,
+                created_date=created_date,
+                hide_add=True,
+                readonly=readonly
+        )
+        r['Cache-Control'] = 'no-cache'
+        r['Expires'] = "Thu, 24 Jan 1980 00:00:00 GMT"
             
-            slug = item.split("comment_question_")[1]
-            # results = Slugs.objects.filter(slug1=slug[:-2], question__questionset__questionnaire=questionnaire_id)
-            # if results == None or len(results) == 0:
-            #     continue
-            # question = results[0].question
-            results = Question.objects.filter(slug_fk__slug1=slug[:-2], questionset__questionnaire=questionnaire_id)
-            if results == None or len(results) == 0:
-                continue
-            question = results[0]
-            request2.get_post()['comment_question_%s' % question.number] = value
-            continue
+        return r
 
-        if item == '_version_':
-            continue
+    except Fingerprint.DoesNotExist:
+        print "-- Error obtaining fingerprint "+str(fingerprint_id)    
 
-        # results = Slugs.objects.filter(slug1=str(item)[:-2],question__questionset__questionnaire=questionnaire_id )
-        # print len(results)
-        # if results == None or len(results) == 0:
-        #     continue
-        # question = results[0].question
-        results = Question.objects.filter(slug_fk__slug1=str(item)[:-2], questionset__questionnaire=questionnaire_id)
-        if results == None or len(results) == 0:
-            continue
-        question = results[0]
-        answer = str(question.number)
+    # Something is really wrong if we get here...
+    return HttpResponse('Error open edit for fingerprint '+str(fingerprint_id), status=500)
 
-        extra[question] = ans = extra.get(question, {})
-        if "[" in str(value):
-            value = str(value).replace("]", "").replace("[", "")
-        request2.get_post()['question_%s' % question.number] = value
-        
-        
-        ans['ANSWER'] = value
-        
-        extra[question] = ans
+def intersect(answers, questionset):
 
-    errors = {}
+    # i know, this would be simpler if we just had the __in query, but we could only do this
+    # if we deleted entries on Answer, and i don't want to do that because of the versioning
+    # (on field can be empty, be filled, be empty and be filled again), the version has a pointer to the answer
+    # we can't go around deleting entries... is preferable to do the process of checking for emptyness in this query
 
-    q_id = questionnaire_id
-    qs_id = 1
+    non_empty = []
+    for ans in answers.filter(question__in=questionset.questions()):
+        if ans.data != None and ans.data != '':
+            non_empty.append(ans)
 
-    qs_list = QuestionSet.objects.filter(questionnaire=questionnaire_id)
-
-    question_set = qs_list[int(qs_id)]
-    '''if request.POST:
-        (qlist_general, qlist, jstriggers, qvalues, jsinclude, cssinclude, extra_fields, hasErrors) = extract_answers(request, questionnaire_id, question_set, qs_list)
-    else:
-        (qlist_general, qlist, jstriggers, qvalues, jsinclude, cssinclude, extra_fields, hasErrors) = extract_answers(request2, questionnaire_id, question_set, qs_list)
-
-    print hasErrors
-    '''
-    if (question_set.sortid == 99 or request.POST):
-        # Index on Solr
-        try:
-            if not hasErrors:
-                add_city(qlist_general)
-                index_answeres_from_qvalues(qlist_general, question_set.questionnaire, users_db,
-                                        fingerprint_id, extra_fields=extra_fields, created_date=created_date)
-        except:
-            raise
-
-    #import pdb
-    #pdb.set_trace()
-    #### Find out about the number of answers serverside 
-
-    c = CoreEngine()
-
-    this_document = c.search_fingerprint('id:' + fingerprint_id).docs[0]
-
-    qreturned = []
-
-    for x in question_set.questionnaire.questionsets():
-        ttct = x.total_count()
-        ans = len(intersect(this_document, x))
-        try:
-            percentage = (ans * 100) / ttct
-        except ZeroDivisionError:
-            percentage = 0
-
-        qreturned.append([x, ans, ttct, percentage])
-
-    #### End of finding out about the number of answers serverside
-
-    r = r2r(template_name, request,
-            questionset=question_set,
-            questionsets=qreturned,
-            runinfo=None,
-            errors=errors,
-            #qlist=qlist,
-            progress=None,
-            #triggers=jstriggers,
-            #qvalues=qvalues,
-            #jsinclude=jsinclude,
-            #cssinclude=cssinclude,
-            fingerprint_id=fingerprint_id,
-            q_id = q_id,
-            async_progress=None,
-            async_url=None,
-            qs_list=qs_list,
-            #questions_list=qlist_general,
-            breadcrumb=True,
-            name=fingerprint_name.encode('utf-8'),
-            id=fingerprint_id,
-            users_db=users_db,
-            created_date=created_date,
-            hide_add=True,
-            readonly=readonly
-    )
-    r['Cache-Control'] = 'no-cache'
-    r['Expires'] = "Thu, 24 Jan 1980 00:00:00 GMT"
-        
-    return r
-
-#class Database:
-#    id = ''
-#    name = ''
-#    date = ''
-#    last_activity = ''
-    
-
-def intersect(this_document, questionset):
-    intersection = []
-
-    for question in questionset.questions():
-        if this_document.has_key(question.slug+"_t"):
-            intersection.append(question.slug+"_t")
-
-    return intersection
+    return non_empty
 
 def get_databases_from_db(request):
     user = request.user
@@ -1549,17 +1416,14 @@ def merge_highlight_results(query, resultHighlights):
     return h  
 
 def delete_fingerprint(request, id):
-    user = request.user
 
-    c = CoreEngine()
-    results = c.search_fingerprint('user_t:' + '"' + user.username + '"')
-    
-    for result in results:
-        if (id == result['id']):
-            c.delete(id)
-            break
+    deleteFingerprint(id, request.user)
 
-    return databases(request)
+    # i dont like this, it should redirect to databases, not show the url of the removal
+    # so i changed it from:
+    #return databases(request)
+    #to:
+    return redirect('databases')
 
 def force_delete_fingerprint(request, id):
     if not request.user.is_superuser:
@@ -1940,360 +1804,283 @@ def all_databases(request, page=1, template_name='alldatabases.html'):
                                             'hide_add': True})
 
 def qs_data_table(request, template_name='qs_data_table.html'):
-    db_type = request.POST.get("db_type")
-    qset = request.POST.getlist("qsets[]")
+    db_type = int(request.POST.get("db_type"))
+    qset_post = request.POST.getlist("qsets[]")
 
-    answers = []
-    # get only databases with correct type
-    list_databases = get_databases_from_solr(request, "type_t:"+re.sub(r'\s+', '', db_type.lower()))
-    titles = []
-    
-    for t in list_databases:
+    # generate a mumbo jumbo digest for this combination of parameters, to be used as key for caching purposes
+    string_to_be_hashed = "dbtype"+str(db_type)
 
-        if t.type_name == db_type:
-            qsets, name, _d, _c = createqsets(t.id)
-            
-            q_list = []
-            a_list = []            
-            for group in qsets.ordered_items():
+    for post in qset_post:
+        string_to_be_hashed+="qs"+post
 
-                (k, qs) = group    
-              
-                if k in qset:
-                    for q in qs.list_ordered_tags:
-                        q_list.append(q)
-                        a_list.append(q.value)
-                continue
-            titles = ('Name', (q_list))
-            
+    hashed = hashlib.sha256(string_to_be_hashed).hexdigest()
 
-            answers.append((name, (a_list)))
-                # print answers
-            
-            
-    return render(request, template_name, {'request': request, 'export_all_answers': True, 'breadcrumb': False, 'collapseall': False, 'geo': False, 'titles': titles, 'answers': answers})
+    titles = None
+    answers = None
+
+    cached = cache.get(hashed)
+
+    if cached != None:
+        print "cache hit"
+        (titles, answers) = cached
+
+    else :
+        print "need for cache"
+        qset_int = []
+        for qs in qset_post:
+            qset_int.append(int(qs))
+
+
+        qset = QuestionSet.objects.filter(id__in=qset_int)
+
+        fingerprints = Fingerprint.objects.filter(questionnaire__id=db_type)
+
+        (titles, answers) = creatematrixqsets(db_type, fingerprints, qset)
+
+        cache.set(hashed, (titles, answers), 720) # 12 hours of cache
+
+    return render(request, template_name, {'request': request,'hash': hashed, 'export_all_answers': True, 'breadcrumb': False, 'collapseall': False, 'geo': False, 'titles': titles, 'answers': answers})
 
 def all_databases_data_table(request, template_name='alldatabases_data_table.html'):
-    answers = []
-    list_databases = get_databases_from_solr(request, "*:*")
-    titles = []
-    
     #dictionary of database types
-    databases_types = {}
+    databases_types = {}     
+    
+    # There's no need to show all, we just need the one's with fingerprints
+    questionnaires = Questionnaire.objects.filter(fingerprint__pk__isnull=False).distinct()
 
-    if list_databases:
-        # Creating list of database types
-        for t in list_databases:
-            if not t.type_name in databases_types:
-                qsets, name, _d, _e,  = createqsets(t.id)
-                
-                databases_types[t.type_name] = qsets.ordered_items()  
+    # Creating list of database types
+    for questionnaire in questionnaires:
+        qsets = createhollowqsets(questionnaire.id)
             
-            '''    this code was loading all the qsets of all the dbs etc etctera
-            id = t.id
-            qsets, name, db_owners, fingerprint_ttype = createqsets(id)
-            q_list = []
-            for group in qsets.ordered_items():
-                (k, qs) = group
-                for q in qs.list_ordered_tags:
-                    q_list.append(q)
-            titles = ('Name', (q_list))
-            a_list = []
-            for group in qsets.ordered_items():
-                (k, qs) = group
-                for q in qs.list_ordered_tags:
-                    a_list.append(q.value)
-            answers.append((name, (a_list)))
-                # print answers
+        databases_types[questionnaire] = qsets.ordered_items()  
 
-        # since we dont have access to the structure directly (?)
-        # i use a random id for each type to get the qset types ?
-        if databases_types:
-            #print databases_types['adcohort'][0].id
-            for type in databases_types:
-                qsets, name = createqsets(databases_types[type][0].id)
-                
-                qsets_by_type[type] = qsets.ordered_items()
- '''           
-    # print titles
-    # print answers
-
-    return render(request, template_name, {'request': request, 'export_all_answers': True, 'titles': titles,
-                                           'answers': answers, 'breadcrumb': True, 'collapseall': False, 'geo': True,
-                                           'list_databases': list_databases,
+    return render(request, template_name, {'request': request, 'export_datatable': True,
+                                           'breadcrumb': True, 'collapseall': False, 'geo': True,
+                                           'list_databases': databases_types,
                                            'no_print': True,
                                            'databases_types': databases_types
                                            })
 
 
-def createqsets(runcode, qsets=None, clean=True, highlights=None):
-    #print "createqsets"
-    c = CoreEngine()
-    results = c.search_fingerprint('id:' + runcode)
+# since createqset estructure isnt tippically made to be used in a row, i decided to implement it 
+# separated since the purpose is different, and this way we try to reduce at a maximum the number of repeated procedures
+def creatematrixqsets(db_type, fingerprints, qsets):
+    ans = []
+
+    # questions stay in memory, are the same for all fingerprints
+
+    qs_mem = []
+    name_question = None # source for the name of fingerprint
+    # first we get the questionsets questions and titles in place
+    q_list = ['Name']
+    for qset in qsets:
+        questions = qset.questions()
+        qs_mem.extend(questions)
+
+        for question in questions:
+            if question.slug_fk.slug1 == "database_name":
+                name_question = question
+            q_list.append(question.text)
+
+    for fingerprint in fingerprints:
+        answers = Answer.objects.filter(fingerprint_id=fingerprint)
+        
+        a_list = []
+        name = None
+        for question in qs_mem:
+            try:
+                answer = answers.get(question=question)
+
+                
+                if question.type in Fingerprint_Summary:
+                    a_list.append([Fingerprint_Summary[question.type](answer.data), question.type])
+                else:
+                    a_list.append([answer.data, question.type])
+            except Answer.DoesNotExist:
+                a_list.append("")
+
+        name = "Unnamed"
+
+        # if we dont get name_question naturally, we must take the time (this is a bother) to look for it...
+        if name_question == None:
+            try:
+                n = answers.get(question__slug_fk__slug1='database_name')
+                name_question = n.question
+            except Answer.DoesNotExist:
+                print "There's no database_name slugged answer for "+fingerprint.fingerprint_hash+" (maybe this questionnaire is a draft still)."
+
+        if name_question != None:
+            try:
+                name_answers = answers.get(question=name_question)
+
+                name = name_answers.data
+
+            except Answer.DoesNotExist:
+                pass
+
+        ans.append((name, (a_list)))
+
+    return (q_list, ans)
+
+def createqsets(runcode, qsets=None, clean=True, highlights=None, getAnswers=True, choosenqsets=None, fullmode=True):
+    try:
+        if fullmode:
+            fingerprint = Fingerprint.objects.get(fingerprint_hash=runcode)
+        else:
+            fingerprint = runcode
+
+        if qsets == None:
+            qsets = ordered_dict()
+
+        rHighlights = None
+        qhighlights = None
+
+        if highlights != None:
+            if "results" in highlights and runcode in highlights["results"]:
+                rHighlights = highlights["results"][runcode]
+            if "questions" in highlights:
+                qhighlights = highlights["questions"]
+            
+        fingerprint_ttype = fingerprint.questionnaire.pk 
+
+        db_owners = unique_users_string(fingerprint)
+
+        qsets_query = None
+        if choosenqsets != None:
+            qsets_query = choosenqsets
+        else:
+            qsets_query = QuestionSet.objects.filter(questionnaire=fingerprint.questionnaire).order_by('sortid')
+        
+        answers = Answer.objects.filter(fingerprint_id=fingerprint)
+        name = None
+        for qset in qsets_query:
+            if qset.sortid != 0 and qset.sortid != 99:
+                (qsets, name) = handle_qset(fingerprint, clean, qsets, qset, answers, fingerprint_ttype, rHighlights, qhighlights, getAnswers)
+
+        return (qsets, name, db_owners, fingerprint_ttype)
+
+    except Fingerprint.DoesNotExist:
+        print "-- Error on createqset: Fingerprint "+str(runcode)+" does not exist"
+
+    # Something is really wrong if it gets here
+    return HttpResponse('Something is wrong on creating qsets', 500)    
+
+# Creates a hollow shell that is similar to the one created by createqset, but doesnt have all the
+# questions and answers (so is a lot faster to create), essentially a useful shell for pages that allow questionset selection
+def createhollowqsets(questionnaire, qsets=None, highlights=None):
 
     if qsets == None:
         qsets = ordered_dict()
-    name = ""
-    list_values = []
-    blacklist = ['created_t', 'type_t', '_version_', 'date_last_modification_t']
-    name = "Not defined."
-    users = ""
-    fingerprint_ttype = ""
-
-    db_owners = "" 
-
-
-    questionnaires_ids = {}
-    qqs = Questionnaire.objects.all()
-    for q in qqs:
-        questionnaires_ids[q.slug] = (q.pk, q.name)
 
     rHighlights = None
     qhighlights = None
+
     if highlights != None:
         if "results" in highlights and runcode in highlights["results"]:
             rHighlights = highlights["results"][runcode]
         if "questions" in highlights:
-            qhighlights = highlights["questions"]
+            qhighlights = highlights["questions"]   
 
-    for result in results:
+    qsets_query = QuestionSet.objects.filter(questionnaire=questionnaire).order_by('sortid')
 
+    for qset in qsets_query:
+        if qset.sortid != 0 and qset.sortid != 99:
+            question_group = QuestionGroup()
+            question_group.sortid = qset.sortid
+            question_group.qsid = qset.id
 
-        (fingerprint_ttype, type_name) = questionnaires_ids[result['type_t']]
+            qsets[qset.text] = question_group
+    
+    return qsets   
 
-        # Get the slug of fingerprint type
-        q_aux = Questionnaire.objects.filter(slug=result['type_t'])
-
-        try:
-            users = result['user_t']
-            db_owners = result['user_t']
-        except:
-            pass
-
-        list_qsets = QuestionSet.objects.filter(questionnaire=q_aux[0]).order_by('sortid')
-
-        
-        for qset in list_qsets:
-
-            if (qset.sortid != 0 and qset.sortid != 99):
-                question_group = QuestionGroup()
-                question_group.sortid = qset.sortid
-                
-                qsets[qset.text] = question_group
-                qset.sortid
-                list_questions = Question.objects.filter(questionset=qset).order_by('number')
-                for question in list_questions:
-                    t = Tag()
-                    t.tag = question.text.encode('utf-8')
-                    t.value = ""
-                    t.number = question.number
-                    t.ttype = question.type
-                    question_group.list_ordered_tags.append(t)
-
-
-
-                qsets[qset.text] = question_group
-
-        for k in result:
-            #print k
-            if k in blacklist:
-                continue
-            if k.startswith("comment_question_"):
-                continue
-
-            t = Tag()
-
-            #aux_results = Slugs.objects.filter(slug1=k[:-2], question__questionset__questionnaire=q_aux[0].pk)
-            qs = None
-            question_group = None
-            q_number = None
-            # if len(aux_results) > 0:
-            #     text = aux_results[0].description
-            #     qs = aux_results[0].question.questionset.text
-            #     q_number = qs = aux_results[0].question.number
-            #     if qsets.has_key(aux_results[0].question.questionset.text):
-            #         # Add the Tag to the QuestionGroup
-            #         question_group = qsets[aux_results[0].question.questionset.text]
-            #     else:
-            #         # Add a new QuestionGroup
-            #         question_group = QuestionGroup()
-            #         qsets[aux_results[0].question.questionset.text] = question_group
-            question_ = Question.objects.filter(slug_fk__slug1=k[:-2], questionset__questionnaire=q_aux[0].pk)
-            if len(question_) > 0:
-                text = question_[0].slug_fk.description
-                qs = question_[0].questionset.text
-                q_number = qs = question_[0].number
-                if qsets.has_key(question_[0].questionset.text):
-                    # Add the Tag to the QuestionGroup
-                    question_group = qsets[question_[0].questionset.text]
-                else:
-                    # Add a new QuestionGroup
-                    question_group = QuestionGroup()
-                    qsets[question_[0].questionset.text] = question_group
-                    
-            else:
-                text = k
-
-            info = text
-            t.tag = info
-            #print t.tag
-            if question_group != None and question_group.list_ordered_tags != None:
-                try:
-                    t = question_group.list_ordered_tags[question_group.list_ordered_tags.index(t)]
-                except:
-                    pass
-
-            qs_text = k[:-1] + "qs"
-            id_text = "questionaire_"+str(fingerprint_ttype)
-            if question_group != None and qhighlights != None and id_text in qhighlights and qs_text in qhighlights[id_text]:
-                question_group.info = True
-
-            value = clean_value(str(result[k]).encode('utf-8'))
-            
-            try:
-
-               t.comment = result['comment_question_'+k]
-               #print t.comment
-            except KeyError:
-               pass
-            if clean:
-                t.value = value.replace("#", " ")
-                if question_group != None and rHighlights != None and k in rHighlights:
-                    question_group.info = True
-            else:
-                t.value = value
-
-            if k == "database_name_t":
-                name = t.value
-            list_values.append(t)
-            if question_group != None:
-                try:
-                    question_group.list_ordered_tags[question_group.list_ordered_tags.index(t)] = t
-                except:
-                    pass
-        break
-    # What should I do with this code?
-    # I know that it actually do nothing    
-    if (users!=""):
-        users.split(" \\ ")
-
-    return (qsets, name, db_owners, fingerprint_ttype)
 
 def createqset(runcode, qsid, qsets=None, clean=True, highlights=None):
     qsid = int(qsid) 
     print "Got into createqset!!" + str(qsid)
-    #print "createqsets"
-    c = CoreEngine()
-    results = c.search_fingerprint('id:' + runcode)
-    #print len(results)    
-    #results = c.search_highlight('id:' + runcode, hlfl="text_t")
-    
-    if qsets == None:
-        qsets = ordered_dict()
-    name = ""
-    list_values = []
-    blacklist = ['created_t', 'type_t', '_version_', 'date_last_modification_t']
-    name = "Not defined."
-    users = ""
-    fingerprint_ttype = ""
 
-    db_owners = "" 
-    
-    questionnaires_ids = {}
-    qqs = Questionnaire.objects.all()
-    for q in qqs:
-        questionnaires_ids[q.slug] = (q.pk, q.name)
+    try:
+        fingerprint = Fingerprint.objects.get(fingerprint_hash=runcode)
 
-    rHighlights = None
-    qhighlights = None
-    if highlights != None:
-        if "results" in highlights and runcode in highlights["results"]:
-            rHighlights = highlights["results"][runcode]
-        if "questions" in highlights:
-            qhighlights = highlights["questions"]
-        
-    for result in results:
+        if qsets == None:
+            qsets = ordered_dict()
 
+        rHighlights = None
+        qhighlights = None
 
-        (fingerprint_ttype, type_name) = questionnaires_ids[result['type_t']]
+        if highlights != None:
+            if "results" in highlights and runcode in highlights["results"]:
+                rHighlights = highlights["results"][runcode]
+            if "questions" in highlights:
+                qhighlights = highlights["questions"]
+            
+        fingerprint_ttype = fingerprint.questionnaire.pk 
 
-        # Get the slug of fingerprint type
-        q_aux = Questionnaire.objects.filter(slug=result['type_t'])
+        db_owners = unique_users_string(fingerprint)
 
         try:
-            users = result['user_t']
-            db_owners = result['user_t']
-        except:
-            pass
+            qset = QuestionSet.objects.get(questionnaire=fingerprint.questionnaire, sortid=qsid)
+            answers = Answer.objects.filter(fingerprint_id=fingerprint)
 
-        list_qsets = QuestionSet.objects.filter(questionnaire=q_aux[0]).order_by('sortid')
+            (qsets, name) = handle_qset(fingerprint, clean, qsets, qset, answers, fingerprint_ttype, rHighlights, qhighlights)
 
-        
-        for qset in list_qsets:
-            if (qset.sortid == qsid):
-                question_group = QuestionGroup()
-                question_group.sortid = qset.sortid
-                
-                qsets[qset.text] = question_group
-                qset.sortid
-                list_questions = Question.objects.filter(questionset=qset).order_by('number')
-                for question in list_questions:
-                    t = Tag()
-                    t.tag = question.text.encode('utf-8')
-                    t.value = ""
-                    t.number = question.number
-                    t.ttype = question.type
-                    question_group.list_ordered_tags.append(t)
+        except QuestionSet.DoesNotExist:
+            print "-- Error: The questionset you want does not exist"
+        except QuestionSet.MultipleObjectsReturned:
+            print "-- Error: Multiple objects returned, sortid ar supposed to be unique"
+
+        return (qsets, name, db_owners, fingerprint_ttype)
+
+    except Fingerprint.DoesNotExist:
+        print "-- Error on createqset: Fingerprint "+str(runcode)+" does not exist"
 
 
-                qsets[qset.text] = question_group
+    # Something is really wrong if it gets here
+    return HttpResponse('Something is wrong on creating qset '+qsid, 500)
 
-                break
+# this handles the generation of the tag - value for a single qset, given a questionset reference
+def handle_qset(fingerprint, clean, qsets, qset, answers, fingerprint_ttype, rHighlights, qhighlights, getAnswers=True):
+    name = ""
+    question_group = QuestionGroup()
+    question_group.sortid = qset.sortid
+    question_group.qsid = qset.id
+    
+    qsets[qset.text] = question_group
+    # questions() already gives us questions ordered by number
+    list_questions = qset.questions()
 
-        for k in result:
-            if k in blacklist:
-                continue
-            
-            if k.startswith("comment_question_"):
-                continue
-                
+    for question in list_questions:
+        t = Tag()
+        t.tag = question.text
+        t.value = ""
+        t.number = question.number
+        t.ttype = question.type
+        question_group.list_ordered_tags.append(t)
+
+    qsets[qset.text] = question_group
+
+    if getAnswers:
+        for answer in answers:
+            question = answer.question
+
+            slug = question.slug_fk.slug1
+
             t = Tag()
 
-            #aux_results = Slugs.objects.filter(slug1=k[:-2], question__questionset__questionnaire=q_aux[0].pk)
             qs = None
             question_group = None
-            q_number = None
-            # if len(aux_results) > 0:
-            #     text = aux_results[0].description
-            #     qs = aux_results[0].question.questionset.text
-            #     q_number = qs = aux_results[0].question.number
-            #     if qsets.has_key(aux_results[0].question.questionset.text):
-            #         # Add the Tag to the QuestionGroup
-            #         question_group = qsets[aux_results[0].question.questionset.text]
-            #     '''else:
-            #         # Add a new QuestionGroup
-            #         question_group = QuestionGroup()
-            #         qsets[aux_results[0].question.questionset.text] = question_group
-            #         print aux_results[0].question.questionset.text
-            #     '''    
-            question_ = Question.objects.filter(slug_fk__slug1=k[:-2], questionset__questionnaire=q_aux[0].pk)
-            if len(question_) > 0:
-                #text = question_[0].slug_fk.description
-                text = question_[0].text
-                qs = question_[0].questionset.text
-                q_number = qs = question_[0].number
-                if qsets.has_key(question_[0].questionset.text):
+            q_number = None          
+
+            
+            if question != None:
+                text = question.slug_fk.description
+                qs = qset.text
+                q_number = qs = question.number
+                if qsets.has_key(qset.text):
                     # Add the Tag to the QuestionGroup
-                    question_group = qsets[question_[0].questionset.text]
-                '''else:
-                    # Add a new QuestionGroup
-                    question_group = QuestionGroup()
-                    qsets[question_.questionset.text] = question_group
-                    print question_.questionset.text
-                 '''   
+                    question_group = qsets[qset.text]
 
             else:
-                text = k
+                text = (slug, answer.data)
 
             info = text
             t.tag = info
@@ -2304,52 +2091,42 @@ def createqset(runcode, qsid, qsets=None, clean=True, highlights=None):
                 except:
                     pass
 
-            raw_value = str(result[k].encode('utf-8'))
+            raw_value = str(answer.data.encode('utf-8'))
             value = clean_value(raw_value)
 
-            qs_text = k[:-1] + "qs"
+            qs_text = slug + "qs"
             id_text = "questionaire_"+str(fingerprint_ttype)
             if qhighlights != None and id_text in qhighlights and qs_text in qhighlights[id_text]:
                 t.tag = qhighlights[id_text][qs_text][0].encode('utf-8')
 
-            try:
+            if answer.comment != None:
+                t.comment = answer.comment
 
-               t.comment = result['comment_question_'+k]
-               #print t.comment
-            except KeyError:
-               pass
             if clean:
                 t.value = value.replace("#", " ")
                 
-                if rHighlights != None and k in rHighlights:
-                    t.value = rHighlights[k][0].encode('utf-8')
+                if rHighlights != None and slug+'_t' in rHighlights:
+                    t.value = rHighlights[slug+'_t'][0].encode('utf-8')
                     #if len(highlights["results"][k])>1:
                     #print t.value
                 
                 if t.ttype in Fingerprint_Summary:
                     t.value = Fingerprint_Summary[t.ttype](raw_value)
 
-
             else:
                 t.value = value
-            if k == "database_name_t":
+
+            if slug == "database_name":
                 name = t.value           
 
-            list_values.append(t)
             if question_group != None:
                 try:
                     question_group.list_ordered_tags[question_group.list_ordered_tags.index(t)] = t
                 except:
                     pass
-        break
-    # What should I do with this code?
-    # I know that it actually do nothing    
-    if (users!=""):
-        users.split(" \\ ")
 
-    return (qsets, name, db_owners, fingerprint_ttype)
+    return (qsets, name)
 
-   
 # TODO: move to another place, maybe API? 
 def get_api_info(fingerprint_id):
     """This is an auxiliar method to get the API Info
@@ -2780,8 +2557,16 @@ def check_database_add_conditions(request, questionnaire_id, sortid, saveid,
 
         if not hasErrors:
             add_city(qlist_general)
-            index_answeres_from_qvalues(qlist_general, question_set2.questionnaire, users_db,
-                                        fingerprint_id, extra_fields=extra_fields, created_date=created_date)
+
+            if request.POST:
+                setNewPermissions(request)
+            else:
+                setNewPermissions(request2)
+
+            saveFingerprintAnswers(qlist_general, fingerprint_id, question_set2.questionnaire, users_db, extra_fields=extra_fields, created_date=created_date)
+
+            # new version that just serializes the created fingerprint object (this eventually can be done using celery)
+            indexFingerprint(fingerprint_id)
 
     r = r2r(template_name, request,
                 questionset=question_set2,
@@ -2806,6 +2591,37 @@ def check_database_add_conditions(request, questionnaire_id, sortid, saveid,
     r['Expires'] = "Thu, 24 Jan 1980 00:00:00 GMT"
 
     return r
+
+# Set new permissions for a questionset, based on a post request
+def setNewPermissions(request):
+
+    if(request == None or not request.POST):
+        return False
+
+    id = request.POST['_qs_perm']
+
+    if(id != None):
+
+        try:
+            this_permissions                = QuestionSetPermissions.objects.get(id=id)
+
+            this_permissions.visibility     = int(request.POST['_qs_visibility'])
+            this_permissions.allow_printing = (request.POST['_qs_printing'] == 'true')
+            this_permissions.allow_indexing = (request.POST['_qs_indexing'] == 'true')
+            this_permissions.allow_exporting= (request.POST['_qs_exporting'] == 'true')
+
+            this_permissions.save()
+
+            return True
+
+        except QuestionSetPermissions.DoesNotExist:
+            print "Can't save this since, there's no permissions object to this questionset yet."
+        except QuestionSetPermissions.MultipleObjectsReturned:
+            print "Can't save this since there's several objects for this questionset permissions (should be only one)"
+
+
+    return False
+
 ## ###############
 ##  STIL MIGHT BE USEFULL FOR DEBUG PORPOSES
 ## #######################
@@ -2961,85 +2777,46 @@ def show_fingerprint_page_read_only(request, q_id, qs_id, SouMesmoReadOnly=False
     else:
         hide_add = False
     
-    serialized_query = None;
+    serialized_query = None
     
     if template_name == 'advanced_search.html' and aqid != None:
         this_query = AdvancedQuery.objects.get(id=aqid)  
         serialized_query = this_query.serialized_query
         
     try:
-
         
         qs_list = QuestionSet.objects.filter(questionnaire=q_id).order_by('sortid')
 
-        #print "Q_id: " + q_id
-        #print "Qs_id: " + qs_id
-        #print "QS List: " + str(qs_list)
         if (int(qs_id) == 99):
             qs_id = len(qs_list) - 1
 
         question_set = qs_list[int(qs_id)]
-        #questions = Question.objects.filter(questionset=qs_id)
 
         questions = question_set.questions()
-        #print "Questions: " + str(questions)
-        #print "QuestionSet: " + str(question_set)
 
         questions_list = {}
         for qset_aux in qs_list:
-            #questions_aux = Question.objects.filter(questionset=qset_aux)
             questions_list[qset_aux.id] = qset_aux.questions()
-            #print "here"
-        
-        qlist = []
-        jsinclude = []      # js files to include
-        cssinclude = []     # css files to include
-        jstriggers = []
-        qvalues = {}
-        qexpression = None  # boolean expression
-        qserialization = None   # boolean expression serialization to show on results
-        
-        qlist_general = []
-
-        errors = {}
+                
         fingerprint_id = generate_hash()
 
-
         #### Find out about the number of answers serverside 
-
-        #c = CoreEngine()
-
-        #this_document = c.search_fingerprint('id:' + db_id)
-
         qreturned = []
-
         for x in question_set.questionnaire.questionsets():
             ttct = x.total_count()
             ans = 0
-            try:
-                percentage = (ans * 100) / ttct
-            except ZeroDivisionError:
-                percentage = 0
+            percentage = 0
             qreturned.append([x, ans, ttct, percentage])
-
-        print qreturned
         #### End of finding out about the number of answers serverside
 
         r = r2r(template_name, request,
                         questionset=question_set,
                         questionsets=qreturned,
                         runinfo=None,
-                        errors=errors,
-                        qlist=qlist,
                         progress=None,
-                        triggers=jstriggers,
-                        qvalues=qvalues,
-                        jsinclude=jsinclude,
-                        cssinclude=cssinclude,
                         async_progress=None,
                         async_url=None,
                         qs_list=qs_list,
-                        questions_list=qlist_general,
                         fingerprint_id=fingerprint_id,
                         breadcrumb=True,
                         hide_add=hide_add,
@@ -3581,25 +3358,124 @@ def save_answers_to_csv(list_databases, filename):
         for t in list_databases:
             id = t.id
 
-            qsets, name, db_owners, fingerprint_ttype = createqsets(id, clean=False)
+            returned = createqsets(id, clean=False)
 
-            for group in qsets.ordered_items():
-                (k, qs) = group
-                if (qs!=None and qs.list_ordered_tags!= None):
-                    list_aux = sorted(qs.list_ordered_tags)
-                    #import pdb
-                    #pdb.set_trace()
-                    for q in list_aux:
-                        _answer = clean_str_exp(str(q.value))
-                        if (_answer == "" and q.ttype=='comment'):
-                            _answer = "-"
-                        writer.writerow([id, name, k.replace('h1. ', ''), clean_str_exp(str(q.tag)), str(q.number), _answer])
-            writer.writerow([id, name, "System", "Date", "99.0", t.date])
-            writer.writerow([id, name, "System", "Date Modification", "99.1", t.date_modification])
-            writer.writerow([id, name, "System", "Type", "99.2", t.type_name])
-            writer.writerow([id, name, "System", "Type Identifier", "99.3", t.ttype])
+            qsets, name, db_owners, fingerprint_ttype  = returned
+
+            qsets = attachPermissions(id, qsets)
+
+            for (k, qs), permissions in qsets:
+                if permissions.visibility == 0 and permissions.allow_exporting == True:
+                    writeGroup(id, k, qs, writer, name, t)
+
+        writer.writerow([id, name, "System", "Date", "99.0", t.date])
+        writer.writerow([id, name, "System", "Date Modification", "99.1", t.date_modification])
+        writer.writerow([id, name, "System", "Type", "99.2", t.type_name])
+        writer.writerow([id, name, "System", "Type Identifier", "99.3", t.ttype])
+    return response
+
+def attachPermissions(fingerprint_id, qsets):
+    zipper = qsets
+    zipee = []
+
+    #print type(zipper)
+
+    for q, v in qsets.ordered_items():
+        print "-----"
+        print q
+        print v.qsid
+        print "-----"
+
+    for q, v in zipper.ordered_items():
+        print "STUFF:"+str(v)
+        qpermissions = getPermissions(fingerprint_id, QuestionSet.objects.get(id=v.qsid))
+        zipee.append(qpermissions)
+
+    merged = zip(zipper.ordered_items(), zipee)
+
+    return merged
+
+def writeGroup(id, k, qs, writer, name, t):
+    if (qs!=None and qs.list_ordered_tags!= None):
+        list_aux = sorted(qs.list_ordered_tags)
+
+        for q in list_aux:
+            _answer = clean_str_exp(str(q.value))
+            if (_answer == "" and q.ttype=='comment'):
+                _answer = "-"
+            writer.writerow([id, name, k.replace('h1. ', ''), clean_str_exp(str(q.tag)), str(q.number), _answer])
+
+def export_datatable(request):
+
+    db_type = int(request.POST.get("db_type"))
+    qset_post = request.POST.getlist("qsets[]")
+
+    # generate a mumbo jumbo digest for this combination of parameters, to be used as key for caching purposes
+    string_to_be_hashed = "dbtype"+str(db_type)
+
+    for post in qset_post:
+        string_to_be_hashed+="qs"+post
+
+    hashed = hashlib.sha256(string_to_be_hashed).hexdigest()
+
+    titles = None
+    answers = None
+
+    cached = cache.get(hashed)
+
+    if cached != None:
+        print "cache hit"
+        (titles, answers) = cached
+
+    else :
+        print "need for cache"
+        qset_int = []
+        for qs in qset_post:
+            qset_int.append(int(qs))
+
+
+        qset = QuestionSet.objects.filter(id__in=qset_int)
+
+        fingerprints = Fingerprint.objects.filter(questionnaire__id=db_type)
+
+        (titles, answers) = creatematrixqsets(db_type, fingerprints, qset)
+
+        cache.set(hashed, (titles, answers), 720) # 12 hours of cache
+
+    """
+    Method to export all databases answers to a csv file
+    """
+    def clean_str_exp(s):
+        s2 = s.replace("\n", "|").replace(";", ",").replace("\t", "    ").replace("\r","").replace("^M","").replace("|", "")
+        
+        return re.sub("\s\s+" , " ", s2)
+
+
+
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="'+str(hashed)+'.csv"'
+
+    writer = csv.writer(response)
+
+    titles_clean = []
+    for title in titles:
+        titles_clean.append(title.replace('h0. ','').replace('h1. ','').replace('h2. ','').replace('h3. ','').replace('h4. ','').replace('h5. ','').replace('h6. ','').replace('h7. ',''))
+    
+    writer.writerow(titles_clean)
+
+    for title, ans in answers:
+        line = [title]
+        for a in ans:
+            if a != '':
+                line.append(clean_str_exp(strip_tags(a[0])))
+            else:
+                line.append('')
+        writer.writerow(line)
 
     return response
+
+    # list_databases = get_databases_from_solr(request, "*:*")
+    # return save_answers_to_csv(list_databases, "DBs")
 
 
 def export_all_answers(request):
@@ -3620,6 +3496,26 @@ def export_my_answers(request):
     list_databases = get_databases_from_solr(request, "user_t:" + '"' + user.username + '"')
 
     return save_answers_to_csv(list_databases, "MyDBs")
+
+def export_search_answers(request):
+    """
+    Method to export search databases answers to a csv file
+    """
+
+    user = request.user
+
+    query = None
+    isadvanced = request.session.get('isAdvanced')
+    value = request.session.get('query')
+
+    if(isadvanced):
+        query = value
+    else:
+        query = "text_t:"+str(value)
+
+    list_databases = get_databases_from_solr(request, query)
+
+    return save_answers_to_csv(list_databases, "search_results")
 
 
 def export_bd_answers(request, runcode):

@@ -117,8 +117,10 @@ urlpatterns = patterns('',
     url(r'^alldatabases/(?P<page>[-]{0,1}\d+)?$', 'emif.views.all_databases_user'),
     url(r'^alldatabases/data-table$', 'emif.views.all_databases_data_table'),
     url(r'^qs_data_table$', 'emif.views.qs_data_table'),    
+    url(r'^export_datatable$', 'emif.views.export_datatable'),
     url(r'^export_all_answers$', 'emif.views.export_all_answers'),
     url(r'^export_my_answers$', 'emif.views.export_my_answers'),
+    url(r'^export_search_answers$', 'emif.views.export_search_answers'),
     url(r'^export_bd_answers/(?P<runcode>[^/]+)/$', 'emif.views.export_bd_answers'),
     url(r'^import-questionnaire', 'emif.views.import_questionnaire'),
     url(r'^delete-questionnaire/(?P<qId>[0-9]+)/$', 'utils.delete_questionnaire.delete'),
@@ -261,6 +263,10 @@ urlpatterns = patterns('',
 
     # AdvancedSearch URLs
     url(r'advsearch/', include('advancedsearch.urls')),
+
+    # Public links URLs
+    url(r'public/', include('public.urls')),
+
 )
 
 if settings.DEBUG:

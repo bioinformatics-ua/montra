@@ -22,8 +22,7 @@ from django.contrib.auth.models import User
 from django.db import models
 
 from django.db.models.fields import *
-#from questionnaire.models import Subject
-#
+
 from django import forms
 
 from questionnaire.models import Questionnaire

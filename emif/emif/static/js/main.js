@@ -1,3 +1,6 @@
+function showExportMessage(){
+    $('#exporting-message').fadeIn('fast');
+
 
 // Validation of quicksearch
 $('#quicksearch').submit(function() {
@@ -9,3 +12,9 @@ $('#quicksearch').submit(function() {
 
         return true;
 });
+
+    setTimeout(function() {
+      $('#exporting-message').fadeOut('fast');  
+    }, 4000);
+}
+

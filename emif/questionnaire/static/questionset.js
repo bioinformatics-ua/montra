@@ -167,6 +167,8 @@ function setsaveqs(id){
 
       if (!(typeof errornavigator === 'undefined')) {
       errornavigator.hideErrorPage();
+      $("#loading-message").fadeOut('fast');
+      $("#loading-error-message").fadeOut('fast');
       errornavigator.reset();
 
       var list_invalid = advValidator.validateFormContext(e, self);
@@ -188,6 +190,13 @@ function setsaveqs(id){
 
             posting.done(function(data) {
               $("#loading-message").fadeOut('fast');
+            });
+
+            posting.fail(function(data){
+              $("#loading-message").fadeOut('fast');
+
+              $("#loading-error-message").fadeIn('fast');
+               
             });
           }
         }

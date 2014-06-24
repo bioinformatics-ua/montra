@@ -23,11 +23,31 @@
         Detailed
       </a>
       {% endif %}
+
       {% if results or databases or alldatabases or more_like_this %}
         <span id="selected_databases" class="btn disabled"> <strong>Type Selected:</strong> <span id="selected_dbstype">---</span> &nbsp; &nbsp; <strong>Selected databases:</strong> <span id="selected_dbscount">0</span></span>      
         <a id="comparabtn" class="btn "  href=""  rel="tooltip" data-container="body" data-placement="bottom" data-original-title="This allows to compare databases.<br /> It is only possible to compare databases of the same type. <br /> When a database is selected, the type is defined automatically, and databases of other types can't be choosen. <br /> To be able to select other type, you must unselect all the databases." class="help_selectresults icon-question-sign" disabled> <i  class=" icon"></i>
           <i class="icon-retweet"></i> Compare</a>
       {% endif %}
+
+      {% if create_public and own_dbs|length > 0 %}
+        <div class="btn-group">
+        <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
+          Create Public Link
+          <span class="caret"></span>
+        </a>
+        <ul class="dropdown-menu">
+          {% for fg in own_dbs %}
+            <li>
+              <a href="public/fingerprint/create/{{fg.fingerprint}}">{{fg.name}}</a>
+            </li>
+          {% endfor %}
+          
+        </ul>
+        </div>
+      {% endif %}
+
+
       {% if add_databases or not hide_add %}
 	      <div class="btn btn-group">
         <a class="btn dropdown-toggle" data-toggle="dropdown" href="#" id="add_list_toolbar">
@@ -63,25 +83,35 @@
       </a>
       {% endif %}
 
+      {% if export_datatable and request.user.is_superuser %}
+      
+        <button id="exportdatatable" class="btn" onclick="showExportMessage();"> <i class="fa fa-upload"></i> Export </button>
+      {% endif %}
+
       {% if export_all_answers and request.user.is_superuser %}
-      <a class="btn" href="export_all_answers" onclick="" > <i class="icon-file"></i>
+      <a class="btn" href="export_all_answers" onclick="showExportMessage();" > <i class="fa fa-upload"></i>
         Export
       </a>
       {% endif %}
 
-
       {% if export_bd_answers and request.user.is_superuser %}
-      <a class="btn" href="export_bd_answers/{{ fingerprint_id }}" onclick="" > <i class="fa fa-upload"></i>
+      <a class="btn" href="export_bd_answers/{{ fingerprint_id }}" onclick="showExportMessage();" > <i class="fa fa-upload"></i>
         Export
       </a>
       {% endif %}
 
       {% if export_my_answers and request.user.is_superuser %}
-      <a class="btn" href="export_my_answers" onclick="" > <i class="fa fa-upload"></i>
+
+      <a class="btn" href="export_my_answers" onclick="showExportMessage();" > <i class="fa fa-upload"></i>
         Export
       </a>
-      {% endif %}
+      {% if isSearch and request.user.is_superuser %}
+      <a class="btn" href="export_search_answers" onclick="showExportMessage();" > <i class="fa fa-upload"></i>
 
+        Export
+      </a>
+      {% endif %}     
+      {% endif %}
       {% if request.user.is_superuser %}
             {% if  api_token %}
                 <a class="btn" href="api-info"> <i class=" icon"></i>
@@ -101,12 +131,22 @@
         Edit
       </a>
       </li>
+      <li class="divider"></li>
+      <li style="margin-top: -10px;"><small style="margin-left: 20px; color: grey;">Share</small></li>
       <li>
-      <a class="sharedb" href="" id="share_list_toolbar" onclick="return false;"> <i class="icon-share icon"></i>
-        Share
+
+      <a class="sharedb" href="" id="share_list_toolbar" onclick="return false;"> <i class="fa fa-users"></i>
+        Invite Other Users
         
       </a>
       </li>
+      <li>
+
+      <a class="publiclink" href="" id="publiclink_toolbar" onclick="return false;"> <i class="fa fa-share"></i>
+        Create Public Link  
+      </a>
+      </li>
+      <li class="divider"></li>
       <li>
       <a class="confirm-delete" href="" id="delete_list_toolbar" onclick="return false;"data-id="{{ fingerprint_id }}"  title="Remove Database"> <i class="icon-trash icon"></i>
         Delete
@@ -120,9 +160,6 @@
 
 	</div>
 </div>
-
-
-
 <!-- **********************************************************************
 ***** Model to delete the fingerprint. It will show a window to confirm the
 ***** deletion of the fingerprint
@@ -155,7 +192,7 @@
 <div id="modal-from-dom-share" class="modal hide fade" style="display:none"  >
     <div class="modal-header">
         <a href="#" onclick="$('#modal-from-dom-share').modal('hide'); return false;" class="close">&times;</a>
-         <h3>Share Database</h3>
+         <h3>Invite Other Users to This Database</h3>
     </div>
     <div class="modal-body">
         <p>What is the email address of your team member? (must be a registered user)</p>
@@ -180,10 +217,44 @@
     </div>
 </div>
 
+<div id="modal-from-dom-publiclink" class="modal hide fade" style="display:none"  >
+    <div class="modal-header">
+        <a href="#" onclick="$('#modal-from-dom-publiclink').modal('hide'); return false;" class="close">&times;</a>
+         <h3>Create a public link to share this Database</h3>
+    </div>
+    <div class="modal-body">
+        <p>It's possible to publicly share your database through a public link.</p>
+
+        <legend>Public link <small><a class="pull-right" href="public/fingerprint">Manage Public Links</a></small></legend>
+        <div class="publiclink_container">
+          {% if public_link %}
+            Public link already exists! <br />
+            <center><h3><a href="public/fingerprint/{{public_link.hash}}">Click to open public link</a></h3>
+
+            <button onclick="deletePublicLink({{public_link.id}});" class="btn btn-link">Delete Public Link</button>
+            </center>
+          {% else %}
+            There's no public link yet. Click below on "Create Public Link", to generate a public link for this
+            database.
+          {% endif %}
+        </div>
+      </div>
+    <div class="modal-footer">
+        <button id="createpubliclink" {% if public_link %} style="display: none;" {% endif %} class="btn">Create Public Link</button>
+
+        <a href="#" onclick="$('#modal-from-dom-publiclink').modal('hide'); return false;" class="btn btn-secondary">Cancel</a>
+    </div>
+</div>
 
 <form id="send" method="POST" > {% csrf_token %}
 </form>
 
+<form id="senddatatablemodel" method="POST" >
+{% csrf_token %}
+</form>
+<form id="senddatatable" action="export_datatable" method="POST" >
+{% csrf_token %}
+</form>
 
 <script>
 
@@ -260,10 +331,23 @@ $(".sharedb" ).click(function(e)
   $('#modal-from-dom-share').data('id', id).modal('show');
        
 });
+$(".publiclink" ).click(function(e) 
+{
+  e.preventDefault();
+  var id = "{{fingerprint_id}}";
+
+  $('#modal-from-dom-publiclink').data('id', id).modal('show');
+       
+});
 $("#share_email" ).change(function(e) 
 {
   checkIfEmailExists();
 });
+
+$("#createpubliclink").click(function(){
+  createPublicLink();
+});
+
 // This bind will share the email. 
 $(".sharedb2" ).click(function(e) 
 {
@@ -297,6 +381,46 @@ function checkIfEmailExists(){
   .fail(function(){
         $('#share_indicator').html('<i class="icon-remove text-error"></i>');
         $('#share_message').html('<p class="text-error">Look up failed, maybe the internet connection is down.</p>');
+  });
+}
+
+function createPublicLink(){
+  var fingerprint = "{{fingerprint_id}}";
+
+  $.post("api/addpubliclink", { fingerprint_id: fingerprint })
+  .done(function(response) {
+    if(response.id){
+      console.log(response.id);
+      $(".publiclink_container").html('Public link already exists! <br /><center><h3><a href="public/fingerprint/'+response.hash+'">Click to open public link</a></h3><button onclick="deletePublicLink('+response.id+');" class="btn btn-link">Delete Public Link</a></center>');
+
+      $("#createpubliclink").hide();
+
+    } else {
+      console.log('Error');
+    }
+
+  })
+  .fail(function(){
+    console.log('Failed creating public link');
+  });
+}
+function deletePublicLink(share_id){
+
+  $.post("api/deletepubliclink", { share_id: share_id })
+  .done(function(response) {
+    if(response.deleted){
+      console.log(response.deleted);
+      $(".publiclink_container").text("There's no public link yet. Click below on \"Create Public Link\", to generate a public link for this database.");
+
+      $("#createpubliclink").show();
+
+    } else {
+      console.log('Error');
+    }
+
+  })
+  .fail(function(){
+    console.log('Failed creating public link');
   });
 }
 

@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+{% load url from future %}
+{% load extra_tags %}
+{% load django_bootstrap_breadcrumbs %}
+
+{% block breadcrumbs %}
+
+        {% breadcrumb "Databases" "home" %}
+        {% breadcrumb "My Public Links" "" %}
+
+{% endblock %}
+    {% block toolbar %}
+    {% include "menu_toolbar.html" with collapse=collapseall %}
+    {% endblock %}
+{% block content %}
+    
+    {% if added %}
+        <div style="margin-top: 50px;" class="alert alert-success">
+        <a class="close" data-dismiss="alert" href="#">&times;</a>
+          Public link created successfully.
+        </div>
+    {% endif %}
+    {% if deleted %}
+        <div style="margin-top: 50px;" class="alert alert-danger">
+        <a class="close" data-dismiss="alert" href="#">&times;</a>
+          Public link deleted successfully.
+        </div>
+    {% endif %}
+    <table class="table table-bordered table-striped">
+        <thead>
+            <tr>
+                <th>Fingerprint</th>
+                <th>Url Expiration date</th>
+                <th>Remaining Views</th>
+                <th>Manage</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% if links|length > 0 %}
+            {% for link in links %}
+                <tr>
+                    <td><a href="fingerprint/{{link.share.fingerprint}}/1/">{{link.name}}</a></td>
+                    <td>{{link.share.expiration_date|date:"Y-M-d H:i:s"}}</td>
+                    <td>{{link.share.remaining_views}}</td>
+                    <td><a class="pub_link" href="public/fingerprint/{{link.share.hash}}">Public Link</a><a class="pull-right" href="public/fingerprint/delete/{{link.share.id}}">
+                        <img src="static/img/glyphicons_192_circle_remove.png" alt="Delete" />
+
+                    </button></td>
+                </tr>
+            {% endfor %}
+        {% else %}
+            <tr><td colspan="4"><center>No database is currently shared publicly, you can share a database by using the "Create Public Link" dropdown on the menu toolbar above.</center></td></tr>
+        {% endif %}
+        </tbody>
+    </table>
+
+{% endblock content %}
+
+{% block scriptextraincludes %}
+    <script type="text/javascript" src="static/js/emif.public.js"></script>
+{% endblock %}
