@@ -132,7 +132,7 @@ def results_comp(request, template_name='results_comp.html'):
     first_name = None
     list_qsets = {}
     for db_id in list_fingerprint_to_compare:
-        qsets, name, db_owners, fingerprint_ttype = createqsets(db_id)
+        qsets, name, db_owners, fingerprint_ttype = createqsets(db_id, noprocessing=True)
 
         list_qsets[db_id] = { 'name': name, 'qset': qsets}
 
@@ -1939,7 +1939,7 @@ def creatematrixqsets(db_type, fingerprints, qsets):
 
     return (q_list, ans)
 
-def createqsets(runcode, qsets=None, clean=True, highlights=None, getAnswers=True, choosenqsets=None, fullmode=True):
+def createqsets(runcode, qsets=None, clean=True, highlights=None, getAnswers=True, choosenqsets=None, fullmode=True, noprocessing=False):
     try:
         if fullmode:
             fingerprint = Fingerprint.objects.get(fingerprint_hash=runcode)
@@ -1972,7 +1972,7 @@ def createqsets(runcode, qsets=None, clean=True, highlights=None, getAnswers=Tru
         name = None
         for qset in qsets_query:
             if qset.sortid != 0 and qset.sortid != 99:
-                (qsets, name) = handle_qset(fingerprint, clean, qsets, qset, answers, fingerprint_ttype, rHighlights, qhighlights, getAnswers)
+                (qsets, name) = handle_qset(fingerprint, clean, qsets, qset, answers, fingerprint_ttype, rHighlights, qhighlights, getAnswers, noprocessing=noprocessing)
 
         return (qsets, name, db_owners, fingerprint_ttype)
 
@@ -2055,7 +2055,7 @@ def createqset(runcode, qsid, qsets=None, clean=True, highlights=None):
     return HttpResponse('Something is wrong on creating qset '+qsid, 500)
 
 # this handles the generation of the tag - value for a single qset, given a questionset reference
-def handle_qset(fingerprint, clean, qsets, qset, answers, fingerprint_ttype, rHighlights, qhighlights, getAnswers=True):
+def handle_qset(fingerprint, clean, qsets, qset, answers, fingerprint_ttype, rHighlights, qhighlights, getAnswers=True, noprocessing=False):
     name = ""
     question_group = QuestionGroup()
     question_group.sortid = qset.sortid
@@ -2127,8 +2127,9 @@ def handle_qset(fingerprint, clean, qsets, qset, answers, fingerprint_ttype, rHi
                     #if len(highlights["results"][k])>1:
                     #print t.value
                 
-                if t.ttype in Fingerprint_Summary:
-                    t.value = Fingerprint_Summary[t.ttype](raw_value)
+                if not noprocessing:
+                    if t.ttype in Fingerprint_Summary:
+                        t.value = Fingerprint_Summary[t.ttype](raw_value)
 
             else:
                 t.value = value
@@ -3443,16 +3444,7 @@ def attachPermissions(fingerprint_id, qsets):
     zipper = qsets
     zipee = []
 
-    #print type(zipper)
-
-    for q, v in qsets.ordered_items():
-        print "-----"
-        print q
-        print v.qsid
-        print "-----"
-
     for q, v in zipper.ordered_items():
-        print "STUFF:"+str(v)
         qpermissions = getPermissions(fingerprint_id, QuestionSet.objects.get(id=v.qsid))
         zipee.append(qpermissions)
 
