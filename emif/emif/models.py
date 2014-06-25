@@ -42,6 +42,7 @@ class QueryLog(models.Model):
     query = models.TextField()
     created_date = models.DateTimeField(auto_now_add=True)
     latest_date = models.DateTimeField(auto_now=True)
+    removed = models.BooleanField(default=False)
 
 class Log(models.Model):
     description = models.TextField()
