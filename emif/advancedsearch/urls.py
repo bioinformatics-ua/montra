@@ -23,8 +23,13 @@ urlpatterns = patterns('',
    
     # Literature tab, on database info view
     url(r'^history$', 'advancedsearch.views.history_defer'),  
-    url(r'^history/(?P<page>[0-9]+)$', 'advancedsearch.views.history'),    
+    url(r'^history_advanced$', 'advancedsearch.views.history_defer_advanced'),  
+    url(r'^history/(?P<source>[0-9]+)/(?P<page>[0-9]+)$', 'advancedsearch.views.history'),    
     url(r'^results/(?P<query_id>[0-9]+)$', 'advancedsearch.views.resultsdiff_history'), 
+    url(r'^results_simple/(?P<query_id>[0-9]+)$', 'advancedsearch.views.resultsdiff_historysimple'), 
     url(r'^history/remove/(?P<query_id>[0-9]+)$', 'advancedsearch.views.remove'), 
+    url(r'^history/remove_simple/(?P<query_id>[0-9]+)$', 'advancedsearch.views.removesimple'), 
     url(r'^history/remove_all$', 'advancedsearch.views.remove_all'), 
+    url(r'^history/remove_all_simple$', 'advancedsearch.views.remove_allsimple'), 
+
 )
