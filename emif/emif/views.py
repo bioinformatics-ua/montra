@@ -3216,7 +3216,7 @@ def create_auth_token(request, page=1, templateName='api-key.html', force=False)
 def invitedb(request, db_id, template_name="sharedb.html"):
 
     email = request.POST.get('email', '')
-
+    message_write = request.POST.get('message', '')
     if (email == None or email==''):
         return HttpResponse('Invalid email address.')
 
@@ -3230,13 +3230,20 @@ def invitedb(request, db_id, template_name="sharedb.html"):
     subject = "EMIF Catalogue: A new database is trying to be shared with you."
     link_invite = settings.BASE_URL + "accounts/signup/"
 
-    message = """Dear %s,\n\n
-            \n
-            %s is sharing a new database with you on Emif Catalogue. 
-            First you must register on the EMIF Catalogue. Please follow the link below: \n\n
+    #message = """Dear %s,\n\n
+    #        \n
+    #        %s is sharing a new database with you on Emif Catalogue. 
+    #        First you must register on the EMIF Catalogue. Please follow the link below: \n\n
+    #        %s 
+    #        \n\nSincerely,\nEMIF Catalogue
+    #""" % (email,request.user.get_full_name(), link_invite)
+
+    message = """%s\n
+            You must register on the EMIF Catalogue. Please follow the link below: \n\n
             %s 
             \n\nSincerely,\nEMIF Catalogue
-    """ % (email,request.user.get_full_name(), link_invite)
+    """ % (message_write, link_invite)
+
 
     send_custom_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [email])
 
@@ -3311,17 +3318,13 @@ def sharedb(request, db_id, template_name="sharedb.html"):
 
     try:
         
-        message = """Dear %s,\n\n
-            \n
-            %s is sharing a new database with you. And left you the following message:\n\n
-
-            \"%s\"
+        message = """%s
 
             Now you're able to edit and manage the database. \n\n
             To activate the database in your account, please open this link:
             %s 
             \n\nSincerely,\nEMIF Catalogue
-        """ % (name,request.user.get_full_name(), message,link_activation)
+        """ % (message,link_activation)
         # Send email to admins
         #send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, emails_to_feedback)
         # Send email to user with the copy of feedback message
