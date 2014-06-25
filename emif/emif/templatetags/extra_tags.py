@@ -128,6 +128,12 @@ def captioned(value):
 
     return value not in exclusion_list
 
+@register.filter(name='is_usecase')
+@stringfilter
+def is_usecase(value):
+
+    return bool(re.match('use', value, re.I))
+
 @register.filter
 def whitespacesplit(str):
     words = []

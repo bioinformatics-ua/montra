@@ -1,5 +1,7 @@
 {% extends 'base.html' %}
 {% load url from future %}
+{% load extra_tags %}
+
 {% load django_bootstrap_breadcrumbs %}
 
 {% block breadcrumbs %}
@@ -10,45 +12,131 @@
 {% endblock %}
 
 {% block content%}
-
 <div class="row">
     <div id="contact_wrap" class="rows">
-        <div class="span6 center">
-            
+        <div class="span12 center">
+{% if request.user.is_staff %}        
+<ul class="nav nav-tabs">
+  <li class="active"><a href="#milestones" data-toggle="tab">Releases</a></li>
+  <li><a href="#closedissues" data-toggle="tab">Recently Closed Issues</a></li>
+  <li><a href="#openissues" data-toggle="tab">Open Issues</a></li>
+</ul>
+{% else %}
+<h2>Releases</h2>
+{% endif %}
+<div class="tab-content">
+  <div class="tab-pane active" id="milestones">
+            <table class="table table-bordered table-striped">
+            <thead>
+                <tr>
+                    <th>Milestone</th>
+                    <th>Description</th>
+                    <th style="width: 140px;">Closed Date</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+                <tbody>
+                    {% for milestone in milestones %}
+                        {% if milestone.state == 'closed' or request.user.is_staff %}
+                        <tr>
+                            <td>{{milestone.title}}</td>
+                            <td>
+                                {{milestone.description|safe}} <br />
+                                <div class="labels">
+                                    <div class="pull-right">
+                                    {% for label in milestone.iter_labels %}
+                                        {% if label|is_usecase %}
+                                        <span style="background-color: #{{label.color}}" class="label">{{ label.name }}</span>
+                                        {% endif %}
+                                        
+                                    {% endfor %}
+                                    </div>
+                                </div>
+                            </td>
+                            <td>{{milestone.due_on|date:"Y-m-d H:i:s"}}</td>
+                            <td style="text-align: center">
+                                {% if milestone.state == 'closed' %}
+                                    <i title="closed" class="fa fa-2 fa-check"></i>
+                                {% else %}
+                                    <i title="open" class="fa fa-2 fa-circle-o"></i>
+                                {%endif %}
+                            </td>
+                        </tr>
+                        {% endif %}
+                    {% endfor %}
+                </tbody>
+            </table>
 
-            <h2>Releases</h2>
-
-            <ul>
-            {% for milestone in milestones %}
-                <li>{{milestone.title}}, - {{milestone.description|safe}}  
-                </li>
-            {% endfor %}
-            </ul>
-            {% if request.user.is_staff %}
-            <h2>List Issues</h2>
-
-
-            <h3>Recently issues closed:</h3>
-            <ul>
+  </div>
+{% if request.user.is_staff %}
+  <div class="tab-pane" id="closedissues">   
+    <table class="table table-bordered table-striped">
+        <thead>
+            <tr>
+                <th>Title</th>
+                <th>Use Cases</th>
+                <th style="width: 140px;">Closed Date</th>
+            </tr>
+        </thead>
+        <tbody>
             {% for issue in issues_closed %}
-                <li>{{issue.title}} 
-                {%comment%}
-                {%for l in issue.labels %}
-                 {{l}} 
-                 {%endfor%}
-                 {%endcomment%}
-                </li>
+                <tr>
+                    <td>{{issue.title}}</td>
+                    <td>
+                        <div class="labels">
+                            <div class="pull-right">
+                            {% for label in issue.labels %}
+                                {% if label|is_usecase %}
+                                <span style="background-color: #{{label.color}}" class="label">{{ label.name }}</span>
+                                {% endif %}
+                                
+                            {% endfor %}
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        {{issue.closed_at|date:"Y-m-d H:i:s"}}
+                    </td>
+                </tr>
             {% endfor %}
-            </ul>
-            <h3>Active issues: </h3>
-            <ul>
+        </tbody>
+    </table>               
+  </div>
+  <div class="tab-pane" id="openissues">      
+    <table class="table table-bordered table-striped">
+        <thead>
+            <tr>
+                <th>Title</th>
+                <th>Use Cases</th>
+                <th style="width: 140px;">Created Date</th>
+            </tr>
+        </thead>
+        <tbody>
             {% for issue in issues_open %}
-                <li>{{issue.title}} 
-
-                </li>
+                <tr>
+                    <td>{{issue.title}}</td>
+                    <td>
+                        <div class="labels">
+                            <div class="pull-right">
+                            {% for label in issue.labels %}
+                                {% if label|is_usecase %}
+                                <span style="background-color: #{{label.color}}" class="label">{{ label.name }}</span>
+                                {% endif %}
+                                
+                            {% endfor %}
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        {{issue.created_at|date:"Y-m-d H:i:s"}}
+                    </td>
+                </tr>
             {% endfor %}
-            </ul>
-            {%endif%}
+        </tbody>
+    </table>  
+  </div>
+{%endif%}
+</div>
 
         </div>
         <!-- end contact_wrap --> </div>
