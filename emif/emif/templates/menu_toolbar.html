@@ -23,21 +23,9 @@
         Detailed
       </a>
       {% endif %}
-      {% if results or databases or alldatabases or more_like_this %}
-        <span id="selected_databases" class="btn disabled"> <strong>Type Selected:</strong> <span id="selected_dbstype">---</span> &nbsp; &nbsp; <strong>Selected databases:</strong> <span id="selected_dbscount">0</span></span>      
+      {% if results or databases or alldatabases or more_like_this %}   
         <a id="comparabtn" class="btn "  href=""  rel="tooltip" data-container="body" data-placement="bottom" data-original-title="This allows to compare databases.<br /> It is only possible to compare databases of the same type. <br /> When a database is selected, the type is defined automatically, and databases of other types can't be choosen. <br /> To be able to select other type, you must unselect all the databases." class="help_selectresults icon-question-sign" disabled> <i  class=" icon"></i>
           <i class="icon-retweet"></i> Compare</a>
-      {% endif %}
-      {% if add_databases or not hide_add %}
-	      <div class="btn btn-group">
-        <a class="btn dropdown-toggle" data-toggle="dropdown" href="#" id="add_list_toolbar">
-         <i class="icon-plus icon"></i> Add
-          <span class="caret"></span>
-        </a>
-        <ul class="pull-right dropdown-menu">
-           {% show_fingerprints_interests request.user %}
-        </ul>
-      </div> 
       {% endif %}
 		<!--/div-->
 		{% endif %}
@@ -46,11 +34,6 @@
             Expand all
          </a>
         {% endif %}
-        {% if list_databases|length > 0 and not no_print %}
-		<button type="button" class="btn btn" onclick="window.print();" title="Print">
-			<i class="icon-print"></i> Print
-		</button>
-        {% endif  %}
 	  {% if geo or alldatabases or databases or results or more_like_this %}
       <a class="btn" href="geo" onclick="" > <i class=" icon"></i>
         <i class="icon-globe"></i> Geolocation
@@ -116,13 +99,22 @@
         </ul>
       </div>      
       {% endif %}
-		
+		        {% if list_databases|length > 0 and not no_print %}
+    <button type="button" class="btn btn" onclick="window.print();" title="Print">
+      <i class="icon-print"></i> Print
+    </button>
+        {% endif  %}
 
 	</div>
 </div>
 
-
-
+{% if results or databases or alldatabases or more_like_this %}  
+<div id="selected_databases"> 
+<div class="pull-right">
+<strong>Type Selected:</strong> <span id="selected_dbstype">---</span> &nbsp; &nbsp; <strong>Selected databases:</strong> <span id="selected_dbscount">0</span>
+</div>
+</div>   
+{% endif %}
 <!-- **********************************************************************
 ***** Model to delete the fingerprint. It will show a window to confirm the
 ***** deletion of the fingerprint
