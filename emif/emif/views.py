@@ -3239,7 +3239,7 @@ def invitedb(request, db_id, template_name="sharedb.html"):
     #""" % (email,request.user.get_full_name(), link_invite)
 
     message = """%s\n
-            You must register on the EMIF Catalogue. Please follow the link below: \n\n
+            To have full access to this fingerprint, please register in the EMIF Catalogue following the link below: \n\n
             %s 
             \n\nSincerely,\nEMIF Catalogue
     """ % (message_write, link_invite)
