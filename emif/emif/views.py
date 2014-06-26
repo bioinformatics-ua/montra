@@ -1770,8 +1770,6 @@ def define_rows(request):
         
         profile.save()
 
-        if rows == -1:
-            rows = 99999
     else:
         # Otherwise get number of rows from preferences
         rows = 5
@@ -1784,6 +1782,8 @@ def define_rows(request):
         except:
             pass
 
+    if rows == -1:
+        rows = 99999
 
     return rows
 # GET ALL DATABASES ACCORDING TO USER INTERESTS
@@ -3239,7 +3239,7 @@ def invitedb(request, db_id, template_name="sharedb.html"):
     #""" % (email,request.user.get_full_name(), link_invite)
 
     message = """%s\n
-            You must register on the EMIF Catalogue. Please follow the link below: \n\n
+            To have full access to this fingerprint, please register in the EMIF Catalogue following the link below: \n\n
             %s 
             \n\nSincerely,\nEMIF Catalogue
     """ % (message_write, link_invite)
