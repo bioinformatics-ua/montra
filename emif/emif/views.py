@@ -1770,8 +1770,6 @@ def define_rows(request):
         
         profile.save()
 
-        if rows == -1:
-            rows = 99999
     else:
         # Otherwise get number of rows from preferences
         rows = 5
@@ -1784,6 +1782,8 @@ def define_rows(request):
         except:
             pass
 
+    if rows == -1:
+        rows = 99999
 
     return rows
 # GET ALL DATABASES ACCORDING TO USER INTERESTS
