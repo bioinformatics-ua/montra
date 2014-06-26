@@ -732,3 +732,10 @@ height: 6em;
   color: #08c !important;
   text-decoration: none !important;
 }
+
+.summary_paginator {
+  text-align: center;
+}
+.showing_publications_info{
+  margin-bottom: -15px;
+}
