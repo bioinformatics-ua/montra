@@ -34,3 +34,9 @@ celery==3.1.0
 django-celery==3.1.0
 python-memcached==1.48
 johnny-cache==1.4
+django-extensions
+vobject
+chardet
+surlex>=0.2.0
+sorl-thumbnail
+django-newsletter==0.4.1

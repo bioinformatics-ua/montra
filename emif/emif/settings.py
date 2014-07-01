@@ -281,6 +281,11 @@ INSTALLED_APPS = (
 
     # public links
     'public',
+
+    # newsletters
+    'django_extensions',
+    'sorl.thumbnail',
+    'newsletter',
 )
 
 # Userena settings
