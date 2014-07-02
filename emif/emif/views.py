@@ -3178,7 +3178,7 @@ def sharedb(request, db_id, template_name="sharedb.html"):
 
 def sharedb_activation(request, activation_code, template_name="sharedb_invited.html"):
 
-    if (request.user==None):
+    if (request.user==None or not request.user.is_authenticated()):
         return HttpResponse('You need to be authenticated.')
     __objs = SharePending.objects.filter(activation_code=activation_code, pending=True, user=request.user)
     if (len(__objs)==0):
