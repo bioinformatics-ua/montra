@@ -267,6 +267,13 @@ function questionsets_handle(id_questionset)
              } else {
                console.log("Already on dom");
              }
+               if (window.history && window.history.pushState)
+              {% if not readonly %}
+                window.history.pushState(null, null, "dbEdit/{{fingerprint_id}}/{{q_id}}/"+obj.id.replace("qs_",""));
+              {% else %}
+                window.history.pushState(null, null, "dbDetailed/{{fingerprint_id}}/{{q_id}}/"+obj.id.replace("qs_",""));
+              {% endif %}
+            }
           }
           else {
             $('#li_'+obj.id).removeClass("active");
