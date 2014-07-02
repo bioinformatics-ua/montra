@@ -281,6 +281,9 @@ INSTALLED_APPS = (
 
     # public links
     'public',
+
+    # FAQ
+    'fack'
 )
 
 # Userena settings

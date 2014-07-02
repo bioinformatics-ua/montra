@@ -145,7 +145,7 @@ urlpatterns = patterns('',
     url(r'^controlversion/', include('control_version.urls')),
 
     # Questionnaire URLs
-    url(r'q/', include('questionnaire.urls')),
+    #url(r'q/', include('questionnaire.urls')),
 
     url(r'^take/(?P<questionnaire_id>[0-9]+)/$', 'questionnaire.views.generate_run'),
     
@@ -269,6 +269,8 @@ urlpatterns = patterns('',
     # Public links URLs
     url(r'public/', include('public.urls')),
 
+    # Faq
+    url('^faq/', include('fack.urls'))
 )
 
 if settings.DEBUG:
