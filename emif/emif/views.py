@@ -4012,9 +4012,14 @@ def import_questionnaire(request, template_name='import_questionnaire.html'):
                         else:
                             slug_db = slugs[0]
 
+                        visible_default = False
+                        if row[10].value:
+                            if str(row[10].value).lower() == 'visible':
+                                visible_default = True
+
                         question = Question(questionset=questionset, text_en=text_en, number=str(questionNumber),
                                             type=dataType_column.value, help_text=helpText, slug=slug, slug_fk=slug_db, stats=True,
-                                            category=False, tooltip=_tooltip, checks=_checks)
+                                            category=False, tooltip=_tooltip, checks=_checks, visible_default=visible_default)
 
                         log += '\n%s - Question created %s ' % (type_Column.row, question)
 
