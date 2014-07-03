@@ -34,3 +34,4 @@ celery==3.1.0
 django-celery==3.1.0
 python-memcached==1.48
 johnny-cache==1.4
+-e git://github.com/ribeiroct/django-fack.git#egg=django-fack
