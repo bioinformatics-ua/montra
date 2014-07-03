@@ -22,6 +22,8 @@
 ##
 from django.shortcuts import render, redirect
 
+from django.http import HttpResponse
+
 from emif.models import AdvancedQuery, AdvancedQueryAnswer
 from emif.views import results_diff, RequestMonkeyPatch
 from emif.models import QueryLog
@@ -35,6 +37,9 @@ def history_defer_advanced(request, template_name='history.html'):
     return history(request, '1', 1)
 
 def history(request, source, page, page_rows=10, template_name='history.html'):
+
+    if not request.user.is_authenticated():
+        return HttpResponse( "Must be logged in to see query history", status=403)
 
     queries = AdvancedQuery.objects.filter(user=request.user, removed=False).order_by('-date')
 
