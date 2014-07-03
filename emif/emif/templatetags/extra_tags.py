@@ -328,5 +328,9 @@ def get_version_tag(parser, token):
 register.tag( 'get_version', get_version_tag )
 
 
+@register.simple_tag
+def slogan():
+    return "Discover the right data for your research"
+
 
 
