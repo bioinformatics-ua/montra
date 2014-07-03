@@ -64,6 +64,10 @@ def show_summ(value):
         return ""
 
     value = value.replace("'", '"')
+
+    if not value.startswith('['):
+        value = '['+value+']'
+
     pubs = json.loads(value)
 
     if type(pubs) is not list:

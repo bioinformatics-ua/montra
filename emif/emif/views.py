@@ -132,7 +132,7 @@ def results_comp(request, template_name='results_comp.html'):
     first_name = None
     list_qsets = {}
     for db_id in list_fingerprint_to_compare:
-        qsets, name, db_owners, fingerprint_ttype = createqsets(db_id)
+        qsets, name, db_owners, fingerprint_ttype = createqsets(db_id, noprocessing=True)
 
         list_qsets[db_id] = { 'name': name, 'qset': qsets}
 
@@ -1939,7 +1939,7 @@ def creatematrixqsets(db_type, fingerprints, qsets):
 
     return (q_list, ans)
 
-def createqsets(runcode, qsets=None, clean=True, highlights=None, getAnswers=True, choosenqsets=None, fullmode=True):
+def createqsets(runcode, qsets=None, clean=True, highlights=None, getAnswers=True, choosenqsets=None, fullmode=True, noprocessing=False):
     try:
         if fullmode:
             fingerprint = Fingerprint.objects.get(fingerprint_hash=runcode)
@@ -1972,7 +1972,7 @@ def createqsets(runcode, qsets=None, clean=True, highlights=None, getAnswers=Tru
         name = None
         for qset in qsets_query:
             if qset.sortid != 0 and qset.sortid != 99:
-                (qsets, name) = handle_qset(fingerprint, clean, qsets, qset, answers, fingerprint_ttype, rHighlights, qhighlights, getAnswers)
+                (qsets, name) = handle_qset(fingerprint, clean, qsets, qset, answers, fingerprint_ttype, rHighlights, qhighlights, getAnswers, noprocessing=noprocessing)
 
         return (qsets, name, db_owners, fingerprint_ttype)
 
@@ -2055,7 +2055,7 @@ def createqset(runcode, qsid, qsets=None, clean=True, highlights=None):
     return HttpResponse('Something is wrong on creating qset '+qsid, 500)
 
 # this handles the generation of the tag - value for a single qset, given a questionset reference
-def handle_qset(fingerprint, clean, qsets, qset, answers, fingerprint_ttype, rHighlights, qhighlights, getAnswers=True):
+def handle_qset(fingerprint, clean, qsets, qset, answers, fingerprint_ttype, rHighlights, qhighlights, getAnswers=True, noprocessing=False):
     name = ""
     question_group = QuestionGroup()
     question_group.sortid = qset.sortid
@@ -2127,8 +2127,9 @@ def handle_qset(fingerprint, clean, qsets, qset, answers, fingerprint_ttype, rHi
                     #if len(highlights["results"][k])>1:
                     #print t.value
                 
-                if t.ttype in Fingerprint_Summary:
-                    t.value = Fingerprint_Summary[t.ttype](raw_value)
+                if not noprocessing:
+                    if t.ttype in Fingerprint_Summary:
+                        t.value = Fingerprint_Summary[t.ttype](raw_value)
 
             else:
                 t.value = value
@@ -3121,9 +3122,11 @@ def sharedb(request, db_id, template_name="sharedb.html"):
     # Verify if it is a valid database 
     if (db_id == None or db_id==''):
         return HttpResponse('Service Unavailable')  
-    c = CoreEngine()
-    results = c.search_fingerprint('id:' + db_id)
-    if (len(results)!=1):
+
+    fingerprint = None
+    try: 
+        fingerprint = Fingerprint.objects.get(fingerprint_hash=db_id)
+    except Fingerprint.DoesNotExist:
         return HttpResponse("Service Unavailable")  
 
     subject = "EMIF Catalogue: A new database has been shared with you."
@@ -3188,27 +3191,30 @@ def sharedb_activation(request, activation_code, template_name="sharedb_invited.
         return HttpResponse('An error has occured. Contact the EMIF Catalogue Team.')
     
     sp = __objs[0]
-    c = CoreEngine()
-    results = c.search_fingerprint('id:' + sp.db_id)
-    for r in results:
-        _aux = r
-        break
-    
-    _aux['user_t'] =  _aux['user_t'] + " \\ " + sp.user.username
-    print _aux['user_t']
 
-    c.update(r)
+    fingerprint = None
+    try:
+        fingerprint = Fingerprint.objects.get(fingerprint_hash=sp.db_id)
+
+    except:
+        return HttpResponse("And error has occurred. Contact the EMIF Catalogue Team.")
+    
+    fingerprint.shared.add(request.user)
+
+    fingerprint.save()
+
+    indexFingerprint(fingerprint.fingerprint_hash)
+
     sp.pending = False
     sp.save()
-
-
+    finger_name = findName(fingerprint)
     try:
         subject = "EMIF Catalogue: Accepted database shared"
         message = """Dear %s,\n\n
             \n\n
             %s has been activated. You can access the new database in "Databases" -> Personal".
             \n\nSincerely,\nEMIF Catalogue
-        """ % (request.user.get_full_name(), _aux['database_name_t'] )
+        """ % (request.user.get_full_name(), finger_name)
 
 
         message_to_inviter = """Dear %s,\n\n
@@ -3216,7 +3222,7 @@ def sharedb_activation(request, activation_code, template_name="sharedb_invited.
             %s has accepted to work with you in database %s. 
             
             \n\nSincerely,\nEMIF Catalogue
-        """ % (sp.user_invite.get_full_name(), request.user.get_full_name(), _aux['database_name_t'])
+        """ % (sp.user_invite.get_full_name(), request.user.get_full_name(), finger_name)
 
         # Send email to admins
         send_custom_mail(subject, message_to_inviter, settings.DEFAULT_FROM_EMAIL, [sp.user_invite.email])
@@ -3438,16 +3444,7 @@ def attachPermissions(fingerprint_id, qsets):
     zipper = qsets
     zipee = []
 
-    #print type(zipper)
-
-    for q, v in qsets.ordered_items():
-        print "-----"
-        print q
-        print v.qsid
-        print "-----"
-
     for q, v in zipper.ordered_items():
-        print "STUFF:"+str(v)
         qpermissions = getPermissions(fingerprint_id, QuestionSet.objects.get(id=v.qsid))
         zipee.append(qpermissions)
 
