@@ -31,7 +31,7 @@
                 <tr>
                     <th>Milestone</th>
                     <th>Description</th>
-                    <th style="width: 140px;">Closed Date</th>
+                    <th style="width: 100px;">Closed Date</th>
                     <th>Status</th>
                 </tr>
             </thead>
@@ -53,7 +53,7 @@
                                     </div>
                                 </div>
                             </td>
-                            <td>{{milestone.due_on|date:"Y-m-d H:i:s"}}</td>
+                            <td>{{milestone.due_on|date:"Y-m-d"}}</td>
                             <td style="text-align: center">
                                 {% if milestone.state == 'closed' %}
                                     <i title="closed" class="fa fa-2 fa-check"></i>
@@ -75,7 +75,7 @@
             <tr>
                 <th>Title</th>
                 <th>Use Cases</th>
-                <th style="width: 140px;">Closed Date</th>
+                <th style="width: 100px;">Closed Date</th>
             </tr>
         </thead>
         <tbody>
@@ -95,7 +95,7 @@
                         </div>
                     </td>
                     <td>
-                        {{issue.closed_at|date:"Y-m-d H:i:s"}}
+                        {{issue.closed_at|date:"Y-m-d"}}
                     </td>
                 </tr>
             {% endfor %}
@@ -108,7 +108,7 @@
             <tr>
                 <th>Title</th>
                 <th>Use Cases</th>
-                <th style="width: 140px;">Created Date</th>
+                <th style="width: 100px;">Created Date</th>
             </tr>
         </thead>
         <tbody>
@@ -128,7 +128,7 @@
                         </div>
                     </td>
                     <td>
-                        {{issue.created_at|date:"Y-m-d H:i:s"}}
+                        {{issue.created_at|date:"Y-m-d"}}
                     </td>
                 </tr>
             {% endfor %}

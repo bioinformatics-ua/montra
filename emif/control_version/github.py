@@ -135,4 +135,4 @@ class IssueManager(object):
         for mile in miles_open:
             milestones.append(mile)
 
-        return milestones
+        return milestones[::-1]
