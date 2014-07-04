@@ -1,21 +1,6 @@
-{% extends "faq/base.html" %}
-{% load django_bootstrap_breadcrumbs %}
-
-
-{% block breadcrumbs %}
-    {{ block.super }}
-    {% breadcrumb topic "" %}
-{% endblock %}
-
-{% block title %}{{ block.super }}: {{ topic }}{% endblock %}
-
-{% block body %}
-<center><h3>{{ topic }}</h3></center>
 <dl>
 {% for question in questions %}
   <dt>{{ question.text }}</dt>
   <dd class="answer">{{ question.answer }}</dd>
 {% endfor %}
 </dl>
-
-{% endblock %}
