@@ -758,3 +758,21 @@ height: 6em;
   text-decoration: none !important;
 }
 
+#notification_center{
+  width: 370px;
+}
+
+#notification_center hr {
+  margin: 0px;
+}
+
+#notification_center .notification {
+  margin:5px;
+}
+.notification_origin{
+  font-size: 75%;
+
+}
+.notification_unread{
+  font-weight: bold;
+}

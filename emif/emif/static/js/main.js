@@ -18,3 +18,33 @@ $('#quicksearch').submit(function() {
     }, 4000);
 }
 
+$(function(){
+    $.get( "api/notifications", function( data ) {
+        console.log("Loading notification center");
+        
+        if(data.unread && data.unread != 0){
+           $('#notification_badge').text(data.unread);
+           $('#notification_badge').show();  
+        }
+        if(data.notifications){
+            $('#notification_center').html('<hr />');
+
+            for(var i=0;i<data.notifications.length;i++){
+                var new_notification = '<div class="notification';
+
+                    if(!data.notifications[i].read){
+                        new_notification+=" notification_unread "
+                    }
+
+                    new_notification+='">'+
+                    data.notifications[i].message
+                    +'<br /> <div class="clearfix"><div class="notification_origin pull-right">by '+data.notifications[i].origin+" at "+data.notifications[i].createddate+
+                    '</div></div></div><hr />'
+
+                $('#notification_center').append(new_notification);
+            }
+        }
+        
+    });
+    
+});

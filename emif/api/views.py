@@ -73,6 +73,9 @@ from fingerprint.models import Fingerprint
 from public.views import PublicFingerprintShare
 from public.services import deleteFingerprintShare, createFingerprintShare
 
+from notifications.models import Notification
+
+import time
 
 class JSONResponse(HttpResponse):
     """
@@ -645,6 +648,51 @@ class NotifyOwnerView(APIView):
                     pass
 
         return Response({}, status=status.HTTP_400_BAD_REQUEST)
+
+############################################################
+##### Get notifications - Web services
+############################################################
+
+
+class NotificationsView(APIView):
+    authentication_classes = (SessionAuthentication, BasicAuthentication)
+    permission_classes = (IsAuthenticated,)    
+    def get(self, request, *args, **kw):
+        
+        if not request.user.is_authenticated():
+            return Response({"Request", "Invalid"}, status=status.HTTP_400_BAD_REQUEST)
+
+        notifications = Notification.objects.filter(destiny=request.user, type=Notification.SYSTEM, 
+            removed=False).order_by('-created_date')
+
+        notifications_array = []
+        unread = 0
+        for notification in notifications:
+
+            readtime=None
+            if notification.read_date:
+                readtime=notification.read_date.strftime("%Y-%m-%d %H:%M")
+
+            notifications_array.append({
+                    'id':   notification.id,
+                    'origin': notification.origin.get_full_name(),
+                    'message': notification.notification,
+                    'type': notification.type,
+                    'href': notification.href,
+                    'createddate': notification.created_date.strftime("%Y-%m-%d %H:%M"),
+                    'readdate': readtime,
+                    'read': notification.read,
+            })
+
+            if notification.read == False:
+                unread+=1
+
+        result = {
+            'unread': unread,
+            'notifications': notifications_array
+            }
+        response = Response(result, status=status.HTTP_200_OK)
+        return response
 
 ############################################################
 ############ Auxiliar functions ############################

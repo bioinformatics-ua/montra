@@ -221,6 +221,7 @@ TEMPLATE_DIRS = (
     os.path.abspath(PROJECT_DIR_ROOT + MIDDLE_DIR + 'docs_manager/templates'),
     os.path.abspath(PROJECT_DIR_ROOT + MIDDLE_DIR + 'advancedsearch/templates'),
     os.path.abspath(PROJECT_DIR_ROOT + MIDDLE_DIR + 'public/templates'),
+    os.path.abspath(PROJECT_DIR_ROOT + MIDDLE_DIR + 'notifications/templates'),
 )
 
 INSTALLED_APPS = (
@@ -281,6 +282,9 @@ INSTALLED_APPS = (
 
     # public links
     'public',
+
+    # notifications
+    'notifications'
 )
 
 # Userena settings

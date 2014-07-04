@@ -33,6 +33,7 @@ from api.views import PopulationView
 from api.views import NotifyOwnerView
 from api.views import AddPublicLinkView
 from api.views import DeletePublicLinkView
+from api.views import NotificationsView
 
 
 urlpatterns = patterns('api.views',
@@ -49,6 +50,7 @@ urlpatterns = patterns('api.views',
     url(r'^notify_owner$', NotifyOwnerView.as_view(), name='notify_owner'),
     url(r'^addpubliclink$', AddPublicLinkView.as_view(), name='addpubliclink'),
     url(r'^deletepubliclink$', DeletePublicLinkView.as_view(), name='addpubliclink'),
+    url(r'^notifications$', NotificationsView.as_view(), name='notifications'),
 
 )
 

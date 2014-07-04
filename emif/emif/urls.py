@@ -269,6 +269,9 @@ urlpatterns = patterns('',
     # Public links URLs
     url(r'public/', include('public.urls')),
 
+    # Notifications URLs
+    url(r'notifications/', include('notifications.urls')),
+
 )
 
 if settings.DEBUG:
