@@ -1113,9 +1113,22 @@ def extract_answers(request2, questionnaire_id, question_set, qs_list):
     
 def database_detailed_view(request, fingerprint_id, questionnaire_id, template_name="database_edit.html"):
 
-    return database_edit(request, fingerprint_id, questionnaire_id, template_name, readonly=True);
+    return database_edit(request, fingerprint_id, questionnaire_id, template_name=template_name, readonly=True);
 
-def database_edit(request, fingerprint_id, questionnaire_id, template_name="database_edit.html", readonly=False):
+# detailed view with direct linking to questionset
+def database_detailed_view_dl(request, fingerprint_id, questionnaire_id, sort_id, template_name="database_edit.html"):
+
+    return database_edit(request, fingerprint_id, questionnaire_id, sort_id=sort_id, template_name=template_name, readonly=True);
+
+# detailed view with direct linking to questionset
+def database_edit_dl(request, fingerprint_id, questionnaire_id, sort_id, template_name="database_edit.html"):
+    return database_edit(request, fingerprint_id, questionnaire_id, sort_id=sort_id, template_name=template_name)
+
+
+def database_edit(request, fingerprint_id, questionnaire_id, sort_id=1, template_name="database_edit.html", readonly=False):
+    
+    print sort_id
+
     try: 
         this_fingerprint = Fingerprint.objects.get(fingerprint_hash=fingerprint_id)
         
@@ -1124,7 +1137,12 @@ def database_edit(request, fingerprint_id, questionnaire_id, template_name="data
 
         qs_list = QuestionSet.objects.filter(questionnaire=questionnaire_id)
 
-        question_set = qs_list[0]
+        question_set = None
+        try:
+            question_set = qs_list.get(sortid=sort_id)
+        except:
+            raise Http404
+
         answers = Answer.objects.filter(fingerprint_id=this_fingerprint)
 
         print answers
@@ -1162,6 +1180,7 @@ def database_edit(request, fingerprint_id, questionnaire_id, template_name="data
                 progress=None,
                 fingerprint_id=fingerprint_id,
                 q_id = questionnaire_id,
+                sort_id = sort_id,
                 async_progress=None,
                 async_url=None,
                 qs_list=qs_list,

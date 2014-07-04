@@ -75,7 +75,10 @@ urlpatterns = patterns('',
     
     # Database Edit
     url(r'^dbEdit/(?P<fingerprint_id>[^/]+)/(?P<questionnaire_id>[0-9]+)$', 'emif.views.database_edit'),
+    url(r'^dbEdit/(?P<fingerprint_id>[^/]+)/(?P<questionnaire_id>[0-9]+)/(?P<sort_id>[0-9]+)/$', 'emif.views.database_edit_dl'),
     url(r'^dbDetailed/(?P<fingerprint_id>[^/]+)/(?P<questionnaire_id>[0-9]+)$', 'emif.views.database_detailed_view'),
+    url(r'^dbDetailed/(?P<fingerprint_id>[^/]+)/(?P<questionnaire_id>[0-9]+)/(?P<sort_id>[0-9]+)$', 'emif.views.database_detailed_view_dl'),
+
     url(r'^editqs/(?P<fingerprint_id>[^/]+)/(?P<questionnaire_id>[0-9]+)/(?P<sort_id>[0-9]+)/$', 'emif.views.database_edit_qs'),
     url(r'^detailedqs/(?P<fingerprint_id>[^/]+)/(?P<questionnaire_id>[0-9]+)/(?P<sort_id>[0-9]+)/$', 'emif.views.database_detailed_qs'),
     #url(r'^dbEdit/(?P<questionnaire_id>[0-9]+)/$$', 'emif.views.database_edit'),
