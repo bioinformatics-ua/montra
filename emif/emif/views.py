@@ -232,39 +232,50 @@ def results_fulltext_aux(request, query, page=1, template_name='results.html', i
                                            'num_results': hits, 'page_obj': pager, 'page_rows': rows,'breadcrumb': True, 'search_old': query_old, 'isAdvanced': False, "sort_params": sort_params, "page":page})
 
 def store_query(user_request, query_executed):
-    print user_request.user.is_authenticated()
+    #print user_request.user.is_authenticated()
     print "Store Query2"
-    # Verify if the query already exists in that user 
-    user_aux = None
+
+    query = QueryLog()
     if user_request.user.is_authenticated():
-
-        user_aux = user_request.user
-
-        results_tmp = QueryLog.objects.filter(query=query_executed, user=user_aux)
-
+        query.user = user_request.user
     else:
-        results_tmp = QueryLog.objects.filter(query=query_executed, user__isnull=True)
-    query = None
+        query.user = None
+
+    query.query = query_executed
+
+    query.save()
+
+    # Verify if the query already exists in that user 
+    # user_aux = None
+    # if user_request.user.is_authenticated():
+
+    #     user_aux = user_request.user
+
+    #     results_tmp = QueryLog.objects.filter(query=query_executed, user=user_aux)
+
+    # else:
+    #     results_tmp = QueryLog.objects.filter(query=query_executed, user__isnull=True)
+    # query = None
     
-    if (results_tmp.exists()):
-        # If the user exists, then update the Query 
-        query = results_tmp[0]
-    else:
-        # Create a query 
-        query = QueryLog()
-        if user_request.user.is_authenticated():
-            query.user = user_request.user
-        else:
-            query.user = None
-        query.query = query_executed
-        print "dmn"
-    if query != None:
-        if user_request.user.is_authenticated():
-            query.user = user_request.user
-        else:
-            query.user = None
-        query.query = query_executed
-        query.save()
+    # if (results_tmp.exists()):
+    #     # If the user exists, then update the Query 
+    #     query = results_tmp[0]
+    # else:
+    #     # Create a query 
+    #     query = QueryLog()
+    #     if user_request.user.is_authenticated():
+    #         query.user = user_request.user
+    #     else:
+    #         query.user = None
+    #     query.query = query_executed
+    #     print "dmn"
+    # if query != None:
+    #     if user_request.user.is_authenticated():
+    #         query.user = user_request.user
+    #     else:
+    #         query.user = None
+    #     query.query = query_executed
+    #     query.save()
 
 
 def results_diff(request, page=1, template_name='results_diff.html'):
@@ -334,52 +345,52 @@ def results_diff(request, page=1, template_name='results_diff.html'):
                 this_query_hash = hashlib.sha1(qserialization).hexdigest()
 
                 # we check if this query was already made before
-                try:
-                    # in case the query exists we just get the reference, we use a hash since the serialized query can get too big
+                # try:
+                #     # in case the query exists we just get the reference, we use a hash since the serialized query can get too big
 
-                    this_query = AdvancedQuery.objects.get(user=this_user, serialized_query_hash=this_query_hash, qid=qid)  
+                #     this_query = AdvancedQuery.objects.get(user=this_user, serialized_query_hash=this_query_hash, qid=qid)  
                     
-                    this_query.removed = False
+                #     this_query.removed = False
 
-                    this_query.save()
+                #     this_query.save()
 
-                    print "This query is already on historic, just updating use time..."
+                #     print "This query is already on historic, just updating use time..."
 
-                    try:
-                        advrep = AdvancedQueryAnswer.objects.get(refquery=this_query, question="boolrelwidget-boolean-representation")
+                #     try:
+                #         advrep = AdvancedQueryAnswer.objects.get(refquery=this_query, question="boolrelwidget-boolean-representation")
 
-                        advrep.answer = qexpression
+                #         advrep.answer = qexpression
 
-                        advrep.save()
+                #         advrep.save()
                     
-                    except AdvancedQueryAnswer.DoesNotExist:
-                        advrep = AdvancedQueryAnswer(refquery=this_query, question="boolrelwidget-boolean-representation", answer=qexpression)
+                #     except AdvancedQueryAnswer.DoesNotExist:
+                #         advrep = AdvancedQueryAnswer(refquery=this_query, question="boolrelwidget-boolean-representation", answer=qexpression)
 
-                        advrep.save()
+                #         advrep.save()
 
-                    this_query.save()
-                except AdvancedQuery.DoesNotExist:
+                #     this_query.save()
+                # except AdvancedQuery.DoesNotExist:
                     # otherwise, we create it
-                    print "This query is new, adding it and answers to it..."
-                    
-                    quest = None
-                    try:
-                        quest = Questionnaire.objects.get(id = qid)
-                    except Questionnaire.DoesNotExist:
-                        print "Questionnaire doesnt exist..."
+                print "This query is new, adding it and answers to it..."
+                
+                quest = None
+                try:
+                    quest = Questionnaire.objects.get(id = qid)
+                except Questionnaire.DoesNotExist:
+                    print "Questionnaire doesnt exist..."
 
-                    this_query = AdvancedQuery(user=this_user,name=("Query on "+time.strftime("%c")),
-                        serialized_query_hash=this_query_hash,
-                        serialized_query=qserialization, qid=quest)
-                    this_query.save()   
-                    # and we all so insert the answers in a specific table exactly as they were on the post request to be able to put it back at a later time
-                    for k, v in request.POST.items():
-                        if k.startswith("question_") and len(v) > 0:                        
-                            aqa = AdvancedQueryAnswer(refquery=this_query,question=k, answer=v)
-                            aqa.save()
+                this_query = AdvancedQuery(user=this_user,name=("Query on "+time.strftime("%c")),
+                    serialized_query_hash=this_query_hash,
+                    serialized_query=qserialization, qid=quest)
+                this_query.save()   
+                # and we all so insert the answers in a specific table exactly as they were on the post request to be able to put it back at a later time
+                for k, v in request.POST.items():
+                    if k.startswith("question_") and len(v) > 0:                        
+                        aqa = AdvancedQueryAnswer(refquery=this_query,question=k, answer=v)
+                        aqa.save()
 
-                    serialization_a = AdvancedQueryAnswer(refquery=this_query, question="boolrelwidget-boolean-representation", answer=qexpression)
-                    serialization_a.save()
+                serialization_a = AdvancedQueryAnswer(refquery=this_query, question="boolrelwidget-boolean-representation", answer=qexpression)
+                serialization_a.save()
 
                 request.session['query_id'] = this_query.id
                 request.session['query_type'] = this_query.qid.id         
@@ -395,7 +406,10 @@ def results_diff(request, page=1, template_name='results_diff.html'):
     try:
         query = request.POST['query']
 
-        
+        # must save only on post, and without the escaping so it doesnt encadeate escapes on queries remade
+        if query != "":
+            store_query(request, query)
+
         query = '"'+escapeSolrArg(query)+'"'
 
         request.session['query'] = query
@@ -412,7 +426,6 @@ def results_diff(request, page=1, template_name='results_diff.html'):
     if query == "":
         return render(request, "results.html", {'request': request,
                                                 'num_results': 0, 'page_obj': None, 'breadcrumb': True})
-    store_query(request, query)
     try:
         # Store query by the user
         if 'search_full' in request.POST:
