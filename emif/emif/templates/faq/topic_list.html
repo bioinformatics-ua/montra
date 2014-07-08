@@ -1,0 +1,46 @@
+{% extends "faq/base.html" %}
+{% load django_bootstrap_breadcrumbs %}
+
+
+{% block title %}{{ block.super }}: Topics{% endblock %}
+
+{% block body %}
+
+<center><h2>Frequently Asked Questions</h2></center>
+  {% if topics|length == 0 %}
+    <div class="well"><center>There's no Frequently Asked Questions Yet.</center></div>
+  {% elif topics|length == 1 %}
+    <div id="faqsection_{{topics.0.slug}}"></div>
+    
+  {% else %}
+ <div class="accordion" id="faqsections">
+ 
+  {% for topic in topics %}
+
+  <div class="accordion-group">
+    <div class="accordion-heading">
+      <a class="accordion-toggle" data-toggle="collapse" data-parent="#faqsellections" href="#faqaccordion_{{topic.slug}}">
+        {{ topic }}
+      </a>
+    </div>
+    <div id="faqaccordion_{{topic.slug}}" class="accordion-body collapse">
+      <div class="accordion-inner">
+        <div id="faqsection_{{topic.slug}}"><center><h4>Loading...</h4></center></div>
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+  </div>
+  {% endif %}
+
+<script type="text/javascript">
+    $(function(){
+        {% for topic in topics %}
+            $.get("{{topic.get_absolute_url}}", function(data){
+                $('#faqsection_{{topic.slug}}').html(data);
+            });
+        {% endfor %}
+    });
+</script>
+
+{% endblock %}
