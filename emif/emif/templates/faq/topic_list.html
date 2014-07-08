@@ -4,6 +4,10 @@
 
 {% block title %}{{ block.super }}: Topics{% endblock %}
 
+{% block headextra %}
+  <script src="{{ STATIC_URL }}js/emif.faq.js"></script>
+{% endblock %}
+
 {% block body %}
 
 <center><h2>Frequently Asked Questions</h2></center>
@@ -36,9 +40,7 @@
 <script type="text/javascript">
     $(function(){
         {% for topic in topics %}
-            $.get("{{topic.get_absolute_url}}", function(data){
-                $('#faqsection_{{topic.slug}}').html(data);
-            });
+            getSection("{{topic.get_absolute_url}}", "{{topic.slug}}");
         {% endfor %}
     });
 </script>
