@@ -21,5 +21,7 @@ from views import *
 
 urlpatterns = patterns('',
     # Notifications list for a user
-    url(r'^$', 'notifications.views.see_notifications'),   
+    url(r'^$', 'notifications.views.see_notifications_defer_all'),   
+    url(r'^(?P<source>[0-9]+)$', 'notifications.views.see_notifications_defer_page'),  
+    url(r'^(?P<source>[0-9]+)/(?P<page>[0-9]+)$', 'notifications.views.see_notifications'),  
 )

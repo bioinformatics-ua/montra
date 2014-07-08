@@ -760,13 +760,16 @@ height: 6em;
 
 #notification_center{
   width: 370px;
+  max-height: 400px;
+  overflow: hidden;
+  overflow-y: auto;
 }
 
-#notification_center hr {
+#notification_center hr, .notification_divider{
   margin: 0px;
 }
 
-#notification_center .notification {
+#notification_center .notification, .notification_header {
   margin:5px;
 }
 .notification_origin{
@@ -775,4 +778,16 @@ height: 6em;
 }
 .notification_unread{
   font-weight: bold;
+}
+
+.notification_options{
+  visibility: hidden;
+  text-align: center;
+  width: 30px;
+}
+.notification_line:hover{
+  cursor:pointer;
+}
+.notification_line:hover > .notification_options, .notification_options:hover{
+  visibility: initial;
 }

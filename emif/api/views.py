@@ -76,6 +76,8 @@ from public.services import deleteFingerprintShare, createFingerprintShare
 from notifications.models import Notification
 
 import time
+from django.utils import timezone
+
 
 class JSONResponse(HttpResponse):
     """
@@ -663,7 +665,7 @@ class NotificationsView(APIView):
             return Response({"Request", "Invalid"}, status=status.HTTP_400_BAD_REQUEST)
 
         notifications = Notification.objects.filter(destiny=request.user, type=Notification.SYSTEM, 
-            removed=False).order_by('-created_date')
+            removed=False).order_by('-created_date')[:20]
 
         notifications_array = []
         unread = 0
@@ -693,6 +695,79 @@ class NotificationsView(APIView):
             }
         response = Response(result, status=status.HTTP_200_OK)
         return response
+
+############################################################
+##### Read notification - Web services
+############################################################
+
+
+class ReadNotificationView(APIView):
+    authentication_classes = (SessionAuthentication, BasicAuthentication)
+    permission_classes = (IsAuthenticated,)    
+    def post(self, request, *args, **kw):
+        
+        if not request.user.is_authenticated():
+            return Response({"Request", "Invalid"}, status=status.HTTP_400_BAD_REQUEST)
+
+        notification_id = request.POST.get('notification', '')
+        value = False
+
+        if request.POST.get('value', False) == 'true':
+            value = True
+
+        print value
+
+        if notification_id != '':
+            try:
+                # This may seem dumb, but i want to make sure the user is the "owner" of the notification
+                notification = Notification.objects.get(destiny=request.user, id=notification_id)
+
+                notification.read_date = timezone.now()
+                notification.read = value
+
+                notification.save()
+
+                return Response({'success': True }, status=status.HTTP_200_OK)              
+
+            except Notification.DoesNotExist:
+                print "Can't mark as read notification with id"+notification_id
+    
+        return Response({'success': False }, status=status.HTTP_400_BAD_REQUEST)
+
+############################################################
+##### Remove notification - Web services
+############################################################
+
+
+class RemoveNotificationView(APIView):
+    authentication_classes = (SessionAuthentication, BasicAuthentication)
+    permission_classes = (IsAuthenticated,)    
+    def post(self, request, *args, **kw):
+        
+        if not request.user.is_authenticated():
+            return Response({"Request", "Invalid"}, status=status.HTTP_400_BAD_REQUEST)
+
+        notification_id = request.POST.get('notification', '')
+        value = False
+
+        if request.POST.get('value', False) == 'true':
+            value = True
+
+        if notification_id != '':
+            try:
+                # This may seem dumb, but i want to make sure the user is the "owner" of the notification
+                notification = Notification.objects.get(destiny=request.user, id=notification_id)
+
+                notification.removed = value
+
+                notification.save()
+                
+                return Response({'success': True }, status=status.HTTP_200_OK)              
+
+            except Notification.DoesNotExist:
+                print "Can't mark as read notification with id"+notification_id
+    
+        return Response({'success': False }, status=status.HTTP_400_BAD_REQUEST)
 
 ############################################################
 ############ Auxiliar functions ############################
