@@ -33,10 +33,15 @@ from literature.utils import dict_union
 
 import json
 
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+
+def literature_database_info_initial(request, fingerprint_id, template_name='literature_info.html'):
+    return literature_database_info(request, fingerprint_id, 1, template_name)
+
 # This view shows annotatted publications associated with a determined fingerprint_id,
 # or a message saying there's no publications associated, in case there's none yet or 
 # the questionnaire type doesn't have publications widget
-def literature_database_info(request, fingerprint_id, template_name='literature_info.html'):
+def literature_database_info(request, fingerprint_id, page, template_name='literature_info.html'):
 
     c = CoreEngine()
 
@@ -48,8 +53,15 @@ def literature_database_info(request, fingerprint_id, template_name='literature_
         #getListPublications(results.docs[0])
         publications = getListPublications(results.docs[0])
 
+    myPaginator = Paginator(publications, 10)
+    try:
+        pager =  myPaginator.page(page)
+    except PageNotAnInteger, e:
+        pager =  myPaginator.page(1)
+    ## End Paginator ##
 
-    return render(request, template_name, {'request': request, 'publications': publications})
+
+    return render(request, template_name, {'request': request, 'fingerprint_id': fingerprint_id, 'publications': pager})
 
 # i could presume 'Publications_t' is always the source, but its better to find out what questions 
 # are of publications type, and get responses for that, 
