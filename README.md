@@ -5,7 +5,7 @@ EMIF Platform - Fingerprint Browser
 
 
 
-#### Installation steps
+#### InstallDependecies in Ubuntu
 
 1.  Install pip package
 
@@ -26,7 +26,14 @@ EMIF Platform - Fingerprint Browser
 
         sudo apt-get install mongodb
 
-        sudo /etc/init.d/mongod start
+        sudo mkdir /data
+        sudo mkdir /data/db
+
+        now you have 2 hypotheses:
+
+            1) change the permissions of data and db folders and run "mongod"
+
+            2)sudo /mongod
 
 
 5.  Install and Configure Apache-solr
@@ -113,7 +120,7 @@ EMIF Platform - Fingerprint Browser
 
 18. Create a script file
 
-        copy code from: https://gist.github.com/bastiao/c8d3be799dc7c257f01a and paste in root
+        copy code from: https://gist.github.com/bastiao/c8d3be799dc7c257f01a and paste in conf/ folder
 
         run the script
 
@@ -166,8 +173,11 @@ EMIF Platform - Fingerprint Browser
         (path).../apache-solr-4.0.0/example>java -jar start.jar
 
     2) Start MongoDB
-        sudo /etc/init.d/mongod start
-
+        if you change the permissions of the /data and /data/db folders
+            just: mongod
+        else
+            sudo /mongod
+            
     3) Activate the virtual environments
         (path) source ...\environments\emif\Scripts>activate (for unix users)
 
