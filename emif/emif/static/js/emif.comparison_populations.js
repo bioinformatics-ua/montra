@@ -30,14 +30,13 @@ function checkExistsPopulation(fingerprint_ids){
 	console.log(fingerprint_ids)
 	$.post( "api/populationcheck", { 'ids[]': fingerprint_ids })
 		.done(function( data ) {
-			console.log('LOG:'+data.contains_population);
 			if(data.contains_population){
 				$('#submitdbsimulate').click();
 			} else {
-				alert('Cant');
+				alert('There are some databases without population characteristics, can\'t compare them. Please check all databases have population characteristics.');
 			}
 	}).fail(function( data ) {
-		alert('Failed try again.');
+		alert('Failed validating database population characteristics.');
 	});	
 }
 
