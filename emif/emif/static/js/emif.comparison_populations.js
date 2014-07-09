@@ -20,15 +20,26 @@
 
 
 function postComparisonPopulations(){
-    
     $('#compare_form').attr('action', 'population/compare');
     postComparison();
 
    return true; 
 };
 
-
-
+function checkExistsPopulation(fingerprint_ids){
+	console.log(fingerprint_ids)
+	$.post( "api/populationcheck", { 'ids[]': fingerprint_ids })
+		.done(function( data ) {
+			console.log('LOG:'+data.contains_population);
+			if(data.contains_population){
+				$('#submitdbsimulate').click();
+			} else {
+				alert('Cant');
+			}
+	}).fail(function( data ) {
+		alert('Failed try again.');
+	});	
+}
 
 $(document).ready(function(){
 

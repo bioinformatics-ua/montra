@@ -368,8 +368,16 @@ function postComparison(){
     for(var i=0;i<dbs.length;i++){
       $('#comparedbs').append('<input type="checkbox" name="chks_'+dbs[i]+'" checked>');
     }
+    var ids = []; 
+    $('[name^="chks_"]').each(function(){
 
-    $('#submitdbsimulate').click();
+      var id = $(this).attr('name').split('_')[1];
+
+      ids.push(id);
+      
+    });
+    checkExistsPopulation(ids); 
+    //$('#submitdbsimulate').click();
   }
   
 }

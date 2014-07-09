@@ -73,6 +73,7 @@ from fingerprint.models import Fingerprint
 from public.views import PublicFingerprintShare
 from public.services import deleteFingerprintShare, createFingerprintShare
 
+from population_characteristics.models import Characteristic
 
 class JSONResponse(HttpResponse):
     """
@@ -162,6 +163,38 @@ class EmailCheckView(APIView):
             'email': email,
             'username': fullname,
             'valid': valid
+            }
+        response = Response(result, status=status.HTTP_200_OK)
+        return response
+
+############################################################
+##### Population Check if exists - Web services
+############################################################
+class PopulationCheckView(APIView):
+    authentication_classes = (SessionAuthentication, BasicAuthentication)
+    permission_classes = (IsAuthenticated,) 
+
+    def post(self, request, *args, **kw):
+        # first we get the email parameter
+        ids = request.POST.getlist('ids[]')
+
+        print ids
+
+        contains_population = True
+
+        for id in ids:
+            print id
+            jerboa_files = Characteristic.objects.filter(fingerprint_id=id)
+            contains_population = len(jerboa_files)!=0
+            if not contains_population:
+                break
+
+        print "---"
+        print contains_population
+        print "---"
+
+        result = {
+            'contains_population': contains_population,
             }
         response = Response(result, status=status.HTTP_200_OK)
         return response
