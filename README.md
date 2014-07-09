@@ -5,7 +5,7 @@ EMIF Platform - Fingerprint Browser
 
 
 
-#### InstallDependecies in Ubuntu
+#### Install Dependecies in Ubuntu
 
 1.  Install pip package
 
@@ -177,7 +177,7 @@ EMIF Platform - Fingerprint Browser
             just: mongod
         else
             sudo /mongod
-            
+
     3) Activate the virtual environments
         (path) source ...\environments\emif\Scripts>activate (for unix users)
 
