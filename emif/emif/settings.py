@@ -200,6 +200,7 @@ MIDDLEWARE_CLASSES = (
     # Uncomment the next line for simple clickjacking protection:
     # 'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'emif.middleware.LoginRequiredMiddleware',
+    'emif.interceptor.NavigationInterceptor',    
     'johnny.middleware.LocalStoreClearMiddleware',
     'johnny.middleware.QueryCacheMiddleware',
 )
@@ -440,6 +441,26 @@ LOGIN_EXEMPT_URLS = (
     r'^bootstrap_ie_compatibility',
     # public shares
     r'^public/fingerprint/(?P<fingerprint_id>[^/]+)',  
+)
+
+#Pages that wont be logged into user history
+DONTLOG_URLS = (
+    r'^fingerprintqs/(?P<runcode>[^/]+)/(?P<qsid>[0-9]+)/$',
+    r'^api/(?P<anything>[^/]*)',
+    r'^docsmanager/uploadfile/(?P<fingerprint_id>[^/]+)/$',
+    r'^docsmanager/docfiles/(?P<fingerprint_id>[^/]+)/$',
+    r'^population/settings/(?P<fingerprint_id>[^/]+)/$',
+    r'^population/jerboafiles/(?P<fingerprint_id>[^/]+)/$',
+    r'^searchqs/(?P<questionnaire_id>[0-9]+)/(?P<sortid>[0-9]+)/(?P<aqid>[0-9]+)?$',
+    r'^addqs/(?P<fingerprint_id>[^/]+)/(?P<questionnaire_id>[0-9]+)/(?P<sortid>[0-9]+)/$',
+    r'^addPost/(?P<questionnaire_id>[0-9]+)/(?P<sortid>[0-9]+)/(?P<saveid>[0-9]+)$',
+    r'^dbEdit/(?P<fingerprint_id>[^/]+)/(?P<questionnaire_id>[0-9]+)$',
+    r'^dbEdit/(?P<fingerprint_id>[^/]+)/(?P<questionnaire_id>[0-9]+)/(?P<sort_id>[0-9]+)/$',
+    r'^dbDetailed/(?P<fingerprint_id>[^/]+)/(?P<questionnaire_id>[0-9]+)$',
+    r'^dbDetailed/(?P<fingerprint_id>[^/]+)/(?P<questionnaire_id>[0-9]+)/(?P<sort_id>[0-9]+)$',
+    r'^editqs/(?P<fingerprint_id>[^/]+)/(?P<questionnaire_id>[0-9]+)/(?P<sort_id>[0-9]+)/$',
+    r'^detailedqs/(?P<fingerprint_id>[^/]+)/(?P<questionnaire_id>[0-9]+)/(?P<sort_id>[0-9]+)/$',
+    r'^qs_data_table$',
 )
 
 #Set session idle timeout (seconds)

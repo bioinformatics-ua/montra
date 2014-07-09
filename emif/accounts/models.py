@@ -42,3 +42,8 @@ class EmifProfile(UserenaBaseProfile):
     paginator = models.IntegerField(max_length=2,
                                       choices=options,
                                       default=5)
+
+class NavigationHistory(models.Model):
+  user = models.ForeignKey(User)
+  path = models.TextField()
+  date = models.DateTimeField(auto_now_add=True)
