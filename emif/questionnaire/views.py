@@ -35,10 +35,10 @@ def r2r(tpl, request, **contextdict):
     contextdict['request'] = request
     return render_to_response(tpl, contextdict, context_instance = RequestContext(request))
 
-def get_runinfo(random):
-    "Return the RunInfo entry with the provided random key"
-    res = RunInfo.objects.filter(random=random.lower())
-    return res and res[0] or None
+#def get_runinfo(random):
+#    "Return the RunInfo entry with the provided random key"
+#    res = RunInfo.objects.filter(random=random.lower())
+#    return res and res[0] or None
 
 def get_question(number, questionnaire):
     "Return the specified Question (by number) from the specified Questionnaire"
@@ -261,171 +261,171 @@ def redirect_to_qs(runinfo):
                 args=[ runinfo.random, runinfo.questionset.sortid ])
     return HttpResponseRedirect(url)
 
-@transaction.commit_on_success
-def questionnaire(request, runcode=None, qs=None):
-    """
-    Process submitted answers (if present) and redirect to next page
+# @transaction.commit_on_success
+# def questionnaire(request, runcode=None, qs=None):
+#     """
+#     Process submitted answers (if present) and redirect to next page
 
-    If this is a POST request, parse the submitted data in order to store
-    all the submitted answers.  Then return to the next questionset or
-    return a completed response.
+#     If this is a POST request, parse the submitted data in order to store
+#     all the submitted answers.  Then return to the next questionset or
+#     return a completed response.
 
-    If this isn't a POST request, redirect to the main page.
+#     If this isn't a POST request, redirect to the main page.
 
-    We only commit on success, to maintain consistency.  We also specifically
-    rollback if there were errors processing the answers for this questionset.
-    """
+#     We only commit on success, to maintain consistency.  We also specifically
+#     rollback if there were errors processing the answers for this questionset.
+#     """
 
-    r = assure_authenticated_or_redirect(request)
-    if r:
-        return r
+#     r = assure_authenticated_or_redirect(request)
+#     if r:
+#         return r
 
-    # if runcode provided as query string, redirect to the proper page
-    if not runcode:
-        runcode = request.GET.get('runcode')
-        if not runcode:
-            return HttpResponseRedirect("/")
-        else:
-            return HttpResponseRedirect(reverse("questionnaire",args=[runcode]))
+#     # if runcode provided as query string, redirect to the proper page
+#     if not runcode:
+#         runcode = request.GET.get('runcode')
+#         if not runcode:
+#             return HttpResponseRedirect("/")
+#         else:
+#             return HttpResponseRedirect(reverse("questionnaire",args=[runcode]))
 
-    runinfo = get_runinfo(runcode)
+#     runinfo = get_runinfo(runcode)
 
-    if not runinfo:
-        transaction.commit()
-        return HttpResponseRedirect('/')
+#     if not runinfo:
+#         transaction.commit()
+#         return HttpResponseRedirect('/')
 
-    # let the runinfo have a piggy back ride on the request
-    # so we can easily use the runinfo in places like the question processor
-    # without passing it around
-    request.runinfo = runinfo
+#     # let the runinfo have a piggy back ride on the request
+#     # so we can easily use the runinfo in places like the question processor
+#     # without passing it around
+#     request.runinfo = runinfo
 
-    if not qs:
-        # Only change the language to the subjects choice for the initial
-        # questionnaire page (may be a direct link from an email)
-        if hasattr(request, 'session'):
-            request.session['django_language'] = runinfo.subject.language
-            translation.activate(runinfo.subject.language)
+#     if not qs:
+#         # Only change the language to the subjects choice for the initial
+#         # questionnaire page (may be a direct link from an email)
+#         if hasattr(request, 'session'):
+#             request.session['django_language'] = runinfo.subject.language
+#             translation.activate(runinfo.subject.language)
 
-    if 'lang' in request.GET:
-        return set_language(request, runinfo, request.path)
+#     if 'lang' in request.GET:
+#         return set_language(request, runinfo, request.path)
 
-    # --------------------------------
-    # --- Handle non-POST requests --- 
-    # --------------------------------
+#     # --------------------------------
+#     # --- Handle non-POST requests --- 
+#     # --------------------------------
 
-    if request.method != "POST":
-        if qs is not None:
-            qs = get_object_or_404(QuestionSet, sortid=qs, questionnaire=runinfo.questionset.questionnaire)
-            if runinfo.random.startswith('test:'):
-                pass # ok for testing
-            elif qs.sortid > runinfo.questionset.sortid:
-                # you may jump back, but not forwards
-                return redirect_to_qs(runinfo)
-            runinfo.questionset = qs
-            runinfo.save()
-            transaction.commit()
-        # no questionset id in URL, so redirect to the correct URL
-        if qs is None:
-            return redirect_to_qs(runinfo)
-        return show_questionnaire(request, runinfo)
+#     if request.method != "POST":
+#         if qs is not None:
+#             qs = get_object_or_404(QuestionSet, sortid=qs, questionnaire=runinfo.questionset.questionnaire)
+#             if runinfo.random.startswith('test:'):
+#                 pass # ok for testing
+#             elif qs.sortid > runinfo.questionset.sortid:
+#                 # you may jump back, but not forwards
+#                 return redirect_to_qs(runinfo)
+#             runinfo.questionset = qs
+#             runinfo.save()
+#             transaction.commit()
+#         # no questionset id in URL, so redirect to the correct URL
+#         if qs is None:
+#             return redirect_to_qs(runinfo)
+#         return show_questionnaire(request, runinfo)
 
-    # -------------------------------------
-    # --- Process POST with QuestionSet ---
-    # -------------------------------------
+#     # -------------------------------------
+#     # --- Process POST with QuestionSet ---
+#     # -------------------------------------
 
-    # if the submitted page is different to what runinfo says, update runinfo
-    # XXX - do we really want this?
-    qs = request.POST.get('questionset_id', None)
-    try:
-        qsobj = QuestionSet.objects.filter(pk=qs)[0]
-        if qsobj.questionnaire == runinfo.questionset.questionnaire:
-            if runinfo.questionset != qsobj:
-                runinfo.questionset = qsobj
-                runinfo.save()
-    except:
-        pass
+#     # if the submitted page is different to what runinfo says, update runinfo
+#     # XXX - do we really want this?
+#     qs = request.POST.get('questionset_id', None)
+#     try:
+#         qsobj = QuestionSet.objects.filter(pk=qs)[0]
+#         if qsobj.questionnaire == runinfo.questionset.questionnaire:
+#             if runinfo.questionset != qsobj:
+#                 runinfo.questionset = qsobj
+#                 runinfo.save()
+#     except:
+#         pass
 
-    questionnaire = runinfo.questionset.questionnaire
-    questionset = runinfo.questionset
+#     questionnaire = runinfo.questionset.questionnaire
+#     questionset = runinfo.questionset
 
-    # to confirm that we have the correct answers
-    expected = questionset.questions()
+#     # to confirm that we have the correct answers
+#     expected = questionset.questions()
 
-    items = request.POST.items()
-    extra = {} # question_object => { "ANSWER" : "123", ... }
+#     items = request.POST.items()
+#     extra = {} # question_object => { "ANSWER" : "123", ... }
 
-    # this will ensure that each question will be processed, even if we did not receive
-    # any fields for it. Also works to ensure the user doesn't add extra fields in
-    for x in expected:
-        items.append( (u'question_%s_Trigger953' % x.number, None) )
+#     # this will ensure that each question will be processed, even if we did not receive
+#     # any fields for it. Also works to ensure the user doesn't add extra fields in
+#     for x in expected:
+#         items.append( (u'question_%s_Trigger953' % x.number, None) )
 
-    # generate the answer_dict for each question, and place in extra
-    for item in items:
-        key, value = item[0], item[1]
-        if key.startswith('question_'):
-            answer = key.split("_", 2)
-            question = get_question(answer[1], questionnaire)
-            if not question:
-                logging.warn("Unknown question when processing: %s" % answer[1])
-                continue
-            extra[question] = ans = extra.get(question, {})
-            if(len(answer) == 2):
-                ans['ANSWER'] = value
-            elif(len(answer) == 3):
-                ans[answer[2]] = value
-            else:
-                logging.warn("Poorly formed form element name: %r" % answer)
-                continue
-            extra[question] = ans
+#     # generate the answer_dict for each question, and place in extra
+#     for item in items:
+#         key, value = item[0], item[1]
+#         if key.startswith('question_'):
+#             answer = key.split("_", 2)
+#             question = get_question(answer[1], questionnaire)
+#             if not question:
+#                 logging.warn("Unknown question when processing: %s" % answer[1])
+#                 continue
+#             extra[question] = ans = extra.get(question, {})
+#             if(len(answer) == 2):
+#                 ans['ANSWER'] = value
+#             elif(len(answer) == 3):
+#                 ans[answer[2]] = value
+#             else:
+#                 logging.warn("Poorly formed form element name: %r" % answer)
+#                 continue
+#             extra[question] = ans
 
-    errors = {}
-    for question, ans in extra.items():
-        if not question_satisfies_checks(question, runinfo):
-            continue
-        if u"Trigger953" not in ans:
-            logging.warn("User attempted to insert extra question (or it's a bug)")
-            continue
-        try:
-            cd = question.getcheckdict()
-            # requiredif is the new way
-            depon = cd.get('requiredif',None) or cd.get('dependent',None)
-            if depon:
-                depparser = BooleanParser(dep_check, runinfo, extra)
-                if not depparser.parse(depon):
-                    # if check is not the same as answer, then we don't care
-                    # about this question plus we should delete it from the DB
-                    delete_answer(question, runinfo.subject, runinfo.runid)
-                    if cd.get('store', False):
-                        runinfo.set_cookie(question.number, None)
-                    continue
-            add_answer(runinfo, question, ans)
-            if cd.get('store', False):
-                runinfo.set_cookie(question.number, ans['ANSWER'])
-        except AnswerException, e:
-            errors[question.number] = e
-        except Exception:
-            logging.exception("Unexpected Exception")
-            transaction.rollback()
-            raise
+#     errors = {}
+#     for question, ans in extra.items():
+#         if not question_satisfies_checks(question, runinfo):
+#             continue
+#         if u"Trigger953" not in ans:
+#             logging.warn("User attempted to insert extra question (or it's a bug)")
+#             continue
+#         try:
+#             cd = question.getcheckdict()
+#             # requiredif is the new way
+#             depon = cd.get('requiredif',None) or cd.get('dependent',None)
+#             if depon:
+#                 depparser = BooleanParser(dep_check, runinfo, extra)
+#                 if not depparser.parse(depon):
+#                     # if check is not the same as answer, then we don't care
+#                     # about this question plus we should delete it from the DB
+#                     delete_answer(question, runinfo.subject, runinfo.runid)
+#                     if cd.get('store', False):
+#                         runinfo.set_cookie(question.number, None)
+#                     continue
+#             add_answer(runinfo, question, ans)
+#             if cd.get('store', False):
+#                 runinfo.set_cookie(question.number, ans['ANSWER'])
+#         except AnswerException, e:
+#             errors[question.number] = e
+#         except Exception:
+#             logging.exception("Unexpected Exception")
+#             transaction.rollback()
+#             raise
 
-    if len(errors) > 0:
-        res = show_questionnaire(request, runinfo, errors=errors)
-        transaction.rollback()
-        return res
+#     if len(errors) > 0:
+#         res = show_questionnaire(request, runinfo, errors=errors)
+#         transaction.rollback()
+#         return res
 
-    questionset_done.send(sender=None,runinfo=runinfo,questionset=questionset)
+#     questionset_done.send(sender=None,runinfo=runinfo,questionset=questionset)
 
-    next = questionset.next()
-    while next and not questionset_satisfies_checks(next, runinfo):
-        next = next.next()
-    runinfo.questionset = next
-    runinfo.save()
+#     next = questionset.next()
+#     while next and not questionset_satisfies_checks(next, runinfo):
+#         next = next.next()
+#     runinfo.questionset = next
+#     runinfo.save()
 
-    if next is None: # we are finished
-        return finish_questionnaire(runinfo, questionnaire)
+#     if next is None: # we are finished
+#         return finish_questionnaire(runinfo, questionnaire)
 
-    transaction.commit()
-    return redirect_to_qs(runinfo)
+#     transaction.commit()
+#     return redirect_to_qs(runinfo)
 
 def finish_questionnaire(runinfo, questionnaire):
 
