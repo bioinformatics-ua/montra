@@ -30,6 +30,8 @@ from questionnaire.models import Questionnaire
 
 from fingerprint.models import Fingerprint
 
+from fingerprint.services import indexFingerprint
+
 from django.dispatch import receiver
 from userena.signals import signup_complete
 
@@ -44,6 +46,7 @@ class QueryLog(models.Model):
     query = models.TextField()
     created_date = models.DateTimeField(auto_now_add=True)
     latest_date = models.DateTimeField(auto_now=True)
+    removed = models.BooleanField(default=False)
 
 class Log(models.Model):
     description = models.TextField()
@@ -122,30 +125,20 @@ def add_invited(user, sender, **kwargs):
 
     # add invited dbs if any
     sps = InvitePending.objects.filter(email=user.email)
-    
-    c = CoreEngine()
-    
+        
     for sp in sps:
-        runcode = sp.fingerprint.fingerprint_hash
 
-        # This will change on dev branch, but since i must do it on master, i have to do it on the searchengine and then change
-        results = c.search_fingerprint("id:" + runcode)
+        fingerprint = sp.fingerprint
 
-        for result in results:
-            old_users = ""
-            d = result
-            try:
-                old_users = d['user_t']
-            except KeyError:
-                pass
+        fingerprint.save()
 
-            d['user_t']  = old_users+" \\ "+user.username
+        fingerprint.shared.add(user)
 
-            del d['_version_']
+        sp.delete()
 
-            c.index_fingerprint_as_json(d)
+        # must reindex, because databases lists come from solr, to update user_t
+        indexFingerprint(fingerprint.fingerprint_hash)
 
-            break
 
     print "Added invited user databases to+"+str(user.email)+"!"
 

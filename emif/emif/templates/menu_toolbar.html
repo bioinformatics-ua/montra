@@ -25,9 +25,22 @@
       {% endif %}
 
       {% if results or databases or alldatabases or more_like_this %}
-        <span id="selected_databases" class="btn disabled"> <strong>Type Selected:</strong> <span id="selected_dbstype">---</span> &nbsp; &nbsp; <strong>Selected databases:</strong> <span id="selected_dbscount">0</span></span>      
-        <a id="comparabtn" class="btn "  href=""  rel="tooltip" data-container="body" data-placement="bottom" data-original-title="This allows to compare databases.<br /> It is only possible to compare databases of the same type. <br /> When a database is selected, the type is defined automatically, and databases of other types can't be choosen. <br /> To be able to select other type, you must unselect all the databases." class="help_selectresults icon-question-sign" disabled> <i  class=" icon"></i>
-          <i class="icon-retweet"></i> Compare</a>
+        <span id="selected_databases" class="btn disabled"> <strong>Type Selected:</strong> <span id="selected_dbstype">---</span> &nbsp; &nbsp; <strong>Selected databases:</strong> <span id="selected_dbscount">0</span></span>     
+
+         <div class="btn btn-group">
+        <a class="btn dropdown-toggle" data-toggle="dropdown" href="#" id="add_list_toolbar">
+         <i class="icon-retweet"></i> Compare
+          <span class="caret"></span>
+        </a>
+        <ul class="dropdown-menu">
+           <li><a id="comparabtn"  href=""  rel="tooltip" data-container="body" data-placement="right" data-original-title="This allows to compare databases.<br /> It is only possible to compare databases of the same type. <br /> When a database is selected, the type is defined automatically, and databases of other types can't be choosen. <br /> To be able to select other type, you must unselect all the databases." disabled> 
+          <i class="fa fa-columns"></i>&nbsp; Databases</a>
+          </li>
+          <li><a id="comparabtnPC"  href=""  rel="tooltip" data-container="body" data-placement="right" data-original-title="This allows to compare databases.<br /> It is only possible to compare databases of the same type. <br /> When a database is selected, the type is defined automatically, and databases of other types can't be choosen. <br /> To be able to select other type, you must unselect all the databases." disabled> 
+          <i class="fa fa-users"></i>&nbsp; Populations</a>
+          </li>
+        </ul>
+      </div>  
       {% endif %}
 
       {% if create_public and own_dbs|length > 0 %}
@@ -210,7 +223,7 @@
         <h4 style="display:none" class="share_m">Message to be sent to user</h4>
         <div class="share_m" style="display:none;">
           <div style="display: table-cell; padding: 5px;" class="controls">
-           <textarea rows="4" class="span6" style="margin-top:5px;" type="text" id="share_mess">I want to share my database with you.</textarea>
+           <textarea rows="4" class="span5" style="margin-top:5px;" type="text" id="share_mess">I want to share my database with you.</textarea>
           </div>
         </div>
 

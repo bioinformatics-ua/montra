@@ -130,6 +130,12 @@ def captioned(value):
 
     return value not in exclusion_list
 
+@register.filter(name='is_usecase')
+@stringfilter
+def is_usecase(value):
+
+    return bool(re.match('use', value, re.I))
+
 @register.filter
 def whitespacesplit(str):
     words = []
@@ -354,6 +360,10 @@ def get_version_tag(parser, token):
     return VersionNode('')
 register.tag( 'get_version', get_version_tag )
 
+
+@register.simple_tag
+def slogan():
+    return "Discover the right data for your research"
 
 
 

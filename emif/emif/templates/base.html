@@ -51,6 +51,7 @@
         <script src="{{ STATIC_URL }}js/vendor/jquery.cookie.js"></script>
         <script src="{{ STATIC_URL }}js/vendor/jquery.canclear.js"></script>
         <script src="{{ STATIC_URL }}js/vendor/jquery.highlight.js"></script>
+        <script src="{{ STATIC_URL }}js/vendor/jquery.history.js"></script>
         <script type="application/javascript">
         // We need to configure this to be able to send requests by json with the csrftoken
         var csrftoken = $.cookie('csrftoken');
@@ -115,35 +116,9 @@
                                 {% endif %}
                                 <div class="pull-right">
                                 <ul class="nav">
-                                    <!--{% if not request.user.is_authenticated %}
-                                    <li class="dropdown">
-                                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                                        <i class="icon-user "></i>
-                                        <i class="icon-chevron-down"></i>
-                                        </a>
-                                        <ul class="dropdown-menu">
-                                            <li id="li_signup">
-                                                <a href="accounts/signup/">Sign up</a>
-                                            </li>
-                                            <li class="divider"></li>
-                                            <li id="li_reset_password">
-                                                <a href="accounts/password/reset/">Forgot the password?</a>
-                                            </li>
-                                        </ul>
-                                    </li>
-                                    {% endif %}
+
                                     {% if request.user.is_authenticated %}
-                                    <li id="li_history">
-                                        <a href="controlversion/history">History</a>
-                                    </li>
-                                    {%endif%}-->
-                                    <!--<li id="li_feedback">
-                                        <a href="feedback">Feedback</a>
-                                    </li>
-                                    <li id="li_about">
-                                        <a href="about">About</a>
-                                    </li>-->
-                                    {% if user.is_authenticated %}
+
                                     <li id="li_workspace" style="padding-right: 5px;" class="dropdown">
                                         <a href="" class="dropdown-toggle" data-toggle="dropdown">Databases
                                         <b class="caret"></b>
@@ -276,10 +251,11 @@
                                         </div>
                                     </li>
                                     {%endif%}
+                                    {% endblock %}
                                 </ul>
                                 </div>
                             </div>
-                            {% endblock %}
+                            
                             {% endif %}
 
                             <!--/.nav-collapse -->
@@ -317,6 +293,7 @@
                 <a href="controlversion/history">History</a> ·
                 {%endif%}
                 <a href="feedback">Feedback</a> ·
+                <a href="faq">FAQ</a> ·
                 <a href="about">About</a><br />
                 <p>&copy; EMIF Catalogue v{% get_version %}<br/><small id="supportability">This website is optimised to Safari, Chrome, Firefox, Opera and IE9+. <!--It runs in IE7-IE8, but it has low performance and no enhanced features.--></small></p>
             </footer>
