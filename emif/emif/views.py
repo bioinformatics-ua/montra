@@ -2167,7 +2167,7 @@ def handle_qset(fingerprint, clean, qsets, qset, answers, fingerprint_ttype, rHi
                 t.value = value
 
             if slug == "database_name":
-                name = t.value           
+                name = raw_value        
 
             if question_group != None:
                 try:
