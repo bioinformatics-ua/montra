@@ -1971,7 +1971,7 @@ def creatematrixqsets(db_type, fingerprints, qsets):
 
     return (q_list, ans)
 
-def createqsets(runcode, qsets=None, clean=True, highlights=None, getAnswers=True, choosenqsets=None, fullmode=True, noprocessing=False):
+def createqsets(runcode, qsets=None, clean=True, highlights=None, getAnswers=True, choosenqsets=None, fullmode=True, noprocessing=False, changeSearch=False):
     try:
         if fullmode:
             fingerprint = Fingerprint.objects.get(fingerprint_hash=runcode)
@@ -2004,7 +2004,7 @@ def createqsets(runcode, qsets=None, clean=True, highlights=None, getAnswers=Tru
         name = None
         for qset in qsets_query:
             if qset.sortid != 0 and qset.sortid != 99:
-                (qsets, name) = handle_qset(fingerprint, clean, qsets, qset, answers, fingerprint_ttype, rHighlights, qhighlights, getAnswers, noprocessing=noprocessing)
+                (qsets, name) = handle_qset(fingerprint, clean, qsets, qset, answers, fingerprint_ttype, rHighlights, qhighlights, getAnswers, noprocessing=noprocessing, changeSearch=changeSearch)
 
         return (qsets, name, db_owners, fingerprint_ttype)
 
@@ -2087,7 +2087,7 @@ def createqset(runcode, qsid, qsets=None, clean=True, highlights=None):
     return HttpResponse('Something is wrong on creating qset '+qsid, 500)
 
 # this handles the generation of the tag - value for a single qset, given a questionset reference
-def handle_qset(fingerprint, clean, qsets, qset, answers, fingerprint_ttype, rHighlights, qhighlights, getAnswers=True, noprocessing=False):
+def handle_qset(fingerprint, clean, qsets, qset, answers, fingerprint_ttype, rHighlights, qhighlights, getAnswers=True, noprocessing=False, changeSearch=False):
     name = ""
     question_group = QuestionGroup()
     question_group.sortid = qset.sortid
@@ -2103,6 +2103,7 @@ def handle_qset(fingerprint, clean, qsets, qset, answers, fingerprint_ttype, rHi
         t.value = ""
         t.number = question.number
         t.ttype = question.type
+        t.lastChange = None
         question_group.list_ordered_tags.append(t)
 
     qsets[qset.text] = question_group
@@ -2150,6 +2151,14 @@ def handle_qset(fingerprint, clean, qsets, qset, answers, fingerprint_ttype, rHi
 
             if answer.comment != None:
                 t.comment = answer.comment
+
+            if changeSearch:
+                changes = AnswerChange.objects.filter(answer=answer).order_by('-id')
+
+                if len(changes) == 0:
+                    t.lastChange = answer.fingerprint_id.created
+                else:
+                    t.lastChange = changes[0].revision_head.date
 
             if clean:
                 t.value = value.replace("#", " ")
@@ -3452,11 +3461,11 @@ def save_answers_to_csv(list_databases, filename):
 
     if list_databases:
         writer = csv.writer(response, delimiter = '\t')
-        writer.writerow(['DB_ID', 'DB_name', 'Questionset', 'Question', 'QuestioNumber', 'Answer'])
+        writer.writerow(['DB_ID', 'DB_name', 'Questionset', 'Question', 'QuestionNumber', 'Answer', 'Date Last Modification'])
         for t in list_databases:
             id = t.id
 
-            returned = createqsets(id, clean=False)
+            returned = createqsets(id, clean=False, changeSearch=True, noprocessing=False)
 
             qsets, name, db_owners, fingerprint_ttype  = returned
 
@@ -3492,7 +3501,7 @@ def writeGroup(id, k, qs, writer, name, t):
             _answer = clean_str_exp(str(q.value))
             if (_answer == "" and q.ttype=='comment'):
                 _answer = "-"
-            writer.writerow([id, name, k.replace('h1. ', ''), clean_str_exp(str(q.tag)), str(q.number), _answer])
+            writer.writerow([id, name, k.replace('h1. ', ''), clean_str_exp(str(q.tag)), str(q.number), _answer, q.lastChange])
 
 def export_datatable(request):
 
