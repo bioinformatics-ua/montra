@@ -140,8 +140,12 @@ EMIF Platform - Fingerprint Browser
         (path).../apache-solr-4.0.0/example>java -jar start.jar
 
 
+19. Create a folder to documents population characteristic
 
-9. Open browser and write
+        mkdir -p emif/static/files/
+
+
+20. Open browser and write
 
 
         localhost:8000
