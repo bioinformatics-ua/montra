@@ -36,6 +36,7 @@
 <script src="{{ STATIC_URL }}js/vendor/jquery.ba-throttle-debounce.min.js"></script>
 <script src="{{ STATIC_URL }}js/vendor/json2.js"></script>
 <script src="{{ STATIC_URL }}js/paginator-sorter.js"></script>
+<script src="{{ STATIC_URL }}js/emif.results.js"></script>
 <script src="{{ STATIC_URL }}js/emif.comparison_populations.js"></script>
 
 {% endblock %}
@@ -244,205 +245,20 @@
 {% endcomment %}
 
 {% block scriptextra %}
-
+$(function(){
 {% if page_obj != None %}
 
-var counter = 0;
-var a;
-var fingerprints_ids = null;
-$(document).ready(function(){
-        
-    a = new PaginatorSorter("table_databases", '{{sort_params.base_filter}}', '{{sort_params.selected_name}}', '{{sort_params.selected_value}}', '{{sort_params.extraObjects|safe}}');
-
-    //TO Be Applied in future releases.
-    a.atachPlugin(new SelectPaginatorPlugin());
-
-  if(a != undefined && a.plugin != undefined){
-
-    var dbcount = updateSelectCount();
-
-    counter = dbcount;
-
-    if(dbcount >= 2){
-        $("#comparabtn").removeAttr('disabled');
-        $("#comparabtn").bind('click',function(e)
-        { 
-          postComparison();
-          return false;
-        });
-
-    }
-
-  }
-    
-    $('a[href="#"]').attr('href', function(i, val){
-        return window.location + val;
-    });
-
-    $('.help_selectresults').tooltip({container: 'body', 'html': true});
-    
-});
+  initializePaginatorSorter('{{sort_params.base_filter}}', '{{sort_params.selected_name}}', '{{sort_params.selected_value}}', '{{sort_params.extraObjects|safe}}');
+  
 {% endif %}
-
-$(document).ready(function(){
-  $("#refine_search_btn").click( function(){
-      {% if isAdvanced %}
-      window.location.replace($('#base_link').prop('href')+"advancedSearch/{{request.session.query_type}}/1/{{request.session.query_id}}");
-      {% else %}
-        $("input[name=query]").focus();
-      {% endif %}  
-    });    
-});
+  setRefineEvent({% if isAdvanced %} true {% else %} false {% endif %});  
 
  {% if isAdvanced %}
- var bool_container;
-$(function(){
-    bool_container = $('#bool_container').boolrelwidget({view_only: true, view_serialized_string: '{{request.session.serialization_query}}', link_back: $('#base_link').prop('href')+"advancedSearch/{{request.session.query_type}}/1/{{request.session.query_id}}" });
-   
-    window.setTimeout(function(){window.location.hash = "#back";}, 100);
-    window.setTimeout(function(){window.location.hash = "#search";}, 100);
+    setBooleanPlugin('{{request.session.serialization_query}}', '{{request.session.query_type}}', '{{request.session.query_id}}');
+ {% endif %}
 });
-  /* This is a trick, to be able to redirect on back button since browsers try to prevent us to do so 
-   I must do this, because the back url is different from the url on history */
-window.onhashchange = function(){
-   if (location.hash == "#back") {
-        window.location.replace($('#base_link').prop('href')+"advancedSearch/{{request.session.query_type}}/1/{{request.session.query_id}}");
-    }
-    
-}
-  {% endif %}
-function updateSelectCount(){
-
-    try{
-    var dbs = a.plugin.getExtraObjects().selectedList;
-    fingerprints_ids = a.plugin.getExtraObjects().selectedList;
-    var type = a.plugin.typedb;
-
-    if(type)
-      $('#selected_dbstype').text(type); 
-    else
-      $('#selected_dbstype').text("---"); 
-
-    $('#selected_dbscount').text(dbs.length); 
-
-    return dbs.length;
-
-    } catch(err){
-      $('#selected_dbscount').text(0); 
-    }
-
-    return 0;
-    }
-function updateSelectCountJs(type, count){
-
-    if(type)
-      $('#selected_dbstype').text(type); 
-
-    if(count)
-      $('#selected_dbscount').text(count); 
-
-}
-function hidecheckbox()
-{
-  $('.checkbox').toggle();
-}
-
-$("#comparabtn").bind('click',function(e)
-        { 
-          
-          e.preventDefault(); 
-          e.stopPropagation();
-          return false;
-        });
-
-//$("#comparabtn").unbind();
-function postComparison(){
-  //$('#result_form').submit();
-  //console.log('A: '+a);
-  //console.log('A-plugin: '+a.plugin);
-  if(a != undefined && a.plugin != undefined){
-    $('#comparedbs').html('');
-
-    var dbs = a.plugin.getExtraObjects().selectedList;
-    //console.error(dbs.length);
-    for(var i=0;i<dbs.length;i++){
-      $('#comparedbs').append('<input type="checkbox" name="chks_'+dbs[i]+'" checked>');
-    }
-    var ids = []; 
-    $('[name^="chks_"]').each(function(){
-
-      var id = $(this).attr('name').split('_')[1];
-
-      ids.push(id);
-      
-    });
-    checkExistsPopulation(ids); 
-    //$('#submitdbsimulate').click();
-  }
-  
-}
-$('.checkbox').click(function()
-{
-
-    if($(this).is(':checked')){
-        counter++;
-    } else 
-    {
-        counter--;
-    }
 
 
-
-    if(counter == 0){
-      updateSelectCountJs("---", ""+counter);   
-      $('input.checkbox').prop("disabled", false);
-
-      $("#comparabtn").attr("disabled", true);  
-    }
-    else if(counter == 1){
-    console.log('cai here');
-
-      $("#comparabtn").attr('disabled', true);
-
-      var checkedtype; 
-      if(a != undefined && a.plugin != undefined && a.plugin.typedb !=undefined){
-        checkedtype = a.plugin.typedb;
-      } else {
-        checkedtype = $('.checkbox:checked').first().attr('typedb');
-      }
-      updateSelectCountJs(checkedtype, counter);
-
-      $('input.checkbox').prop("disabled", false);
-
-      $('input.checkbox:not([typedb="' + checkedtype 
-      + '"])').prop('disabled', true);
-
-
-    }
-    else if (counter >= 2){
-      updateSelectCountJs(null, counter); 
-      $("#comparabtn").attr('disabled', false);
-         $("#comparabtn").bind('click',function(e)
-        { 
-          postComparison();
-          return false;
-        });    
-    }
-
-});
-$('[rel=tooltip]').tooltip({container: 'body', 'html': true});
-
-$('.popover').popover({
-    container: 'body'
-});
-$('.accordion-body.collapse').hover(
-function () {
-$(this).css('overflow','visible');
-}, 
-function () {
-$(this).css('overflow','hidden');
-}
-);
 {% endblock %}
 
 {% comment %}
