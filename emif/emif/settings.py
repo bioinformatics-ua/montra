@@ -168,6 +168,7 @@ STATICFILES_DIRS = (
     os.path.abspath(PROJECT_DIR_ROOT + MIDDLE_DIR + 'docs_manager/static'),
     os.path.abspath(PROJECT_DIR_ROOT + MIDDLE_DIR + 'advancedsearch/static'),
     os.path.abspath(PROJECT_DIR_ROOT + MIDDLE_DIR + 'public/static'),
+    os.path.abspath(PROJECT_DIR_ROOT + MIDDLE_DIR + 'accounts/static'),
 )
 
 # List of finder classes that know how to find static files in
@@ -284,7 +285,10 @@ INSTALLED_APPS = (
     'public',
 
     # FAQ
-    'fack'
+    'fack',
+
+    # Utility to hook custom view admin pages easily
+    'adminplus',
 )
 
 # Userena settings
@@ -461,6 +465,7 @@ DONTLOG_URLS = (
     r'^editqs/(?P<fingerprint_id>[^/]+)/(?P<questionnaire_id>[0-9]+)/(?P<sort_id>[0-9]+)/$',
     r'^detailedqs/(?P<fingerprint_id>[^/]+)/(?P<questionnaire_id>[0-9]+)/(?P<sort_id>[0-9]+)/$',
     r'^qs_data_table$',
+    r'^admin/jsi18n/',
 )
 
 #Set session idle timeout (seconds)
