@@ -21,12 +21,26 @@
             <div class="tab-pane {% if source == '0' %} active {% endif%}" id="allnot">
             <div id="user_notifications">
                 <table class="table table-bordered table-striped">
+                    <thead>
+                        <tr>
+                            <th>Notification</th>
+                            <th style="width: 150px;">Sender</th>
+                            <th style="width: 120px;">Date</th>
+                            <th style="width: 40px;"></th>
+                        </tr>
+                    </thead>
                     <tbody>
                         {% for notification in notifications%}
-                            <tr><td>{{notification}}</td></tr>
+                            <tr data-ident="{{notification.id}}" data-link="{{notification.href}}" data-read="{{notification.read}}">
+                                <td class="notification_detail">{% if not notification.read %}<strong>{% endif%}
+                                {{notification}} {% if not notification.read %} </strong> {% endif %}</td>
+                                <td><small>{{notification.origin.get_full_name}}</small></td>
+                                <td><small>{{notification.created_date|date:"Y-m-d H:i:s"}}</small></td>
+                                <td><i class="notification_read {% if notification.read %} muted {% endif %} fa fa-eye"></i>&nbsp; &nbsp;<i class="notification_delete fa fa-times"></i></td>
+                            </tr>
                         {% endfor%}
                         {% if notifications|length == 0 %}
-                            <tr><td><center>There's no notifications.</center></td></tr>
+                            <tr><td colspan="4"><center>There's no notifications.</center></td></tr>
                         {% endif %}
                     </tbody>
                 </table>
@@ -54,16 +68,30 @@
             </div>
         </div>
     <div class="tab-pane {% if source == '1' %} active {% endif%}" id="unreadnot">
-    <table class="table table-bordered table-striped">
-        <tbody>
-            {% for notification in notifications_unread%}
-                <tr><td>{{notification}}</td></tr>
-            {% endfor%}
-            {% if notifications_unread|length == 0 %}
-                <tr><td><center>There's no unread notifications.</center></td></tr>
-            {% endif %}
-        </tbody>
-    </table>
+                <table class="table table-bordered table-striped">
+                    <thead>
+                        <tr>
+                            <th>Notification</th>
+                            <th style="width: 150px;">Sender</th>
+                            <th style="width: 120px;">Date</th>
+                            <th style="width: 40px;"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for notification in notifications_unread%}
+                            <tr data-ident="{{notification.id}}" data-link="{{notification.href}}" data-read="{{notification.read}}">
+                                <td class="notification_detail">{% if not notification.read %}<strong>{% endif%}
+                                {{notification}} {% if not notification.read %} </strong> {% endif %}</td>
+                                <td><small>{{notification.origin.get_full_name}}</small></td>
+                                <td><small>{{notification.created_date|date:"Y-m-d H:i:s"}}</small></td>
+                                <td><i class="notification_read {% if notification.read %} muted {% endif %} fa fa-eye"></i>&nbsp; &nbsp;<i class="notification_delete fa fa-times"></i></td>
+                            </tr>
+                        {% endfor%}
+                        {% if notifications_unread|length == 0 %}
+                            <tr><td colspan="4"><center>There's no notifications.</center></td></tr>
+                        {% endif %}
+                    </tbody>
+                </table>
     <div style="font-size: 80%;" class="pull-left">Showing page {{ notifications.number }} of {{ notifications.paginator.num_pages }}</div>
                 <div style="text-align: center" class="pagination">
                     <ul>
@@ -87,16 +115,30 @@
                 </form>
 </div>
 <div class="tab-pane {% if source == '2' %} active {% endif%}" id="readnot">
-<table class="table table-bordered table-striped">
-<tbody>
-    {% for notification in notifications_read%}
-        <tr><td>{{notification}}</td></tr>
-    {% endfor%}
-    {% if notifications_read|length == 0 %}
-        <tr><td><center>There's no read notifications.</center></td></tr>
-    {% endif %}
-</tbody>
-</table>
+                <table class="table table-bordered table-striped">
+                    <thead>
+                        <tr>
+                            <th>Notification</th>
+                            <th style="width: 150px;">Sender</th>
+                            <th style="width: 120px;">Date</th>
+                            <th style="width: 40px;"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for notification in notifications_read%}
+                            <tr data-ident="{{notification.id}}" data-link="{{notification.href}}" data-read="{{notification.read}}">
+                                <td class="notification_detail">{% if not notification.read %}<strong>{% endif%}
+                                {{notification}} {% if not notification.read %} </strong> {% endif %}</td>
+                                <td><small>{{notification.origin.get_full_name}}</small></td>
+                                <td><small>{{notification.created_date|date:"Y-m-d H:i:s"}}</small></td>
+                                <td><i class="notification_read {% if notification.read %} muted {% endif %} fa fa-eye"></i>&nbsp; &nbsp;<i class="notification_delete fa fa-times"></i></td>
+                            </tr>
+                        {% endfor%}
+                        {% if notifications_read|length == 0 %}
+                            <tr><td colspan="4"><center>There's no notifications.</center></td></tr>
+                        {% endif %}
+                    </tbody>
+                </table>
 <div style="font-size: 80%;" class="pull-left">Showing page {{ notifications.number }} of {{ notifications.paginator.num_pages }}</div>
                 <div style="text-align: center" class="pagination">
                     <ul>
@@ -124,12 +166,12 @@
 </div>
 <script type="text/javascript">
 $(function(){
-$('.page_rows').change(function(){
-$(this).closest('form').submit();
-});
+    $('.page_rows').change(function(){
+        $(this).closest('form').submit();
+    });
 });
 </script>
 {% endblock content %}
 {% block scriptextraincludes %}
-<script type="text/javascript" src="static/js/emif.public.js"></script>
+<script type="text/javascript" src="static/js/emif.notifications.js"></script>
 {% endblock %}

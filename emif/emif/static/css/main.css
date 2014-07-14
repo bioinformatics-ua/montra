@@ -785,7 +785,7 @@ height: 6em;
   text-align: center;
   width: 30px;
 }
-.notification_line:hover{
+.notification_line:hover, .notification_detail:hover, .notification_delete:hover, .notification_read:hover{
   cursor:pointer;
 }
 .notification_line:hover > .notification_options, .notification_options:hover{
