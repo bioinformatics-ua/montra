@@ -34,6 +34,9 @@ from views import *
 
 from django.conf import settings
 
+from hitcount.views import update_hit_count_ajax
+
+
 urlpatterns = patterns('',
 
     # Comments
@@ -273,7 +276,10 @@ urlpatterns = patterns('',
     url(r'public/', include('public.urls')),
 
     # Faq
-    url('^faq/', include('fack.urls'))
+    url('^faq/', include('fack.urls')),
+
+    # unique views plugin
+    url(r'^api/hit_counter/$', update_hit_count_ajax, name='hitcount_update_ajax'),
 )
 
 if settings.DEBUG:

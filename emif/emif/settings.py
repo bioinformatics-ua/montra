@@ -283,7 +283,10 @@ INSTALLED_APPS = (
     'public',
 
     # FAQ
-    'fack'
+    'fack',
+
+    # unique views counter
+    'hitcount',
 )
 
 # Userena settings
@@ -518,4 +521,7 @@ JOHNNY_MIDDLEWARE_KEY_PREFIX='emif_'
 PUBLIC_LINK_MAX_VIEWS = 50; # number of views
 PUBLIC_LINK_MAX_TIME = 24*30; # hours
 
+
+# Unique views definitions
+HITCOUNT_KEEP_HIT_ACTIVE = { 'days': 1 }
 
