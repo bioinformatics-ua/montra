@@ -3,6 +3,7 @@
 {% load extra_tags %} 
 {% load django_bootstrap_breadcrumbs %} 
 {% load comments %}
+{% load hitcount_tags %}
 
 {% block headextra %}
 
@@ -88,7 +89,6 @@
 
 {% endblock %}
 
-
 {% block toolbar %} 
 {% include "menu_toolbar.html" with collapse=collapseall %} 
 {% endblock %} 
@@ -125,6 +125,12 @@
             <div style="margin-bottom: 50px;" class="tab-content">
                 <div class="tab-pane {%if activetab == 'summary'%}active{%endif%}" id="metadata">
                     <div>
+                        <div class="pull-left">
+                            <small>
+                                <strong>Hits: </strong>{{hits}} &nbsp;&nbsp;
+                                <strong>Unique Views: </strong> {% get_hit_count for fingerprint %}
+                            </small>
+                        </div>
                         <div class="pull-right btn-group">
                             <button style="display: none;" type="button" class="btn" id="show_hide_button">Hide Empty</button>
 
@@ -285,6 +291,10 @@
 {% endblock %}
 
 {% block scriptextra %}
+    $(function(){ 
+    var csrf_token = '{{ csrf_token }}';
+        {% get_hit_count_javascript for fingerprint %} 
+    });
 var threads = {};
 function load_questionnary(){
 

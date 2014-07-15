@@ -208,9 +208,18 @@ def document_form_view(request, runcode, qs, activetab='summary', readOnly=False
         except PublicFingerprintShare.MultipleObjectsReturned:
             print "- Error, there are multiple shares for this user/key, can't be."
 
+    # increase database hits
+    hits = 0
+    if fingerprint != None:
+        hits = fingerprint.hits+1
+        fingerprint.hits = hits
+        fingerprint.save()
+
     return render(request, template_name, 
         {'request': request, 'qsets': qsets, 'export_bd_answers': True, 
-        'apiinfo': apiinfo, 'fingerprint_id': runcode, 'fingerprint_pk': fingerprint_pk,
+        'apiinfo': apiinfo, 'fingerprint_id': runcode, 
+                    'fingerprint': fingerprint,
+                    'fingerprint_pk': fingerprint_pk,
                    'breadcrumb': True, 'breadcrumb_name': name_bc.decode('utf-8'),
                     'style': qs, 'collapseall': False, 
                     'owner_fingerprint':owner_fingerprint,
@@ -224,6 +233,7 @@ def document_form_view(request, runcode, qs, activetab='summary', readOnly=False
                     'activetab': activetab,
                     'readOnly': readOnly,
                     'public_link': public_link,
+                    'hits': hits,
                     })
 
 
