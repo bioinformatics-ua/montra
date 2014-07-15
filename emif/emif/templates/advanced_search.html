@@ -88,7 +88,12 @@ text-decoration: none;
       {% if qs.sortid != 0 and qs.sortid != 99 and qs.text != 'h1. Key Publications' %}
       <li{% if questionset.text == qs.text %} class="active" {% endif %} id="li_qs_{{qs.sortid}}">
         <!--<a href="q2/{{runinfo.random}}/{{ qs.sortid }}">-->
-        <a href="advancedSearch/{{qs.questionnaire.pk}}/{{ qs.sortid }}" onclick="questionsets_handle(qs_{{ qs.sortid }}); return false;">
+
+    {% if aqid %}
+        <a href="advancedSearch/{{qs.questionnaire.pk}}/{{ qs.sortid }}" onclick="questionsets_handle('qs_{{ qs.sortid }}', '{{q_id}}', '{{aqid}}', QsType.SEARCH); return false;">
+    {% else %}
+        <a href="advancedSearch/{{qs.questionnaire.pk}}/{{ qs.sortid }}" onclick="questionsets_handle('qs_{{ qs.sortid }}', '{{q_id}}', null, QsType.SEARCH); return false;">
+    {% endif %}
             <table>
             <tr>
               <td width="80%">{{ qs.text|removeh1 }}</td>
@@ -218,17 +223,16 @@ $( document ).ready(function(e) {
                     }     
         );
     }
-    generateStub();
-    //load_questionnary();
-    {% if not aqid %}
-      loadqspart("{{questionset.sortid}}", "{{q_id}}", null);
+    
+    {% if aqid %}
+      initQsEnv("{{q_id}}", "{{questionset.sortid}}", "{{aqid}}", QsType.SEARCH);
     {% else %}
-      loadqspart("{{questionset.sortid}}", "{{q_id}}", "{{aqid}}");
-    {% endif %}  
-
-  errornavigator = $('#errornavigator').errornavigator();
-
+      initQsEnv("{{q_id}}", "{{questionset.sortid}}", null, QsType.SEARCH);
+    {% endif %}
 });
+function initialCounterSetup(){ 
+  // currently we are not showing any counters on search, may change in the future
+}
 var threads = {};
 function load_questionnary(){
 
@@ -256,9 +260,9 @@ function load_questionnary(){
         var priority=1;
         {% for qs in questionset.questionnaire.questionsets %}
             {% if not aqid %}
-                var thread = new Runnable(loadqspart, priority++, {{ qs.sortid }}, {{qs.questionnaire.pk}}, null);
+                var thread = new Runnable(loadqspart, priority++, {{qs.questionnaire.pk}},{{ qs.sortid }}, null, QsType.SEARCH);
             {% else %}
-                var thread = new Runnable(loadqspart, priority++, {{ qs.sortid }}, {{qs.questionnaire.pk}}, {{aqid}});
+                var thread = new Runnable(loadqspart, priority++, {{qs.questionnaire.pk}}, {{ qs.sortid }}, {{aqid}}, QsType.SEARCH);
             {% endif %}
             threadpool.run(thread);
             threads['qs_{{ qs.sortid }}'] = thread;
@@ -268,22 +272,7 @@ function load_questionnary(){
         //threadpool.run(new Runnable(add_triggers, priority+2));
         threadpool.destroy();
 }
-function loadqspart(sortid, pk, aqid){
-    
-    //console.log("getting part from searchqs/"+pk+"/"+sortid+"/");
-    if(aqid == null){
-        $.get( "searchqs/"+pk+"/"+sortid+"/", function( data ) {
-          $( "#qs_"+sortid ).html( data );
-        });
-    } else {
-        $.get( "searchqs/"+pk+"/"+sortid+"/"+aqid, function( data ) {
-          $( "#qs_"+sortid ).html( data );
-        });    
-    }
-    //threads['qs_'+sortid] = null;
-    //parts_missing--;
-    //this.complete();
-}
+
 function generateStub(){
           var containers = [];
 
@@ -295,134 +284,5 @@ function generateStub(){
 
         $('#set_container').append(containers.join(''));
 }
-function next_questionset(id_questionset)
-{
-
-  var next = false;
-  $('.questionset').each(function(i, obj) {
-    console.log("obj.id: " + obj.id);
-    console.log("next" + next);
-    if (next==true)
-    {
-      questionsets_handle(obj, "");
-      next = false;
-
-  }
-    if (obj.id==id_questionset.id)
-    {
-      next = true; 
-    }    
-  }
-
-  );
-
-}
-
-function questionsets_handle(id_questionset)
-{
-
-    if (!e) var e = window.event;
-
-    var idString = id_questionset.id;
-    var id = idString.split('_');
-
-    $('#active_qs').val(id_questionset.id);
-    $('#active_qs_sortid').val(id[1]);
-
-      if (!(typeof errornavigator === 'undefined')) {
-      errornavigator.hideErrorPage();
-      errornavigator.reset();
-
-      var previous_id = $('.questionset:not(.hide)').first().attr('id').split('_')[1];
-
-      var current_form = $('#asform');
-
-      console.log(current_form);
-
-      var list_invalid = advValidator.validateFormContext(e, current_form);
-      console.log(list_invalid);
-
-
-      console.log(list_invalid);
-
-      if(list_invalid.length == 0){
-
-
-  $('.questionset').each(function(i, obj) {
-
-    if (obj.id==id_questionset.id)
-    {
-       // Check if we are still loading
-        console.log("Thread state for "+id_questionset.id+": "+threads[id_questionset.id]);
-       if(threads[id_questionset.id] != null){
-            threads[id_questionset.id].setPriority(0);
-        }
-            
-    
-       $('#'+obj.id).addClass("show");
-       $('#li_'+id_questionset.id).addClass("active");
-       $('#'+obj.id).removeClass("hide");
-
-       
-       if($('#'+obj.id).find('.loadingindicator').length != 0){
-              
-              {% if not aqid %}
-                loadqspart(obj.id.replace("qs_",""), "{{q_id}}", null);
-              {% else %}
-                loadqspart(obj.id.replace("qs_",""), "{{q_id}}", "{{aqid}}");
-              {% endif %}     
-              console.log("Loading to dom");
-       } else {
-               console.log("Already on dom");
-      }
-
-    }
-    else {
-      $('#li_'+obj.id).removeClass("active");
-      $('#'+obj.id).addClass("hide");
-      $('#'+obj.id).removeClass("show");
-    }
-    
-  }
-
-  );
-    document.body.scrollTop = document.documentElement.scrollTop = 0;
-          } else {
-        console.log("Jump to errors and show error navigator.");
-
-          for(var i = 0;i<list_invalid.length;i++){
-            errornavigator.addError('qc_'+list_invalid[i]);
-          }
-          errornavigator.showErrorPager();
-
-          // jump to first problem
-          errornavigator.nextError();
-
-        }
-          }
-};
-    
-    function collapseAll(element, div_id){
-        if (element.text().indexOf('Collapse') !== -1) {
-           console.log('Collapse all');
-           element.text('Expand all');
-           if (!element.hasClass('disabled')){
-            console.log('#'+div_id +' .collapse');
-            element.parents().find('#'+div_id +' .collapse').each(function(index){
-                $(this).addClass('in');
-                $(this).collapse('hide');
-            });
-           }
-       } else {
-           console.log('Expand all');
-            element.text('Collapse all');
-           if (!element.hasClass('disabled')){
-            element.parents().find('#'+div_id +' .collapse').each(function(index){
-                $(this).removeClass('in');
-                $(this).collapse('show');
-            });
-           }
-       }
-    };
 
 {% endblock %}

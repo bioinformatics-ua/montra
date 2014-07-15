@@ -58,6 +58,7 @@ from rest_framework.authtoken.models import Token
 from django.contrib.auth.decorators import login_required
 
 from django.utils.html import strip_tags
+from django.utils import simplejson
 
 import json
 import logging
@@ -827,8 +828,10 @@ def render_one_questionset(request, q_id, qs_id, errors={}, aqid=None, fingerpri
                 fingerprint_id=fingerprint_id,
                 breadcrumb=True,
                 permissions=permissions,
-                readonly=readonly
+                readonly=readonly,
+                aqid = aqid,
         )
+
         r['Cache-Control'] = 'no-cache'
         r['Expires'] = "Thu, 24 Jan 1980 00:00:00 GMT"
 
@@ -2622,34 +2625,25 @@ def check_database_add_conditions(request, questionnaire_id, sortid, saveid,
             else:
                 setNewPermissions(request2)
 
-            saveFingerprintAnswers(qlist_general, fingerprint_id, question_set2.questionnaire, users_db, extra_fields=extra_fields, created_date=created_date)
+            success = saveFingerprintAnswers(qlist_general, fingerprint_id, question_set2.questionnaire, users_db, extra_fields=extra_fields, created_date=created_date)
 
+            print "SUCCESS SAVING:"+str(success)
+
+            if not success:
+
+                qs = -1
+                try :
+                    qs = question_set2.questionnaire.findMandatoryQs().sortid
+                except:
+                    pass
+                return HttpResponse(simplejson.dumps({'mandatoryqs': qs}), 
+                                    mimetype='application/json')
+            
             # new version that just serializes the created fingerprint object (this eventually can be done using celery)
             indexFingerprint(fingerprint_id)
 
-    r = r2r(template_name, request,
-                questionset=question_set2,
-                questionsets=question_set2.questionnaire.questionsets,
-                runinfo=None,
-                errors={},
-                qlist=qlist,
-                progress=None,
-                triggers=jstriggers,
-                qvalues=qvalues,
-                jsinclude=jsinclude,
-                cssinclude=cssinclude,
-                async_progress=None,
-                async_url=None,
-                qs_list=qsobjs,
-                questions_list=qlist_general,
-                fingerprint_id=fingerprint_id,
-                breadcrumb=True,
-                extra_fields=extra_fields
-        )
-    r['Cache-Control'] = 'no-cache'
-    r['Expires'] = "Thu, 24 Jan 1980 00:00:00 GMT"
-
-    return r
+    return HttpResponse(simplejson.dumps({'success': 'true'}), 
+                                    mimetype='application/json')
 
 # Set new permissions for a questionset, based on a post request
 def setNewPermissions(request):

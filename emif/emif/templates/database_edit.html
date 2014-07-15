@@ -111,7 +111,12 @@ It was not possible to save this questionnary. Please try again in a few seconds
       <li{% if questionset.text == qs.text %} class="active" {% endif %} id="li_qs_{{qs.sortid}}">
         <!--<a href="q2/{{runinfo.random}}/{{ qs.sortid }}">
         -->
-        <a href="add/{{qs.questionnaire.pk}}/{{ qs.sortid }}" onclick="questionsets_handle(qs_{{ qs.sortid }}); return false;">
+        {% if readonly %}
+                <a href="dbDetailed/{{qs.questionnaire.pk}}/{{ qs.sortid }}" onclick="questionsets_handle('qs_{{ qs.sortid }}', '{{fingerprint_id}}', '{{q_id}}', QsType.VIEW); return false;">
+        {% else %}
+                <a href="dbEdit/{{qs.questionnaire.pk}}/{{ qs.sortid }}" onclick="questionsets_handle('qs_{{ qs.sortid }}', '{{fingerprint_id}}', '{{q_id}}', QsType.EDIT); return false;">
+        {% endif %}
+
           <table class="fullwidth">
             <tr>
               <td style="width: 80%; font-size: 93%;">
@@ -164,145 +169,13 @@ It was not possible to save this questionnary. Please try again in a few seconds
 <script type="text/javascript">
 {% block scriptextra %}
 
+{% if not readonly %}
+this_mode = QsType.EDIT;
+{% else %}
+this_mode = QsType.VIEW;
+{% endif %}
 $('#li_workspace').addClass("active");
 
-
-function next_questionset(id_questionset)
-{
-
-  var next = false;
-  $('.questionset').each(function(i, obj) {
-    console.log("obj.id: " + obj.id);
-    console.log("next" + next);
-    if (next==true)
-    {
-      questionsets_handle(obj);
-      next = false;
-
-  }
-    if (obj.id==id_questionset.id)
-    {
-      next = true;
-    }
-
-  }
-
-  );
-
-}
-
-function questionsets_handle(id_questionset)
-{
-
-    if (!e) var e = window.event;
-
-    var idString = id_questionset.id
-    var id = idString.split('_');
-
-    $('#active_qs').val(id_questionset.id);
-    $('#active_qs_sortid').val(id[1]);
-
-
-      // First we get the previous form
-      var previous_id = $('.questionset:not(.hide)').first().attr('id').split('_')[1];
-      var current_form = $('#qform'+previous_id);
-
-       // First we get the previous form
-      var previous_id = $('.questionset:not(.hide)').first().attr('id').split('_')[1];
-      var current_form = $('#qform'+previous_id);
-
-
-      if (!(typeof errornavigator === 'undefined')) {
-      errornavigator.hideErrorPage();
-      // Reset messages
-      $("#loading-message").fadeOut('fast');
-      $("#loading-error-message").fadeOut('fast');
-      errornavigator.reset();
-
-      {% if not readonly %}
-      var list_invalid = advValidator.validateFormContext(e, current_form);
-      //console.log(list_invalid);
-      {% else %}
-      var list_invalid =[];
-      {% endif %}
-
-      if(list_invalid.length == 0){
-
-        {% if not readonly %}
-        if(formHasChanged){
-          // If its not the first or last
-          if(current_form.length != 0 && id[1] != '0' && id[1] != '99'){
-
-            // Save this questionset using an ajax post
-            var posting = $.post(current_form.attr("action"), current_form.serialize());
-
-            $("#loading-message").fadeIn('fast');
-
-            posting.done(function(data) {
-              $("#loading-message").fadeOut('fast');
-              formHasChanged = false; 
-            });
-            posting.fail(function(data){
-              $("#loading-message").fadeOut('fast');
-
-              $("#loading-error-message").fadeIn('fast');
-               
-            });
-          }
-        }
-        {% endif %}
-        
-        $('.questionset').each(function(i, obj) {
-
-          if (obj.id==id_questionset.id)
-          {
-
-             $('#'+obj.id).addClass("show");
-             $('#li_'+id_questionset.id).addClass("active");
-             $('#'+obj.id).removeClass("hide");
-
-             if($('#'+obj.id).find('.loadingindicator').length != 0){
-              loadqspart("{{fingerprint_id}}", "{{q_id}}",obj.id.replace("qs_",""));
-              console.log("Loading to dom");
-             } else {
-               console.log("Already on dom");
-             }
-              {% if not readonly %}
-                History.pushState(null, null, "dbEdit/{{fingerprint_id}}/{{q_id}}/"+obj.id.replace("qs_",""));
-              {% else %}
-                History.pushState(null, null, "dbDetailed/{{fingerprint_id}}/{{q_id}}/"+obj.id.replace("qs_",""));
-              {% endif %}
-            
-          }
-          else {
-            $('#li_'+obj.id).removeClass("active");
-            $('#'+obj.id).addClass("hide");
-            $('#'+obj.id).removeClass("show");
-          }
-          
-        }
-
-        );
-        document.body.scrollTop = document.documentElement.scrollTop = 0; 
-
-          
-        list_invalid = []; 
-
-      } else {
-        console.log("Jump to errors and show error navigator.");
-
-          for(var i = 0;i<list_invalid.length;i++){
-            errornavigator.addError('qc_'+list_invalid[i]);
-          }
-          errornavigator.showErrorPager();
-
-          // jump to first problem
-          errornavigator.nextError();
-
-        }
-
-      }
-};
 function generateStub(){
           var containers = [];
 
@@ -314,45 +187,13 @@ function generateStub(){
 
         $('#set_container').append(containers.join(''));
 }
-function loadqspart(fingerprint, pk, sortid){
-    
-    //console.log("getting part from searchqs/"+pk+"/"+sortid+"/");
-        {% if readonly %}
-          $.get( "detailedqs/"+fingerprint+"/"+pk+"/"+sortid+"/", function( data ) {
-            $( "#qs_"+sortid ).html( data );
-          });
-        {% else %}
-          $.get( "editqs/"+fingerprint+"/"+pk+"/"+sortid+"/", function( data ) {
-            $( "#qs_"+sortid ).html( data );
-          });
-        {% endif %}
-
-}
-var errornavigator;
 $(function(){
-  generateStub();  
-
-  $('.reqfield').tooltip({container: 'body'});
-  errornavigator = $('#errornavigator').errornavigator();
-
-  loadqspart("{{fingerprint_id}}", "{{q_id}}", "{{questionset.sortid}}");
-
-  // Clearly identify database name before the edition
-  advValidator.setDatabase("{{name}}");
   {% if readonly %}
-  advValidator.searchMode(true);
+    initQsEnv("{{fingerprint_id}}","{{q_id}}","{{questionset.sortid}}", QsType.VIEW);
+  {% else %}
+    initQsEnv("{{fingerprint_id}}","{{q_id}}","{{questionset.sortid}}", QsType.VIEW); 
   {% endif %}
-  initialCounterSetup();
-
-  if(!(window.history && history.pushState)){
-    page = History.getState().hash.split('/')[3];
-
-    if(page)
-      questionsets_handle(document.getElementById('qs_'+page));
-  }
-
 });
-
 //questionsets_handle(qs_0);
 function initialCounterSetup(){ 
   {% for qs, answered, total_count, percentage in questionsets %}
@@ -360,27 +201,6 @@ function initialCounterSetup(){
 
   {% endfor %}
 }
-    function collapseAll(element, div_id){
-        if (element.text().indexOf('Collapse') !== -1) {
-           console.log('Collapse all');
-           element.text('Expand all');
-           if (!element.hasClass('disabled')){
-            element.parents().find('#'+div_id +' .collapse').each(function(index){
-                $(this).addClass('in');
-                $(this).collapse('hide');
-            });
-           }
-       } else {
-           console.log('Expand all');
-            element.text('Collapse all');
-           if (!element.hasClass('disabled')){
-            element.parents().find('#'+div_id +' .collapse').each(function(index){
-                $(this).removeClass('in');
-                $(this).collapse('show');
-            });
-           }
-       }
-    };
     
 {% endblock %}
 

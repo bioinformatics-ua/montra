@@ -40,6 +40,19 @@ class Questionnaire(models.Model):
 
         return self.__questionscache        
 
+    def findMandatoryQs(self):
+        if not hasattr(self, "__mandatoryqscache"):
+            self.__mandatoryqscache = None
+            try: 
+                name = Question.objects.get(questionset__questionnaire=self, slug_fk__slug1="database_name")
+
+                self.__mandatoryqscache = name.questionset
+
+            except Question.DoesNotExist:
+                print "does not exist question database_name"
+                pass
+        return self.__mandatoryqscache      
+
     class Meta:
         permissions = (
             ("export", "Can export questionnaire answers"),

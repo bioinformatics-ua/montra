@@ -213,12 +213,12 @@
     <div class="span5 text-center">
         <!-- If Questionset is not the first (Introduction) or the final (Thank you) -->
         {% if questions_list.0.0.prev %}
-        <a href="add/{{ questionset.questionnaire.pk }}/{{ questions_list.0.0.prev.sortid }}" class="btn large primary" onclick="questionsets_handle(qs_{{ questions_list.0.0.prev.sortid }});  return false;">{% trans "Previous" %}</a>
+        <a href="add/{{ questionset.questionnaire.pk }}/{{ questions_list.0.0.prev.sortid }}" class="btn large primary" onclick="questionsets_handle('qs_{{ questions_list.0.0.prev.sortid }}', '{{fingerprint_id}}', '{{questionset.questionnaire.pk}}', this_mode);  return false;">{% trans "Previous" %}</a>
         {% endif %}
         {% if questions_list.0.0.prev and questions_list.0.0.next %}
         {% endif %}
         {% if questions_list.0.0.next %}
-        <a href="add/{{ questionset.questionnaire.pk }}/{{ questions_list.0.0.next.sortid }}" class="btn large primary" onclick="questionsets_handle(qs_{{ questions_list.0.0.next.sortid }});  return false;">{% trans "Next" %}</a>
+        <a href="add/{{ questionset.questionnaire.pk }}/{{ questions_list.0.0.next.sortid }}" class="btn large primary" onclick="questionsets_handle('qs_{{ questions_list.0.0.next.sortid }}', '{{fingerprint_id}}', '{{questionset.questionnaire.pk}}', this_mode);  return false;">{% trans "Next" %}</a>
         {% endif %}
         <!-- First Questionset - Introduction -->
     </div>
@@ -305,7 +305,7 @@ collapseAll($("#collapseall_qs_{{ k.sortid }}"), div_id);
 {% endfor %}
 $(function(){
     add_triggers{{ questions_list.0.0.sortid }}();
-    setsaveqs("qform{{ questions_list.0.0.sortid }}");
+    setsaveqs("qform{{ questions_list.0.0.sortid }}", '{{fingerprint_id}}', '{{questionset.questionnaire.pk}}', this_mode);
     $('.dropdown-menu').on('click', function(e) {
         if($(this).hasClass('dropdown-menu-form')) {
             e.stopPropagation();
