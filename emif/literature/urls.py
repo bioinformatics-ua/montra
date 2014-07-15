@@ -22,5 +22,7 @@ from views import *
 urlpatterns = patterns('',
    
     # Literature tab, on database info view
-    url(r'^(?P<fingerprint_id>[^/]+)$', 'literature.views.literature_database_info'),    
+    url(r'^(?P<fingerprint_id>[^/]+)/(?P<page>[0-9]+)$', 'literature.views.literature_database_info'), 
+    url(r'^(?P<fingerprint_id>[^/]+)$', 'literature.views.literature_database_info_initial'),    
+
 )

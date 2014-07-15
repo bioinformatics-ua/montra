@@ -58,6 +58,7 @@ from rest_framework.authtoken.models import Token
 from django.contrib.auth.decorators import login_required
 
 from django.utils.html import strip_tags
+from django.utils import simplejson
 
 import json
 import logging
@@ -827,8 +828,10 @@ def render_one_questionset(request, q_id, qs_id, errors={}, aqid=None, fingerpri
                 fingerprint_id=fingerprint_id,
                 breadcrumb=True,
                 permissions=permissions,
-                readonly=readonly
+                readonly=readonly,
+                aqid = aqid,
         )
+
         r['Cache-Control'] = 'no-cache'
         r['Expires'] = "Thu, 24 Jan 1980 00:00:00 GMT"
 
@@ -1733,8 +1736,6 @@ def define_rows(request):
         
         profile.save()
 
-        if rows == -1:
-            rows = 99999
     else:
         # Otherwise get number of rows from preferences
         rows = 5
@@ -1747,6 +1748,8 @@ def define_rows(request):
         except:
             pass
 
+    if rows == -1:
+        rows = 99999
 
     return rows
 # GET ALL DATABASES ACCORDING TO USER INTERESTS
@@ -1971,7 +1974,7 @@ def creatematrixqsets(db_type, fingerprints, qsets):
 
     return (q_list, ans)
 
-def createqsets(runcode, qsets=None, clean=True, highlights=None, getAnswers=True, choosenqsets=None, fullmode=True, noprocessing=False):
+def createqsets(runcode, qsets=None, clean=True, highlights=None, getAnswers=True, choosenqsets=None, fullmode=True, noprocessing=False, changeSearch=False):
     try:
         if fullmode:
             fingerprint = Fingerprint.objects.get(fingerprint_hash=runcode)
@@ -2004,7 +2007,7 @@ def createqsets(runcode, qsets=None, clean=True, highlights=None, getAnswers=Tru
         name = None
         for qset in qsets_query:
             if qset.sortid != 0 and qset.sortid != 99:
-                (qsets, name) = handle_qset(fingerprint, clean, qsets, qset, answers, fingerprint_ttype, rHighlights, qhighlights, getAnswers, noprocessing=noprocessing)
+                (qsets, name) = handle_qset(fingerprint, clean, qsets, qset, answers, fingerprint_ttype, rHighlights, qhighlights, getAnswers, noprocessing=noprocessing, changeSearch=changeSearch)
 
         return (qsets, name, db_owners, fingerprint_ttype)
 
@@ -2087,7 +2090,7 @@ def createqset(runcode, qsid, qsets=None, clean=True, highlights=None):
     return HttpResponse('Something is wrong on creating qset '+qsid, 500)
 
 # this handles the generation of the tag - value for a single qset, given a questionset reference
-def handle_qset(fingerprint, clean, qsets, qset, answers, fingerprint_ttype, rHighlights, qhighlights, getAnswers=True, noprocessing=False):
+def handle_qset(fingerprint, clean, qsets, qset, answers, fingerprint_ttype, rHighlights, qhighlights, getAnswers=True, noprocessing=False, changeSearch=False):
     name = ""
     question_group = QuestionGroup()
     question_group.sortid = qset.sortid
@@ -2103,6 +2106,7 @@ def handle_qset(fingerprint, clean, qsets, qset, answers, fingerprint_ttype, rHi
         t.value = ""
         t.number = question.number
         t.ttype = question.type
+        t.lastChange = None
         question_group.list_ordered_tags.append(t)
 
     qsets[qset.text] = question_group
@@ -2151,6 +2155,14 @@ def handle_qset(fingerprint, clean, qsets, qset, answers, fingerprint_ttype, rHi
             if answer.comment != None:
                 t.comment = answer.comment
 
+            if changeSearch:
+                changes = AnswerChange.objects.filter(answer=answer).order_by('-id')
+
+                if len(changes) == 0:
+                    t.lastChange = answer.fingerprint_id.created
+                else:
+                    t.lastChange = changes[0].revision_head.date
+
             if clean:
                 t.value = value.replace("#", " ")
                 
@@ -2167,7 +2179,7 @@ def handle_qset(fingerprint, clean, qsets, qset, answers, fingerprint_ttype, rHi
                 t.value = value
 
             if slug == "database_name":
-                name = t.value           
+                name = raw_value        
 
             if question_group != None:
                 try:
@@ -2613,34 +2625,25 @@ def check_database_add_conditions(request, questionnaire_id, sortid, saveid,
             else:
                 setNewPermissions(request2)
 
-            saveFingerprintAnswers(qlist_general, fingerprint_id, question_set2.questionnaire, users_db, extra_fields=extra_fields, created_date=created_date)
+            success = saveFingerprintAnswers(qlist_general, fingerprint_id, question_set2.questionnaire, users_db, extra_fields=extra_fields, created_date=created_date)
 
+            print "SUCCESS SAVING:"+str(success)
+
+            if not success:
+
+                qs = -1
+                try :
+                    qs = question_set2.questionnaire.findMandatoryQs().sortid
+                except:
+                    pass
+                return HttpResponse(simplejson.dumps({'mandatoryqs': qs}), 
+                                    mimetype='application/json')
+            
             # new version that just serializes the created fingerprint object (this eventually can be done using celery)
             indexFingerprint(fingerprint_id)
 
-    r = r2r(template_name, request,
-                questionset=question_set2,
-                questionsets=question_set2.questionnaire.questionsets,
-                runinfo=None,
-                errors={},
-                qlist=qlist,
-                progress=None,
-                triggers=jstriggers,
-                qvalues=qvalues,
-                jsinclude=jsinclude,
-                cssinclude=cssinclude,
-                async_progress=None,
-                async_url=None,
-                qs_list=qsobjs,
-                questions_list=qlist_general,
-                fingerprint_id=fingerprint_id,
-                breadcrumb=True,
-                extra_fields=extra_fields
-        )
-    r['Cache-Control'] = 'no-cache'
-    r['Expires'] = "Thu, 24 Jan 1980 00:00:00 GMT"
-
-    return r
+    return HttpResponse(simplejson.dumps({'success': 'true'}), 
+                                    mimetype='application/json')
 
 # Set new permissions for a questionset, based on a post request
 def setNewPermissions(request):
@@ -3093,7 +3096,7 @@ def create_auth_token(request, page=1, templateName='api-key.html', force=False)
 def invitedb(request, db_id, template_name="sharedb.html"):
 
     email = request.POST.get('email', '')
-
+    message_write = request.POST.get('message', '')
     if (email == None or email==''):
         return HttpResponse('Invalid email address.')
 
@@ -3107,13 +3110,20 @@ def invitedb(request, db_id, template_name="sharedb.html"):
     subject = "EMIF Catalogue: A new database is trying to be shared with you."
     link_invite = settings.BASE_URL + "accounts/signup/"
 
-    message = """Dear %s,\n\n
-            \n
-            %s is sharing a new database with you on Emif Catalogue. 
-            First you must register on the EMIF Catalogue. Please follow the link below: \n\n
+    #message = """Dear %s,\n\n
+    #        \n
+    #        %s is sharing a new database with you on Emif Catalogue. 
+    #        First you must register on the EMIF Catalogue. Please follow the link below: \n\n
+    #        %s 
+    #        \n\nSincerely,\nEMIF Catalogue
+    #""" % (email,request.user.get_full_name(), link_invite)
+
+    message = """%s\n
+            To have full access to this fingerprint, please register in the EMIF Catalogue following the link below: \n\n
             %s 
             \n\nSincerely,\nEMIF Catalogue
-    """ % (email,request.user.get_full_name(), link_invite)
+    """ % (message_write, link_invite)
+
 
     send_custom_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [email])
 
@@ -3190,17 +3200,13 @@ def sharedb(request, db_id, template_name="sharedb.html"):
 
     try:
         
-        message = """Dear %s,\n\n
-            \n
-            %s is sharing a new database with you. And left you the following message:\n\n
-
-            \"%s\"
+        message = """%s
 
             Now you're able to edit and manage the database. \n\n
             To activate the database in your account, please open this link:
             %s 
             \n\nSincerely,\nEMIF Catalogue
-        """ % (name,request.user.get_full_name(), message,link_activation)
+        """ % (message,link_activation)
         # Send email to admins
         #send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, emails_to_feedback)
         # Send email to user with the copy of feedback message
@@ -3452,11 +3458,11 @@ def save_answers_to_csv(list_databases, filename):
 
     if list_databases:
         writer = csv.writer(response, delimiter = '\t')
-        writer.writerow(['DB_ID', 'DB_name', 'Questionset', 'Question', 'QuestioNumber', 'Answer'])
+        writer.writerow(['DB_ID', 'DB_name', 'Questionset', 'Question', 'QuestionNumber', 'Answer', 'Date Last Modification'])
         for t in list_databases:
             id = t.id
 
-            returned = createqsets(id, clean=False)
+            returned = createqsets(id, clean=False, changeSearch=True, noprocessing=False)
 
             qsets, name, db_owners, fingerprint_ttype  = returned
 
@@ -3492,7 +3498,7 @@ def writeGroup(id, k, qs, writer, name, t):
             _answer = clean_str_exp(str(q.value))
             if (_answer == "" and q.ttype=='comment'):
                 _answer = "-"
-            writer.writerow([id, name, k.replace('h1. ', ''), clean_str_exp(str(q.tag)), str(q.number), _answer])
+            writer.writerow([id, name, k.replace('h1. ', ''), clean_str_exp(str(q.tag)), str(q.number), _answer, q.lastChange])
 
 def export_datatable(request):
 

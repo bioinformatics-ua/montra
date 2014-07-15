@@ -95,6 +95,10 @@ function PCDraw(actualChart,chartType, e)
         if (fV=="Total") fV = "";
         if (fV=="Male") fV = "(Male)";
         if (fV=="Female") fV = "(Female)";
+        if (fV.indexOf('M') >= 0 &&  fV.indexOf('F') >= 0 && fV.indexOf('T') >= 0) //convert M/F/T to Male/Female
+        {
+          fV = translations["ALL"];
+        }
         valueFilters += " " + fV;
       });
       

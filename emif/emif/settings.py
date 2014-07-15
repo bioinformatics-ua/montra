@@ -201,7 +201,7 @@ MIDDLEWARE_CLASSES = (
     # Uncomment the next line for simple clickjacking protection:
     # 'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'emif.middleware.LoginRequiredMiddleware',
-    'emif.interceptor.NavigationInterceptor',    
+    'emif.interceptor.NavigationInterceptor',
     'johnny.middleware.LocalStoreClearMiddleware',
     'johnny.middleware.QueryCacheMiddleware',
 )
@@ -240,13 +240,13 @@ INSTALLED_APPS = (
     'django.contrib.admin',
     'django.contrib.admindocs',
 
-    
+
 
     # Questionnaires
     'transmeta',
     'questionnaire',
     'questionnaire.page',
-    
+
     # User signup/signin/management
     'userena',
     'guardian',
@@ -256,7 +256,7 @@ INSTALLED_APPS = (
     # DB migrations
     'south',
 
-    # Django Rest Framework 
+    # Django Rest Framework
     'rest_framework',
     'rest_framework.authtoken',
 
@@ -289,6 +289,9 @@ INSTALLED_APPS = (
 
     # Utility to hook custom view admin pages easily
     'adminplus',
+
+    # unique views counter
+    'hitcount',
 )
 
 # Userena settings
@@ -370,15 +373,15 @@ LANGUAGES = (
 # the possible options are 'default', 'async' and 'none'
 #
 #   'default'
-#   The progressbar will be rendered in each questionset together with the 
-#   questions. This is a good choice for smaller questionnaires as the 
+#   The progressbar will be rendered in each questionset together with the
+#   questions. This is a good choice for smaller questionnaires as the
 #   progressbar will always be up to date.
 #
 #   'async'
 #   The progressbar value is updated using ajax once the questions have been
 #   rendered. This approach is the right choice for bigger questionnaires which
 #   result in a long time spent on updating the progressbar with each request.
-#   (The progress calculation is by far the most time consuming method in 
+#   (The progress calculation is by far the most time consuming method in
 #    bigger questionnaires as all questionsets and questions need to be
 #    parsed to decide if they play a role in the current run or not)
 #
@@ -444,7 +447,7 @@ LOGIN_EXEMPT_URLS = (
     r'^delete-questionnaire',
     r'^bootstrap_ie_compatibility',
     # public shares
-    r'^public/fingerprint/(?P<fingerprint_id>[^/]+)',  
+    r'^public/fingerprint/(?P<fingerprint_id>[^/]+)',
 )
 
 #Pages that wont be logged into user history
@@ -544,4 +547,7 @@ JOHNNY_MIDDLEWARE_KEY_PREFIX='emif_'
 PUBLIC_LINK_MAX_VIEWS = 50; # number of views
 PUBLIC_LINK_MAX_TIME = 24*30; # hours
 
+
+# Unique views definitions
+HITCOUNT_KEEP_HIT_ACTIVE = { 'days': 1 }
 

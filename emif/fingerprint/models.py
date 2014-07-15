@@ -39,7 +39,7 @@ class Fingerprint(models.Model):
     created = models.DateTimeField(auto_now_add=True, null=True)
     owner = models.ForeignKey(User, related_name="fingerprint_owner_fk")
     shared = models.ManyToManyField(User, null=True, related_name="fingerprint_shared_fk") 
-
+    hits = models.IntegerField(default=0, help_text="Hit count for this fingerprint")
     removed = models.BooleanField(default=False, help_text="Remove logically the fingerprint")
 
     def __unicode__(self):

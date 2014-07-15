@@ -32,6 +32,9 @@ from views import *
 
 from django.conf import settings
 
+from hitcount.views import update_hit_count_ajax
+
+
 admin.site = AdminSitePlus()
 admin.autodiscover()
 
@@ -67,7 +70,7 @@ urlpatterns = patterns('',
     # Database Add
 
     url(r'^add/(?P<questionnaire_id>[0-9]+)/(?P<sortid>[0-9]+)/$', 'emif.views.database_add'),
-    url(r'^searchqs/(?P<questionnaire_id>[0-9]+)/(?P<sortid>[0-9]+)/(?P<aqid>[0-9]+)?$', 'emif.views.database_search_qs'),
+    url(r'^searchqs/(?P<questionnaire_id>[0-9]+)/(?P<sortid>[0-9]+)/((?P<aqid>[0-9]+)/)?$', 'emif.views.database_search_qs'),
     url(r'^addqs/(?P<fingerprint_id>[^/]+)/(?P<questionnaire_id>[0-9]+)/(?P<sortid>[0-9]+)/$', 'emif.views.database_add_qs'),
 
     url(r'^addPost/(?P<questionnaire_id>[0-9]+)/(?P<sortid>[0-9]+)/(?P<saveid>[0-9]+)$', 'emif.views.check_database_add_conditions'),
@@ -180,6 +183,9 @@ urlpatterns = patterns('',
 
     # Faq
     url('^faq/', include('fack.urls')),
+
+    # unique views plugin
+    url(r'^api/hit_counter/$', update_hit_count_ajax, name='hitcount_update_ajax'),
 )
 
 if settings.DEBUG:
