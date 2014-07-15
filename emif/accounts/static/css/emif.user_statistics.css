@@ -1,0 +1,19 @@
+#user_choice{
+    margin:0;
+}
+#user_choice label{
+    display: inline-block;
+    padding:15px;
+}
+#user_choice select{
+    margin-bottom: 0;
+    padding:15px;
+    min-width: 400px;
+}
+#submit_user{
+    margin-top:0px;
+}
+.userstatistics_table{
+    font-size:90%;
+    background-color: white;
+}

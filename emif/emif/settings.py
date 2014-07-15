@@ -168,6 +168,7 @@ STATICFILES_DIRS = (
     os.path.abspath(PROJECT_DIR_ROOT + MIDDLE_DIR + 'docs_manager/static'),
     os.path.abspath(PROJECT_DIR_ROOT + MIDDLE_DIR + 'advancedsearch/static'),
     os.path.abspath(PROJECT_DIR_ROOT + MIDDLE_DIR + 'public/static'),
+    os.path.abspath(PROJECT_DIR_ROOT + MIDDLE_DIR + 'accounts/static'),
 )
 
 # List of finder classes that know how to find static files in
@@ -200,6 +201,7 @@ MIDDLEWARE_CLASSES = (
     # Uncomment the next line for simple clickjacking protection:
     # 'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'emif.middleware.LoginRequiredMiddleware',
+    'emif.interceptor.NavigationInterceptor',
     'johnny.middleware.LocalStoreClearMiddleware',
     'johnny.middleware.QueryCacheMiddleware',
 )
@@ -238,13 +240,13 @@ INSTALLED_APPS = (
     'django.contrib.admin',
     'django.contrib.admindocs',
 
-    
+
 
     # Questionnaires
     'transmeta',
     'questionnaire',
     'questionnaire.page',
-    
+
     # User signup/signin/management
     'userena',
     'guardian',
@@ -254,7 +256,7 @@ INSTALLED_APPS = (
     # DB migrations
     'south',
 
-    # Django Rest Framework 
+    # Django Rest Framework
     'rest_framework',
     'rest_framework.authtoken',
 
@@ -284,6 +286,9 @@ INSTALLED_APPS = (
 
     # FAQ
     'fack',
+
+    # Utility to hook custom view admin pages easily
+    'adminplus',
 
     # unique views counter
     'hitcount',
@@ -368,15 +373,15 @@ LANGUAGES = (
 # the possible options are 'default', 'async' and 'none'
 #
 #   'default'
-#   The progressbar will be rendered in each questionset together with the 
-#   questions. This is a good choice for smaller questionnaires as the 
+#   The progressbar will be rendered in each questionset together with the
+#   questions. This is a good choice for smaller questionnaires as the
 #   progressbar will always be up to date.
 #
 #   'async'
 #   The progressbar value is updated using ajax once the questions have been
 #   rendered. This approach is the right choice for bigger questionnaires which
 #   result in a long time spent on updating the progressbar with each request.
-#   (The progress calculation is by far the most time consuming method in 
+#   (The progress calculation is by far the most time consuming method in
 #    bigger questionnaires as all questionsets and questions need to be
 #    parsed to decide if they play a role in the current run or not)
 #
@@ -442,7 +447,28 @@ LOGIN_EXEMPT_URLS = (
     r'^delete-questionnaire',
     r'^bootstrap_ie_compatibility',
     # public shares
-    r'^public/fingerprint/(?P<fingerprint_id>[^/]+)',  
+    r'^public/fingerprint/(?P<fingerprint_id>[^/]+)',
+)
+
+#Pages that wont be logged into user history
+DONTLOG_URLS = (
+    r'^fingerprintqs/(?P<runcode>[^/]+)/(?P<qsid>[0-9]+)/$',
+    r'^api/(?P<anything>[^/]*)',
+    r'^docsmanager/uploadfile/(?P<fingerprint_id>[^/]+)/$',
+    r'^docsmanager/docfiles/(?P<fingerprint_id>[^/]+)/$',
+    r'^population/settings/(?P<fingerprint_id>[^/]+)/$',
+    r'^population/jerboafiles/(?P<fingerprint_id>[^/]+)/$',
+    r'^searchqs/(?P<questionnaire_id>[0-9]+)/(?P<sortid>[0-9]+)/(?P<aqid>[0-9]+)?$',
+    r'^addqs/(?P<fingerprint_id>[^/]+)/(?P<questionnaire_id>[0-9]+)/(?P<sortid>[0-9]+)/$',
+    r'^addPost/(?P<questionnaire_id>[0-9]+)/(?P<sortid>[0-9]+)/(?P<saveid>[0-9]+)$',
+    r'^dbEdit/(?P<fingerprint_id>[^/]+)/(?P<questionnaire_id>[0-9]+)$',
+    r'^dbEdit/(?P<fingerprint_id>[^/]+)/(?P<questionnaire_id>[0-9]+)/(?P<sort_id>[0-9]+)/$',
+    r'^dbDetailed/(?P<fingerprint_id>[^/]+)/(?P<questionnaire_id>[0-9]+)$',
+    r'^dbDetailed/(?P<fingerprint_id>[^/]+)/(?P<questionnaire_id>[0-9]+)/(?P<sort_id>[0-9]+)$',
+    r'^editqs/(?P<fingerprint_id>[^/]+)/(?P<questionnaire_id>[0-9]+)/(?P<sort_id>[0-9]+)/$',
+    r'^detailedqs/(?P<fingerprint_id>[^/]+)/(?P<questionnaire_id>[0-9]+)/(?P<sort_id>[0-9]+)/$',
+    r'^qs_data_table$',
+    r'^admin/jsi18n/',
 )
 
 #Set session idle timeout (seconds)

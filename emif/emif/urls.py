@@ -24,9 +24,7 @@ from django.conf.urls import patterns, include, url
 from django.contrib.auth import views as auth_views
 
 from django.contrib import admin
-from django.views.generic.simple import direct_to_template
-
-admin.autodiscover()
+from adminplus.sites import AdminSitePlus
 
 from userena import views as userena_views
 from accounts.views import SignupFormExtra, signup, signin
@@ -36,6 +34,9 @@ from django.conf import settings
 
 from hitcount.views import update_hit_count_ajax
 
+
+admin.site = AdminSitePlus()
+admin.autodiscover()
 
 urlpatterns = patterns('',
 
@@ -159,103 +160,8 @@ urlpatterns = patterns('',
     #
     # User accounts URLs
     #
-
-    # Signup, signin and signout
-    url(r'^accounts/signup/$',
-        signup,
-        {'signup_form': SignupFormExtra,
-         'success_url': settings.BASE_URL + 'wherenext'},
-        name='userena_signup'),
-
-    url(r'^accounts/signup/complete/$',
-        direct_to_template,
-        {'template': 'userena/signup_complete.html',
-         'extra_context': {'userena_activation_required': settings.USERENA_ACTIVATION_REQUIRED,
-                           'userena_moderated_registration': settings.USERENA_MODERATE_REGISTRATION}},
-        name='userena_signup_complete'),
-
-    url(r'^accounts/signup/activate/complete/$',
-        direct_to_template,
-        {'template': 'userena/activation_complete.html'},
-        name='userena_activated'),
-
-    url(r'^accounts/signin/$',
-        signin,
-        name='userena_signin'),
-
-    url(r'^accounts/signout/$',
-        userena_views.signout,
-        name='userena_signout'),
-
-    # Edit Profile
-    url(r'^accounts/profile_edit/$', 'accounts.views.profile_edit'),
-
-    # Reset password
-    url(r'^accounts/password/reset/$',
-        auth_views.password_reset,
-        {'template_name': 'userena/password_reset_form.html',
-         'email_template_name': 'userena/emails/password_reset_message.txt'},
-        name='userena_password_reset'),
-    url(r'^accounts/password/reset/done/$',
-        auth_views.password_reset_done,
-        {'template_name': 'userena/password_reset_done.html'},
-        name='userena_password_reset_done'),
-    url(r'^accounts/password/reset/confirm/(?P<uidb36>[0-9A-Za-z]+)-(?P<token>.+)/$',
-        auth_views.password_reset_confirm,
-        {'template_name': 'userena/password_reset_confirm_form.html'},
-        name='userena_password_reset_confirm'),
-    url(r'^accounts/password/reset/confirm/complete/$',
-        auth_views.password_reset_complete,
-        {'template_name': 'userena/password_reset_complete.html'}),
-
-    # Activate
-    url(r'^accounts/activate/(?P<activation_key>\w+)/$',
-       userena_views.activate,
-       name='userena_activate'),
-
-
-    # Change email and confirm it
-    url(r'^accounts/(?P<username>[^/]+)/email/$',
-        userena_views.email_change,
-        name='userena_email_change'),
-    url(r'^accounts/(?P<username>[^/]+)/email/complete/$',
-        userena_views.direct_to_user_template,
-        {'template_name': 'userena/email_change_complete.html'},
-        name='userena_email_change_complete'),
-    url(r'^accounts/(?P<username>[^/]+)/confirm-email/complete/$',
-        userena_views.direct_to_user_template,
-        {'template_name': 'userena/email_confirm_complete.html'},
-        name='userena_email_confirm_complete'),
-    url(r'^accounts/confirm-email/(?P<confirmation_key>\w+)/$',
-        userena_views.email_confirm,
-        name='userena_email_confirm'),
-
-    # Disabled account
-    url(r'^accounts/(?P<username>[^/]+)/disabled/$',
-        userena_views.direct_to_user_template,
-        {'template_name': 'userena/disabled.html'},
-        name='userena_disabled'),
-
-    # Change password
-    url(r'^accounts/(?P<username>[^/]+)/password/$',
-        userena_views.password_change,
-        name='userena_password_change'),
-    url(r'^accounts/(?P<username>[^/]+)/password/complete/$',
-        userena_views.direct_to_user_template,
-        {'template_name': 'userena/password_complete.html'},
-        name='userena_password_change_complete'),
-
-    # View profiles
-    url(r'^accounts/(?P<username>(?!signout|signup|signin)[^/]+)/$',
-        userena_views.profile_detail,
-        name='userena_profile_detail'),
-    url(r'^accounts/page/(?P<page>[0-9]+)/$',
-        userena_views.ProfileListView.as_view(),
-        name='userena_profile_list_paginated'),
-    url(r'^accounts/$',
-        userena_views.ProfileListView.as_view(),
-        name='userena_profile_list'),
-
+    url(r'^accounts/', include('accounts.urls')),
+    
     # url(r'^api-upload-info/', 'rest_framework.authtoken.views.obtain_auth_token'),
     url(r'^api-info/(?P<page>[-]{0,1}\d+)?', 'emif.views.create_auth_token', name="api-info"),
     url(r'^docs/api', 'emif.views.docs_api'),

@@ -1,0 +1,18 @@
+{% extends "admin/index.html" %}
+
+{% block sidebar %}
+  {{ block.super }}
+
+  {% if custom_list %}
+  <div class="module">
+    <table class="table table-bordered table-striped" style="width: 100%">
+      <h2 id="CustomViews" class="app-name"><a href="/admin/">Custom Views</a></h2>
+      <tbody>
+        {% for path, name in custom_list %}
+          <tr><td><b><a href="{{ path }}">{{ name }}</a></b></td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% endif %}
+{% endblock %}
