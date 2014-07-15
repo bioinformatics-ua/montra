@@ -188,8 +188,8 @@ function generateStub(){
         $('#set_container').append(containers.join(''));
 }
 $(function(){
-  {% if readonly %}
-    initQsEnv("{{fingerprint_id}}","{{q_id}}","{{questionset.sortid}}", QsType.VIEW);
+  {% if not readonly %}
+    initQsEnv("{{fingerprint_id}}","{{q_id}}","{{questionset.sortid}}", QsType.EDIT);
   {% else %}
     initQsEnv("{{fingerprint_id}}","{{q_id}}","{{questionset.sortid}}", QsType.VIEW); 
   {% endif %}
