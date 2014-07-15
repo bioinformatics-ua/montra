@@ -357,7 +357,7 @@ $( "#qs_"+sortid ).html( data );
 // Mark the tab as highlighted if there's any highlight inside it
 
 
-/*var highlights = $("#qs_"+sortid).find('.highlight');
+var highlights = $("#qs_"+sortid).find('.highlight');
 
 //console.dir(highlights);
 
@@ -368,7 +368,7 @@ $(".markered" ,this_row).tooltip({container: "body"});
 $(".markered" ,this_row).click(function(){
 this_row.parent().siblings().first().collapse('toggle');
 });
-}  */   
+} 
 
     var erec = new EmailRecognizer("#qs_"+sortid+" td");
     var results = erec.match();
