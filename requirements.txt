@@ -35,9 +35,6 @@ django-celery==3.1.0
 python-memcached==1.48
 johnny-cache==1.4
 -e git://github.com/ribeiroct/django-fack.git#egg=django-fack
-<<<<<<< HEAD
 django-adminplus==0.3
-=======
 -e git://github.com/leandrosouza/django-hitcount.git#egg=django-hitcount
 
->>>>>>> 28ce74a3d89242ff59bba2576d554994d3b50671
