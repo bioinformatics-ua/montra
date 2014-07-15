@@ -88,7 +88,7 @@ class UserStatistics(View):
             max = user_day_history.aggregate(Max('date'))['date__max']
 
             try:
-                session = (max-min).total_seconds() // 3600
+                session = (max-min).total_seconds() / 3600
 
                 average += session
 
