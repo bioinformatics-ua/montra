@@ -239,6 +239,8 @@ function questionsets_handle(id_questionset)
              } else {
                console.log("Already on dom");
              }
+                History.pushState(null, null, "add/{{q_id}}/"+obj.id.replace("qs_",""));
+
              advValidator.reload();
           }
           else {
@@ -300,6 +302,14 @@ $(function(){
 
   loadqspart("{{fingerprint_id}}","{{q_id}}","{{questionset.sortid}}");
   initialCounterSetup();
+
+  if(!(window.history && history.pushState)){
+    page = History.getState().hash.split('/')[2];
+
+    if(page)
+      questionsets_handle(document.getElementById('qs_'+page));
+  }
+
 });
 
 function initialCounterSetup(){ 

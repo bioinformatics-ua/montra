@@ -1,0 +1,75 @@
+<div class="pull-left"><h3>Advanced Query History</h3></div>
+<div style="margin-top: 20px" class="pull-right"><a class="btn" href="advsearch/history/remove_all">Remove All Queries</a></div>
+
+<table class="table table-bordered table-striped">
+<thead>
+    <tr>
+        <th>
+            Query
+        </th>
+        <th style="width:80px;">Date</th>
+        <th style="width:70px;">Type</th>
+        <th style="width:100px;">Manage</th>
+    </tr>
+</thead>
+<tbody>
+{% if queries|length > 0 %}
+    {% for query in queries%}
+        <tr>
+            <td style="padding:0px;">
+                <div id="queryhistory{{forloop.counter}}"></div>
+            </td>
+            <td>{{query.date|date:"Y-m-d H:i:s"}}</td>
+            <td>{{query.qid}}</td>
+            <td><a href="advancedSearch/{{query.qid.id}}/1/{{query.id}}" class="btn btn-block">Refine</a>
+            {% if query.has_representation %}
+            <a href="advsearch/results/{{query.id}}" class="btn btn-block btn-info">Results</a>
+            {% endif %}
+            <a class="btn btn-block" href="advsearch/history/remove/{{query.id}}">Remove</a>
+            </td>
+        </tr>
+    {% endfor %}
+{%else %}
+    <tr>
+        <td colspan="4"> <center>There's no Advanced Search History, searches you conduct will appear here.</center></td>
+    </tr>
+{% endif %}
+</tbody>
+</table>
+{% for query in queries%}
+<script type="text/javascript">
+
+    $('#queryhistory{{forloop.counter}}').boolrelwidget({norefine: true, view_only: true, inplace: true, view_serialized_string:'{{query.serialized_query}}'});
+
+</script>
+{% endfor %}
+<div style="font-size: 80%;" class="pull-left">Showing page {{ queries.number }} of {{ queries.paginator.num_pages }}</div>
+<div style="text-align: center" class="pagination">
+  <ul>
+        {% if queries.has_previous %}
+           <li> <a href="advsearch/history/1/{{ queries.previous_page_number }}">« Previous Page</a></li>
+        {% endif %}
+        {% if queries.has_next %}
+            <li><a href="advsearch/history/1/{{ queries.next_page_number }}">Next Page »</a></li>
+        {% endif %}
+  </ul>
+</div>
+<form id="send2" method="POST" > 
+<div style="font-size: 80%; margin-top: -65px;" class="pull-right">Show <select style="width: 50px; margin-top: 10px;" id="paginator_rows" name="paginator_rows" class="span1 paginator-page-selector" >
+  <option value="5" {% if page_rows == 5 %}selected{% endif %}>5</option>
+  <option value="10" {% if page_rows == 10 %}selected{% endif %}>10</option>
+  <option value="25" {% if page_rows == 25 %}selected{% endif %}>25</option>
+  <option value="50" {% if page_rows == 50 %}selected{% endif %}>50</option>
+  <option value="99999" {% if page_rows > 50 %}selected{% endif %}>All</option>
+</select>&nbsp; per page</div>
+{% csrf_token %}
+</form>
+<script type="text/javascript">
+    $(function(){
+        $('#paginator_rows').change(function(){
+            console.log('submit')
+            $('#send2').submit();
+
+        });
+    });
+</script>

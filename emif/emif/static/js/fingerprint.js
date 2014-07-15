@@ -322,4 +322,17 @@ $(document).ready(function() {
     });
 
 });
+
+function tabindexer(){
+var index=1;
+$('input').each(function(){
+$(this).attr('tabindex',index++);
+});
+}
+
+function toggle_comments(question_number)
+{
+$("#comments_"+question_number).toggle();
+}
+
 /***************** END - CHECK IF ANSWER IS FILLED IN *****************/

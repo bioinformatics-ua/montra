@@ -267,6 +267,12 @@ function questionsets_handle(id_questionset)
              } else {
                console.log("Already on dom");
              }
+              {% if not readonly %}
+                History.pushState(null, null, "dbEdit/{{fingerprint_id}}/{{q_id}}/"+obj.id.replace("qs_",""));
+              {% else %}
+                History.pushState(null, null, "dbDetailed/{{fingerprint_id}}/{{q_id}}/"+obj.id.replace("qs_",""));
+              {% endif %}
+            
           }
           else {
             $('#li_'+obj.id).removeClass("active");
@@ -337,6 +343,14 @@ $(function(){
   advValidator.searchMode(true);
   {% endif %}
   initialCounterSetup();
+
+  if(!(window.history && history.pushState)){
+    page = History.getState().hash.split('/')[3];
+
+    if(page)
+      questionsets_handle(document.getElementById('qs_'+page));
+  }
+
 });
 
 //questionsets_handle(qs_0);

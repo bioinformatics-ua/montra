@@ -53,7 +53,7 @@
                 output.push(' class="dyndropdown_options dropdown-menu');
                 if (settings.left_centered_dropdown)
                     output.push(' pull-right');
-                output.push(' dropdown-menu-f">');
+                output.push(' dropdown-menu-f" style="z-index:0;">');
                  
                 output.push('</ul></div>');
 
