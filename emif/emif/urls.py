@@ -24,14 +24,16 @@ from django.conf.urls import patterns, include, url
 from django.contrib.auth import views as auth_views
 
 from django.contrib import admin
-
-admin.autodiscover()
+from adminplus.sites import AdminSitePlus
 
 from userena import views as userena_views
 from accounts.views import SignupFormExtra, signup, signin
 from views import *
 
 from django.conf import settings
+
+admin.site = AdminSitePlus()
+admin.autodiscover()
 
 urlpatterns = patterns('',
 

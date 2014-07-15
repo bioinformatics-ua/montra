@@ -18,9 +18,6 @@ from django.db.models import Count, Avg, Max, Min
 from django.utils import timezone
 import datetime
 
-admin.site = AdminSitePlus()
-admin.autodiscover()
-
 class NavigationAdmin(admin.ModelAdmin):
     list_display = ['user', 'path', 'date']
     search_fields = ['user__username','user__email','path']
