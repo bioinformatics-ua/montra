@@ -63,8 +63,6 @@ def show_summ(value):
     if value== "":
         return ""
 
-    value = value.replace("'", '"')
-
     if not value.startswith('['):
         value = '['+value+']'
 
