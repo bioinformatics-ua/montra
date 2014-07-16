@@ -189,13 +189,15 @@ EMIF Platform - Fingerprint Browser
         python manage.py runserver 0.0.0.0:8000
 
 
+
+
 #### Developers
 
  * Luís A. Bastião Silva <bastiao@ua.pt>
- * Rui Mendes <ruidamendes@ua.pt>
+ * Ricardo Ribeiro <ribeiro.r@ua.pt> 
  * Tiago Godinho <tmgodinho@ua.pt>
- * Ricardo Ribeiro <ribeiro.r@ua.pt>
- * José Melo <melojms@gmail.com>
+ * Tiago Lourenço <tiago.vf.lourenco@ua.pt>
+ 
 
 #### Lead developer
 
@@ -205,4 +207,9 @@ EMIF Platform - Fingerprint Browser
 
  * José Luis Oliveira <jlo@ua.pt>
 
+
+#### Past Developers
+
+ * Rui Mendes <ruidamendes@ua.pt>
+ * José Melo <melojms@gmail.com>
  Enjoy!
