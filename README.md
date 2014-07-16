@@ -212,4 +212,7 @@ EMIF Platform - Fingerprint Browser
 
  * Rui Mendes <ruidamendes@ua.pt>
  * José Melo <melojms@gmail.com>
+
+
+
  Enjoy!
