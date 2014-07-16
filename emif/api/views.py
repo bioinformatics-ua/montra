@@ -75,6 +75,8 @@ from public.services import deleteFingerprintShare, createFingerprintShare
 
 from population_characteristics.models import Characteristic
 
+from public.utils import hasFingerprintPermissions
+
 class JSONResponse(HttpResponse):
     """
     An HttpResponse that renders it's content into JSON.
@@ -205,25 +207,25 @@ class PopulationCheckView(APIView):
 
 
 class GetFileView(APIView):
-
-    authentication_classes = (SessionAuthentication, BasicAuthentication)
-    permission_classes = (IsAuthenticated,)
-
     def post(self, request, *args, **kw):
-        if request.user.is_authenticated():
-            # first we get the email parameter
-            name = request.POST.get('filename', '')
-            revision = request.POST.get('revision', '')
 
-            # Verify if we have name and revision
-            if not (name == None or name=='' or revision == None or revision == ''):
 
-                print name 
-                print revision
+        if request.POST.get('publickey') != "" and not hasFingerprintPermissions(request, request.POST.get('fingerprint')):
+            return HttpResponse("Access forbidden",status=403)
 
-                path_to_file = os.path.join(os.path.abspath(PATH_STORE_FILES), revision+name)
-                print path_to_file
-                return respond_as_attachment(request, path_to_file, name)
+        # first we get the email parameter
+        name = request.POST.get('filename', '')
+        revision = request.POST.get('revision', '')
+
+        # Verify if we have name and revision
+        if not (name == None or name=='' or revision == None or revision == ''):
+
+            print name 
+            print revision
+
+            path_to_file = os.path.join(os.path.abspath(PATH_STORE_FILES), revision+name)
+            print path_to_file
+            return respond_as_attachment(request, path_to_file, name)
 
         return Response({}, status=status.HTTP_400_BAD_REQUEST)
 

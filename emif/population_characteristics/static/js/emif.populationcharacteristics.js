@@ -100,13 +100,16 @@ function PCAPI (endpoint)
     
     this.getValuesRow = function(Var, Row, fingerprintID){
         var result = {}
+
+        console.log(result);
           
         $.ajax({
           dataType: "json",
           url: this.endpoint+"/"+Var+"/"+Row+"/" + fingerprintID,
 
           async: false,
-          data: result,
+          type: "POST",
+          data: { publickey: global_public_key, result: result },
           success: function (data){result=data;}
         });
         return result;
@@ -114,13 +117,15 @@ function PCAPI (endpoint)
      this.getValuesRowWithFilters = function(Var, Row, fingerprintID, filters){
         var result = {}
 
+        console.log(filters);
+
 
         $.ajax({
           dataType: "json",
           url: this.endpoint+"/"+Var+"/"+Row+"/" + fingerprintID,
           async: false,
           type: "POST",
-          data: filters,
+          data: { publickey: global_public_key, filters: filters },
           success: function (data){
             result=data;
           }
@@ -137,7 +142,8 @@ function PCAPI (endpoint)
           dataType: "json",
           url: "population/filters/"+Var+"/" + fingerprintID,
           async: false,
-          data: result,
+          type: "POST",
+          data: { publickey: global_public_key, result: result },        
           success: function (data){result=data;}
         });
         return result;

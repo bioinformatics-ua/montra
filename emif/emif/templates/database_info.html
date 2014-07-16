@@ -297,6 +297,7 @@
     });
 var threads = {};
 var global_fingerprint_id = '{{fingerprint_id}}';
+var global_public_key = '{{public_key.hash}}'
 function load_questionnary(){
 
 console.log("Creating questionnary set containers (so they are in order)");
@@ -363,7 +364,11 @@ threadpool.destroy(function(){
 });
 }
 function loadqspart(sortid, pk){
+{% if user.is_authenticated %}
 $.get( "fingerprintqs/"+pk+"/"+sortid+"/", function( data ) {
+{% else %}
+$.post( "fingerprintqs/"+pk+"/"+sortid+"/",{publickey:'{{public_key.hash}}'}, function( data ) {
+{% endif %}
 $( "#qs_"+sortid ).html( data );
 // Mark the tab as highlighted if there's any highlight inside it
 
@@ -470,8 +475,14 @@ $(document).ready(function() {
             // if not loaded yet
             if($('#literature').find('.loadingsection').length != 0){
                 console.log("Loading literature, since it was not loaded yet.");
+
+                {% if user.is_authenticated %}
                 $.get( "literature/{{fingerprint_id}}", function( data ) {
+                {% else %}
+                $.post( "literature/{{fingerprint_id}}", {publickey:'{{public_key.hash}}'}, function( data ) {
+                {% endif %}
                     $( "#literature" ).html( data );
+                
                 });
             }
 

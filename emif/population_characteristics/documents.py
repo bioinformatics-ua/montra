@@ -51,6 +51,8 @@ from api.models import FingerprintAPI
 
 from public.models import PublicFingerprintShare
 
+from public.utils import hasFingerprintPermissions
+
 def document_form_view_upload(request, fingerprint_id, template_name='documents_upload_form.html'):
     """Store the files at the backend 
     """
@@ -125,7 +127,10 @@ def parsejerboa(request, template_name='documents_upload_form.html'):
     return response
 
 def single_qset_view(request, runcode, qsid, template_name='fingerprint_qs.html'):
-    
+        
+    if not hasFingerprintPermissions(request, runcode):
+        return HttpResponse("Access forbidden",status=403)
+
     h = None
     if "query" in request.session and "highlight_results" in request.session:
         h = request.session["highlight_results"]
@@ -138,7 +143,7 @@ def single_qset_view(request, runcode, qsid, template_name='fingerprint_qs.html'
     return render(request, template_name,{'request': request, 'qset': qset})   
 
 
-def document_form_view(request, runcode, qs, activetab='summary', readOnly=False,
+def document_form_view(request, runcode, qs, activetab='summary', readOnly=False, public_key = None,
     template_name='documents_upload_form.html'):
     
     h = None
@@ -233,6 +238,7 @@ def document_form_view(request, runcode, qs, activetab='summary', readOnly=False
                     'activetab': activetab,
                     'readOnly': readOnly,
                     'public_link': public_link,
+                    'public_key': public_key,
                     'hits': hits,
                     })
 

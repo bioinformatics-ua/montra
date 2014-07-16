@@ -34,7 +34,8 @@ function PCConfs ()
           dataType: "json",
           url: "population/settings/" + fingerprintId + "/",
           async: false,
-          data: result,
+          type: "POST",
+          data: {result: result, publickey: global_public_key},
           success: function (data){result=data;}
         });
         return JSON.parse(result.conf).charts;

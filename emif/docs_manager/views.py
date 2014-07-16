@@ -36,6 +36,7 @@ from dateutil.tz import tzutc
 UTC = tzutc()
 from django.db.models import Max
 
+from public.utils import hasFingerprintPermissions
 
 def serialize_date(dt):
     """
@@ -107,6 +108,9 @@ def upload_file(request, fingerprint_id, template_name='documents_upload_form.ht
 
 
 def list_fingerprint_files(request, fingerprint):
+
+    if not hasFingerprintPermissions(request, fingerprint):
+        return HttpResponse("Access forbidden",status=403)
 
     # List the Jerboa files for a particular fingerprint
     jerboa_files = FingerprintDocuments.objects.filter(
