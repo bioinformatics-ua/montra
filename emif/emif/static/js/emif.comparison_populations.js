@@ -20,15 +20,25 @@
 
 
 function postComparisonPopulations(){
-    
     $('#compare_form').attr('action', 'population/compare');
     postComparison();
 
    return true; 
 };
 
-
-
+function checkExistsPopulation(fingerprint_ids){
+	console.log(fingerprint_ids)
+	$.post( "api/populationcheck", { 'ids[]': fingerprint_ids })
+		.done(function( data ) {
+			if(data.contains_population){
+				$('#submitdbsimulate').click();
+			} else {
+				alert('There are some databases without population characteristics, can\'t compare them. Please check all databases have population characteristics.');
+			}
+	}).fail(function( data ) {
+		alert('Failed validating database population characteristics.');
+	});	
+}
 
 $(document).ready(function(){
 

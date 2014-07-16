@@ -393,7 +393,7 @@ box-shadow: inset 0 3px 8px rgba(0,0,0,0.125);
   width: 226px;
 }
 }
-#no_results, #comparingwait{
+#no_results{
   display: none;
 }
 .basetable td{
@@ -522,7 +522,7 @@ top: 50px;
 
 #selected_databases{
   opacity: 1 !important;
-  font-size: 11px;
+  font-size: 12px;
 }
 /* Style for results table */
 .select_line{
@@ -758,3 +758,9 @@ height: 6em;
   text-decoration: none !important;
 }
 
+.summary_paginator {
+  text-align: center;
+}
+.showing_publications_info{
+  margin-bottom: -15px;
+}

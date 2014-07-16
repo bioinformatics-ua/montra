@@ -58,6 +58,7 @@ from rest_framework.authtoken.models import Token
 from django.contrib.auth.decorators import login_required
 
 from django.utils.html import strip_tags
+from django.utils import simplejson
 
 import json
 import logging
@@ -78,6 +79,8 @@ from django.views.decorators.cache import cache_page
 import hashlib
 
 from emif.utils import escapeSolrArg
+
+from fingerprint.tasks import anotateshowonresults
 
 def list_questions():
     print "list_questions"
@@ -132,7 +135,7 @@ def results_comp(request, template_name='results_comp.html'):
     first_name = None
     list_qsets = {}
     for db_id in list_fingerprint_to_compare:
-        qsets, name, db_owners, fingerprint_ttype = createqsets(db_id)
+        qsets, name, db_owners, fingerprint_ttype = createqsets(db_id, noprocessing=True)
 
         list_qsets[db_id] = { 'name': name, 'qset': qsets}
 
@@ -148,7 +151,7 @@ def results_comp(request, template_name='results_comp.html'):
                                            'results': list_qsets, 'database_to_compare': first_name})
 
 
-def results_fulltext(request, page=1, full_text=True,template_name='results.html', isAdvanced=False):
+def results_fulltext(request, page=1, full_text=True,template_name='results.html', isAdvanced=False, query_reference=None):
     query = ""
     in_post = True
     try:
@@ -164,10 +167,10 @@ def results_fulltext(request, page=1, full_text=True,template_name='results.html
         query = "text_t:"+escapeSolrArg(query)
         print query
 
-    return results_fulltext_aux(request, query, page, template_name, isAdvanced)
+    return results_fulltext_aux(request, query, page, template_name, isAdvanced=isAdvanced, query_reference=query_reference)
 
 
-def results_fulltext_aux(request, query, page=1, template_name='results.html', isAdvanced=False, force=False):
+def results_fulltext_aux(request, query, page=1, template_name='results.html', isAdvanced=False, force=False, query_reference=None):
     
     rows = define_rows(request)
     if request.POST and "page" in request.POST and not force:
@@ -213,6 +216,11 @@ def results_fulltext_aux(request, query, page=1, template_name='results.html', i
     
     list_databases = paginator_process_list(list_databases, hits, range)   
 
+    # only execute if this if we are not posting back, we dont want to do this on changing page or applying filters
+    if request.POST.get('page') == None and query_reference != None: 
+        # anotate the databases appearing on results
+        anotateshowonresults.delay(query_filtered, request.user, isAdvanced, query_reference)
+
     myPaginator = Paginator(list_databases, rows)
     try:
         pager =  myPaginator.page(page)
@@ -220,7 +228,8 @@ def results_fulltext_aux(request, query, page=1, template_name='results.html', i
         pager =  myPaginator.page(page)
 
     query_old = request.session.get('query', "")
-        
+     
+
     if isAdvanced == True:
         return render(request, template_name, {'request': request,
                                            'num_results': hits, 'page_obj': pager, 'page_rows': rows, 'isSearch': True,
@@ -232,39 +241,20 @@ def results_fulltext_aux(request, query, page=1, template_name='results.html', i
                                            'num_results': hits, 'page_obj': pager, 'page_rows': rows,'breadcrumb': True, 'search_old': query_old, 'isAdvanced': False, "sort_params": sort_params, "page":page})
 
 def store_query(user_request, query_executed):
-    print user_request.user.is_authenticated()
+    #print user_request.user.is_authenticated()
     print "Store Query2"
-    # Verify if the query already exists in that user 
-    user_aux = None
+
+    query = QueryLog()
     if user_request.user.is_authenticated():
-
-        user_aux = user_request.user
-
-        results_tmp = QueryLog.objects.filter(query=query_executed, user=user_aux)
-
+        query.user = user_request.user
     else:
-        results_tmp = QueryLog.objects.filter(query=query_executed, user__isnull=True)
-    query = None
-    
-    if (results_tmp.exists()):
-        # If the user exists, then update the Query 
-        query = results_tmp[0]
-    else:
-        # Create a query 
-        query = QueryLog()
-        if user_request.user.is_authenticated():
-            query.user = user_request.user
-        else:
-            query.user = None
-        query.query = query_executed
-        print "dmn"
-    if query != None:
-        if user_request.user.is_authenticated():
-            query.user = user_request.user
-        else:
-            query.user = None
-        query.query = query_executed
-        query.save()
+        query.user = None
+
+    query.query = query_executed
+
+    query.save()
+
+    return query
 
 
 def results_diff(request, page=1, template_name='results_diff.html'):
@@ -333,53 +323,26 @@ def results_diff(request, page=1, template_name='results_diff.html'):
 
                 this_query_hash = hashlib.sha1(qserialization).hexdigest()
 
-                # we check if this query was already made before
+                print "This query is new, adding it and answers to it..."
+                
+                quest = None
                 try:
-                    # in case the query exists we just get the reference, we use a hash since the serialized query can get too big
+                    quest = Questionnaire.objects.get(id = qid)
+                except Questionnaire.DoesNotExist:
+                    print "Questionnaire doesnt exist..."
 
-                    this_query = AdvancedQuery.objects.get(user=this_user, serialized_query_hash=this_query_hash, qid=qid)  
-                    
-                    this_query.removed = False
+                this_query = AdvancedQuery(user=this_user,name=("Query on "+time.strftime("%c")),
+                    serialized_query_hash=this_query_hash,
+                    serialized_query=qserialization, qid=quest)
+                this_query.save()   
+                # and we all so insert the answers in a specific table exactly as they were on the post request to be able to put it back at a later time
+                for k, v in request.POST.items():
+                    if k.startswith("question_") and len(v) > 0:                        
+                        aqa = AdvancedQueryAnswer(refquery=this_query,question=k, answer=v)
+                        aqa.save()
 
-                    this_query.save()
-
-                    print "This query is already on historic, just updating use time..."
-
-                    try:
-                        advrep = AdvancedQueryAnswer.objects.get(refquery=this_query, question="boolrelwidget-boolean-representation")
-
-                        advrep.answer = qexpression
-
-                        advrep.save()
-                    
-                    except AdvancedQueryAnswer.DoesNotExist:
-                        advrep = AdvancedQueryAnswer(refquery=this_query, question="boolrelwidget-boolean-representation", answer=qexpression)
-
-                        advrep.save()
-
-                    this_query.save()
-                except AdvancedQuery.DoesNotExist:
-                    # otherwise, we create it
-                    print "This query is new, adding it and answers to it..."
-                    
-                    quest = None
-                    try:
-                        quest = Questionnaire.objects.get(id = qid)
-                    except Questionnaire.DoesNotExist:
-                        print "Questionnaire doesnt exist..."
-
-                    this_query = AdvancedQuery(user=this_user,name=("Query on "+time.strftime("%c")),
-                        serialized_query_hash=this_query_hash,
-                        serialized_query=qserialization, qid=quest)
-                    this_query.save()   
-                    # and we all so insert the answers in a specific table exactly as they were on the post request to be able to put it back at a later time
-                    for k, v in request.POST.items():
-                        if k.startswith("question_") and len(v) > 0:                        
-                            aqa = AdvancedQueryAnswer(refquery=this_query,question=k, answer=v)
-                            aqa.save()
-
-                    serialization_a = AdvancedQueryAnswer(refquery=this_query, question="boolrelwidget-boolean-representation", answer=qexpression)
-                    serialization_a.save()
+                serialization_a = AdvancedQueryAnswer(refquery=this_query, question="boolrelwidget-boolean-representation", answer=qexpression)
+                serialization_a.save()
 
                 request.session['query_id'] = this_query.id
                 request.session['query_type'] = this_query.qid.id         
@@ -388,14 +351,18 @@ def results_diff(request, page=1, template_name='results_diff.html'):
                 return HttpResponse("Invalid username")
 
             
-            return results_fulltext_aux(request, query, isAdvanced=True) 
+            return results_fulltext_aux(request, query, isAdvanced=True, query_reference=this_query) 
      
     query = ""
+    simple_query=None
     in_post = True
     try:
         query = request.POST['query']
 
-        
+        # must save only on post, and without the escaping so it doesnt encadeate escapes on queries remade
+        if query != "" and request.POST.get('page') == None: 
+            simple_query = store_query(request, query)
+
         query = '"'+escapeSolrArg(query)+'"'
 
         request.session['query'] = query
@@ -412,7 +379,6 @@ def results_diff(request, page=1, template_name='results_diff.html'):
     if query == "":
         return render(request, "results.html", {'request': request,
                                                 'num_results': 0, 'page_obj': None, 'breadcrumb': True})
-    store_query(request, query)
     try:
         # Store query by the user
         if 'search_full' in request.POST:
@@ -422,12 +388,12 @@ def results_diff(request, page=1, template_name='results_diff.html'):
             print "try to get in session"
             search_full = request.session.get('search_full', "")
         if search_full == "search_full":
-            return results_fulltext(request, page, full_text=True, isAdvanced=request.session['isAdvanced'])
+            return results_fulltext(request, page, full_text=True, isAdvanced=request.session['isAdvanced'], query_reference=simple_query)
     except:
         raise
     #print "Printing the qexpression"
     #print request.POST['qexpression']
-    return results_fulltext(request, page, full_text=False, isAdvanced=request.session['isAdvanced'])
+    return results_fulltext(request, page, full_text=False, isAdvanced=request.session['isAdvanced'], query_reference=simple_query)
 
 def geo(request, template_name='geo.html'):
 
@@ -814,8 +780,10 @@ def render_one_questionset(request, q_id, qs_id, errors={}, aqid=None, fingerpri
                 fingerprint_id=fingerprint_id,
                 breadcrumb=True,
                 permissions=permissions,
-                readonly=readonly
+                readonly=readonly,
+                aqid = aqid,
         )
+
         r['Cache-Control'] = 'no-cache'
         r['Expires'] = "Thu, 24 Jan 1980 00:00:00 GMT"
 
@@ -1100,9 +1068,22 @@ def extract_answers(request2, questionnaire_id, question_set, qs_list):
     
 def database_detailed_view(request, fingerprint_id, questionnaire_id, template_name="database_edit.html"):
 
-    return database_edit(request, fingerprint_id, questionnaire_id, template_name, readonly=True);
+    return database_edit(request, fingerprint_id, questionnaire_id, template_name=template_name, readonly=True);
 
-def database_edit(request, fingerprint_id, questionnaire_id, template_name="database_edit.html", readonly=False):
+# detailed view with direct linking to questionset
+def database_detailed_view_dl(request, fingerprint_id, questionnaire_id, sort_id, template_name="database_edit.html"):
+
+    return database_edit(request, fingerprint_id, questionnaire_id, sort_id=sort_id, template_name=template_name, readonly=True);
+
+# detailed view with direct linking to questionset
+def database_edit_dl(request, fingerprint_id, questionnaire_id, sort_id, template_name="database_edit.html"):
+    return database_edit(request, fingerprint_id, questionnaire_id, sort_id=sort_id, template_name=template_name)
+
+
+def database_edit(request, fingerprint_id, questionnaire_id, sort_id=1, template_name="database_edit.html", readonly=False):
+    
+    print sort_id
+
     try: 
         this_fingerprint = Fingerprint.objects.get(fingerprint_hash=fingerprint_id)
         
@@ -1111,7 +1092,12 @@ def database_edit(request, fingerprint_id, questionnaire_id, template_name="data
 
         qs_list = QuestionSet.objects.filter(questionnaire=questionnaire_id)
 
-        question_set = qs_list[0]
+        question_set = None
+        try:
+            question_set = qs_list.get(sortid=sort_id)
+        except:
+            raise Http404
+
         answers = Answer.objects.filter(fingerprint_id=this_fingerprint)
 
         print answers
@@ -1149,6 +1135,7 @@ def database_edit(request, fingerprint_id, questionnaire_id, template_name="data
                 progress=None,
                 fingerprint_id=fingerprint_id,
                 q_id = questionnaire_id,
+                sort_id = sort_id,
                 async_progress=None,
                 async_url=None,
                 qs_list=qs_list,
@@ -1701,8 +1688,6 @@ def define_rows(request):
         
         profile.save()
 
-        if rows == -1:
-            rows = 99999
     else:
         # Otherwise get number of rows from preferences
         rows = 5
@@ -1715,6 +1700,8 @@ def define_rows(request):
         except:
             pass
 
+    if rows == -1:
+        rows = 99999
 
     return rows
 # GET ALL DATABASES ACCORDING TO USER INTERESTS
@@ -1939,7 +1926,7 @@ def creatematrixqsets(db_type, fingerprints, qsets):
 
     return (q_list, ans)
 
-def createqsets(runcode, qsets=None, clean=True, highlights=None, getAnswers=True, choosenqsets=None, fullmode=True):
+def createqsets(runcode, qsets=None, clean=True, highlights=None, getAnswers=True, choosenqsets=None, fullmode=True, noprocessing=False, changeSearch=False):
     try:
         if fullmode:
             fingerprint = Fingerprint.objects.get(fingerprint_hash=runcode)
@@ -1972,7 +1959,7 @@ def createqsets(runcode, qsets=None, clean=True, highlights=None, getAnswers=Tru
         name = None
         for qset in qsets_query:
             if qset.sortid != 0 and qset.sortid != 99:
-                (qsets, name) = handle_qset(fingerprint, clean, qsets, qset, answers, fingerprint_ttype, rHighlights, qhighlights, getAnswers)
+                (qsets, name) = handle_qset(fingerprint, clean, qsets, qset, answers, fingerprint_ttype, rHighlights, qhighlights, getAnswers, noprocessing=noprocessing, changeSearch=changeSearch)
 
         return (qsets, name, db_owners, fingerprint_ttype)
 
@@ -2055,7 +2042,7 @@ def createqset(runcode, qsid, qsets=None, clean=True, highlights=None):
     return HttpResponse('Something is wrong on creating qset '+qsid, 500)
 
 # this handles the generation of the tag - value for a single qset, given a questionset reference
-def handle_qset(fingerprint, clean, qsets, qset, answers, fingerprint_ttype, rHighlights, qhighlights, getAnswers=True):
+def handle_qset(fingerprint, clean, qsets, qset, answers, fingerprint_ttype, rHighlights, qhighlights, getAnswers=True, noprocessing=False, changeSearch=False):
     name = ""
     question_group = QuestionGroup()
     question_group.sortid = qset.sortid
@@ -2071,6 +2058,7 @@ def handle_qset(fingerprint, clean, qsets, qset, answers, fingerprint_ttype, rHi
         t.value = ""
         t.number = question.number
         t.ttype = question.type
+        t.lastChange = None
         question_group.list_ordered_tags.append(t)
 
     qsets[qset.text] = question_group
@@ -2119,6 +2107,14 @@ def handle_qset(fingerprint, clean, qsets, qset, answers, fingerprint_ttype, rHi
             if answer.comment != None:
                 t.comment = answer.comment
 
+            if changeSearch:
+                changes = AnswerChange.objects.filter(answer=answer).order_by('-id')
+
+                if len(changes) == 0:
+                    t.lastChange = answer.fingerprint_id.created
+                else:
+                    t.lastChange = changes[0].revision_head.date
+
             if clean:
                 t.value = value.replace("#", " ")
                 
@@ -2127,14 +2123,15 @@ def handle_qset(fingerprint, clean, qsets, qset, answers, fingerprint_ttype, rHi
                     #if len(highlights["results"][k])>1:
                     #print t.value
                 
-                if t.ttype in Fingerprint_Summary:
-                    t.value = Fingerprint_Summary[t.ttype](raw_value)
+                if not noprocessing:
+                    if t.ttype in Fingerprint_Summary:
+                        t.value = Fingerprint_Summary[t.ttype](raw_value)
 
             else:
                 t.value = value
 
             if slug == "database_name":
-                name = t.value           
+                name = raw_value        
 
             if question_group != None:
                 try:
@@ -2580,34 +2577,25 @@ def check_database_add_conditions(request, questionnaire_id, sortid, saveid,
             else:
                 setNewPermissions(request2)
 
-            saveFingerprintAnswers(qlist_general, fingerprint_id, question_set2.questionnaire, users_db, extra_fields=extra_fields, created_date=created_date)
+            success = saveFingerprintAnswers(qlist_general, fingerprint_id, question_set2.questionnaire, users_db, extra_fields=extra_fields, created_date=created_date)
 
+            print "SUCCESS SAVING:"+str(success)
+
+            if not success:
+
+                qs = -1
+                try :
+                    qs = question_set2.questionnaire.findMandatoryQs().sortid
+                except:
+                    pass
+                return HttpResponse(simplejson.dumps({'mandatoryqs': qs}), 
+                                    mimetype='application/json')
+            
             # new version that just serializes the created fingerprint object (this eventually can be done using celery)
             indexFingerprint(fingerprint_id)
 
-    r = r2r(template_name, request,
-                questionset=question_set2,
-                questionsets=question_set2.questionnaire.questionsets,
-                runinfo=None,
-                errors={},
-                qlist=qlist,
-                progress=None,
-                triggers=jstriggers,
-                qvalues=qvalues,
-                jsinclude=jsinclude,
-                cssinclude=cssinclude,
-                async_progress=None,
-                async_url=None,
-                qs_list=qsobjs,
-                questions_list=qlist_general,
-                fingerprint_id=fingerprint_id,
-                breadcrumb=True,
-                extra_fields=extra_fields
-        )
-    r['Cache-Control'] = 'no-cache'
-    r['Expires'] = "Thu, 24 Jan 1980 00:00:00 GMT"
-
-    return r
+    return HttpResponse(simplejson.dumps({'success': 'true'}), 
+                                    mimetype='application/json')
 
 # Set new permissions for a questionset, based on a post request
 def setNewPermissions(request):
@@ -3060,7 +3048,7 @@ def create_auth_token(request, page=1, templateName='api-key.html', force=False)
 def invitedb(request, db_id, template_name="sharedb.html"):
 
     email = request.POST.get('email', '')
-
+    message_write = request.POST.get('message', '')
     if (email == None or email==''):
         return HttpResponse('Invalid email address.')
 
@@ -3074,13 +3062,20 @@ def invitedb(request, db_id, template_name="sharedb.html"):
     subject = "EMIF Catalogue: A new database is trying to be shared with you."
     link_invite = settings.BASE_URL + "accounts/signup/"
 
-    message = """Dear %s,\n\n
-            \n
-            %s is sharing a new database with you on Emif Catalogue. 
-            First you must register on the EMIF Catalogue. Please follow the link below: \n\n
+    #message = """Dear %s,\n\n
+    #        \n
+    #        %s is sharing a new database with you on Emif Catalogue. 
+    #        First you must register on the EMIF Catalogue. Please follow the link below: \n\n
+    #        %s 
+    #        \n\nSincerely,\nEMIF Catalogue
+    #""" % (email,request.user.get_full_name(), link_invite)
+
+    message = """%s\n
+            To have full access to this fingerprint, please register in the EMIF Catalogue following the link below: \n\n
             %s 
             \n\nSincerely,\nEMIF Catalogue
-    """ % (email,request.user.get_full_name(), link_invite)
+    """ % (message_write, link_invite)
+
 
     send_custom_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [email])
 
@@ -3121,9 +3116,11 @@ def sharedb(request, db_id, template_name="sharedb.html"):
     # Verify if it is a valid database 
     if (db_id == None or db_id==''):
         return HttpResponse('Service Unavailable')  
-    c = CoreEngine()
-    results = c.search_fingerprint('id:' + db_id)
-    if (len(results)!=1):
+
+    fingerprint = None
+    try: 
+        fingerprint = Fingerprint.objects.get(fingerprint_hash=db_id)
+    except Fingerprint.DoesNotExist:
         return HttpResponse("Service Unavailable")  
 
     subject = "EMIF Catalogue: A new database has been shared with you."
@@ -3155,17 +3152,13 @@ def sharedb(request, db_id, template_name="sharedb.html"):
 
     try:
         
-        message = """Dear %s,\n\n
-            \n
-            %s is sharing a new database with you. And left you the following message:\n\n
-
-            \"%s\"
+        message = """%s
 
             Now you're able to edit and manage the database. \n\n
             To activate the database in your account, please open this link:
             %s 
             \n\nSincerely,\nEMIF Catalogue
-        """ % (name,request.user.get_full_name(), message,link_activation)
+        """ % (message,link_activation)
         # Send email to admins
         #send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, emails_to_feedback)
         # Send email to user with the copy of feedback message
@@ -3178,7 +3171,7 @@ def sharedb(request, db_id, template_name="sharedb.html"):
 
 def sharedb_activation(request, activation_code, template_name="sharedb_invited.html"):
 
-    if (request.user==None):
+    if (request.user==None or not request.user.is_authenticated()):
         return HttpResponse('You need to be authenticated.')
     __objs = SharePending.objects.filter(activation_code=activation_code, pending=True, user=request.user)
     if (len(__objs)==0):
@@ -3188,27 +3181,30 @@ def sharedb_activation(request, activation_code, template_name="sharedb_invited.
         return HttpResponse('An error has occured. Contact the EMIF Catalogue Team.')
     
     sp = __objs[0]
-    c = CoreEngine()
-    results = c.search_fingerprint('id:' + sp.db_id)
-    for r in results:
-        _aux = r
-        break
-    
-    _aux['user_t'] =  _aux['user_t'] + " \\ " + sp.user.username
-    print _aux['user_t']
 
-    c.update(r)
+    fingerprint = None
+    try:
+        fingerprint = Fingerprint.objects.get(fingerprint_hash=sp.db_id)
+
+    except:
+        return HttpResponse("And error has occurred. Contact the EMIF Catalogue Team.")
+    
+    fingerprint.shared.add(request.user)
+
+    fingerprint.save()
+
+    indexFingerprint(fingerprint.fingerprint_hash)
+
     sp.pending = False
     sp.save()
-
-
+    finger_name = findName(fingerprint)
     try:
         subject = "EMIF Catalogue: Accepted database shared"
         message = """Dear %s,\n\n
             \n\n
             %s has been activated. You can access the new database in "Databases" -> Personal".
             \n\nSincerely,\nEMIF Catalogue
-        """ % (request.user.get_full_name(), _aux['database_name_t'] )
+        """ % (request.user.get_full_name(), finger_name)
 
 
         message_to_inviter = """Dear %s,\n\n
@@ -3216,7 +3212,7 @@ def sharedb_activation(request, activation_code, template_name="sharedb_invited.
             %s has accepted to work with you in database %s. 
             
             \n\nSincerely,\nEMIF Catalogue
-        """ % (sp.user_invite.get_full_name(), request.user.get_full_name(), _aux['database_name_t'])
+        """ % (sp.user_invite.get_full_name(), request.user.get_full_name(), finger_name)
 
         # Send email to admins
         send_custom_mail(subject, message_to_inviter, settings.DEFAULT_FROM_EMAIL, [sp.user_invite.email])
@@ -3414,11 +3410,11 @@ def save_answers_to_csv(list_databases, filename):
 
     if list_databases:
         writer = csv.writer(response, delimiter = '\t')
-        writer.writerow(['DB_ID', 'DB_name', 'Questionset', 'Question', 'QuestioNumber', 'Answer'])
+        writer.writerow(['DB_ID', 'DB_name', 'Questionset', 'Question', 'QuestionNumber', 'Answer', 'Date Last Modification'])
         for t in list_databases:
             id = t.id
 
-            returned = createqsets(id, clean=False)
+            returned = createqsets(id, clean=False, changeSearch=True, noprocessing=False)
 
             qsets, name, db_owners, fingerprint_ttype  = returned
 
@@ -3438,16 +3434,7 @@ def attachPermissions(fingerprint_id, qsets):
     zipper = qsets
     zipee = []
 
-    #print type(zipper)
-
-    for q, v in qsets.ordered_items():
-        print "-----"
-        print q
-        print v.qsid
-        print "-----"
-
     for q, v in zipper.ordered_items():
-        print "STUFF:"+str(v)
         qpermissions = getPermissions(fingerprint_id, QuestionSet.objects.get(id=v.qsid))
         zipee.append(qpermissions)
 
@@ -3463,7 +3450,7 @@ def writeGroup(id, k, qs, writer, name, t):
             _answer = clean_str_exp(str(q.value))
             if (_answer == "" and q.ttype=='comment'):
                 _answer = "-"
-            writer.writerow([id, name, k.replace('h1. ', ''), clean_str_exp(str(q.tag)), str(q.number), _answer])
+            writer.writerow([id, name, k.replace('h1. ', ''), clean_str_exp(str(q.tag)), str(q.number), _answer, q.lastChange])
 
 def export_datatable(request):
 
@@ -4012,9 +3999,14 @@ def import_questionnaire(request, template_name='import_questionnaire.html'):
                         else:
                             slug_db = slugs[0]
 
+                        visible_default = False
+                        if row[10].value:
+                            if str(row[10].value).lower() == 'visible':
+                                visible_default = True
+
                         question = Question(questionset=questionset, text_en=text_en, number=str(questionNumber),
                                             type=dataType_column.value, help_text=helpText, slug=slug, slug_fk=slug_db, stats=True,
-                                            category=False, tooltip=_tooltip, checks=_checks)
+                                            category=False, tooltip=_tooltip, checks=_checks, visible_default=visible_default)
 
                         log += '\n%s - Question created %s ' % (type_Column.row, question)
 

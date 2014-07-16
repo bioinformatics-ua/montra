@@ -80,6 +80,8 @@ def saveFingerprintAnswers(qlist_general, fingerprint_id, questionnaire, user, e
                         print this_ans
                         this_ans.save()
                 
+        return checkMandatoryAnswers(fingerprint)
+
 
         # format for answers : Answer(question=question, data=data, comment=comment, fingerprint_id=fingerprint_id) 
 
@@ -93,6 +95,19 @@ def getComment(question, extra_fields):
         pass
 
     return None
+
+# Checks if all mandatory answers have been answered, namely fingerprint name
+def checkMandatoryAnswers(fingerprint):
+    try:
+        name = Answer.objects.get(fingerprint_id=fingerprint, question__slug_fk__slug1="database_name")
+
+        if name.data.strip() == "":
+            return False
+
+    except Answer.DoesNotExist:
+        return False
+
+    return True
 
 def getAnswerValue(question, qdict):
     try:

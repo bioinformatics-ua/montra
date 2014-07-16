@@ -23,6 +23,7 @@ from rest_framework.urlpatterns import format_suffix_patterns
 
 from api.views import SearchView
 from api.views import EmailCheckView
+from api.views import PopulationCheckView
 from api.views import GetFileView
 from api.views import DeleteFileView
 from api.views import MetaDataView
@@ -39,6 +40,7 @@ from api.views import RequestAnswerView
 urlpatterns = patterns('api.views',
     url(r'^root/$', 'api_root'),
     url(r'^emailcheck$', EmailCheckView.as_view(), name='emailcheck'),
+    url(r'^populationcheck$', PopulationCheckView.as_view(), name='populationcheck'),
     url(r'^getfile$', GetFileView.as_view(), name='getfile'),
     url(r'^deletefile$', DeleteFileView.as_view(), name='deletefile'),
     url(r'^search$', SearchView.as_view(), name='search'),

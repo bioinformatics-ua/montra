@@ -121,11 +121,18 @@ class IssueManager(object):
     
     def list_milestones(self):
         repo = self.gh.repository(settings.GITHUB_ACCOUNT,settings.GITHUB_REPO)
-        return repo.iter_milestones()
 
-"""
->>> from github3 import login
->>> gh = login('bastiao','GOFUCKYOURSELF')
->>> gh.create_issue('bioinformatics-ua', 'emif-fb', 'bastiao test inserting issue programtically')
+        # for some reason i couldnt find out, 
+        # milestones iterator only returns open milestones when used without state parameter
+        # so i join them up myself...
+        milestones = []
+        miles_open = repo.iter_milestones()
+        miles_closed = repo.iter_milestones(state='closed')
 
-"""
+        for mile in miles_closed:
+            milestones.append(mile)
+
+        for mile in miles_open:
+            milestones.append(mile)
+
+        return milestones[::-1]

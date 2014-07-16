@@ -26,11 +26,15 @@ django-jenkins
 PIL==1.1.7
 geopy==0.96.2
 openpyxl==1.6.2
-request==1.2.3
-biopython==1.63
-django_nvd3==0.6.0
+requests==1.2.3
+#biopython==1.63
+#django_nvd3==0.6.0
 python-dateutil==2.2
 celery==3.1.0
 django-celery==3.1.0
 python-memcached==1.48
 johnny-cache==1.4
+-e git://github.com/ribeiroct/django-fack.git#egg=django-fack
+django-adminplus==0.3
+-e git://github.com/leandrosouza/django-hitcount.git#egg=django-hitcount
+

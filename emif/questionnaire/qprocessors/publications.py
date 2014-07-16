@@ -63,36 +63,18 @@ def show_summ(value):
     if value== "":
         return ""
 
-    value = value.replace("'", '"')
-    pubs = json.loads(value)
+    if not value.startswith('['):
+        value = '['+value+']'
 
-    if type(pubs) is not list:
-        pubs = [pubs]
+    try:
+        pubs = json.loads(value)
 
-    #print "###########"
-    #print pubs[{\"pmid\":\"22874241\",
-    # \"title\":\"Dicoogle Mobile: a medical imaging platform for Android.\"
-    # ,\"journal\":\"Studies in health technology and informatics\"
-    # ,\"year\":\"2012\",
-    # \"pages\":\"180\",\"volume\":\"502-6\",
-    # \"authors\":\"Viana-Ferreira C,Ferreira D,Valente F,Monteiro E,Costa C,Oliveira JL\",\"link\":\"\"}]",
-        
-    return render_to_string('questionnaire/publications_summary.html', {'pubs': pubs})
+        if type(pubs) is not list:
+            pubs = [pubs]
 
-    ret = "<ul>"
-    for p in pubs:
-        title = p["title"]
-        authors = p["authors"]
-        year = p["year"]
-        journal = p["journal"]
-        pages = p["pages"]
-        volume = p["volume"]        
-        ret += "<li>" + authors + " - " + title + ". " + journal + ". " + year +" :" +pages +":"+ volume +"</li>"
-
-    ret += "</ul>"
-    #print "##########"
-    #print ret
-    return ret
+        return render_to_string('questionnaire/publications_summary.html', {'pubs': pubs})
+    except:
+        return "Error Loading Publications"
 
 add_type('publication', 'Publication')
 
