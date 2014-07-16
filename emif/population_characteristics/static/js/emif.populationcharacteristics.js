@@ -58,7 +58,7 @@ function getFingerprintID(){
   var fingerprint_id='abcd';
 
   try{
-    fingerprint_id = url.split("fingerprint/")[1].split("/1")[0];
+    fingerprint_id = global_fingerprint_id;
   }
   catch(err){
     fingerprint_id=defaultFingerprintID;

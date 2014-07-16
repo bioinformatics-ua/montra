@@ -296,6 +296,7 @@
         {% get_hit_count_javascript for fingerprint %} 
     });
 var threads = {};
+var global_fingerprint_id = '{{fingerprint_id}}';
 function load_questionnary(){
 
 console.log("Creating questionnary set containers (so they are in order)");
