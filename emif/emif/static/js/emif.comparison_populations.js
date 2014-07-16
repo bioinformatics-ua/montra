@@ -21,7 +21,7 @@
 
 function postComparisonPopulations(){
     $('#compare_form').attr('action', 'population/compare');
-    postComparison();
+    postComparison(false);
 
    return true; 
 };
@@ -45,7 +45,7 @@ $(document).ready(function(){
     $("#comparabtnPC").bind('click',function(e)
         { 
 
-                event.preventDefault();
+        event.preventDefault();
 
 
           postComparisonPopulations();

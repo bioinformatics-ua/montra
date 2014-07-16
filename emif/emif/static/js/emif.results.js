@@ -20,7 +20,7 @@ function initializePaginatorSorter(base_filter, selected_name, selected_value, e
         $("#comparabtn").removeAttr('disabled');
         $("#comparabtn").bind('click',function(e)
         { 
-          postComparison();
+          postComparison(true);
           return false;
         });
 
@@ -107,7 +107,7 @@ $("#comparabtn").bind('click',function(e)
         });
 
 //$("#comparabtn").unbind();
-function postComparison(){
+function postComparison(isdbs){
   //$('#result_form').submit();
   //console.log('A: '+a);
   //console.log('A-plugin: '+a.plugin);
@@ -127,8 +127,9 @@ function postComparison(){
       ids.push(id);
       
     });
-    checkExistsPopulation(ids); 
-    //$('#submitdbsimulate').click();
+    if(!isdbs)
+      checkExistsPopulation(ids); 
+    else $('#submitdbsimulate').click();
   }
   
 }
@@ -175,7 +176,7 @@ $('.checkbox').click(function()
       $("#comparabtn").attr('disabled', false);
          $("#comparabtn").bind('click',function(e)
         { 
-          postComparison();
+          postComparison(true);
           return false;
         });    
     }
