@@ -15,12 +15,12 @@
 						<!-- title="{{ t.tag|safe }}" -->
 						<td class="tooltipped" title="{{ t.tag|removehs|safe }}">{{ t.tag|removehs|safe }}</td>
 						{% if t.ttype|captioned %}
-						<td class="value_content captioned_content" style="white-space: normal;" title="{{ t.value|force_escape }}">
+						<td class="value_content captioned_content" style="white-space: normal;" data-title="{{ t.value|force_escape }}">
 						{% else %}
 						<td class="value_content" style="white-space: normal;">
 						{% endif %}
 						<span class="summary_content">
-						{{ t.value|safe }}
+							{{ t.value|safe }}
 						</span>
 
 						{% if not t.comment|safe == None and not t.comment|safe == "" %}
@@ -37,20 +37,6 @@
 				</tbody>
 			</table>
 <script type="text/javascript">
-	addTooltip('#t2_{{qs.sortid}}');
-	$('.captioned_content .summary_content', $('#t2_{{qs.sortid}}')).expander({slicePoint: 68, expandText: 'more', userCollapseText: 'less'});
-	// Add highlighting
-	/*{% if request.session.query and not isAdvanced %}
-
-		{% for word in request.session.query|whitespacesplit %}
-			$('#set_container, .tooltip').highlight('{{word}}');
-		{% endfor %}
-	{% endif %}*/
-  /*$('.comment_button', '#t2_{{qs.sortid}}').click(function(){
-  	$(this).parent().find('.comment_text').toggle('fast');
-  });*/
-	$('.comment_button', '#t2_{{qs.sortid}}').popover({trigger: 'hover', html: true,
-            template: '<div class="popover popover-medium"><div class="arrow"></div><div class="popover-inner"><h3 class="popover-title"></h3><div class="popover-content"><p></p></div></div></div>'
-});
+	initializeQset({{qs.sortid}});
 </script>
 {% endfor %}
