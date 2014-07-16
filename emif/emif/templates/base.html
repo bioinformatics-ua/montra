@@ -51,6 +51,7 @@
         <script src="{{ STATIC_URL }}js/vendor/jquery.cookie.js"></script>
         <script src="{{ STATIC_URL }}js/vendor/jquery.canclear.js"></script>
         <script src="{{ STATIC_URL }}js/vendor/jquery.highlight.js"></script>
+        <script src="{{ STATIC_URL }}js/vendor/jquery.history.js"></script>
         <script type="application/javascript">
         // We need to configure this to be able to send requests by json with the csrftoken
         var csrftoken = $.cookie('csrftoken');
@@ -303,6 +304,7 @@
                 <a href="controlversion/history">History</a> ·
                 {%endif%}
                 <a href="feedback">Feedback</a> ·
+                <a href="faq">FAQ</a> ·
                 <a href="about">About</a><br />
                 <p>&copy; EMIF Catalogue v{% get_version %}<br/><small id="supportability">This website is optimised to Safari, Chrome, Firefox, Opera and IE9+. <!--It runs in IE7-IE8, but it has low performance and no enhanced features.--></small></p>
             </footer>

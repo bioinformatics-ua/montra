@@ -10,7 +10,7 @@
 		</button>
          {% endif %}
 
-		{% if request.user.is_authenticated %} 
+		{% if request.user.is_authenticated %}
 		<!--div class="btn-group" id="group_toolbar"-->
 
       {% if fingerprint_dump %}
@@ -23,24 +23,9 @@
         Detailed
       </a>
       {% endif %}
-
       {% if results or databases or alldatabases or more_like_this %}
-        <span id="selected_databases" class="btn disabled"> <strong>Type Selected:</strong> <span id="selected_dbstype">---</span> &nbsp; &nbsp; <strong>Selected databases:</strong> <span id="selected_dbscount">0</span></span>     
-
-         <div class="btn btn-group">
-        <a class="btn dropdown-toggle" data-toggle="dropdown" href="#" id="add_list_toolbar">
-         <i class="icon-retweet"></i> Compare
-          <span class="caret"></span>
-        </a>
-        <ul class="dropdown-menu">
-           <li><a id="comparabtn"  href=""  rel="tooltip" data-container="body" data-placement="right" data-original-title="This allows to compare databases.<br /> It is only possible to compare databases of the same type. <br /> When a database is selected, the type is defined automatically, and databases of other types can't be choosen. <br /> To be able to select other type, you must unselect all the databases." disabled> 
-          <i class="fa fa-columns"></i>&nbsp; Databases</a>
-          </li>
-          <li><a id="comparabtnPC"  href=""  rel="tooltip" data-container="body" data-placement="right" data-original-title="This allows to compare databases.<br /> It is only possible to compare databases of the same type. <br /> When a database is selected, the type is defined automatically, and databases of other types can't be choosen. <br /> To be able to select other type, you must unselect all the databases." disabled> 
-          <i class="fa fa-users"></i>&nbsp; Populations</a>
-          </li>
-        </ul>
-      </div>  
+        <a id="comparabtn" class="btn "  href=""  rel="tooltip" data-container="body" data-placement="bottom" data-original-title="This allows to compare databases.<br /> It is only possible to compare databases of the same type. <br /> When a database is selected, the type is defined automatically, and databases of other types can't be choosen. <br /> To be able to select other type, you must unselect all the databases." class="help_selectresults icon-question-sign" disabled> <i  class=" icon"></i>
+          <i class="icon-retweet"></i> Compare</a>
       {% endif %}
 
       {% if create_public and own_dbs|length > 0 %}
@@ -55,23 +40,12 @@
               <a href="public/fingerprint/create/{{fg.fingerprint}}">{{fg.name}}</a>
             </li>
           {% endfor %}
-          
+
         </ul>
         </div>
       {% endif %}
 
 
-      {% if add_databases or not hide_add %}
-	      <div class="btn btn-group">
-        <a class="btn dropdown-toggle" data-toggle="dropdown" href="#" id="add_list_toolbar">
-         <i class="icon-plus icon"></i> Add
-          <span class="caret"></span>
-        </a>
-        <ul class="pull-right dropdown-menu">
-           {% show_fingerprints_interests request.user %}
-        </ul>
-      </div> 
-      {% endif %}
 		<!--/div-->
 		{% endif %}
         {% if  collapse %}
@@ -79,11 +53,6 @@
             Expand all
          </a>
         {% endif %}
-        {% if list_databases|length > 0 and not no_print %}
-		<button type="button" class="btn btn" onclick="window.print();" title="Print">
-			<i class="icon-print"></i> Print
-		</button>
-        {% endif  %}
 	  {% if geo or alldatabases or databases or results or more_like_this %}
       <a class="btn" href="geo" onclick="" > <i class=" icon"></i>
         <i class="icon-globe"></i> Geolocation
@@ -97,7 +66,7 @@
       {% endif %}
 
       {% if export_datatable and request.user.is_superuser %}
-      
+
         <button id="exportdatatable" class="btn" onclick="showExportMessage();"> <i class="fa fa-upload"></i> Export </button>
       {% endif %}
 
@@ -123,7 +92,7 @@
 
         Export
       </a>
-      {% endif %}     
+      {% endif %}
       {% endif %}
       {% if request.user.is_superuser %}
             {% if  api_token %}
@@ -138,7 +107,7 @@
           <i class="fa fa-cogs"></i> Manage
           <span class="caret"></span>
         </a>
-        <ul class="pull-right dropdown-menu">
+        <ul class="pull-right dropdown-menu" style="z-index:1;">
         <li>
           <a href="dbEdit/{{fingerprint_id}}/{{fingerprint_ttype}}" id="edit_list_toolbar" title="Edit Database" title="Share Database"> <i class="icon-pencil icon"></i>
         Edit
@@ -150,29 +119,41 @@
 
       <a class="sharedb" href="" id="share_list_toolbar" onclick="return false;"> <i class="fa fa-users"></i>
         Invite Other Users
-        
+
       </a>
       </li>
       <li>
 
       <a class="publiclink" href="" id="publiclink_toolbar" onclick="return false;"> <i class="fa fa-share"></i>
-        Create Public Link  
+        Create Public Link
       </a>
       </li>
       <li class="divider"></li>
       <li>
       <a class="confirm-delete" href="" id="delete_list_toolbar" onclick="return false;"data-id="{{ fingerprint_id }}"  title="Remove Database"> <i class="icon-trash icon"></i>
         Delete
-        
-      </a> 
-      </li>     
+
+      </a>
+      </li>
         </ul>
-      </div>      
+      </div>
       {% endif %}
-		
+		        {% if list_databases|length > 0 and not no_print %}
+    <button type="button" class="btn btn" onclick="window.print();" title="Print">
+      <i class="icon-print"></i> Print
+    </button>
+        {% endif  %}
 
 	</div>
 </div>
+
+{% if results or databases or alldatabases or more_like_this %}
+<div id="selected_databases">
+<div class="pull-right">
+<strong>Type Selected:</strong> <span id="selected_dbstype">---</span> &nbsp; &nbsp; <strong>Selected databases:</strong> <span id="selected_dbscount">0</span>
+</div>
+</div>
+{% endif %}
 <!-- **********************************************************************
 ***** Model to delete the fingerprint. It will show a window to confirm the
 ***** deletion of the fingerprint
@@ -199,7 +180,7 @@
 
 <!-- **********************************************************************
 ***** Model to share the fingerprint. It will show a window to share the
-***** the fingerprint. A list of email addresses should entered. 
+***** the fingerprint. A list of email addresses should entered.
  ***************************************************************************-->
 
 <div id="modal-from-dom-share" class="modal hide fade" style="display:none"  >
@@ -220,16 +201,19 @@
 
         </div>
         <div style="padding: 5px;" id="share_message"></div>
-        <h4 style="display:none" class="share_m">Message to be sent to user</h4>
-        <div class="share_m" style="display:none;">
+        <h4 style="display:block" class="share_m">Message to be sent to user</h4>
+        <div class="share_m" style="display:block;">
           <div style="display: table-cell; padding: 5px;" class="controls">
-           <textarea rows="4" class="span5" style="margin-top:5px;" type="text" id="share_mess">I want to share my database with you.</textarea>
+           <textarea rows="6" class="span5" style="margin-top:5px;" type="text" id="share_mess">Dear colleague,
+
+This is an invitation sent by {{request.user.first_name }} {{request.user.last_name}} to share with you the fingerprint of the database "{{breadcrumb_name}}", which is currently described in the EMIF Catalogue: http://bioinformatics.ua.pt/emif.
+           </textarea>
           </div>
         </div>
 
-          
-        
-        
+
+
+
 
     </div>
     <div class="modal-footer">
@@ -298,7 +282,7 @@ $('#modal-from-dom').bind('show', function() {
 
 $('.confirm-delete').click(function(e) {
     e.preventDefault();
-    
+
     var id = $(this).data('id');
     $('#modal-from-dom').data('id', id).modal('show');
 });
@@ -306,7 +290,7 @@ $('.confirm-delete').click(function(e) {
 
 
 /***************************************************************
-************** Auxiliar method to post 
+************** Auxiliar method to post
 ****************************************************************/
 
 function post_to_url(path, params, method) {
@@ -341,29 +325,29 @@ $('#modal-from-dom-share').bind('show', function() {
     var id = $(this).data('id'),
         removeBtn = $(this).find('.sharedb2');
         //href = removeBtn.attr('href');
-    
+
     //removeBtn.attr('href', href.replace('ref', '' + id));
 });
 
 // This bind is handle the click in share button
-$(".sharedb" ).click(function(e) 
+$(".sharedb" ).click(function(e)
 {
   console.log("Share DB ");
   e.preventDefault();
   var id = "{{fingerprint_id}}";
 
   $('#modal-from-dom-share').data('id', id).modal('show');
-       
+
 });
-$(".publiclink" ).click(function(e) 
+$(".publiclink" ).click(function(e)
 {
   e.preventDefault();
   var id = "{{fingerprint_id}}";
 
   $('#modal-from-dom-publiclink').data('id', id).modal('show');
-       
+
 });
-$("#share_email" ).change(function(e) 
+$("#share_email" ).change(function(e)
 {
   checkIfEmailExists();
 });
@@ -372,20 +356,20 @@ $("#createpubliclink").click(function(){
   createPublicLink();
 });
 
-// This bind will share the email. 
-$(".sharedb2" ).click(function(e) 
+// This bind will share the email.
+$(".sharedb2" ).click(function(e)
 {
   e.preventDefault();
-  
+
   //post_to_url($(this).attr('href'), {"email": $("#share_email").val(), "csrfmiddlewaretoken": $('input[name="csrfmiddlewaretoken"]').prop('value')});
   shareDatabase();
 
 });
 
-$(".sharedb_invite" ).click(function(e) 
+$(".sharedb_invite" ).click(function(e)
 {
   e.preventDefault();
-  
+
   //post_to_url($(this).attr('href'), {"email": $("#share_email").val(), "csrfmiddlewaretoken": $('input[name="csrfmiddlewaretoken"]').prop('value')});
   inviteDatabase();
 
@@ -410,7 +394,7 @@ function checkIfEmailExists(){
       $('.sharedb2').hide();
       $('.sharedb2_shadow').hide();
       $('.sharedb_invite').show();
-      $('.share_m').hide();
+      //$('.share_m').hide();
       //$('.sharedb2_shadow').show();
       $('#share_indicator').html('<i class="icon-remove text-warning"></i>');
         $('#share_message').html('<p class="text-warning">Email doesn\'t belong to any registered user. Do you want to invite?</p>');
@@ -469,7 +453,7 @@ function shareDatabase(){
   $('#share_message').html('<p class="text-info">Trying to share.</p>');
   $.post("share/{{fingerprint_id}}", { email: $("#share_email").val(), message: $('#share_mess').val() })
   .done(function(response) {
-    
+
     $('#share_message').html('<p class="text-info">'+response+'.</p>');
 
   })
@@ -481,9 +465,9 @@ function shareDatabase(){
 function inviteDatabase(){
   $('#share_indicator').html('<i class="icon-refresh"></i>');
   $('#share_message').html('<p class="text-info">Trying to invite.</p>');
-  $.post("invite/{{fingerprint_id}}", { email: $("#share_email").val() })
+  $.post("invite/{{fingerprint_id}}", { email: $("#share_email").val(), message: $('#share_mess').val() })
   .done(function(response) {
-    
+
     $('#share_message').html('<p class="text-info">'+response+'.</p>');
 
   })

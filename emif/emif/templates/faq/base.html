@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% load url from future %}
+{% load extra_tags %}
+{% load django_bootstrap_breadcrumbs %}
+
+{% block breadcrumbs %}
+
+        {% breadcrumb "Home" "home" %}
+        {% breadcrumb "FAQ" "faq" %}
+
+{% endblock %}
+
+{% block toolbar %}
+    {% include "menu_toolbar.html" with collapse=collapseall %}
+{% endblock %}
+
+{% block content %}
+<div style="clear: both;"><hr /></div>
+
+{% for message in messages %}
+    <p class="message">{{ message }}</p>
+  {% endfor %}
+  {% block body %}{% endblock %}
+
+{% endblock %}

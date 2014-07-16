@@ -27,7 +27,6 @@ from django.core.validators import MaxLengthValidator
 from questionnaire.models import *
 from django.contrib.auth.models import User
 
-
 from description import fingerprint_description_slugs
 
 class Fingerprint(models.Model):
@@ -39,7 +38,7 @@ class Fingerprint(models.Model):
     created = models.DateTimeField(auto_now_add=True, null=True)
     owner = models.ForeignKey(User, related_name="fingerprint_owner_fk")
     shared = models.ManyToManyField(User, null=True, related_name="fingerprint_shared_fk") 
-
+    hits = models.IntegerField(default=0, help_text="Hit count for this fingerprint")
     removed = models.BooleanField(default=False, help_text="Remove logically the fingerprint")
 
     def __unicode__(self):
@@ -129,6 +128,20 @@ class AnswerChange(models.Model):
     new_value     = models.TextField(null=True)
     old_comment   = models.TextField(null=True)
     new_comment   = models.TextField(null=True)
+
+''' The idea is showing the number of times the db is returned over time
+'''
+class FingerprintReturnedSimple(models.Model):
+    fingerprint = models.ForeignKey(Fingerprint)
+    searcher    = models.ForeignKey(User)
+    date        = models.DateTimeField(auto_now_add=True)
+    query_reference = models.ForeignKey('emif.QueryLog')
+
+class FingerprintReturnedAdvanced(models.Model):
+    fingerprint = models.ForeignKey(Fingerprint)
+    searcher    = models.ForeignKey(User)
+    date        = models.DateTimeField(auto_now_add=True)
+    query_reference = models.ForeignKey('emif.AdvancedQuery')
 
 """
 This class wraps the Description of the Fingerprint.

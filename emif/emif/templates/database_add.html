@@ -49,6 +49,7 @@ text-decoration: none;
 <!--script type="text/javascript" src="{{ STATIC_URL }}jquery.min.js"></script-->
 <script type="text/javascript" src="{{ STATIC_URL }}questionset.js"></script>
 <script src="{{ STATIC_URL }}js/vendor/jquery.errornavigator.js"></script>
+<script src="{{ STATIC_URL }}js/jquery.simplePagination.js"></script>
 
 <script type="text/javascript" src="{{ STATIC_URL }}js/fingerprint_edit.js"></script>
 
@@ -98,7 +99,9 @@ It was not possible to save this questionnary. Please try again in a few seconds
       <li{% if questionset.text == qs.text %} class="active" {% endif %} id="li_qs_{{qs.sortid}}">
         <!--<a href="q2/{{runinfo.random}}/{{ qs.sortid }}">
         -->
-        <a href="add/{{qs.questionnaire.pk}}/{{ qs.sortid }}" onclick="questionsets_handle(qs_{{ qs.sortid }}); return false;">
+
+
+        <a href="add/{{qs.questionnaire.pk}}/{{ qs.sortid }}" onclick="questionsets_handle('qs_{{ qs.sortid }}', '{{fingerprint_id}}', '{{q_id}}', QsType.ADD); return false;">
           <table class="fullwidth">
             <tr>
               <td style="width: 80%; font-size: 93%;">
@@ -147,131 +150,9 @@ It was not possible to save this questionnary. Please try again in a few seconds
 <script type="text/javascript">
 {% block scriptextra %}
 
+this_mode = QsType.ADD;
+
 $('#li_workspace').addClass("active");
-
-function next_questionset(id_questionset)
-{
-
-  var next = false;
-  $('.questionset').each(function(i, obj) {
-
-    if (next==true)
-    {
-      questionsets_handle(obj);
-      next = false;
-
-  }
-    if (obj.id==id_questionset.id)
-    {
-      next = true; 
-    }
-      
-  }
-
-  );
-
-}
-
-function questionsets_handle(id_questionset)
-{
-    if (!e) var e = window.event;
-
-    console.log(e);
-
-    var idString = id_questionset.id
-    var id = idString.split('_');
-
-    $('#active_qs').val(id_questionset.id);
-    $('#active_qs_sortid').val(id[1]);
-
-      // First we get the previous form
-      var previous_id = $('.questionset:not(.hide)').first().attr('id').split('_')[1];
-      var current_form = $('#qform'+previous_id);
-
-
-      if (!(typeof errornavigator === 'undefined')) {
-      errornavigator.hideErrorPage();
-      $("#loading-message").fadeOut('fast');
-      $("#loading-error-message").fadeOut('fast');
-      errornavigator.reset();
-
-      var list_invalid = advValidator.validateFormContext(e, current_form);
-      //console.log(list_invalid);
-
-
-      if(list_invalid.length == 0){
-
-        if(formHasChanged){
-          // If its not the first or last
-          if(current_form.length != 0 && id[1] != '0' && id[1] != '99'){
-
-            // Save this questionset using an ajax post
-            var posting = $.post(current_form.attr("action"), current_form.serialize());
-
-            $("#loading-message").fadeIn('fast');
-
-            posting.done(function(data) {
-              $("#loading-message").fadeOut('fast');
-              formHasChanged = false;   
-
-            });
-            posting.fail(function(data){
-              $("#loading-message").fadeOut('fast');
-
-              $("#loading-error-message").fadeIn('fast');
-               
-            });
-          }
-        }
-        $('.questionset').each(function(i, obj) {
-
-          if (obj.id==id_questionset.id)
-          {
-
-             $('#'+obj.id).addClass("show");
-             $('#li_'+id_questionset.id).addClass("active");
-             $('#'+obj.id).removeClass("hide");
-
-             if($('#'+obj.id).find('.loadingindicator').length != 0){
-              loadqspart("{{fingerprint_id}}", "{{q_id}}",obj.id.replace("qs_",""));
-              console.log("Loading to dom");
-             } else {
-               console.log("Already on dom");
-             }
-             advValidator.reload();
-          }
-          else {
-
-            $('#li_'+obj.id).removeClass("active");
-            $('#'+obj.id).addClass("hide");
-            $('#'+obj.id).removeClass("show");
-          }
-          
-        }
-
-        );
-        document.body.scrollTop = document.documentElement.scrollTop = 0; 
-
-        list_invalid = []; 
-
-      } else {
-        console.log("Jump to errors and show error navigator.");
-
-          for(var i = 0;i<list_invalid.length;i++){
-            errornavigator.addError('qc_'+list_invalid[i]);
-          }
-          errornavigator.showErrorPager();
-
-          // jump to first problem
-          errornavigator.nextError();
-
-        }
-
-
-
-
-      }
-};
 
 function generateStub(){
           var containers = [];
@@ -284,21 +165,9 @@ function generateStub(){
 
         $('#set_container').append(containers.join(''));
 }
-function loadqspart(fid, pk, sortid){
-    
-    //console.log("getting part from searchqs/"+pk+"/"+sortid+"/");
-        $.get( "addqs/"+fid+"/"+pk+"/"+sortid+"/", function( data ) {
-          $( "#qs_"+sortid ).html( data );
-        });
-}
-var errornavigator;
-$(function(){
-  generateStub();
-  $('.reqfield').tooltip({container: 'body'});
-  errornavigator = $('#errornavigator').errornavigator();
 
-  loadqspart("{{fingerprint_id}}","{{q_id}}","{{questionset.sortid}}");
-  initialCounterSetup();
+$(function(){
+  initQsEnv("{{fingerprint_id}}","{{q_id}}","{{questionset.sortid}}", QsType.ADD);
 });
 
 function initialCounterSetup(){ 
@@ -307,27 +176,6 @@ function initialCounterSetup(){
 
   {% endfor %}
 }
-    function collapseAll(element, div_id){
-        if (element.text().indexOf('Collapse') !== -1) {
-           console.log('Collapse all');
-           element.text('Expand all');
-           if (!element.hasClass('disabled')){
-            element.parents().find('#'+div_id +' .collapse').each(function(index){
-                $(this).addClass('in');
-                $(this).collapse('hide');
-            });
-           }
-       } else {
-           console.log('Expand all');
-            element.text('Collapse all');
-           if (!element.hasClass('disabled')){
-            element.parents().find('#'+div_id +' .collapse').each(function(index){
-                $(this).removeClass('in');
-                $(this).collapse('show');
-            });
-           }
-       }
-    };
 {% endblock %}
 
 </script>

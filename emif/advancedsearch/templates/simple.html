@@ -1,0 +1,63 @@
+<div class="pull-left"><h3>Free Text Search History</h3></div>
+<div style="margin-top: 20px" class="pull-right"><a class="btn" href="advsearch/history/remove_all_simple">Remove All Queries</a></div>
+
+<table class="table table-bordered table-striped">
+<thead>
+    <tr>
+        <th>
+            Query
+        </th>
+        <th style="width:140px;">Date</th>
+        <th style="width:158px;">Manage</th>
+    </tr>
+</thead>
+<tbody>
+{% if queries_simple|length > 0 %}
+    {% for query in queries_simple %}
+        <tr>
+            <td>
+                {{query.query}}
+            </td>
+            <td>{{query.created_date|date:"Y-m-d H:i:s"}}</td>
+            <td>
+            <a href="advsearch/results_simple/{{query.id}}" class="btn btn-info">Results</a>
+            <a class="btn" href="advsearch/history/remove_simple/{{query.id}}">Remove</a>
+            </td>
+        </tr>
+    {% endfor %}
+{%else %}
+    <tr>
+        <td colspan="4"> <center>There's no Free Text Search History, searches you conduct will appear here.</center></td>
+    </tr>
+{% endif %}
+</tbody>
+</table>
+<div style="font-size: 80%;" class="pull-left">Showing page {{ queries_simple.number }} of {{ queries_simple.paginator.num_pages }}</div>
+<div style="text-align: center" class="pagination">
+  <ul>
+        {% if queries_simple.has_previous %}
+           <li> <a href="advsearch/history/0/{{ queries_simple.previous_page_number }}">« Previous Page</a></li>
+        {% endif %}
+        {% if queries_simple.has_next %}
+            <li><a href="advsearch/history/0/{{ queries_simple.next_page_number }}">Next Page »</a></li>
+        {% endif %}
+  </ul>
+</div>
+<form id="send2" method="POST" > 
+<div style="font-size: 80%; margin-top: -65px;" class="pull-right">Show <select style="width: 50px; margin-top: 10px;" id="paginator_rows" name="paginator_rows" class="span1 paginator-page-selector" >
+  <option value="5" {% if page_rows == 5 %}selected{% endif %}>5</option>
+  <option value="10" {% if page_rows == 10 %}selected{% endif %}>10</option>
+  <option value="25" {% if page_rows == 25 %}selected{% endif %}>25</option>
+  <option value="50" {% if page_rows == 50 %}selected{% endif %}>50</option>
+  <option value="99999" {% if page_rows > 50 %}selected{% endif %}>All</option>
+</select>&nbsp; per page</div>
+{% csrf_token %}
+</form>
+<script type="text/javascript">
+    $(function(){
+        $('#page_rows').change(function(){
+            console.log('submit')
+            $('#send2').submit();
+        });
+    });
+</script>
