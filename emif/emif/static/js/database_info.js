@@ -320,7 +320,7 @@ function addTooltip(table_id) {
             $(this).removeAttr("title");
         });
     } else {
-        
+
         /* I decided to change this as this is was a very intensive process, 
             I instead tagged them, and add to the class the instance, this way i only have on instance per, table
             declaring a tooltip instance every td...*/
@@ -344,4 +344,38 @@ function isSafari() {
         return true;
     }
     return false;
+}
+
+function initializeQset(sortid) {
+    var erec = new EmailRecognizer("#qs_"+sortid+" td");
+    var results = erec.match();
+    if (results > 0)
+        erec.applyMasks();
+
+    var lrec = new LinkRecognizer("#qs_"+sortid+" td.captioned_content");
+    var results = lrec.match();
+    if (results > 0)
+        lrec.applyMasks();
+
+    addTooltip('#t2_'+sortid);
+    $('.captioned_content .summary_content', $('#t2_'+sortid)).expander({
+        slicePoint: 68,
+        expandText: 'more',
+        userCollapseText: 'less'
+    });
+    // Add highlighting
+    /*{% if request.session.query and not isAdvanced %}
+
+            {% for word in request.session.query|whitespacesplit %}
+                $('#set_container, .tooltip').highlight('{{word}}');
+            {% endfor %}
+        {% endif %}*/
+    /*$('.comment_button', '#t2_{{qs.sortid}}').click(function(){
+        $(this).parent().find('.comment_text').toggle('fast');
+      });*/
+    $('.comment_button', '#t2_'+sortid).popover({
+        trigger: 'hover',
+        html: true,
+        template: '<div class="popover popover-medium"><div class="arrow"></div><div class="popover-inner"><h3 class="popover-title"></h3><div class="popover-content"><p></p></div></div></div>'
+    });
 }
