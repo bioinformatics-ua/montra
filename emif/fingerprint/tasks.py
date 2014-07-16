@@ -26,12 +26,12 @@ import time
 
 from searchengine.search_indexes import CoreEngine
 
-from fingerprint.models import Fingerprint, FingerprintReturned
+from fingerprint.models import Fingerprint, FingerprintReturnedSimple, FingerprintReturnedAdvanced
 
 from django.contrib.auth.models import User
 
 @shared_task
-def anotateshowonresults(query_filtered, user):
+def anotateshowonresults(query_filtered, user, isadvanced, query_reference):
     # Operations
     print "start annotating database appearing on results"
 
@@ -44,12 +44,17 @@ def anotateshowonresults(query_filtered, user):
             try:
                 fp = Fingerprint.objects.get(fingerprint_hash=fingerprint_id)
                 print "processing "+str(fp)
-                fingerprintreturn = FingerprintReturned(fingerprint=fp, searcher=user)
-                fingerprintreturn.save()
-                
+
+                if isadvanced:
+                    fingerprintreturn = FingerprintReturnedAdvanced(fingerprint=fp, searcher=user, query_reference=query_reference)
+                    fingerprintreturn.save()
+                else:
+                    fingerprintreturn = FingerprintReturnedSimple(fingerprint=fp, searcher=user, query_reference=query_reference)
+                    fingerprintreturn.save()
+
             except Fingerprint.DoesNotExist:
                 print fingerprint_id + ' doesnt exist on db'
         
     print "ends annotation of databases appearing on results"
-    return fingerprint_id
+    return 0
 

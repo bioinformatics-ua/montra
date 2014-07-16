@@ -151,7 +151,7 @@ def results_comp(request, template_name='results_comp.html'):
                                            'results': list_qsets, 'database_to_compare': first_name})
 
 
-def results_fulltext(request, page=1, full_text=True,template_name='results.html', isAdvanced=False):
+def results_fulltext(request, page=1, full_text=True,template_name='results.html', isAdvanced=False, query_reference=None):
     query = ""
     in_post = True
     try:
@@ -167,10 +167,10 @@ def results_fulltext(request, page=1, full_text=True,template_name='results.html
         query = "text_t:"+escapeSolrArg(query)
         print query
 
-    return results_fulltext_aux(request, query, page, template_name, isAdvanced)
+    return results_fulltext_aux(request, query, page, template_name, isAdvanced=isAdvanced, query_reference=query_reference)
 
 
-def results_fulltext_aux(request, query, page=1, template_name='results.html', isAdvanced=False, force=False):
+def results_fulltext_aux(request, query, page=1, template_name='results.html', isAdvanced=False, force=False, query_reference=None):
     
     rows = define_rows(request)
     if request.POST and "page" in request.POST and not force:
@@ -217,9 +217,9 @@ def results_fulltext_aux(request, query, page=1, template_name='results.html', i
     list_databases = paginator_process_list(list_databases, hits, range)   
 
     # only execute if this if we are not posting back, we dont want to do this on changing page or applying filters
-    if request.POST.get('page') == None: 
+    if request.POST.get('page') == None and query_reference != None: 
         # anotate the databases appearing on results
-        anotateshowonresults.delay(query_filtered, request.user)
+        anotateshowonresults.delay(query_filtered, request.user, isAdvanced, query_reference)
 
     myPaginator = Paginator(list_databases, rows)
     try:
@@ -254,37 +254,7 @@ def store_query(user_request, query_executed):
 
     query.save()
 
-    # Verify if the query already exists in that user 
-    # user_aux = None
-    # if user_request.user.is_authenticated():
-
-    #     user_aux = user_request.user
-
-    #     results_tmp = QueryLog.objects.filter(query=query_executed, user=user_aux)
-
-    # else:
-    #     results_tmp = QueryLog.objects.filter(query=query_executed, user__isnull=True)
-    # query = None
-    
-    # if (results_tmp.exists()):
-    #     # If the user exists, then update the Query 
-    #     query = results_tmp[0]
-    # else:
-    #     # Create a query 
-    #     query = QueryLog()
-    #     if user_request.user.is_authenticated():
-    #         query.user = user_request.user
-    #     else:
-    #         query.user = None
-    #     query.query = query_executed
-    #     print "dmn"
-    # if query != None:
-    #     if user_request.user.is_authenticated():
-    #         query.user = user_request.user
-    #     else:
-    #         query.user = None
-    #     query.query = query_executed
-    #     query.save()
+    return query
 
 
 def results_diff(request, page=1, template_name='results_diff.html'):
@@ -353,33 +323,6 @@ def results_diff(request, page=1, template_name='results_diff.html'):
 
                 this_query_hash = hashlib.sha1(qserialization).hexdigest()
 
-                # we check if this query was already made before
-                # try:
-                #     # in case the query exists we just get the reference, we use a hash since the serialized query can get too big
-
-                #     this_query = AdvancedQuery.objects.get(user=this_user, serialized_query_hash=this_query_hash, qid=qid)  
-                    
-                #     this_query.removed = False
-
-                #     this_query.save()
-
-                #     print "This query is already on historic, just updating use time..."
-
-                #     try:
-                #         advrep = AdvancedQueryAnswer.objects.get(refquery=this_query, question="boolrelwidget-boolean-representation")
-
-                #         advrep.answer = qexpression
-
-                #         advrep.save()
-                    
-                #     except AdvancedQueryAnswer.DoesNotExist:
-                #         advrep = AdvancedQueryAnswer(refquery=this_query, question="boolrelwidget-boolean-representation", answer=qexpression)
-
-                #         advrep.save()
-
-                #     this_query.save()
-                # except AdvancedQuery.DoesNotExist:
-                    # otherwise, we create it
                 print "This query is new, adding it and answers to it..."
                 
                 quest = None
@@ -408,16 +351,17 @@ def results_diff(request, page=1, template_name='results_diff.html'):
                 return HttpResponse("Invalid username")
 
             
-            return results_fulltext_aux(request, query, isAdvanced=True) 
+            return results_fulltext_aux(request, query, isAdvanced=True, query_reference=this_query) 
      
     query = ""
+    simple_query=None
     in_post = True
     try:
         query = request.POST['query']
 
         # must save only on post, and without the escaping so it doesnt encadeate escapes on queries remade
         if query != "" and request.POST.get('page') == None: 
-            store_query(request, query)
+            simple_query = store_query(request, query)
 
         query = '"'+escapeSolrArg(query)+'"'
 
@@ -444,12 +388,12 @@ def results_diff(request, page=1, template_name='results_diff.html'):
             print "try to get in session"
             search_full = request.session.get('search_full', "")
         if search_full == "search_full":
-            return results_fulltext(request, page, full_text=True, isAdvanced=request.session['isAdvanced'])
+            return results_fulltext(request, page, full_text=True, isAdvanced=request.session['isAdvanced'], query_reference=simple_query)
     except:
         raise
     #print "Printing the qexpression"
     #print request.POST['qexpression']
-    return results_fulltext(request, page, full_text=False, isAdvanced=request.session['isAdvanced'])
+    return results_fulltext(request, page, full_text=False, isAdvanced=request.session['isAdvanced'], query_reference=simple_query)
 
 def geo(request, template_name='geo.html'):
 

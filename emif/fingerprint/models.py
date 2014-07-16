@@ -27,7 +27,6 @@ from django.core.validators import MaxLengthValidator
 from questionnaire.models import *
 from django.contrib.auth.models import User
 
-
 from description import fingerprint_description_slugs
 
 class Fingerprint(models.Model):
@@ -132,10 +131,17 @@ class AnswerChange(models.Model):
 
 ''' The idea is showing the number of times the db is returned over time
 '''
-class FingerprintReturned(models.Model):
+class FingerprintReturnedSimple(models.Model):
     fingerprint = models.ForeignKey(Fingerprint)
     searcher    = models.ForeignKey(User)
     date        = models.DateTimeField(auto_now_add=True)
+    query_reference = models.ForeignKey('emif.QueryLog')
+
+class FingerprintReturnedAdvanced(models.Model):
+    fingerprint = models.ForeignKey(Fingerprint)
+    searcher    = models.ForeignKey(User)
+    date        = models.DateTimeField(auto_now_add=True)
+    query_reference = models.ForeignKey('emif.AdvancedQuery')
 
 """
 This class wraps the Description of the Fingerprint.
