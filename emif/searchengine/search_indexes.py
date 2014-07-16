@@ -65,7 +65,7 @@ class CoreEngine:
     CONNECTION_TIMEOUT_DEFAULT = 10
     def __init__(self, timeout=CONNECTION_TIMEOUT_DEFAULT):
         # Setup a Solr instance. The timeout is optional.
-        self.solr = pysolr.Solr('http://' +settings.SOLR_HOST+ ':'+ settings.SOLR_PORT+'/solr', timeout=timeout)
+        self.solr = pysolr.Solr('http://' +settings.SOLR_HOST+ ':'+ settings.SOLR_PORT+settings.SOLR_PATH, timeout=timeout)
 
 
 

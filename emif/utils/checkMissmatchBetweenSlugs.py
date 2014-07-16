@@ -7,6 +7,8 @@ import re
 import pysolr
 import csv
 
+from django.conf import settings
+
 BLACKLIST = ["If_yes_:_repeated_measurements",
 	"If_yes_:_repeated_measurements",
 	"comment_question_How_would_you_characterize_your_database",
@@ -28,11 +30,7 @@ def search_in_table(t, value, field="slug1"):
 			return r
 	return None
 
-host1 = "localhost"
-port1 = str(8983)
-
-
-solr = pysolr.Solr('http://' +host1+ ':'+ port1+'/solr')
+solr = pysolr.Solr('http://' + settings.SOLR_HOST+ ':'+ settings.SOLR_PORT+settings.SOLR_PATH)
 start=0
 rows=100000000
 fl='*_t, id'
