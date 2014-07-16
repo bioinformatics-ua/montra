@@ -80,6 +80,8 @@ import hashlib
 
 from emif.utils import escapeSolrArg
 
+from fingerprint.tasks import anotateshowonresults
+
 def list_questions():
     print "list_questions"
     objs = Questionnaire.objects.all()
@@ -214,6 +216,11 @@ def results_fulltext_aux(request, query, page=1, template_name='results.html', i
     
     list_databases = paginator_process_list(list_databases, hits, range)   
 
+    # only execute if this if we are not posting back, we dont want to do this on changing page or applying filters
+    if request.POST.get('page') == None: 
+        # anotate the databases appearing on results
+        anotateshowonresults.delay(query_filtered, request.user)
+
     myPaginator = Paginator(list_databases, rows)
     try:
         pager =  myPaginator.page(page)
@@ -221,7 +228,8 @@ def results_fulltext_aux(request, query, page=1, template_name='results.html', i
         pager =  myPaginator.page(page)
 
     query_old = request.session.get('query', "")
-        
+     
+
     if isAdvanced == True:
         return render(request, template_name, {'request': request,
                                            'num_results': hits, 'page_obj': pager, 'page_rows': rows, 'isSearch': True,
@@ -408,7 +416,7 @@ def results_diff(request, page=1, template_name='results_diff.html'):
         query = request.POST['query']
 
         # must save only on post, and without the escaping so it doesnt encadeate escapes on queries remade
-        if query != "":
+        if query != "" and request.POST.get('page') == None: 
             store_query(request, query)
 
         query = '"'+escapeSolrArg(query)+'"'

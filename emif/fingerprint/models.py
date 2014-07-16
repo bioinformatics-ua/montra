@@ -130,6 +130,13 @@ class AnswerChange(models.Model):
     old_comment   = models.TextField(null=True)
     new_comment   = models.TextField(null=True)
 
+''' The idea is showing the number of times the db is returned over time
+'''
+class FingerprintReturned(models.Model):
+    fingerprint = models.ForeignKey(Fingerprint)
+    searcher    = models.ForeignKey(User)
+    date        = models.DateTimeField(auto_now_add=True)
+
 """
 This class wraps the Description of the Fingerprint.
 It will be used to list fingerprints, for instance.
