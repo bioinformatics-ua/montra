@@ -1,11 +1,11 @@
+from django.conf import settings
+
 import pysolr
 import pickle
 import sys
 import json
 
 #Local
-host1 = "localhost"
-port1 = str(8983)
 
 #DEV
 #host1 = "biodatacenter.ieeta.pt"
@@ -14,7 +14,7 @@ port1 = str(8983)
 
 def main(f_id, file_path):
 
-    solr = pysolr.Solr('http://' +host1+ ':'+ port1+'/solr')
+    solr = pysolr.Solr('http://' + settings.SOLR_HOST+ ':'+ settings.SOLR_PORT+settings.SOLR_PATH)
     start=0
     rows=10000
     fl=''

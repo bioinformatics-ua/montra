@@ -77,7 +77,7 @@
     {% if search_old %}
     {% breadcrumb "Search" "resultsdiff/1" %} 
     {% breadcrumb breadcrumb_name "databases" %} 
-    {% elif style == '1' %} 
+    {% elif request.session.list_origin == 'personal' %} 
     {% breadcrumb "Personal" "databases" %} 
     {% breadcrumb breadcrumb_name|ellipsis:40 "databases" %} 
     {% else %} 

@@ -251,7 +251,8 @@ $(function(){
   initializePaginatorSorter('{{sort_params.base_filter}}', '{{sort_params.selected_name}}', '{{sort_params.selected_value}}', '{{sort_params.extraObjects|safe}}');
   
 {% endif %}
-  setRefineEvent({% if isAdvanced %} true {% else %} false {% endif %});  
+
+  setRefineEvent({% if isAdvanced %} true, '{{request.session.query_type}}', '{{request.session.query_id}}' {% else %} false, null, null {% endif %});  
 
  {% if isAdvanced %}
     setBooleanPlugin('{{request.session.serialization_query}}', '{{request.session.query_type}}', '{{request.session.query_id}}');

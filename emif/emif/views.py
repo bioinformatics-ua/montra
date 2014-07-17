@@ -1439,18 +1439,18 @@ def query_solr(request, page=1):
 
     (sortString, filterString, sort_params, range) = paginator_process_params(request.POST, page, rows)    
         
-    print filterString
+    #print filterString
 
     if len(filterString) > 0:
         _filter += " AND " + filterString
 
-    print _filter
+    #print _filter
 
     (list_databases,hits) = get_databases_from_solr_v2(request, _filter, sort=sortString, rows=rows, start=range)
 
-    print "Range: "+str(range)
-    print "hits: "+str(hits)
-    print "len: "+str(len(list_databases))
+    #print "Range: "+str(range)
+    #print "hits: "+str(hits)
+    #print "len: "+str(len(list_databases))
 
     list_databases = paginator_process_list(list_databases, hits, range) 
 
@@ -1466,9 +1466,6 @@ def query_solr(request, page=1):
 
     return HttpResponse(json.dumps(ret), mimetype='application/json')
 
-
-
-
 def databases(request, page=1, template_name='results.html', force=False):
 
      #first lets clean the query session log
@@ -1482,6 +1479,8 @@ def databases(request, page=1, template_name='results.html', force=False):
         del request.session['query_id']
     if 'query_type' in request.session:
         del request.session['query_type']
+
+    request.session['list_origin'] = 'personal'
         
     # Get the list of databases for a specific user
     user = request.user
@@ -1639,45 +1638,6 @@ def paginator_process_list(list_databases, hits, start):
 
     return nList
 
-# def databases(request, page=1, template_name='databases.html'):
-#     #first lets clean the query session log
-#     if 'query' in request.session:
-#         del request.session['query']
-        
-#     if 'isAdvanced' in request.session:
-#         del request.session['isAdvanced'] 
-    
-#     if 'query_id' in request.session:
-#         del request.session['query_id']
-#     if 'query_type' in request.session:
-#         del request.session['query_type']
-        
-#     # Get the list of databases for a specific user
-
-#     user = request.user
-#     #list_databases = get_databases_from_db(request)
-#     _filter = "user_t:" + '"' + user.username + '"'
-#     if user.is_superuser:
-#         _filter = "user_t:*" 
-#     list_databases = get_databases_from_solr(request, _filter)
-
-
-#     ## Paginator ##
-#     rows = 5
-#     myPaginator = Paginator(list_databases, rows)
-#     try:
-#         pager =  myPaginator.page(page)
-#     except PageNotAnInteger, e:
-#         pager =  myPaginator.page(1)
-#     ## End Paginator ##
-
-#     return render(request, template_name, {'request': request, 'export_my_answers': True,
-#                                            'list_databases': list_databases, 'breadcrumb': True, 'collapseall': False,
-#                                            'page_obj': pager,
-#                                            'api_token': True, 
-#                                            'owner_fingerprint': False,
-#                                            'add_databases': True})
-
 def define_rows(request):
     if request.POST and "page_rows" in request.POST:
         rows = int(request.POST["page_rows"])
@@ -1722,6 +1682,8 @@ def all_databases_user(request, page=1, template_name='results.html', force=Fals
     except:
         pass
     
+    request.session['list_origin'] = 'all'
+
     emifprofile = request.user.get_profile()
     interests = emifprofile.interests.all()
 
@@ -1767,45 +1729,6 @@ def all_databases_user(request, page=1, template_name='results.html', force=Fals
                                             'page_obj': pager, "page_rows": rows,
                                             'alldatabases': True,
                                             'add_databases': True, "sort_params": sort_params, "page":page})
-
-def all_databases(request, page=1, template_name='alldatabases.html'):
-    print "FUUUUUUUUUUUU"
-    # lets clear the geolocation session search filter (if any)
-    try:
-        del request.session['query']
-        del request.session['isAdvanced']   
-        del request.session['query_id']
-        del request.session['query_type']
-    except:
-        pass
-    
-    #list_databases = get_databases_from_db(request)
-    list_databases = get_databases_from_solr(request, "*:*")
-
-    ## Paginator ##
-    print "TIAGO"
-    print request.POST
-    if request.POST:
-        rows = request.POST["page_rows"]
-        print "ROWWWWWS" + str(rows)
-    else:
-        rows = 5
-    myPaginator = Paginator(list_databases, rows)
-    try:
-        pager =  myPaginator.page(page)
-    except PageNotAnInteger, e:
-        pager =  myPaginator.page(1)
-    ## End Paginator ##
-    
-    return render(request, template_name, {'request': request, 'export_all_answers': True, 'data_table': True,
-                                           'list_databases': list_databases,
-                                            'breadcrumb': True, 'collapseall': False, 
-                                            'alldatabases': True,
-                                            'geo': True,
-                                            'page_obj': pager,
-                                            'page_rows': rows,
-                                            'add_databases': False,
-                                            'hide_add': True})
 
 def qs_data_table(request, template_name='qs_data_table.html'):
     db_type = int(request.POST.get("db_type"))

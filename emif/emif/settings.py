@@ -55,6 +55,7 @@ ADMINS = (
 
 SOLR_HOST = "localhost"
 SOLR_PORT = "8983"
+SOLR_PATH = "/solr"
 
 TEMPLATE_CONTEXT_PROCESSORS = (
     "django.contrib.auth.context_processors.auth",

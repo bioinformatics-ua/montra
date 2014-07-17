@@ -1,13 +1,13 @@
+from django.conf import settings
+
 import pysolr
 import sys
 import pickle
 import time
 from cStringIO import StringIO
 
-host1 = "localhost"
-port1 = str(8983)
 
-solr = pysolr.Solr('http://' +host1+ ':'+ port1+'/solr')
+solr = pysolr.Solr('http://' + settings.SOLR_HOST+ ':'+ settings.SOLR_PORT+settings.SOLR_PATH)
 ticks = time.time()
 fileAddr = "/tmp/solr-backup-"+str(ticks)+".pkl"
 

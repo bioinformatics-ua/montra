@@ -1,12 +1,9 @@
 
-
+from django.conf import settings
 
 import pysolr
 
-host1 = "localhost"
-port1 = str(8983)
-
-solr = pysolr.Solr('http://' +host1+ ':'+ port1+'/solr')
+solr = pysolr.Solr('http://' + settings.SOLR_HOST+ ':'+ settings.SOLR_PORT+settings.SOLR_PATH)
 start=0
 rows=100
 fl=''

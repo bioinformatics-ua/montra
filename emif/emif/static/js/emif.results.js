@@ -36,10 +36,10 @@ function initializePaginatorSorter(base_filter, selected_name, selected_value, e
     
 
 }
-function setRefineEvent(is_advanced){
+function setRefineEvent(is_advanced, query_type, query_id){
       $("#refine_search_btn").click( function(){
       if(is_advanced)
-        window.location.replace($('#base_link').prop('href')+"advancedSearch/{{request.session.query_type}}/1/{{request.session.query_id}}");
+        window.location.replace($('#base_link').prop('href')+"advancedSearch/"+query_type+"/1/"+query_id);
       else
         $("input[name=query]").focus();
 
