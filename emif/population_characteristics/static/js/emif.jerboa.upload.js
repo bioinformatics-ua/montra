@@ -34,10 +34,11 @@ $(document).ready(
           dataType: "json",
           url: "population/jerboafiles/"+getFingerprintID_new()+"/",
           async: false,
-          data: result,
+          data: { publickey: global_public_key, result: result },
+          type: "POST",
+
           success: function (data){result=data;}
         });
-        console.log(result);
         result.conf.forEach(function(d){
             var context = $('<tr>').appendTo('#jerboafiles');
             var node = $('<td/>')

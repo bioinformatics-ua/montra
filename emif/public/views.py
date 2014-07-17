@@ -99,7 +99,7 @@ def fingerprint(request, fingerprintshare_id, template_name='fingerprint_summary
 
         fingerprintshare.save()
 
-        return document_form_view(request, fingerprintshare.fingerprint.fingerprint_hash, 1, readOnly=True)
+        return document_form_view(request, fingerprintshare.fingerprint.fingerprint_hash, 1, readOnly=True, public_key=fingerprintshare)
     
     except PublicFingerprintShare.DoesNotExist:
         print "Fingerprint with id "+str(fingerprintshare_id) + " does not exist."

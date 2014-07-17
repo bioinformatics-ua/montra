@@ -76,9 +76,10 @@ function fillList(admin){
 
         $.ajax({
           dataType: "json",
+          type: "POST",
           url: "docsmanager/docfiles/"+getFingerprintID_new()+"/",
           async: false,
-          data: result,
+          data: { publickey: global_public_key, result:result },
           success: function (data){result=data;},
         });
         console.log(result);
@@ -113,7 +114,8 @@ function requestFile(filename, revision){
     var df = $('#downloadfile');
     $('[name="filename"]').val(filename);
     $('[name="revision"]').val(revision);
-
+    $('[name="publickey"]').val(global_public_key);
+    $('[name="fingerprint"]').val(global_fingerprint_id);
     df.submit();
 }
 function deleteFile(filename, revision){

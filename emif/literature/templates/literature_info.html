@@ -82,7 +82,7 @@
     <script type="text/javascript">
         function loadPage(page_number){
             console.log("Loading literature, page "+page_number);
-                $.get( "literature/{{fingerprint_id}}/"+page_number, function( data ) {
+                $.post( "literature/{{fingerprint_id}}/"+page_number, { publickey: global_public_key }, function( data ) {
                     $( "#literature" ).html( data );
             });
         }

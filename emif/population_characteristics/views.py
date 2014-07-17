@@ -35,6 +35,8 @@ from django.http import *
 
 from dateutil.tz import tzutc
 
+from public.utils import hasFingerprintPermissions
+
 UTC = tzutc()
 
 def serialize_date(dt):
@@ -53,20 +55,25 @@ def serialize_date(dt):
 
 def jerboa_list_values(request, var, row, fingerprint_id, template_name='documents_upload_form.html'):
 
+    if not hasFingerprintPermissions(request, fingerprint_id):
+        return HttpResponse("Access forbidden",status=403)
+
     filters = []
 
     if request.POST:
         # Get the filters to apply.
 
         filters = {}
-        
         myRq = dict(request.POST.lists())
+
         for i in myRq:
-            filters[i[0:-2]] = myRq[i]
+            if i == 'publickey':
+                continue
+            filters[i[8:-3]] = myRq[i]
 
-            filters[i[0:-2]] = myRq[i]
+            filters[i[8:-3]] = myRq[i]
 
-        
+        print filters    
     
 
     pc = PopulationCharacteristic(None)
@@ -134,6 +141,9 @@ def comments(request, fingerprint_id=None, chart_id=None, comment_id=None):
 
 def filters(request, var, fingerprint_id, template_name='documents_upload_form.html'):
 
+    if not hasFingerprintPermissions(request, fingerprint_id):
+        return HttpResponse("Access forbidden",status=403)
+
     pc = PopulationCharacteristic(None)
     values = pc.filters(var, fingerprint_id)
     _values = []
@@ -154,7 +164,9 @@ def generic_filter(request, param, template_name='documents_upload_form.html'):
     return response
 
 def get_settings(request, runcode):
-    
+    if not hasFingerprintPermissions(request, runcode):
+        return HttpResponse("Access forbidden",status=403)
+
     if (runcode=="COMPARE"):
         return get_compare_settings(request)
     pc = PopulationCharacteristic(None)
@@ -166,6 +178,9 @@ def get_settings(request, runcode):
     return response
 
 def list_jerboa_files(request, fingerprint):
+
+    if not hasFingerprintPermissions(request, fingerprint):
+        return HttpResponse("Access forbidden",status=403)
 
     # List the Jerboa files for a particular fingerprint
     jerboa_files = Characteristic.objects.filter(fingerprint_id=fingerprint)

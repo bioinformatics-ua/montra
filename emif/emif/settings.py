@@ -449,6 +449,18 @@ LOGIN_EXEMPT_URLS = (
     r'^bootstrap_ie_compatibility',
     # public shares
     r'^public/fingerprint/(?P<fingerprint_id>[^/]+)',
+    r'^literature/(?P<fingerprint_id>[^/]+)/(?P<page>[0-9]+)$',
+    r'^literature/(?P<fingerprint_id>[^/]+)$',
+    r'^fingerprintqs/(?P<runcode>[^/]+)/(?P<qsid>[0-9]+)/$',
+    r'^population/jerboafiles/(?P<fingerprint_id>[^/]+)/$',
+    r'^population/jerboalistvalues/(?P<var>[^/]+)/(?P<row>[^/]+)/(?P<fingerprint_id>[^/]+)$',
+    r'^population/filters/(?P<var>[^/]+)/(?P<fingerprint_id>[^/]+)$',
+    r'^population/genericfilter/(?P<param>[^/]+)$',
+    r'^population/settings/(?P<runcode>[^/]+)/$',
+
+    r'^docsmanager/docfiles/(?P<fingerprint>[^/]+)/$',
+    r'^api/getfile',
+
 )
 
 #Pages that wont be logged into user history
