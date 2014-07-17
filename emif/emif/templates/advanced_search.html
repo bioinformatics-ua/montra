@@ -176,7 +176,7 @@ $( document ).ready(function(e) {
                     function(e) {
                      if(bool_container.isEmpty()){
                         e.preventDefault();
-                        alert("It's not possible to search without specifying parameters first.");
+                        bootbox.alert("It's not possible to search without specifying parameters first.");
                         return false;
                       }
 

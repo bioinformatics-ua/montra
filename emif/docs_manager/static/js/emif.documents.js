@@ -130,11 +130,11 @@ function deleteFile(filename, revision){
             fillList(isadmin);
 
         } else {
-            alert('It was impossible to delete the document.');
+            bootbox.alert('It was impossible to delete the document.');
         }
       })
       .fail(function() {
-        alert( "Error Deleting File" );
+        bootbox.alert( "Error Deleting File" );
       });
 }
 /********************************************************
