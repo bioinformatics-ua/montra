@@ -125,12 +125,14 @@
             <div style="margin-bottom: 50px;" class="tab-content">
                 <div class="tab-pane {%if activetab == 'summary'%}active{%endif%}" id="metadata">
                     <div>
+                        {% if owner_fingerprint or user.is_staff %}
                         <div class="pull-left">
                             <small>
                                 <strong>Hits: </strong>{{hits}} &nbsp;&nbsp;
                                 <strong>Unique Views: </strong> {% get_hit_count for fingerprint %}
                             </small>
                         </div>
+                        {% endif %}
                         <div class="pull-right btn-group">
                             <button style="display: none;" type="button" class="btn" id="show_hide_button">Hide Empty</button>
 
