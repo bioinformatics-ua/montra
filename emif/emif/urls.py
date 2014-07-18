@@ -181,6 +181,9 @@ urlpatterns = patterns('',
     # Public links URLs
     url(r'public/', include('public.urls')),
 
+    # Notifications URLs
+    url(r'notifications/', include('notifications.urls')),
+
     # Faq
     url('^faq/', include('fack.urls')),
 

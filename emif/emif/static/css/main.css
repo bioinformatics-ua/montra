@@ -758,8 +758,45 @@ height: 6em;
   text-decoration: none !important;
 }
 
-.summary_paginator {
+#notification_center{
+  width: 370px;
+  max-height: 400px;
+  overflow: hidden;
+  overflow-y: auto;
+}
+
+#notification_center hr, .notification_divider{
+  margin: 0px;
+}
+
+#notification_center .notification, .notification_header {
+  margin:5px;
+}
+.notification_origin{
+  font-size: 75%;
+
+}
+.notification_unread{
+  font-weight: bold;
+}
+
+.notification_options{
+  visibility: hidden;
   text-align: center;
+  width: 30px;
+}
+.notification_line:hover, .notification_detail:hover, .notification_delete:hover, .notification_read:hover{
+  cursor:pointer;
+}
+.notification_line:hover > .notification_options, .notification_options:hover{
+  visibility: initial;
+}.summary_paginator {
+  text-align: center;
+}
+.notification_line td{
+  text-overflow: initial;
+  overflow: initial;
+  white-space: initial;
 }
 .showing_publications_info{
   margin-bottom: -15px;

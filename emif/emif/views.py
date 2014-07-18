@@ -80,6 +80,8 @@ import hashlib
 
 from emif.utils import escapeSolrArg
 
+from notifications.models import Notification
+
 from fingerprint.tasks import anotateshowonresults
 
 def list_questions():
@@ -3144,6 +3146,11 @@ def sharedb(request, db_id, template_name="sharedb.html"):
         success_msg = "An invitation has been sent to your co-worker start collaboration in your database. If you need further assistance, please do not hesitate to contact EMIF Catalogue team."
 
     link_activation = settings.BASE_URL + "share/activation/"+share_pending.activation_code
+
+    new_notification = Notification(destiny=username_to_share ,origin=request.user, 
+        notification=(findName(fingerprint)+" has been shared with you, please click here to activate it."), type=Notification.SYSTEM, href=link_activation)
+
+    new_notification.save()
 
     emails_to_feedback = []
     print settings.ADMINS
