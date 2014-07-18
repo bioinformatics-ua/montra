@@ -78,7 +78,7 @@ from population_characteristics.models import Characteristic
 
 import time
 from django.utils import timezone
-
+from datetime import timedelta
 
 class JSONResponse(HttpResponse):
     """
@@ -665,6 +665,26 @@ class NotifyOwnerView(APIView):
                     else:
                         user_fullname = this_user.username
 
+                    
+                    # Dont add more notifications unless theres been no notification of this type in a hour
+                    notification_message = str(fingerprint_name)+" has new comments, please click here to see them."
+                    old_not = Notification.objects.filter(notification = notification_message, destiny=this_user, removed=False,
+                                                created_date__gt=(timezone.now()-timedelta(hours=1)))
+
+                    print "EXISTEM ANTIGAS ?"+str(len(old_not))
+
+                    if len(old_not) > 0:
+                        old_not[0].read_date=None
+                        old_not[0].read = False
+                        old_not[0].created_date = timezone.now()
+                        old_not[0].save()
+                    else:
+                        new_notification = Notification(destiny=this_user ,origin=request.user, 
+        notification=notification_message, 
+        type=Notification.SYSTEM, href="fingerprint/"+fingerprint_id+"/1/discussion/")
+
+                        new_notification.save()
+
                     send_custom_mail('Emif Catalogue: There\'s a new comment on one of your databases',
                      render_to_string('emails/new_db_comment.html', {
                             'fingerprint_id': fingerprint_id,
@@ -674,7 +694,7 @@ class NotifyOwnerView(APIView):
                             'base_url': settings.BASE_URL,
                             'user_commented': user_commented
                         }), 
-                     settings.DEFAULT_FROM_EMAIL, [owner]);
+                     settings.DEFAULT_FROM_EMAIL, [this_user.email]);
 
                     return Response({}, status=status.HTTP_200_OK)
 

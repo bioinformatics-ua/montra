@@ -3148,7 +3148,7 @@ def sharedb(request, db_id, template_name="sharedb.html"):
     link_activation = settings.BASE_URL + "share/activation/"+share_pending.activation_code
 
     new_notification = Notification(destiny=username_to_share ,origin=request.user, 
-        notification=(findName(fingerprint)+" has been shared with you by "+username_to_share.get_full_name()+"."), type=Notification.SYSTEM, href=link_activation)
+        notification=(findName(fingerprint)+" has been shared with you, please click here to activate it."), type=Notification.SYSTEM, href=link_activation)
 
     new_notification.save()
 

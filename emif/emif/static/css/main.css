@@ -793,6 +793,11 @@ height: 6em;
 }.summary_paginator {
   text-align: center;
 }
+.notification_line td{
+  text-overflow: initial;
+  overflow: initial;
+  white-space: initial;
+}
 .showing_publications_info{
   margin-bottom: -15px;
 }
