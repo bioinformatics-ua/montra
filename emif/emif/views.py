@@ -179,7 +179,7 @@ def results_fulltext_aux(request, query, page=1, template_name='results.html', i
     if page == None:
         page = 1
 
-    if query == "" or query.strip()=="text_t:*" :
+    if query == "" or query == "text_t:" or query.strip()=="text_t:*" :
         return render(request, "results.html", {'request': request, 'breadcrumb': True,  'isSearch': True,
                                                 'results': True, 'hide_add': True,
                                                 'num_results': 0, 'page_obj': None})

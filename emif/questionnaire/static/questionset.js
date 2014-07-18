@@ -346,6 +346,8 @@ function questionsets_handle(id_questionset, fingerprint_id, q_id, mode) {
     $('#active_qs').val(id_questionset);
     $('#active_qs_sortid').val(id[1]);
 
+    advValidator.reload();
+
     // First we get the previous form
     var previous_id = $('.questionset:not(.hide)').first().attr('id').split('_')[1];
     var current_form = $('#qform' + previous_id);

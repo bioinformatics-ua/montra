@@ -98,7 +98,7 @@ class UserStatistics(View):
                           
             d -= delta
 
-        return [session_times, average/30]
+        return [session_times[::-1], average/30]
 
     def getViewTimes(self, user_history):
 
@@ -123,7 +123,7 @@ class UserStatistics(View):
                           
             d -= delta
 
-        return [view_times, average/30]
+        return [view_times[::-1], average/30]
 
 admin.site.register_view('user_statistics', view=login_required(staff_member_required(UserStatistics.as_view())))
 
