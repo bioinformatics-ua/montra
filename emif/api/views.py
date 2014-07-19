@@ -334,7 +334,7 @@ class AddPublicLinkView(APIView):
         if request.user.is_authenticated():
             # first we get the email parameter
             fingerprint_id = request.POST.get('fingerprint_id', '')
-
+            description = request.POST.get('description', '')
 
             try:
                 fingerprint = Fingerprint.objects.get(fingerprint_hash=fingerprint_id)
@@ -345,7 +345,7 @@ class AddPublicLinkView(APIView):
                     share = PublicFingerprintShare.objects.get(fingerprint=fingerprint, user=request.user)
 
                 except PublicFingerprintShare.DoesNotExist:
-                    share = createFingerprintShare(fingerprint_id, request.user)
+                    share = createFingerprintShare(fingerprint_id, request.user, description=description)
 
                 return Response({
                                     'hash': str(share.hash),

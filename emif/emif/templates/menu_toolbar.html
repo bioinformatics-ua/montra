@@ -256,7 +256,10 @@ This is an invitation sent by {{request.user.first_name }} {{request.user.last_n
             </center>
           {% else %}
             There's no public link yet. Click below on "Create Public Link", to generate a public link for this
-            database.
+            database. Optionally, you can leave a decription for the public link below.
+            <div style="display: table-cell; padding: 5px;" class="controls">
+           <textarea rows="6" class="span5" style="margin-top:5px;" type="text" id="public_link_description" placeholder="Description for public link (optional)"></textarea>
+          </div>
           {% endif %}
         </div>
       </div>
@@ -423,8 +426,9 @@ function checkIfEmailExists(){
 
 function createPublicLink(){
   var fingerprint = "{{fingerprint_id}}";
+  var description = $('#public_link_description').val();
 
-  $.post("api/addpubliclink", { fingerprint_id: fingerprint })
+  $.post("api/addpubliclink", { fingerprint_id: fingerprint, description: description })
   .done(function(response) {
     if(response.id){
       console.log(response.id);

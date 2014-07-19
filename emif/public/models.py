@@ -26,6 +26,7 @@ class PublicFingerprintShare(models.Model):
     fingerprint = models.ForeignKey(Fingerprint)
     user = models.ForeignKey(User)
     hash = models.CharField(max_length=255, blank=False, null=False)
+    description = models.TextField(null=True)
     expiration_date = models.DateTimeField()
     remaining_views = models.IntegerField()
     def __str__(self):
