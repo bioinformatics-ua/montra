@@ -39,6 +39,7 @@ class Migration(DataMigration):
             for doc in documents:
                 old = None
                 try:
+                    del doc['_version_']
                     old = doc['If_yes_:_repeated_measurements__t']
                     del doc['If_yes_:_repeated_measurements__t']
                 except:
