@@ -58,7 +58,7 @@ def literature_database_info(request, fingerprint_id, page, template_name='liter
         #getListPublications(results.docs[0])
         publications = getListPublications(results.docs[0])
 
-    myPaginator = Paginator(publications, 2)
+    myPaginator = Paginator(publications, 10)
     try:
         pager =  myPaginator.page(page)
     except PageNotAnInteger, e:

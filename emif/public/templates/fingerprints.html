@@ -6,7 +6,7 @@
 {% block breadcrumbs %}
 
         {% breadcrumb "Databases" "home" %}
-        {% breadcrumb "My Public Links" "" %}
+        {% breadcrumb "My Private Links" "" %}
 
 {% endblock %}
     {% block toolbar %}
@@ -17,13 +17,13 @@
     {% if added %}
         <div style="margin-top: 50px;" class="alert alert-success">
         <a class="close" data-dismiss="alert" href="#">&times;</a>
-          Public link created successfully.
+          Private link created successfully.
         </div>
     {% endif %}
     {% if deleted %}
         <div style="margin-top: 50px;" class="alert alert-danger">
         <a class="close" data-dismiss="alert" href="#">&times;</a>
-          Public link deleted successfully.
+          Private link deleted successfully.
         </div>
     {% endif %}
     <table class="table table-bordered table-striped">
@@ -44,14 +44,14 @@
                     <td><center>{{link.share.expiration_date|date:"Y-m-d H:i:s"}}</center></td>
                     <td><center>{{link.share.remaining_views}}</center></td>
                     <td>{%if link.share.description %}{{link.share.description}}{% endif %}</td>
-                    <td><a class="pub_link" href="public/fingerprint/{{link.share.hash}}">Public Link</a><a class="pull-right" href="public/fingerprint/delete/{{link.share.id}}">
+                    <td><a class="pub_link" href="public/fingerprint/{{link.share.hash}}">Private Link</a><a class="pull-right" href="public/fingerprint/delete/{{link.share.id}}">
                         <img src="static/img/glyphicons_192_circle_remove.png" alt="Delete" />
 
                     </button></td>
                 </tr>
             {% endfor %}
         {% else %}
-            <tr><td colspan="4"><center>No database is currently shared publicly, you can share a database by using the "Create Public Link" dropdown on the menu toolbar above.</center></td></tr>
+            <tr><td colspan="4"><center>No database is currently shared, you can share a database by using the "Create Private Link" dropdown on the menu toolbar above.</center></td></tr>
         {% endif %}
         </tbody>
     </table>

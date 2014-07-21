@@ -157,8 +157,16 @@ class Migration(DataMigration):
                         if question == None:
                             print "EMPTY KEY ON:"+key   
 
-                        ans = Answer(question=question, data=data, comment=comment, fingerprint_id=fingerprint_id) 
-                        ans.save()     
+                        try:
+                            existing_answer = Answer.objects.get(question=question, fingerprint_id=fingerprint_id)
+                            
+                            existing_answer.data = data
+                            existing_answer.comment = comment
+                            existing_answer.save()
+
+                        except Answer.DoesNotExist:
+                            ans = Answer(question=question, data=data, comment=comment, fingerprint_id=fingerprint_id) 
+                            ans.save()     
             print "---------------------------------------- "          
             print " "
         

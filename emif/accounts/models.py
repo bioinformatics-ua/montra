@@ -41,7 +41,7 @@ class EmifProfile(UserenaBaseProfile):
 
     paginator = models.IntegerField(max_length=2,
                                       choices=options,
-                                      default=5)
+                                      default=10)
 
 class NavigationHistory(models.Model):
   user = models.ForeignKey(User)

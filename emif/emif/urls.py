@@ -178,7 +178,7 @@ urlpatterns = patterns('',
     # AdvancedSearch URLs
     url(r'advsearch/', include('advancedsearch.urls')),
 
-    # Public links URLs
+    # Private links URLs
     url(r'public/', include('public.urls')),
 
     # Faq
