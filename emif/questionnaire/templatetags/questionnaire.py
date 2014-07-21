@@ -28,9 +28,17 @@ def spanclass(string):
 @register.filter(name="qtesturl")
 def qtesturl(question):
     qset = question.questionset
-    return reverse("questionset",
+
+    return "/admin/questionnaire/questionset/"+str(qset.id)+"/"
+
+    '''
+        This reverse stopped worked for some reason, we are keeping the url manually
+        but will have to take a look at this with more time at a later date.
+        
+    return reverse("admin:questionset",
         args=("test:%s" % qset.questionnaire.id,
          qset.sortid))
+    '''
 
 @register.filter(name="rangeleft")
 def rangeleft(value):

@@ -44,7 +44,7 @@
       {% if create_public and own_dbs|length > 0 %}
         <div class="btn-group">
         <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
-          Create Public Link
+          Create Private Link
           <span class="caret"></span>
         </a>
         <ul class="dropdown-menu">
@@ -138,7 +138,7 @@
       <li>
 
       <a class="publiclink" href="" id="publiclink_toolbar" onclick="return false;"> <i class="fa fa-share"></i>
-        Create Public Link
+        Create Private Link
       </a>
       </li>
       <li class="divider"></li>
@@ -241,22 +241,22 @@ This is an invitation sent by {{request.user.first_name }} {{request.user.last_n
 <div id="modal-from-dom-publiclink" class="modal hide fade" style="display:none"  >
     <div class="modal-header">
         <a href="#" onclick="$('#modal-from-dom-publiclink').modal('hide'); return false;" class="close">&times;</a>
-         <h3>Create a public link to share this Database</h3>
+         <h3>Create a private link to share this Database</h3>
     </div>
     <div class="modal-body">
-        <p>It's possible to publicly share your database through a public link.</p>
+        <p>It's possible to share your database through a private link.</p>
 
-        <legend>Public link <small><a class="pull-right" href="public/fingerprint">Manage Public Links</a></small></legend>
+        <legend>Private link <small><a class="pull-right" href="public/fingerprint">Manage Private Links</a></small></legend>
         <div class="publiclink_container">
           {% if public_link %}
-            Public link already exists! <br />
-            <center><h3><a href="public/fingerprint/{{public_link.hash}}">Click to open public link</a></h3>
+            Private link already exists! <br />
+            <center><h3><a href="public/fingerprint/{{public_link.hash}}">Click to open private link</a></h3>
 
-            <button onclick="deletePublicLink({{public_link.id}});" class="btn btn-link">Delete Public Link</button>
+            <button onclick="deletePublicLink({{public_link.id}});" class="btn btn-link">Delete Private Link</button>
             </center>
           {% else %}
-            There's no public link yet. Click below on "Create Public Link", to generate a public link for this
-            database. Optionally, you can leave a decription for the public link below.
+            There's no private link yet. Click below on "Create Private Link", to generate a private link for this
+            database. Optionally, you can leave a decription for the private link below.
             <div style="display: table-cell; padding: 5px;" class="controls">
            <textarea rows="6" class="span5" style="margin-top:5px;" type="text" id="public_link_description" placeholder="Description for public link (optional)"></textarea>
           </div>
@@ -264,7 +264,7 @@ This is an invitation sent by {{request.user.first_name }} {{request.user.last_n
         </div>
       </div>
     <div class="modal-footer">
-        <button id="createpubliclink" {% if public_link %} style="display: none;" {% endif %} class="btn">Create Public Link</button>
+        <button id="createpubliclink" {% if public_link %} style="display: none;" {% endif %} class="btn">Create Private Link</button>
 
         <a href="#" onclick="$('#modal-from-dom-publiclink').modal('hide'); return false;" class="btn btn-secondary">Cancel</a>
     </div>
