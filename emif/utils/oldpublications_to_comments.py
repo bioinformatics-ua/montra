@@ -54,7 +54,7 @@ def old_publications_to_comments():
                         this_answer.save()
 
                     # after save must reindex to update solr too
-                    indexFingerprint(this_fingerprint.fingerprint_hash)
+                    #indexFingerprint(this_fingerprint.fingerprint_hash)
 
 
                 except Fingerprint.DoesNotExist:
