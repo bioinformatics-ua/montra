@@ -246,25 +246,42 @@ This is an invitation sent by {{request.user.first_name }} {{request.user.last_n
     <div class="modal-body">
         <p>It's possible to share your database through a private link.</p>
 
-        <legend>Private link <small><a class="pull-right" href="public/fingerprint">Manage Private Links</a></small></legend>
+        <legend>Existing Private links <small><a class="pull-right" href="public/fingerprint">Manage Private Links</a></small></legend>
         <div class="publiclink_container">
-          {% if public_link %}
-            Private link already exists! <br />
-            <center><h3><a href="public/fingerprint/{{public_link.hash}}">Click to open private link</a></h3>
+            <table class="table table-bordered table-stripped">
+              <thead>
+                <tr>
+                  <th>Description</th>
+                  <th style="width: 150px;"></th>
+                </tr>
+              </thead>
+              <tbody id="public_links_table">
+                {% if public_link %}
+                  {% for link in public_link %}
+                    <tr id="publink_{{link.id}}">
+                      <td>{% if link.description %} {{link.description}} {% endif %}</td>
+                      <td><a href="public/fingerprint/{{link.hash}}">Private Link</a>
+                      <button onclick="deletePublicLink({{link.id}});" class="btn btn-link"><img src="static/img/glyphicons_192_circle_remove.png" alt="Delete" /></button>
+                      </td>
+                    </tr>
+                  {% endfor %}
+                {% else %}
+                  <tr id="no_fingerprint"><td colspan="2">
+                    There's no private link yet. Click below on "Create Private Link", to generate a private link for this database. Optionally, you can leave a decription for the private link below.
+                  </td></tr>
+                {% endif %}
 
-            <button onclick="deletePublicLink({{public_link.id}});" class="btn btn-link">Delete Private Link</button>
-            </center>
-          {% else %}
-            There's no private link yet. Click below on "Create Private Link", to generate a private link for this
-            database. Optionally, you can leave a decription for the private link below.
+              </tbody>
+            </table>
+            <legend>Create new Private Link </legend>
             <div style="display: table-cell; padding: 5px;" class="controls">
-           <textarea rows="6" class="span5" style="margin-top:5px;" type="text" id="public_link_description" placeholder="Description for public link (optional)"></textarea>
+           <textarea rows="4" class="span5" style="margin-top:5px;" type="text" id="public_link_description" placeholder="Description for public link (optional)"></textarea>
           </div>
-          {% endif %}
+          
         </div>
       </div>
     <div class="modal-footer">
-        <button id="createpubliclink" {% if public_link %} style="display: none;" {% endif %} class="btn">Create Private Link</button>
+        <button id="createpubliclink" class="btn">Create Private Link</button>
 
         <a href="#" onclick="$('#modal-from-dom-publiclink').modal('hide'); return false;" class="btn btn-secondary">Cancel</a>
     </div>
@@ -430,12 +447,12 @@ function createPublicLink(){
 
   $.post("api/addpubliclink", { fingerprint_id: fingerprint, description: description })
   .done(function(response) {
+
+    $('#no_fingerprint').remove();
+
     if(response.id){
-      console.log(response.id);
-      $(".publiclink_container").html('Public link already exists! <br /><center><h3><a href="public/fingerprint/'+response.hash+'">Click to open public link</a></h3><button onclick="deletePublicLink('+response.id+');" class="btn btn-link">Delete Public Link</a></center>');
-
-      $("#createpubliclink").hide();
-
+      console.log(response);
+      $('#public_links_table').prepend('<tr id="publink_'+response.id+'"><td>'+response.description+'</td><td><a href="public/fingerprint/'+response.hash+'">Private Link</a><button onclick="deletePublicLink('+response.id+');" class="btn btn-link"><img src="static/img/glyphicons_192_circle_remove.png" alt="Delete" /></button></td></tr>');
     } else {
       console.log('Error');
     }
@@ -450,15 +467,10 @@ function deletePublicLink(share_id){
   $.post("api/deletepubliclink", { share_id: share_id })
   .done(function(response) {
     if(response.deleted){
-      console.log(response.deleted);
-      $(".publiclink_container").text("There's no public link yet. Click below on \"Create Public Link\", to generate a public link for this database.");
-
-      $("#createpubliclink").show();
-
+      $('#publink_'+share_id).remove();
     } else {
       console.log('Error');
     }
-
   })
   .fail(function(){
     console.log('Failed creating public link');

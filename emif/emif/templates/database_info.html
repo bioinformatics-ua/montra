@@ -70,7 +70,7 @@
 {% block breadcrumbs %} 
 
 {% if readOnly %}
-    {% breadcrumb breadcrumb_name|ellipsis:40|add:" - Public View Link" "" %} 
+    {% breadcrumb breadcrumb_name|ellipsis:40|add:" - Private View Link" "" %} 
 {% else %}
 
     {{ block.super }} 

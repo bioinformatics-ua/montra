@@ -19,6 +19,11 @@ td {
     -o-text-overflow: ellipsis;
     -ms-text-overflow: ellipsis;
 }
+#public_links_table td {
+    white-space: initial;
+    overflow: initial;
+    text-overflow: initial;  
+}
 .tooltip.in {
     opacity: 0.8;
     filter: alpha(opacity=80);

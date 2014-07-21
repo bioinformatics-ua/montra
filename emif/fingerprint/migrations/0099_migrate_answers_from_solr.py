@@ -111,7 +111,7 @@ class Migration(DataMigration):
 
         for doc in documents:
 
-            ignorelist = ['id', 'type_t', '_version_', 'text_t', 'date_last_modification_t', 'user_t', 'created_t']
+            ignorelist = ['id', 'type_t', '_version_', 'text_t', 'date_last_modification_t', 'user_t', 'created_t', 'list_of_peer_reviewed_papers_based_on_your_data_ba_t']
             this_id = doc['id']
             
             print "-- Processing ---------------------- " + this_id + "\n"
