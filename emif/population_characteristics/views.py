@@ -167,7 +167,7 @@ def get_settings(request, runcode):
     if not hasFingerprintPermissions(request, runcode):
         return HttpResponse("Access forbidden",status=403)
 
-    if (runcode=="COMPARE"):
+    if (runcode=="COMPARE/"):
         return get_compare_settings(request)
     pc = PopulationCharacteristic(None)
     values = pc.get_settings()
