@@ -41,7 +41,7 @@
                         <tr>
                             <td>{{milestone.title}}</td>
                             <td>
-                                {{milestone.description|safe}} <br />
+                                {{milestone.description|safe|linebreaks}} <br />
                                 <div class="labels">
                                     <div class="pull-right">
                                     {% for label in milestone.iter_labels %}

@@ -339,17 +339,12 @@ class AddPublicLinkView(APIView):
             try:
                 fingerprint = Fingerprint.objects.get(fingerprint_hash=fingerprint_id)
 
-                # add only if necessary, try to get first...
-                share = None
-                try:
-                    share = PublicFingerprintShare.objects.get(fingerprint=fingerprint, user=request.user)
-
-                except PublicFingerprintShare.DoesNotExist:
-                    share = createFingerprintShare(fingerprint_id, request.user, description=description)
+                share = createFingerprintShare(fingerprint_id, request.user, description=description)
 
                 return Response({
                                     'hash': str(share.hash),
-                                    'id'  : share.id
+                                    'id'  : share.id,
+                                    'description': share.description
                                 }, status=status.HTTP_200_OK)
 
             except Fingerprint.DoesNotExist:

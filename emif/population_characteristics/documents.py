@@ -198,20 +198,14 @@ def document_form_view(request, runcode, qs, activetab='summary', readOnly=False
 
     # Find if user has public links for this db.
 
-    public_link = None
+    public_links = None
 
     print "owner ?"+str(owner_fingerprint)
     print "fingerprint? "+str(fingerprint)
 
     if owner_fingerprint and fingerprint != None:
-        try:
-             public_link = PublicFingerprintShare.objects.get(user=request.user, fingerprint=fingerprint)
 
-        except PublicFingerprintShare.DoesNotExist:
-            print "no public link for this fingerprint."
-
-        except PublicFingerprintShare.MultipleObjectsReturned:
-            print "- Error, there are multiple shares for this user/key, can't be."
+        public_links = PublicFingerprintShare.objects.filter(user=request.user, fingerprint=fingerprint)
 
     # increase database hits
     hits = 0
@@ -237,7 +231,7 @@ def document_form_view(request, runcode, qs, activetab='summary', readOnly=False
                     'isAdvanced': isAdvanced,
                     'activetab': activetab,
                     'readOnly': readOnly,
-                    'public_link': public_link,
+                    'public_link': public_links,
                     'public_key': public_key,
                     'hits': hits,
                     })

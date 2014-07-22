@@ -45,6 +45,8 @@ def fingerprint_list(request, template_name='fingerprints.html', added=False):
     except:
         pass
 
+    request.session.modified = True
+
     links_query  = PublicFingerprintShare.objects.filter(user=request.user)
 
     own_dbs      = Fingerprint.objects.filter(owner=request.user)
@@ -72,11 +74,11 @@ def fingerprint_list(request, template_name='fingerprints.html', added=False):
         links.append({'name': name, 'share': link})
 
     intersection = own_dbs | shared_dbs 
-    intersection_clean = intersection.filter(~Q(id__in=linkedfingerprints))
+    #intersection_clean = intersection.filter(~Q(id__in=linkedfingerprints))
 
     intersection_wnames = []
 
-    for o in intersection_clean:
+    for o in intersection:
         name = findName(o)
 
         intersection_wnames.append({'name': name, 'fingerprint': o})
@@ -113,6 +115,7 @@ def fingerprint_create(request, fingerprint_id):
     createFingerprintShare(fingerprint_id, request.user)
 
     request.session['created_public_link'] = True
+    request.session['deleted_public_link'] = False
     return redirect('public.views.fingerprint_list')
 
 def fingerprint_delete(request, share_id):
@@ -122,4 +125,5 @@ def fingerprint_delete(request, share_id):
     deleteFingerprintShare(share_id)
 
     request.session['deleted_public_link'] = True
+    request.session['created_public_link'] = False
     return redirect('public.views.fingerprint_list')
