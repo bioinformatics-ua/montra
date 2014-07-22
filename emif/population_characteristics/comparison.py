@@ -104,6 +104,9 @@ def handle_compare_values(request, var, row, fingerprint_id, template_name="comp
         myRq = dict(request.POST.lists())
         
         for i in myRq:
+            if i == 'publickey':
+                continue
+
             #if "chks_" in i:
             #    fingerprint_ids.append(i.replace("chks_", ""))
             #    continue
@@ -113,11 +116,16 @@ def handle_compare_values(request, var, row, fingerprint_id, template_name="comp
                 for fp in fps:
                     fingerprint_ids.append(fp)
                 continue
-            filters[i[0:-2]] = myRq[i]
+            filters[i[8:-3]] = myRq[i]
 
 
+        print "----"
+        print "var:"+var
+        print "row:"+row
         print "Filters" + str(filters)
         print fingerprint_ids
+        print "----"
+
     cp = ComparisonPopulation(None)
     # Only hard coded for testing 
     #fingerprint_ids = ["66a47f694ffb676bf7676dfde24900e6", "3dc3d622130eac4d092786afb9a0ec76", "2e303fd12bc5e5fd03a54651dd8d6334"]
@@ -166,6 +174,7 @@ class ComparisonPopulation(object):
         # Get the Rule Matcher 
         mrules = RuleMatcher( comp=True)
         __filters = mrules.get_filter(var)
+
         c1 = mrules.get_chart(var)
 
         dict_query = {'$or': self.__fingerprints_to_mongo_query(fingerprints_id), 
@@ -178,8 +187,8 @@ class ComparisonPopulation(object):
         for _f in c1.y_axis.static_filters:
             dict_query['values.'+_f.key] = _f.value
 
-        print "filters"
-        print filters
+        #print "filters"
+        #print filters
         # Apply filters in the query 
         dict_query_general=[]
         
