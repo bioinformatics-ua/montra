@@ -198,7 +198,7 @@ def document_form_view(request, runcode, qs, activetab='summary', readOnly=False
 
     # Find if user has public links for this db.
 
-    public_link = None
+    public_links = None
 
     print "owner ?"+str(owner_fingerprint)
     print "fingerprint? "+str(fingerprint)
