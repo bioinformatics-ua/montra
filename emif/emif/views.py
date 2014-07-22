@@ -1690,7 +1690,7 @@ def all_databases_user(request, page=1, template_name='results.html', force=Fals
     type_t_list = ""
     if interests:
         for i in interests:
-            type_t = i.name.replace(" ", "").lower()
+            type_t = i.slug.replace(" ", "").lower()
             type_t_list+=(type_t + ",")
 
         type_t_list = type_t_list[:-1]
