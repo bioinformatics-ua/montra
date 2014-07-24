@@ -4,8 +4,14 @@
 {% load django_bootstrap_breadcrumbs %}
 
 {% block breadcrumbs %}
-    {{ block.super }}
+    {{ block.super }} 
+    {% if request.session.query %}
     {% breadcrumb "Search" "resultsdiff/1" %} 
+    {% elif request.session.list_origin == 'personal' %} 
+    {% breadcrumb "Personal" "databases" %} 
+    {% else %} 
+    {% breadcrumb "All" "alldatabases" %} 
+    {% endif %}
 
     {% breadcrumb "Compare Databases" "" %}
 
