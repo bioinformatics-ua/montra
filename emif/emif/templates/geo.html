@@ -8,9 +8,12 @@
 
 {% if search_old %}
     {% breadcrumb "Search" "resultsdiff/1" %} 
-{% else %}
-    {% breadcrumb "Databases" "alldatabases" %}
+{% elif request.session.list_origin == 'personal' %} 
+    {% breadcrumb "Personal" "databases" %} 
+{% else %} 
+    {% breadcrumb "All" "alldatabases" %} 
 {% endif %}
+
 {% if search_old and not isAdvanced %}
 {% breadcrumb "Geolocation ("|add:search_old|add:")" "" %}
 {% else %}
