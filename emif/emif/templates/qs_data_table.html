@@ -6,7 +6,7 @@
 		<tr>{% for t in titles %}<th class="minwidth250" title="{{ t|removehs }}">{{t|truncate|removehs}} </th>{% endfor %}</tr>
 
 	</thead>
-    <tbody>{% for ans in answers %}<tr><td>{{ ans.0 }}</td>{% for a in ans.1 %}{% if a.1|captioned %}<td title="{{a.0}}"> {{ a.0|truncate }}</td>{% else %}<td>{{a.0}}</td>{% endif %}{% endfor %}</tr>{% endfor %}</tbody></table>
+    <tbody>{% for ans in answers %}<tr><td>{{ ans.0 }}</td>{% for a in ans.1 %}{% if a.1 == 'publication' %} {% elif a.1|captioned %}<td title="{{a.0|striptags}}"> {{ a.0|truncate }}</td>{% else %}<td>{{a.0}}</td>{% endif %}{% endfor %}</tr>{% endfor %}</tbody></table>
 </div>
 <script type="application/javascript">
 $(function() {

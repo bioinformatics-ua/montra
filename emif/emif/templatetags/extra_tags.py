@@ -129,7 +129,7 @@ def truncate(value):
 @register.filter(name='captioned')
 @stringfilter
 def captioned(value):
-    exclusion_list = ['publication', 'choice-multiple','choice-multiple-freeform','choice-multiple-freeform-options']
+    exclusion_list = ['publication', 'choice', 'choice-freeform','choice-multiple','choice-multiple-freeform','choice-multiple-freeform-options']
 
     return value not in exclusion_list
 
