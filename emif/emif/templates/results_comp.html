@@ -196,7 +196,7 @@ th, td {
     </div>
     </div>
     <div id="no_results" class="pull-center"><h4>No results found, for this filtering parameters.</h4></div>
-    <div id="comparingwait" class="pull-center"><h4>Comparing results, please wait</h4></div>
+    <div style="display: none;" id="comparingwait" class="pull-center"><h4>Comparing results, please wait</h4></div>
   </div>
 </div>
 
@@ -436,8 +436,6 @@ function compareDatabase(base, other){
   //console.log(base)
   this.complete();
 }
-
-compareDatabases(false);
 
 {% endblock %}
 <!--<![endif]-->
