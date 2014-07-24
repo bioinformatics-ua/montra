@@ -59,7 +59,9 @@
 
             redrawIndicator(start, end);
 
-            $('.publication_details').popover({trigger: 'hover', html: 'true'});   
+            $('.publication_details').popover({trigger: 'hover', html: 'true',
+                template: '<div class="popover popover-small"><div class="arrow"></div><div class="popover-inner"><h3 class="popover-title"></h3><div class="popover-content"><p></p></div></div></div>'
+            });   
         }
         function drawPublication(publication){
             var line = '<li class="publication_details" data-container="body" data-toggle="popover" data-placement="left" data-content=\'<div style="text-align:justify;"><div class="well well-small"><small><strong>'+publication.title+'</strong></small></div>';
@@ -70,8 +72,13 @@
 
                     line += "<table><tr><td style=\"vertical-align: top;\"><small><strong>Authors: </strong></small></td><td><small>";
 
-                        for( var i = 0; i< authors.length;i++){
-                            line += authors[i]+"<br />"
+                        for( var i = 0; i< authors.length;i=i+3){
+                            line += authors[i];
+                            if(i+1<authors.length)
+                                line += ", "+authors[i+1];
+                            if(i+2<authors.length)
+                                line += ", "+authors[i+2];
+                            line += "<br />";
                         }
 
                     line += "</small></td></tr></table>";

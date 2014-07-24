@@ -677,7 +677,14 @@ label input[type="radio"], label input[type="checkbox"]{
       max-width: 300px;
   }
 }
+.popover-small {
+      max-width: 500px;
+  }
   .popover-medium {
+      z-index: 9999;
+      text-align:justify;
+  }
+  .popover-small {
       z-index: 9999;
       text-align:justify;
   }

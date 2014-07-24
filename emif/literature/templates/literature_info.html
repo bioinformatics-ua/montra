@@ -10,7 +10,7 @@
         <a id="collapseall_literature" class="btn pull-right" href=""><i class="icon-plus"></i>&nbsp; Expand all</a>
     <div class="accordion fullwidth pull-left" id="accordion2" style="margin-top: 10px;">
         {% for publication in publications %}
-        {% if publication.pmid %}
+        {% if publication.pmid|isnumber %}
         <div class="accordion-group">
             <div class="accordion-heading">
                 <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapse{{forloop.counter}}">

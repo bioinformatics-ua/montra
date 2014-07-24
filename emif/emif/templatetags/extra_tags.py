@@ -95,6 +95,11 @@ def removedots(value):
     
     return value
 
+@register.filter(name='isnumber')
+@stringfilter
+def isnumber(value):
+    return value.isdigit()
+
 
 @register.filter(name='geths')
 @stringfilter
