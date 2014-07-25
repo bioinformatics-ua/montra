@@ -31,21 +31,17 @@ var substringMatcher = function(strs) {
 
     // iterate through the pool of strings and for any string that
     // contains the substring `q`, add it to the `matches` array
-    i=0;
+    var i=0;
     $.each(strs, function(i, str) {
-
-      if(i>MAX_RESULTS)
-        return false;
-
       if (substrRegex.test(str.query)) {
         // the typeahead jQuery plugin expects suggestions to a
         // JavaScript object, refer to typeahead docs for more info
         matches.push({ value: str.query });
       }
-      i++;
+      
     });
 
-    cb(matches);
+    cb(matches.slice(0, MAX_RESULTS));
   };
 };
 $(function(){

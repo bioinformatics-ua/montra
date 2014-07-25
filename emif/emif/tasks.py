@@ -52,7 +52,7 @@ def generatesearchsuggestions():
 
     for query in unique_queries:   
         if "type_t:" not in query['query']:
-            print str(query['query']) + ": " + str(query['times_appeared'])
+            #print str(query['query']) + ": " + str(query['times_appeared'])
             output.append({"query": query['query'], "count": query['times_appeared']})
 
     with open(outFile, 'w') as outfile:
