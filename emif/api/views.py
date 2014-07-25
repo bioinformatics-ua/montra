@@ -77,6 +77,9 @@ from population_characteristics.models import Characteristic
 
 from public.utils import hasFingerprintPermissions
 
+from django.contrib.staticfiles.templatetags.staticfiles import static
+
+
 class JSONResponse(HttpResponse):
     """
     An HttpResponse that renders it's content into JSON.
@@ -220,11 +223,11 @@ class GetFileView(APIView):
         # Verify if we have name and revision
         if not (name == None or name=='' or revision == None or revision == ''):
 
-            print name 
-            print revision
+            #print name 
+            #print revision
 
             path_to_file = os.path.join(os.path.abspath(PATH_STORE_FILES), revision+name)
-            print path_to_file
+            #print path_to_file
             return respond_as_attachment(request, path_to_file, name)
 
         return Response({}, status=status.HTTP_400_BAD_REQUEST)
@@ -675,6 +678,35 @@ class NotifyOwnerView(APIView):
                     pass
 
         return Response({}, status=status.HTTP_400_BAD_REQUEST)
+
+
+############################################################
+##### Seach Suggestions - Web services
+############################################################
+
+
+class SearchSuggestionsView(APIView):
+    authentication_classes = (SessionAuthentication, BasicAuthentication)
+    permission_classes = (IsAuthenticated,)    
+    def get(self, request, *args, **kw):
+        
+        if request.user.is_authenticated():
+
+            path_to_file = os.path.join(os.path.abspath(PATH_STORE_FILES), "quicksearch/freetext.json")
+
+            print path_to_file
+
+            data= None
+            with open(path_to_file) as data_file:    
+                data = json.load(data_file)            
+
+            result = {
+                'suggestions': data
+                }
+            response = Response(result, status=status.HTTP_200_OK)
+            return response
+
+        return Response ({}, status=status.HTTP_400_BAD_REQUEST)
 
 ############################################################
 ############ Auxiliar functions ############################

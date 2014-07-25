@@ -29,10 +29,10 @@
             }
         //-webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 6px #7ab5d3;-moz-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 6px #7ab5d3;box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 6px #7ab5d3;
         this.focusin(function() {
-          $( self ).parent().css({'-webkit-box-shadow': 'inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 6px #7ab5d3', '-moz-box-shadow': 'inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 6px #7ab5d3', 'box-shadow': 'inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 6px #7ab5d3'});
+          $( self ).parent().parent().css({'-webkit-box-shadow': 'inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 6px #7ab5d3', '-moz-box-shadow': 'inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 6px #7ab5d3', 'box-shadow': 'inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 6px #7ab5d3'});
         });
         this.focusout(function() {
-          $( self ).parent().css({'-webkit-box-shadow': 'inset 0 0px 0px rgba(0, 0, 0, 0), 0 0 0px #7ab5d3', '-moz-box-shadow': 'inset 0 0px 0px rgba(0, 0, 0, 0), 0 0 0px #7ab5d3', 'box-shadow': 'inset 0 0px 0px rgba(0, 0, 0, 0), 0 0 0px #7ab5d3'});
+          $( self ).parent().parent().css({'-webkit-box-shadow': 'inset 0 0px 0px rgba(0, 0, 0, 0), 0 0 0px #7ab5d3', '-moz-box-shadow': 'inset 0 0px 0px rgba(0, 0, 0, 0), 0 0 0px #7ab5d3', 'box-shadow': 'inset 0 0px 0px rgba(0, 0, 0, 0), 0 0 0px #7ab5d3'});
         });     
         this.on('keyup', function(){
             console.log($(this).val());
