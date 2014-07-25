@@ -1,5 +1,1858 @@
 [
-    "Arvore", 
-    "Arva", 
-    "Erva"
+    {
+        "count": 36,
+        "query": "ieeta"
+    },
+    {
+        "count": 12,
+        "query": "cardiac"
+    },
+    {
+        "count": 6,
+        "query": "aveiro"
+    },
+    {
+        "count": 6,
+        "query": "cancer"
+    },
+    {
+        "count": 5,
+        "query": "csf"
+    },
+    {
+        "count": 5,
+        "query": "alzheimer"
+    },
+    {
+        "count": 4,
+        "query": "parkinson"
+    },
+    {
+        "count": 4,
+        "query": "milan"
+    },
+    {
+        "count": 4,
+        "query": "ADNI"
+    },
+    {
+        "count": 3,
+        "query": "tartu"
+    },
+    {
+        "count": 3,
+        "query": "test"
+    },
+    {
+        "count": 3,
+        "query": "Aveiro"
+    },
+    {
+        "count": 3,
+        "query": "CSF"
+    },
+    {
+        "count": 3,
+        "query": "PET"
+    },
+    {
+        "count": 3,
+        "query": "gp"
+    },
+    {
+        "count": 3,
+        "query": "SNAC-K"
+    },
+    {
+        "count": 3,
+        "query": "barcelona"
+    },
+    {
+        "count": 3,
+        "query": "mri"
+    },
+    {
+        "count": 3,
+        "query": "adni"
+    },
+    {
+        "count": 3,
+        "query": "pet"
+    },
+    {
+        "count": 3,
+        "query": "slam"
+    },
+    {
+        "count": 3,
+        "query": "italy"
+    },
+    {
+        "count": 3,
+        "query": "diabetes"
+    },
+    {
+        "count": 3,
+        "query": "emc"
+    },
+    {
+        "count": 3,
+        "query": "caide"
+    },
+    {
+        "count": 3,
+        "query": "erasmus"
+    },
+    {
+        "count": 3,
+        "query": "descripa"
+    },
+    {
+        "count": 3,
+        "query": "pediatric"
+    },
+    {
+        "count": 2,
+        "query": "Perugia"
+    },
+    {
+        "count": 2,
+        "query": "MRC multicentre study of cognitive function and ageing (MRC-CFAS)"
+    },
+    {
+        "count": 2,
+        "query": "Beta amyloid oligomers in the early diagnosis of AD and as marker for treatment respons"
+    },
+    {
+        "count": 2,
+        "query": "EADC prodromal"
+    },
+    {
+        "count": 2,
+        "query": "IMAP"
+    },
+    {
+        "count": 2,
+        "query": "EDAR"
+    },
+    {
+        "count": 2,
+        "query": "perugia"
+    },
+    {
+        "count": 2,
+        "query": "GAP"
+    },
+    {
+        "count": 2,
+        "query": "EADC prodromal "
+    },
+    {
+        "count": 2,
+        "query": "genome"
+    },
+    {
+        "count": 2,
+        "query": "100"
+    },
+    {
+        "count": 2,
+        "query": "lovestone"
+    },
+    {
+        "count": 2,
+        "query": "cardio"
+    },
+    {
+        "count": 2,
+        "query": "pediatrics"
+    },
+    {
+        "count": 2,
+        "query": "Diagnostic molecular imaging"
+    },
+    {
+        "count": 2,
+        "query": "FINGER"
+    },
+    {
+        "count": 2,
+        "query": "cardiac disease"
+    },
+    {
+        "count": 2,
+        "query": "a*"
+    },
+    {
+        "count": 2,
+        "query": "Descripa"
+    },
+    {
+        "count": 2,
+        "query": "Imagerie Multimodale de l'Alzheimer Pr\u00e9coce"
+    },
+    {
+        "count": 2,
+        "query": "Kuopio-ADGEN"
+    },
+    {
+        "count": 2,
+        "query": "c"
+    },
+    {
+        "count": 2,
+        "query": "SPECT"
+    },
+    {
+        "count": 2,
+        "query": "mollenhauer"
+    },
+    {
+        "count": 2,
+        "query": "uk"
+    },
+    {
+        "count": 2,
+        "query": "dementia"
+    },
+    {
+        "count": 2,
+        "query": "ieeta2"
+    },
+    {
+        "count": 2,
+        "query": "asd"
+    },
+    {
+        "count": 2,
+        "query": "4686905818"
+    },
+    {
+        "count": 2,
+        "query": "cardiology"
+    },
+    {
+        "count": 2,
+        "query": "Oslo University Hospital Ulleval"
+    },
+    {
+        "count": 2,
+        "query": "cohort"
+    },
+    {
+        "count": 2,
+        "query": "yes"
+    },
+    {
+        "count": 2,
+        "query": "Memento"
+    },
+    {
+        "count": 2,
+        "query": "Heinz Nixdorf Recall Study "
+    },
+    {
+        "count": 2,
+        "query": "The finish Geriatric intervention study to prevent congnitive Imparirment and disability"
+    },
+    {
+        "count": 2,
+        "query": "gothenburg"
+    },
+    {
+        "count": 2,
+        "query": "DCR"
+    },
+    {
+        "count": 2,
+        "query": "brescia"
+    },
+    {
+        "count": 2,
+        "query": "addneuromed"
+    },
+    {
+        "count": 2,
+        "query": "Antwerpen"
+    },
+    {
+        "count": 2,
+        "query": "Amsterdam dementia cohort"
+    },
+    {
+        "count": 2,
+        "query": "*"
+    },
+    {
+        "count": 2,
+        "query": "Cardiology"
+    },
+    {
+        "count": 2,
+        "query": "DNA"
+    },
+    {
+        "count": 2,
+        "query": "Kuopio Longitunidal MCI Study"
+    },
+    {
+        "count": 2,
+        "query": "HNR"
+    },
+    {
+        "count": 2,
+        "query": "The Swedish National Study on Aging and Care in Kungsholmen"
+    },
+    {
+        "count": 2,
+        "query": "ct"
+    },
+    {
+        "count": 2,
+        "query": "denopa"
+    },
+    {
+        "count": 2,
+        "query": "ADGEN"
+    },
+    {
+        "count": 2,
+        "query": "The Finnish Geriatric Intervention Study to Prevent Cognitive Impairment and Disability"
+    },
+    {
+        "count": 2,
+        "query": "patient"
+    },
+    {
+        "count": 2,
+        "query": "MCI-GO"
+    },
+    {
+        "count": 2,
+        "query": "unnamed"
+    },
+    {
+        "count": 2,
+        "query": "http://www.snac-k.se/indexsv.htm"
+    },
+    {
+        "count": 2,
+        "query": "memento"
+    },
+    {
+        "count": 2,
+        "query": "Diabetes"
+    },
+    {
+        "count": 2,
+        "query": "46739940922"
+    },
+    {
+        "count": 2,
+        "query": "SNACK"
+    },
+    {
+        "count": 2,
+        "query": "MRI"
+    },
+    {
+        "count": 2,
+        "query": "Policlinico Hospital"
+    },
+    {
+        "count": 2,
+        "query": "Rete Geriatrica Alzheimer (Italian Geriatric Network)"
+    },
+    {
+        "count": 2,
+        "query": "aarhus"
+    },
+    {
+        "count": 2,
+        "query": "pharmacog"
+    },
+    {
+        "count": 1,
+        "query": "array"
+    },
+    {
+        "count": 1,
+        "query": "gd"
+    },
+    {
+        "count": 1,
+        "query": "ipsi"
+    },
+    {
+        "count": 1,
+        "query": "DiMi"
+    },
+    {
+        "count": 1,
+        "query": "aveiro\u00b4"
+    },
+    {
+        "count": 1,
+        "query": "emnc"
+    },
+    {
+        "count": 1,
+        "query": "Germany"
+    },
+    {
+        "count": 1,
+        "query": "barcelona-sant pau"
+    },
+    {
+        "count": 1,
+        "query": "t*"
+    },
+    {
+        "count": 1,
+        "query": "Network for Efficiency and standardisation of Dementia DiagnosisImpairment and Disability"
+    },
+    {
+        "count": 1,
+        "query": "UNK"
+    },
+    {
+        "count": 1,
+        "query": "Denopa "
+    },
+    {
+        "count": 1,
+        "query": "vaudois"
+    },
+    {
+        "count": 1,
+        "query": "avillach"
+    },
+    {
+        "count": 1,
+        "query": "ge"
+    },
+    {
+        "count": 1,
+        "query": "IEETA"
+    },
+    {
+        "count": 1,
+        "query": "gothenbrg"
+    },
+    {
+        "count": 1,
+        "query": "egnitio"
+    },
+    {
+        "count": 1,
+        "query": "Innovative Medicines for Europe (Innomed)"
+    },
+    {
+        "count": 1,
+        "query": "Mikko Hiltunen"
+    },
+    {
+        "count": 1,
+        "query": "gepar"
+    },
+    {
+        "count": 1,
+        "query": "Essen"
+    },
+    {
+        "count": 1,
+        "query": "Policlinico Hospital1"
+    },
+    {
+        "count": 1,
+        "query": "Benfica"
+    },
+    {
+        "count": 1,
+        "query": "Lausanne"
+    },
+    {
+        "count": 1,
+        "query": "RNA"
+    },
+    {
+        "count": 1,
+        "query": "gotenburg"
+    },
+    {
+        "count": 1,
+        "query": "observational"
+    },
+    {
+        "count": 1,
+        "query": "mamography"
+    },
+    {
+        "count": 1,
+        "query": "http\\\\:\\\\/\\\\/www.snac-k.se\\\\/indexsv\\\\.htm"
+    },
+    {
+        "count": 1,
+        "query": "adults"
+    },
+    {
+        "count": 1,
+        "query": "Lausanne cohort"
+    },
+    {
+        "count": 1,
+        "query": "Aging Research Center"
+    },
+    {
+        "count": 1,
+        "query": "frisioni"
+    },
+    {
+        "count": 1,
+        "query": "Leuven"
+    },
+    {
+        "count": 1,
+        "query": "SNAC"
+    },
+    {
+        "count": 1,
+        "query": "Genomic"
+    },
+    {
+        "count": 1,
+        "query": "aveiro*"
+    },
+    {
+        "count": 1,
+        "query": "maria.wahlberg@ki.se"
+    },
+    {
+        "count": 1,
+        "query": "snac_k"
+    },
+    {
+        "count": 1,
+        "query": "KCL"
+    },
+    {
+        "count": 1,
+        "query": "a"
+    },
+    {
+        "count": 1,
+        "query": "prediction of alzheimer"
+    },
+    {
+        "count": 1,
+        "query": "DCN"
+    },
+    {
+        "count": 1,
+        "query": "sant pau"
+    },
+    {
+        "count": 1,
+        "query": "Mamo*"
+    },
+    {
+        "count": 1,
+        "query": "tartur"
+    },
+    {
+        "count": 1,
+        "query": "antwerp"
+    },
+    {
+        "count": 1,
+        "query": "ct scans"
+    },
+    {
+        "count": 1,
+        "query": "obesity"
+    },
+    {
+        "count": 1,
+        "query": "tomography"
+    },
+    {
+        "count": 1,
+        "query": "leuven"
+    },
+    {
+        "count": 1,
+        "query": "mamo"
+    },
+    {
+        "count": 1,
+        "query": "EADC prodromal AD"
+    },
+    {
+        "count": 1,
+        "query": " Cohort 1"
+    },
+    {
+        "count": 1,
+        "query": "Stockholm"
+    },
+    {
+        "count": 1,
+        "query": "export"
+    },
+    {
+        "count": 1,
+        "query": "biomarker"
+    },
+    {
+        "count": 1,
+        "query": "Des*"
+    },
+    {
+        "count": 1,
+        "query": "MRC"
+    },
+    {
+        "count": 1,
+        "query": "GP based data"
+    },
+    {
+        "count": 1,
+        "query": "IDIBAP"
+    },
+    {
+        "count": 1,
+        "query": " +35 84 05 735 749"
+    },
+    {
+        "count": 1,
+        "query": "cardic"
+    },
+    {
+        "count": 1,
+        "query": "Portugal"
+    },
+    {
+        "count": 1,
+        "query": "finnish"
+    },
+    {
+        "count": 1,
+        "query": "MCI GO"
+    },
+    {
+        "count": 1,
+        "query": "Cardiovascular Risk Factors, Aging and Dementia"
+    },
+    {
+        "count": 1,
+        "query": "freesurver"
+    },
+    {
+        "count": 1,
+        "query": "genetic"
+    },
+    {
+        "count": 1,
+        "query": "What_are_the_possible_causes_for_a_person_to_enter_t: 'the%20subject%20enters%20or%20leaves%20the%20practice%20of%20a%20general%20practitioner'"
+    },
+    {
+        "count": 1,
+        "query": "subjective complaints"
+    },
+    {
+        "count": 1,
+        "query": "1975"
+    },
+    {
+        "count": 1,
+        "query": "CITA"
+    },
+    {
+        "count": 1,
+        "query": "cardiolgy"
+    },
+    {
+        "count": 1,
+        "query": "ADAS"
+    },
+    {
+        "count": 1,
+        "query": "paediatric"
+    },
+    {
+        "count": 1,
+        "query": "data table"
+    },
+    {
+        "count": 1,
+        "query": "arv"
+    },
+    {
+        "count": 1,
+        "query": "PEt"
+    },
+    {
+        "count": 1,
+        "query": "A"
+    },
+    {
+        "count": 1,
+        "query": "neuropathology"
+    },
+    {
+        "count": 1,
+        "query": "pet amyloid"
+    },
+    {
+        "count": 1,
+        "query": "SLAM"
+    },
+    {
+        "count": 1,
+        "query": "'geograph' "
+    },
+    {
+        "count": 1,
+        "query": "Karolinska Institutet"
+    },
+    {
+        "count": 1,
+        "query": "NEONATAL DEATH"
+    },
+    {
+        "count": 1,
+        "query": "cancer diabetes pediatric cardiac"
+    },
+    {
+        "count": 1,
+        "query": "Denopa"
+    },
+    {
+        "count": 1,
+        "query": "pi"
+    },
+    {
+        "count": 1,
+        "query": "Pharmacog"
+    },
+    {
+        "count": 1,
+        "query": "CARDIOLOGIA"
+    },
+    {
+        "count": 1,
+        "query": "Perugia2"
+    },
+    {
+        "count": 1,
+        "query": "maastricht"
+    },
+    {
+        "count": 1,
+        "query": "antwerpen"
+    },
+    {
+        "count": 1,
+        "query": "donepezil"
+    },
+    {
+        "count": 1,
+        "query": "gotenbutg"
+    },
+    {
+        "count": 1,
+        "query": "ferreira"
+    },
+    {
+        "count": 1,
+        "query": "diabete"
+    },
+    {
+        "count": 1,
+        "query": "Development of screening guidelines and clinical criteria for predementia Alzheimer's disease"
+    },
+    {
+        "count": 1,
+        "query": "Hilkka.Soininen@uef.fi"
+    },
+    {
+        "count": 1,
+        "query": "mci"
+    },
+    {
+        "count": 1,
+        "query": "Neuro"
+    },
+    {
+        "count": 1,
+        "query": "geneva"
+    },
+    {
+        "count": 1,
+        "query": "cardiologty"
+    },
+    {
+        "count": 1,
+        "query": "gens"
+    },
+    {
+        "count": 1,
+        "query": "a\u00bb"
+    },
+    {
+        "count": 1,
+        "query": "RNA-seq"
+    },
+    {
+        "count": 1,
+        "query": "LeARN"
+    },
+    {
+        "count": 1,
+        "query": "California"
+    },
+    {
+        "count": 1,
+        "query": "SCI"
+    },
+    {
+        "count": 1,
+        "query": "amyloid"
+    },
+    {
+        "count": 1,
+        "query": "PET scans"
+    },
+    {
+        "count": 1,
+        "query": "sleep"
+    },
+    {
+        "count": 1,
+        "query": "oncology"
+    },
+    {
+        "count": 1,
+        "query": "csf adascog"
+    },
+    {
+        "count": 1,
+        "query": "Hellenic Epidemiological and Longitudinal Investigation of Aging and Diet"
+    },
+    {
+        "count": 1,
+        "query": "haha"
+    },
+    {
+        "count": 1,
+        "query": "subject"
+    },
+    {
+        "count": 1,
+        "query": "DIABETES TYPE 1"
+    },
+    {
+        "count": 1,
+        "query": "Milan"
+    },
+    {
+        "count": 1,
+        "query": "bla"
+    },
+    {
+        "count": 1,
+        "query": "IMMUNIZATION AND CHILDREN"
+    },
+    {
+        "count": 1,
+        "query": "bleo"
+    },
+    {
+        "count": 1,
+        "query": "THIN free text"
+    },
+    {
+        "count": 1,
+        "query": "PEDIATRICS"
+    },
+    {
+        "count": 1,
+        "query": "RAVLT"
+    },
+    {
+        "count": 1,
+        "query": "kassel"
+    },
+    {
+        "count": 1,
+        "query": "patients"
+    },
+    {
+        "count": 1,
+        "query": "preAl"
+    },
+    {
+        "count": 1,
+        "query": "uturku"
+    },
+    {
+        "count": 1,
+        "query": "heliad"
+    },
+    {
+        "count": 1,
+        "query": "lausanne"
+    },
+    {
+        "count": 1,
+        "query": "Example"
+    },
+    {
+        "count": 1,
+        "query": "Prediction of Alzheimer's disease"
+    },
+    {
+        "count": 1,
+        "query": "adni 1"
+    },
+    {
+        "count": 1,
+        "query": "NEUROMED"
+    },
+    {
+        "count": 1,
+        "query": "paris"
+    },
+    {
+        "count": 1,
+        "query": "freesurfer"
+    },
+    {
+        "count": 1,
+        "query": "surfer"
+    },
+    {
+        "count": 1,
+        "query": "population"
+    },
+    {
+        "count": 1,
+        "query": "autopsy"
+    },
+    {
+        "count": 1,
+        "query": "Bhulaar"
+    },
+    {
+        "count": 1,
+        "query": "Leuven1"
+    },
+    {
+        "count": 1,
+        "query": "*:*"
+    },
+    {
+        "count": 1,
+        "query": "Cognitive Disorders Unit, Department of Neurology, Eginition Hospital"
+    },
+    {
+        "count": 1,
+        "query": "innomed"
+    },
+    {
+        "count": 1,
+        "query": "Learn"
+    },
+    {
+        "count": 1,
+        "query": "preAL"
+    },
+    {
+        "count": 1,
+        "query": "preal"
+    },
+    {
+        "count": 1,
+        "query": "MMSE"
+    },
+    {
+        "count": 1,
+        "query": "popp-vaudois"
+    },
+    {
+        "count": 1,
+        "query": "acute coronary syndrome and diabetes"
+    },
+    {
+        "count": 1,
+        "query": "regional"
+    },
+    {
+        "count": 1,
+        "query": "Cardio*"
+    },
+    {
+        "count": 1,
+        "query": "omics"
+    },
+    {
+        "count": 1,
+        "query": "avei"
+    },
+    {
+        "count": 1,
+        "query": "Gothenborg"
+    },
+    {
+        "count": 1,
+        "query": "asdaa\\s \\as\\d\\12\\! "
+    },
+    {
+        "count": 1,
+        "query": "hospital "
+    },
+    {
+        "count": 1,
+        "query": "oslo"
+    },
+    {
+        "count": 1,
+        "query": "gennomic"
+    },
+    {
+        "count": 1,
+        "query": "IDIBAPS"
+    },
+    {
+        "count": 1,
+        "query": "card"
+    },
+    {
+        "count": 1,
+        "query": "donzepil"
+    },
+    {
+        "count": 1,
+        "query": "POLI"
+    },
+    {
+        "count": 1,
+        "query": "Test"
+    },
+    {
+        "count": 1,
+        "query": "s"
+    },
+    {
+        "count": 1,
+        "query": "Innomed"
+    },
+    {
+        "count": 1,
+        "query": "eadc "
+    },
+    {
+        "count": 1,
+        "query": "Gens"
+    },
+    {
+        "count": 1,
+        "query": "www.ahus.no/omoss/avdelinger/nevroklinikken/forskning-og-utvikling"
+    },
+    {
+        "count": 1,
+        "query": "Donepezil"
+    },
+    {
+        "count": 1,
+        "query": "alzei"
+    },
+    {
+        "count": 1,
+        "query": "datum"
+    },
+    {
+        "count": 1,
+        "query": "PET AD"
+    },
+    {
+        "count": 1,
+        "query": "crf"
+    },
+    {
+        "count": 1,
+        "query": "ieeta\u00b4"
+    },
+    {
+        "count": 1,
+        "query": "Modality:NM"
+    },
+    {
+        "count": 1,
+        "query": "athens"
+    },
+    {
+        "count": 1,
+        "query": "cfas "
+    },
+    {
+        "count": 1,
+        "query": "EMIF-AD Study Characteristics Data collection_20_V1.0_20131111_Kassel"
+    },
+    {
+        "count": 1,
+        "query": "\"Network for Efficiency and Standardisation of Dementia Diagnosis\""
+    },
+    {
+        "count": 1,
+        "query": "germany"
+    },
+    {
+        "count": 1,
+        "query": "Eadc pet"
+    },
+    {
+        "count": 1,
+        "query": "CSF=Yes"
+    },
+    {
+        "count": 1,
+        "query": "pet-fdg"
+    },
+    {
+        "count": 1,
+        "query": "turku"
+    },
+    {
+        "count": 1,
+        "query": "biomarkers"
+    },
+    {
+        "count": 1,
+        "query": "lleo"
+    },
+    {
+        "count": 1,
+        "query": "av*"
+    },
+    {
+        "count": 1,
+        "query": "San Francisco"
+    },
+    {
+        "count": 1,
+        "query": "MRC-CFAS"
+    },
+    {
+        "count": 1,
+        "query": "mamo*"
+    },
+    {
+        "count": 1,
+        "query": "dicom"
+    },
+    {
+        "count": 1,
+        "query": "kuopio"
+    },
+    {
+        "count": 1,
+        "query": "IMMUNISATION IN CHILDREN"
+    },
+    {
+        "count": 1,
+        "query": "MCI"
+    },
+    {
+        "count": 1,
+        "query": "liver"
+    },
+    {
+        "count": 1,
+        "query": "fat people"
+    },
+    {
+        "count": 1,
+        "query": "eginitio"
+    },
+    {
+        "count": 1,
+        "query": "0047 928 17 764"
+    },
+    {
+        "count": 1,
+        "query": "\"Development of screening guidelines and clinical criteria for predementia Alzheimer's disease \""
+    },
+    {
+        "count": 1,
+        "query": "Heinz Nixdorf Recall Study"
+    },
+    {
+        "count": 1,
+        "query": "Pablo Martinez-Lage"
+    },
+    {
+        "count": 1,
+        "query": "gini"
+    },
+    {
+        "count": 1,
+        "query": "ns257@columbia.edu"
+    },
+    {
+        "count": 1,
+        "query": "pet AD"
+    },
+    {
+        "count": 1,
+        "query": "diabites"
+    },
+    {
+        "count": 1,
+        "query": "ars"
+    },
+    {
+        "count": 1,
+        "query": "pop "
+    },
+    {
+        "count": 1,
+        "query": "PreAl"
+    },
+    {
+        "count": 1,
+        "query": "Rey"
+    },
+    {
+        "count": 1,
+        "query": "Corhot1"
+    },
+    {
+        "count": 1,
+        "query": "cardiovascular"
+    },
+    {
+        "count": 1,
+        "query": "London Alzheimer"
+    },
+    {
+        "count": 1,
+        "query": "paediatrics"
+    },
+    {
+        "count": 1,
+        "query": "www.denopa.de"
+    },
+    {
+        "count": 1,
+        "query": "gh"
+    },
+    {
+        "count": 1,
+        "query": "cardiol"
+    },
+    {
+        "count": 1,
+        "query": "egcut"
+    },
+    {
+        "count": 1,
+        "query": "cancer diabetes pediatric spain Netherlands"
+    },
+    {
+        "count": 1,
+        "query": "Mild cognitive "
+    },
+    {
+        "count": 1,
+        "query": "h10"
+    },
+    {
+        "count": 1,
+        "query": "peruia"
+    },
+    {
+        "count": 1,
+        "query": "diabetes and cancer"
+    },
+    {
+        "count": 1,
+        "query": "simmons"
+    },
+    {
+        "count": 1,
+        "query": "aveiro tur"
+    },
+    {
+        "count": 1,
+        "query": "ADNI "
+    },
+    {
+        "count": 1,
+        "query": "qwkeoiqe'1i1'0231"
+    },
+    {
+        "count": 1,
+        "query": "RYTHMOLOGY IN PEDIATRICS"
+    },
+    {
+        "count": 1,
+        "query": "mri csf"
+    },
+    {
+        "count": 1,
+        "query": "Mild cognitive impairment"
+    },
+    {
+        "count": 1,
+        "query": "innomd"
+    },
+    {
+        "count": 1,
+        "query": "geo"
+    },
+    {
+        "count": 1,
+        "query": "Bruno Dubois"
+    },
+    {
+        "count": 1,
+        "query": "Dementia Case Register"
+    },
+    {
+        "count": 1,
+        "query": "csf and wbc"
+    },
+    {
+        "count": 1,
+        "query": "49 201 7236503"
+    },
+    {
+        "count": 1,
+        "query": "adwibo"
+    },
+    {
+        "count": 1,
+        "query": "fat"
+    },
+    {
+        "count": 1,
+        "query": "0047 452 46 719"
+    },
+    {
+        "count": 1,
+        "query": "Age"
+    },
+    {
+        "count": 1,
+        "query": "Folstein"
+    },
+    {
+        "count": 1,
+        "query": "spect"
+    },
+    {
+        "count": 1,
+        "query": "cancer diabetes pediatric"
+    },
+    {
+        "count": 1,
+        "query": "prodromal"
+    },
+    {
+        "count": 1,
+        "query": "Cardiac"
+    },
+    {
+        "count": 1,
+        "query": "kcl"
+    },
+    {
+        "count": 1,
+        "query": "Amsterdam"
+    },
+    {
+        "count": 1,
+        "query": "IMAP+"
+    },
+    {
+        "count": 1,
+        "query": "Corhot 1"
+    },
+    {
+        "count": 1,
+        "query": "Cancer"
+    },
+    {
+        "count": 1,
+        "query": "Patients"
+    },
+    {
+        "count": 1,
+        "query": "cfas"
+    },
+    {
+        "count": 1,
+        "query": "omic"
+    },
+    {
+        "count": 1,
+        "query": "OSLO"
+    },
+    {
+        "count": 1,
+        "query": "NEST "
+    },
+    {
+        "count": 1,
+        "query": "pet-amyloid"
+    },
+    {
+        "count": 1,
+        "query": "metmorfin"
+    },
+    {
+        "count": 1,
+        "query": "31204440816"
+    },
+    {
+        "count": 1,
+        "query": "BIRTH"
+    },
+    {
+        "count": 1,
+        "query": "snac"
+    },
+    {
+        "count": 1,
+        "query": " 00 44 2078480626"
+    },
+    {
+        "count": 1,
+        "query": "GP"
+    },
+    {
+        "count": 1,
+        "query": "Oslo"
+    },
+    {
+        "count": 1,
+        "query": "Bhullar"
+    },
+    {
+        "count": 1,
+        "query": "\\\\\\\\\\"
+    },
+    {
+        "count": 1,
+        "query": "Cohort 1"
+    },
+    {
+        "count": 1,
+        "query": "Oslo cohort"
+    },
+    {
+        "count": 1,
+        "query": "ASd"
+    },
+    {
+        "count": 1,
+        "query": "http://www.snac-k.se/indexsv.htm'"
+    },
+    {
+        "count": 1,
+        "query": "simon.lovestone@kcl.ac.uk"
+    },
+    {
+        "count": 1,
+        "query": "IPSI"
+    },
+    {
+        "count": 1,
+        "query": "pathology"
+    },
+    {
+        "count": 1,
+        "query": "neuropsychiatric"
+    },
+    {
+        "count": 1,
+        "query": "amsterdam"
+    },
+    {
+        "count": 1,
+        "query": "primary care"
+    },
+    {
+        "count": 1,
+        "query": "edar"
+    },
+    {
+        "count": 1,
+        "query": "Simon Lovestone"
+    },
+    {
+        "count": 1,
+        "query": "DIABETIS TYPE I"
+    },
+    {
+        "count": 1,
+        "query": "EADC"
+    },
+    {
+        "count": 1,
+        "query": "agden"
+    },
+    {
+        "count": 1,
+        "query": "ola"
+    },
+    {
+        "count": 1,
+        "query": "THIN"
+    },
+    {
+        "count": 1,
+        "query": "expory"
+    },
+    {
+        "count": 1,
+        "query": "geograph"
+    },
+    {
+        "count": 1,
+        "query": "gothenborg"
+    },
+    {
+        "count": 1,
+        "query": "bruno.dubois@psl.aphp.fr"
+    },
+    {
+        "count": 1,
+        "query": "tu*"
+    },
+    {
+        "count": 1,
+        "query": "sommons"
+    },
+    {
+        "count": 1,
+        "query": "gotenborg mci"
+    },
+    {
+        "count": 1,
+        "query": "ex"
+    },
+    {
+        "count": 1,
+        "query": "unk"
+    },
+    {
+        "count": 1,
+        "query": "jenni.lehtisalo@thl.fiImpairment and Disability"
+    },
+    {
+        "count": 1,
+        "query": "alzheimer's"
+    },
+    {
+        "count": 1,
+        "query": "chort"
+    },
+    {
+        "count": 1,
+        "query": "pj.visser@maastrichtuniversity.nl"
+    },
+    {
+        "count": 1,
+        "query": "ieetaieeta"
+    },
+    {
+        "count": 1,
+        "query": "go"
+    },
+    {
+        "count": 1,
+        "query": "CARDIOLOGY"
+    },
+    {
+        "count": 1,
+        "query": "ADNI-1"
+    },
+    {
+        "count": 1,
+        "query": "example"
+    },
+    {
+        "count": 1,
+        "query": "london"
+    },
+    {
+        "count": 1,
+        "query": "as"
+    },
+    {
+        "count": 1,
+        "query": "EGCUT"
+    },
+    {
+        "count": 1,
+        "query": "Julius Popp"
+    },
+    {
+        "count": 1,
+        "query": "finger"
+    },
+    {
+        "count": 1,
+        "query": "ua"
+    },
+    {
+        "count": 1,
+        "query": "Gothenbog"
+    },
+    {
+        "count": 1,
+        "query": "NEONATES AND DIABETES"
+    },
+    {
+        "count": 1,
+        "query": "0561-6009-163"
+    },
+    {
+        "count": 1,
+        "query": "IPCI"
+    },
+    {
+        "count": 1,
+        "query": "ASTMA IN PEDIATRICS"
+    },
+    {
+        "count": 1,
+        "query": "pedianet"
+    },
+    {
+        "count": 1,
+        "query": "eadc-pet"
+    },
+    {
+        "count": 1,
+        "query": "sPECT"
+    },
+    {
+        "count": 1,
+        "query": "cancer diabetes"
+    },
+    {
+        "count": 1,
+        "query": "eadc"
+    },
+    {
+        "count": 1,
+        "query": "Barcelona"
+    },
+    {
+        "count": 1,
+        "query": "CFAS "
+    },
+    {
+        "count": 1,
+        "query": "the Pre-Al study"
+    },
+    {
+        "count": 1,
+        "query": "SNAC_K"
+    },
+    {
+        "count": 1,
+        "query": "asdas"
+    },
+    {
+        "count": 1,
+        "query": "Klinkstr. 16, 34128 Kassel"
+    },
+    {
+        "count": 1,
+        "query": "imap"
+    },
+    {
+        "count": 1,
+        "query": "NEST-DD"
+    },
+    {
+        "count": 1,
+        "query": "unname"
+    },
+    {
+        "count": 1,
+        "query": "AS"
+    },
+    {
+        "count": 1,
+        "query": "NEONATES"
+    },
+    {
+        "count": 1,
+        "query": "Caen"
+    },
+    {
+        "count": 1,
+        "query": "NEST"
+    },
+    {
+        "count": 1,
+        "query": "karolinska"
+    },
+    {
+        "count": 1,
+        "query": "ADNEUROMED"
+    },
+    {
+        "count": 1,
+        "query": "Des"
+    },
+    {
+        "count": 1,
+        "query": "bio"
+    },
+    {
+        "count": 1,
+        "query": "SNAC-k"
+    },
+    {
+        "count": 1,
+        "query": "genomic"
+    },
+    {
+        "count": 1,
+        "query": "INSERM U610 and AP-HP F\u00e9d\u00e9ration de Neurologie, H\u00f4pital de la Salp\u00e9tri\u00e8re"
+    },
+    {
+        "count": 1,
+        "query": "Descripa-clin"
+    },
+    {
+        "count": 1,
+        "query": "EU"
+    },
+    {
+        "count": 1,
+        "query": "simon lovestone"
+    },
+    {
+        "count": 1,
+        "query": "Subjective cognitive impairment\t"
+    },
+    {
+        "count": 1,
+        "query": "liver disease"
+    },
+    {
+        "count": 1,
+        "query": "egi"
+    },
+    {
+        "count": 1,
+        "query": "+49 201 7236503"
+    },
+    {
+        "count": 1,
+        "query": "(0030) 6977491901"
+    },
+    {
+        "count": 1,
+        "query": "Hilkka Soininen"
+    },
+    {
+        "count": 1,
+        "query": "rotterdam"
+    },
+    {
+        "count": 1,
+        "query": "diabtetes"
+    },
+    {
+        "count": 1,
+        "query": "cancer diabetes pediatric spain"
+    },
+    {
+        "count": 1,
+        "query": "gotenborg"
+    },
+    {
+        "count": 1,
+        "query": "Athens"
+    },
+    {
+        "count": 1,
+        "query": "Professor Dr. Miia Kivipelto"
+    },
+    {
+        "count": 1,
+        "query": "diabetes and dementia"
+    },
+    {
+        "count": 1,
+        "query": "csf "
+    },
+    {
+        "count": 1,
+        "query": "rosa gini"
+    },
+    {
+        "count": 1,
+        "query": "AUH"
+    },
+    {
+        "count": 1,
+        "query": "BMI"
+    },
+    {
+        "count": 1,
+        "query": "Mamo"
+    },
+    {
+        "count": 1,
+        "query": "guarda"
+    },
+    {
+        "count": 1,
+        "query": "bank"
+    },
+    {
+        "count": 1,
+        "query": "Neuropathology"
+    },
+    {
+        "count": 1,
+        "query": "Akershus"
+    },
+    {
+        "count": 1,
+        "query": "BARCELONA-SANT PAU"
+    },
+    {
+        "count": 1,
+        "query": "cancer "
+    },
+    {
+        "count": 1,
+        "query": "Erasmus"
+    },
+    {
+        "count": 1,
+        "query": "Lisboa"
+    },
+    {
+        "count": 1,
+        "query": "Old Age Psychiatry, Institute of Psychiatry"
+    },
+    {
+        "count": 1,
+        "query": "cardia"
+    },
+    {
+        "count": 1,
+        "query": "RECALL "
+    }
 ]

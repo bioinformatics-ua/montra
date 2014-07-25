@@ -1,3 +1,5 @@
+var MAX_RESULTS = 10;
+
 function showExportMessage(){
     $('#exporting-message').fadeIn('fast');
 
@@ -29,12 +31,18 @@ var substringMatcher = function(strs) {
 
     // iterate through the pool of strings and for any string that
     // contains the substring `q`, add it to the `matches` array
+    i=0;
     $.each(strs, function(i, str) {
-      if (substrRegex.test(str)) {
+
+      if(i>MAX_RESULTS)
+        return false;
+
+      if (substrRegex.test(str.query)) {
         // the typeahead jQuery plugin expects suggestions to a
         // JavaScript object, refer to typeahead docs for more info
-        matches.push({ value: str });
+        matches.push({ value: str.query });
       }
+      i++;
     });
 
     cb(matches);
@@ -49,7 +57,6 @@ $(function(){
 });
 
 function handleQuickSearch(){
-
     $.get('api/searchsuggestions').done(function(data) {
         if(data.suggestions){
             $('.search-query').typeahead({

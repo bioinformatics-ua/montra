@@ -799,6 +799,7 @@ height: 6em;
   line-height: 1.428571429;
   color: #333333;
   white-space: nowrap;
+  font-size: 80%;
 }
 .tt-suggestion > p:hover,
 .tt-suggestion > p:focus,
