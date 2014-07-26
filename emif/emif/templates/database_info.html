@@ -7,7 +7,7 @@
 
 {% block headextra %}
 
-<script src="{{ STATIC_URL}}js/vendor/threadpool.js"></script>
+<script src="{{ STATIC_URL}}js/vendor/taskqueuer.js"></script>
 
 <script src="{{ STATIC_URL}}js/vendor/jquery.expander.min.js"></script>
 
@@ -291,24 +291,62 @@
 
 
 {% endblock %}
-
+<script>
 {% block scriptextra %}
-    $(function(){ 
-    var csrf_token = '{{ csrf_token }}';
-        {% get_hit_count_javascript for fingerprint %} 
-    });
-var threads = {};
 var global_fingerprint_id = '{{fingerprint_id}}';
-var global_public_key = '{{public_key.hash}}'
+var global_public_key = '{{public_key.hash}}';
+var global_is_authenticated = {% if request.user.is_authenticated %}true{% else %}false{% endif %};
 function load_questionnary(){
 
 console.log("Creating questionnary set containers (so they are in order)");
-        containers = []
-        // We build the qs containers in memory and just do dom op, on the end, for speed
-        // on ie joins are significantly faster than concatenation
-        // tuple = k, qs
-        {% for tuple, permissions in qsets %}
+        pushQsets();
 
+        //var threadpool = new ThreadPool(20);
+        //parts_missing = {{qsets|length}};
+
+        var priority=1;
+        {% for tuple, permissions in qsets %}
+            {% if permissions.visibility == 0 or owner_fingerprint or request.user.is_superuser %}
+        //        var thread = new Runnable(loadqspart, priority++, {{tuple.1.sortid}}, '{{fingerprint_id}}');
+
+        //        threadpool.run(thread);
+        //        threads['qs_{{ tuple.1.sortid }}'] = thread;
+            {% endif %}
+        {% endfor %}
+
+console.log( "Loading questionnary by parts, we have {{qsets|length}} sets");  
+
+{% for k, qs in qsets.ordered_items %}
+//var thread = new Runnable(loadqspart, priority++, {{qs.sortid}}, '{{fingerprint_id}}');
+
+//threadpool.run(thread);
+//threads['qs_{{ qs.sortid }}'] = thread;
+{% endfor %}
+
+//  we add the triggers thread
+//threadpool.destroy(function(){
+//    $('#show_hide_button').fadeIn();
+//});
+}
+$(function(){
+    var csrf_token = '{{ csrf_token }}';
+    {% get_hit_count_javascript for fingerprint %} 
+
+    initDatabaseInfo('{{apiinfo|safe}}');
+
+    bindPostCommentHandler('{{ request.user.first_name }}', '{{ request.user.last_name }}', '{{ request.user.username }}', '{{owners}}', '{{fingerprint_id}}', '{{breadcrumb_name}}');
+
+    {% if isAdvanced %}
+    initAdvSearchPlugin('{{request.session.serialization_query}}', '{{request.session.query_type}}', '{{request.session.query_id}}');
+    {% endif %}
+});
+
+function pushQsets(){
+    containers = []
+    // We build the qs containers in memory and just do dom op, on the end, for speed
+    // on ie joins are significantly faster than concatenation
+    // tuple = k, qs
+    {% for tuple, permissions in qsets %}
             {% if permissions.visibility == 0 or owner_fingerprint or request.user.is_superuser %}
                 containers.push('<div class="{% if not permissions.allow_printing %}noprinting {% endif %}'+
                 '{% if not permissions.allow_exporting %}noexporting {% endif %}'+
@@ -317,188 +355,11 @@ console.log("Creating questionnary set containers (so they are in order)");
                 '{% if permissions.visibility == 1 and owner_fingerprint %}<i class="tooltipit icon-eye-close" title="This questionset is private, only the data custodian can see it." ></i>{% endif %}'+
                 '{% if not permissions.allow_printing %}<img class="tooltipit" title="The data custodian doesn\'t allow this section to be printed." src="{{ STATIC_URL}}img/noprint.png"/>{% endif %}'+
                 '{% if not permissions.allow_exporting %}<img class="tooltipit" title="The data custodian doesn\'t allow this section to be exported." src="{{ STATIC_URL}}img/noexport.png"/>{% endif %}'+
-                '<span class="accordion-icon"></span></div><div id="collapse{{ tuple.0|removespaces|safe|clean }}" class="accordion-body collapse"><div id="qs_{{ tuple.1.sortid }}" class="accordion-inner"><h4 class="pull-center">Loading...</h4></div></div></div>');
+                '<span class="accordion-icon"></span></div><div id="collapse{{ tuple.0|removespaces|safe|clean }}" class="accordion-body collapse"><div id="qs_{{ tuple.1.sortid }}" class="accordion-inner"><h4 class="pull-center loadingsection">Loading...</h4></div></div></div>');
             {% endif %}
-        
-        {% endfor %}
-
-        var threadpool = new ThreadPool(20);
-        parts_missing = {{qsets|length}};
-
-
-{% if qs.info %}
-console.log("QS_DEBUG: {{qs.sortid}} : {{qs.info}}");
-{% endif %}
-
-
-        var priority=1;
-        {% for tuple, permissions in qsets %}
-            {% if permissions.visibility == 0 or owner_fingerprint or request.user.is_superuser %}
-                var thread = new Runnable(loadqspart, priority++, {{tuple.1.sortid}}, '{{fingerprint_id}}');
-
-                threadpool.run(thread);
-                threads['qs_{{ tuple.1.sortid }}'] = thread;
-            {% endif %}
-        {% endfor %}
-
-$('#set_container').append(containers.join(''));
-
-console.log( "Loading questionnary by parts, we have {{qsets|length}} sets");  
-
-var threadpool = new ThreadPool(20);
-parts_missing = {{qsets|length}};
-
-
-// i dont everything on a single run, because i just add the containers all at once, not by parts
-// only the constainers content are loaded by parts
-
-var priority=1;
-{% for k, qs in qsets.ordered_items %}
-var thread = new Runnable(loadqspart, priority++, {{qs.sortid}}, '{{fingerprint_id}}');
-
-threadpool.run(thread);
-threads['qs_{{ qs.sortid }}'] = thread;
-{% endfor %}
-
-//  we add the triggers thread
-threadpool.destroy(function(){
-    $('#show_hide_button').fadeIn();
-});
+    {% endfor %}
+    $('#set_container').append(containers.join(''));
 }
-function loadqspart(sortid, pk){
-{% if user.is_authenticated %}
-$.get( "fingerprintqs/"+pk+"/"+sortid+"/", function( data ) {
-{% else %}
-$.post( "fingerprintqs/"+pk+"/"+sortid+"/",{publickey:'{{public_key.hash}}'}, function( data ) {
-{% endif %}
-$( "#qs_"+sortid ).html( data );
-// Mark the tab as highlighted if there's any highlight inside it
-
-
-var highlights = $("#qs_"+sortid).find('.highlight');
-
-//console.dir(highlights);
-
-if(highlights.length > 0){
-var this_row = $( "#qs_"+sortid ).parent().siblings().find('.accordion-icon');
-this_row.html('<img title="This section has search keywords" class="markered" src="{{STATIC_URL}}/img/marker.png" />');
-$(".markered" ,this_row).tooltip({container: "body"});
-$(".markered" ,this_row).click(function(){
-this_row.parent().siblings().first().collapse('toggle');
-});
-} 
-
-});    
-
-threads['qs_'+sortid] = null;
-parts_missing--;
-this.complete();
-}
-<!-- This must be here because of dynamic code -->
-$(document).ready(function() {
-
-        bindPostCommentHandler('{{ request.user.first_name }}', '{{ request.user.last_name }}', '{{ request.user.username }}', '{{owners}}', '{{fingerprint_id}}', '{{breadcrumb_name}}');
-//load_questionnary();
-    $('.tabbable a[data-toggle="tab"]').on('shown', function (e) {
-        if(e.target.textContent == 'Population Characteristics'){
-          console.log("test");
-        }
-    });
-    load_questionnary();
-
-    $(".tooltipit").tooltip({container: "body"});
-
-    // On expand event, we burst the priority of this thread to load before the others
-    $('.accordion-heading').click(function(){
-        var load_faster = $('.accordion-inner', $(this).parent()).attr('id');
-        console.log("Thread state for "+load_faster+": "+threads[load_faster]);        
-        if(threads[load_faster] != null){
-            threads[load_faster].setPriority(0);
-        }        
-    });
-
-    var json_aux = '{{apiinfo|safe}}';
-
     
-    if (json_aux == '' || json_aux == null || json_aux.length == 2) {
-        $("#pivot_table_extra_information").html('No information available. You can add information from external applications with <a href="api-info">API web services.</a>');
-    } else {
-        $("#btn_pivot_table").removeClass("hidden");
-        $("#btn_pivot_table").addClass("show");
-        json_aux = json_aux.replace("/&quot;/g", "\"");
-        
-        json = JSON.parse(json_aux);
-        //console.log(json_aux);
-        //console.log(json);
-        var json2 = json;
-        json = json_to_d3json(json);
-        json.x0 = 0;
-        json.y0 = 0;
-    
-        update(root = json);
-        $("#pivot_table_extra_information").html(json_to_table(json2));
-    }
-
-        $('#show_hide_button').click(function(){
-           if($(this).hasClass('hiding_empty')){
-            $(this).removeClass('hiding_empty');
-            $(this).text('Hide Empty');
-
-            // Show empty
-            $('.hide_empty_content').removeClass('hide_empty_content');
-
-            // double check expansions
-            //$("#collapseall_metadata").click();
-            //$("#collapseall_metadata").click();
-
-           } else {
-            $(this).addClass('hiding_empty');
-            $(this).text('Show Empty');
-
-            // Hide empty
-            $('.value_content').each(function(){
-                if( $(this).text().trim().length == 0){
-                    $(this).parent().addClass('hide_empty_content');
-                }
-            });
-
-            $('.hide_empty_content').parent().parent().each(function(){
-                var visible = $(this).find('tr:visible').length;
-                if (visible === 1){
-                    $(this).parent().parent().parent().addClass('hide_empty_content');
-                }
-            });
-           }
-        });
-    });
-    /* On tab change, to literature tab, lazy load literature tab */
-    $(document).on('shown', 'a[data-toggle="tab"]', function (e) {
-        if($(e.target).text().toLowerCase().indexOf('literature')!=-1){
-            // if not loaded yet
-            if($('#literature').find('.loadingsection').length != 0){
-                console.log("Loading literature, since it was not loaded yet.");
-
-                {% if user.is_authenticated %}
-                $.get( "literature/{{fingerprint_id}}", function( data ) {
-                {% else %}
-                $.post( "literature/{{fingerprint_id}}", {publickey:'{{public_key.hash}}'}, function( data ) {
-                {% endif %}
-                    $( "#literature" ).html( data );
-                
-                });
-            }
-
-        }
-    });
- {% if isAdvanced %}
- var bool_container;
-$(function(){
-
-    bool_container = $('#bool_container').boolrelwidget({view_only: true, view_serialized_string: '{{request.session.serialization_query}}', link_back: $('#base_link').prop('href')+"advancedSearch/{{request.session.query_type}}/1/{{request.session.query_id}}"});
-
-
-});
-{% endif %}
-
 {% endblock %}
-
+</script>
