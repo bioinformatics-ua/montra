@@ -134,7 +134,7 @@
                         </div>
                         {% endif %}
                         <div class="pull-right btn-group">
-                            <button style="display: none;" type="button" class="btn" id="show_hide_button">Hide Empty</button>
+                            <button type="button" class="btn" id="show_hide_button">Hide Empty</button>
 
                             <a id="collapseall_metadata" class="btn" href=""><i class="icon-plus"></i>&nbsp; Expand all</a>
                         </div> 
@@ -346,6 +346,7 @@ function pushQsets(){
     // We build the qs containers in memory and just do dom op, on the end, for speed
     // on ie joins are significantly faster than concatenation
     // tuple = k, qs
+
     {% for tuple, permissions in qsets %}
             {% if permissions.visibility == 0 or owner_fingerprint or request.user.is_superuser %}
                 containers.push('<div class="{% if not permissions.allow_printing %}noprinting {% endif %}'+
@@ -355,7 +356,7 @@ function pushQsets(){
                 '{% if permissions.visibility == 1 and owner_fingerprint %}<i class="tooltipit icon-eye-close" title="This questionset is private, only the data custodian can see it." ></i>{% endif %}'+
                 '{% if not permissions.allow_printing %}<img class="tooltipit" title="The data custodian doesn\'t allow this section to be printed." src="{{ STATIC_URL}}img/noprint.png"/>{% endif %}'+
                 '{% if not permissions.allow_exporting %}<img class="tooltipit" title="The data custodian doesn\'t allow this section to be exported." src="{{ STATIC_URL}}img/noexport.png"/>{% endif %}'+
-                '<span class="accordion-icon"></span></div><div id="collapse{{ tuple.0|removespaces|safe|clean }}" class="accordion-body collapse"><div id="qs_{{ tuple.1.sortid }}" class="accordion-inner"><h4 class="pull-center loadingsection">Loading...</h4></div></div></div>');
+                '<span class="accordion-icon">{% if tuple.1.highlights %}<img title="This section has search keywords" class="markered" src="{{ STATIC_URL}}img/marker.png" /> {% endif %}</span></div><div id="collapse{{ tuple.0|removespaces|safe|clean }}" class="accordion-body collapse"><div id="qs_{{ tuple.1.sortid }}" class="accordion-inner"><h4 class="pull-center loadingsection">Loading...</h4></div></div></div>');
             {% endif %}
     {% endfor %}
     $('#set_container').append(containers.join(''));

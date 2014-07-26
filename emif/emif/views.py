@@ -1970,6 +1970,7 @@ def handle_qset(fingerprint, clean, qsets, qset, answers, fingerprint_ttype, rHi
     question_group = QuestionGroup()
     question_group.sortid = qset.sortid
     question_group.qsid = qset.id
+    question_group.highlights = False
     
     qsets[qset.text] = question_group
     # questions() already gives us questions ordered by number
@@ -2042,10 +2043,14 @@ def handle_qset(fingerprint, clean, qsets, qset, answers, fingerprint_ttype, rHi
                 t.value = value.replace("#", " ")
                 
                 if rHighlights != None and slug+'_t' in rHighlights:
+                    try:
+                        qsets[question.questionset.text].highlights = True
+                    except:
+                        pass
+
                     t.value = rHighlights[slug+'_t'][0].encode('utf-8')
                     #if len(highlights["results"][k])>1:
                     #print t.value
-                
                 if not noprocessing:
                     if t.ttype in Fingerprint_Summary:
                         t.value = Fingerprint_Summary[t.ttype](raw_value)

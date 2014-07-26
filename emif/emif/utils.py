@@ -174,6 +174,7 @@ class QuestionGroup:
         self.name = ""
         self.sortid = ""
         self.qsid = ""
+        self.highlights = False
         #self.qsid = -1
 
         self.info = False

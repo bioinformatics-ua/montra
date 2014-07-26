@@ -1,16 +1,22 @@
  var bool_container;
+ var expanded = false;
 
  function collapse_expand(context) {
      if ($(context).text().indexOf('Collapse') !== -1) {
+         expanded = false;
          $(context).html('<i class="icon-plus"></i>&nbsp; Expand all');
          //change_name_collapse(false);
 
          $(".collapse:visible").collapse("hide");
 
+
      } else {
+         expanded = true;
          $(context).html('<i class="icon-minus"></i>&nbsp; Collapse all');
          //change_name_collapse(true);
          $(".collapse:visible").collapse("show");
+
+         loadRemainingQsets();
      }
  }
 
@@ -341,13 +347,13 @@
          template: '<div class="popover popover-medium"><div class="arrow"></div><div class="popover-inner"><h3 class="popover-title"></h3><div class="popover-content"><p></p></div></div></div>'
      });
  }
- var abortAllRequests = function (){
-    for (var request in ajaxRequests) {
-      if (ajaxRequests.hasOwnProperty(request)) {
-        ajaxRequests[request].abort();
-      }
-    }
-    ajaxRequests = {};
+ var abortAllRequests = function() {
+     for (var request in ajaxRequests) {
+         if (ajaxRequests.hasOwnProperty(request)) {
+             ajaxRequests[request].abort();
+         }
+     }
+     ajaxRequests = {};
  }
  var threadpool = new TaskQueuer(20, 200);
  var threads = {};
@@ -355,6 +361,49 @@
  var ajaxRequestId = 10000;
  var ajaxRequests = {};
 
+ /**
+   * This enforces empty rows removal (because of lazy loading and such, we must reapply this after each load to maintain consistency)
+   */
+ function enforceEmpties() {
+     var self = $('#show_hide_button');
+
+     if (self.hasClass('hiding_empty')) {
+         hideEmpties(self);
+     } else {
+         showEmpties(self);
+     }
+ }
+
+ function showEmpties(self) {
+     self.removeClass('hiding_empty');
+     self.text('Hide Empty');
+
+     // Show empty
+     $('.hide_empty_content').removeClass('hide_empty_content');
+
+     // double check expansions
+     //$("#collapseall_metadata").click();
+     //$("#collapseall_metadata").click();
+ }
+
+ function hideEmpties(self) {
+     self.addClass('hiding_empty');
+     self.text('Show Empty');
+
+     // Hide empty
+     $('.value_content').each(function() {
+         if ($(this).text().trim().length == 0) {
+             $(this).parent().addClass('hide_empty_content');
+         }
+     });
+
+     $('.hide_empty_content').parent().parent().each(function() {
+         var visible = self.find('tr:visible').length;
+         if (visible === 1) {
+             $(this).parent().parent().parent().addClass('hide_empty_content');
+         }
+     });
+ }
 
  function initDatabaseInfo(json_aux) {
      load_questionnary();
@@ -392,34 +441,11 @@
       *  Setup show hide button event
       */
      $('#show_hide_button').click(function() {
-         if ($(this).hasClass('hiding_empty')) {
-             $(this).removeClass('hiding_empty');
-             $(this).text('Hide Empty');
-
-             // Show empty
-             $('.hide_empty_content').removeClass('hide_empty_content');
-
-             // double check expansions
-             //$("#collapseall_metadata").click();
-             //$("#collapseall_metadata").click();
-
+         var self = $(this);
+         if (self.hasClass('hiding_empty')) {
+             showEmpties(self);
          } else {
-             $(this).addClass('hiding_empty');
-             $(this).text('Show Empty');
-
-             // Hide empty
-             $('.value_content').each(function() {
-                 if ($(this).text().trim().length == 0) {
-                     $(this).parent().addClass('hide_empty_content');
-                 }
-             });
-
-             $('.hide_empty_content').parent().parent().each(function() {
-                 var visible = $(this).find('tr:visible').length;
-                 if (visible === 1) {
-                     $(this).parent().parent().parent().addClass('hide_empty_content');
-                 }
-             });
+             hideEmpties(self);
          }
      });
 
@@ -484,21 +510,17 @@
              } catch (err) {
                  console.error("Error retrieving sortid for qs lazy loading");
              }
-             console.log('Loading qs '+sortid);
-
-             var resumethreadpool = false;
-             if(Object.keys(ajaxRequests).length > 0) 
-                resumethreadpool = true;
+             console.log('Loading qs ' + sortid);
 
              abortAllRequests();
              threadpool.abort();
 
              loadqspart(sortid, global_fingerprint_id);
 
-             if(resumethreadpool){
-                loadRemainingQsets();
+             if (expanded) {
+                 loadRemainingQsets();
              }
-             
+
 
          }
      });
@@ -520,77 +542,60 @@
 
  function loadqspart(sortid, pk) {
      if (global_is_authenticated === true) {
-        var request = $.ajax({
+         var request = $.ajax({
              url: "fingerprintqs/" + pk + "/" + sortid + "/",
              type: 'GET',
              success: function(data) {
                  delete ajaxRequests[ajaxRequestId];
                  $("#qs_" + sortid).html(data);
-                 markHighLights(sortid);
 
-                 
-
-                 threads[sortid] = true;
-                 try { this.complete(); } catch(err){}
+                 enforceEmpties();
              },
-        });  
-        ajaxRequests[ajaxRequestId++] = request;
+         });
+         ajaxRequests[ajaxRequestId++] = request;
 
      } else {
-        var request = $.ajax({
+         var request = $.ajax({
              url: "fingerprintqs/" + pk + "/" + sortid + "/",
              type: 'POST',
-             data: { publickey: global_public_key },
+             data: {
+                 publickey: global_public_key
+             },
              success: function(data) {
                  delete ajaxRequests[ajaxRequestId];
                  $("#qs_" + sortid).html(data);
-                 markHighLights(sortid);
 
-                 threads[sortid] = true;
-                 try { this.complete(); } catch(err){}
+                 enforceEmpties();
              },
-        });
+         });
 
-        ajaxRequests[ajaxRequestId++] = request;
-
+         ajaxRequests[ajaxRequestId++] = request;
+         threads[sortid] = true;
+         try {
+             this.complete();
+         } catch (err) {}
      }
  }
-
- function markHighLights(sortid) {
-    var qs = $("#qs_" + sortid);
-     // Mark the tab as highlighted if there's any highlight inside it
-     var highlights = qs.find('.highlight');
-
-     if (highlights.length > 0) {
-         var this_row = qs.parent().siblings().find('.accordion-icon');
-         this_row.html('<img title="This section has search keywords" class="markered" src="' + $('#base_link').prop('href') + 'static/img/marker.png" />');
-         $(".markered", this_row).tooltip({
-             container: "body"
-         });
-         $(".markered", this_row).click(function() {
-             this_row.parent().siblings().first().collapse('toggle');
-         });
-     }
- }
-/**
+ /**
   * Since we allow expand all functionalities, we must still load all questionsets when they are all open at once
   * and this is done as was done before, with threadpool (lazy loading one qset doesnt need threadpool)
   */
-function loadRemainingQsets(){
-    threadpool = new TaskQueuer(20, 200);
-    var not_loaded = findRemainingQsets();
-    for(var i=0;i<not_loaded.length;i++){
-        var thread = new Runnable(loadqspart, thread_priority++, not_loaded[i], global_fingerprint_id);
-        threadpool.run(thread);
-        threads[not_loaded[i]] = thread;
-    }
-}
-function findRemainingQsets(){
-    var not_loaded = []
-    $('[id^="qs_"]').each(function(key, value){
-        if($(value).find('.loadingsection').length != 0)
-            not_loaded.push(value.id.split("_")[1]);
-    });
+ function loadRemainingQsets() {
+     threadpool = new TaskQueuer(20, 200);
+     var not_loaded = findRemainingQsets();
+     for (var i = 0; i < not_loaded.length; i++) {
+         var thread = new Runnable(loadqspart, thread_priority++, not_loaded[i], global_fingerprint_id);
+         threadpool.run(thread);
+         threads[not_loaded[i]] = thread;
+     }
+ }
 
-    return not_loaded;
-}
+ function findRemainingQsets() {
+     var not_loaded = []
+     $('[id^="qs_"]').each(function(key, value) {
+         if ($(value).find('.loadingsection').length != 0)
+             not_loaded.push(value.id.split("_")[1]);
+     });
+
+     return not_loaded;
+ }
