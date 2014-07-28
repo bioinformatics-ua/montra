@@ -47,8 +47,10 @@
 <!--[if gte IE 9]><!-->
 
     {% if not contains_population and owner_fingerprint %}
+         <h4 class="pull-center">No population characteristics associated with this database yet.</h4>
+    <p class="pull-center">This database fingerprint does not have population characteristics. Submit the Population Characteristics file that can be extracted using <a onclick="return false;" href="">Jerboa</a>.</p>
 
-    This database fingerprint does not have population characteristics. Submit the Population Characteristics file that can be extracted using <a onclick="return false;" href="">Jerboa</a>.
+    
 
 
     <form id="jerboaupload" method="post" action="." enctype="multipart/form-data">
@@ -220,10 +222,8 @@
     </div>
 
     {% else %}
-
-This database fingerprint does not have population characteristics yet. Please contact the database owner to get more information.
-    
-    
+     <h4 class="pull-center">No population characteristics associated with this database yet.</h4>
+    <p class="pull-center">This database fingerprint does not have population characteristics yet. Please contact the database owner to get more information.</p>
     {% endif %}
 
 
