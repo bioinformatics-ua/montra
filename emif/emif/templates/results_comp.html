@@ -4,8 +4,14 @@
 {% load django_bootstrap_breadcrumbs %}
 
 {% block breadcrumbs %}
-    {{ block.super }}
+    {{ block.super }} 
+    {% if request.session.query %}
     {% breadcrumb "Search" "resultsdiff/1" %} 
+    {% elif request.session.list_origin == 'personal' %} 
+    {% breadcrumb "Personal" "databases" %} 
+    {% else %} 
+    {% breadcrumb "All" "alldatabases" %} 
+    {% endif %}
 
     {% breadcrumb "Compare Databases" "" %}
 
@@ -132,16 +138,18 @@ th, td {
 
               <tbody>
                 {% for t in v.list_ordered_tags %}
-                <tr data-fingerprintid="HEADER" 
-                data-rowid="{{forloop.parentloop.counter}}_{{forloop.counter}}" class="entry rowid_{{forloop.parentloop.counter}}_{{forloop.counter}}">
-                  <td style="background-color: white; font-size: 85%;" class="tooltippable" data-original-title="{{ t.tag|removehs }}" title="">
-                  
-                  
-                  {{ t.tag|removehs }}
-                  
-                  </td> 
+                  {% if t.ttype != 'publication' %}
+                  <tr data-fingerprintid="HEADER" 
+                  data-rowid="{{forloop.parentloop.counter}}_{{forloop.counter}}" class="entry rowid_{{forloop.parentloop.counter}}_{{forloop.counter}}">
+                    <td style="background-color: white; font-size: 85%;" class="tooltippable" data-original-title="{{ t.tag|removehs }}" title="">
+                    
+                    
+                    {{ t.tag|removehs }}
+                    
+                    </td> 
 
-                </tr>
+                  </tr>
+                  {% endif %}
                 {% endfor %}
               </tbody>
             </table>
@@ -158,7 +166,7 @@ th, td {
     <div id="db_{{fingerprint_id}}" class="database_listing database_listing_away">
     <div {% if forloop.first%}style="margin-left: 0px;"{% endif %}>
      <div data-clampedwidth=".database_listing" class="clearfix database_title btn-darkgrey">
-      <div class="database_title_text pull-left">{{content.name}}</div>
+      <div data-title="{{content.name}}" class="database_title_text pull-left tooltippable">{{content.name|ellipsis:25}}</div>
       <div class="dropdown_placer pull-right">
           ---
       </div>
@@ -166,23 +174,25 @@ th, td {
       {% for k,v in content.qset.ordered_items %}
       <div data-clampedwidth=".database_listing" style="background-color: white;" data-block="{{forloop.counter}}" class="block_{{forloop.counter}} elips accordion-group">
         <div title="{{k|removeh1}}" class="tooltippable accordion-heading">
-          <small><a id="a_collapse{{k|removespaces}}_{{content.name|removespaces}}" class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapse{{k|removespaces}}_{{content.name|removespaces}}">
+          <small><a id="a_collapse{{k|removespaces}}_{{content.name|removespaces|hash}}" class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapse{{k|removespaces}}_{{content.name|removespaces|hash}}">
           <div class="linktoellipse">{{k|removeh1}}</div></a></small>
         </div>
-        <div id="collapse{{k|removespaces}}_{{content.name|removespaces}}" class="accordion-body collapse">
+        <div id="collapse{{k|removespaces}}_{{content.name|removespaces|hash}}" class="accordion-body collapse">
           <div class="accordion-inner">
 
-            <table id="{{fingerprint_id|removespaces}}_{{k|removespaces}}" class="table table-bordered table-hover">
+            <table id="{{fingerprint_id|removespaces}}_{{k|removespaces|hash}}" class="table table-bordered table-hover">
               <thead></thead>
 
               <tbody>
                 {% for t in v.list_ordered_tags %}
-                <tr data-fingerprintid="{{fingerprint_id}}" 
-                    data-rowid="{{forloop.parentloop.counter}}_{{forloop.counter}}"
-                class="entry rowid_{{forloop.parentloop.counter}}_{{forloop.counter}}">
-                  <td style="width:0 !important;" class="tooltippable" data-original-title="{{ t.tag|removehs }}" title="">{{ t.tag|removehs }}</td> 
-                   <td style="font-size: 95%;" class="tooltippable" data-original-title="{{ t.value }}" title="">{{ t.value }}</td>
-                </tr>
+                  {% if t.ttype != 'publication' %}
+                  <tr data-fingerprintid="{{fingerprint_id}}" 
+                      data-rowid="{{forloop.parentloop.counter}}_{{forloop.counter}}"
+                  class="entry rowid_{{forloop.parentloop.counter}}_{{forloop.counter}}">
+                    <td style="width:0 !important;" class="tooltippable" data-original-title="{{ t.tag|removehs }}" title="">{{ t.tag|removehs }}</td> 
+                     <td style="font-size: 95%;" class="tooltippable" data-original-title="{{ t.value }}" title="">{{ t.value }}</td>
+                  </tr>
+                  {% endif %}
                 {% endfor %}
               </tbody>
             </table>
@@ -196,7 +206,7 @@ th, td {
     </div>
     </div>
     <div id="no_results" class="pull-center"><h4>No results found, for this filtering parameters.</h4></div>
-    <div id="comparingwait" class="pull-center"><h4>Comparing results, please wait</h4></div>
+    <div style="display: none;" id="comparingwait" class="pull-center"><h4>Comparing results, please wait</h4></div>
   </div>
 </div>
 
@@ -385,7 +395,7 @@ $(function(){
   dbs.addDatabase(
     '{{fingerprint_id}}', 
     {
-      label: '{{content.name}}'
+      label: '{{content.name|removespaces|hash}}'
     });
   {% endfor %}
 
@@ -427,7 +437,6 @@ $('[data-clampedwidth]').each(function () {
       top: 150
     }
   })
-
 });
 var databases = [];
 
@@ -436,8 +445,6 @@ function compareDatabase(base, other){
   //console.log(base)
   this.complete();
 }
-
-compareDatabases(false);
 
 {% endblock %}
 <!--<![endif]-->

@@ -24,10 +24,14 @@ from django.template.defaultfilters import stringfilter
 
 from questionnaire.models import Questionnaire
 
+import hashlib
+
+from django.conf import settings
+
 register = template.Library()
 
 
-from django.conf import settings
+
 
 @register.filter(name='removeh1')
 @stringfilter
@@ -113,6 +117,10 @@ def removespaces(value):
 
     return result
 
+@register.filter(name='hash')
+@stringfilter
+def hash(value):
+    return hashlib.sha224(value).hexdigest()
 
 @register.filter(name='truncate')
 @stringfilter
