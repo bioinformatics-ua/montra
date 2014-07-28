@@ -823,6 +823,26 @@ class RemoveNotificationView(APIView):
         return Response({'success': False }, status=status.HTTP_400_BAD_REQUEST)
 
 ############################################################
+##### Request Answer - Web services
+############################################################
+class RequestAnswerView(APIView):
+    authentication_classes = (SessionAuthentication, BasicAuthentication)
+    permission_classes = (IsAuthenticated,)    
+    def post(self, request, *args, **kw):
+        # first we get the email parameter
+        fingerprint_id = request.POST.get('fingerprint_id', '')
+        question = request.POST.get('question', '')      
+               
+        print fingerprint_id+ " : "+question
+
+        result = {
+            'fingerprint_id': fingerprint_id,
+            'question': question
+            }
+        response = Response(result, status=status.HTTP_200_OK)
+        return response
+
+############################################################
 ############ Auxiliar functions ############################
 ############################################################
 def validate_fingerprint(user, fingerprintID):

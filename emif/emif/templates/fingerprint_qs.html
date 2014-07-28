@@ -14,17 +14,7 @@
 					<tr>
 						<!-- title="{{ t.tag|safe }}" -->
 						<td class="tooltipped" title="{{ t.tag|removehs|safe }}">
-							{% if t.value == "" %}
-						    <div class="pull-left requestanswerbtn">
-						    	<input class="requestanswer" type="hidden" value="{{ t.tag|removehs|safe }}" />
-						    	<i class="fa fa-bell"></i>
-						    	<span style="display: none;" class="requestlabel">&nbsp;Request Answer</span>
-						    </div>
-						    {% endif %}
-						  &nbsp;
-						
-						{{ t.tag|removehs|safe }}
-							
+							{{ t.tag|removehs|safe }}	
 						</td>
 						{% if t.ttype|captioned %}
 						<td class="value_content captioned_content" style="white-space: normal;" title="{{ t.value|force_escape }}">
@@ -32,6 +22,12 @@
 						<td class="value_content" style="white-space: normal;">
 						{% endif %}
 						<span class="summary_content">
+						{% if t.value == "" and user.is_authenticated %}
+						    <div class="requestanswerbtn">
+						    	<input class="requestanswer" type="hidden" value="{{ t.tag|removehs|safe }}" />
+						    	<button style="margin-top: -6px;margin-bottom: -6px;" class="btn input-block-level requestlabel depon_class">Request Answer</button>
+						    </div>
+						{% endif %}
 						{{ t.value|safe }}
 						</span>
 
@@ -67,10 +63,12 @@
 });
 
 	$(function(){
-		$('.requestanswerbtn').click(function(e){
+		$('.requestanswerbtn', $('#t2_{{qs.sortid}}')).click(function(e){
 			var answer = $(this).find('.requestanswer').val();
-			console.log(answer);
+			
+			var confirmed = confirm("This question doesn't have an answer, do you want to request the owner of this database to answer this question ?");
 
+			if(confirmed){
 			  $.post("api/requestanswer", { fingerprint_id: '{{fingerprint_id}}', question: answer })
 				  .done(function(response) {
 				    alert('A request for this answer was sent to the owner of the database.');
@@ -78,17 +76,15 @@
 				  .fail(function(){
 				    console.log('Failed sending request for answer');
 				  });
+			
+			}
 
 		});
-		$('.requestanswerbtn').mouseover(function(e){
+		$('.value_content').mouseover(function(e){
 			$(this).find('.requestlabel').show();
-			$(this).addClass('btn');
-			$(this).addClass('btn-small');
 		});
-		$('.requestanswerbtn').mouseout(function(e){
+		$('.value_content').mouseout(function(e){
 			$(this).find('.requestlabel').hide();
-			$(this).removeClass('btn');
-			$(this).removeClass('btn-small');
 		});
 	});
 
