@@ -300,11 +300,13 @@ def indexFingerprint(fingerprint_id):
         for answer in answers:
             # We try to get permissions preferences for this question
             permissions = getPermissions(fingerprint_id, QuestionSet.objects.get(id=answer.question.questionset.id))
+            
+            slug = answer.question.slug_fk.slug1
 
-            if permissions.allow_indexing:
-                setProperFields(d, answer.question, answer.question.slug_fk.slug1, answer.data)
+            if permissions.allow_indexing or slug == 'database_name':
+                setProperFields(d, answer.question, slug, answer.data)
                 if answer.comment != None:
-                    d['comment_question_'+answer.question.slug_fk.slug1+'_t'] = answer.comment
+                    d['comment_question_'+slug+'_t'] = answer.comment
             
         
         d['text_t']= generateFreeText(d)
