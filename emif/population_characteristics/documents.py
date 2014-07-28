@@ -135,7 +135,7 @@ def single_qset_view(request, runcode, qsid, template_name='fingerprint_qs.html'
 
     qset, name, db_owners, fingerprint_ttype = createqset(runcode, qsid, highlights=h)   
     
-    return render(request, template_name,{'request': request, 'qset': qset})   
+    return render(request, template_name,{'request': request, 'qset': qset, 'fingerprint_id': runcode})   
 
 
 def document_form_view(request, runcode, qs, activetab='summary', readOnly=False,

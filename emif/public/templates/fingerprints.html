@@ -4,14 +4,14 @@
 {% load django_bootstrap_breadcrumbs %}
 
 {% block breadcrumbs %}
-
         {% breadcrumb "Databases" "home" %}
         {% breadcrumb "My Public Links" "" %}
-
 {% endblock %}
-    {% block toolbar %}
+
+{% block toolbar %}
     {% include "menu_toolbar.html" with collapse=collapseall %}
-    {% endblock %}
+{% endblock %}
+
 {% block content %}
     
     {% if added %}

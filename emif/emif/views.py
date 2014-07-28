@@ -588,6 +588,7 @@ def database_edit_qs(request, fingerprint_id, questionnaire_id, sort_id):
     response = render_one_questionset(request, questionnaire_id, sort_id, fingerprint_id = fingerprint_id, is_new=False,
                                                template_name='fingerprint_add_qs.html')
 
+
     return response
 
 def database_detailed_qs(request, fingerprint_id, questionnaire_id, sort_id):
@@ -763,6 +764,14 @@ def render_one_questionset(request, q_id, qs_id, errors={}, aqid=None, fingerpri
         if template_name == 'fingerprint_search_qs.html':
             advanced_search = True
 
+        ansrequests = []
+        if is_new == False and readonly == False:
+            ansrequests = AnswerRequest.objects.filter(fingerprint = this_fingerprint, question__questionset__sortid=qs_id, removed = False)
+
+            print "---"
+            print ansrequests
+            print "---"
+
         r = r2r(template_name, request,
                 questionset=question_set,
                 questionsets=question_set.questionnaire.questionsets,
@@ -784,6 +793,7 @@ def render_one_questionset(request, q_id, qs_id, errors={}, aqid=None, fingerpri
                 permissions=permissions,
                 readonly=readonly,
                 aqid = aqid,
+                answer_requests = ansrequests
         )
 
         r['Cache-Control'] = 'no-cache'
@@ -1084,8 +1094,6 @@ def database_edit_dl(request, fingerprint_id, questionnaire_id, sort_id, templat
 
 def database_edit(request, fingerprint_id, questionnaire_id, sort_id=1, template_name="database_edit.html", readonly=False):
     
-    print sort_id
-
     try: 
         this_fingerprint = Fingerprint.objects.get(fingerprint_hash=fingerprint_id)
         
@@ -1102,21 +1110,15 @@ def database_edit(request, fingerprint_id, questionnaire_id, sort_id=1, template
 
         answers = Answer.objects.filter(fingerprint_id=this_fingerprint)
 
-        print answers
-
         # well this doesnt scale well, we should have the database name on the fingerprint
         # it probably will be mitigated by using the descriptor that should be updated on save...
-        fingerprint_name = 'unnamed' 
-
-        for answer in answers:
-            print answer
-            slug = answer.question.slug_fk.slug1
-            if answer.question.slug_fk.slug1 == 'database_name':
-                fingerprint_name = answer.data
-                break
+        fingerprint_name = findName(this_fingerprint)
 
         # count questionset filled answers
         qreturned = []
+
+        # mark questionsets that have questions request by other users
+        requests = AnswerRequest.objects.filter(fingerprint = this_fingerprint, removed=False)
 
         for x in question_set.questionnaire.questionsets():
             ttct = x.total_count()
@@ -1126,7 +1128,10 @@ def database_edit(request, fingerprint_id, questionnaire_id, sort_id=1, template
             except ZeroDivisionError:
                 percentage = 0
 
-            qreturned.append([x, ans, ttct, percentage])
+            hasRequests = False
+            questionset_requests = requests.filter(question__questionset=x)
+
+            qreturned.append([x, ans, ttct, percentage, questionset_requests])
 
 
         r = r2r(template_name, request,
@@ -1928,7 +1933,8 @@ def creatematrixqsets(db_type, fingerprints, qsets):
 
     return (q_list, ans)
 
-def createqsets(runcode, qsets=None, clean=True, highlights=None, getAnswers=True, choosenqsets=None, fullmode=True, noprocessing=False, changeSearch=False):
+def createqsets(runcode, qsets=None, clean=True, highlights=None, getAnswers=True, 
+    choosenqsets=None, fullmode=True, noprocessing=False, changeSearch=False):
     try:
         if fullmode:
             fingerprint = Fingerprint.objects.get(fingerprint_hash=runcode)
@@ -2056,6 +2062,7 @@ def handle_qset(fingerprint, clean, qsets, qset, answers, fingerprint_ttype, rHi
 
     for question in list_questions:
         t = Tag()
+        t.id = question.id
         t.tag = question.text
         t.value = ""
         t.number = question.number

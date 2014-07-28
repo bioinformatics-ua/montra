@@ -158,6 +158,9 @@
             <i class="icon-check green">&nbsp;</i>
             </span>
             {% endif %}
+            {% if answer_requests|length > 0 %} 
+                {% ans_requested question answer_requests %}
+            {% endif %}
         </div>
         {% if question.text|geths == 'h1' %}
         </a>
@@ -311,6 +314,9 @@ $(function(){
             e.stopPropagation();
         }
     });
+
+    $('.tooltippable', $('#qs_{{questions_list.0.0.sortid}}')).tooltip({container:'body'});
+
 });
 
 
