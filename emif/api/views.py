@@ -69,12 +69,15 @@ from django.template.loader import render_to_string
 from emif.utils import send_custom_mail
 
 from fingerprint.models import Fingerprint, AnswerRequest
+from fingerprint.services import findName
+
 from questionnaire.models import Question
 
 from public.views import PublicFingerprintShare
 from public.services import deleteFingerprintShare, createFingerprintShare
 
 from notifications.models import Notification
+from notifications.services import sendNotification
 from population_characteristics.models import Characteristic
 
 import time
@@ -839,11 +842,12 @@ class RequestAnswerView(APIView):
                 fingerprint = Fingerprint.objects.get(fingerprint_hash=fingerprint_id)
                 question = Question.objects.get(id=question_id)
 
+                ansrequest = None
                 try:
                     ansrequest = AnswerRequest.objects.get(
                                     fingerprint=fingerprint, 
                                     question=question, 
-                                    requester=request.user)
+                                    requester=request.user, removed = False)
 
                     # If this user already request this answer, just update request time
                     ansrequest.save()
@@ -853,6 +857,12 @@ class RequestAnswerView(APIView):
                     ansrequest = AnswerRequest(fingerprint=fingerprint, question=question, requester=request.user)
                     ansrequest.save()
 
+                if ansrequest != None:
+
+                    message = str(ansrequest.requester.get_full_name())+" requested you to answer some unanswered questions on database "+str(findName(fingerprint))+"."
+
+                    sendNotification(timedelta(hours=12), fingerprint.owner, ansrequest.requester, 
+            "dbEdit/"+fingerprint.fingerprint_hash+"/"+str(fingerprint.questionnaire.id), message)
 
                 result = {
                     'fingerprint_id': fingerprint_id,

@@ -75,7 +75,6 @@ def removehs(value):
 @register.simple_tag()
 def ans_requested(question, requests, *args, **kwargs):
     try:
-        print question.id
         question_requests = requests.filter(question = question)
 
         if len(question_requests) > 0:

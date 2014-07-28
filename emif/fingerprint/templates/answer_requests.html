@@ -1,7 +1,7 @@
 <span class="pull-right">
     {% if requests|length == 1 %}
-    <i title="User {% for req in requests %}{{req.requester.get_full_name}}{% endfor %} requested an answer for this question" class="tooltippable fa fa-bell">&nbsp;</i>
+    <i title="{% for req in requests %}{{req.requester.get_full_name}}{% endfor %} requested an answer for this question" class="tooltippable fa fa-bell">&nbsp;</i>
     {% else %}
-    <i title="Users {% for req in requests %}{{req.requester.get_full_name}}, {% endfor %}requested an answer for this questions" class="tooltippable fa fa-bell">&nbsp;</i>
+    <i title="{% for req in requests %}{{req.requester.get_full_name}}, {% endfor %}requested an answer for this question" class="tooltippable fa fa-bell">&nbsp;</i>
     {% endif %}
 </span>

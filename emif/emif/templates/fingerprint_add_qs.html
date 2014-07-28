@@ -117,6 +117,9 @@
     <span class="pull-right answered hide " id="answered_{{ question.number|removedots }}">
     <i class="icon-check green">&nbsp;</i>
     </span>
+    {% if answer_requests|length > 0 %} 
+        {% ans_requested question answer_requests %}
+    {% endif %}
     {% endif %}
     <div class="question type_{{ qdict.qtype }} {% if error %} error prepend-top{% endif %}{{ qdict.qnum_class }}{{ qdict.qalpha_class }} {{qdict.depon_class}}" id="qc_{{ question.number }}" {{qdict.checkstring|safe}} >
         {% if question.text|geths == 'h1' %}
@@ -157,10 +160,11 @@
             <span class="pull-right answered hide" id="answered_{{ question.number|removedots }}">
             <i class="icon-check green">&nbsp;</i>
             </span>
-            {% endif %}
             {% if answer_requests|length > 0 %} 
                 {% ans_requested question answer_requests %}
             {% endif %}
+            {% endif %}
+            
         </div>
         {% if question.text|geths == 'h1' %}
         </a>
