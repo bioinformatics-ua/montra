@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% load url from future %}
+{% load extra_tags %}
+{% load django_bootstrap_breadcrumbs %}
+
+{% block breadcrumbs %}
+        {% breadcrumb "Databases" "home" %}
+        {% breadcrumb "Dashboard" "" %}
+{% endblock %}
+
+{% block toolbar %}
+    {% include "menu_toolbar.html" with collapse=collapseall %}
+{% endblock %}
+
+{% block headextra %}
+    <link rel="stylesheet" href="{{ STATIC_URL}}css/vendor/jquery.gridster.css" />
+
+    <link rel="stylesheet" href="{{ STATIC_URL}}css/emif.dashboard.css" />
+
+    <script src="{{ STATIC_URL}}js/vendor/jquery.gridster.min.js"></script>
+
+
+    <script src="{{ STATIC_URL}}js/emif.dashboard.js"></script>
+    <script src="{{ STATIC_URL}}js/vendor/jquery.dashboard.js"></script>
+{% endblock %}
+
+{% block content %}
+    <div id="playground" style="margin-left: 0px;" class="span12">
+    </div>
+{% endblock %}
