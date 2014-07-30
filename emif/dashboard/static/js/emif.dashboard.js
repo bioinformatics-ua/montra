@@ -18,14 +18,17 @@
     # along with this program.  If not, see <http://www.gnu.org/licenses/>.
     #
 */
+var dashzone;
 var feed;
 $(function(){
 
-    var dashzone = $("#playground").dashboard();  
+    dashzone = $("#playground").dashboard();  
     feed = new SimpleTextWidget("feed", "Feed", "Feednews<hr /> Feedanother <hr /> Feed me crazy<hr />Feednews<hr /> Feedanother <hr /> Feed me crazy", 4, 3, 1, 1);
     dashzone.addWidget(feed);
     dashzone.addWidget(new SimpleTextWidget("actions", "Common Actions", "Feednews<hr /> Feedanother <hr /> Feed me crazy", 2, 2, 5, 2));
-    dashzone.addWidget(new SimpleTextWidget("Concepts", "Concepts", "Feednews<hr /> Feedanother <hr /> Feed me crazy", 2, 1, 5, 3));
+    dashzone.addWidget(new SimpleTextWidget("concepts", "Concepts", "Feednews<hr /> Feedanother <hr /> Feed me crazy", 2, 1, 5, 3));
+
+    dashzone.loadConfiguration();
 });
 
 
