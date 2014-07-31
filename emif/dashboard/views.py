@@ -34,5 +34,5 @@ def dashboard(request, template_name='dashboard.html'):
 
 
     return render(request, template_name, {'request': request, 'hide_add': True, 
-        'breadcrumb': True })
+        'breadcrumb': True, 'dashboard': True })
 

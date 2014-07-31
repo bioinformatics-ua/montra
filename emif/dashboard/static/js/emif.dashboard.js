@@ -19,18 +19,23 @@
     #
 */
 var dashzone;
-var feed;
 $(function(){
-
-    dashzone = $("#playground").dashboard();  
-
+    dashzone = $("#playground").dashboard(
+        {
+            showRegistry: true, 
+            registryTarget: "#dashboardselectbox"
+        });  
+    // Registering plugins on dashboard
+    dashzone.register(new SimpleTextWidget("feed", "Feed", "Feednews<hr /> Feedanother <hr /> Feed me crazy<hr />Feednews<hr /> Feedanother <hr /> Feed me crazy", 4, 3, 1, 1));
+    dashzone.register(new SimpleTextWidget("actions", "Common Actions", "Feednews<hr /> Feedanother <hr /> Feed me crazy", 2, 2, 5, 2));
+    dashzone.register(new SimpleTextWidget("concepts", "Concepts", "Feednews<hr /> Feedanother <hr /> Feed me crazy", 2, 1, 5, 3));
+    
     var any_configuration = dashzone.loadConfiguration();
 
     if(any_configuration == false){
-        feed = new SimpleTextWidget("feed", "Feed", "Feednews<hr /> Feedanother <hr /> Feed me crazy<hr />Feednews<hr /> Feedanother <hr /> Feed me crazy", 4, 3, 1, 1);
-        dashzone.addWidget(feed);
-        dashzone.addWidget(new SimpleTextWidget("actions", "Common Actions", "Feednews<hr /> Feedanother <hr /> Feed me crazy", 2, 2, 5, 2));
-        dashzone.addWidget(new SimpleTextWidget("concepts", "Concepts", "Feednews<hr /> Feedanother <hr /> Feed me crazy", 2, 1, 5, 3));
+        dashzone.addWidget("feed");
+        dashzone.addWidget("actions");
+        dashzone.addWidget("concepts");
     }
 });
 

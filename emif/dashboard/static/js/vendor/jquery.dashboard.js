@@ -8,11 +8,15 @@
         var self = this;
 
         var settings = $.extend({
-
+            showRegistry: null,
+            registryTarget: null
         }, options);
 
         var gridster;
         var timer = 0;
+
+        var registered_widgets = {};
+        var in_use = {};
 
         var widgets = [
             
@@ -101,16 +105,54 @@
                         break;
                     }
                 }
+            },
+            __indexOf: function(widgetname){
+                for(var i=0;i<widgets.length;i++){
+                    if(widgets[i].widgetname == widgetname)
+                        return i;
+                }
+                return -1;
+            },
+            __renderRegistry: function(){
+                if(settings.showRegistry != null && settings.registryTarget != null){
+                    var target = $(settings.registryTarget);
+
+                    var to_render = '<a class="btn dropdown-toggle" data-toggle="dropdown" href="#" id="add_list_toolbar"><i class="icon-retweet"></i> Add Widgets <span class="caret"></span></a>'+
+                    '<ul class="dropdown-menu">';
+
+                    var no_results = true;
+                    for (var key in registered_widgets) {
+                        if (registered_widgets.hasOwnProperty(key)) {
+                            if(private_funcs.__indexOf(key) == -1){
+                                to_render += '<li><a id="'+key+'" class="dashboardaddwidget" data-widgetname="'+key+'" href="javascript:void(0)">'+registered_widgets[key].header+'</a></li>';
+                                no_results=false;
+                            }
+                        }
+
+                    }
+                    
+                    if(no_results)
+                        to_render+='<li><a id="noresultswidget" href="javascript:void(0)">No more widgets available.</a></li>'
+                    to_render+='</ul>';
+
+                    target.html(to_render);
+
+                    $(".dashboardaddwidget",target).click(function(){
+                        var key = $(this).data('widgetname');
+                        public_funcs.addWidget(key);
+                    });
+                }
             }
 
         };
 
         var public_funcs = {
-            addWidget: function(widget) {
-                console.log('Add new widget');
+            addWidget: function(widgetname) {
+                var widget = registered_widgets[widgetname];
 
                 if(widget instanceof DashboardWidget){
                     if (widget.__validate() === true){
+
                         widget.__init(gridster, public_funcs);
                         widgets.push(widget);
 
@@ -120,11 +162,22 @@
 
                     }
 
+                    private_funcs.__renderRegistry();
                     
                 } else {    
                     console.error("You can only add DashboardWidget objects to this dashboard.");
                 }
 
+            },
+            register: function(widget){
+                registered_widgets[widget.widgetname] = widget;
+            },
+            unregister: function(widgetname){
+                try{
+                    delete registered_widgets[widgetname];
+                } catch(err){
+                    console.error("Couldnt delete registered widget with name"+widgetname);
+                }
             },
             removeWidget: function(widgetname) {
                 for(var i=0;i<widgets.length;i++){
@@ -137,6 +190,7 @@
                 gridster.remove_widget.apply(gridster, $('#'+widgetname));
 
                 public_funcs.saveConfiguration();
+                private_funcs.__renderRegistry();
 
             },
             refresh: function() {
@@ -178,15 +232,19 @@
                                 eval(tryme);
                                 this_widget.deserialize(parsed_configurations[i]);
 
-                                public_funcs.addWidget(this_widget);
+                                public_funcs.register(this_widget);
+                                public_funcs.addWidget(this_widget.widgetname);
 
                             } catch(err){
                                 console.log(err);
                                 console.error("Couldnt create new widget from serialized input of type "+parsed_configurations[i].type);
                             }
                         }
+
+                        private_funcs.__renderRegistry();
+
                         return true;
-                        
+
                     } catch(err){
                         console.warn("There seems to be nothing to be loaded, going with default configuration.");
                         return false;
@@ -217,6 +275,8 @@
 
         private_funcs.__init();
 
+        private_funcs.__renderRegistry();
+
         $(window).resize(function() {
             private_funcs.__delay(function() {
                 gridster.destroy();
@@ -230,13 +290,13 @@
     };
 }(jQuery));
 
-var DashboardWidget = function DashboardWidget(widgetname, width, height, pos_x, pos_y) {
+var DashboardWidget = function DashboardWidget(widgetname, header, width, height, pos_x, pos_y) {
         this.widgetname = widgetname;
         this.width = width;
         this.height = height;
         this.pos_x = pos_x;
         this.pos_y = pos_y;
-        this.header = "";
+        this.header = header;
         this.content = "";
     
 }.addToPrototype({
@@ -248,10 +308,9 @@ var DashboardWidget = function DashboardWidget(widgetname, width, height, pos_x,
         this.widgetname+'" class="accordion-inner">'+this.content+'</div></div></li>', this.width, this.height, this.pos_x, this.pos_y];
 
         gridster.add_widget.apply(gridster, widget)
+        $('#'+this.widgetname+" .dragtooltip").tooltip({'container': 'body'});
 
-        $(".dragtooltip", $('#'+this.widgetname)).tooltip({'container': 'body'});
-
-        $(".removewidget", $('#'+this.widgetname)).click(function(){
+        $('#'+this.widgetname+" .removewidget").click(function(){
             if(typeof bootbox !== 'undefined'){
                 bootbox.confirm("Are you sure you want to remove this widget ?", function(confirmation){
                     if (confirmation)
@@ -263,12 +322,17 @@ var DashboardWidget = function DashboardWidget(widgetname, width, height, pos_x,
                     parent.removeWidget(self.widgetname);
             }
         });
+
     },
     // private methods
     __validate : function(){
         if (!(typeof this.widgetname == 'string' || this.widgetname instanceof String)) {
             console.warn('Widget name on Dashboard widget must be a string');
             return false;
+        }
+        if (!(typeof this.header == 'string' || this.header instanceof String)) {
+                console.warn('Header on Dashboard must be a string');
+                return false;
         }
         if (!(typeof this.width == 'number' || this.width instanceof Number)) {
             console.warn('Width on Dashboard widget must be a number.');
@@ -313,9 +377,8 @@ var DashboardWidget = function DashboardWidget(widgetname, width, height, pos_x,
 });
 
 var SimpleTextWidget = function SimpleTextWidget(widgetname, header, content, width, height, pos_x, pos_y){
-    SimpleTextWidget._base.apply(this, [widgetname, width, height, pos_x, pos_y]);
+    SimpleTextWidget._base.apply(this, [widgetname, header, width, height, pos_x, pos_y]);
 
-    this.header = header;
     this.content = content;
 
 }.inherit(DashboardWidget).addToPrototype({
@@ -324,10 +387,6 @@ var SimpleTextWidget = function SimpleTextWidget(widgetname, header, content, wi
         var success = SimpleTextWidget._super.__validate.apply(this);
 
         if(success){
-            if (!(typeof this.header == 'string' || this.header instanceof String)) {
-                console.warn('Header on SimpleTextWidget must be a string');
-                return false;
-            }
             if (!(typeof this.content == 'string' || this.content instanceof String)) {
                 console.warn('Content on SimpleTextWidget must be a string');
                 return false;
