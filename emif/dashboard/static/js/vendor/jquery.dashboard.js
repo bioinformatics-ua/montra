@@ -110,11 +110,13 @@
                 console.log('Add new widget');
 
                 if(widget instanceof DashboardWidget){
-                    if (widget.__validate() == true){
-                        widget.__init(gridster);
+                    if (widget.__validate() === true){
+                        widget.__init(gridster, public_funcs);
                         widgets.push(widget);
 
                         private_funcs.__clampHeight($('#'+widget.widgetname));
+
+                        public_funcs.saveConfiguration();
 
                     }
 
@@ -124,8 +126,18 @@
                 }
 
             },
-            removeWidget: function() {
-                console.log('Remove widget');
+            removeWidget: function(widgetname) {
+                for(var i=0;i<widgets.length;i++){
+                    if(widgets[i].widgetname == widgetname){
+                        widgets.splice(i,1);
+                        break;
+                    }
+                }
+
+                gridster.remove_widget.apply(gridster, $('#'+widgetname));
+
+                public_funcs.saveConfiguration();
+
             },
             refresh: function() {
                 console.log("Refreshing");
@@ -173,14 +185,17 @@
                                 console.error("Couldnt create new widget from serialized input of type "+parsed_configurations[i].type);
                             }
                         }
+                        return true;
+                        
                     } catch(err){
                         console.warn("There seems to be nothing to be loaded, going with default configuration.");
+                        return false;
                     }
                     
                     
                 } else {
                     console.error("Your browser doesn't support local storage!");
-                    return null;
+                    return false;
                 }
 
             }, serialize:   function(){
@@ -225,14 +240,29 @@ var DashboardWidget = function DashboardWidget(widgetname, width, height, pos_x,
         this.content = "";
     
 }.addToPrototype({
-    __init  :   function(gridster){
+    __init  :   function(gridster, parent){
+        var self = this;
+
         var widget = ['<li id="'+ this.widgetname+'"><div class="widget-header"><div title="Drag to change widget position" class="dragtooltip pull-left"><i class="icon-align-justify"></i></div>'+this.header+
-        '</div><div class="accordion-body"><div style="overflow:auto; height: auto;" data-clampedheight="#'+
+        '<div class="pull-right removewidget"><i class="icon-remove"></i></div></div><div class="accordion-body"><div style="overflow:auto; height: auto;" data-clampedheight="#'+
         this.widgetname+'" class="accordion-inner">'+this.content+'</div></div></li>', this.width, this.height, this.pos_x, this.pos_y];
 
         gridster.add_widget.apply(gridster, widget)
 
-        $(".dragtooltip", $('#'+this.widget_name)).tooltip({'container': 'body'});
+        $(".dragtooltip", $('#'+this.widgetname)).tooltip({'container': 'body'});
+
+        $(".removewidget", $('#'+this.widgetname)).click(function(){
+            if(typeof bootbox !== 'undefined'){
+                bootbox.confirm("Are you sure you want to remove this widget ?", function(confirmation){
+                    if (confirmation)
+                    parent.removeWidget(self.widgetname);
+                });
+            } else {
+                var confirmation = confirm("Are you sure you want to remove this widget ?");
+                if ( confirmation === true)
+                    parent.removeWidget(self.widgetname);
+            }
+        });
     },
     // private methods
     __validate : function(){
