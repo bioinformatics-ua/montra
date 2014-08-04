@@ -33,9 +33,6 @@ def dashboard(request, template_name='dashboard.html'):
     if not request.user.is_authenticated():
         raise Http404
 
-    # There's no need to show all, we just need the one's with fingerprints
-    questionnaires = Questionnaire.objects.filter(fingerprint__pk__isnull=False).distinct()
-
     return render(request, template_name, {'request': request, 'hide_add': True, 
-        'breadcrumb': True, 'dashboard': True, 'db_types': questionnaires })
+        'breadcrumb': True, 'dashboard': True })
 

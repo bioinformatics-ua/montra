@@ -28,7 +28,3 @@
     <div id="playground" style="margin-left: 0px;" class="span12">
     </div>
 {% endblock %}
-
-{% block scriptextra %}
-    var global_db_types = [{% for db in db_types %}{"id": {{db.id}},"name": "{{db.name}}"},{% endfor %}];
-{% endblock %}

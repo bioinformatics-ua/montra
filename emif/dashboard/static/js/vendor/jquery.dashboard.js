@@ -311,7 +311,8 @@ var DashboardWidget = function DashboardWidget(widgetname, header, width, height
         '<div class="pull-right removewidget"><i class="icon-remove"></i></div></div><div class="accordion-body"><div style="overflow:auto; height: auto;" data-clampedheight="#'+
         this.widgetname+'" class="accordion-inner">'+this.content+'</div></div></li>', this.width, this.height, this.pos_x, this.pos_y];
 
-        gridster.add_widget.apply(gridster, widget)
+        gridster.add_widget.apply(gridster, widget);
+
         $('#'+this.widgetname+" .dragtooltip").tooltip({'container': 'body'});
 
         $('#'+this.widgetname+" .removewidget").click(function(){
@@ -327,6 +328,10 @@ var DashboardWidget = function DashboardWidget(widgetname, header, width, height
             }
         });
 
+    },
+    __refresh    : function(){
+        console.log(this.content);
+        $('#'+this.widgetname+' .accordion-inner').html(this.content);
     },
     // private methods
     __validate : function(){

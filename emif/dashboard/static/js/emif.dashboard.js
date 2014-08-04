@@ -32,7 +32,7 @@ $(function(){
         });  
     // Registering plugins on dashboard
     dashzone.register(new SimpleTextWidget("feed", "Feed", "Feednews<hr /> Feedanother <hr /> Feed me crazy<hr />Feednews<hr /> Feedanother <hr /> Feed me crazy", 4, 3, 1, 1));
-    dashzone.register(new CommonActionsWidget("actions", global_db_types, 2, 2, 5, 2));
+    dashzone.register(new CommonActionsWidget("actions", 2, 2, 5, 2));
     dashzone.register(new SimpleTextWidget("concepts", "Concepts", "Feednews<hr /> Feedanother <hr /> Feed me crazy", 2, 1, 5, 3));
     
     var any_configuration = dashzone.loadConfiguration();
