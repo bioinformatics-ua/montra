@@ -37,7 +37,7 @@ urlpatterns = patterns('',
     url(r'^genericfilter/(?P<param>[^/]+)$', 'population_characteristics.views.generic_filter'),
 
     # Settings
-    url(r'^settings/(?P<runcode>[^/]+(/)?)$', 'population_characteristics.views.get_settings'),
+    url(r'^settings/(?P<runcode>[^/]+)(/)?$', 'population_characteristics.views.get_settings'),
 
     # Parsing Jerboa 
     url(r'^parsejerboa$', 'population_characteristics.documents.parsejerboa'),
