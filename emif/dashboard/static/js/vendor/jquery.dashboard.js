@@ -9,7 +9,8 @@
 
         var settings = $.extend({
             showRegistry: null,
-            registryTarget: null
+            registryTarget: null,
+            initial: null
         }, options);
 
         var gridster;
@@ -268,6 +269,9 @@
                 serialization+="]";
 
                 return serialization;
+            }, initial : function(){
+                if(settings.initial !== null && typeof(settings.initial) === 'function')
+                    settings.initial();
             }
         };
 

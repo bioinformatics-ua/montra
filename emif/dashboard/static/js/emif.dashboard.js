@@ -23,33 +23,22 @@ $(function(){
     dashzone = $("#playground").dashboard(
         {
             showRegistry: true, 
-            registryTarget: "#dashboardselectbox"
+            registryTarget: "#dashboardselectbox",
+            initial: function () {
+                dashzone.addWidget("feed");
+                dashzone.addWidget("actions");
+                dashzone.addWidget("concepts");
+            }   
         });  
     // Registering plugins on dashboard
     dashzone.register(new SimpleTextWidget("feed", "Feed", "Feednews<hr /> Feedanother <hr /> Feed me crazy<hr />Feednews<hr /> Feedanother <hr /> Feed me crazy", 4, 3, 1, 1));
-    dashzone.register(new SimpleTextWidget("actions", "Common Actions", "Feednews<hr /> Feedanother <hr /> Feed me crazy", 2, 2, 5, 2));
+    dashzone.register(new CommonActionsWidget("actions", global_db_types, 2, 2, 5, 2));
     dashzone.register(new SimpleTextWidget("concepts", "Concepts", "Feednews<hr /> Feedanother <hr /> Feed me crazy", 2, 1, 5, 3));
     
     var any_configuration = dashzone.loadConfiguration();
 
     if(any_configuration == false){
-        dashzone.addWidget("feed");
-        dashzone.addWidget("actions");
-        dashzone.addWidget("concepts");
+        dashzone.initial();
     }
 });
 
-/** Emif specific plugins, since they are not part of the isolated generic jquery.dashboard plugin, i put them here */
-
-var CommonActionsWidget = function SimpleTextWidget(widgetname, width, height, pos_x, pos_y){
-
-    CommonActionsWidget._base.apply(this, [widgetname, "Common Actions", width, height, pos_x, pos_y]);
-
-}.inherit(DashboardWidget).addToPrototype({
-    __init : function(){
-
-
-
-        CommonActionsWidget._super.__init.apply(this);
-    }
-});

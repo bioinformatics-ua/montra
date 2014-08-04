@@ -19,12 +19,16 @@
 
     <script src="{{ STATIC_URL}}js/vendor/jquery.gridster.min.js"></script>
 
-
-    <script src="{{ STATIC_URL}}js/emif.dashboard.js"></script>
     <script src="{{ STATIC_URL}}js/vendor/jquery.dashboard.js"></script>
+    <script src="{{ STATIC_URL}}js/vendor/widgets/widget.commonactions.js"></script>
+    <script src="{{ STATIC_URL}}js/emif.dashboard.js"></script>
 {% endblock %}
 
 {% block content %}
     <div id="playground" style="margin-left: 0px;" class="span12">
     </div>
+{% endblock %}
+
+{% block scriptextra %}
+    var global_db_types = [{% for db in db_types %}{"id": {{db.id}},"name": "{{db.name}}"},{% endfor %}];
 {% endblock %}
