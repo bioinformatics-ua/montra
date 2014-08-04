@@ -39,4 +39,17 @@ $(function(){
     }
 });
 
+/** Emif specific plugins, since they are not part of the isolated generic jquery.dashboard plugin, i put them here */
 
+var CommonActionsWidget = function SimpleTextWidget(widgetname, width, height, pos_x, pos_y){
+
+    CommonActionsWidget._base.apply(this, [widgetname, "Common Actions", width, height, pos_x, pos_y]);
+
+}.inherit(DashboardWidget).addToPrototype({
+    __init : function(){
+
+
+
+        CommonActionsWidget._super.__init.apply(this);
+    }
+});
