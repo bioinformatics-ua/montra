@@ -66,7 +66,8 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     "django.core.context_processors.tz",
     "django.contrib.messages.context_processors.messages",
     "emif.context_processors.debug",
-    "emif.context_processors.baseurl"
+    "emif.context_processors.baseurl",
+    "emif.context_processors.profiles_processor"
 )
 
 MANAGERS = ADMINS
@@ -309,6 +310,17 @@ EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 # EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 # EMAIL_HOST = 'localhost'
 # EMAIL_PORT = 1025
+
+EMAIL_HOST = 'smtp.gmail.com'
+
+EMAIL_HOST_USER = 'longinus525@gmail.com'
+
+EMAIL_HOST_PASSWORD = 'ok3pij5irb0oyT1ma0gl'
+
+EMAIL_PORT = 587
+
+EMAIL_USE_TLS = True
+
 
 
 ANONYMOUS_USER_ID = -1

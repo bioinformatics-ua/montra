@@ -173,6 +173,7 @@
                                             {% endcomment %}
                                             
                                             <li class="divider"></li>
+                                            {% if profiles|isDataCustodian %}
                                             <li class="dropdown-submenu">
                                                 <a href="" onclick="return false;">Add New</a>
                                                 <ul class="dropdown-menu">
@@ -183,6 +184,7 @@
                                                     {% endif %}
                                                 </ul>
                                             </li>
+                                            {% endif %}
                                             <li class="dropdown-submenu">
                                                 <a href="" onclick="return false;">Search</a>
                                                 <ul class="dropdown-menu">
