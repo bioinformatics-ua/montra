@@ -449,3 +449,15 @@ def send_custom_mail(title, description, from_mail, to_mail):
 
     msg.send()
 
+def removehs(value):
+    value = value.replace('h0. ','')
+    value = value.replace('h1. ','')
+    value = value.replace('h2. ','')
+    value = value.replace('h3. ','')
+    value = value.replace('h4. ','')
+    value = value.replace('h5. ','')
+    value = value.replace('h6. ','')
+    value = value.replace('h7. ','')
+
+    return value
+

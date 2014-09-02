@@ -231,6 +231,7 @@
                             try {
                                 var tryme = "this_widget = new "+parsed_configurations[i].type+"();";
                                 eval(tryme);
+                                console.log(parsed_configurations[i].type);
                                 this_widget.deserialize(parsed_configurations[i]);
 
                                 public_funcs.register(this_widget);
@@ -330,7 +331,7 @@ var DashboardWidget = function DashboardWidget(widgetname, header, width, height
 
     },
     __refresh    : function(){
-        console.log(this.content);
+        //console.log(this.content);
         $('#'+this.widgetname+' .accordion-inner').html(this.content);
     },
     // private methods
@@ -392,7 +393,7 @@ var SimpleTextWidget = function SimpleTextWidget(widgetname, header, content, wi
 
 }.inherit(DashboardWidget).addToPrototype({
     __validate : function(){
-        console.log();
+        //console.log();
         var success = SimpleTextWidget._super.__validate.apply(this);
 
         if(success){
