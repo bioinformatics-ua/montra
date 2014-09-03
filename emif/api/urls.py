@@ -53,6 +53,7 @@ urlpatterns = patterns('api.views',
     url(r'^addpubliclink$', AddPublicLinkView.as_view(), name='addpubliclink'),
     url(r'^deletepubliclink$', DeletePublicLinkView.as_view(), name='addpubliclink'),
     url(r'^dbtypes$', DatabaseTypesView.as_view(), name='dbtypes'),
+    url(r'^userstats$', UserStatsView.as_view(), name='userstats'),
     url(r'^feed$', FeedView.as_view(), name='feed'),
     
 

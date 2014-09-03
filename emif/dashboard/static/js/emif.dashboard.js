@@ -27,13 +27,13 @@ $(function(){
             initial: function () {
                 dashzone.addWidget("feed");
                 dashzone.addWidget("actions");
-                dashzone.addWidget("concepts");
+                dashzone.addWidget("userstats");
             }   
         });  
     // Registering plugins on dashboard
     dashzone.register(new FeedWidget("feed", 4, 3, 1, 1));
     dashzone.register(new CommonActionsWidget("actions", 2, 2, 5, 2));
-    dashzone.register(new SimpleTextWidget("concepts", "Concepts", "Feednews<hr /> Feedanother <hr /> Feed me crazy", 2, 1, 5, 3));
+    dashzone.register(new UserStatsWidget("userstats",  2, 1, 5, 3));
     
     var any_configuration = dashzone.loadConfiguration();
 
