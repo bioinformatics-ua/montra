@@ -29,7 +29,7 @@
     <tbody>
       {% for ans in answers %}
         <tr class="commonheight" data-common="{{forloop.counter}}">
-          <td>{{ ans.0 }}</td>
+          <td data-point="{{forloop.counter}}" class="syncpoint">{{ ans.0 }}</td>
           {% for a in ans.1 %}
             {% if a.1 == 'publication' %} 
             {% elif a.1|captioned %}
@@ -124,7 +124,27 @@ $(function() {
         console.log(table);
         $("#table_databases").trigger("sorton",[[0,0]]); 
       }
-  );
+  ).bind("filterStart", function(event, config){
+    console.log(config);
+    $('#table_databases').trigger('search', [config]);
+  });
+
+
+  
+
+  $('#table_databases').bind("filterEnd", function(event, config){
+      $('.syncpoint').each(function(){
+        var visible = $(this).parent().is(':visible');
+        var point = $(this).data('point');
+        if(!visible){
+          $('#commonheight_'+point).hide();
+        } else {
+          $('#commonheight_'+point).show();
+        }
+      });
+  });
+
+
 
   // I also need to resize the sticky header conterpart... damn it
   // tablesorter-stickyHeader
@@ -167,6 +187,8 @@ $(function() {
   $('.dataTables_scrollBody2').scroll(syncscroll);
   console.log("-"+$('#nametag').width());
   $('#table_databases').css('margin-left', "-"+(parseInt($('#nametag').width())+30)+"px");
+
+
 //$("#table_databases").stickyTableHeaders({container: ".dataTables_scrollBody"});
 });
 </script>
