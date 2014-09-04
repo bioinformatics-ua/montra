@@ -771,3 +771,7 @@ height: 6em;
 .showing_publications_info{
   margin-bottom: -15px;
 }
+.name_container{
+  min-width: 145px;
+  display: inline-block;
+}
