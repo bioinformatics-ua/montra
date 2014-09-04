@@ -55,6 +55,8 @@ from questionnaire import Processors, QuestionProcessors, Fingerprint_Summary
 
 from django.db.models import Count
 
+from accounts.models import NavigationHistory
+
 ############################################################
 ##### Database Types - Web service
 ############################################################
@@ -74,6 +76,55 @@ class DatabaseTypesView(APIView):
                 db_types.append({'id': db.id, 'name': db.name})    
 
             response = Response({'types': db_types}, status=status.HTTP_200_OK)
+
+        else:
+            response = Response({}, status=status.HTTP_403_FORBIDDEN)
+        return response
+
+############################################################
+##### Most Viewed - Web service
+############################################################
+
+
+class MostViewedView(APIView):
+    authentication_classes = (SessionAuthentication, BasicAuthentication)
+    permission_classes = (IsAuthenticated,)    
+    def get(self, request, *args, **kw):
+
+        if request.user.is_authenticated():    
+            list_viewed = []
+
+            user_history = user_history = NavigationHistory.objects.filter(user=request.user)
+            most_viewed = user_history.values('path').annotate(number_viewed=Count('path')).order_by('-number_viewed')[:10]
+
+            for viewed in most_viewed:
+                list_viewed.append({'page': viewed['path'], 'count': viewed['number_viewed']})
+
+            response = Response({'mostviewed': list_viewed}, status=status.HTTP_200_OK)
+
+        else:
+            response = Response({}, status=status.HTTP_403_FORBIDDEN)
+        return response
+
+############################################################
+##### Last Users - Web service
+############################################################
+
+
+class LastUsersView(APIView):
+    authentication_classes = (SessionAuthentication, BasicAuthentication)
+    permission_classes = (IsAuthenticated,)    
+    def get(self, request, *args, **kw):
+
+        if request.user.is_authenticated() and request.user.is_staff == True:    
+            last_users = []
+
+            users = User.objects.all().order_by('-last_login')[:10]
+
+            for user in users:
+                last_users.append(user.username)
+
+            response = Response({'lastusers': last_users}, status=status.HTTP_200_OK)
 
         else:
             response = Response({}, status=status.HTTP_403_FORBIDDEN)
@@ -117,8 +168,6 @@ class UserStatsView(APIView):
             all_dbs = my_db | my_db_share
 
             quest_types = all_dbs.order_by('questionnaire').values('questionnaire__name').annotate(Count('questionnaire')).order_by('-questionnaire__count')
-
-            print quest_types[0]['questionnaire__name']
 
             try:
                 stats['populartype'] = quest_types[0]['questionnaire__name']

@@ -1,13 +1,22 @@
 {% extends "base.html" %}
 {% load bootstrap_pagination %}
 
+{% load django_bootstrap_breadcrumbs %}
+
+{% block breadcrumbs %}
+  {{ block.super }}
+
+  {% breadcrumb "Search History" "advsearch/history" %}
+
+{% endblock %}
+
 {% block headextra %}
     <link rel="stylesheet" href="{{ STATIC_URL }}css/vendor/jquery.boolrelwidget.css"></script>
     <script src="{{ STATIC_URL}}js/vendor/jquery.boolrelwidget.js"></script>
 {% endblock %}
 
 {% block content %}
-
+<div style="margin-left: 0px;" class="span12">
 <ul class="nav nav-tabs">
   <li {% if source == '0' %} class="active" {% endif %}><a href="#simple" data-toggle="tab">Free Text History</a></li>
   <li {% if not source == '0' %} class="active" {% endif %}><a href="#advanced" data-toggle="tab">Advanced Search History</a></li>
@@ -19,5 +28,6 @@
   <div class="tab-pane {% if not source == '0' %} active {% endif %}" id="advanced">
       {% include 'advanced.html' %}
   </div>
+</div>
 </div>
 {% endblock %}

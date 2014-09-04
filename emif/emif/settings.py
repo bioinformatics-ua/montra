@@ -548,8 +548,8 @@ except ConnectionFailure, e:
     sys.exit(1)
 
 # REDIRECT USER ACCORDING TO PROFILE
-REDIRECT_DATACUSTODIAN = 'emif.views.databases'
-REDIRECT_RESEARCHER = 'emif.views.all_databases_user'
+REDIRECT_DATACUSTODIAN = 'dashboard.views.dashboard'
+REDIRECT_RESEARCHER = 'dashboard.views.dashboard'
 
 
 # MEMCACHED

@@ -142,6 +142,8 @@
                         var key = $(this).data('widgetname');
                         public_funcs.addWidget(key);
                     });
+
+
                 }
             }
 
@@ -237,6 +239,8 @@
                                 public_funcs.register(this_widget);
                                 public_funcs.addWidget(this_widget.widgetname);
 
+                                private_funcs.__clampHeight($('#'+this_widget.widgetname));
+
                             } catch(err){
                                 console.log(err);
                                 console.error("Couldnt create new widget from serialized input of type "+parsed_configurations[i].type);
@@ -248,6 +252,7 @@
                         return true;
 
                     } catch(err){
+                        console.log(err);
                         console.warn("There seems to be nothing to be loaded, going with default configuration.");
                         return false;
                     }
@@ -373,7 +378,7 @@ var DashboardWidget = function DashboardWidget(widgetname, header, width, height
                     '"pos_x": '+this.pos_x+','+
                     '"pos_y": '+this.pos_y+','+
                     '"header": "'+this.header+'",'+
-                    '"content": "'+this.content+'"'+
+                    '"content": "'+encodeURI(this.content)+'"'+
                 '}';
     }, deserialize : function(json){
         this.widgetname = json.widgetname;
@@ -382,7 +387,7 @@ var DashboardWidget = function DashboardWidget(widgetname, header, width, height
         this.pos_x = json.pos_x;
         this.pos_y = json.pos_y;
         this.header = json.header;
-        this.content = json.content;
+        this.content = decodeURI(json.content);
     }
 });
 

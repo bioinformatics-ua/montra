@@ -28,12 +28,23 @@ $(function(){
                 dashzone.addWidget("feed");
                 dashzone.addWidget("actions");
                 dashzone.addWidget("userstats");
+                dashzone.addWidget("mostviewed");
+
+                if(is_staff){
+                    dashzone.addWidget("lastusers");
+                }
             }   
         });  
     // Registering plugins on dashboard
-    dashzone.register(new FeedWidget("feed", 4, 3, 1, 1));
+    dashzone.register(new FeedWidget("feed", 4, 2, 1, 1));
     dashzone.register(new CommonActionsWidget("actions", 2, 2, 5, 2));
     dashzone.register(new UserStatsWidget("userstats",  2, 1, 5, 3));
+
+    dashzone.register(new MostViewedWidget("mostviewed",  2, 1, 6, 4));
+
+    if(is_staff){
+        dashzone.register(new LastUsersWidget("lastusers",  2, 1, 6, 5));
+    }
     
     var any_configuration = dashzone.loadConfiguration();
 
