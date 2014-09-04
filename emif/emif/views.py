@@ -183,13 +183,14 @@ def results_fulltext_aux(request, query, page=1, template_name='results.html', i
         return render(request, "results.html", {'request': request, 'breadcrumb': True,  'isSearch': True,
                                                 'results': True, 'hide_add': True,
                                                 'num_results': 0, 'page_obj': None})
+
+    query = query + " AND " + typeFilter(request.user)
+
     (sortString, filterString, sort_params, range) = paginator_process_params(request.POST, page, rows)   
     sort_params["base_filter"] = query;
     query_filtered=query
     if len(filterString) > 0:
         query_filtered += " AND " + filterString
-
-    #print query_filtered
 
     (list_databases, hits, hi) = get_databases_from_solr_with_highlight(request, query_filtered, sort=sortString, rows=rows, start=range)
     if not isAdvanced:
@@ -239,6 +240,20 @@ def results_fulltext_aux(request, query, page=1, template_name='results.html', i
         return render(request, template_name, {'request': request, 'isSearch': True,
                                            'results': True, 'hide_add': True,
                                            'num_results': hits, 'page_obj': pager, 'page_rows': rows,'breadcrumb': True, 'search_old': query_old, 'isAdvanced': False, "sort_params": sort_params, "page":page})
+
+def typeFilter(user):
+    emifprofile = user.get_profile()
+    interests = emifprofile.interests.all()
+
+    type_t_list = ""
+    if interests:
+        for i in interests:
+            type_t = i.slug.replace(" ", "").lower()
+            type_t_list+=(type_t + ",")
+
+        type_t_list = type_t_list[:-1]
+
+        return "type_t:" + type_t_list
 
 def store_query(user_request, query_executed):
     #print user_request.user.is_authenticated()
@@ -350,9 +365,12 @@ def results_diff(request, page=1, template_name='results_diff.html'):
             except User.DoesNotExist:
                 return HttpResponse("Invalid username")
 
+
             
             return results_fulltext_aux(request, query, isAdvanced=True, query_reference=this_query) 
      
+
+
     query = ""
     simple_query=None
     in_post = True

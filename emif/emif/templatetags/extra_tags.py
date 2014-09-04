@@ -235,9 +235,9 @@ def show_fingerprints():
 register.inclusion_tag('menu_ttags.html')(show_fingerprints)
 
 
-def show_fingerprints_for_search():
+def show_fingerprints_for_search(user):
     
-    return {'fingerprints':fingerprints_list()}
+    return {'fingerprints':fingerprints_list_user(user)}
 register.inclusion_tag('menu_ttags_for_search.html')(show_fingerprints_for_search)
 
 
