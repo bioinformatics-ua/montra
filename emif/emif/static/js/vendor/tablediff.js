@@ -100,7 +100,7 @@ comparetable = function(table1, table2) {
                     //console.log($(this.childNodes[3].childNodes[0]).context);
 
                     var result = compare_cell(table2, $(this.childNodes[1].childNodes[0]).context, $(this.childNodes[3].childNodes[0]).context);
-                    console.log('Result: ' + result);
+                    //console.log('Result: ' + result);
                     if (result == 1) {
 
                         console.log($('#' + table2));
@@ -466,8 +466,8 @@ function checkWords(context, word, databases){
     return fullfills_condition;
 }
 function filter_results(databases, reference, word, show_match, show_unmatch, show_emptyrows, show_proximity) {
-    console.log('filtering show_match, show_unmatch, show_emptyrows, show_proximity');
-    console.log(show_match+" - "+show_unmatch+" - "+show_emptyrows+" - "+show_proximity);
+    //console.log('filtering show_match, show_unmatch, show_emptyrows, show_proximity');
+    //console.log(show_match+" - "+show_unmatch+" - "+show_emptyrows+" - "+show_proximity);
     // reset results
     reset_results(databases, reference);
 
@@ -511,14 +511,14 @@ function filter_results(databases, reference, word, show_match, show_unmatch, sh
 function hide_uncessary_qs(table, databases) {
     var visibles_left = $(table).find('tr:visible').length;
 
-    console.log('visibles_left: '+visibles_left);
+    //console.log('visibles_left: '+visibles_left);
 
     if (visibles_left <= 0) {
         var super_parent = $(table).parent().parent().parent();
 
         var block = super_parent.data('block');
 
-        console.log(block);
+        //console.log(block);
 
         $('.block_'+block).hide();
     }
