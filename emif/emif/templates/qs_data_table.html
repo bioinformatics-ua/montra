@@ -8,9 +8,9 @@
     </tr>
 
   </thead>
-    <tbody>
+    <tbody id="commonplacer">
     {% for ans in answers %}
-      <tr><td id="commonheight_{{forloop.counter}}"> {{ ans.0 }}</td>
+      <tr data-common="{{forloop.counter}}"><td id="commonheight_{{forloop.counter}}"> {{ ans.0 }}</td>
       </tr>
     {% endfor %}
     </tbody></table>
@@ -26,7 +26,7 @@
     </tr>
 
 	</thead>
-    <tbody>
+    <tbody id="commonsource">
       {% for ans in answers %}
         <tr class="commonheight" data-common="{{forloop.counter}}">
           <td data-point="{{forloop.counter}}" class="syncpoint">{{ ans.0 }}</td>
@@ -41,13 +41,14 @@
       </tbody></table>
 </div>
 <script type="application/javascript">
+var loco = null;
 $(function() {
 
   $("#table_databases_names").tablesorter({
     theme : 'blue',
 
     // sort on the first column and third column in ascending order
-    sortList: [[0,0],[2,0]],
+    sortList: [[0,0]],
 
     // hidden filter input/selects will resize the columns, so try to minimize the change
     //widthFixed : true,
@@ -85,7 +86,7 @@ $(function() {
     theme : 'blue',
 
     // sort on the first column and third column in ascending order
-    sortList: [[0,0],[2,0]],
+    sortList: [[0,0]],
 
     // hidden filter input/selects will resize the columns, so try to minimize the change
     //widthFixed : true,
@@ -118,11 +119,16 @@ $(function() {
     
   });
 
-  $("#table_databases_names").bind("sortStart", 
+  $("#table_databases_names").bind("sortEnd", 
       function(e, table) {
-        console.log(e);
-        console.log(table);
-        $("#table_databases").trigger("sorton",[[0,0]]); 
+        
+        if($(table).find('.tablesorter-headerDesc').length != 0){
+          $("#table_databases").trigger("sorton",[[[0,1]]]); 
+        } else {
+          $("#table_databases").trigger("sorton",[[[0,0]]]); 
+        }
+
+        
       }
   ).bind("filterStart", function(event, config){
     console.log(config);
@@ -142,7 +148,32 @@ $(function() {
           $('#commonheight_'+point).show();
         }
       });
-  });
+
+    }).bind("sortEnd", 
+      function(e, table) {
+        if(e.target.config.sortList[0][0] !== 0)
+          $('#table_databases_names').trigger('sortReset');
+
+        var detached = $('#commonplacer').detach();
+        loco=detached;
+        console.log(detached);
+
+        var newcontainer = $(document.createElement('tbody'));
+
+        newcontainer.attr("id", "commonplacer");
+        newcontainer.attr("aria-live", "polite");
+        newcontainer.attr("aria-relevant", "all");
+
+        $('#table_databases_names').append(newcontainer);
+
+        $('#commonsource').children().each(function(){
+          var ident = $(this).data('common');
+
+          var find = detached.find('[data-common="'+ident+'"]').detach()
+          $('#commonplacer').append(find);
+        })
+      }
+    );
 
 
 
