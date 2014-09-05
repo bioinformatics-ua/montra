@@ -170,6 +170,36 @@ class EmailCheckView(APIView):
         return response
 
 ############################################################
+##### RemovePermissions - Web services
+############################################################
+
+
+class RemovePermissionsView(APIView):
+    authentication_classes = (SessionAuthentication, BasicAuthentication)
+    permission_classes = (IsAuthenticated,)    
+    def post(self, request, *args, **kw):
+        id = request.POST.get('id', -1)
+        hash = request.POST.get('hash')
+        valid = False
+
+        # Verify if it is a valid email
+        if id != None and id != -1 and hash != None:
+            try: 
+                finger = Fingerprint.objects.get(fingerprint_hash=hash)
+
+                username = finger.shared.get(id=id)
+
+                finger.shared.remove(username)
+
+
+                return Response({'success': True}, status=status.HTTP_200_OK)
+
+            except Fingerprint.DoesNotExist:
+                pass             
+               
+        return Response(result, status=status.HTTP_403_OK)
+
+############################################################
 ##### Population Check if exists - Web services
 ############################################################
 class PopulationCheckView(APIView):
