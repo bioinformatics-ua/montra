@@ -775,3 +775,11 @@ height: 6em;
   min-width: 145px;
   display: inline-block;
 }
+
+.comphidden{
+  width:0 !important; 
+  padding-left: 0px !important; 
+  padding-right: 0px !important;
+  margin-left: 0px !important;
+  margin-right: 0px !important;
+}
