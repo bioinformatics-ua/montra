@@ -19,6 +19,9 @@ Organization: {{ organization }}<br /><br />
 {% trans "Sincerely" %},<br />
 {{ site.name }}
 
+<div style="text-align: right;">
+    <small >To reject this request, click <a href="{{ protocol }}://{{ site.domain }}{% url 'userena_reject' activation_key %}">here</a>.</small>
+</div>
 
 {% endblock %}
 
