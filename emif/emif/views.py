@@ -1326,6 +1326,10 @@ def get_databases_process_results(results):
                 database_aux.location = r['location_t']
             if (r.has_key('PI:_Address_t')):
                 database_aux.location = r['PI:_Address_t']
+            if (r.has_key('AC__Address_t')):
+                database_aux.location = r['AC__Address_t']
+            if (r.has_key('TC__Address_t')):
+                database_aux.location = r['TC__Address_t']
 
             if (not r.has_key('institution_name_t')):
                 database_aux.institution = ''
