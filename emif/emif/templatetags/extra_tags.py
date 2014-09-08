@@ -28,6 +28,8 @@ import hashlib
 
 from django.conf import settings
 
+from accounts.models import Profile
+
 register = template.Library()
 
 
@@ -174,6 +176,30 @@ def ellipsis(str, size):
         return str[:size]+"..."
 
     return str
+
+@register.filter
+def isDataCustodian(profiles):
+    try:
+        dc = Profile.objects.get(name="Data Custodian")
+
+        if dc in profiles:
+            return True
+    except Profile.DoesNotExist:
+        pass
+
+    return False
+
+@register.filter
+def isResearcher(profiles):
+    try:
+        rs = Profile.objects.get(name="Researcher")
+
+        if rs in profiles:
+            return True
+    except Profile.DoesNotExist:
+        pass
+
+    return False
 
 def fingerprints_list():
     
