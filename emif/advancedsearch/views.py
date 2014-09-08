@@ -80,7 +80,7 @@ def history(request, source, page, page_rows=10, template_name='history.html'):
 
         pager_simple = myPaginator.page(1)
 
-    return render(request, template_name, {'request': request, 'source': source, 'queries_simple': pager_simple, 'queries': pager, 'page_rows':page_rows})
+    return render(request, template_name, {'request': request, 'source': source, 'breadcrumb': True, 'queries_simple': pager_simple, 'queries': pager, 'page_rows':page_rows})
 
 
 def resultsdiff_history(request, query_id, template_name='history.html'):
