@@ -45,7 +45,9 @@ $(function(){
     if(is_staff){
         dashzone.register(new LastUsersWidget("lastusers",  2, 1, 6, 5));
     }
-    
+
+    dashzone.register(new TagCloudWidget("tagcloud",  2, 1, 6, 6));
+
     var any_configuration = dashzone.loadConfiguration();
 
     if(any_configuration == false){

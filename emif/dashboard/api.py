@@ -251,3 +251,118 @@ class FeedView(APIView):
         else:
             response = Response({}, status=status.HTTP_403_FORBIDDEN)
         return response
+
+############################################################
+##### Tag Cloud - Web service
+############################################################
+
+
+class TagCloudView(APIView):
+    authentication_classes = (SessionAuthentication, BasicAuthentication)
+    permission_classes = (IsAuthenticated,)    
+    def get(self, request, *args, **kw):
+
+        if request.user.is_authenticated():    
+            tags = []
+
+            tags.append({
+                    'name': 'Important',
+                    'relevance': 14,
+                    'link': 'resultsdiff/1'
+                })
+            tags.append({
+                    'name': 'Moderate',
+                    'relevance': 7,
+                    'link': 'resultsdiff/2'
+                })
+            tags.append({
+                    'name': 'Low',
+                    'relevance': 4,
+                    'link': 'resultsdiff/1'
+                })
+            tags.append({
+                    'name': 'Important other',
+                    'relevance': 1,
+                    'link': 'resultsdiff/1'
+                })
+            tags.append({
+                    'name': 'Moderate s',
+                    'relevance': 3,
+                    'link': 'resultsdiff/2'
+                })
+            tags.append({
+                    'name': 'slow',
+                    'relevance': 20,
+                    'link': 'resultsdiff/1'
+                })
+            tags.append({
+                    'name': 'Important',
+                    'relevance': 1,
+                    'link': 'resultsdiff/1'
+                })
+            tags.append({
+                    'name': 'Moderate',
+                    'relevance': 32,
+                    'link': 'resultsdiff/2'
+                })
+            tags.append({
+                    'name': 'Low',
+                    'relevance': 3,
+                    'link': 'resultsdiff/1'
+                })
+            tags.append({
+                    'name': 'Important other',
+                    'relevance': 4,
+                    'link': 'resultsdiff/1'
+                })
+            tags.append({
+                    'name': 'Moderate s',
+                    'relevance': 5,
+                    'link': 'resultsdiff/2'
+                })
+            tags.append({
+                    'name': 'slow',
+                    'relevance': 24,
+                    'link': 'resultsdiff/1'
+                })
+
+            tags.append({
+                    'name': 'Important',
+                    'relevance': 14,
+                    'link': 'resultsdiff/1'
+                })
+            tags.append({
+                    'name': 'Moderate',
+                    'relevance': 7,
+                    'link': 'resultsdiff/2'
+                })
+            tags.append({
+                    'name': 'Low',
+                    'relevance': 4,
+                    'link': 'resultsdiff/1'
+                })
+            tags.append({
+                    'name': 'Important other',
+                    'relevance': 1,
+                    'link': 'resultsdiff/1'
+                })
+            tags.append({
+                    'name': 'Moderate s',
+                    'relevance': 3,
+                    'link': 'resultsdiff/2'
+                })
+            tags.append({
+                    'name': 'slow',
+                    'relevance': 20,
+                    'link': 'resultsdiff/1'
+                })
+            tags.append({
+                    'name': 'Important',
+                    'relevance': 1,
+                    'link': 'resultsdiff/1'
+                })
+            response = Response({'tags': tags}, status=status.HTTP_200_OK)
+
+        else:
+            response = Response({}, status=status.HTTP_403_FORBIDDEN)
+        return response
