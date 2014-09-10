@@ -57,10 +57,18 @@ from django.db.models import Count
 
 from accounts.models import NavigationHistory
 
+
+from django.conf import settings
+
+import json
+
+import urllib2
+
+import random
+
 ############################################################
 ##### Database Types - Web service
 ############################################################
-
 
 class DatabaseTypesView(APIView):
     authentication_classes = (SessionAuthentication, BasicAuthentication)
@@ -263,104 +271,33 @@ class TagCloudView(APIView):
     def get(self, request, *args, **kw):
 
         if request.user.is_authenticated():    
+
             tags = []
 
-            tags.append({
-                    'name': 'Important',
-                    'relevance': 14,
-                    'link': 'resultsdiff/1'
-                })
-            tags.append({
-                    'name': 'Moderate',
-                    'relevance': 7,
-                    'link': 'resultsdiff/2'
-                })
-            tags.append({
-                    'name': 'Low',
-                    'relevance': 4,
-                    'link': 'resultsdiff/1'
-                })
-            tags.append({
-                    'name': 'Important other',
-                    'relevance': 1,
-                    'link': 'resultsdiff/1'
-                })
-            tags.append({
-                    'name': 'Moderate s',
-                    'relevance': 3,
-                    'link': 'resultsdiff/2'
-                })
-            tags.append({
-                    'name': 'slow',
-                    'relevance': 20,
-                    'link': 'resultsdiff/1'
-                })
-            tags.append({
-                    'name': 'Important',
-                    'relevance': 1,
-                    'link': 'resultsdiff/1'
-                })
-            tags.append({
-                    'name': 'Moderate',
-                    'relevance': 32,
-                    'link': 'resultsdiff/2'
-                })
-            tags.append({
-                    'name': 'Low',
-                    'relevance': 3,
-                    'link': 'resultsdiff/1'
-                })
-            tags.append({
-                    'name': 'Important other',
-                    'relevance': 4,
-                    'link': 'resultsdiff/1'
-                })
-            tags.append({
-                    'name': 'Moderate s',
-                    'relevance': 5,
-                    'link': 'resultsdiff/2'
-                })
-            tags.append({
-                    'name': 'slow',
-                    'relevance': 24,
-                    'link': 'resultsdiff/1'
-                })
+            solrlink = 'http://' +settings.SOLR_HOST+ ':'+ settings.SOLR_PORT+settings.SOLR_PATH+'/admin/luke?fl=text_t&numTerms=50&wt=json'
 
-            tags.append({
-                    'name': 'Important',
-                    'relevance': 14,
-                    'link': 'resultsdiff/1'
-                })
-            tags.append({
-                    'name': 'Moderate',
-                    'relevance': 7,
-                    'link': 'resultsdiff/2'
-                })
-            tags.append({
-                    'name': 'Low',
-                    'relevance': 4,
-                    'link': 'resultsdiff/1'
-                })
-            tags.append({
-                    'name': 'Important other',
-                    'relevance': 1,
-                    'link': 'resultsdiff/1'
-                })
-            tags.append({
-                    'name': 'Moderate s',
-                    'relevance': 3,
-                    'link': 'resultsdiff/2'
-                })
-            tags.append({
-                    'name': 'slow',
-                    'relevance': 20,
-                    'link': 'resultsdiff/1'
-                })
-            tags.append({
-                    'name': 'Important',
-                    'relevance': 1,
-                    'link': 'resultsdiff/1'
-                })
+            stopwords = ['yes', 'and', 'not', 'the', 'for', 'all', 'more', 'with', 'than', 'please']
+
+            topwords = json.load(urllib2.urlopen(solrlink))['fields']['text_t']['topTerms']
+
+            i = 0
+
+            while i < len(topwords):
+                if len(topwords[i]) > 2 and topwords[i] not in stopwords:
+                    tags.append({
+                        'name': topwords[i],
+                        'relevance': topwords[i+1],
+                        'link': 'resultsdiff/1'
+                    })
+
+                if len(tags) >= 20:
+                    break
+
+                i+=2
+
+            random.shuffle(tags, random.random)
+            
+         
             response = Response({'tags': tags}, status=status.HTTP_200_OK)
 
         else:
