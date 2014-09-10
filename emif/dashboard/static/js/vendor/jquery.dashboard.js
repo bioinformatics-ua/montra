@@ -314,7 +314,7 @@ var DashboardWidget = function DashboardWidget(widgetname, header, width, height
         var self = this;
 
         var widget = ['<li id="'+ this.widgetname+'"><div class="widget-header"><div title="Drag to change widget position" class="dragtooltip pull-left"><i class="icon-align-justify"></i></div>'+this.header+
-        '<div class="pull-right removewidget"><i class="icon-remove"></i></div></div><div class="accordion-body"><div style="overflow:auto; height: auto;" data-clampedheight="#'+
+        '<div class="pull-right removewidget"><i class="icon-remove"></i></div></div><div class="accordion-body"><div style="overflow-y:auto; height: auto;" data-clampedheight="#'+
         this.widgetname+'" class="accordion-inner">'+this.content+'</div></div></li>', this.width, this.height, this.pos_x, this.pos_y];
 
         gridster.add_widget.apply(gridster, widget);
