@@ -135,7 +135,7 @@ def results_comp(request, template_name='results_comp.html'):
     first_name = None
     list_qsets = {}
     for db_id in list_fingerprint_to_compare:
-        qsets, name, db_owners, fingerprint_ttype = createqsets(db_id, noprocessing=True)
+        qsets, name, db_owners, fingerprint_ttype = createqsets(db_id)
 
         list_qsets[db_id] = { 'name': name, 'qset': qsets}
 
