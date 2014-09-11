@@ -34,45 +34,52 @@ compare_cell = function(table, cell_name, value) {
 
             //$('#t11').addClass("warning");
             //$(this.childNodes[1]).addClass("success");
-            try {
+            //try {
                 var question = $(this.childNodes[1].childNodes[0]);
                 var response = $(this.childNodes[3].childNodes[0]);
 
-
                 if (question.context.data == cell_name.data) {
-                    //console.log(question.context.data + "? --" + (response.length == 0 && (value == undefined || value.data == undefined)));
-                    //console.log("FOUND: " + value.data);
-                    //console.log($(this.childNodes[3].childNodes[0])[0].textContent);
-                    //console.log($(this.childNodes[3].childNodes[0])[0].textContent.indexOf(value.data));
-                    //if (value.data.indexOf($(this.childNodes[3].childNodes[0]).context) !== -1))
-                    //console.log("COMPARE:[" + response[0].textContent + "][" + value.data + "]");
-                    if (response.length == 0 && (value == undefined || value.data == undefined)) {
+                    var this_response;
+                    var reference_response;
+                    try {
+                        var this_response = response[0].parentElement.textContent.replace(/(\r\n|\n|\r|  )/gm,"");
+                    } catch(err){
+                        console.log(err);
+                        this_response = "";
+                    }
+                    try {
+                        var reference_response = value.parentElement.textContent.replace(/(\r\n|\n|\r|  )/gm,"");
+                    } catch(err){
+                        console.log(value);
+                        reference_response = "";
+                    }
+
+                    console.log("this:"+this_response);
+                    console.log("ref:"+reference_response);
+                    if (this_response.length == 0 && reference_response.length == 0) {
                         result_final = 3;
 
-                        return false;
-                    } else if (response[0].textContent.indexOf(value.data) !== -1 && response[0].textContent === value.data) {
-                        //console.log("True: " + value.data);
-                        //$(this.childNodes[1]).addClass("success");
+                        return result_final;
+                    }
+                    else if (this_response === reference_response) {
                         result_final = 1;
                         return false;
-                    } else if (
-                        (response[0].textContent.indexOf(value.data) >= 0 ||
-                            value.data.indexOf(response[0].textContent) >= 0
-                        ) && response[0].textContent !== value.data) {
-                        //$(this.childNodes[1]).addClass("warning");
+                    }
+                    else if ( this_response.length != 0 && reference_response.length != 0 
+                                && (this_response.indexOf(reference_response) >= 0 || reference_response.indexOf(this_response) >= 0 )
+                        ) {
                         result_final = 2;
                         return result_final;
                     }
-                    //$(this.childNodes[1]).addClass("error");
+                    
                     $(this.childNodes[1]).add("found");
-                    //console.log($(this.childNodes[1]));
                 }
                 //console.log($(this.childNodes[1].childNodes[0]).context);
                 //console.log($(this.childNodes[3].childNodes[0]).context);
-            } catch (err) {
+            //} catch (err) {
                 //console.log(err.message)
 
-            }
+//            }
             //console.log($(this));		
 
         });
@@ -187,8 +194,6 @@ comparetable_two = function(table1, table2) {
                         response = $(this.childNodes[3].childNodes[0]);
                     } catch (err) {}
                     //console.log(question);
-                    //console.log(response);
-
                     var result = -2;
                     // if (response && response.length !== 0)
                     result = compare_cell(table2, question.context, response.context);
