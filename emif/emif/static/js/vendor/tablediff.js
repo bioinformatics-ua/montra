@@ -25,8 +25,14 @@
  * @param  {[type]} value     [description]
  * @return {[type]}           1 =
  */
+function cleanup(string){
+
+    return string.replace(/\n\s*\n/g, '\n').replace(/(  )/gm,"").trim();
+}
+
 compare_cell = function(table, cell_name, value) {
     var result_final = 0;
+    var row = "";
     //console.log("Cellname: " + cell_name.data);
     //console.log("Value: " + value.data);
     $('#' + table).each(function() {
@@ -39,52 +45,70 @@ compare_cell = function(table, cell_name, value) {
                 var response = $(this.childNodes[3].childNodes[0]);
 
                 if (question.context.data == cell_name.data) {
+                    row = discoverRowId($(this));
+
                     var this_response;
                     var reference_response;
                     try {
-                        var this_response = response[0].parentElement.textContent.replace(/(\r\n|\n|\r|  )/gm,"");
+                        var this_response = cleanup(response[0].parentElement.textContent).split('\n');
                     } catch(err){
-                        console.log(err);
-                        this_response = "";
+                        this_response = [];
                     }
                     try {
-                        var reference_response = value.parentElement.textContent.replace(/(\r\n|\n|\r|  )/gm,"");
+                        var reference_response = cleanup(value.parentElement.textContent).split('\n');
                     } catch(err){
-                        console.log(value);
-                        reference_response = "";
+                        reference_response = [];
                     }
 
-                    console.log("this:"+this_response);
-                    console.log("ref:"+reference_response);
+                    //console.log(this_response);
+                    //console.log(reference_response);
+
                     if (this_response.length == 0 && reference_response.length == 0) {
                         result_final = 3;
 
-                        return result_final;
+                        return {'value': result_final, 'row': row};
                     }
-                    else if (this_response === reference_response) {
-                        result_final = 1;
-                        return false;
-                    }
-                    else if ( this_response.length != 0 && reference_response.length != 0 
-                                && (this_response.indexOf(reference_response) >= 0 || reference_response.indexOf(this_response) >= 0 )
-                        ) {
-                        result_final = 2;
-                        return result_final;
-                    }
-                    
-                    $(this.childNodes[1]).add("found");
-                }
-                //console.log($(this.childNodes[1].childNodes[0]).context);
-                //console.log($(this.childNodes[3].childNodes[0]).context);
-            //} catch (err) {
-                //console.log(err.message)
+                    else if(this_response.length == 1 && reference_response.length == 1){
+                        if (this_response[0].toLowerCase().trim() === reference_response[0].toLowerCase().trim()) {
+                            result_final = 1;
 
-//            }
-            //console.log($(this));		
+                            return {'value': result_final, 'row': row};
+                        }
+                        else if ( this_response[0].length != 0 && reference_response[0].length != 0 
+                                    && (this_response[0].indexOf(reference_response[0]) >= 0 || reference_response[0].indexOf(this_response[0]) >= 0 )
+                            ) {
+
+                            result_final = 2;
+
+                            return {'value': result_final, 'row': row};
+                        }
+                    }
+                    else {
+                        var matches = 0;
+                        for(var i = 0; i < this_response.length;i++){
+                            var pos = $.inArray(this_response[i], reference_response);
+                            if (pos != -1)
+                                matches++;
+                        }
+
+                        if(matches === this_response.length && matches === reference_response.length){
+                            result_final = 1;
+
+                            return {'value': result_final, 'row': row};
+
+                        } else if(matches > 0){
+                            result_final = 2;
+
+                            return {'value': result_final, 'row': row};
+                        }
+                    }
+
+                    //$(this.childNodes[1]).add("found");
+                }	
 
         });
     });
-    return result_final;
+    return {'value': result_final, 'row': row};
 }
 
 
@@ -99,8 +123,6 @@ compare_cell = function(table, cell_name, value) {
  */
 comparetable = function(table1, table2) {
     // Compare two tables: highlight the differences
-    $(function() {
-
         $('#' + table1).each(function() {
             $(this).children().eq(1).children().each(function() {
                     //console.log($(this.childNodes[1].childNodes[0]).context);
@@ -109,8 +131,6 @@ comparetable = function(table1, table2) {
                     var result = compare_cell(table2, $(this.childNodes[1].childNodes[0]).context, $(this.childNodes[3].childNodes[0]).context);
                     //console.log('Result: ' + result);
                     if (result == 1) {
-
-                        console.log($('#' + table2));
 
                         //$('#' + table2).childNodes[1].childNodes[0]).addClass("success")
                         //$($('#' + table2).childNodes[1].childNodes[0]).addClass("success");
@@ -143,29 +163,31 @@ comparetable = function(table1, table2) {
             //console.log(content)
 
         });
-
-    });
-
 };
 
 paint_table2 = function(table2, tag, nameClass) {
-    $('#' + table2).each(function() {
-        $(this).children().eq(1).children().each(function() {
 
-            //console.log($(this.childNodes[1].childNodes[0]).context.data);
-            //console.log(tag);
-            //if ($(this.childNodes[1].childNodes[0]).context.nodeValue.indexOf(tag)!==-1)
-            try {
-                if (tag.indexOf($(this.childNodes[1].childNodes[0]).context.data) !== -1) {
+    $('#'+table2+" "+"."+tag).addClass(nameClass);
 
-                    $(this).addClass(nameClass);
-                    $('.database_listing_names .'+discoverRowId(this)).addClass(nameClass);
+    $('.database_listing_names .'+tag).addClass(nameClass);
 
-                }
-            } catch (err) {}
+    // $('#' + table2).each(function() {
+    //     $(this).children().eq(1).children().each(function() {
 
-        });
-    });
+    //         //console.log($(this.childNodes[1].childNodes[0]).context.data);
+    //         //console.log(tag);
+    //         //if ($(this.childNodes[1].childNodes[0]).context.nodeValue.indexOf(tag)!==-1)
+    //         try {
+    //             //  console.log(tag);
+    //             if (tag.indexOf($(this.childNodes[1].childNodes[0]).context.data) === 0) {
+    //                 $(this).addClass(nameClass);
+    //                 $('.database_listing_names .'+discoverRowId(this)).addClass(nameClass);
+
+    //             }
+    //         } catch (err) {}
+
+    //     });
+    // });
 
 };
 
@@ -182,7 +204,6 @@ function discoverRowId(element){
 comparetable_two = function(table1, table2) {
     var empty_rows = 0;
     // Compare two tables: highlight the differences
-    $(function() {
 
         $('#' + table1).each(function() {
             $(this).children().eq(1).children().each(function() {
@@ -197,32 +218,33 @@ comparetable_two = function(table1, table2) {
                     var result = -2;
                     // if (response && response.length !== 0)
                     result = compare_cell(table2, question.context, response.context);
-                    //console.log("RESULT: " + result + "TEST:[" + question.context.data + "]");
+                    console.log(result);
 
-                    if (result == 1) {
-
+                    if (result.value == 1) {
                         //console.log($('#' + table2));
                         //console.log($('#' + table1));
-                        paint_table2(table2, question.context.data, "success");
+                        paint_table2(table2, result.row, "success");
 
                         //$('#' + table2).childNodes[1].childNodes[0]).addClass("success")
                         //$($('#' + table2).childNodes[1].childNodes[0]).addClass("success");
                         /*$(this).addClass("success"); */
-                    } else if (result == 2) {
+                    } else if (result.value == 2) {
                         //$($('#' + table2).childNodes[1].childNodes[0]).addClass("warning");
                         
                         /*$(this).addClass("warning");*/
 
-                        paint_table2(table2, question.context.data, "warning");
-                    } else if (result == 3) {
-                        paint_table2(table2, question.context.data, "emptycells");
+                        paint_table2(table2, result.row, "warning");
+                    } else if (result.value == 3) {
+
+                        paint_table2(table2, result.row, "emptycells");
                         $(this).addClass("emptycells");
 
                     } else {
+                        console.log("fail");
                         //$($('#' + table2).childNodes[1].childNodes[0]).addClass("error");
                         /*$(this).addClass("error");*/
 
-                        paint_table2(table2, question.context.data, "error");
+                        paint_table2(table2, result.row, "error");
                     }
 
                 }
@@ -243,9 +265,6 @@ comparetable_two = function(table1, table2) {
             //console.log(content)
 
         });
-
-    });
-
 };
 
 /**
