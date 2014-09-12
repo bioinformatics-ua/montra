@@ -105,7 +105,15 @@
         {%if contains_population %}
 
     {% if latest_pop %}
-    <div class="pull-right">Last update on: {{latest_pop.latest_date|date:"d/m/Y H:i:s"}}</div>
+        <div class="pull-left">
+            Last update on: {{latest_pop.latest_date|date:"d/m/Y H:i:s"}}
+        </div>
+        {%if owner_fingerprint and not compare or request.user.is_superuser  and not compare %}
+        <div class="pull-right">
+            <button onclick="$('#modal-updatepopchar').modal('show');" class="btn"><i class="fa fa-pencil-square-o"></i>&nbsp;Update</button>
+            {% include "population_characteristics_update.html" %}
+        </div>
+        {% endif %}
     {% endif %}
 
     <div class="span9 populationcharacteristicsbar">

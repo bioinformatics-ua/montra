@@ -43,11 +43,11 @@ class PopulationCharacteristic(object):
     def revisions(self):
         pass
 
-    def submit_new_revision(self, fingerprint_id, path_file=None):
+    def submit_new_revision(self, fingerprint_id, revision, path_file=None):
         
         #path_file = "C:/Users/lbastiao/Projects/TEST_DataProfile_v1.5.6b.txt"
         #path_file = "/Volumes/EXT1/Dropbox/MAPi-Dropbox/EMIF/Jerboa/TEST_DataProfile_v1.5.6b.txt"        
-        self._json = import_population_characteristics_data(fingerprint_id, filename=path_file)
+        self._json = import_population_characteristics_data(fingerprint_id, revision, filename=path_file)
         #print self._json
         #f = open('jerboaTmp', 'w')
         #f.write(self._json)
@@ -64,7 +64,7 @@ class PopulationCharacteristic(object):
         return json_data
 
 
-    def get_variables(self, var, row, fingerprint_id='abcd', filters=[], vars_that_should_exists=[]):
+    def get_variables(self, var, row, fingerprint_id='abcd', revision='-1', filters=[], vars_that_should_exists=[]):
         #db.jerboa_files.distinct( 'values.Var' )
         # Need to filter by Fingerprint, otherwise, we're trapped.
         
@@ -77,7 +77,7 @@ class PopulationCharacteristic(object):
         __filters = mrules.get_filter(var)
         c1 = mrules.get_chart(var)
 
-        dict_query = {'fingerprint_id':fingerprint_id, 
+        dict_query = {'fingerprint_id':fingerprint_id, 'revision': revision, 
             'values.Var': c1.title.var}
 
         

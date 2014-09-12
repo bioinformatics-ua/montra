@@ -96,7 +96,7 @@ def document_form_view_upload(request, fingerprint_id, template_name='documents_
     #_json = import_population_characteristics_data(fingerprint_id,filename=path_file)
 
     pc = PopulationCharacteristic()
-    data_jerboa = pc.submit_new_revision(fingerprint_id, path_file)
+    data_jerboa = pc.submit_new_revision(fingerprint_id, revision, path_file)
 
 
     aggregation.apply_async([fingerprint_id, data_jerboa])
@@ -120,7 +120,7 @@ def parsejerboa(request, template_name='documents_upload_form.html'):
     _json = import_population_characteristics_data(filename=path_file)
 
     pc = PopulationCharacteristic()
-    pc.submit_new_revision(fingerprint_id)
+    pc.submit_new_revision(fingerprint_id, revision)
     data = {'data': _json}
     response = JSONResponse(data, mimetype=response_mimetype(request))
     response['Content-Disposition'] = 'inline; filename=files.json'

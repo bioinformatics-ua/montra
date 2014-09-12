@@ -58,6 +58,7 @@ function PCDraw(actualChart,chartType, e)
 
       
       fingerprintID = getFingerprintID();
+      revision = getRevision();
       
       
       var valuesFromGraph = null;
@@ -77,7 +78,7 @@ function PCDraw(actualChart,chartType, e)
           
         }
         valuesFromGraph = PC.getValuesRowWithFilters(this.actualChart.title.fixed_title, 
-          this.actualChart.y_axis['var'],fingerprintID, filters );
+          this.actualChart.y_axis['var'],fingerprintID, revision, filters );
       }
       if (PAGE_TYPE==PC_COMPARE)
       {

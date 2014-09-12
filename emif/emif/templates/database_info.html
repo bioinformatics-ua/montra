@@ -299,6 +299,11 @@
     });
 var threads = {};
 var global_fingerprint_id = '{{fingerprint_id}}';
+
+{%if latest_pop %}
+var global_revision = '{{latest_pop.revision}}';
+{% endif %}
+
 var global_public_key = '{{public_key.hash}}'
 function load_questionnary(){
 

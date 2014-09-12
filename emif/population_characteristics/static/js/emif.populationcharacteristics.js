@@ -67,6 +67,20 @@ function getFingerprintID(){
 
 };
 
+function getRevision(){
+  var url = document.URL;
+  var revision='-1';
+
+  try{
+    revision = global_revision;
+  }
+  catch(err){
+    console.error('Error retrieving revision from pop.char.');
+  };
+  return revision;
+
+};
+
 var filtersMap = {};
 var translations = {};
 var translationsBack = {};
@@ -98,14 +112,14 @@ function PCAPI (endpoint)
                 }
     });
     
-    this.getValuesRow = function(Var, Row, fingerprintID){
+    this.getValuesRow = function(Var, Row, fingerprintID, revision){
         var result = {}
 
         console.log(result);
           
         $.ajax({
           dataType: "json",
-          url: this.endpoint+"/"+Var+"/"+Row+"/" + fingerprintID,
+          url: this.endpoint+"/"+Var+"/"+Row+"/" + fingerprintID+"/"+revision,
 
           async: false,
           type: "POST",
@@ -114,7 +128,7 @@ function PCAPI (endpoint)
         });
         return result;
     };
-     this.getValuesRowWithFilters = function(Var, Row, fingerprintID, filters){
+     this.getValuesRowWithFilters = function(Var, Row, fingerprintID, revision, filters){
         var result = {}
 
         console.log(filters);
@@ -122,7 +136,7 @@ function PCAPI (endpoint)
 
         $.ajax({
           dataType: "json",
-          url: this.endpoint+"/"+Var+"/"+Row+"/" + fingerprintID,
+          url: this.endpoint+"/"+Var+"/"+Row+"/" + fingerprintID + "/" + revision,
           async: false,
           type: "POST",
           data: { publickey: global_public_key, filters: filters },
