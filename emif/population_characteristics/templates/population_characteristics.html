@@ -46,7 +46,7 @@
 <![endif]-->
 <!--[if gte IE 9]><!-->
 
-    {% if not contains_population and owner_fingerprint %}
+    {% if not contains_population and owner_fingerprint or not contains_population and request.user.is_superuser %}
          <h4 class="pull-center">No population characteristics associated with this database yet.</h4>
     <p class="pull-center">This database fingerprint does not have population characteristics. Submit the Population Characteristics file that can be extracted using <a onclick="return false;" href="">Jerboa</a>.</p>
 
@@ -104,7 +104,10 @@
     {% else %}
         {%if contains_population %}
 
-    {%comment%} You have already population characteristics. Last update on: {{pc_last_activity}}{%endcomment%}
+    {% if latest_pop %}
+    <div class="pull-right">Last update on: {{latest_pop.latest_date|date:"d/m/Y H:i:s"}}</div>
+    {% endif %}
+
     <div class="span9 populationcharacteristicsbar">
     <div class="pull-right hidden ">
         <div class="btn-group">
@@ -187,7 +190,7 @@
             </div>
             <div id='pc_comments_placeholder' class="pc_comment">
             </div>
-            {%if owner_fingerprint and not compare%}
+            {%if owner_fingerprint and not compare or request.user.is_superuser  and not compare %}
                 <div id="pc_comment_id" class="pc_comment">
                 <form id="chartcomments" method="post" action="comments" >
                     {% csrf_token %}

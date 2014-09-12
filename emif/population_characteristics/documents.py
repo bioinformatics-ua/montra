@@ -193,8 +193,16 @@ def document_form_view(request, runcode, qs, activetab='summary', readOnly=False
     except:
         fingerprint_pk = 0
 
-    jerboa_files = Characteristic.objects.filter(fingerprint_id=runcode)
-    contains_population = len(jerboa_files)!=0
+    jerboa_files = Characteristic.objects.filter(fingerprint_id=runcode).order_by('-latest_date')
+
+
+    contains_population = False
+    latest_pop = None
+    if len(jerboa_files)!=0:
+        contains_population = True
+        latest_pop = jerboa_files[0]
+
+
 
     # Find if user has public links for this db.
 
@@ -225,6 +233,7 @@ def document_form_view(request, runcode, qs, activetab='summary', readOnly=False
                     'owners': db_owners,
                     'fingerprint_dump': True,
                     'contains_population': contains_population, 
+                    'latest_pop': latest_pop,
                     'hide_add': True,
                     'fingerprint_ttype': fingerprint_ttype,
                     'search_old': query_old,
