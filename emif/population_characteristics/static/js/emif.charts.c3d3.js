@@ -307,6 +307,7 @@ function GraphicChartC3D3(divArg, dataArg)
         chartConfigs.data.types = {};
 
         chartConfigs.data.types['T'] = 'bar';
+
         if (actualChart.x_axis.categorized )
         {
             var arr2 = datasetX.slice(0);
@@ -378,6 +379,11 @@ function GraphicChartC3D3(divArg, dataArg)
     chartConfigs.legend = {}
     chartConfigs.legend['show'] = legend;
        
+    chartConfigs.data.colors = {
+            M: '#0084ff',
+            F: '#ff8fe1',
+            T: '#83bd59'
+    };
 
     try{chart = c3.generate(chartConfigs);}
     catch(ex)
