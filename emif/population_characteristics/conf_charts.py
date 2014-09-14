@@ -516,7 +516,8 @@ class ConfCharts(object):
         f2.name = 'Gender'
         f2.key = None
         f2.value = 'Gender'
-        f2.translation = {'M': 'Male', 'F': 'Female', 'T': 'Total',  'ALL': 'Male/Female'}
+        #f2.translation = {'M': 'Male', 'F': 'Female', 'T': 'Total', 'ALL': 'Male/Female'}
+        f2.translation = {'M': 'Male', 'F': 'Female', 'T': 'Total'}
 
         c12.filters = [f2]
         sc.charts.append(c12)
@@ -575,7 +576,8 @@ class ConfCharts(object):
         f2.name = 'Gender'
         f2.key = None
         f2.value = 'Gender'
-        f2.translation = {'M': 'Male', 'F': 'Female', 'T': 'Total',  'ALL': 'Male/Female'}
+        #f2.translation = {'M': 'Male', 'F': 'Female', 'T': 'Total',  'ALL': 'Male/Female'}
+        f2.translation = {'M': 'Male', 'F': 'Female', 'T': 'Total'}
 
         c13.filters = [f2]
         sc.charts.append(c13)
@@ -635,7 +637,8 @@ class ConfCharts(object):
         f2.name = 'Gender'
         f2.key = None
         f2.value = 'Gender'
-        f2.translation = {'M': 'Male', 'F': 'Female', 'T': 'Total',  'ALL': 'Male/Female'}
+        #f2.translation = {'M': 'Male', 'F': 'Female', 'T': 'Total',  'ALL': 'Male/Female'}
+        f2.translation = {'M': 'Male', 'F': 'Female', 'T': 'Total'}
 
         c14.filters = [f2]
         sc.charts.append(c14)
@@ -695,7 +698,8 @@ class ConfCharts(object):
         f2.name = 'Gender'
         f2.key = None
         f2.value = 'Gender'
-        f2.translation = {'M': 'Male', 'F': 'Female', 'T': 'Total',  'ALL': 'Male/Female'}
+        #f2.translation = {'M': 'Male', 'F': 'Female', 'T': 'Total',  'ALL': 'Male/Female'}
+        f2.translation = {'M': 'Male', 'F': 'Female', 'T': 'Total'}
 
         c14.filters = [f2]
         sc.charts.append(c14)
@@ -754,7 +758,8 @@ class ConfCharts(object):
         f2.name = 'Gender'
         f2.key = None
         f2.value = 'Gender'
-        f2.translation = {'M': 'Male', 'F': 'Female', 'T': 'Total',  'ALL': 'Male/Female'}
+        #f2.translation = {'M': 'Male', 'F': 'Female', 'T': 'Total',  'ALL': 'Male/Female'}
+        f2.translation = {'M': 'Male', 'F': 'Female', 'T': 'Total'}
 
         c14.filters = [f2]
         sc.charts.append(c14)
