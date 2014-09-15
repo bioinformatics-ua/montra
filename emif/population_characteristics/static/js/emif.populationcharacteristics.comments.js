@@ -19,7 +19,7 @@
 ***********************************************************************/
 
 var commentsBinded = false;
-var NONCONTACTCOMMENTS = "This chart does not have any associated comments.";
+var NONCONTACTCOMMENTS = "This chart does not have any associated comments. To comment please write below";
 function removeComment(commentId)
 {
 

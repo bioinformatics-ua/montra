@@ -255,8 +255,8 @@ function GraphicChartC3D3(divArg, dataArg)
         chartConfigs.data.columns = [datasetY];  
         
         
-        chartConfigs.data.xs = {};
-        chartConfigs.data.x = {};
+        delete chartConfigs.data.xs;
+        delete chartConfigs.data.x;
         
     }
     
@@ -320,8 +320,8 @@ function GraphicChartC3D3(divArg, dataArg)
                 }
                 
             });
-            chartConfigs.data.xs = {};
-            chartConfigs.data.x = {};
+            delete chartConfigs.data.xs;
+            delete chartConfigs.data.x;
 
             
         }
@@ -388,6 +388,7 @@ function GraphicChartC3D3(divArg, dataArg)
     try{chart = c3.generate(chartConfigs);}
     catch(ex)
     {
+      console.log(ex);
       // Handle the shit here!
       // Otherwise once you will be fucked up.
     }
@@ -428,7 +429,14 @@ function GraphicChartC3D3(divArg, dataArg)
         var id = d3.select(this).attr('data-id');
         var container = $(d3.select(this)[0][0].children[0]);
 
-        container.css('background-color', chart.color(id));
+        var color;
+        try {
+          color = chart.color(id);
+        } catch(err){
+          color ="#83bd59";
+        }
+
+        container.css('background-color', color);
     })
     .on('mouseover', function () {
         var id = d3.select(this).attr('data-id');

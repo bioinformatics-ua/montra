@@ -94,7 +94,8 @@
 
                         }
                         options.push('"><a tabindex="-1" href="javascript: void(0)">');
-                        options.push(json[element].name);
+                        var this_name = json[element].name;
+                        options.push(this_name[0].toUpperCase() + this_name.substring(1).toLowerCase());
                         if(this.size(json[element]) == 0 && settings.alwaysOneOption){
                             options.push(selected);
                             api.addSelection(element, element);
@@ -103,7 +104,7 @@
                         options.push('<ul class="dropdown-menu dropdown-menu-f">');
                         var first = true;
                         for (subelement in json[element].values) {
-                            console.log(json[element].values[subelement])
+                            //console.log(json[element].values[subelement])
                             if (json[element].values.hasOwnProperty(subelement)) {
                                 options.push('<li id="dyndropdownop_' + element + '___' + subelement + '" class="dyndropdown-selectable">');
                                 options.push('<a tabindex="-1" href="javascript: void(0)">');

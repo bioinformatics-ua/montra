@@ -38,8 +38,6 @@ function PCDraw(actualChart,chartType, e)
       $("#pcBarContent").populationChartsBar2('init', pc,this.actualChart.title.fixed_title,
         fingerprintID);
 
-      console.log(pc);
-
       $("#pcBarContent").populationChartsBar2('draw', pc);
 
 

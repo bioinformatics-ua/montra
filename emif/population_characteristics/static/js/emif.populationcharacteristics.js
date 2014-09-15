@@ -131,9 +131,6 @@ function PCAPI (endpoint)
      this.getValuesRowWithFilters = function(Var, Row, fingerprintID, revision, filters){
         var result = {}
 
-        console.log(filters);
-
-
         $.ajax({
           dataType: "json",
           url: this.endpoint+"/"+Var+"/"+Row+"/" + fingerprintID + "/" + revision,
