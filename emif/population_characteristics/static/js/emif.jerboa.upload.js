@@ -96,7 +96,7 @@ $(function () {
         dataType: 'json',
         autoUpload: false,
         acceptFileTypes: /(\.|\/)(tsv|txt)$/i,
-        maxFileSize: 5000000, // 5 MB
+        maxFileSize: 20000000, // 20 MB
         // Enable image resizing, except for Android and Opera,
         // which actually support image resizing, but fail to
         // send Blob objects via XHR requests:
