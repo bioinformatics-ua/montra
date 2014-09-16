@@ -17,7 +17,8 @@
             size: null,
             button_dropdown: false,
             onSelectionChanged: null,
-            alwaysOneOption: false
+            alwaysOneOption: false,
+            defaultOption: null
         }, options);
 
         // Validate that callbacks are functions
@@ -103,19 +104,28 @@
                         options.push('</a>');
                         options.push('<ul class="dropdown-menu dropdown-menu-f">');
                         var first = true;
-                        for (subelement in json[element].values) {
+                        var subop = json[element].values;
+
+                        for (var i = 0; i< subop.length; i++) {
                             //console.log(json[element].values[subelement])
-                            if (json[element].values.hasOwnProperty(subelement)) {
-                                options.push('<li id="dyndropdownop_' + element + '___' + subelement + '" class="dyndropdown-selectable">');
+                                options.push('<li id="dyndropdownop_' + element + '___' + subop[i].key + '" class="dyndropdown-selectable">');
                                 options.push('<a tabindex="-1" href="javascript: void(0)">');
-                                options.push(json[element].values[subelement]);
+                                options.push(subop[i].value);
                                 if(first && settings.alwaysOneOption){
-                                    options.push(selected);
-                                    first = false;
-                                    api.addSelection(element, subelement);
+                                    if(settings.defaultOptions === null || !(element in settings.defaultOptions)){
+                                        options.push(selected);
+                                        api.addSelection(element, subop[i].key);
+                                        first = false;
+                                    }
+                                    else if(element in settings.defaultOptions){
+                                        if(subop[i].key == settings.defaultOptions[element]){
+                                            options.push(selected);
+                                            api.addSelection(element, subop[i].key);
+                                            first = false;
+                                        }
+                                    }
                                 }
                                 options.push('</a></li>');
-                            }
                         }
 
                         options.push('</ul>');

@@ -165,7 +165,7 @@ function PCAPI (endpoint)
 /********************************************************************
 **************** Population Characteristics - Bar (Jquery Plugin) v2 (using dyndropdown)
 *********************************************************************/
-
+var stuff;
  (function( $ )
  {
 
@@ -201,6 +201,7 @@ function PCAPI (endpoint)
             filters_tmp = [];
             
             JSON_OUTPUT = {};
+            var default_options = {};
 
             values.values.forEach(function(_value){
 
@@ -211,7 +212,7 @@ function PCAPI (endpoint)
                 return;
               
               self.append(xFilter.name+": ");
-              var options = {};
+              var options = [];
 
               //var tmpUl = $('<ul class="nav nav-pills nav-stacked">');
 
@@ -224,11 +225,13 @@ function PCAPI (endpoint)
                   if (xFilter.translation.hasOwnProperty("ALL"))
                   {
                     xFilter.values.push("ALL");  
-                    options['ALL'] = 'ALL';               
+                    //options.push({'ALL': 'ALL'});               
                   }
                   
               }
 
+              xFilter.values.sort();
+              xFilter.values.reverse();
 
               $.each(xFilter.values, function (data){
                   
@@ -242,6 +245,7 @@ function PCAPI (endpoint)
                     fType = xFilter.value;
 
                   }
+
                   var originalValue = xFilter.values[data];
                   //console.log("originalValue");
                   //console.log(originalValue);
@@ -256,14 +260,22 @@ function PCAPI (endpoint)
                       
                   }
                   
-                 
                   //tmpUl.append('<li><a class="filterBar '+fType+'" id=_'+fType+'_'+xFilter.values[data]+' href="#" onclick="return false;"> '+originalValue+'</a></li>')
-                  options[xFilter.values[data]] = originalValue;                  
+                  options.push({'key': xFilter.values[data], 'value': originalValue}); 
+
+                  // if('ALL' in default_option[xFilter.values[data]]){
+
+                  // }                 
                     
               });
               JSON_OUTPUT[xFilter.value] = {values: options, name: xFilter.name};
+              if($.inArray( 'ALL', xFilter.values ) != -1){
+                default_options[xFilter.value] = 'ALL';
+              } else if($.inArray( 'T', xFilter.values ) != -1){
+                default_options[xFilter.value] = 'T';
+              }
             });
-            //console.log('JSON_OUTPOUT');
+            //console.log('JSON_OUTPUT');
             //console.log(JSON.stringify(JSON_OUTPUT));
             
 
@@ -271,6 +283,7 @@ function PCAPI (endpoint)
                     label: "Filter", 
                     dropup: false, 
                     alwaysOneOption: true,
+                    defaultOptions: default_options,
                     onSelectionChanged: function(selection){
                         //console.log('callback called');
                         //console.log(selection);
