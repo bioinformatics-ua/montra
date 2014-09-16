@@ -2,14 +2,8 @@
 {% if choices|length > 0 %}
 <div>
     <ul style="list-style-type: none; margin:0px;">
-        {% for choice, comment in choices.items %}
-        <li>{{choice}} 
-
-        {%if comment and comment != ''%}
-            <small>({{comment}})</small>
-        {% endif %}
-
-        </li>
+        {% for choice in choices %}
+        <li>{{choice.key}}{%if choice.comment and choice.comment != ''%}: {{choice.comment}}{% endif %}</li>
         {% endfor %}
     </ul>
 </div>
