@@ -105,9 +105,9 @@ function GraphicChartC3D3(divArg, dataArg)
                 actualChart.filters[a]['comparable_values']==null &&
                 actualChart.filters[a]['values']!=null)
               {
-                console.log("chart filter");
-                console.log(actualChart.filters[a]);
-                console.log(actualChart.filters[a]['values']);
+                //console.log("chart filter");
+                //console.log(actualChart.filters[a]);
+                //console.log(actualChart.filters[a]['values']);
                 multivalue_stacked = actualChart.filters[a]['value']
                 $.each(actualChart.filters[a]['values'], function(tr) {
                     // Get the list of values 
@@ -255,8 +255,8 @@ function GraphicChartC3D3(divArg, dataArg)
         chartConfigs.data.columns = [datasetY];  
         
         
-        chartConfigs.data.xs = {};
-        chartConfigs.data.x = {};
+        delete chartConfigs.data.xs;
+        delete chartConfigs.data.x;
         
     }
     
@@ -307,6 +307,7 @@ function GraphicChartC3D3(divArg, dataArg)
         chartConfigs.data.types = {};
 
         chartConfigs.data.types['T'] = 'bar';
+
         if (actualChart.x_axis.categorized )
         {
             var arr2 = datasetX.slice(0);
@@ -319,8 +320,8 @@ function GraphicChartC3D3(divArg, dataArg)
                 }
                 
             });
-            chartConfigs.data.xs = {};
-            chartConfigs.data.x = {};
+            delete chartConfigs.data.xs;
+            delete chartConfigs.data.x;
 
             
         }
@@ -376,15 +377,89 @@ function GraphicChartC3D3(divArg, dataArg)
 
     chartConfigs.axis.x['tick']['culling'] = true;
     chartConfigs.legend = {}
-    chartConfigs.legend['show'] = legend;
+    chartConfigs.legend['show'] = false;
        
+    chartConfigs.data.colors = {
+            M: '#0084ff',
+            F: '#ff8fe1',
+            T: '#83bd59'
+    };
 
     try{chart = c3.generate(chartConfigs);}
     catch(ex)
     {
+      console.log(ex);
       // Handle the shit here!
       // Otherwise once you will be fucked up.
     }
+    try{
+    if(chartConfigs.data.types['T'] === '')
+      chart.toggle('T');
+    } catch(ex){}
+
+    function toggle(id) {
+        chart.toggle(id);
+    }
+    var legend = d3.select('#pc_chart_place').insert('div', '.chart').attr('class', 'legend').attr('style','position: absolute; top:0; right: 0;');
+
+    var columns = chartConfigs.data.columns;
+
+    for (var i=0; i< columns.length;i++) {
+            var row = columns[i][0];
+
+            var drawLegend = function(row){
+              legend.append('span').attr('data-id', row).attr('data-opacity', '1').attr('style', 'cursor: pointer;').html(
+                '<div style="display: inline-block; width: 10px; height: 10px; margin-left: 20px;" class="color_container"></div>&nbsp;'+row);
+            };
+
+            if(row.toLowerCase() == 't'){
+              if(chartConfigs.data.types['T'] !== ''){
+                drawLegend(row);
+              }
+            } else {
+              if(row.toLowerCase() != 'x' && columns[i].length > 1){
+                drawLegend(row);
+              }
+            }
+        
+    }
+
+    d3.selectAll('.legend span')
+    .each(function () {
+        var id = d3.select(this).attr('data-id');
+        var container = $(d3.select(this)[0][0].children[0]);
+
+        var color;
+        try {
+          color = chart.color(id);
+        } catch(err){
+          color ="#83bd59";
+        }
+
+        container.css('background-color', color);
+    })
+    .on('mouseover', function () {
+        var id = d3.select(this).attr('data-id');
+        chart.focus(id);
+    })
+    .on('mouseout', function () {
+        var id = d3.select(this).attr('data-id');
+        chart.revert();
+    })
+    .on('click', function () {
+        var id = d3.select(this).attr('data-id');
+        var opacity = d3.select(this).attr('data-opacity');
+
+        if(opacity === '1'){
+          d3.select(this).attr('style','opacity: 0.5;cursor: pointer;').attr('data-opacity', '0.5');
+
+        } else {
+          d3.select(this).attr('style','opacity: 1;cursor: pointer;').attr('data-opacity', '1');
+        }
+
+        chart.toggle(id);
+    });
+
    }; 
 };
 

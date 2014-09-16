@@ -94,7 +94,7 @@ class ConfCharts(object):
         c1.title = Title()
         c1.title.operation = Operation.UNIQUE
         c1.title.var = "Birth in year" 
-        c1.title.fixed_title = "Birth date"
+        c1.title.fixed_title = "Birth Year"
         
         c1.x_axis = Axis()
         c1.x_axis.operation = "unique"
@@ -126,7 +126,7 @@ class ConfCharts(object):
         c10.title = Title()
         c10.title.operation = Operation.UNIQUE
         c10.title.var = "Age at patient start" 
-        c10.title.fixed_title = "Start date" 
+        c10.title.fixed_title = "Start Year" 
         c10.x_axis = Axis()
         c10.x_axis.operation = "unique"
         c10.x_axis.var = "Value1"
@@ -180,7 +180,7 @@ class ConfCharts(object):
         c11.title = Title()
         c11.title.operation = Operation.UNIQUE
         c11.title.var = "Age at patient end" 
-        c11.title.fixed_title = "End date" 
+        c11.title.fixed_title = "End Year" 
         c11.x_axis = Axis()
         c11.x_axis.operation = "unique"
         c11.x_axis.var = "Value1"
@@ -223,7 +223,7 @@ class ConfCharts(object):
         c2.title = Title()
         c2.title.operation = Operation.UNIQUE
         c2.title.var = "Age at start of year" 
-        c2.title.fixed_title = "Age at start of year" 
+        c2.title.fixed_title = "Age Distribution at Start of Year" 
 
         # X AXIS 
         c2.x_axis = Axis()
@@ -257,7 +257,6 @@ class ConfCharts(object):
         fy3.key = 'Name1'
         fy3.value = 'YEAR'
 
-
         c2.y_axis.static_filters = [fy2, fy3]
 
 
@@ -265,6 +264,7 @@ class ConfCharts(object):
         f_year.name = 'YEAR'
         f_year.key = 'Name1'
         f_year.value = 'Value1'
+
         #f_year.values = []
         f2 = Filter()
         f2.name = 'Gender'
@@ -287,7 +287,7 @@ class ConfCharts(object):
         c4.title = Title()
         c4.title.operation = Operation.UNIQUE
         c4.title.var = "Age at patient start" 
-        c4.title.fixed_title = "Age at patient start" 
+        c4.title.fixed_title = "Age Distribution of Patients Entering" 
         
         #4X AXIS 
         c4.x_axis = Axis()
@@ -351,7 +351,7 @@ class ConfCharts(object):
         c3.title = Title()
         c3.title.operation = Operation.UNIQUE
         c3.title.var = "Age at patient end" 
-        c3.title.fixed_title = "Age at patient end" 
+        c3.title.fixed_title = "Age Distribution of Patients Exiting" 
         
         #3X AXIS 
         c3.x_axis = Axis()
@@ -419,7 +419,7 @@ class ConfCharts(object):
         c5.title = Title()
         c5.title.operation = Operation.UNIQUE
         c5.title.var = "Observation time in a year" 
-        c5.title.fixed_title = "Total patient time in a year" 
+        c5.title.fixed_title = "Age Distribution at Start of Year" 
         c5.x_axis = Axis()
         c5.x_axis.operation = "unique"
         c5.x_axis.var = "Value1"
@@ -472,7 +472,7 @@ class ConfCharts(object):
         c12.title = Title()
         c12.legend = True
         c12.title.operation = Operation.UNIQUE
-        c12.title.fixed_title = "Age at patient start - percentiles" 
+        c12.title.fixed_title = "Age Distribution of Patients Entering - percentiles" 
         c12.title.var = "Age at patient start" 
         c12.x_axis = Axis()
         c12.x_axis.operation = "unique"
@@ -516,7 +516,8 @@ class ConfCharts(object):
         f2.name = 'Gender'
         f2.key = None
         f2.value = 'Gender'
-        f2.translation = {'M': 'Male', 'F': 'Female', 'T': 'Total',  'ALL': 'Male/Female'}
+        #f2.translation = {'M': 'Male', 'F': 'Female', 'T': 'Total', 'ALL': 'Male/Female'}
+        f2.translation = {'M': 'Male', 'F': 'Female', 'T': 'Total'}
 
         c12.filters = [f2]
         sc.charts.append(c12)
@@ -530,7 +531,7 @@ class ConfCharts(object):
         c13.title = Title()
         c13.legend = True
         c13.title.operation = Operation.UNIQUE
-        c13.title.fixed_title = "Age at patient end - percentiles" 
+        c13.title.fixed_title = "Age Distribution of Patients Exiting - percentiles" 
         c13.title.var = "Age at patient end" 
         c13.x_axis = Axis()
         c13.x_axis.operation = "unique"
@@ -575,7 +576,8 @@ class ConfCharts(object):
         f2.name = 'Gender'
         f2.key = None
         f2.value = 'Gender'
-        f2.translation = {'M': 'Male', 'F': 'Female', 'T': 'Total',  'ALL': 'Male/Female'}
+        #f2.translation = {'M': 'Male', 'F': 'Female', 'T': 'Total',  'ALL': 'Male/Female'}
+        f2.translation = {'M': 'Male', 'F': 'Female', 'T': 'Total'}
 
         c13.filters = [f2]
         sc.charts.append(c13)
@@ -590,7 +592,7 @@ class ConfCharts(object):
         c14.title = Title()
         c14.legend = True
         c14.title.operation = Operation.UNIQUE
-        c14.title.fixed_title = "Age at start of year - percentiles" 
+        c14.title.fixed_title = "Age Distribution at Start of Year - percentiles" 
         c14.title.var = "Age at start of year" 
         c14.x_axis = Axis()
         c14.x_axis.operation = "unique"
@@ -635,7 +637,8 @@ class ConfCharts(object):
         f2.name = 'Gender'
         f2.key = None
         f2.value = 'Gender'
-        f2.translation = {'M': 'Male', 'F': 'Female', 'T': 'Total',  'ALL': 'Male/Female'}
+        #f2.translation = {'M': 'Male', 'F': 'Female', 'T': 'Total',  'ALL': 'Male/Female'}
+        f2.translation = {'M': 'Male', 'F': 'Female', 'T': 'Total'}
 
         c14.filters = [f2]
         sc.charts.append(c14)
@@ -695,7 +698,8 @@ class ConfCharts(object):
         f2.name = 'Gender'
         f2.key = None
         f2.value = 'Gender'
-        f2.translation = {'M': 'Male', 'F': 'Female', 'T': 'Total',  'ALL': 'Male/Female'}
+        #f2.translation = {'M': 'Male', 'F': 'Female', 'T': 'Total',  'ALL': 'Male/Female'}
+        f2.translation = {'M': 'Male', 'F': 'Female', 'T': 'Total'}
 
         c14.filters = [f2]
         sc.charts.append(c14)
@@ -754,7 +758,8 @@ class ConfCharts(object):
         f2.name = 'Gender'
         f2.key = None
         f2.value = 'Gender'
-        f2.translation = {'M': 'Male', 'F': 'Female', 'T': 'Total',  'ALL': 'Male/Female'}
+        #f2.translation = {'M': 'Male', 'F': 'Female', 'T': 'Total',  'ALL': 'Male/Female'}
+        f2.translation = {'M': 'Male', 'F': 'Female', 'T': 'Total'}
 
         c14.filters = [f2]
         sc.charts.append(c14)

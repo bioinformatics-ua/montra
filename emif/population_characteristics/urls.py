@@ -30,7 +30,7 @@ urlpatterns = patterns('',
     url(r'^jerboafiles/(?P<fingerprint>[^/]+)/$', 'population_characteristics.views.list_jerboa_files'),
 
     # List staff to the charts
-    url(r'^jerboalistvalues/(?P<var>[^/]+)/(?P<row>[^/]+)/(?P<fingerprint_id>[^/]+)$', 
+    url(r'^jerboalistvalues/(?P<var>[^/]+)/(?P<row>[^/]+)/(?P<fingerprint_id>[^/]+)/(?P<revision>[^/]+)$', 
         'population_characteristics.views.jerboa_list_values'),
     url(r'^filters/(?P<var>[^/]+)/(?P<fingerprint_id>[^/]+)$', 
         'population_characteristics.views.filters'),
