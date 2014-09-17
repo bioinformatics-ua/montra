@@ -130,6 +130,10 @@ function PCDraw(actualChart,chartType, e)
       
 
       $("#pctitle").html("<h2>"+ this.actualChart.title.fixed_title + valuefilt +"</h2>");
+      if(this.actualChart.hint != undefined)
+        $("#pchint").html("<center><h4>"+ this.actualChart.hint +"</h4></center>");
+      else
+        $("#pchint").html("<center><h4></h4></center>");
       if (this.e != null ) 
       {
           if ($(this.e.target.firstChild).hasClass('icon-ok')) 

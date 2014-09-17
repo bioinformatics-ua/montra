@@ -51,7 +51,8 @@ class ConfCharts(object):
         c.title = Title()
         c.title.operation = Operation.UNIQUE
         c.title.var = "Active patients" 
-        c.title.fixed_title = "Active patients" 
+        c.title.fixed_title = "Active patients"
+        c.hint = "Number of patient with a least one day of patient time in a year" 
         c.x_axis = Axis()
         c.x_axis.operation = "unique"
         c.x_axis.var = "Value1"
@@ -95,6 +96,7 @@ class ConfCharts(object):
         c1.title.operation = Operation.UNIQUE
         c1.title.var = "Birth in year" 
         c1.title.fixed_title = "Birth Year"
+        c1.hint = "Birth year histogram"
         
         c1.x_axis = Axis()
         c1.x_axis.operation = "unique"
@@ -127,6 +129,8 @@ class ConfCharts(object):
         c10.title.operation = Operation.UNIQUE
         c10.title.var = "Age at patient start" 
         c10.title.fixed_title = "Start Year" 
+        c10.hint = "Histogram of patients entering the database"
+
         c10.x_axis = Axis()
         c10.x_axis.operation = "unique"
         c10.x_axis.var = "Value1"
@@ -176,11 +180,14 @@ class ConfCharts(object):
         f2.translation = {'M': 'Male', 'F': 'Female', 'T': 'Total',  'ALL': 'Male/Female'}
 
         c11 = Chart()
+
         c11.uid = 4
         c11.title = Title()
         c11.title.operation = Operation.UNIQUE
         c11.title.var = "Age at patient end" 
         c11.title.fixed_title = "End Year" 
+        c11.hint = "Histogram of last year of data capturing"
+
         c11.x_axis = Axis()
         c11.x_axis.operation = "unique"
         c11.x_axis.var = "Value1"

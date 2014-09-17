@@ -61,6 +61,7 @@ class Axis(object):
 class Chart(object):
     def __init__(self):
         self.title = None
+        self.hint = None
         self.x_axis = None
         self.y_axis = None
         self.filters = None

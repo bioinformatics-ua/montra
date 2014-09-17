@@ -401,6 +401,10 @@ this.complete();
 }
 <!-- This must be here because of dynamic code -->
 $(document).ready(function() {
+        
+        {%if activetab == 'pc'%}
+            $('#pc_list a').first().click();
+        {%endif%}
 
         bindPostCommentHandler('{{ request.user.first_name }}', '{{ request.user.last_name }}', '{{ request.user.username }}', '{{owners}}', '{{fingerprint_id}}', '{{breadcrumb_name}}');
 //load_questionnary();
