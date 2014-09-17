@@ -1999,6 +1999,7 @@ def handle_qset(fingerprint, clean, qsets, qset, answers, fingerprint_ttype, rHi
 
     for question in list_questions:
         t = Tag()
+        t.id = question.id
         t.tag = question.text
         t.value = ""
         t.number = question.number
@@ -2022,9 +2023,12 @@ def handle_qset(fingerprint, clean, qsets, qset, answers, fingerprint_ttype, rHi
 
             
             if question != None:
+                t.id = question.id
+
                 text = question.slug_fk.description
                 qs = qset.text
                 q_number = qs = question.number
+
                 if qsets.has_key(qset.text):
                     # Add the Tag to the QuestionGroup
                     question_group = qsets[qset.text]
@@ -2034,10 +2038,10 @@ def handle_qset(fingerprint, clean, qsets, qset, answers, fingerprint_ttype, rHi
 
             info = text
             t.tag = info
-            #print t.tag
+
             if question_group != None and question_group.list_ordered_tags != None:
                 try:
-                    t = question_group.list_ordered_tags[question_group.list_ordered_tags.index(t)]                   
+                    t = question_group.list_ordered_tags[question_group.list_ordered_tags.index(t)]
                 except:
                     pass
 

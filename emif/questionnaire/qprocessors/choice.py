@@ -312,7 +312,7 @@ def show_summ(value):
 
             multiple_choices.append({'key': key, 'comment': comment})
         else:
-            multiple_choices.append({'key': key, 'comment': ''})
+            multiple_choices.append({'key': choice, 'comment': ''})
 
     #return value   
     return render_to_string('questionnaire/choice_summary.html', {'choices':multiple_choices})

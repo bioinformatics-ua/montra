@@ -143,6 +143,7 @@ class ordered_dict(dict):
 class Tag:
         
         def __init__(self):
+            self.id = -1
             self.tag = ''
             self.value = ''
             self.extra = ''   
@@ -152,11 +153,11 @@ class Tag:
 
 
         def __eq__(self, other):
-            return other.tag == self.tag
+            return other.id == self.id
 
 
         def __cmp__(self, other):
-            return cmp(other.tag, self.tag)
+            return cmp(other.id, self.id)
 
         def __lt__ (self, other):
             return self.number < other.number
