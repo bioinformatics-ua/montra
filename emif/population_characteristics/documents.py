@@ -96,7 +96,7 @@ def document_form_view_upload(request, fingerprint_id, template_name='documents_
     #_json = import_population_characteristics_data(fingerprint_id,filename=path_file)
 
     pc = PopulationCharacteristic()
-    data_jerboa = pc.submit_new_revision(fingerprint_id, path_file)
+    data_jerboa = pc.submit_new_revision(fingerprint_id, revision, path_file)
 
 
     aggregation.apply_async([fingerprint_id, data_jerboa])
@@ -120,7 +120,7 @@ def parsejerboa(request, template_name='documents_upload_form.html'):
     _json = import_population_characteristics_data(filename=path_file)
 
     pc = PopulationCharacteristic()
-    pc.submit_new_revision(fingerprint_id)
+    pc.submit_new_revision(fingerprint_id, revision)
     data = {'data': _json}
     response = JSONResponse(data, mimetype=response_mimetype(request))
     response['Content-Disposition'] = 'inline; filename=files.json'
@@ -193,8 +193,16 @@ def document_form_view(request, runcode, qs, activetab='summary', readOnly=False
     except:
         fingerprint_pk = 0
 
-    jerboa_files = Characteristic.objects.filter(fingerprint_id=runcode)
-    contains_population = len(jerboa_files)!=0
+    jerboa_files = Characteristic.objects.filter(fingerprint_id=runcode).order_by('-latest_date')
+
+
+    contains_population = False
+    latest_pop = None
+    if len(jerboa_files)!=0:
+        contains_population = True
+        latest_pop = jerboa_files[0]
+
+
 
     # Find if user has public links for this db.
 
@@ -225,6 +233,7 @@ def document_form_view(request, runcode, qs, activetab='summary', readOnly=False
                     'owners': db_owners,
                     'fingerprint_dump': True,
                     'contains_population': contains_population, 
+                    'latest_pop': latest_pop,
                     'hide_add': True,
                     'fingerprint_ttype': fingerprint_ttype,
                     'search_old': query_old,

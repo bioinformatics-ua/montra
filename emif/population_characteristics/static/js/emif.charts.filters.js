@@ -34,7 +34,7 @@ function TransformFilter(filters){
         }
         if (compare)
         {
-            this.filters['values.Gender'] = ['M', 'F', 'T'];    
+            this.filters['values.Gender'] = ['T', 'M', 'F'];    
         }
 
         return this.filters;        

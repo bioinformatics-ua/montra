@@ -139,9 +139,10 @@ th, td {
               <tbody>
                 {% for t in v.list_ordered_tags %}
                   {% if t.ttype != 'publication' %}
+
                   <tr data-fingerprintid="HEADER" 
                   data-rowid="{{forloop.parentloop.counter}}_{{forloop.counter}}" class="entry rowid_{{forloop.parentloop.counter}}_{{forloop.counter}}">
-                    <td style="background-color: white; font-size: 85%;" class="tooltippable" data-original-title="{{ t.tag|removehs }}" title="">
+                    <td style="background-color: white; font-size: 85%;" class="tooltippable" data-original-title='{{ t.tag|removehs }}' title="">
                     
                     
                     {{ t.tag|removehs }}
@@ -190,7 +191,7 @@ th, td {
                       data-rowid="{{forloop.parentloop.counter}}_{{forloop.counter}}"
                   class="entry rowid_{{forloop.parentloop.counter}}_{{forloop.counter}}">
                     <td class="comphidden tooltippable" data-original-title="{{ t.tag|removehs }}" title="">{{ t.tag|removehs }}</td> 
-                     <td style="font-size: 95%;" class="tooltippable" data-original-title="{{ t.value }}" title="">{{ t.value }}</td>
+                     <td style="font-size: 95%;" class="tooltippable" data-original-title="{{ t.value|force_escape }}" title="">{{ t.value|escape }}</td>
                   </tr>
                   {% endif %}
                 {% endfor %}
@@ -220,6 +221,13 @@ th, td {
 {% endblock %}
 <!--[if gte IE 9]><!-->
 {% block scriptextra %}
+
+  {% for k,v in results.items.0.1.qset.ordered_items %}
+    syncHeight({{forloop.counter}}, {{v.list_ordered_tags|length}});
+  {% endfor %}
+
+  sync();
+
 function applyFilters(){
   reset_empties();
       var others = [];
@@ -364,7 +372,7 @@ function compareDbsSelected(initial){
             $('.database_listing_names').fadeIn('fast');
             $('.database_listing').fadeIn('fast');
             }
-            $(".tooltippable").tooltip({container:"body"});
+            $(".tooltippable").tooltip({container:"body", html: true});
             applyFilters();
         }
       );

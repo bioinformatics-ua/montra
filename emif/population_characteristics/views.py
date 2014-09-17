@@ -53,7 +53,7 @@ def serialize_date(dt):
     return dt.isoformat() + 'Z'
 
 
-def jerboa_list_values(request, var, row, fingerprint_id, template_name='documents_upload_form.html'):
+def jerboa_list_values(request, var, row, fingerprint_id, revision, template_name='documents_upload_form.html'):
 
     if not hasFingerprintPermissions(request, fingerprint_id):
         return HttpResponse("Access forbidden",status=403)
@@ -77,7 +77,7 @@ def jerboa_list_values(request, var, row, fingerprint_id, template_name='documen
     
 
     pc = PopulationCharacteristic(None)
-    values = pc.get_variables(var, row, fingerprint_id, filters=filters)
+    values = pc.get_variables(var, row, fingerprint_id, revision, filters=filters)
     data = {'values': values}
     response = JSONResponse(data, mimetype="application/json")
     response['Content-Disposition'] = 'inline; filename=files.json'

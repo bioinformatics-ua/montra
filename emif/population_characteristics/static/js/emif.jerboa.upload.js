@@ -40,8 +40,8 @@ $(document).ready(
           success: function (data){result=data;}
         });
         result.conf.forEach(function(d){
-            var context = $('<tr>').appendTo('#jerboafiles');
-            var node = $('<td/>')
+            var context = $('<tr>').prependTo('#jerboafiles');
+            var node = $('<td colspan="3"/>')
                         .append($('<span/>').html("<p>File name: " + d.file_name
                             + "</p><p>Description: " + d.comments 
                             + "</p><p>Last update: " + d.latest_date ));
@@ -96,7 +96,7 @@ $(function () {
         dataType: 'json',
         autoUpload: false,
         acceptFileTypes: /(\.|\/)(tsv|txt)$/i,
-        maxFileSize: 5000000, // 5 MB
+        maxFileSize: 20000000, // 20 MB
         // Enable image resizing, except for Android and Opera,
         // which actually support image resizing, but fail to
         // send Blob objects via XHR requests:
@@ -107,7 +107,7 @@ $(function () {
         previewCrop: true
     }).on('fileuploadadd', function (e, data) {
         console.log('File Upload - fileuploadadd');
-        data.context = $('<tr>').appendTo('#jerboafiles');
+        data.context = $('<tr>').prependTo('#jerboafiles');
         $.each(data.files, function (index, file) {
             var node = $('<td>').text(file.name);
 
@@ -158,7 +158,8 @@ $(function () {
 
             // Trigger the charts 
             var url = document.URL;
-            url = url + "pc/"
+            if(url.indexOf('pc/') == -1)
+                url = url + "pc/"
             window.location.assign(url);
             
 
