@@ -180,6 +180,7 @@ STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
     #    'django.contrib.staticfiles.finders.DefaultStorageFinder',
     #'djangobower.finders.BowerFinder',
+    'compressor.finders.CompressorFinder',
 )
 
 # Make this unique, and don't share it with anybody.
@@ -294,6 +295,9 @@ INSTALLED_APPS = (
 
     # unique views counter
     'hitcount',
+
+    # Django-Compressor
+    "compressor",
 )
 
 # Userena settings
@@ -563,4 +567,7 @@ PUBLIC_LINK_MAX_TIME = 24*30; # hours
 
 # Unique views definitions
 HITCOUNT_KEEP_HIT_ACTIVE = { 'days': 1 }
+
+# Django-Compressor activation
+COMPRESS_ENABLED = True
 

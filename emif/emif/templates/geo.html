@@ -21,8 +21,11 @@
 {% endif %}
 {% endblock %}
 
+{% block uncompressed_js %}
+    <script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false"></script>
+{% endblock %}
+
 {% block scriptextraincludes %}
-<script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false"></script>
 <link rel="stylesheet"  href="{{STATIC_URL}}css/emif.geo.css">
 <link rel="stylesheet" href="{{ STATIC_URL }}css/vendor/jquery.boolrelwidget.css"></script>
 <script src="{{ STATIC_URL}}js/vendor/jquery.boolrelwidget.js"></script>

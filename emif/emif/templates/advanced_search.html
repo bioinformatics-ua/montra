@@ -30,6 +30,14 @@ text-decoration: none;
 }
 {% endblock %}
 
+{% block styleinclude %}
+  <link rel="stylesheet" href="{{ STATIC_URL }}css/vendor/chosen.css"></script>
+  <link rel="stylesheet" href="{{ STATIC_URL }}progressbar.css"></script>
+  <link rel="stylesheet" href="{{ STATIC_URL }}css/vendor/jquery.boolrelwidget.css"></script>
+  {% for x in cssinclude %}
+  <link rel="stylesheet" href="{{ x }}" type="text/css" />
+  {% endfor %}
+{% endblock %}
 {% block breadcrumbs %}
   {{ block.super }}
 
@@ -38,9 +46,7 @@ text-decoration: none;
 {% endblock %}
 
 {% block headextra %}
-<link rel="stylesheet" href="{{ STATIC_URL }}css/vendor/chosen.css"></script>
-<link rel="stylesheet" href="{{ STATIC_URL }}progressbar.css"></script>
-<link rel="stylesheet" href="{{ STATIC_URL }}css/vendor/jquery.boolrelwidget.css"></script>
+
 <script src="{{ STATIC_URL }}js/vendor/jquery.errornavigator.js"></script>
 
 
@@ -49,7 +55,7 @@ text-decoration: none;
 <script src="{{ STATIC_URL}}js/vendor/bootstrap-tooltip.js"></script>
 <script src="{{ STATIC_URL}}js/vendor/bootstrap-popover.js"></script>
 <script src="{{ STATIC_URL}}js/fingerprint_validation.js"></script>
-<script src="{{ STATIC_URL }}js/vendor/jquery.inputmask.bundle.min.js" type="text/javascript"></script>
+<script src="{{ STATIC_URL }}js/vendor/jquery.inputmask.bundle.js" type="text/javascript"></script>
 
 <script src="{{ STATIC_URL}}js/fingerprint.js"></script>
 <script src="{{ STATIC_URL}}js/vendor/jquery.boolrelwidget.js"></script>
@@ -58,12 +64,6 @@ text-decoration: none;
 {% for x in jsinclude %}
 <script type="text/javascript" src="{{ x }}"></script>
 {% endfor %}
-    
-    {% for x in cssinclude %}
-<link rel="stylesheet" href="{{ x }}" type="text/css" />
-{% endfor %}
-
-
 
 {% if async_progress %}
 <script type="text/javascript">var progress_url = "{{ async_url }}";</script>
