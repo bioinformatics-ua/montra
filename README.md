@@ -63,7 +63,7 @@ EMIF Platform - Fingerprint Browser
 
         sudo apt-get install libpython-dev
         sudo apt-get install build-essential
-        sudo pip install PIL --allow-external PIL --allow-unverified PIL
+        pip install -r requirements.txt --allow-all-external --allow-unverified pil
 
 
 9.  Install celery and memcached
@@ -114,7 +114,7 @@ EMIF Platform - Fingerprint Browser
     
 17. Install requirements.txt
 
-        pip install -r requirements.txt
+        pip install -r requirements.txt --allow-all-external
 
     NOTE: git must be in environment variables and PIP have to be installed.
 
