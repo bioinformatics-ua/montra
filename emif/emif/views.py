@@ -3120,60 +3120,7 @@ def sharedb(request, db_id, template_name="sharedb.html"):
 
 def sharedb_activation(request, activation_code, template_name="sharedb_invited.html"):
 
-    if (request.user==None or not request.user.is_authenticated()):
-        return HttpResponse('You need to be authenticated.')
-    __objs = SharePending.objects.filter(activation_code=activation_code, pending=True, user=request.user)
-    if (len(__objs)==0):
-        return HttpResponse('It is already activated or does the item has been expired.')
-
-    if (len(__objs)>1):
-        return HttpResponse('An error has occured. Contact the EMIF Catalogue Team.')
-
-    sp = __objs[0]
-
-    fingerprint = None
-    try:
-        fingerprint = Fingerprint.objects.get(fingerprint_hash=sp.db_id)
-
-    except:
-        return HttpResponse("And error has occurred. Contact the EMIF Catalogue Team.")
-
-    fingerprint.shared.add(request.user)
-
-    fingerprint.save()
-
-    indexFingerprint(fingerprint.fingerprint_hash)
-
-    sp.pending = False
-    sp.save()
-    finger_name = findName(fingerprint)
-    try:
-        subject = "EMIF Catalogue: Accepted database shared"
-        message = """Dear %s,\n\n
-            \n\n
-            %s has been activated. You can access the new database in "Databases" -> Personal".
-            \n\nSincerely,\nEMIF Catalogue
-        """ % (request.user.get_full_name(), finger_name)
-
-
-        message_to_inviter = """Dear %s,\n\n
-            \n\n
-            %s has accepted to work with you in database %s.
-
-            \n\nSincerely,\nEMIF Catalogue
-        """ % (sp.user_invite.get_full_name(), request.user.get_full_name(), finger_name)
-
-        # Send email to admins
-        send_custom_mail(subject, message_to_inviter, settings.DEFAULT_FROM_EMAIL, [sp.user_invite.email])
-        # Send email to user with the copy of feedback message
-        send_custom_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [sp.user.email])
-
-    except BadHeaderError:
-        return HttpResponse('Invalid header found.')
-
-
-    return render(request, template_name, {'request': request, 'breadcrumb': True})
-
+    return activate_user(activation_code, request.user, context = request)
 
 # Documentation
 def docs_api(request, template_name='docs/api.html'):
