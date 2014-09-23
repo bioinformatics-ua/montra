@@ -405,7 +405,6 @@ function GraphicChartC3D3(divArg, dataArg)
 
     // Clean the legend container.
     $(".color_container").html("");
-
     // Draw legend manually
     for (var i=0; i< columns.length;i++) {
             var row = columns[i][0];
@@ -416,7 +415,7 @@ function GraphicChartC3D3(divArg, dataArg)
             };
 
             if(row.toLowerCase() == 't'){
-              if(chartConfigs.data.types['T'] !== ''){
+              if(chartConfigs.data.types['T'] !== '' && columns[i].length > 1){
                 drawLegend(row);
               }
             } else {
