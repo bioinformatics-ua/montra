@@ -196,7 +196,7 @@ EMIF Platform - Fingerprint Browser
  * Luís A. Bastião Silva <bastiao@ua.pt>
  * Ricardo Ribeiro <ribeiro.r@ua.pt> 
  * Tiago Godinho <tmgodinho@ua.pt>
- * Tiago Lourenço <tiago.vf.lourenco@ua.pt>
+ 
  
 
 #### Lead developer
