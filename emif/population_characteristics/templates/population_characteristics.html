@@ -1,50 +1,6 @@
 {% load url from future %}
 
-{% block styleinclude %}
-    <link rel="stylesheet" href="{{ STATIC_URL }}css/jquery.dyndropdown.css">
-    <link rel="stylesheet" href="{{ STATIC_URL }}css/pc.css">
-    <style type="text/css">
-
-    .axis path,
-    .axis line {
-      fill: none;
-      stroke: #000;
-      shape-rendering: crispEdges;
-    }
-
-    .bar {
-      fill: steelblue;
-    }
-
-    .x.axis path {
-      display: none;
-    }
-
-    #pctitle{
-        text-align: center;
-    }
-    #pc_chart_place{
-        /*margin-left: 60px;*/
-    }
-    #jerboaupload{
-        margin-left: 60px;
-        margin-top: 30px;
-
-    }
-    </style>
-{% endblock %}
-{% block headextra %}
-<script src="{{ STATIC_URL}}js/jquery.dyndropdown.js"></script>
-<!--[if gte IE 9]><!-->
-<script src="{{ STATIC_URL}}js/emif.charts.filters.js"></script>
-<script src="{{ STATIC_URL}}js/emif.charts.draw.js"></script>
-
-<script src="{{ STATIC_URL}}js/emif.populationcharacteristics.comments.js"></script>
-{% endblock %}
 <!--<![endif]-->
-
-
-
 
 <!--[if lte IE 8]>
 <div class="well">Currently IE 7 and 8 don't support this functionality. To use this functionality please update your browser to a modern browser, like IE 9 or better, Google Chrome, Firefox, Opera or Safari.</div>
@@ -247,19 +203,4 @@
 
 {% endif %}
 
-<!--<![endif]-->
-
-
-<!--
-<script src="{{ STATIC_URL}}js/emif.populationcharacteristics.charts.js"></script>
-
-<script src="{{ STATIC_URL}}js/emif.populationcharacteristics.js"></script>
-
-<script src="{{ STATIC_URL}}js/emif.documents.js"></script>
--->
-<!--[if gte IE 9]><!-->
-<script src="{{ STATIC_URL}}js/emif.charts.c3d3.js"></script>
-<script src="{{ STATIC_URL}}js/emif.charts.d3.js"></script>
-
-<script src="{{ STATIC_URL}}js/emif.charts.js"></script>
 <!--<![endif]-->

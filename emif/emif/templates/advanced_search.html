@@ -60,6 +60,8 @@ text-decoration: none;
 <script src="{{ STATIC_URL}}js/fingerprint.js"></script>
 <script src="{{ STATIC_URL}}js/vendor/jquery.boolrelwidget.js"></script>
 
+<script type="text/javascript" src="{{ STATIC_URL }}js/vendor/chosen.jquery.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}js/emif.advanced_search.js"></script>
 
 {% for x in jsinclude %}
 <script type="text/javascript" src="{{ x }}"></script>
@@ -133,16 +135,11 @@ text-decoration: none;
     
 </div>
        <div id="bool_container"></div>
-
-<script type="text/javascript" src="{{ STATIC_URL }}js/vendor/chosen.jquery.js"></script>
-<script type="text/javascript" src="{{ STATIC_URL }}js/emif.advanced_search.js"></script>
-<script type="text/javascript">
-    var parts_missing = 0;    
-
-    </script>
 {% endblock %}
 
 {% block scriptextra %}
+var parts_missing = 0;    
+
 function add_triggers() {
             
             console.log("adding triggers");

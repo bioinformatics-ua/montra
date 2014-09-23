@@ -182,6 +182,9 @@ STATICFILES_FINDERS = (
     #'djangobower.finders.BowerFinder',
     'compressor.finders.CompressorFinder',
 )
+COMPRESS_JS_FILTERS = (
+    'compressor.filters.jsmin.JSMinFilter',
+)
 
 # Make this unique, and don't share it with anybody.
 SECRET_KEY = 'j*zdirg7yy9@q1k=c*q!*kovfsd#$FDFfsdfkae#id04pyta=yz@w34m6rvwfe'
@@ -570,4 +573,4 @@ HITCOUNT_KEEP_HIT_ACTIVE = { 'days': 1 }
 
 # Django-Compressor activation
 COMPRESS_ENABLED = True
-
+COMPRESS_OFFLINE = True
