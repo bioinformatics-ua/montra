@@ -191,7 +191,7 @@ th, td {
                       data-rowid="{{forloop.parentloop.counter}}_{{forloop.counter}}"
                   class="entry rowid_{{forloop.parentloop.counter}}_{{forloop.counter}}">
                     <td class="comphidden tooltippable" data-original-title="{{ t.tag|removehs }}" title="">{{ t.tag|removehs }}</td> 
-                     <td style="font-size: 95%;" class="tooltippable" data-original-title="{{ t.value|force_escape }}" title="">{{ t.value|escape }}</td>
+                     <td style="font-size: 95%;" class="tooltippable" data-original-title="{{ t.value.strip|force_escape|safe }}" title="">{{ t.value.strip|escape|safe }}</td>
                   </tr>
                   {% endif %}
                 {% endfor %}

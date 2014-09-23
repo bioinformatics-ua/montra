@@ -196,9 +196,67 @@ function GraphicChartC3D3(divArg, dataArg)
   *
   */
   this.draw = function(div, dataset){
+    var findMin = function(possibilities, start){
+      var pointer = 0;
+      var max = possibilities.length;
+
+      while(pointer < max){
+        if(possibilities[pointer] >= start){
+          return pointer;
+        }
+        pointer++;
+      }
+
+      return 0;
+    };
+    var findMax = function(possibilities, end){
+      var pointer = 0;
+      var max = possibilities.length;
+
+      while(pointer < max){
+        if(possibilities[pointer] >= end){
+          return pointer;
+        }
+        pointer++;
+      }
+      return max;
+    };
+    var findIntermediary = function(possibilities_string, start, end){
+
+      var possibilities = [];
+      var length = possibilities_string.length;
+
+      for(var i=0;i<length;i++){
+        if(possibilities_string[i].indexOf('-') !== -1){
+          possibilities.push(i);
+        }
+        else
+          possibilities.push(parseInt(possibilities_string[i]));
+      }
+      //console.log(start);
+      //console.log(end);
+
+      var min = findMin(possibilities, start);
+      var max = findMax(possibilities, end);
+
+      var hipotetical = possibilities.slice(min, max);
+
+        var step = Math.ceil(hipotetical.length / 12);
+        var visible = [];
+        var len = hipotetical.length;
+
+        var i = 0;
+
+        while(i < len){
+          visible.push(""+hipotetical[i]);
+          i+=step;
+        }
+        return visible;
+    };
 
     // Get the temporary var to get the chart title
     var tmpValue = actualChart.title['var'];
+    var memoize = null;
 
     // Pre-set configurations to c3
     chartConfigs = {
@@ -222,16 +280,22 @@ function GraphicChartC3D3(divArg, dataArg)
           x: {
             //type: 'categorized',
             label_position : {},
-            tick: { culling: true,count: 4,values:["0-4", "105-109"], format: function (x) {
-               return x;
-               if ($.type(x) === "string") {
-                  return x;
-              }
+            tick : { 
+                culling: true,
+                format: function (x) {
+                 return x;
+                 if ($.type(x) === "string") {
+                    return x;
+                }
 
-              return parseInt(x);
+                return parseInt(x);
+              },
+              values : 
+                function(domain) {
+                  console.log('here'); 
+                  console.log(domain);
+                }
             }
-          },
-
           },
           y: {
             label_position : {}
@@ -285,11 +349,38 @@ function GraphicChartC3D3(divArg, dataArg)
             datasetYs,
         },
         axis: {
-          x: {
-            label_position : {},
+            x: {
+                //type: 'categorized',
+                label_position : {},
+                tick : { 
+                    culling: true,
+                    /*format: function (x) {
+                     return x;
+                     if ($.type(x) === "string") {
+                        return x;
+                    }
 
+                    return parseInt(x);
+                  },*/
+                  values : 
+                    function(domain) {
+                      if(memoize == null){
+                        if(chartConfigs.axis.x.categories != undefined){
+                          memoize = chartConfigs.axis.x.categories;
+                        } else {
+                          var columns = chartConfigs.data.columns;
+                          $.each(columns, function(d){
+                              if (columns[d][0]=="x"){
+                                memoize = columns[d].slice(1, columns[d].length);
+                              }
 
-          },
+                          });
+                        }
+                      }
+                      return findIntermediary(memoize, domain[0], domain[1]);
+                    }
+                }
+            },
           y: {
             label_position : {}
 
@@ -373,7 +464,6 @@ function GraphicChartC3D3(divArg, dataArg)
     chartConfigs.axis.x['label'] = {'text': actualChart.x_axis['label'], 'position': 'outer-center'};
     chartConfigs.axis.y['label'] = {'text': actualChart.y_axis['label'], 'position': 'outer-middle'};
 
-
     chartConfigs.legend = {}
     chartConfigs.legend['show'] = false;
 
@@ -405,9 +495,8 @@ function GraphicChartC3D3(divArg, dataArg)
 
     // Clean the legend container.
     $(".color_container").html("");
-
     // Draw legend manually
-    for (var i=0; i< columns.length;i++) {
+    for (var i=0; i< columns.length;i++) {  
             var row = columns[i][0];
 
             var drawLegend = function(row){
@@ -416,7 +505,7 @@ function GraphicChartC3D3(divArg, dataArg)
             };
 
             if(row.toLowerCase() == 't'){
-              if(chartConfigs.data.types['T'] !== ''){
+              if(chartConfigs.data.types['T'] !== '' && columns[i].length > 1){
                 drawLegend(row);
               }
             } else {
