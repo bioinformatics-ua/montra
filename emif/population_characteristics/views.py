@@ -69,8 +69,7 @@ def jerboa_list_values(request, var, row, fingerprint_id, revision, template_nam
         for i in myRq:
             if i == 'publickey':
                 continue
-            filters[i[8:-3]] = myRq[i]
-
+                
             filters[i[8:-3]] = myRq[i]
 
         #print filters    

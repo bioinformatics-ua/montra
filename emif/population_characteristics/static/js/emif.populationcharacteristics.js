@@ -538,7 +538,6 @@ var stuff;
       this.bindFilters = function(){
 
             /*** The magic of the changing of the type of the graph happens here */
-
             $(".graphTypes").bind('click',function(e)
                     { 
                       e.preventDefault(); 
@@ -559,18 +558,16 @@ var stuff;
                       $('.graphTypes').closest('li').removeClass('active')
                       $(this.parentNode).closest('li').addClass('active')
 
+                      var this_title = e.target.innerHTML;
+
                       chartTypes.forEach(function(a){
                           
-                          if (a.title.fixed_title==e.target.innerHTML) 
+                          if (a.title.fixed_title== this_title) 
                           {
                               actualChart = a;
                           }
                           
                       });
-                      if (actualChart==null)
-                      {
-                          // do something here like an abort or shit! 
-                      }
 
                       // Comments ids
                       var fid = getFingerprintID();
@@ -584,8 +581,9 @@ var stuff;
                       var _filters = {};
                       charDraw.draw(_filters);
                       charDraw.drawBar();
-                      $(".filterBar").last().click();   
-                      $(".filterBar").first().click(); 
+                      //var filterbar = $(".filterBar");
+                      //filterbar.last().click();   
+                      //filterbar.first().click(); 
 
                       
                       return false;
