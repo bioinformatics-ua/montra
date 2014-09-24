@@ -30,7 +30,6 @@ from rest_framework import renderers
 from rest_framework.authentication import TokenAuthentication
 
 from rest_framework.authentication import SessionAuthentication, BasicAuthentication
-from rest_framework.permissions import IsAuthenticated
 
 from rest_framework.decorators import api_view, parser_classes
 from rest_framework.response import Response

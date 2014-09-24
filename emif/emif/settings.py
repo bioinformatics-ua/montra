@@ -171,6 +171,7 @@ STATICFILES_DIRS = (
     os.path.abspath(PROJECT_DIR_ROOT + MIDDLE_DIR + 'advancedsearch/static'),
     os.path.abspath(PROJECT_DIR_ROOT + MIDDLE_DIR + 'public/static'),
     os.path.abspath(PROJECT_DIR_ROOT + MIDDLE_DIR + 'accounts/static'),
+    os.path.abspath(PROJECT_DIR_ROOT + MIDDLE_DIR + 'dashboard/static'),
 )
 
 # List of finder classes that know how to find static files in
@@ -225,6 +226,8 @@ TEMPLATE_DIRS = (
     os.path.abspath(PROJECT_DIR_ROOT + MIDDLE_DIR + 'docs_manager/templates'),
     os.path.abspath(PROJECT_DIR_ROOT + MIDDLE_DIR + 'advancedsearch/templates'),
     os.path.abspath(PROJECT_DIR_ROOT + MIDDLE_DIR + 'public/templates'),
+    os.path.abspath(PROJECT_DIR_ROOT + MIDDLE_DIR + 'dashboard/templates'),
+
 )
 
 INSTALLED_APPS = (
@@ -298,6 +301,9 @@ INSTALLED_APPS = (
 
     # unique views counter
     'hitcount',
+
+    # dashboard
+    'dashboard',
 )
 
 # Userena settings
@@ -546,8 +552,8 @@ except ConnectionFailure, e:
     sys.exit(1)
 
 # REDIRECT USER ACCORDING TO PROFILE
-REDIRECT_DATACUSTODIAN = 'emif.views.databases'
-REDIRECT_RESEARCHER = 'emif.views.all_databases_user'
+REDIRECT_DATACUSTODIAN = 'dashboard.views.dashboard'
+REDIRECT_RESEARCHER = 'dashboard.views.dashboard'
 
 
 # MEMCACHED

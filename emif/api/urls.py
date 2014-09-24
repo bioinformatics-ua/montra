@@ -36,6 +36,7 @@ from api.views import NotifyOwnerView
 from api.views import AddPublicLinkView
 from api.views import DeletePublicLinkView
 
+from dashboard.api import *
 
 urlpatterns = patterns('api.views',
     url(r'^root/$', 'api_root'),
@@ -53,6 +54,14 @@ urlpatterns = patterns('api.views',
     url(r'^notify_owner$', NotifyOwnerView.as_view(), name='notify_owner'),
     url(r'^addpubliclink$', AddPublicLinkView.as_view(), name='addpubliclink'),
     url(r'^deletepubliclink$', DeletePublicLinkView.as_view(), name='addpubliclink'),
+
+    # dashboard widgets services
+    url(r'^dbtypes$', DatabaseTypesView.as_view(), name='dbtypes'),
+    url(r'^userstats$', UserStatsView.as_view(), name='userstats'),
+    url(r'^mostviewed$', MostViewedView.as_view(), name='mostviewed'),
+    url(r'^lastusers$', LastUsersView.as_view(), name='lastusers'),
+    url(r'^feed$', FeedView.as_view(), name='feed'),
+    url(r'^tagcloud$', TagCloudView.as_view(), name='tagcloud'),
 
 )
 

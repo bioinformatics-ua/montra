@@ -189,6 +189,9 @@ urlpatterns = patterns('',
 
     # unique views plugin
     url(r'^api/hit_counter/$', update_hit_count_ajax, name='hitcount_update_ajax'),
+
+    # DashBoard
+    url(r'^dashboard', include('dashboard.urls')),
 )
 
 if settings.DEBUG:

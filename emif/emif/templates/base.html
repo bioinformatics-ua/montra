@@ -24,6 +24,9 @@
         <link rel="shortcut icon" href="{{ STATIC_URL }}img/favicon.ico" type="image/x-icon" />
         <link rel="stylesheet" href="{{ STATIC_URL }}css/bootstrap.min.css">
         <link rel="stylesheet" href="{{ STATIC_URL }}font-awesome/css/font-awesome.min.css">
+
+        <link rel="stylesheet" href="{{ STATIC_URL }}css/vendor/jquery-ui-1.10.4.custom.min.css">
+
         <link href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet">
         <!-- IE 7 doesnt recognize awesome icons correctly... -->
         <!--[if IE]>
@@ -270,7 +273,7 @@
                 <div style="padding-top: 60px;" class="container">
                     {% if breadcrumb %}
                     {% block breadcrumbs %}
-                    {% breadcrumb "Databases" "databases" %}
+                    {% breadcrumb "Home" "home" %}
                     {% endblock %}
                     <div class="pull-left">
                         {% render_breadcrumbs %}

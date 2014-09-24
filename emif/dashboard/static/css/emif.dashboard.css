@@ -1,0 +1,56 @@
+ul {
+  list-style-type: none;
+}
+
+.gridster ul {
+    background-color: white;
+}
+
+.gridster li {
+    text-align:justify;
+	text-justify:inter-word;
+	color: black;
+}
+
+.widget-header{
+	font-weight: bold;
+	text-align: center;
+	background-color: #F5F5F5;
+}
+
+.gridster {
+    margin: 0 auto;
+
+    opacity: .8;
+
+    -webkit-transition: opacity .6s;
+    -moz-transition: opacity .6s;
+    -o-transition: opacity .6s;
+    -ms-transition: opacity .6s;
+    transition: opacity .6s;
+}
+
+.gridster .gs-w {
+	border: 1px solid #e5e5e5;
+	-webkit-border-radius: 4px;
+	-moz-border-radius: 4px;
+	border-radius: 4px;
+	-webkit-transition: border-color 0.3s;
+	-moz-transition: border-color 0.3s;
+	transition: border-color 0.3s;
+    cursor: pointer;
+}
+
+.gridster .player {
+    background: #BBB;
+}
+
+
+.gridster .preview-holder {
+    border: none!important;
+    background: red!important;
+}
+
+.widget-header{
+	padding:10px;
+}

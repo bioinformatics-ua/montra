@@ -12,7 +12,9 @@
 
 		{% if request.user.is_authenticated %}
 		<!--div class="btn-group" id="group_toolbar"-->
-
+      {% if dashboard %}
+        <div id="dashboardselectbox" class="btn btn-group"></div>
+      {% endif %}
       {% if fingerprint_dump %}
       <a class="btn btn morelikethis" href="mlt/{{fingerprint_id}}" id="morelikethis_toolbar"> <i class="icon-search icon"></i>
         More Like This

@@ -121,6 +121,9 @@ class FingerprintHead(models.Model):
     revision       = models.IntegerField()
     date           = models.DateTimeField(auto_now_add=True)
 
+    def __str__(self):
+        return "FINGERPRINT_ID:"+str(self.fingerprint_id)+" REVISION: "+str(self.revision) + " DATE: "+ str(self.date)
+
 class AnswerChange(models.Model):
     revision_head = models.ForeignKey(FingerprintHead)
     answer        = models.ForeignKey(Answer)
