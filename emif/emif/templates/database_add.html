@@ -75,6 +75,7 @@ text-decoration: none;
 {% endblock %}
 
 {% block content %}
+  {% if profiles|isDataCustodian %}
 
 <div style="display: none;" id="errornavigator"></div>
 
@@ -135,6 +136,12 @@ It was not possible to save this questionnary. Please try again in a few seconds
 <div class="span8" id="set_container"></div>
 
 </div>
+{% else %}
+  <div class="span12">
+    <center><h4>You must have Data Custodian Profile to be allowed to create databases.</h4></center>
+  </div>
+{% endif %}
+
 {% endblock %}
 
 {% block scriptextraincludes %} 

@@ -120,7 +120,7 @@ th, td {
   <div style="overflow-x: auto;" class="well accordion" id="accordion2">
        <div style="opacity: 0;" class="database_listing_names">
     <div>
-     <div data-clampedwidth=".database_listing_names"  class="clearfix database_title btn-darkgrey">
+     <div style="width: 220px;" class="clearfix database_title btn-darkgrey">
       <div style="height: 26px;" class="database_title_text pull-left"> &nbsp;
       </div>
     </div>   
@@ -139,9 +139,10 @@ th, td {
               <tbody>
                 {% for t in v.list_ordered_tags %}
                   {% if t.ttype != 'publication' %}
-                  <tr data-fingerprintid="HEADER" 
+
+                  <tr data-qid="{{t.id}}" data-fingerprintid="HEADER" 
                   data-rowid="{{forloop.parentloop.counter}}_{{forloop.counter}}" class="entry rowid_{{forloop.parentloop.counter}}_{{forloop.counter}}">
-                    <td style="background-color: white; font-size: 85%;" class="tooltippable" data-original-title="{{ t.tag|removehs }}" title="">
+                    <td style="background-color: white; font-size: 85%;" class="tooltippable" data-original-title='{{ t.tag|removehs }}' title="">
                     
                     
                     {{ t.tag|removehs }}
@@ -172,7 +173,7 @@ th, td {
       </div>
     </div>   
       {% for k,v in content.qset.ordered_items %}
-      <div data-clampedwidth=".database_listing" style="background-color: white;" data-block="{{forloop.counter}}" class="block_{{forloop.counter}} elips accordion-group">
+      <div style="background-color: white;" data-block="{{forloop.counter}}" class="block_{{forloop.counter}} elips accordion-group">
         <div title="{{k|removeh1}}" class="tooltippable accordion-heading">
           <small><a id="a_collapse{{k|removespaces}}_{{content.name|removespaces|hash}}" class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapse{{k|removespaces}}_{{content.name|removespaces|hash}}">
           <div class="linktoellipse">{{k|removeh1}}</div></a></small>
@@ -186,11 +187,11 @@ th, td {
               <tbody>
                 {% for t in v.list_ordered_tags %}
                   {% if t.ttype != 'publication' %}
-                  <tr data-fingerprintid="{{fingerprint_id}}" 
+                  <tr data-qid="{{t.id}}" data-fingerprintid="{{fingerprint_id}}" 
                       data-rowid="{{forloop.parentloop.counter}}_{{forloop.counter}}"
                   class="entry rowid_{{forloop.parentloop.counter}}_{{forloop.counter}}">
-                    <td style="width:0 !important;" class="tooltippable" data-original-title="{{ t.tag|removehs }}" title="">{{ t.tag|removehs }}</td> 
-                     <td style="font-size: 95%;" class="tooltippable" data-original-title="{{ t.value }}" title="">{{ t.value }}</td>
+                    <td class="comphidden tooltippable" data-original-title="{{ t.tag|removehs }}" title="">{{ t.tag|removehs }}</td> 
+                     <td style="font-size: 95%;" class="tooltippable" data-original-title="{{ t.value.strip|force_escape|safe }}" title="">{{ t.value.strip|escape|safe }}</td>
                   </tr>
                   {% endif %}
                 {% endfor %}
@@ -220,6 +221,13 @@ th, td {
 {% endblock %}
 <!--[if gte IE 9]><!-->
 {% block scriptextra %}
+
+  {% for k,v in results.items.0.1.qset.ordered_items %}
+    syncHeight({{forloop.counter}}, {{v.list_ordered_tags|length}});
+  {% endfor %}
+
+  sync();
+
 function applyFilters(){
   reset_empties();
       var others = [];
@@ -351,7 +359,7 @@ function compareDbsSelected(initial){
       {%for fingerprint_id, content in results.items|slice:":1" %}
         {% for k,v in content.qset.ordered_items %}
           for( var i = 0; i < others.length;i++){
-            thread = new Runnable(compareDatabase, priority++, ref+'_{{k|removespaces}}', others[i]+'_{{k|removespaces}}'); 
+            thread = new Runnable(compareDatabase, priority++, ref+'_{{k|removespaces|hash}}', others[i]+'_{{k|removespaces|hash}}'); 
             threadpool.run(thread);  
           }
         {% endfor %}
@@ -364,7 +372,7 @@ function compareDbsSelected(initial){
             $('.database_listing_names').fadeIn('fast');
             $('.database_listing').fadeIn('fast');
             }
-            $(".tooltippable").tooltip({container:"body"});
+            $(".tooltippable").tooltip({container:"body", html: true});
             applyFilters();
         }
       );
@@ -395,7 +403,7 @@ $(function(){
   dbs.addDatabase(
     '{{fingerprint_id}}', 
     {
-      label: '{{content.name|removespaces|hash}}'
+      label: '{{content.name|removespaces}}'
     });
   {% endfor %}
 
@@ -409,11 +417,18 @@ $(function(){
   if(comparing_current == max_comparing)
      $('#compare_next').prop('disabled', true);
  
+var first = null;
+
 $('[data-clampedwidth]').each(function () {
     var elem = $(this);
     var parentPanel = elem.data('clampedwidth');
+
+    if(first == null){
+      first = $(parentPanel).width();
+    }
+
     var resizeFn = function () {
-        var sideBarNavWidth = $(parentPanel).width() - parseInt(elem.css('paddingLeft')) - parseInt(elem.css('paddingRight')) - parseInt(elem.css('marginLeft')) - parseInt(elem.css('marginRight')) - parseInt(elem.css('borderLeftWidth')) - parseInt(elem.css('borderRightWidth'));
+        var sideBarNavWidth = first - parseInt(elem.css('paddingLeft')) - parseInt(elem.css('paddingRight')) - parseInt(elem.css('marginLeft')) - parseInt(elem.css('marginRight')) - parseInt(elem.css('borderLeftWidth')) - parseInt(elem.css('borderRightWidth'));
         elem.css('width', sideBarNavWidth);
 
         if(elem.hasClass('elips')){

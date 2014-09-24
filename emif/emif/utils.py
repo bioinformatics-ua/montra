@@ -20,12 +20,18 @@
 
 import logging
 import re
+from django.shortcuts import render
+from django.http import HttpResponse
 from searchengine.models import Nomenclature
 from datetime import datetime
 from searchengine.search_indexes import CoreEngine, assert_suffix, convert_value
 from searchengine.models import Slugs
 
 from questionnaire.models import Question, Questionnaire, QuestionSet
+
+from emif.models import SharePending
+from fingerprint.models import Fingerprint
+from fingerprint.services import indexFingerprint, findName
 
 import md5
 import random
@@ -143,6 +149,7 @@ class ordered_dict(dict):
 class Tag:
         
         def __init__(self):
+            self.id = -1
             self.tag = ''
             self.value = ''
             self.extra = ''   
@@ -152,11 +159,11 @@ class Tag:
 
 
         def __eq__(self, other):
-            return other.tag == self.tag
+            return other.id == self.id
 
 
         def __cmp__(self, other):
-            return cmp(other.tag, self.tag)
+            return cmp(other.id, self.id)
 
         def __lt__ (self, other):
             return self.number < other.number
@@ -449,3 +456,83 @@ def send_custom_mail(title, description, from_mail, to_mail):
 
     msg.send()
 
+def activate_user(activation_code, user, context = None):
+    if (user==None or not user.is_authenticated()):
+        if context != None:
+            return HttpResponse('You need to be authenticated.')
+        else:
+            print 'You need to be authenticated.'
+            return False
+
+    __objs = SharePending.objects.filter(activation_code=activation_code, pending=True, user=user)
+    if (len(__objs)==0):
+        if context != None:
+            return HttpResponse('It is already activated or does the item has been expired.')
+        else:
+            print 'It is already activated or does the item has been expired.'
+            return False
+
+
+    if (len(__objs)>1):
+        if context != None:
+            return HttpResponse('An error has occurred. Contact the EMIF Catalogue Team.')
+
+        else:
+            print 'Multiple objects. An error has occurred. Contact the EMIF Catalogue Team.'
+            return False
+
+    sp = __objs[0]
+
+    fingerprint = None
+    try:
+        fingerprint = Fingerprint.objects.get(fingerprint_hash=sp.db_id)
+
+    except:
+        if context != None:
+            return HttpResponse("An error has occurred. Contact the EMIF Catalogue Team.")
+        else:
+            print "No fingerprint found. An error has occurred. Contact the EMIF Catalogue Team."
+            return False
+
+    fingerprint.shared.add(user)
+
+    fingerprint.save()
+
+    indexFingerprint(fingerprint.fingerprint_hash)
+
+    sp.pending = False
+    sp.save()
+    finger_name = findName(fingerprint)
+    try:
+        subject = "EMIF Catalogue: Accepted database shared"
+        message = """Dear %s,\n\n
+            \n\n
+            %s has been activated. You can access the new database in "Databases" -> Personal".
+            \n\nSincerely,\nEMIF Catalogue
+        """ % (user.get_full_name(), finger_name)
+
+
+        message_to_inviter = """Dear %s,\n\n
+            \n\n
+            %s has accepted to work with you in database %s.
+
+            \n\nSincerely,\nEMIF Catalogue
+        """ % (sp.user_invite.get_full_name(), user.get_full_name(), finger_name)
+
+        # Send email to admins
+        send_custom_mail(subject, message_to_inviter, settings.DEFAULT_FROM_EMAIL, [sp.user_invite.email])
+        # Send email to user with the copy of feedback message
+        send_custom_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [sp.user.email])
+
+    except BadHeaderError:
+        if context != None:
+            return HttpResponse('Invalid header found.')
+        else:
+            print 'Invalid header found.'
+            return False
+
+    if context != None:
+        return render(context, template_name, {'request': request, 'breadcrumb': True})
+    else:
+        print 'Activation successfull'
+        return True

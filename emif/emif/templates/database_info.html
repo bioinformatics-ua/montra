@@ -299,6 +299,11 @@
     });
 var threads = {};
 var global_fingerprint_id = '{{fingerprint_id}}';
+
+{%if latest_pop %}
+var global_revision = '{{latest_pop.revision}}';
+{% endif %}
+
 var global_public_key = '{{public_key.hash}}'
 function load_questionnary(){
 
@@ -396,6 +401,10 @@ this.complete();
 }
 <!-- This must be here because of dynamic code -->
 $(document).ready(function() {
+        
+        {%if activetab == 'pc'%}
+            $('#pc_list a').first().click();
+        {%endif%}
 
         bindPostCommentHandler('{{ request.user.first_name }}', '{{ request.user.last_name }}', '{{ request.user.username }}', '{{owners}}', '{{fingerprint_id}}', '{{breadcrumb_name}}');
 //load_questionnary();

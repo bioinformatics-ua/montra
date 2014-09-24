@@ -20,6 +20,7 @@ function initializePaginatorSorter(base_filter, selected_name, selected_value, e
         $("#comparabtn").removeAttr('disabled');
         $("#comparabtn").bind('click',function(e)
         { 
+          $('#compare_form').attr('action', 'resultscomp');
           postComparison(true);
           return false;
         });
@@ -176,6 +177,7 @@ $('.checkbox').click(function()
       $("#comparabtn").attr('disabled', false);
          $("#comparabtn").bind('click',function(e)
         { 
+          $('#compare_form').attr('action', 'resultscomp');
           postComparison(true);
           return false;
         });    
