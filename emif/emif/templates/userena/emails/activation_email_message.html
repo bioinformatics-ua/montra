@@ -4,7 +4,7 @@
 {% autoescape off %}
 
 {% block email_content %}
-{% if not without_usernames %}{% blocktrans with user.username as username %}Dear {{ username }},{% endblocktrans %}<br /><br />
+{% if not without_usernames %}{% blocktrans with user.email as email %}Dear {{ email }},{% endblocktrans %}<br /><br />
 {% endif %}
 {% blocktrans with site.name as site %}Thank you for signing up at {{ site }}.{% endblocktrans %}<br /><br />
 

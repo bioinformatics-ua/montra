@@ -90,7 +90,7 @@ function sync(){
   for(var i =0;i<syncPoint.length;i++){
     var loop = syncPoint[i];
 
-    for(var j=0;j<loop.rows;j++){
+    for(var j=0;j<=loop.rows;j++){
       setMinimumCommonHeight(loop.number, j);
     }
   }

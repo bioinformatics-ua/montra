@@ -277,8 +277,7 @@ INSTALLED_APPS = (
     'bootstrap-pagination',
     'django_jenkins',
 
-    # Django NVD3
-    'django_nvd3',
+    
     'djcelery',
     #'djangobower',
     'advancedsearch',
