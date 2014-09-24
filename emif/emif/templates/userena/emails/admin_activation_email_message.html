@@ -6,7 +6,7 @@
 
 {% blocktrans with site.name as site %}A new user has been registered at {{ site }}.{% endblocktrans %}<br /><br />
 
-{% blocktrans with user.username as username %} Username: {{ username }} {% endblocktrans %}<br />
+{% blocktrans with user.email as email %} Username: {{ email }} {% endblocktrans %}<br />
 
 Name: {% blocktrans with user.first_name as fname %} {{ fname }} {% endblocktrans %} {% blocktrans with user.last_name as lname %} {{ lname }} {% endblocktrans %}<br />
 Organization: {{ organization }}<br /><br />
@@ -19,6 +19,9 @@ Organization: {{ organization }}<br /><br />
 {% trans "Sincerely" %},<br />
 {{ site.name }}
 
+<div style="text-align: right;">
+    <small >To reject this request, click <a href="{{ protocol }}://{{ site.domain }}{% url 'userena_reject' activation_key %}">here</a>.</small>
+</div>
 
 {% endblock %}
 

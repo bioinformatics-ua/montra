@@ -172,7 +172,7 @@
             <div class="">
                 <div id="chart" class="span4" style="display:none;"></div>
 
-                <div  class='span9' id="pivot_table_extra_information">
+                <div  class='span10' id="pivot_table_extra_information">
 
                 </div>
 
@@ -296,6 +296,11 @@
 var global_fingerprint_id = '{{fingerprint_id}}';
 var global_public_key = '{{public_key.hash}}';
 var global_is_authenticated = {% if request.user.is_authenticated %}true{% else %}false{% endif %};
+
+{%if latest_pop %}
+var global_revision = '{{latest_pop.revision}}';
+{% endif %}
+
 function load_questionnary(){
 
 console.log("Creating questionnary set containers (so they are in order)");
@@ -360,7 +365,6 @@ function pushQsets(){
             {% endif %}
     {% endfor %}
     $('#set_container').append(containers.join(''));
-}
-    
+}   
 {% endblock %}
 </script>

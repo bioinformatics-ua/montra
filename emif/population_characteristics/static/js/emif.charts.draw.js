@@ -38,8 +38,6 @@ function PCDraw(actualChart,chartType, e)
       $("#pcBarContent").populationChartsBar2('init', pc,this.actualChart.title.fixed_title,
         fingerprintID);
 
-      console.log(pc);
-
       $("#pcBarContent").populationChartsBar2('draw', pc);
 
 
@@ -58,6 +56,7 @@ function PCDraw(actualChart,chartType, e)
 
       
       fingerprintID = getFingerprintID();
+      revision = getRevision();
       
       
       var valuesFromGraph = null;
@@ -77,31 +76,47 @@ function PCDraw(actualChart,chartType, e)
           
         }
         valuesFromGraph = PC.getValuesRowWithFilters(this.actualChart.title.fixed_title, 
-          this.actualChart.y_axis['var'],fingerprintID, filters );
+          this.actualChart.y_axis['var'],fingerprintID, revision, filters );
       }
       if (PAGE_TYPE==PC_COMPARE)
       {
           delete filters['fingerprint_ids'];
       }
-      var valueFilters = "";
-      $.each(filters, function (data){
-        var fV = filters[data];
-        
-        if (translations.hasOwnProperty(filters[data]))
-        {
+      var valuefilt;
+      var gender_values;
+      var handleFilters = function(filters){
+        var valueFilters = "";
+
+        $.each(filters, function (data){
+          var fV = filters[data];
           
-            fV = translations[filters[data]];
+          if (translations.hasOwnProperty(filters[data]))
+          {
+            
+              fV = translations[filters[data]];
+          }
+          if (fV=="Total") fV = "";
+          if (fV=="Male") fV = "(Male)";
+          if (fV=="Female") fV = "(Female)";
+          if (fV.indexOf('M') >= 0 &&  fV.indexOf('F') >= 0 && fV.indexOf('T') >= 0) //convert M/F/T to Male/Female
+          {
+            fV = translations["ALL"];
+          }
+          valueFilters += " " + fV;
+        });
+
+        return valueFilters;
+      };
+        // gender always comes last as per specification
+        if( filters != undefined && 'values.Value1' in filters){
+          gender_values = {'filters.values.Gender': filters['values.Gender']};
+          delete filters['values.Gender'];
         }
-        if (fV=="Total") fV = "";
-        if (fV=="Male") fV = "(Male)";
-        if (fV=="Female") fV = "(Female)";
-        if (fV.indexOf('M') >= 0 &&  fV.indexOf('F') >= 0 && fV.indexOf('T') >= 0) //convert M/F/T to Male/Female
-        {
-          fV = translations["ALL"];
-        }
-        valueFilters += " " + fV;
-      });
-      
+        valuefilt = handleFilters(filters);
+
+        if(gender_values != undefined){
+          valuefilt += handleFilters(gender_values);
+        }      
     
       $("#pc_chart_place").html('');
       $("#pc_chart_place").graphicChart('init');
@@ -114,7 +129,11 @@ function PCDraw(actualChart,chartType, e)
       
       
 
-      $("#pctitle").html("<h2>"+ this.actualChart.title.fixed_title + valueFilters +"</h2>");
+      $("#pctitle").html("<h2>"+ this.actualChart.title.fixed_title + valuefilt +"</h2>");
+      if(this.actualChart.hint != undefined)
+        $("#pchint").html("<center><h4>"+ this.actualChart.hint +"</h4></center>");
+      else
+        $("#pchint").html("<center><h4></h4></center>");
       if (this.e != null ) 
       {
           if ($(this.e.target.firstChild).hasClass('icon-ok')) 
