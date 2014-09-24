@@ -66,6 +66,8 @@ function reset_empties(){
  * Written by Gaten
  * Exemple : $("#input").delayKeyup(function(){ alert("5 secondes passed from the last event keyup."); }, 5000);
  */
+ var syncPoint = [];
+
 (function ($) {
     $.fn.delayKeyup = function(callback, ms){
         var timer = 0;
@@ -78,7 +80,35 @@ function reset_empties(){
         });
         return $(this);
     };
+
 })(jQuery);
+function syncHeight(loop, rows){
+  syncPoint.push({'number': loop, 'rows': rows});
+}
+
+function sync(){
+  for(var i =0;i<syncPoint.length;i++){
+    var loop = syncPoint[i];
+
+    for(var j=0;j<=loop.rows;j++){
+      setMinimumCommonHeight(loop.number, j);
+    }
+  }
+}
+
+function setMinimumCommonHeight(number, row){
+  var rows = $('.rowid_'+number+'_'+row);
+  var maxHeight = 0;
+
+  rows.each(function(){
+    var this_height = $(this).height();
+
+    if(this_height > maxHeight)
+      maxHeight = this_height;
+  });
+
+  rows.height(maxHeight);
+}
 
 $("#searchfilter").delayKeyup(
     function(){

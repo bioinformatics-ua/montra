@@ -66,7 +66,8 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     "django.core.context_processors.tz",
     "django.contrib.messages.context_processors.messages",
     "emif.context_processors.debug",
-    "emif.context_processors.baseurl"
+    "emif.context_processors.baseurl",
+    "emif.context_processors.profiles_processor"
 )
 
 MANAGERS = ADMINS
@@ -276,8 +277,7 @@ INSTALLED_APPS = (
     'bootstrap-pagination',
     'django_jenkins',
 
-    # Django NVD3
-    'django_nvd3',
+    
     'djcelery',
     #'djangobower',
     'advancedsearch',
@@ -309,7 +309,6 @@ EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 # EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 # EMAIL_HOST = 'localhost'
 # EMAIL_PORT = 1025
-
 
 ANONYMOUS_USER_ID = -1
 

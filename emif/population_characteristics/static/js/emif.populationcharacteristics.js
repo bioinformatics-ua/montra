@@ -67,6 +67,20 @@ function getFingerprintID(){
 
 };
 
+function getRevision(){
+  var url = document.URL;
+  var revision='-1';
+
+  try{
+    revision = global_revision;
+  }
+  catch(err){
+    console.error('Error retrieving revision from pop.char.');
+  };
+  return revision;
+
+};
+
 var filtersMap = {};
 var translations = {};
 var translationsBack = {};
@@ -98,14 +112,14 @@ function PCAPI (endpoint)
                 }
     });
     
-    this.getValuesRow = function(Var, Row, fingerprintID){
+    this.getValuesRow = function(Var, Row, fingerprintID, revision){
         var result = {}
 
         console.log(result);
           
         $.ajax({
           dataType: "json",
-          url: this.endpoint+"/"+Var+"/"+Row+"/" + fingerprintID,
+          url: this.endpoint+"/"+Var+"/"+Row+"/" + fingerprintID+"/"+revision,
 
           async: false,
           type: "POST",
@@ -114,15 +128,12 @@ function PCAPI (endpoint)
         });
         return result;
     };
-     this.getValuesRowWithFilters = function(Var, Row, fingerprintID, filters){
+     this.getValuesRowWithFilters = function(Var, Row, fingerprintID, revision, filters){
         var result = {}
-
-        console.log(filters);
-
 
         $.ajax({
           dataType: "json",
-          url: this.endpoint+"/"+Var+"/"+Row+"/" + fingerprintID,
+          url: this.endpoint+"/"+Var+"/"+Row+"/" + fingerprintID + "/" + revision,
           async: false,
           type: "POST",
           data: { publickey: global_public_key, filters: filters },
@@ -154,7 +165,7 @@ function PCAPI (endpoint)
 /********************************************************************
 **************** Population Characteristics - Bar (Jquery Plugin) v2 (using dyndropdown)
 *********************************************************************/
-
+var stuff;
  (function( $ )
  {
 
@@ -190,6 +201,7 @@ function PCAPI (endpoint)
             filters_tmp = [];
             
             JSON_OUTPUT = {};
+            var default_options = {};
 
             values.values.forEach(function(_value){
 
@@ -200,7 +212,7 @@ function PCAPI (endpoint)
                 return;
               
               self.append(xFilter.name+": ");
-              var options = {};
+              var options = [];
 
               //var tmpUl = $('<ul class="nav nav-pills nav-stacked">');
 
@@ -213,11 +225,13 @@ function PCAPI (endpoint)
                   if (xFilter.translation.hasOwnProperty("ALL"))
                   {
                     xFilter.values.push("ALL");  
-                    options['ALL'] = 'ALL';               
+                    //options.push({'ALL': 'ALL'});               
                   }
                   
               }
 
+              xFilter.values.sort();
+              xFilter.values.reverse();
 
               $.each(xFilter.values, function (data){
                   
@@ -231,6 +245,7 @@ function PCAPI (endpoint)
                     fType = xFilter.value;
 
                   }
+
                   var originalValue = xFilter.values[data];
                   //console.log("originalValue");
                   //console.log(originalValue);
@@ -245,14 +260,22 @@ function PCAPI (endpoint)
                       
                   }
                   
-                 
                   //tmpUl.append('<li><a class="filterBar '+fType+'" id=_'+fType+'_'+xFilter.values[data]+' href="#" onclick="return false;"> '+originalValue+'</a></li>')
-                  options[xFilter.values[data]] = originalValue;                  
+                  options.push({'key': xFilter.values[data], 'value': originalValue}); 
+
+                  // if('ALL' in default_option[xFilter.values[data]]){
+
+                  // }                 
                     
               });
               JSON_OUTPUT[xFilter.value] = {values: options, name: xFilter.name};
+              if($.inArray( 'ALL', xFilter.values ) != -1){
+                default_options[xFilter.value] = 'ALL';
+              } else if($.inArray( 'T', xFilter.values ) != -1){
+                default_options[xFilter.value] = 'T';
+              }
             });
-            //console.log('JSON_OUTPOUT');
+            //console.log('JSON_OUTPUT');
             //console.log(JSON.stringify(JSON_OUTPUT));
             
 
@@ -260,6 +283,7 @@ function PCAPI (endpoint)
                     label: "Filter", 
                     dropup: false, 
                     alwaysOneOption: true,
+                    defaultOptions: default_options,
                     onSelectionChanged: function(selection){
                         //console.log('callback called');
                         //console.log(selection);

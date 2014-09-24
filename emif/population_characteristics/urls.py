@@ -30,14 +30,14 @@ urlpatterns = patterns('',
     url(r'^jerboafiles/(?P<fingerprint>[^/]+)/$', 'population_characteristics.views.list_jerboa_files'),
 
     # List staff to the charts
-    url(r'^jerboalistvalues/(?P<var>[^/]+)/(?P<row>[^/]+)/(?P<fingerprint_id>[^/]+)$', 
+    url(r'^jerboalistvalues/(?P<var>[^/]+)/(?P<row>[^/]+)/(?P<fingerprint_id>[^/]+)/(?P<revision>[^/]+)$', 
         'population_characteristics.views.jerboa_list_values'),
     url(r'^filters/(?P<var>[^/]+)/(?P<fingerprint_id>[^/]+)$', 
         'population_characteristics.views.filters'),
     url(r'^genericfilter/(?P<param>[^/]+)$', 'population_characteristics.views.generic_filter'),
 
     # Settings
-    url(r'^settings/(?P<runcode>[^/]+(/)?)$', 'population_characteristics.views.get_settings'),
+    url(r'^settings/(?P<runcode>[^/]+)(/)?$', 'population_characteristics.views.get_settings'),
 
     # Parsing Jerboa 
     url(r'^parsejerboa$', 'population_characteristics.documents.parsejerboa'),

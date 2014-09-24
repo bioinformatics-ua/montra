@@ -175,6 +175,7 @@
                                             {% endcomment %}
                                             
                                             <li class="divider"></li>
+                                            {% if profiles|isDataCustodian %}
                                             <li class="dropdown-submenu">
                                                 <a href="" onclick="return false;">Add New</a>
                                                 <ul class="dropdown-menu">
@@ -185,10 +186,11 @@
                                                     {% endif %}
                                                 </ul>
                                             </li>
+                                            {% endif %}
                                             <li class="dropdown-submenu">
                                                 <a href="" onclick="return false;">Search</a>
                                                 <ul class="dropdown-menu">
-                                                    {% show_fingerprints_for_search %}
+                                                    {% show_fingerprints_for_search request.user %}
                                                     <li class="divider"></li>
                                                     <li><a tabindex="-1" href="advsearch/history">Search History</a></li>
                                                 </ul>
@@ -218,9 +220,9 @@
                                         <div class="btn-group">
                                             <button class="btn btn-success dropdown-toggle" data-toggle="dropdown" tabindex="-1">
                                             {% if not request.user.first_name and not request.user.last_name %}
-                                            <i class="icon-user"></i><small>&nbsp; {{request.user.username|ellipsis:30}} &nbsp;</small><i class="icon-angle-down"></i>
+                                            <i class="icon-user"></i><span class="name_container"><small>&nbsp; {{request.user.username|ellipsis:30}} &nbsp;</small></span><i class="icon-angle-down"></i>
                                             {% else %}
-                                            <i class="icon-user"></i><small>&nbsp; {{request.user.first_name|add:" "|add:request.user.last_name|ellipsis:30}} &nbsp;</small><i class="icon-angle-down"></i>
+                                            <i class="icon-user"></i><span class="name_container"><small>&nbsp; {{request.user.first_name|add:" "|add:request.user.last_name|ellipsis:30}} &nbsp;</small></span><i class="icon-angle-down"></i>
                                             {% endif %}
                                             </button>
                                             <ul class="dropdown-menu">
