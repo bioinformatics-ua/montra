@@ -262,6 +262,7 @@ def question_multiple_options(request, question):
 
 @answer_proc('choice-multiple', 'choice-multiple-freeform-options')
 def process_multiple_options(question, answer):
+
     multiple = []
     multiple_freeform = []
 
@@ -288,7 +289,7 @@ def process_multiple_options(question, answer):
     multiple.sort()
     if multiple_freeform:
         multiple.append(multiple_freeform)
-    #print "Multiple" + str(multiple)
+
     return dumps(multiple)
 
 
@@ -296,21 +297,22 @@ def process_multiple_options(question, answer):
 @show_summary('choice','choice-freeform','choice-multiple', 'choice-multiple-freeform', 'choice-multiple-freeform-options')
 def show_summ(value):
 
+    print value
+
     choices = value.split('#')
 
-    multiple_choices = {}
+    multiple_choices = []
 
     for choice in choices[1:]:
         
         if '{' in choice and '}' in choice:
             values = choice.split('{')
             key = values[0]
-            comment = values[1].replace('}','')
+            comment = values[1].replace('}', '')
 
-            multiple_choices[key] = comment
+            multiple_choices.append({'key': key, 'comment': comment})
         else:
-            multiple_choices[choice] = ''
-
+            multiple_choices.append({'key': choice, 'comment': ''})
 
     #return value   
     return render_to_string('questionnaire/choice_summary.html', {'choices':multiple_choices})

@@ -28,7 +28,7 @@ def clean_value(value):
     return str(value).replace('\n', '').rstrip()
 
 
-def import_population_characteristics_data(fingerprint_id,filename='TEST_DataProfile_v1.5.6b.txt'):
+def import_population_characteristics_data(user, fingerprint_id, revision, filename='TEST_DataProfile_v1.5.6b.txt'):
     """
     This function is responsabible to parse Jerboa file
 
@@ -47,8 +47,9 @@ def import_population_characteristics_data(fingerprint_id,filename='TEST_DataPro
     for line in data:
         file_line_info = {
             'fingerprint_id': fingerprint_id,
+            'revision': revision,
             'created_date': datetime.datetime.now().strftime("%Y%m%d-%H%M%S"),
-            'author': 'rui',
+            'author': user.id,
         }
         line_data = {}
         # parse input, assign values to variables
