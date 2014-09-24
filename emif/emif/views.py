@@ -438,7 +438,7 @@ def geo(request, template_name='geo.html'):
     _long_lats = []
     # since the geolocation is now adding the locations, we no longer need to look it up when showing,
     # we rather get it directly
-    db_list = []
+    db_list = {}
     questionnaires_ids = {}
     qqs = Questionnaire.objects.all()
     for q in qqs:
@@ -449,9 +449,6 @@ def geo(request, template_name='geo.html'):
             _loc = database.location.split(".")[0]
         else:
             _loc = database.location
-
-
-        print "CITY:"+_loc
 
         city=None
         g = geocoders.GeoNames(username='bastiao')
@@ -485,34 +482,40 @@ def geo(request, template_name='geo.html'):
             #pdb.set_trace()
             def __cleanvalue(v):
                 return v.encode('ascii', 'ignore').strip().replace('\n', ' ').replace('\r', ' ')
-            db_list.append({'name': database.name,
-            'location': __cleanvalue(database.location),
-            'institution': __cleanvalue(database.institution),
-            'contact': __cleanvalue(database.email_contact),
-            'number_patients': __cleanvalue(database.number_patients),
-            'ttype': __cleanvalue(database.type_name),
-            'id' : database.id,
-            'admin_name': __cleanvalue(database.admin_name),
-            'admin_address': __cleanvalue(database.admin_address),
-            'admin_email': __cleanvalue(database.admin_email),
-            'admin_phone': __cleanvalue(database.admin_phone),
-            'scien_name': __cleanvalue(database.scien_name),
-            'scien_address': __cleanvalue(database.scien_address),
-            'scien_email': __cleanvalue(database.scien_email),
-            'scien_phone': __cleanvalue(database.scien_phone),
-            'tec_name': __cleanvalue(database.tec_name),
-            'tec_address': __cleanvalue(database.tec_address),
-            'tec_email': __cleanvalue(database.tec_email),
-            'tec_phone': __cleanvalue(database.tec_phone),
-            'lat' : str(city.lat),
-            'long': str(city.long),
-            })
+
+
+            def db_ready(database, city):
+                return {    'name': database.name,
+                            'location': __cleanvalue(database.location),
+                            'institution': __cleanvalue(database.institution),
+                            'contact': __cleanvalue(database.email_contact),
+                            'number_patients': __cleanvalue(database.number_patients),
+                            'ttype': __cleanvalue(database.type_name),
+                            'id' : database.id,
+                            'admin_name': __cleanvalue(database.admin_name),
+                            'admin_address': __cleanvalue(database.admin_address),
+                            'admin_email': __cleanvalue(database.admin_email),
+                            'admin_phone': __cleanvalue(database.admin_phone),
+                            'scien_name': __cleanvalue(database.scien_name),
+                            'scien_address': __cleanvalue(database.scien_address),
+                            'scien_email': __cleanvalue(database.scien_email),
+                            'scien_phone': __cleanvalue(database.scien_phone),
+                            'tec_name': __cleanvalue(database.tec_name),
+                            'tec_address': __cleanvalue(database.tec_address),
+                            'tec_email': __cleanvalue(database.tec_email),
+                            'tec_phone': __cleanvalue(database.tec_phone),
+                            'lat' : str(city.lat),
+                            'long': str(city.long),
+                        }
+
+            if((city.lat, city.long) in db_list):
+                db_list[(city.lat, city.long)].append(db_ready(database, city))
+            else:
+                db_list[(city.lat, city.long)] = [db_ready(database, city)]
 
         list_locations.append(_loc)
 
-    print isAdvanced
-
-    return render(request, template_name, {'request': request, 'db_list' : db_list,
+    return render(request, template_name, {'request': request, 'db_list' : db_list, 
                                            'search_old': request.session.get('query',''),
                                            'list_cities': list_locations,
                                            'lats_longs': _long_lats,
