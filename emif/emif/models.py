@@ -38,6 +38,7 @@ from userena.signals import signup_complete
 from searchengine.search_indexes import CoreEngine
 
 
+from newsletter.models import Subscription, Newsletter
 
 class QueryLog(models.Model):
     id = AutoField(primary_key=True)
@@ -106,6 +107,23 @@ class ContactForm(forms.Form):
 @receiver(signup_complete)
 def add_invited(user, sender, **kwargs):
 
+    ## Add to subscription list
+    
+    # get newsletter
+    try:
+        newsl = Newsletter.objects.get(slug='emif-catalogue-newsletter')
+
+        # create subscription
+        user_sub = Subscription(user=user,  newsletter=newsl)
+
+        user_sub.subscribe()  
+
+        user_sub.save()      
+
+    except Newsletter.DoesNotExist:
+        print "Problem registering new user to emif default newsletter"
+
+    # add invited dbs if any
     sps = InvitePending.objects.filter(email=user.email)
         
     for sp in sps:
@@ -120,6 +138,7 @@ def add_invited(user, sender, **kwargs):
 
         # must reindex, because databases lists come from solr, to update user_t
         indexFingerprint(fingerprint.fingerprint_hash)
+
 
     print "Added invited user databases to+"+str(user.email)+"!"
 
