@@ -1,0 +1,90 @@
+{% extends 'adminplus/base.html' %}
+{% load admin_static %}
+
+{% block extrastyle %}
+<link rel="stylesheet" type="text/css" href="{% static "css/emif.user_statistics.css" %}" />
+<link rel="stylesheet" type="text/css" href="{% static "css/nv.d3.min.css" %}" />
+{% endblock %}
+
+{% block extrahead %}
+    <script src="{{ STATIC_URL }}js/d3/d3.v3.min.js"></script>
+    <script src="{{ STATIC_URL }}js/vendor/nvd3/nv.d3.min.js"></script>
+
+    <script src="{{ STATIC_URL }}js/emif.user_statistics.js"></script>
+{% endblock %}
+
+{% block  pretitle %}
+    <form id="user_choice" method="POST">
+        {% csrf_token %}
+        {{choice}}
+        <input id="submit_user" class="btn btn-info" type="submit" value="See user statistics">
+    </form>
+{% endblock %}
+
+{% block content %}
+    <div class="well">
+        <center><h3>Global Statistics</h3></center>
+
+        <div class="row-fluid">
+          <div class="span6"><h4>Most Viewed Pages</h4>
+          <table class="userstatistics_table table table-striped table-bordered">
+            <thead>
+              <tr>
+                <th>Path</th>
+                <th>Views</th>
+              </tr>
+            </thead>
+            <tbody>
+                {% for view in most_viewed %}
+                    <tr>
+                        <td>{{view.path}}</td>
+                        <td>{{view.number_viewed}}</td>
+                    </tr>
+                {% endfor %}
+                {% if most_viewed|length == 0 %}
+                    <tr><td colspan="2"><center>There's no viewed pages to show.</center></td></tr>
+                {% endif %}
+            </tbody>
+          </table>
+          </div>
+          <div class="span6">
+              <div class="row-fluid">
+        <div class="span12"><h4>Last 30 days Session Time</h4>
+            <div id="session_time">
+                <svg></svg>
+            </div>
+          </div>
+          <div><strong>Average Session Time: </strong>{{session_average}} hours</div>
+        </div>
+        <div class="row-fluid">
+        <div class="span12"><h4>Last 30 days Pages Viewed</h4>
+
+        <div id="users_views">
+                <svg></svg>
+            </div>
+        </div>
+         <div><strong>Average Views per day: </strong>{{views_average}} views</div> 
+        </div>
+          </div>
+          
+        </div>
+
+    </div>
+
+    <script type="text/javascript">
+        $(function(){
+            {% for session in session_time %}
+                addSession("{{session.label}}", {{session.value}});
+            {% endfor %}
+
+            drawSessionTimes();
+
+            {% for view in views_time %}
+                addView("{{view.label}}", {{view.value}});
+            {% endfor %}
+
+            drawViewTimes();
+
+        });
+    </script>
+{% endblock %}

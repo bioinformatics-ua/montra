@@ -24,12 +24,18 @@ from django.template.defaultfilters import stringfilter
 
 from questionnaire.models import Questionnaire
 
+import hashlib
+
+from django.conf import settings
+
+from accounts.models import Profile
+
 from newsletter.models import Newsletter, Subscription
 
 register = template.Library()
 
 
-from django.conf import settings
+
 
 @register.filter(name='removeh1')
 @stringfilter
@@ -97,6 +103,11 @@ def removedots(value):
     
     return value
 
+@register.filter(name='isnumber')
+@stringfilter
+def isnumber(value):
+    return value.isdigit()
+
 
 @register.filter(name='geths')
 @stringfilter
@@ -115,6 +126,10 @@ def removespaces(value):
 
     return result
 
+@register.filter(name='hash')
+@stringfilter
+def hash(value):
+    return hashlib.sha224(value).hexdigest()
 
 @register.filter(name='truncate')
 @stringfilter
@@ -126,7 +141,7 @@ def truncate(value):
 @register.filter(name='captioned')
 @stringfilter
 def captioned(value):
-    exclusion_list = ['publication', 'choice-multiple','choice-multiple-freeform','choice-multiple-freeform-options']
+    exclusion_list = ['publication', 'choice', 'choice-freeform','choice-multiple','choice-multiple-freeform','choice-multiple-freeform-options']
 
     return value not in exclusion_list
 
@@ -163,6 +178,30 @@ def ellipsis(str, size):
         return str[:size]+"..."
 
     return str
+
+@register.filter
+def isDataCustodian(profiles):
+    try:
+        dc = Profile.objects.get(name="Data Custodian")
+
+        if dc in profiles:
+            return True
+    except Profile.DoesNotExist:
+        pass
+
+    return False
+
+@register.filter
+def isResearcher(profiles):
+    try:
+        rs = Profile.objects.get(name="Researcher")
+
+        if rs in profiles:
+            return True
+    except Profile.DoesNotExist:
+        pass
+
+    return False
 
 def fingerprints_list():
     
@@ -249,9 +288,9 @@ def show_fingerprints():
 register.inclusion_tag('menu_ttags.html')(show_fingerprints)
 
 
-def show_fingerprints_for_search():
+def show_fingerprints_for_search(user):
     
-    return {'fingerprints':fingerprints_list()}
+    return {'fingerprints':fingerprints_list_user(user)}
 register.inclusion_tag('menu_ttags_for_search.html')(show_fingerprints_for_search)
 
 

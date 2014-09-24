@@ -3,12 +3,15 @@
 {% load extra_tags %} 
 {% load django_bootstrap_breadcrumbs %} 
 {% load comments %}
+{% load hitcount_tags %}
 
 {% block headextra %}
 
 <script src="{{ STATIC_URL}}js/vendor/threadpool.js"></script>
 
 <script src="{{ STATIC_URL}}js/vendor/jquery.expander.min.js"></script>
+
+<script src="{{ STATIC_URL}}js/jquery.simplePagination.js"></script>
 
 
 <link rel="stylesheet" href="{{ STATIC_URL}}css/database_info.css" />
@@ -67,14 +70,14 @@
 {% block breadcrumbs %} 
 
 {% if readOnly %}
-    {% breadcrumb breadcrumb_name|ellipsis:40|add:" - Public View Link" "" %} 
+    {% breadcrumb breadcrumb_name|ellipsis:40|add:" - Private View Link" "" %} 
 {% else %}
 
     {{ block.super }} 
     {% if search_old %}
     {% breadcrumb "Search" "resultsdiff/1" %} 
     {% breadcrumb breadcrumb_name "databases" %} 
-    {% elif style == '1' %} 
+    {% elif request.session.list_origin == 'personal' %} 
     {% breadcrumb "Personal" "databases" %} 
     {% breadcrumb breadcrumb_name|ellipsis:40 "databases" %} 
     {% else %} 
@@ -85,7 +88,6 @@
 {% endif %}
 
 {% endblock %}
-
 
 {% block toolbar %} 
 {% include "menu_toolbar.html" with collapse=collapseall %} 
@@ -123,6 +125,14 @@
             <div style="margin-bottom: 50px;" class="tab-content">
                 <div class="tab-pane {%if activetab == 'summary'%}active{%endif%}" id="metadata">
                     <div>
+                        {% if owner_fingerprint or user.is_staff %}
+                        <div class="pull-left">
+                            <small>
+                                <strong>Hits: </strong>{{hits}} &nbsp;&nbsp;
+                                <strong>Unique Views: </strong> {% get_hit_count for fingerprint %}
+                            </small>
+                        </div>
+                        {% endif %}
                         <div class="pull-right btn-group">
                             <button style="display: none;" type="button" class="btn" id="show_hide_button">Hide Empty</button>
 
@@ -162,7 +172,7 @@
             <div class="">
                 <div id="chart" class="span4" style="display:none;"></div>
 
-                <div  class='span9' id="pivot_table_extra_information">
+                <div  class='span10' id="pivot_table_extra_information">
 
                 </div>
 
@@ -283,7 +293,18 @@
 {% endblock %}
 
 {% block scriptextra %}
+    $(function(){ 
+    var csrf_token = '{{ csrf_token }}';
+        {% get_hit_count_javascript for fingerprint %} 
+    });
 var threads = {};
+var global_fingerprint_id = '{{fingerprint_id}}';
+
+{%if latest_pop %}
+var global_revision = '{{latest_pop.revision}}';
+{% endif %}
+
+var global_public_key = '{{public_key.hash}}'
 function load_questionnary(){
 
 console.log("Creating questionnary set containers (so they are in order)");
@@ -350,12 +371,16 @@ threadpool.destroy(function(){
 });
 }
 function loadqspart(sortid, pk){
+{% if user.is_authenticated %}
 $.get( "fingerprintqs/"+pk+"/"+sortid+"/", function( data ) {
+{% else %}
+$.post( "fingerprintqs/"+pk+"/"+sortid+"/",{publickey:'{{public_key.hash}}'}, function( data ) {
+{% endif %}
 $( "#qs_"+sortid ).html( data );
 // Mark the tab as highlighted if there's any highlight inside it
 
 
-/*var highlights = $("#qs_"+sortid).find('.highlight');
+var highlights = $("#qs_"+sortid).find('.highlight');
 
 //console.dir(highlights);
 
@@ -366,17 +391,7 @@ $(".markered" ,this_row).tooltip({container: "body"});
 $(".markered" ,this_row).click(function(){
 this_row.parent().siblings().first().collapse('toggle');
 });
-}  */   
-
-    var erec = new EmailRecognizer("#qs_"+sortid+" td");
-    var results = erec.match();
-        if (results > 0)
-            erec.applyMasks();
-
-    var lrec = new LinkRecognizer("#qs_"+sortid+" td.captioned_content");
-    var results = lrec.match();
-        if (results > 0)
-            lrec.applyMasks();
+} 
 
 });    
 
@@ -386,6 +401,10 @@ this.complete();
 }
 <!-- This must be here because of dynamic code -->
 $(document).ready(function() {
+        
+        {%if activetab == 'pc'%}
+            $('#pc_list a').first().click();
+        {%endif%}
 
         bindPostCommentHandler('{{ request.user.first_name }}', '{{ request.user.last_name }}', '{{ request.user.username }}', '{{owners}}', '{{fingerprint_id}}', '{{breadcrumb_name}}');
 //load_questionnary();
@@ -411,7 +430,7 @@ $(document).ready(function() {
 
     
     if (json_aux == '' || json_aux == null || json_aux.length == 2) {
-        $("#pivot_table_extra_information").html('No information available. You can add information from external applications with <a href="api-info">API web services.</a>');
+        $("#pivot_table_extra_information").html('<h4 class="pull-center">No information available.</h4><p class="pull-center">You can add information from external applications with <a href="api-info">API web services.</a></p>');
     } else {
         $("#btn_pivot_table").removeClass("hidden");
         $("#btn_pivot_table").addClass("show");
@@ -467,8 +486,14 @@ $(document).ready(function() {
             // if not loaded yet
             if($('#literature').find('.loadingsection').length != 0){
                 console.log("Loading literature, since it was not loaded yet.");
+
+                {% if user.is_authenticated %}
                 $.get( "literature/{{fingerprint_id}}", function( data ) {
+                {% else %}
+                $.post( "literature/{{fingerprint_id}}", {publickey:'{{public_key.hash}}'}, function( data ) {
+                {% endif %}
                     $( "#literature" ).html( data );
+                
                 });
             }
 

@@ -51,6 +51,8 @@ from api.models import FingerprintAPI
 
 from public.models import PublicFingerprintShare
 
+from public.utils import hasFingerprintPermissions
+
 def document_form_view_upload(request, fingerprint_id, template_name='documents_upload_form.html'):
     """Store the files at the backend 
     """
@@ -91,10 +93,10 @@ def document_form_view_upload(request, fingerprint_id, template_name='documents_
     # Parse the Jerboa and insert it in MongoDB
     # The best option will be use django-celery
 
-    #_json = import_population_characteristics_data(fingerprint_id,filename=path_file)
+    #_json = import_population_characteristics_data(request.user, fingerprint_id,filename=path_file)
 
     pc = PopulationCharacteristic()
-    data_jerboa = pc.submit_new_revision(fingerprint_id, path_file)
+    data_jerboa = pc.submit_new_revision(request.user, fingerprint_id, revision, path_file)
 
 
     aggregation.apply_async([fingerprint_id, data_jerboa])
@@ -115,17 +117,20 @@ def parsejerboa(request, template_name='documents_upload_form.html'):
     path_file = "/Volumes/EXT1/Dropbox/MAPi-Dropbox/EMIF/Jerboa/TEST_DataProfile_v1.5.6b.txt"  
 
 
-    _json = import_population_characteristics_data(filename=path_file)
+    _json = import_population_characteristics_data(request.user, filename=path_file)
 
     pc = PopulationCharacteristic()
-    pc.submit_new_revision(fingerprint_id)
+    pc.submit_new_revision(request.user, fingerprint_id, revision)
     data = {'data': _json}
     response = JSONResponse(data, mimetype=response_mimetype(request))
     response['Content-Disposition'] = 'inline; filename=files.json'
     return response
 
 def single_qset_view(request, runcode, qsid, template_name='fingerprint_qs.html'):
-    
+        
+    if not hasFingerprintPermissions(request, runcode):
+        return HttpResponse("Access forbidden",status=403)
+
     h = None
     if "query" in request.session and "highlight_results" in request.session:
         h = request.session["highlight_results"]
@@ -138,7 +143,7 @@ def single_qset_view(request, runcode, qsid, template_name='fingerprint_qs.html'
     return render(request, template_name,{'request': request, 'qset': qset})   
 
 
-def document_form_view(request, runcode, qs, activetab='summary', readOnly=False,
+def document_form_view(request, runcode, qs, activetab='summary', readOnly=False, public_key = None,
     template_name='documents_upload_form.html'):
     
     h = None
@@ -188,42 +193,56 @@ def document_form_view(request, runcode, qs, activetab='summary', readOnly=False
     except:
         fingerprint_pk = 0
 
-    jerboa_files = Characteristic.objects.filter(fingerprint_id=runcode)
-    contains_population = len(jerboa_files)!=0
+    jerboa_files = Characteristic.objects.filter(fingerprint_id=runcode).order_by('-latest_date')
+
+
+    contains_population = False
+    latest_pop = None
+    if len(jerboa_files)!=0:
+        contains_population = True
+        latest_pop = jerboa_files[0]
+
+
 
     # Find if user has public links for this db.
 
-    public_link = None
+    public_links = None
 
     print "owner ?"+str(owner_fingerprint)
     print "fingerprint? "+str(fingerprint)
 
     if owner_fingerprint and fingerprint != None:
-        try:
-             public_link = PublicFingerprintShare.objects.get(user=request.user, fingerprint=fingerprint)
 
-        except PublicFingerprintShare.DoesNotExist:
-            print "no public link for this fingerprint."
+        public_links = PublicFingerprintShare.objects.filter(user=request.user, fingerprint=fingerprint)
 
-        except PublicFingerprintShare.MultipleObjectsReturned:
-            print "- Error, there are multiple shares for this user/key, can't be."
+    # increase database hits
+    hits = 0
+    if fingerprint != None:
+        hits = fingerprint.hits+1
+        fingerprint.hits = hits
+        fingerprint.save()
 
     return render(request, template_name, 
         {'request': request, 'qsets': qsets, 'export_bd_answers': True, 
-        'apiinfo': apiinfo, 'fingerprint_id': runcode, 'fingerprint_pk': fingerprint_pk,
+        'apiinfo': apiinfo, 'fingerprint_id': runcode, 
+                    'fingerprint': fingerprint,
+                    'fingerprint_pk': fingerprint_pk,
                    'breadcrumb': True, 'breadcrumb_name': name_bc.decode('utf-8'),
                     'style': qs, 'collapseall': False, 
                     'owner_fingerprint':owner_fingerprint,
                     'owners': db_owners,
                     'fingerprint_dump': True,
                     'contains_population': contains_population, 
+                    'latest_pop': latest_pop,
                     'hide_add': True,
                     'fingerprint_ttype': fingerprint_ttype,
                     'search_old': query_old,
                     'isAdvanced': isAdvanced,
                     'activetab': activetab,
                     'readOnly': readOnly,
-                    'public_link': public_link,
+                    'public_link': public_links,
+                    'public_key': public_key,
+                    'hits': hits,
                     })
 
 

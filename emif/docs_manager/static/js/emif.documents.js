@@ -76,9 +76,10 @@ function fillList(admin){
 
         $.ajax({
           dataType: "json",
+          type: "POST",
           url: "docsmanager/docfiles/"+getFingerprintID_new()+"/",
           async: false,
-          data: result,
+          data: { publickey: global_public_key, result:result },
           success: function (data){result=data;},
         });
         console.log(result);
@@ -113,7 +114,8 @@ function requestFile(filename, revision){
     var df = $('#downloadfile');
     $('[name="filename"]').val(filename);
     $('[name="revision"]').val(revision);
-
+    $('[name="publickey"]').val(global_public_key);
+    $('[name="fingerprint"]').val(global_fingerprint_id);
     df.submit();
 }
 function deleteFile(filename, revision){
@@ -128,11 +130,11 @@ function deleteFile(filename, revision){
             fillList(isadmin);
 
         } else {
-            alert('It was impossible to delete the document.');
+            bootbox.alert('It was impossible to delete the document.');
         }
       })
       .fail(function() {
-        alert( "Error Deleting File" );
+        bootbox.alert( "Error Deleting File" );
       });
 }
 /********************************************************
@@ -225,7 +227,7 @@ $(function () {
         dataType: 'json',
         autoUpload: false,
         acceptFileTypes: /(\.|\/)(gif|jpe?g|png|pdf|docx|xls|doc|docx|tsv|txt)$/i,
-        maxFileSize: 5000000, // 5 MB
+        maxFileSize: 20000000, // 20 MB
         // Enable image resizing, except for Android and Opera,
         // which actually support image resizing, but fail to
         // send Blob objects via XHR requests:

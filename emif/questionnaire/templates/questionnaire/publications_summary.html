@@ -1,44 +1,137 @@
 {% load extra_tags %}
 {% if pubs and pubs.0.title %}
 <div style="white-space: normal;">
-    <ul>
-        {% for pub in pubs%}
-        <li class="publication_details" data-container="body" data-toggle="popover" data-placement="left" data-content='<div style="text-align:justify;">
-<div class="well well-small"><small><strong>{{pub.title}}</strong></small></div>
-{% if pub.authors %}
-<table>
-<tr>
-<td style="vertical-align: top;"><small><strong>Authors: </strong></small></td>
-<td><small>{% for author in pub.authors|commasplit %}
-    {{author}}<br />
-{% endfor %}</small></td>
-</tr>
-</table>
-{% endif %}
-{% if pub.journal %}
-<small><strong>Journal: </strong>{{pub.journal}}</small><br />
-{% endif %}
-{% if pub.volume %}
-<small><strong>Volume: </strong>{{pub.volume}}</small> &nbsp;
-{% endif %}
-{% if pub.pages %}
-<small><strong>Pages: </strong>{{pub.pages}}</small> &nbsp;
-{% endif %}
-{% if pub.year %}
-<small><strong>Year: </strong>{{pub.year}}</small><br />
-{% endif %}
-{% if pub.link %}
-<small><strong>Link: </strong><a href="{{pub.link}}">{{pub.link}}</a></small><br />
-{% endif %}
-</div>'>{{pub.title}}</li>
-        {% endfor %}
-        <script type="text/javascript">
-        $(function (){
-            $('.publication_details').popover({trigger: 'hover', html: 'true'});    
-        });
-        </script>
-
+    <div style="margin-bottom: -20px;"><small><center>
+        <span class="showing_publications_info"></span></center>
+        </small></div>
+    <hr />
+    <ul class="publications_container">
     </ul>
+    <div class="summary_paginator pagination"></div>
+<script type="text/javascript">
+
+        var publications = [];
+
+        var publications_drawn = [];
+
+        var max = {{pubs|length}};
+        var per_page = 5;
+
+        var handlePagination = function(pageNumber, event){
+            console.log('Show page '+pageNumber)
+
+            drawPublications(pageNumber);
+
+            disableLinks();
+        }
+        // The plugin uses hrefs, and since we are using base url, hashtags work differently (not as anchors) so i have to stop the redirect
+        function disableLinks(){
+            $('.summary_paginator .page-link').click(function(event){
+                 event.preventDefault();
+                 return false;
+            });
+        }
+        function redrawIndicator(start, end){
+            $('.showing_publications_info').html("Showing "+(start+1)+" - "+end+" of "+max+" Publications");
+        }
+        function drawPublications(pageNumber){
+
+            var container = $('.publications_container');
+
+            container.html("");
+
+            var start = (pageNumber-1)*per_page;
+
+            var end = ((pageNumber-1)*per_page)+per_page;
+
+            // If last page and end is bigger than results
+            if (end > max){
+                end = max;
+            }
+            for(var i=start;i<end;i++){
+                // If not on memory yet
+                if(publications_drawn[i] == null){
+                    publications_drawn[i] = drawPublication(publications[i]);
+                }
+
+                container.append(publications_drawn[i]);
+            }
+
+            redrawIndicator(start, end);
+
+            $('.publication_details').popover({trigger: 'hover', html: 'true',
+                template: '<div class="popover popover-small"><div class="arrow"></div><div class="popover-inner"><h3 class="popover-title"></h3><div class="popover-content"><p></p></div></div></div>'
+            });   
+        }
+        function drawPublication(publication){
+            var line = '<li class="publication_details" data-container="body" data-toggle="popover" data-placement="left" data-content=\'<div style="text-align:justify;"><div class="well well-small"><small><strong>'+publication.title+'</strong></small></div>';
+
+                if( publication.authors != ""){
+
+                    authors = publication.authors.split(',');
+
+                    line += "<table><tr><td style=\"vertical-align: top;\"><small><strong>Authors: </strong></small></td><td><small>";
+
+                        for( var i = 0; i< authors.length;i=i+3){
+                            line += authors[i];
+                            if(i+1<authors.length)
+                                line += ", "+authors[i+1];
+                            if(i+2<authors.length)
+                                line += ", "+authors[i+2];
+                            line += "<br />";
+                        }
+
+                    line += "</small></td></tr></table>";
+                }
+                if( publication.journal != ""){
+                    line += "<small><strong>Journal: </strong>"+publication.journal+"</small><br />";
+                }
+                if( publication.volume != ""){
+                    line += "<small><strong>Volume: </strong>"+publication.volume+"</small>&nbsp;";
+                }
+                if( publication.pages != ""){
+                    line += "<small><strong>Pages: </strong>"+publication.pages+"</small><br />";
+                }
+                if( publication.year != ""){
+                    line += "<small><strong>Year: </strong>"+publication.year+"</small><br />";
+                }
+                if( publication.link != ""){
+                    line += "<small><strong>Url: </strong><a href=\""+publication.link+"\">"+publication.link+"</a></small><br />";
+                }
+
+                line += '</div>\'>'+publication.title+"</li>";
+
+                return line;
+        }
+
+        $(function (){
+            {% for pub in pubs%}
+                    publications.push({
+                        title: "{{pub.title}}",
+                        authors: "{{pub.authors}}" ,
+                        journal: "{{pub.journal}}",
+                        volume: "{{pub.volume}}",
+                        pages: "{{pub.pages}}",
+                        year: "{{pub.year}}",
+                        link: "{{pub.link}}"
+                    });
+                    publications_drawn.push(null);
+            {% endfor %}             
+
+            $('.summary_paginator').pagination({
+                items: max,
+                itemsOnPage: per_page,
+                onPageClick: handlePagination
+            });
+
+            drawPublications(1);
+
+            disableLinks();
+
+        });
+
+
+        </script>
 </div>
 {% else %}
     There's no publications associated.

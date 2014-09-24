@@ -107,14 +107,3 @@ function RepresentData(wrapper)
         return this;
     };
 }( jQuery ));
-
-
-
-$(document).ready(
-    function(){
-
-
-
-
-    }
-);

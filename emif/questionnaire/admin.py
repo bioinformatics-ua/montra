@@ -4,9 +4,6 @@
 from django.contrib import admin
 from models import *
 
-adminsite = admin.site
-
-
 class ChoiceAdmin(admin.ModelAdmin):
     list_display = ['sortid', 'text', 'value', 'question']
 
@@ -36,6 +33,6 @@ class QuestionnaireAdmin(admin.ModelAdmin):
     pass
 
 
-adminsite.register(Questionnaire, QuestionnaireAdmin)
-adminsite.register(Question, QuestionAdmin)
-adminsite.register(QuestionSet, QuestionSetAdmin)
+admin.site.register(Questionnaire, QuestionnaireAdmin)
+admin.site.register(Question, QuestionAdmin)
+admin.site.register(QuestionSet, QuestionSetAdmin)

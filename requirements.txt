@@ -41,3 +41,8 @@ surlex>=0.2.0
 sorl-thumbnail
 django-newsletter==0.4.1
 -e git://github.com/ribeiroct/django-fack.git#egg=django-fack
+django-adminplus==0.3
+-e git://github.com/leandrosouza/django-hitcount.git#egg=django-hitcount
+psycopg2==2.5.4
+biopython==1.64
+

@@ -52,6 +52,9 @@
         <script src="{{ STATIC_URL }}js/vendor/jquery.canclear.js"></script>
         <script src="{{ STATIC_URL }}js/vendor/jquery.highlight.js"></script>
         <script src="{{ STATIC_URL }}js/vendor/jquery.history.js"></script>
+
+        <script src="{{ STATIC_URL }}js/vendor/bootbox.min.js"></script>
+
         <script type="application/javascript">
         // We need to configure this to be able to send requests by json with the csrftoken
         var csrftoken = $.cookie('csrftoken');
@@ -135,7 +138,7 @@
                                                     </li>
                                                     <li class="divider"></li>
                                                     <li>
-                                                        <a href="public/fingerprint">Public Links</a>
+                                                        <a href="public/fingerprint">Private Links</a>
                                                     </li>
                                                 </ul>
                                             </li>
@@ -172,6 +175,7 @@
                                             {% endcomment %}
                                             
                                             <li class="divider"></li>
+                                            {% if profiles|isDataCustodian %}
                                             <li class="dropdown-submenu">
                                                 <a href="" onclick="return false;">Add New</a>
                                                 <ul class="dropdown-menu">
@@ -182,10 +186,11 @@
                                                     {% endif %}
                                                 </ul>
                                             </li>
+                                            {% endif %}
                                             <li class="dropdown-submenu">
                                                 <a href="" onclick="return false;">Search</a>
                                                 <ul class="dropdown-menu">
-                                                    {% show_fingerprints_for_search %}
+                                                    {% show_fingerprints_for_search request.user %}
                                                     <li class="divider"></li>
                                                     <li><a tabindex="-1" href="advsearch/history">Search History</a></li>
                                                 </ul>
