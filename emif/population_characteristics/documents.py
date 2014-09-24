@@ -208,9 +208,6 @@ def document_form_view(request, runcode, qs, activetab='summary', readOnly=False
 
     public_links = None
 
-    print "owner ?"+str(owner_fingerprint)
-    print "fingerprint? "+str(fingerprint)
-
     if owner_fingerprint and fingerprint != None:
 
         public_links = PublicFingerprintShare.objects.filter(user=request.user, fingerprint=fingerprint)
@@ -231,6 +228,8 @@ def document_form_view(request, runcode, qs, activetab='summary', readOnly=False
                     'style': qs, 'collapseall': False, 
                     'owner_fingerprint':owner_fingerprint,
                     'owners': db_owners,
+                    'owner_obj': fingerprint.owner,
+                    'shared_obj': fingerprint.shared,
                     'fingerprint_dump': True,
                     'contains_population': contains_population, 
                     'latest_pop': latest_pop,
