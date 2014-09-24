@@ -46,7 +46,7 @@
 <![endif]-->
 <!--[if gte IE 9]><!-->
 
-    {% if not contains_population and owner_fingerprint %}
+    {% if not contains_population and owner_fingerprint or not contains_population and request.user.is_superuser %}
          <h4 class="pull-center">No population characteristics associated with this database yet.</h4>
     <p class="pull-center">This database fingerprint does not have population characteristics. Submit the Population Characteristics file that can be extracted using <a onclick="return false;" href="">Jerboa</a>.</p>
 
@@ -104,7 +104,18 @@
     {% else %}
         {%if contains_population %}
 
-    {%comment%} You have already population characteristics. Last update on: {{pc_last_activity}}{%endcomment%}
+    {% if latest_pop %}
+        <div class="pull-left">
+            Last update on: {{latest_pop.latest_date|date:"d/m/Y H:i:s"}}
+        </div>
+        {%if owner_fingerprint and not compare or request.user.is_superuser  and not compare %}
+        <div class="pull-right">
+            <button onclick="$('#modal-updatepopchar').modal('show');" class="btn"><i class="fa fa-pencil-square-o"></i>&nbsp;Update</button>
+            {% include "population_characteristics_update.html" %}
+        </div>
+        {% endif %}
+    {% endif %}
+
     <div class="span9 populationcharacteristicsbar">
     <div class="pull-right hidden ">
         <div class="btn-group">
@@ -178,16 +189,18 @@
 
     </div>
     
-    <div class="span5" id="chart2">
+    <div class="span7" id="chart2">
     
-        <div class='row'>
+        <div style="margin-left: auto; margin-right: auto;" class='row'>
             <div id='pctitle'>
+            </div>
+            <div id='pchint'>
             </div>
             <div id='pc_chart_place'>
             </div>
             <div id='pc_comments_placeholder' class="pc_comment">
             </div>
-            {%if owner_fingerprint and not compare%}
+            {%if owner_fingerprint and not compare or request.user.is_superuser  and not compare %}
                 <div id="pc_comment_id" class="pc_comment">
                 <form id="chartcomments" method="post" action="comments" >
                     {% csrf_token %}
@@ -208,7 +221,7 @@
     </div>
     
 
-    <div class="span3" id="pcBarContentRoot">
+    <div class="span2" id="pcBarContentRoot">
         <div class="pull-right" id="pcBarContent"></div>
 
         <!--div id="pcBarContent" class="well">

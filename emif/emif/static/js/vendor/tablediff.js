@@ -25,59 +25,88 @@
  * @param  {[type]} value     [description]
  * @return {[type]}           1 =
  */
+function cleanup(string){
+
+    return string.replace(/\n\s*\n/g, '\n').replace(/(  )/gm,"").trim();
+}
+
 compare_cell = function(table, cell_name, value) {
     var result_final = 0;
+    var row = "";
     //console.log("Cellname: " + cell_name.data);
     //console.log("Value: " + value.data);
     $('#' + table).each(function() {
         $(this).children().eq(1).children().each(function() {
+            
 
             //$('#t11').addClass("warning");
             //$(this.childNodes[1]).addClass("success");
-            try {
+            //try {
                 var question = $(this.childNodes[1].childNodes[0]);
                 var response = $(this.childNodes[3].childNodes[0]);
 
+                if ($(this).data('qid') === cell_name) {
 
-                if (question.context.data == cell_name.data) {
-                    //console.log(question.context.data + "? --" + (response.length == 0 && (value == undefined || value.data == undefined)));
-                    //console.log("FOUND: " + value.data);
-                    //console.log($(this.childNodes[3].childNodes[0])[0].textContent);
-                    //console.log($(this.childNodes[3].childNodes[0])[0].textContent.indexOf(value.data));
-                    //if (value.data.indexOf($(this.childNodes[3].childNodes[0]).context) !== -1))
-                    //console.log("COMPARE:[" + response[0].textContent + "][" + value.data + "]");
-                    if (response.length == 0 && (value == undefined || value.data == undefined)) {
+                    row = discoverRowId($(this));
+
+                    var this_response;
+                    var reference_response;
+                    try {
+                        var this_response = cleanup(response[0].parentElement.textContent).split('\n');
+                    } catch(err){
+                        this_response = [];
+                    }
+                    try {
+                        var reference_response = cleanup(value.parentElement.textContent).split('\n');
+                    } catch(err){
+                        reference_response = [];
+                    }
+                    if (this_response.length == 0 && reference_response.length == 0) {
                         result_final = 3;
 
-                        return false;
-                    } else if (response[0].textContent.indexOf(value.data) !== -1 && response[0].textContent === value.data) {
-                        //console.log("True: " + value.data);
-                        //$(this.childNodes[1]).addClass("success");
-                        result_final = 1;
-                        return false;
-                    } else if (
-                        (response[0].textContent.indexOf(value.data) >= 0 ||
-                            value.data.indexOf(response[0].textContent) >= 0
-                        ) && response[0].textContent !== value.data) {
-                        //$(this.childNodes[1]).addClass("warning");
-                        result_final = 2;
-                        return result_final;
+                        return {'value': result_final, 'row': row};
                     }
-                    //$(this.childNodes[1]).addClass("error");
-                    $(this.childNodes[1]).add("found");
-                    //console.log($(this.childNodes[1]));
-                }
-                //console.log($(this.childNodes[1].childNodes[0]).context);
-                //console.log($(this.childNodes[3].childNodes[0]).context);
-            } catch (err) {
-                //console.log(err.message)
+                    else if(this_response.length == 1 && reference_response.length == 1){
+                        if (this_response[0].toLowerCase().trim() === reference_response[0].toLowerCase().trim()) {
+                            result_final = 1;
 
-            }
-            //console.log($(this));		
+                            return {'value': result_final, 'row': row};
+                        }
+                        else if ( this_response[0].length != 0 && reference_response[0].length != 0 
+                                    && (this_response[0].indexOf(reference_response[0]) >= 0 || reference_response[0].indexOf(this_response[0]) >= 0 )
+                            ) {
+
+                            result_final = 2;
+
+                            return {'value': result_final, 'row': row};
+                        }
+                    }
+                    else {
+                        var matches = 0;
+                        for(var i = 0; i < this_response.length;i++){
+                            var pos = $.inArray(this_response[i], reference_response);
+                            if (pos != -1)
+                                matches++;
+                        }
+
+                        if(matches === this_response.length && matches === reference_response.length){
+                            result_final = 1;
+
+                            return {'value': result_final, 'row': row};
+
+                        } else if(matches > 0){
+                            result_final = 2;
+
+                            return {'value': result_final, 'row': row};
+                        }
+                    }
+
+                    //$(this.childNodes[1]).add("found");
+                }	
 
         });
     });
-    return result_final;
+    return {'value': result_final, 'row': row};
 }
 
 
@@ -92,8 +121,6 @@ compare_cell = function(table, cell_name, value) {
  */
 comparetable = function(table1, table2) {
     // Compare two tables: highlight the differences
-    $(function() {
-
         $('#' + table1).each(function() {
             $(this).children().eq(1).children().each(function() {
                     //console.log($(this.childNodes[1].childNodes[0]).context);
@@ -102,8 +129,6 @@ comparetable = function(table1, table2) {
                     var result = compare_cell(table2, $(this.childNodes[1].childNodes[0]).context, $(this.childNodes[3].childNodes[0]).context);
                     //console.log('Result: ' + result);
                     if (result == 1) {
-
-                        console.log($('#' + table2));
 
                         //$('#' + table2).childNodes[1].childNodes[0]).addClass("success")
                         //$($('#' + table2).childNodes[1].childNodes[0]).addClass("success");
@@ -136,29 +161,31 @@ comparetable = function(table1, table2) {
             //console.log(content)
 
         });
-
-    });
-
 };
 
 paint_table2 = function(table2, tag, nameClass) {
-    $('#' + table2).each(function() {
-        $(this).children().eq(1).children().each(function() {
 
-            //console.log($(this.childNodes[1].childNodes[0]).context.data);
-            //console.log(tag);
-            //if ($(this.childNodes[1].childNodes[0]).context.nodeValue.indexOf(tag)!==-1)
-            try {
-                if (tag.indexOf($(this.childNodes[1].childNodes[0]).context.data) !== -1) {
+    $('#'+table2+" "+"."+tag).addClass(nameClass);
 
-                    $(this).addClass(nameClass);
-                    $('.database_listing_names .'+discoverRowId(this)).addClass(nameClass);
+    $('.database_listing_names .'+tag).addClass(nameClass);
 
-                }
-            } catch (err) {}
+    // $('#' + table2).each(function() {
+    //     $(this).children().eq(1).children().each(function() {
 
-        });
-    });
+    //         //console.log($(this.childNodes[1].childNodes[0]).context.data);
+    //         //console.log(tag);
+    //         //if ($(this.childNodes[1].childNodes[0]).context.nodeValue.indexOf(tag)!==-1)
+    //         try {
+    //             //  console.log(tag);
+    //             if (tag.indexOf($(this.childNodes[1].childNodes[0]).context.data) === 0) {
+    //                 $(this).addClass(nameClass);
+    //                 $('.database_listing_names .'+discoverRowId(this)).addClass(nameClass);
+
+    //             }
+    //         } catch (err) {}
+
+    //     });
+    // });
 
 };
 
@@ -175,7 +202,6 @@ function discoverRowId(element){
 comparetable_two = function(table1, table2) {
     var empty_rows = 0;
     // Compare two tables: highlight the differences
-    $(function() {
 
         $('#' + table1).each(function() {
             $(this).children().eq(1).children().each(function() {
@@ -187,37 +213,36 @@ comparetable_two = function(table1, table2) {
                         response = $(this.childNodes[3].childNodes[0]);
                     } catch (err) {}
                     //console.log(question);
-                    //console.log(response);
-
                     var result = -2;
                     // if (response && response.length !== 0)
-                    result = compare_cell(table2, question.context, response.context);
-                    //console.log("RESULT: " + result + "TEST:[" + question.context.data + "]");
+                    result = compare_cell(table2, $(this).data('qid'), response.context);
+                    //console.log(result);
 
-                    if (result == 1) {
-
+                    if (result.value == 1) {
                         //console.log($('#' + table2));
                         //console.log($('#' + table1));
-                        paint_table2(table2, question.context.data, "success");
+                        paint_table2(table2, result.row, "success");
 
                         //$('#' + table2).childNodes[1].childNodes[0]).addClass("success")
                         //$($('#' + table2).childNodes[1].childNodes[0]).addClass("success");
                         /*$(this).addClass("success"); */
-                    } else if (result == 2) {
+                    } else if (result.value == 2) {
                         //$($('#' + table2).childNodes[1].childNodes[0]).addClass("warning");
                         
                         /*$(this).addClass("warning");*/
 
-                        paint_table2(table2, question.context.data, "warning");
-                    } else if (result == 3) {
-                        paint_table2(table2, question.context.data, "emptycells");
+                        paint_table2(table2, result.row, "warning");
+                    } else if (result.value == 3) {
+
+                        paint_table2(table2, result.row, "emptycells");
                         $(this).addClass("emptycells");
 
                     } else {
+                        //console.log("fail");
                         //$($('#' + table2).childNodes[1].childNodes[0]).addClass("error");
                         /*$(this).addClass("error");*/
 
-                        paint_table2(table2, question.context.data, "error");
+                        paint_table2(table2, result.row, "error");
                     }
 
                 }
@@ -238,9 +263,6 @@ comparetable_two = function(table1, table2) {
             //console.log(content)
 
         });
-
-    });
-
 };
 
 /**
