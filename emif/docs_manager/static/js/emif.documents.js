@@ -82,7 +82,20 @@ function fillList(admin){
           data: { publickey: global_public_key, result:result },
           success: function (data){result=data;},
         });
-        console.log(result);
+        var output = "";
+
+        if(result.conf != undefined && result.conf.length > 0){
+            output = '<h4 class="pull-center">Documents Available</h4>';
+        } else {
+            if(typeof global_owner === 'undefined'){
+                output = '<h4 class="pull-center">No documents associated with this database yet.</h4><p class="pull-center">You can upload documents to associate them to the fingerprint browser.</p>';
+
+            } else {
+                output = '<h4 class="pull-center">No documents associated with this database yet.</h4><p class="pull-center">This database fingerprint does not have documents yet. Please contact the database owner to get more information.</p>';
+            }
+        }
+        $('#doc_status').html(output);
+
         result.conf.forEach(function(d){
             //var context = $('<tr>').appendTo('#files');
 

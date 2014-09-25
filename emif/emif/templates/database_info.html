@@ -300,6 +300,10 @@
 var threads = {};
 var global_fingerprint_id = '{{fingerprint_id}}';
 
+{% if owner_fingerprint %}
+var global_owner = true;
+{% endif %}
+
 {%if latest_pop %}
 var global_revision = '{{latest_pop.revision}}';
 {% endif %}

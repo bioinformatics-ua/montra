@@ -452,7 +452,7 @@ LOGIN_EXEMPT_URLS = (
     r'^literature/(?P<fingerprint_id>[^/]+)$',
     r'^fingerprintqs/(?P<runcode>[^/]+)/(?P<qsid>[0-9]+)/$',
     r'^population/jerboafiles/(?P<fingerprint_id>[^/]+)/$',
-    r'^population/jerboalistvalues/(?P<var>[^/]+)/(?P<row>[^/]+)/(?P<fingerprint_id>[^/]+)$',
+    r'^population/jerboalistvalues/(?P<var>[^/]+)/(?P<row>[^/]+)/(?P<fingerprint_id>[^/]+)/(?P<revision>[^/]+)$',
     r'^population/filters/(?P<var>[^/]+)/(?P<fingerprint_id>[^/]+)$',
     r'^population/genericfilter/(?P<param>[^/]+)$',
     r'^population/settings/(?P<runcode>[^/]+)/$',
@@ -470,6 +470,7 @@ DONTLOG_URLS = (
     r'^docsmanager/docfiles/(?P<fingerprint_id>[^/]+)/$',
     r'^population/settings/(?P<fingerprint_id>[^/]+)/$',
     r'^population/jerboafiles/(?P<fingerprint_id>[^/]+)/$',
+    r'^jerboalistvalues/(?P<var>[^/]+)/(?P<row>[^/]+)/(?P<fingerprint_id>[^/]+)/(?P<revision>[^/]+)$'
     r'^searchqs/(?P<questionnaire_id>[0-9]+)/(?P<sortid>[0-9]+)/(?P<aqid>[0-9]+)?$',
     r'^addqs/(?P<fingerprint_id>[^/]+)/(?P<questionnaire_id>[0-9]+)/(?P<sortid>[0-9]+)/$',
     r'^addPost/(?P<questionnaire_id>[0-9]+)/(?P<sortid>[0-9]+)/(?P<saveid>[0-9]+)$',
