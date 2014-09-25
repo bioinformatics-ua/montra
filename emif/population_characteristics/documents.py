@@ -93,10 +93,10 @@ def document_form_view_upload(request, fingerprint_id, template_name='documents_
     # Parse the Jerboa and insert it in MongoDB
     # The best option will be use django-celery
 
-    #_json = import_population_characteristics_data(fingerprint_id,filename=path_file)
+    #_json = import_population_characteristics_data(request.user, fingerprint_id,filename=path_file)
 
     pc = PopulationCharacteristic()
-    data_jerboa = pc.submit_new_revision(fingerprint_id, revision, path_file)
+    data_jerboa = pc.submit_new_revision(request.user, fingerprint_id, revision, path_file)
 
 
     aggregation.apply_async([fingerprint_id, data_jerboa])
@@ -117,10 +117,10 @@ def parsejerboa(request, template_name='documents_upload_form.html'):
     path_file = "/Volumes/EXT1/Dropbox/MAPi-Dropbox/EMIF/Jerboa/TEST_DataProfile_v1.5.6b.txt"  
 
 
-    _json = import_population_characteristics_data(filename=path_file)
+    _json = import_population_characteristics_data(request.user, filename=path_file)
 
     pc = PopulationCharacteristic()
-    pc.submit_new_revision(fingerprint_id, revision)
+    pc.submit_new_revision(request.user, fingerprint_id, revision)
     data = {'data': _json}
     response = JSONResponse(data, mimetype=response_mimetype(request))
     response['Content-Disposition'] = 'inline; filename=files.json'
@@ -157,7 +157,7 @@ def document_form_view(request, runcode, qs, activetab='summary', readOnly=False
     apiinfo = json.dumps(get_api_info(runcode))
     owner_fingerprint = False
 
-    print request.user.username
+    #print request.user.username
 
     for owner in db_owners.split(" "):
         #print request.user.username
@@ -208,9 +208,6 @@ def document_form_view(request, runcode, qs, activetab='summary', readOnly=False
 
     public_links = None
 
-    print "owner ?"+str(owner_fingerprint)
-    print "fingerprint? "+str(fingerprint)
-
     if owner_fingerprint and fingerprint != None:
 
         public_links = PublicFingerprintShare.objects.filter(user=request.user, fingerprint=fingerprint)
@@ -231,6 +228,8 @@ def document_form_view(request, runcode, qs, activetab='summary', readOnly=False
                     'style': qs, 'collapseall': False, 
                     'owner_fingerprint':owner_fingerprint,
                     'owners': db_owners,
+                    'owner_obj': fingerprint.owner,
+                    'shared_obj': fingerprint.shared,
                     'fingerprint_dump': True,
                     'contains_population': contains_population, 
                     'latest_pop': latest_pop,

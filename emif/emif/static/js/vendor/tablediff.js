@@ -37,6 +37,7 @@ compare_cell = function(table, cell_name, value) {
     //console.log("Value: " + value.data);
     $('#' + table).each(function() {
         $(this).children().eq(1).children().each(function() {
+            
 
             //$('#t11').addClass("warning");
             //$(this.childNodes[1]).addClass("success");
@@ -44,7 +45,8 @@ compare_cell = function(table, cell_name, value) {
                 var question = $(this.childNodes[1].childNodes[0]);
                 var response = $(this.childNodes[3].childNodes[0]);
 
-                if (question.context.data == cell_name.data) {
+                if ($(this).data('qid') === cell_name) {
+
                     row = discoverRowId($(this));
 
                     var this_response;
@@ -59,10 +61,6 @@ compare_cell = function(table, cell_name, value) {
                     } catch(err){
                         reference_response = [];
                     }
-
-                    //console.log(this_response);
-                    //console.log(reference_response);
-
                     if (this_response.length == 0 && reference_response.length == 0) {
                         result_final = 3;
 
@@ -217,8 +215,8 @@ comparetable_two = function(table1, table2) {
                     //console.log(question);
                     var result = -2;
                     // if (response && response.length !== 0)
-                    result = compare_cell(table2, question.context, response.context);
-                    console.log(result);
+                    result = compare_cell(table2, $(this).data('qid'), response.context);
+                    //console.log(result);
 
                     if (result.value == 1) {
                         //console.log($('#' + table2));
@@ -240,7 +238,7 @@ comparetable_two = function(table1, table2) {
                         $(this).addClass("emptycells");
 
                     } else {
-                        console.log("fail");
+                        //console.log("fail");
                         //$($('#' + table2).childNodes[1].childNodes[0]).addClass("error");
                         /*$(this).addClass("error");*/
 

@@ -12,7 +12,9 @@
 
 		{% if request.user.is_authenticated %}
 		<!--div class="btn-group" id="group_toolbar"-->
-
+      {% if dashboard %}
+        <div id="dashboardselectbox" class="btn btn-group"></div>
+      {% endif %}
       {% if fingerprint_dump %}
       <a class="btn btn morelikethis" href="mlt/{{fingerprint_id}}" id="morelikethis_toolbar"> <i class="icon-search icon"></i>
         More Like This
@@ -128,6 +130,12 @@
       </li>
       <li class="divider"></li>
       <li style="margin-top: -10px;"><small style="margin-left: 20px; color: grey;">Share</small></li>
+      <li>
+
+      <a id="editpermissions" href="" onclick="return false;"> <i class="fa fa-lock"></i> Edit Share permissions
+      </a>
+      </li>
+
       <li>
 
       <a class="sharedb" href="" id="share_list_toolbar" onclick="return false;"> <i class="fa fa-users"></i>
@@ -287,6 +295,51 @@ This is an invitation sent by {{request.user.first_name }} {{request.user.last_n
     </div>
 </div>
 
+<div id="modal-permissions" class="modal hide fade" style="display:none"  >
+    <div class="modal-header">
+        <a href="#" onclick="$('#modal-permissions').modal('hide'); return false;" class="close">&times;</a>
+         <h3>Sharing Permissions</h3>
+    </div>
+    <div class="modal-body">
+        {% if owner_fingerprint or request.user.is_superuser %}
+        <legend>Database Owner</legend>
+        <table class="table table-bordered">
+          <thead>
+            <tr>
+              <th>User</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>{{owner_obj.get_full_name}}</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <legend>Existing Shared Users</legend>
+        <table class="table table-bordered">
+          <thead>
+            <tr>
+              <th>User</th>
+              <th style="width: 90px;"></th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for this_user in shared_obj.all %}
+            <tr id="permissions_{{this_user.id}}">
+              <td>{{this_user.get_full_name}}</td>
+              <td><button onclick="removeShared({{this_user.id}});" class="btn">Remove</button></td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+        {% endif %}
+    </div>
+    <div class="modal-footer">
+        <a href="#" onclick="$('#modal-permissions').modal('hide'); return false;" class="btn btn-secondary">Cancel</a>
+    </div>
+</div>
+
 <form id="send" method="POST" > {% csrf_token %}
 </form>
 
@@ -372,6 +425,11 @@ $(".sharedb" ).click(function(e)
   $('#modal-from-dom-share').data('id', id).modal('show');
 
 });
+
+$('#editpermissions').click(function(e){
+  $('#modal-permissions').modal('show');
+});
+
 $(".publiclink" ).click(function(e)
 {
   e.preventDefault();
@@ -504,5 +562,29 @@ function inviteDatabase(){
         $('#share_indicator').html('<i class="icon-remove text-error"></i>');
         $('#share_message').html('<p class="text-error">Request failed, maybe the internet connection is down.</p>');
   });
+}
+function removeShared(ident){
+  var ident = parseInt(ident);
+  if(ident){
+
+    var success = bootbox.confirm(
+      "Are you sure you want to remove the permissions from this user to the database ?", function(result){
+        if(result === true){
+        $.post("api/removePermissions", { id: ident, hash: '{{fingerprint}}'})
+          .done(function(response) {
+
+            $('#permissions_'+ident).remove();
+
+          })
+          .fail(function(){
+            bootbox.alert('Removing failed, please try again.');
+          });
+        }
+      });
+
+     
+  }
+
+
 }
 </script>

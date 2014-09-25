@@ -43,11 +43,11 @@ class PopulationCharacteristic(object):
     def revisions(self):
         pass
 
-    def submit_new_revision(self, fingerprint_id, revision, path_file=None):
+    def submit_new_revision(self, user, fingerprint_id, revision, path_file=None):
         
         #path_file = "C:/Users/lbastiao/Projects/TEST_DataProfile_v1.5.6b.txt"
         #path_file = "/Volumes/EXT1/Dropbox/MAPi-Dropbox/EMIF/Jerboa/TEST_DataProfile_v1.5.6b.txt"        
-        self._json = import_population_characteristics_data(fingerprint_id, revision, filename=path_file)
+        self._json = import_population_characteristics_data(user, fingerprint_id, revision, filename=path_file)
         #print self._json
         #f = open('jerboaTmp', 'w')
         #f.write(self._json)

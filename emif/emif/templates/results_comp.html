@@ -142,7 +142,7 @@ th, td {
                 {% for t in v.list_ordered_tags %}
                   {% if t.ttype != 'publication' %}
 
-                  <tr data-fingerprintid="HEADER" 
+                  <tr data-qid="{{t.id}}" data-fingerprintid="HEADER" 
                   data-rowid="{{forloop.parentloop.counter}}_{{forloop.counter}}" class="entry rowid_{{forloop.parentloop.counter}}_{{forloop.counter}}">
                     <td style="background-color: white; font-size: 85%;" class="tooltippable" data-original-title='{{ t.tag|removehs }}' title="">
                     
@@ -189,11 +189,11 @@ th, td {
               <tbody>
                 {% for t in v.list_ordered_tags %}
                   {% if t.ttype != 'publication' %}
-                  <tr data-fingerprintid="{{fingerprint_id}}" 
+                  <tr data-qid="{{t.id}}" data-fingerprintid="{{fingerprint_id}}" 
                       data-rowid="{{forloop.parentloop.counter}}_{{forloop.counter}}"
                   class="entry rowid_{{forloop.parentloop.counter}}_{{forloop.counter}}">
                     <td class="comphidden tooltippable" data-original-title="{{ t.tag|removehs }}" title="">{{ t.tag|removehs }}</td> 
-                     <td style="font-size: 95%;" class="tooltippable" data-original-title="{{ t.value|force_escape }}" title="">{{ t.value|escape }}</td>
+                     <td style="font-size: 95%;" class="tooltippable" data-original-title="{{ t.value.strip|force_escape|safe }}" title="">{{ t.value.strip|escape|safe }}</td>
                   </tr>
                   {% endif %}
                 {% endfor %}

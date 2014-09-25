@@ -4,7 +4,7 @@
     /*global define, module, exports, require */
 
     var c3 = {
-        version: "0.2.4"
+        version: "0.2.5"
     };
 
     var CLASS = {
@@ -126,7 +126,8 @@
 
         var __zoom_enabled = getConfig(['zoom', 'enabled'], false),
             __zoom_extent = getConfig(['zoom', 'extent']),
-            __zoom_privileged = getConfig(['zoom', 'privileged'], false);
+            __zoom_privileged = getConfig(['zoom', 'privileged'], false),
+            __zoom_onzoom = getConfig(['zoom', 'onzoom'], function () {});
 
         var __interaction_enabled = getConfig(['interaction', 'enabled'], true);
 
@@ -152,7 +153,7 @@
             __data_type = getConfig(['data', 'type']),
             __data_types = getConfig(['data', 'types'], {}),
             __data_labels = getConfig(['data', 'labels'], {}),
-            __data_order = getConfig(['data', 'order']),
+            __data_order = getConfig(['data', 'order'], 'desc'),
             __data_regions = getConfig(['data', 'regions'], {}),
             __data_color = getConfig(['data', 'color']),
             __data_colors = getConfig(['data', 'colors'], {}),
@@ -172,10 +173,11 @@
 
         // configuration for no plot-able data supplied.
         var __data_empty_label_text = getConfig(['data', 'empty', 'label', 'text'], "");
-        
+
         // subchart
         var __subchart_show = getConfig(['subchart', 'show'], false),
-            __subchart_size_height = getConfig(['subchart', 'size', 'height'], 60);
+            __subchart_size_height = getConfig(['subchart', 'size', 'height'], 60),
+            __subchart_onbrush = getConfig(['subchart', 'onbrush'], function () {});
 
         // color
         var __color_pattern = getConfig(['color', 'pattern'], []),
@@ -207,6 +209,7 @@
             __axis_x_tick_fit = getConfig(['axis', 'x', 'tick', 'fit'], true),
             __axis_x_tick_values = getConfig(['axis', 'x', 'tick', 'values'], null),
             __axis_x_tick_rotate = getConfig(['axis', 'x', 'tick', 'rotate']),
+            __axis_x_tick_outer = getConfig(['axis', 'x', 'tick', 'outer'], true),
             __axis_x_max = getConfig(['axis', 'x', 'max'], null),
             __axis_x_min = getConfig(['axis', 'x', 'min'], null),
             __axis_x_padding = getConfig(['axis', 'x', 'padding'], {}),
@@ -220,6 +223,7 @@
             __axis_y_label = getConfig(['axis', 'y', 'label'], {}),
             __axis_y_inner = getConfig(['axis', 'y', 'inner'], false),
             __axis_y_tick_format = getConfig(['axis', 'y', 'tick', 'format']),
+            __axis_y_tick_outer = getConfig(['axis', 'y', 'tick', 'outer'], true),
             __axis_y_padding = getConfig(['axis', 'y', 'padding']),
             __axis_y_ticks = getConfig(['axis', 'y', 'ticks'], 10),
             __axis_y2_show = getConfig(['axis', 'y2', 'show'], false),
@@ -229,6 +233,7 @@
             __axis_y2_label = getConfig(['axis', 'y2', 'label'], {}),
             __axis_y2_inner = getConfig(['axis', 'y2', 'inner'], false),
             __axis_y2_tick_format = getConfig(['axis', 'y2', 'tick', 'format']),
+            __axis_y2_tick_outer = getConfig(['axis', 'y2', 'tick', 'outer'], true),
             __axis_y2_padding = getConfig(['axis', 'y2', 'padding']),
             __axis_y2_ticks = getConfig(['axis', 'y2', 'ticks'], 10);
 
@@ -255,6 +260,7 @@
         // bar
         var __bar_width = getConfig(['bar', 'width']),
             __bar_width_ratio = getConfig(['bar', 'width', 'ratio'], 0.6),
+            __bar_width_max = getConfig(['bar', 'width', 'max']),
             __bar_zerobased = getConfig(['bar', 'zerobased'], true);
 
         // area
@@ -265,10 +271,7 @@
             __pie_label_format = getConfig(['pie', 'label', 'format']),
             __pie_label_threshold = getConfig(['pie', 'label', 'threshold'], 0.05),
             __pie_sort = getConfig(['pie', 'sort'], true),
-            __pie_expand = getConfig(['pie', 'expand'], true),
-            __pie_onclick = getConfig(['pie', 'onclick'], function () {}),
-            __pie_onmouseover = getConfig(['pie', 'onmouseover'], function () {}),
-            __pie_onmouseout = getConfig(['pie', 'onmouseout'], function () {});
+            __pie_expand = getConfig(['pie', 'expand'], true);
 
         // gauge
         var __gauge_label_show = getConfig(['gauge', 'label', 'show'], true),
@@ -276,9 +279,6 @@
             __gauge_expand = getConfig(['gauge', 'expand'], true),
             __gauge_min = getConfig(['gauge', 'min'], 0),
             __gauge_max = getConfig(['gauge', 'max'], 100),
-            __gauge_onclick = getConfig(['gauge', 'onclick'], function () {}),
-            __gauge_onmouseover = getConfig(['gauge', 'onmouseover'], function () {}),
-            __gauge_onmouseout = getConfig(['gauge', 'onmouseout'], function () {}),
             __gauge_units = getConfig(['gauge', 'units']),
             __gauge_width = getConfig(['gauge', 'width']);
 
@@ -286,12 +286,10 @@
         var __donut_label_show = getConfig(['donut', 'label', 'show'], true),
             __donut_label_format = getConfig(['donut', 'label', 'format']),
             __donut_label_threshold = getConfig(['donut', 'label', 'threshold'], 0.05),
+            __donut_width = getConfig(['donut', 'width']),
             __donut_sort = getConfig(['donut', 'sort'], true),
             __donut_expand = getConfig(['donut', 'expand'], true),
-            __donut_title = getConfig(['donut', 'title'], ""),
-            __donut_onclick = getConfig(['donut', 'onclick'], function () {}),
-            __donut_onmouseover = getConfig(['donut', 'onmouseover'], function () {}),
-            __donut_onmouseout = getConfig(['donut', 'onmouseout'], function () {});
+            __donut_title = getConfig(['donut', 'title'], "");
 
         // region - region to change style
         var __regions = getConfig(['regions'], []);
@@ -532,14 +530,14 @@
             main.select('line.' + CLASS.xgridFocus)
                 .attr("x1", __axis_rotated ? 0 : -10)
                 .attr("x2", __axis_rotated ? width : -10)
-                .attr("y1", __axis_rotated ? -10 : margin.top)
+                .attr("y1", __axis_rotated ? -10 : 0)
                 .attr("y2", __axis_rotated ? -10 : height);
         }
         function updateRadius() {
-            var innerRadiusRatio;
+            var innerRadiusRatio, w = __gauge_width || __donut_width;
             radiusExpanded = Math.min(arcWidth, arcHeight) / 2;
             radius = radiusExpanded * 0.95;
-            innerRadiusRatio = __gauge_width ? (radius - __gauge_width) / radius : 0.6;
+            innerRadiusRatio = w ? (radius - w) / radius : 0.6;
             innerRadius = hasDonutType(c3.data.targets) || hasGaugeType(c3.data.targets) ? radius * innerRadiusRatio : 0;
         }
         function getSvgLeft() {
@@ -717,8 +715,8 @@
             xAxisTickValues = __axis_x_tick_values ? __axis_x_tick_values : (forInit ? undefined : xAxis.tickValues());
             xAxis = getXAxis(x, xOrient, xAxisTickFormat, xAxisTickValues);
             subXAxis = getXAxis(subX, subXOrient, xAxisTickFormat, xAxisTickValues);
-            yAxis = getYAxis(y, yOrient, __axis_y_tick_format, __axis_y_ticks);
-            y2Axis = getYAxis(y2, y2Orient, __axis_y2_tick_format, __axis_y2_ticks);
+            yAxis = getYAxis(y, yOrient, __axis_y_tick_format, __axis_y_ticks, __axis_y_tick_outer);
+            y2Axis = getYAxis(y2, y2Orient, __axis_y2_tick_format, __axis_y2_ticks, __axis_y2_tick_outer);
             // Set initialized scales to brush and zoom
             if (!forInit) {
                 brush.scale(subX);
@@ -786,14 +784,15 @@
         //-- Axes --//
 
         function getXAxis(scale, orient, tickFormat, tickValues) {
-            var axis = c3_axis(d3, isCategorized).scale(scale).orient(orient);
+            var axisParams = {isCategory: isCategorized, withOuterTick: __axis_x_tick_outer},
+                axis = c3_axis(d3, axisParams).scale(scale).orient(orient);
 
             // Set tick
             axis.tickFormat(tickFormat).tickValues(tickValues);
             if (isCategorized) {
                 axis.tickCentered(__axis_x_tick_centered);
                 if (isEmpty(__axis_x_tick_culling)) {
-                    __axis_x_tick_culling = false;
+                    __axis_x_tick_culling = true;
                 }
             } else {
                 // TODO: move this to c3_axis
@@ -806,8 +805,9 @@
 
             return axis;
         }
-        function getYAxis(scale, orient, tickFormat, ticks) {
-            return c3_axis(d3).scale(scale).orient(orient).tickFormat(tickFormat).ticks(ticks);
+        function getYAxis(scale, orient, tickFormat, ticks, withOuterTick) {
+            var axisParams = {withOuterTick: withOuterTick};
+            return c3_axis(d3, axisParams).scale(scale).orient(orient).tickFormat(tickFormat).ticks(ticks);
         }
         function getAxisId(id) {
             return id in __data_axes ? __data_axes[id] : 'y';
@@ -981,10 +981,10 @@
                 targetsToShow = filterTargetsToShow(c3.data.targets);
                 if (id === 'y') {
                     scale = y.copy().domain(getYDomain(targetsToShow, 'y'));
-                    axis = getYAxis(scale, yOrient, __axis_y_tick_format, __axis_y_ticks);
+                    axis = getYAxis(scale, yOrient, __axis_y_tick_format, __axis_y_ticks, __axis_y_tick_outer);
                 } else if (id === 'y2') {
                     scale = y2.copy().domain(getYDomain(targetsToShow, 'y2'));
-                    axis = getYAxis(scale, y2Orient, __axis_y2_tick_format, __axis_y2_ticks);
+                    axis = getYAxis(scale, y2Orient, __axis_y2_tick_format, __axis_y2_ticks, __axis_y2_tick_outer);
                 } else {
                     scale = x.copy().domain(getXDomain(targetsToShow));
                     axis = getXAxis(scale, xOrient, getXAxisTickFormat(), __axis_x_tick_values ? __axis_x_tick_values : xAxis.tickValues());
@@ -1026,17 +1026,23 @@
         pie = d3.layout.pie().value(function (d) {
             return d.values.reduce(function (a, b) { return a + b.value; }, 0);
         });
-        if (!__pie_sort || !__donut_sort) { // TODO: this needs to be called by each type
+        if (!__data_order || !__pie_sort || !__donut_sort) {
             pie.sort(null);
         }
 
+        function descByStartAngle(a, b) {
+            return a.startAngle - b.startAngle;
+        }
+
         function updateAngle(d) {
-            var found = false;
-            pie(filterTargetsToShow(c3.data.targets)).forEach(function (t) {
+            var found = false, index = 0;
+            pie(filterTargetsToShow(c3.data.targets)).sort(descByStartAngle).forEach(function (t) {
                 if (! found && t.data.id === d.data.id) {
                     found = true;
                     d = t;
+                    d.index = index;
                 }
+                index++;
             });
             if (isNaN(d.endAngle)) {
                 d.endAngle = d.startAngle;
@@ -1094,7 +1100,8 @@
             return addName({
                 id: d.data.id,
                 value: d.value,
-                ratio: getArcRatio(d)
+                ratio: getArcRatio(d),
+                index: d.index,
             });
         }
         function textForArcLabel(d) {
@@ -1161,33 +1168,6 @@
         }
         function getArcTitle() {
             return hasDonutType(c3.data.targets) ? __donut_title : "";
-        }
-        function getArcOnClick() {
-            var callback = __pie_onclick;
-            if (hasGaugeType(c3.data.targets)) {
-                callback = __gauge_onclick;
-            } else if (hasDonutType(c3.data.targets)) {
-                callback = __donut_onclick;
-            }
-            return typeof callback === 'function' ? callback : function () {};
-        }
-        function getArcOnMouseOver() {
-            var callback = __pie_onmouseover;
-            if (hasGaugeType(c3.data.targets)) {
-                callback = __gauge_onmouseover;
-            } else if (hasDonutType(c3.data.targets)) {
-                callback = __donut_onmouseover;
-            }
-            return typeof callback === 'function' ? callback : function () {};
-        }
-        function getArcOnMouseOut() {
-            var callback = __pie_onmouseout;
-            if (hasGaugeType(c3.data.targets)) {
-                callback = __gauge_onmouseout;
-            } else if (hasDonutType(c3.data.targets)) {
-                callback = __donut_onmouseout;
-            }
-            return typeof callback === 'function' ? callback : function () {};
         }
 
         //-- Domain --//
@@ -1523,6 +1503,18 @@
             }
             return x;
         }
+        function convertUrlToData(url, mimeType, keys, done) {
+            var type = mimeType ? mimeType : 'csv';
+            d3.xhr(url, function (error, data) {
+                var d;
+                if (type === 'json') {
+                    d = convertJsonToData(JSON.parse(data.response), keys);
+                } else {
+                    d = convertCsvToData(data.response);
+                }
+                done(d);
+            });
+        }
         function convertCsvToData(csv) {
             var rows = d3.csv.parseRows(csv), d;
             if (rows.length === 1) {
@@ -1547,7 +1539,7 @@
                 json.forEach(function (o) {
                     var new_row = [];
                     targetKeys.forEach(function (key) {
-                        // convert undefined to null becuase undefined data will be removed in convertDataToTargets()
+                        // convert undefined to null because undefined data will be removed in convertDataToTargets()
                         var v = typeof o[key] === 'undefined' ? null : o[key];
                         new_row.push(v);
                     });
@@ -1567,6 +1559,9 @@
             for (i = 1; i < rows.length; i++) {
                 new_row = {};
                 for (j = 0; j < rows[i].length; j++) {
+                    if (isUndefined(rows[i][j])) {
+                        throw new Error("Source data is missing a component at (" + i + "," + j + ")!");
+                    }
                     new_row[keys[j]] = rows[i][j];
                 }
                 new_rows.push(new_row);
@@ -1580,6 +1575,9 @@
                 for (j = 1; j < columns[i].length; j++) {
                     if (isUndefined(new_rows[j - 1])) {
                         new_rows[j - 1] = {};
+                    }
+                    if (isUndefined(columns[i][j])) {
+                        throw new Error("Source data is missing a component at (" + i + "," + j + ")!");
                     }
                     new_rows[j - 1][key] = columns[i][j];
                 }
@@ -2065,7 +2063,7 @@
                 if (tooltipRight > chartRight) {
                     tooltipLeft -= tooltipRight - chartRight;
                 }
-                if (tooltipTop + tHeight > getCurrentHeight()) {
+                if (tooltipTop + tHeight > getCurrentHeight() && tooltipTop > tHeight + 30) {
                     tooltipTop -= tHeight + 30;
                 }
             }
@@ -2174,7 +2172,8 @@
         //-- Bar --//
 
         function getBarW(axis, barTargetsNum) {
-            return typeof __bar_width === 'number' ? __bar_width : barTargetsNum ? (axis.tickOffset() * 2 * __bar_width_ratio) / barTargetsNum : 0;
+            var w = typeof __bar_width === 'number' ? __bar_width : barTargetsNum ? (axis.tickOffset() * 2 * __bar_width_ratio) / barTargetsNum : 0;
+            return __bar_width_ratio && w > __bar_width_max ? __bar_width_max : w;
         }
 
         //-- Type --//
@@ -2555,9 +2554,10 @@
                 };
 
             area = __axis_rotated ? area.x0(value0).x1(value1).y(xx) : area.x(xx).y0(value0).y1(value1);
+            if (!__line_connect_null) { area = area.defined(function (d) { return d.value !== null; }); }
 
             return function (d) {
-                var data = filterRemoveNull(d.values), x0 = 0, y0 = 0, path;
+                var data = __line_connect_null ? filterRemoveNull(d.values):d.values, x0 = 0, y0 = 0, path;
 
                 if (isAreaType(d)) {
                     path = area.interpolate(getInterpolate(d))(data);
@@ -2982,24 +2982,20 @@
             grid = main.append('g')
                 .attr("clip-path", clipPath)
                 .attr('class', CLASS.grid);
-
-            // X-Grid
             if (__grid_x_show) {
                 grid.append("g").attr("class", CLASS.xgrids);
             }
+            if (__grid_y_show) {
+                grid.append('g').attr('class', CLASS.ygrids);
+            }
+            grid.append('g').attr("class", CLASS.xgridLines);
+            grid.append('g').attr('class', CLASS.ygridLines);
             if (__grid_focus_show) {
                 grid.append('g')
                     .attr("class", CLASS.xgridFocus)
                   .append('line')
                     .attr('class', CLASS.xgridFocus);
             }
-            grid.append('g').attr("class", CLASS.xgridLines);
-
-            // Y-Grid
-            if (__grid_y_show) {
-                grid.append('g').attr('class', CLASS.ygrids);
-            }
-            grid.append('g').attr('class', CLASS.ygridLines);
 
             // Define g for chart area
             main.append('g')
@@ -3069,7 +3065,6 @@
                 .attr('width', width)
                 .attr('height', height)
                 .style('opacity', 0)
-                .style('cursor', __axis_rotated ? 'ns-resize' : 'ew-resize')
                 .on("dblclick.zoom", null);
 
             // Set default extent if defined
@@ -3364,7 +3359,7 @@
                             __data_onmouseover.call(c3, closest);
                             mouseover = true;
                         }
-                    } else {
+                    } else if (mouseover) {
                         svg.select('.' + CLASS.eventRect).style('cursor', null);
                         __data_onmouseout.call(c3, closest);
                         mouseover = false;
@@ -3383,7 +3378,7 @@
 
                     // select if selection enabled
                     if (dist(closest, mouse) < 100) {
-                        main.select('.' + CLASS.circles + '-' + getTargetSelectorSuffix(closest.id)).select('.' + CLASS.circle + '-' + closest.index).each(function () {
+                        main.select('.' + CLASS.circles + getTargetSelectorSuffix(closest.id)).select('.' + CLASS.circle + '-' + closest.index).each(function () {
                             toggleShape(this, closest, closest.index);
                         });
                     }
@@ -3433,7 +3428,7 @@
             if (hasArcType(c3.data.targets)) { return; }
             if (! __data_selection_enabled) { return; } // do nothing if not selectable
             if (__zoom_enabled && ! zoom.altDomain) { return; } // skip if zoomable because of conflict drag dehavior
-            if (!__data_selection_multiple) { return; } // skip when single selection becuase drag is used for multiple selection
+            if (!__data_selection_multiple) { return; } // skip when single selection because drag is used for multiple selection
 
             sx = dragStart[0];
             sy = dragStart[1];
@@ -3656,7 +3651,7 @@
                 } : {
                     'x1': function (d) { return x(d) + tickOffset; },
                     'x2': function (d) { return x(d) + tickOffset; },
-                    'y1': margin.top,
+                    'y1': 0,
                     'y2': height
                 };
                 // this is used to flow
@@ -3832,41 +3827,38 @@
                     }
                     this._current = d;
                 })
-                .on('mouseover', function (d, i) {
-                    var updated, arcData, callback;
+                .on('mouseover', function (d) {
+                    var updated, arcData;
                     if (transiting) { // skip while transiting
                         return;
                     }
                     updated = updateAngle(d);
                     arcData = convertToArcData(updated);
-                    callback = getArcOnMouseOver();
                     // transitions
                     expandArc(updated.data.id);
                     toggleFocusLegend(updated.data.id, true);
-                    callback.call(c3, arcData, i);
+                    __data_onmouseover.call(c3, arcData, this);
                 })
                 .on('mousemove', function (d) {
                     var updated = updateAngle(d), arcData = convertToArcData(updated), selectedData = [arcData];
                     showTooltip(selectedData, d3.mouse(this));
                 })
-                .on('mouseout', function (d, i) {
-                    var updated, arcData, callback;
+                .on('mouseout', function (d) {
+                    var updated, arcData;
                     if (transiting) { // skip while transiting
                         return;
                     }
                     updated = updateAngle(d);
                     arcData = convertToArcData(updated);
-                    callback = getArcOnMouseOut();
                     // transitions
                     unexpandArc(updated.data.id);
                     revertLegend();
                     hideTooltip();
-                    callback.call(c3, arcData, i);
+                    __data_onmouseout.call(c3, arcData, this);
                 })
                 .on('click', function (d, i) {
-                    var updated = updateAngle(d), arcData = convertToArcData(updated), callback = getArcOnClick();
-                    toggleShape(this, d, i);
-                    callback.call(c3, arcData, i);
+                    var updated = updateAngle(d), arcData = convertToArcData(updated);
+                    toggleShape(this, arcData, i); // onclick called in toogleShape()
                 });
             mainArc
                 .attr("transform", function (d) { return !isGaugeType(d.data) && withTransform ? "scale(0)" : ""; })
@@ -4012,7 +4004,7 @@
                         .attr('y', 0)
                         .attr('width', width)
                         .attr('height', height);
-                    // exit : not needed becuase always only one rect exists
+                    // exit : not needed because always only one rect exists
                 } else {
 
                     if (!eventRect.classed(CLASS.eventRectsSingle)) {
@@ -4244,6 +4236,7 @@
                 withSubchart: false,
                 withUpdateXDomain: true
             });
+            __subchart_onbrush.call(c3, x.orgDomain());
         }
         function redrawForZoom() {
             if (!__zoom_enabled) {
@@ -4268,6 +4261,7 @@
             if (d3.event.sourceEvent.type === 'mousemove') {
                 cancelClick = true;
             }
+            __zoom_onzoom.call(c3, x.orgDomain());
         }
 
         function generateResize() {
@@ -4493,7 +4487,7 @@
                 load(convertDataToTargets(args.data), args);
             }
             else if (args.url) {
-                d3.csv(args.url, function (error, data) {
+                convertUrlToData(args.url, args.mimeType, args.keys, function (data) {
                     load(convertDataToTargets(data), args);
                 });
             }
@@ -4945,16 +4939,31 @@
             }
         };
 
-        c3.unload = function (targetIds, done) {
-            unload(mapToTargetIds(targetIds), function () {
+        c3.unload = function (args) {
+            args = args || {};
+            unload(mapToTargetIds(args.ids), function () {
                 redraw({withUpdateOrgXDomain: true, withUpdateXDomain: true, withLegend: true});
-                if (typeof done === 'function') { done(); }
+                if (typeof args.done === 'function') { args.done(); }
             });
         };
 
         c3.flow = function (args) {
-            var targets = convertDataToTargets(convertColumnsToData(args.columns), true), notfoundIds = [],
+            var targets, data, notfoundIds = [],
                 orgDataCount = getMaxDataCount(), dataCount, domain, baseTarget, baseValue, length = 0, tail = 0, diff, to;
+
+            if (args.json) {
+                data = convertJsonToData(args.json, args.keys);
+            }
+            else if (args.rows) {
+                data = convertRowsToData(args.rows);
+            }
+            else if (args.columns) {
+                data = convertColumnsToData(args.columns);
+            }
+            else {
+                return;
+            }
+            targets = convertDataToTargets(data, true);
 
             // Update/Add data
             c3.data.targets.forEach(function (t) {
@@ -5024,7 +5033,7 @@
             }
             c3.data.targets = c3.data.targets.concat(targets); // add remained
 
-            // check data count becuase behavior needs to change when it's only one
+            // check data count because behavior needs to change when it's only one
             dataCount = getMaxDataCount();
             baseTarget = c3.data.targets[0];
             baseValue = baseTarget.values[0];
@@ -5332,21 +5341,8 @@
 
         /*-- Load data and init chart with defined functions --*/
 
-        function initWithUrl(args) {
-            var type = args.mimeType ? args.mimeType : 'csv';
-            d3.xhr(args.url, function (error, data) {
-                var d;
-                if (type === 'json') {
-                    d = convertJsonToData(JSON.parse(data.response), args.keys);
-                } else {
-                    d = convertCsvToData(data.response);
-                }
-                init(d);
-            });
-        }
-
         if (config.data.url) {
-            initWithUrl(config.data);
+            convertUrlToData(config.data.url, config.data.mimeType, config.data.keys, init);
         }
         else if (config.data.json) {
             init(convertJsonToData(config.data.json, config.data.keys));
@@ -5385,10 +5381,13 @@
     // Features:
     // 1. category axis
     // 2. ceil values of translate/x/y to int for half pixel antialiasing
-    function c3_axis(d3, isCategory) {
-        var scale = d3.scale.linear(), orient = "bottom", innerTickSize = 6, outerTickSize = 6, tickPadding = 3, tickValues = null, tickFormat, tickArguments;
+    function c3_axis(d3, params) {
+        var scale = d3.scale.linear(), orient = "bottom", innerTickSize = 6, outerTickSize, tickPadding = 3, tickValues = null, tickFormat, tickArguments;
 
         var tickOffset = 0, tickCulling = true, tickCentered;
+
+        params = params || {};
+        outerTickSize = params.withOuterTick ? 6 : 0;
 
         function axisX(selection, x) {
             selection.attr("transform", function (d) {
@@ -5420,7 +5419,7 @@
         }
         function copyScale() {
             var newScale = scale.copy(), domain;
-            if (isCategory) {
+            if (params.isCategory) {
                 domain = scale.domain();
                 newScale.domain([domain[0], domain[1] - 1]);
             }
@@ -5454,7 +5453,7 @@
                     textEnter = tickEnter.select("text"),
                     textUpdate = tickUpdate.select("text");
 
-                if (isCategory) {
+                if (params.isCategory) {
                     tickOffset = Math.ceil((scale1(1) - scale1(0)) / 2);
                     tickX = tickCentered ? 0 : tickOffset;
                 } else {
@@ -5560,8 +5559,15 @@
             return axis;
         };
         axis.tickValues = function (x) {
-            if (!arguments.length) { return tickValues; }
-            tickValues = x;
+            if (typeof x === 'function') {
+                tickValues = function () {
+                    return x(scale.domain());
+                };
+            }
+            else {
+                if (!arguments.length) { return tickValues; }
+                tickValues = x;
+            }
             return axis;
         };
         return axis;
