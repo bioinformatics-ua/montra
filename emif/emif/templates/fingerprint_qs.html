@@ -13,13 +13,20 @@
 					{% for t in qs.list_ordered_tags %}
 					<tr>
 						<!-- title="{{ t.tag|safe }}" -->
-						<td class="tooltipped" title="{{ t.tag|removehs|safe }}">{{ t.tag|removehs|safe }}</td>
+						<td class="tooltipped" title="{{ t.tag|removehs|safe }}">
+							{{ t.tag|removehs|safe }}	
+						</td>
 						{% if t.ttype|captioned %}
 						<td class="value_content captioned_content" style="white-space: normal;" title="{{ t.value|force_escape }}">
 						{% else %}
 						<td class="value_content" style="white-space: normal;">
 						{% endif %}
 						<span class="summary_content">
+						{% if t.value == "" and user.is_authenticated %}
+						    <div class="requestanswerbtn" data-question="{{t.id}}">
+						    	<button style="margin-top: -6px;margin-bottom: -6px;" class="btn input-block-level requestlabel depon_class">Request Answer</button>
+						    </div>
+						{% endif %}
 						{{ t.value|safe }}
 						</span>
 
@@ -31,6 +38,7 @@
 							<strong>Comment: </strong>{{ t.comment|safe }}
 						</div>
 						{% endif %}
+						
 						</td>
 					</tr>
 					{% endfor %}
@@ -52,5 +60,36 @@
 	$('.comment_button', '#t2_{{qs.sortid}}').popover({trigger: 'hover', html: true,
             template: '<div class="popover popover-medium"><div class="arrow"></div><div class="popover-inner"><h3 class="popover-title"></h3><div class="popover-content"><p></p></div></div></div>'
 });
+
+	$(function(){
+		$('.requestanswerbtn', $('#t2_{{qs.sortid}}')).click(function(e){
+			var answer = $(this).data("question");
+
+			var confirmed = confirm("This question doesn't have an answer, do you want to request the owner of this database to answer this question ?");
+
+			if(confirmed){
+			  $.post("api/requestanswer", { fingerprint_id: '{{fingerprint_id}}', question: answer })
+				  .done(function(response) {
+				  	if(response.success){
+				    	alert('A request for this answer was sent to the owner of the database.');
+				  	} else {
+				  		alert("There was a problem requesting this answer. please try again. If the problem persists contact the database owner.")
+				  	}
+				  })
+				  .fail(function(){
+				    console.log('Failed sending request for answer');
+				  });
+
+			}
+
+		});
+		$('.value_content').mouseover(function(e){
+			$(this).find('.requestlabel').show();
+		});
+		$('.value_content').mouseout(function(e){
+			$(this).find('.requestlabel').hide();
+		});
+	});
+
 </script>
 {% endfor %}

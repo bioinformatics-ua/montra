@@ -1,10 +1,15 @@
-from fingerprint.models import Fingerprint, Answer, FingerprintHead, AnswerChange
+from fingerprint.models import *
 from questionnaire.models import Questionnaire, QuestionSet, Question, QuestionSetPermissions
 from django.contrib.auth.models import User
 
 from searchengine.search_indexes import generateFreeText, setProperFields, CoreEngine
 
 from django.utils import timezone    
+
+from notifications.models import Notification
+from notifications.services import sendNotification
+
+from datetime import timedelta
 
 def saveFingerprintAnswers(qlist_general, fingerprint_id, questionnaire, user, extra_fields=None, created_date=None):
 
@@ -24,7 +29,10 @@ def saveFingerprintAnswers(qlist_general, fingerprint_id, questionnaire, user, e
 
         versionhead = None
 
-        print "TO:"
+        # we must mark answer requests as solved if any exist when a question is given an response
+        answer_requests = AnswerRequest.objects.filter(fingerprint=fingerprint, removed = False)
+
+        #print "TO:"
         for qs_aux, qlist in qlist_general:
             for question, qdict in qlist:
                 value = getAnswerValue(question, qdict)
@@ -34,6 +42,9 @@ def saveFingerprintAnswers(qlist_general, fingerprint_id, questionnaire, user, e
                 #print question.slug_fk.slug1 + ": '"+value+"' Comment: " + str(comment)
 
                 if value != None:
+                    if value.strip() != "":
+                        markAnswerRequests(user, fingerprint, question, answer_requests)
+
                     this_ans = None
                     try:
                         this_ans = Answer.objects.get(fingerprint_id=fingerprint, question=question)
@@ -47,8 +58,8 @@ def saveFingerprintAnswers(qlist_general, fingerprint_id, questionnaire, user, e
                         if comment != None:
                             this_ans.comment=comment;
 
-                        print "UPDATE: "
-                        print this_ans
+                        #print "UPDATE: "
+                        #print this_ans
                         this_ans.save()
 
                         # if value or comment changed
@@ -76,8 +87,8 @@ def saveFingerprintAnswers(qlist_general, fingerprint_id, questionnaire, user, e
                     except Answer.DoesNotExist:
                         # new ,create new answer
                         this_ans = Answer(question=question, data=value, comment=comment, fingerprint_id=fingerprint)
-                        print "NEW: "
-                        print this_ans
+                        #print "NEW: "
+                        #print this_ans
                         this_ans.save()
                 
         return checkMandatoryAnswers(fingerprint)
@@ -373,4 +384,19 @@ def getPermissions(fingerprint_id, question_set):
         print "Error retrieved several models for this questionset, its impossible, so something went very wrong."    
 
     return permissions
+
+def markAnswerRequests(user, fingerprint, question, answer_requests):
+
+    this_requests = answer_requests.filter(question=question)
+
+    for req in this_requests:
+        # We set the request as fullfilled
+        req.removed = True
+        req.save()
+
+        message = "User "+str(fingerprint.owner.get_full_name())+" answered some questions you requested on database "+str(findName(fingerprint))+"."
+
+        sendNotification(timedelta(hours=12), req.requester, fingerprint.owner, 
+            "fingerprint/"+fingerprint.fingerprint_hash+"/1/", message)
+
 

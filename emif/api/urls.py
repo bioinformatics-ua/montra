@@ -37,6 +37,7 @@ from api.views import DeletePublicLinkView
 from api.views import NotificationsView
 from api.views import ReadNotificationView
 from api.views import RemoveNotificationView
+from api.views import RequestAnswerView
 
 urlpatterns = patterns('api.views',
     url(r'^root/$', 'api_root'),
@@ -56,6 +57,7 @@ urlpatterns = patterns('api.views',
     url(r'^notifications$', NotificationsView.as_view(), name='notifications'),
     url(r'^readnotification$', ReadNotificationView.as_view(), name='readnotification'),
     url(r'^removenotification$', RemoveNotificationView.as_view(), name='removenotification'),
+    url(r'^requestanswer$', RequestAnswerView.as_view(), name='requestanswer'),
 
 )
 

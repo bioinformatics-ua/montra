@@ -19,10 +19,14 @@
 #
 #
 import re
+
+from django.template.loader import render_to_string
+
 from django import template
 from django.template.defaultfilters import stringfilter
 
 from questionnaire.models import Questionnaire
+from fingerprint.models import AnswerRequest
 
 register = template.Library()
 
@@ -67,6 +71,19 @@ def removehs(value):
     value = value.replace('h7. ','')
 
     return value
+
+@register.simple_tag()
+def ans_requested(question, requests, *args, **kwargs):
+    try:
+        question_requests = requests.filter(question = question)
+
+        if len(question_requests) > 0:
+            return render_to_string('answer_requests.html', { "requests": question_requests })
+
+    except AnswerRequest.DoesNotExist:
+        pass
+
+    return ""
 
 @register.filter(name='datehhmm')
 @stringfilter

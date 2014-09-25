@@ -68,12 +68,16 @@ from django.template.loader import render_to_string
 
 from emif.utils import send_custom_mail
 
-from fingerprint.models import Fingerprint
+from fingerprint.models import Fingerprint, AnswerRequest
+from fingerprint.services import findName
+
+from questionnaire.models import Question
 
 from public.views import PublicFingerprintShare
 from public.services import deleteFingerprintShare, createFingerprintShare
 
 from notifications.models import Notification
+from notifications.services import sendNotification
 from population_characteristics.models import Characteristic
 
 import time
@@ -821,6 +825,62 @@ class RemoveNotificationView(APIView):
                 print "Can't mark as read notification with id"+notification_id
     
         return Response({'success': False }, status=status.HTTP_400_BAD_REQUEST)
+
+############################################################
+##### Request Answer - Web services
+############################################################
+class RequestAnswerView(APIView):
+    authentication_classes = (SessionAuthentication, BasicAuthentication)
+    permission_classes = (IsAuthenticated,)    
+    def post(self, request, *args, **kw):
+        # first we get the email parameter
+        fingerprint_id = request.POST.get('fingerprint_id', '')
+        question_id = request.POST.get('question', '')      
+
+        if request.user.is_authenticated():     
+            try:
+                fingerprint = Fingerprint.objects.get(fingerprint_hash=fingerprint_id)
+                question = Question.objects.get(id=question_id)
+
+                ansrequest = None
+                try:
+                    ansrequest = AnswerRequest.objects.get(
+                                    fingerprint=fingerprint, 
+                                    question=question, 
+                                    requester=request.user, removed = False)
+
+                    # If this user already request this answer, just update request time
+                    ansrequest.save()
+
+                # otherwise we must create the request as a new one
+                except:
+                    ansrequest = AnswerRequest(fingerprint=fingerprint, question=question, requester=request.user)
+                    ansrequest.save()
+
+                if ansrequest != None:
+
+                    message = str(ansrequest.requester.get_full_name())+" requested you to answer some unanswered questions on database "+str(findName(fingerprint))+"."
+
+                    sendNotification(timedelta(hours=12), fingerprint.owner, ansrequest.requester, 
+            "dbEdit/"+fingerprint.fingerprint_hash+"/"+str(fingerprint.questionnaire.id), message)
+
+                result = {
+                    'fingerprint_id': fingerprint_id,
+                    'question_id': question_id,
+                    'success': True
+                }
+                
+                return Response(result, status=status.HTTP_200_OK)
+
+            except Fingerprint.DoesNotExist:
+                pass
+
+            except Question.DoesNotExist:
+                pass
+    
+        return Response({'success': False }, status=status.HTTP_400_BAD_REQUEST)
+
+
 
 ############################################################
 ############ Auxiliar functions ############################
