@@ -1,0 +1,27 @@
+{% extends "newsletter/common.html" %}
+
+{% load i18n %}
+
+{% block title %}{% trans "Newsletter archive" %}{% endblock title %}
+
+{% block body %}
+<center><h3>Archive of {{ newsletter.title }}</h3>
+<table class="table table-bordered table-striped table-hover">
+    <thead>
+        <tr>
+            <th>Newsletter</th>
+            <th>Date</th>
+        </tr>
+    </thead>
+    <tbody>
+    {% for submission in latest %}
+    <tr style="cursor: pointer;" onclick="javascript:location.href='{{ submission.get_absolute_url }}'">
+        <td>{{ submission.message.title }}</td>
+        <td>{{ submission.publish_date }}</td>
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>
+<a href="newsletter/{{newsletter.slug}}/">Back to list</a>
+</center>
+{% endblock body %}

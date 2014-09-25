@@ -92,7 +92,7 @@ def handle_compare(request, template_name="compare_populations.html"):
         'contains_population': True }) 
 
 
-def handle_compare_values(request, var, row, fingerprint_id, template_name="compare_populations.html"):
+def handle_compare_values(request, var, row, fingerprint_id, revision, template_name="compare_populations.html"):
 
     filters = []
     fingerprint_ids = []
@@ -100,10 +100,13 @@ def handle_compare_values(request, var, row, fingerprint_id, template_name="comp
         # Get the filters to apply.
         
         filters = {}
-        print request.POST
+        #print request.POST
         myRq = dict(request.POST.lists())
         
         for i in myRq:
+            if i == 'publickey':
+                continue
+
             #if "chks_" in i:
             #    fingerprint_ids.append(i.replace("chks_", ""))
             #    continue
@@ -113,16 +116,21 @@ def handle_compare_values(request, var, row, fingerprint_id, template_name="comp
                 for fp in fps:
                     fingerprint_ids.append(fp)
                 continue
-            filters[i[0:-2]] = myRq[i]
+            filters[i[8:-3]] = myRq[i]
 
 
+        print "----"
+        print "var:"+var
+        print "row:"+row
         print "Filters" + str(filters)
         print fingerprint_ids
+        print "----"
+
     cp = ComparisonPopulation(None)
     # Only hard coded for testing 
     #fingerprint_ids = ["66a47f694ffb676bf7676dfde24900e6", "3dc3d622130eac4d092786afb9a0ec76", "2e303fd12bc5e5fd03a54651dd8d6334"]
     
-    values = cp.get_variables(var, row, fingerprints_id=fingerprint_ids, filters=filters)
+    values = cp.get_variables(var, row, fingerprints_id=fingerprint_ids, filters=filters, revision=revision)
     data = {'values': values}
     response = JSONResponse(data, mimetype="application/json")
     response['Content-Disposition'] = 'inline; filename=files.json'
@@ -150,14 +158,26 @@ class ComparisonPopulation(object):
     def __fingerprints_to_mongo_query(self, fingerprints_id):
         filter_fp = []
         for fid in fingerprints_id:
-            _filter_fp = {"fingerprint_id": fid}
-            filter_fp.append(_filter_fp)
+            if fid != None and len(fid) > 0:
+                _filter_fp = {"fingerprint_id": fid}
+                
+
+                revision = '-1'
+                try:
+                    latest_jerboa = Characteristic.objects.filter(fingerprint_id=fid).order_by('-latest_date')[0]
+                    revision = latest_jerboa.revision
+                except:
+                    print "-- Error retrieving last revision for fingerprint "+str(fid)
+
+                _filter_fp['revision'] = revision
+
+                filter_fp.append(_filter_fp)
 
         return filter_fp
 
 
 
-    def get_variables(self, var, row, fingerprints_id=[], filters=[], vars_that_should_exists=[]):
+    def get_variables(self, var, row, fingerprints_id=[], filters=[], revision=-1, vars_that_should_exists=[]):
         
         # Sometimes there are rude files. According to Marius (from Erasmus MC)
         # This variable should exist always.
@@ -166,6 +186,7 @@ class ComparisonPopulation(object):
         # Get the Rule Matcher 
         mrules = RuleMatcher( comp=True)
         __filters = mrules.get_filter(var)
+
         c1 = mrules.get_chart(var)
 
         dict_query = {'$or': self.__fingerprints_to_mongo_query(fingerprints_id), 
@@ -178,8 +199,8 @@ class ComparisonPopulation(object):
         for _f in c1.y_axis.static_filters:
             dict_query['values.'+_f.key] = _f.value
 
-        print "filters"
-        print filters
+        #print "filters"
+        #print filters
         # Apply filters in the query 
         dict_query_general=[]
         

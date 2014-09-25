@@ -10,7 +10,7 @@
         <a id="collapseall_literature" class="btn pull-right" href=""><i class="icon-plus"></i>&nbsp; Expand all</a>
     <div class="accordion fullwidth pull-left" id="accordion2" style="margin-top: 10px;">
         {% for publication in publications %}
-        {% if publication.pmid %}
+        {% if publication.pmid|isnumber %}
         <div class="accordion-group">
             <div class="accordion-heading">
                 <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapse{{forloop.counter}}">
@@ -82,7 +82,7 @@
     <script type="text/javascript">
         function loadPage(page_number){
             console.log("Loading literature, page "+page_number);
-                $.get( "literature/{{fingerprint_id}}/"+page_number, function( data ) {
+                $.post( "literature/{{fingerprint_id}}/"+page_number, { publickey: global_public_key }, function( data ) {
                     $( "#literature" ).html( data );
             });
         }

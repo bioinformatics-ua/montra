@@ -55,6 +55,7 @@ ADMINS = (
 
 SOLR_HOST = "localhost"
 SOLR_PORT = "8983"
+SOLR_PATH = "/solr"
 
 TEMPLATE_CONTEXT_PROCESSORS = (
     "django.contrib.auth.context_processors.auth",
@@ -65,7 +66,8 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     "django.core.context_processors.tz",
     "django.contrib.messages.context_processors.messages",
     "emif.context_processors.debug",
-    "emif.context_processors.baseurl"
+    "emif.context_processors.baseurl",
+    "emif.context_processors.profiles_processor"
 )
 
 MANAGERS = ADMINS
@@ -169,6 +171,7 @@ STATICFILES_DIRS = (
     os.path.abspath(PROJECT_DIR_ROOT + MIDDLE_DIR + 'advancedsearch/static'),
     os.path.abspath(PROJECT_DIR_ROOT + MIDDLE_DIR + 'public/static'),
     os.path.abspath(PROJECT_DIR_ROOT + MIDDLE_DIR + 'accounts/static'),
+    os.path.abspath(PROJECT_DIR_ROOT + MIDDLE_DIR + 'dashboard/static'),
 )
 
 # List of finder classes that know how to find static files in
@@ -223,6 +226,8 @@ TEMPLATE_DIRS = (
     os.path.abspath(PROJECT_DIR_ROOT + MIDDLE_DIR + 'docs_manager/templates'),
     os.path.abspath(PROJECT_DIR_ROOT + MIDDLE_DIR + 'advancedsearch/templates'),
     os.path.abspath(PROJECT_DIR_ROOT + MIDDLE_DIR + 'public/templates'),
+    os.path.abspath(PROJECT_DIR_ROOT + MIDDLE_DIR + 'dashboard/templates'),
+
     os.path.abspath(PROJECT_DIR_ROOT + MIDDLE_DIR + 'notifications/templates'),
 )
 
@@ -276,14 +281,18 @@ INSTALLED_APPS = (
     'bootstrap-pagination',
     'django_jenkins',
 
-    # Django NVD3
-    'django_nvd3',
+    
     'djcelery',
     #'djangobower',
     'advancedsearch',
 
     # public links
     'public',
+
+    # newsletters
+    'django_extensions',
+    'sorl.thumbnail',
+    'newsletter',
 
     # FAQ
     'fack',
@@ -293,6 +302,9 @@ INSTALLED_APPS = (
 
     # unique views counter
     'hitcount',
+
+    # dashboard
+    'dashboard',
 
     # notifications
     'notifications'
@@ -312,7 +324,6 @@ EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 # EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 # EMAIL_HOST = 'localhost'
 # EMAIL_PORT = 1025
-
 
 ANONYMOUS_USER_ID = -1
 
@@ -452,6 +463,18 @@ LOGIN_EXEMPT_URLS = (
     r'^bootstrap_ie_compatibility',
     # public shares
     r'^public/fingerprint/(?P<fingerprint_id>[^/]+)',
+    r'^literature/(?P<fingerprint_id>[^/]+)/(?P<page>[0-9]+)$',
+    r'^literature/(?P<fingerprint_id>[^/]+)$',
+    r'^fingerprintqs/(?P<runcode>[^/]+)/(?P<qsid>[0-9]+)/$',
+    r'^population/jerboafiles/(?P<fingerprint_id>[^/]+)/$',
+    r'^population/jerboalistvalues/(?P<var>[^/]+)/(?P<row>[^/]+)/(?P<fingerprint_id>[^/]+)/(?P<revision>[^/]+)$',
+    r'^population/filters/(?P<var>[^/]+)/(?P<fingerprint_id>[^/]+)$',
+    r'^population/genericfilter/(?P<param>[^/]+)$',
+    r'^population/settings/(?P<runcode>[^/]+)/$',
+
+    r'^docsmanager/docfiles/(?P<fingerprint>[^/]+)/$',
+    r'^api/getfile',
+
 )
 
 #Pages that wont be logged into user history
@@ -462,6 +485,7 @@ DONTLOG_URLS = (
     r'^docsmanager/docfiles/(?P<fingerprint_id>[^/]+)/$',
     r'^population/settings/(?P<fingerprint_id>[^/]+)/$',
     r'^population/jerboafiles/(?P<fingerprint_id>[^/]+)/$',
+    r'^jerboalistvalues/(?P<var>[^/]+)/(?P<row>[^/]+)/(?P<fingerprint_id>[^/]+)/(?P<revision>[^/]+)$'
     r'^searchqs/(?P<questionnaire_id>[0-9]+)/(?P<sortid>[0-9]+)/(?P<aqid>[0-9]+)?$',
     r'^addqs/(?P<fingerprint_id>[^/]+)/(?P<questionnaire_id>[0-9]+)/(?P<sortid>[0-9]+)/$',
     r'^addPost/(?P<questionnaire_id>[0-9]+)/(?P<sortid>[0-9]+)/(?P<saveid>[0-9]+)$',
@@ -533,8 +557,8 @@ except ConnectionFailure, e:
     sys.exit(1)
 
 # REDIRECT USER ACCORDING TO PROFILE
-REDIRECT_DATACUSTODIAN = 'emif.views.databases'
-REDIRECT_RESEARCHER = 'emif.views.all_databases_user'
+REDIRECT_DATACUSTODIAN = 'dashboard.views.dashboard'
+REDIRECT_RESEARCHER = 'dashboard.views.dashboard'
 
 
 # MEMCACHED

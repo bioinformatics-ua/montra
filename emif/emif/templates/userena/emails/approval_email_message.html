@@ -4,7 +4,7 @@
 
 {% block email_content %}
 
-{% blocktrans with user.username as username %}Dear {{ username }},{% endblocktrans %}<br /><br />
+{% blocktrans with user.email as email %}Dear {{ email }},{% endblocktrans %}<br /><br />
 
 {% blocktrans with site.name as site %}Thank you for signing up at {{ site }}.{% endblocktrans %}<br /><br />
 

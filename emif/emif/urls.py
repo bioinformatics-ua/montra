@@ -178,8 +178,11 @@ urlpatterns = patterns('',
     # AdvancedSearch URLs
     url(r'advsearch/', include('advancedsearch.urls')),
 
-    # Public links URLs
+    # Private links URLs
     url(r'public/', include('public.urls')),
+
+    # newsletter system
+    url(r'^newsletter/', include('newsletter.urls')),
 
     # Notifications URLs
     url(r'notifications/', include('notifications.urls')),
@@ -192,6 +195,9 @@ urlpatterns = patterns('',
 
     # Fingerprint
     url('^fingerprint/', include('fingerprint.urls')),
+
+    # DashBoard
+    url(r'^dashboard', include('dashboard.urls')),
 )
 
 if settings.DEBUG:

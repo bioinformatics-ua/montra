@@ -76,12 +76,26 @@ function fillList(admin){
 
         $.ajax({
           dataType: "json",
+          type: "POST",
           url: "docsmanager/docfiles/"+getFingerprintID_new()+"/",
           async: false,
-          data: result,
+          data: { publickey: global_public_key, result:result },
           success: function (data){result=data;},
         });
-        console.log(result);
+        var output = "";
+
+        if(result.conf != undefined && result.conf.length > 0){
+            output = '<h4 class="pull-center">Documents Available</h4>';
+        } else {
+            if(typeof global_owner === 'undefined'){
+                output = '<h4 class="pull-center">No documents associated with this database yet.</h4><p class="pull-center">You can upload documents to associate them to the fingerprint browser.</p>';
+
+            } else {
+                output = '<h4 class="pull-center">No documents associated with this database yet.</h4><p class="pull-center">This database fingerprint does not have documents yet. Please contact the database owner to get more information.</p>';
+            }
+        }
+        $('#doc_status').html(output);
+
         result.conf.forEach(function(d){
             //var context = $('<tr>').appendTo('#files');
 
@@ -113,7 +127,8 @@ function requestFile(filename, revision){
     var df = $('#downloadfile');
     $('[name="filename"]').val(filename);
     $('[name="revision"]').val(revision);
-
+    $('[name="publickey"]').val(global_public_key);
+    $('[name="fingerprint"]').val(global_fingerprint_id);
     df.submit();
 }
 function deleteFile(filename, revision){
@@ -128,11 +143,11 @@ function deleteFile(filename, revision){
             fillList(isadmin);
 
         } else {
-            alert('It was impossible to delete the document.');
+            bootbox.alert('It was impossible to delete the document.');
         }
       })
       .fail(function() {
-        alert( "Error Deleting File" );
+        bootbox.alert( "Error Deleting File" );
       });
 }
 /********************************************************
@@ -225,7 +240,7 @@ $(function () {
         dataType: 'json',
         autoUpload: false,
         acceptFileTypes: /(\.|\/)(gif|jpe?g|png|pdf|docx|xls|doc|docx|tsv|txt)$/i,
-        maxFileSize: 5000000, // 5 MB
+        maxFileSize: 20000000, // 20 MB
         // Enable image resizing, except for Android and Opera,
         // which actually support image resizing, but fail to
         // send Blob objects via XHR requests:

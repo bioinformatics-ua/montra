@@ -677,7 +677,14 @@ label input[type="radio"], label input[type="checkbox"]{
       max-width: 300px;
   }
 }
+.popover-small {
+      max-width: 500px;
+  }
   .popover-medium {
+      z-index: 9999;
+      text-align:justify;
+  }
+  .popover-small {
       z-index: 9999;
       text-align:justify;
   }
@@ -800,4 +807,16 @@ height: 6em;
 }
 .showing_publications_info{
   margin-bottom: -15px;
+}
+.name_container{
+  min-width: 145px;
+  display: inline-block;
+}
+
+.comphidden{
+  width:0 !important; 
+  padding-left: 0px !important; 
+  padding-right: 0px !important;
+  margin-left: 0px !important;
+  margin-right: 0px !important;
 }

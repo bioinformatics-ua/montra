@@ -21,16 +21,7 @@
 
 
 function getFingerprintID_new(){
-  var url = document.URL;
-  var fingerprint_id='abcd';
-  try{
-    fingerprint_id = url.split("fingerprint/")[1].split("/1")[0];
-  }
-  catch(err){
-    fingerprint_id='abcde'
-  };
-  return fingerprint_id;
-
+  return global_fingerprint_id;
 };
 
 
@@ -43,13 +34,14 @@ $(document).ready(
           dataType: "json",
           url: "population/jerboafiles/"+getFingerprintID_new()+"/",
           async: false,
-          data: result,
+          data: { publickey: global_public_key, result: result },
+          type: "POST",
+
           success: function (data){result=data;}
         });
-        console.log(result);
         result.conf.forEach(function(d){
-            var context = $('<tr>').appendTo('#jerboafiles');
-            var node = $('<td/>')
+            var context = $('<tr>').prependTo('#jerboafiles');
+            var node = $('<td colspan="3"/>')
                         .append($('<span/>').html("<p>File name: " + d.file_name
                             + "</p><p>Description: " + d.comments 
                             + "</p><p>Last update: " + d.latest_date ));
@@ -104,7 +96,7 @@ $(function () {
         dataType: 'json',
         autoUpload: false,
         acceptFileTypes: /(\.|\/)(tsv|txt)$/i,
-        maxFileSize: 5000000, // 5 MB
+        maxFileSize: 20000000, // 20 MB
         // Enable image resizing, except for Android and Opera,
         // which actually support image resizing, but fail to
         // send Blob objects via XHR requests:
@@ -115,7 +107,7 @@ $(function () {
         previewCrop: true
     }).on('fileuploadadd', function (e, data) {
         console.log('File Upload - fileuploadadd');
-        data.context = $('<tr>').appendTo('#jerboafiles');
+        data.context = $('<tr>').prependTo('#jerboafiles');
         $.each(data.files, function (index, file) {
             var node = $('<td>').text(file.name);
 
@@ -166,7 +158,8 @@ $(function () {
 
             // Trigger the charts 
             var url = document.URL;
-            url = url + "pc/"
+            if(url.indexOf('pc/') == -1)
+                url = url + "pc/"
             window.location.assign(url);
             
 

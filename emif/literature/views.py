@@ -25,15 +25,17 @@ from django.conf import settings
 
 from django.http import *
 
-from searchengine.search_indexes import CoreEngine
+from fingerprint.models import Fingerprint, Answer
 
-from questionnaire.models import Question
+from questionnaire.models import Question, Questionnaire
 
 from literature.utils import dict_union
 
 import json
 
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+
+from public.utils import hasFingerprintPermissions
 
 def literature_database_info_initial(request, fingerprint_id, template_name='literature_info.html'):
     return literature_database_info(request, fingerprint_id, 1, template_name)
@@ -43,15 +45,17 @@ def literature_database_info_initial(request, fingerprint_id, template_name='lit
 # the questionnaire type doesn't have publications widget
 def literature_database_info(request, fingerprint_id, page, template_name='literature_info.html'):
 
-    c = CoreEngine()
-
-    results = c.search_fingerprint("id:" + fingerprint_id)
+    if not hasFingerprintPermissions(request, fingerprint_id):
+        return HttpResponse("Access forbidden",status=403)
 
     publications = []
+    try:
+        fingerprint = Fingerprint.objects.get(fingerprint_hash=fingerprint_id)
 
-    if(len(results) == 1):
-        #getListPublications(results.docs[0])
-        publications = getListPublications(results.docs[0])
+        publications = getListPublications(fingerprint)
+
+    except Fingerprint.DoesNotExist:
+        print "--- Literature Error: fingerprint doesnt exist"
 
     myPaginator = Paginator(publications, 10)
     try:
@@ -59,7 +63,6 @@ def literature_database_info(request, fingerprint_id, page, template_name='liter
     except PageNotAnInteger, e:
         pager =  myPaginator.page(1)
     ## End Paginator ##
-
 
     return render(request, template_name, {'request': request, 'fingerprint_id': fingerprint_id, 'publications': pager})
 
@@ -71,18 +74,19 @@ def getListPublications(database):
 
 
     # first we find the questionnaire type 
-    pubquestions = Question.objects.filter(type='publication')
+    pubquestions = Question.objects.filter(type='publication', questionset__questionnaire=database.questionnaire)
 
     # we then get the field values themselves
     publications = []
     for pubq in pubquestions:
-            print pubq.slug
             string_publications = None
 
+            string_publications = "[]"
             try:
-                string_publications = database[pubq.slug+'_t']
+                string_publications = Answer.objects.get(fingerprint_id=database, question=pubq).data
 
-            except KeyError:
+            except Answer.DoesNotExist:
+                print "-- Literature Error: Couldnt find answer for publications question"
                 pass
 
             # If we actually have publications defined

@@ -4,7 +4,7 @@ from django.contrib.auth.models import User
 
 from searchengine.search_indexes import generateFreeText, setProperFields, CoreEngine
 
-from django.utils import timezone    
+from django.utils import timezone
 
 from notifications.models import Notification
 from notifications.services import sendNotification
@@ -36,7 +36,7 @@ def saveFingerprintAnswers(qlist_general, fingerprint_id, questionnaire, user, e
         for qs_aux, qlist in qlist_general:
             for question, qdict in qlist:
                 value = getAnswerValue(question, qdict)
-                
+
                 comment = getComment(question, extra_fields)
 
                 #print question.slug_fk.slug1 + ": '"+value+"' Comment: " + str(comment)
@@ -68,13 +68,13 @@ def saveFingerprintAnswers(qlist_general, fingerprint_id, questionnaire, user, e
                             if versionhead == None:
                                 # find out if we already have other revisions, if not revision starts at 1
                                 revision = None
-                                
-                                try: 
+
+                                try:
                                     last_revision = FingerprintHead.objects.filter(fingerprint_id=fingerprint).order_by('-id')[0]
 
                                     revision = last_revision.revision+1
                                 except:
-                                    revision = 1                                    
+                                    revision = 1
 
                                 versionhead = FingerprintHead(fingerprint_id=fingerprint, revision=revision)
 
@@ -90,11 +90,11 @@ def saveFingerprintAnswers(qlist_general, fingerprint_id, questionnaire, user, e
                         #print "NEW: "
                         #print this_ans
                         this_ans.save()
-                
+
         return checkMandatoryAnswers(fingerprint)
 
 
-        # format for answers : Answer(question=question, data=data, comment=comment, fingerprint_id=fingerprint_id) 
+        # format for answers : Answer(question=question, data=data, comment=comment, fingerprint_id=fingerprint_id)
 
 def getComment(question, extra_fields):
 
@@ -133,7 +133,7 @@ def getAnswerValue(question, qdict):
 
         elif qdict.has_key('choices'):
             #import pdb
-            #pdb.set_trace()     
+            #pdb.set_trace()
             choices = qdict['choices']
             qv = ""
             try:
@@ -144,14 +144,14 @@ def getAnswerValue(question, qdict):
                 pass
 
             value = qv
-            
+
             do_again = False
             try:
                 if len(choices[0])==3:
                     for choice, unk, checked  in choices:
                         if checked == " checked":
-                            value = value + "#" + choice.value   
-                            
+                            value = value + "#" + choice.value
+
                 elif len(choices[0])==4:
                     for choice, unk, checked, _aux  in choices:
                         if checked == " checked":
@@ -159,14 +159,14 @@ def getAnswerValue(question, qdict):
                                 value = value + "#" + choice.value + "{" + _aux +"}"
                             else:
                                 value = value + "#" + choice.value
-                            
+
 
                 elif len(choices[0])==2:
                     for checked, choice  in choices:
                         # print("checked" + str(checked))
                         if checked:
                             value = value + "#" + choice.value
-                            
+
             except:
                 do_again = True
 
@@ -174,9 +174,9 @@ def getAnswerValue(question, qdict):
                 for checked, choice  in choices:
                     # print("checked" + str(checked))
                     if checked:
-                        
+
                         value = value + "#" + choice.value
-                        
+
 
             # print("choice value " + value)
 
@@ -193,7 +193,7 @@ def getAnswerValue(question, qdict):
                     if val:
                         value = value + "||" + val
 
-        
+
         else:
             pass
 
@@ -209,9 +209,9 @@ def getAnswerValue(question, qdict):
 def updateFingerprint(fingerprint_id, questionnaire, user):
 
     def getUser(user):
-        try: 
+        try:
             user = User.objects.get(username=user)
-            
+
             return user
 
         except User.DoesNotExist:
@@ -236,12 +236,12 @@ def updateFingerprint(fingerprint_id, questionnaire, user):
             print "-- ERROR: Could not save fingerprint because user '"+user+"' does not exist."
         elif questionnaire == None or not isinstance(questionnaire, Questionnaire):
             print "-- ERROR: You must pass a valid questionnaire object to save a fingerprint."
-        else:                     
+        else:
             # At this point the description isnt being used (since there's no way to add descriptions to a fingerprint on the gui)
-            fingerprint = Fingerprint(fingerprint_hash=fingerprint_id, 
-                description="", 
-                questionnaire=questionnaire, 
-                last_modification=timezone.now(), 
+            fingerprint = Fingerprint(fingerprint_hash=fingerprint_id,
+                description="",
+                questionnaire=questionnaire,
+                last_modification=timezone.now(),
                 created=timezone.now(),
                 owner=user_fk)
             fingerprint.save()
@@ -287,6 +287,11 @@ def unindexFingerprint(fingerprint_id):
     c.delete(fingerprint_id)
 
 
+def is_if_yes_no(question):
+    return question.type in 'choice-yesno' or \
+            question.type in 'choice-yesnocomment' or \
+            question.type in 'choice-yesnodontknow'
+
 def indexFingerprint(fingerprint_id):
     try:
         fingerprint = Fingerprint.objects.get(fingerprint_hash=fingerprint_id)
@@ -303,6 +308,7 @@ def indexFingerprint(fingerprint_id):
 
         d['user_t'] = unique_users_string(fingerprint)
 
+        adicional_text = ""
 
 
         # Add answers
@@ -312,21 +318,25 @@ def indexFingerprint(fingerprint_id):
             # We try to get permissions preferences for this question
             permissions = getPermissions(fingerprint_id, QuestionSet.objects.get(id=answer.question.questionset.id))
 
-            if permissions.allow_indexing:
-                setProperFields(d, answer.question, answer.question.slug_fk.slug1, answer.data)
+            slug = answer.question.slug_fk.slug1
+
+            if permissions.allow_indexing or slug == 'database_name':
+                setProperFields(d, answer.question, slug, answer.data)
+                if is_if_yes_no(answer.question) and 'yes' in answer.data:
+                    adicional_text += answer.question.text+ " "
                 if answer.comment != None:
-                    d['comment_question_'+answer.question.slug_fk.slug1+'_t'] = answer.comment
-            
-        
-        d['text_t']= generateFreeText(d)
-        
+                    d['comment_question_'+slug+'_t'] = answer.comment
+
+
+        d['text_t']= generateFreeText(d) +  " " + adicional_text
+
         c = CoreEngine()
 
         results = c.search_fingerprint("id:"+fingerprint_id)
         if len(results) == 1:
             # Delete old entry if any
             c.delete(results.docs[0]['id'])
-        
+
         c.index_fingerprint_as_json(d)
 
     # In case is a new one, create it
@@ -353,7 +363,7 @@ def unique_users_string(fingerprint):
 def findName(fingerprint):
     name = ""
     try:
-        name_ans = Answer.objects.get(question__slug_fk__slug1='database_name', fingerprint_id=fingerprint) 
+        name_ans = Answer.objects.get(question__slug_fk__slug1='database_name', fingerprint_id=fingerprint)
 
         name = name_ans.data
 
@@ -379,9 +389,9 @@ def getPermissions(fingerprint_id, question_set):
         permissions = QuestionSetPermissions(fingerprint_id=fingerprint_id, qs=question_set, visibility=0,
          allow_printing=True, allow_indexing=True, allow_exporting=True)
         permissions.save()
-            
+
     except QuestionSetPermissions.MultipleObjectsReturned:
-        print "Error retrieved several models for this questionset, its impossible, so something went very wrong."    
+        print "Error retrieved several models for this questionset, its impossible, so something went very wrong."
 
     return permissions
 

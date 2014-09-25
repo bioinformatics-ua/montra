@@ -194,6 +194,8 @@ function setsaveqs(id, fingerprint_id, q_id, mode) {
             $("#loading-error-message").fadeOut('fast');
             errornavigator.reset();
 
+            advValidator.reload();
+
             var list_invalid = advValidator.validateFormContext(e, self);
             //console.log(list_invalid);
 
@@ -213,6 +215,7 @@ function setsaveqs(id, fingerprint_id, q_id, mode) {
 
                         posting.done(function(data) {
                             $("#loading-message").fadeOut('fast');
+                            $("#success-message").fadeIn('fast').delay(2000).fadeOut('fast');
                             formHasChanged = false;
 
                             if (data.mandatoryqs && data.mandatoryqs != -1 && data.mandatoryqs != id[1]) {
@@ -346,6 +349,8 @@ function questionsets_handle(id_questionset, fingerprint_id, q_id, mode) {
     $('#active_qs').val(id_questionset);
     $('#active_qs_sortid').val(id[1]);
 
+    advValidator.reload();
+
     // First we get the previous form
     var previous_id = $('.questionset:not(.hide)').first().attr('id').split('_')[1];
     var current_form = $('#qform' + previous_id);
@@ -377,6 +382,7 @@ function questionsets_handle(id_questionset, fingerprint_id, q_id, mode) {
 
                     posting.done(function(data) {
                         $("#loading-message").fadeOut('fast');
+                        $("#success-message").fadeIn('fast').delay(2000).fadeOut('fast');
                         formHasChanged = false;
 
                         if (data.mandatoryqs && data.mandatoryqs != -1) {
@@ -410,15 +416,19 @@ function questionsets_handle(id_questionset, fingerprint_id, q_id, mode) {
                         }
                         console.log(mode);
                         console.log(findPath(mode));
-                        if (mode == QsType.SEARCH)
+                        if (mode == QsType.SEARCH){
                             if(q_id != null){
                               History.pushState(null, null, findPath(mode) + fingerprint_id + "/" + obj.id.replace("qs_", "")+"/"+q_id);
                             } else {
                               History.pushState(null, null, findPath(mode) + fingerprint_id + "/" + obj.id.replace("qs_", ""));
                             }
-                            
-                        else
-                            History.pushState(null, null, findPath(mode) + q_id + "/" + obj.id.replace("qs_", ""));
+                        }
+                        else{
+                            if (mode == QsType.EDIT)
+                                History.pushState(null, null, findPath(mode)+ fingerprint_id +"/" + q_id + "/" + obj.id.replace("qs_", ""));
+                            else
+                                History.pushState(null, null, findPath(mode) + q_id + "/" + obj.id.replace("qs_", ""));
+                        }
 
                         advValidator.reload();
                     } else {

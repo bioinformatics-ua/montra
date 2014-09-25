@@ -30,7 +30,6 @@ from rest_framework import renderers
 from rest_framework.authentication import TokenAuthentication
 
 from rest_framework.authentication import SessionAuthentication, BasicAuthentication
-from rest_framework.permissions import IsAuthenticated
 
 from rest_framework.decorators import api_view, parser_classes
 from rest_framework.response import Response
@@ -83,6 +82,8 @@ from population_characteristics.models import Characteristic
 import time
 from django.utils import timezone
 from datetime import timedelta
+
+from public.utils import hasFingerprintPermissions
 
 class JSONResponse(HttpResponse):
     """
@@ -177,6 +178,36 @@ class EmailCheckView(APIView):
         return response
 
 ############################################################
+##### RemovePermissions - Web services
+############################################################
+
+
+class RemovePermissionsView(APIView):
+    authentication_classes = (SessionAuthentication, BasicAuthentication)
+    permission_classes = (IsAuthenticated,)    
+    def post(self, request, *args, **kw):
+        id = request.POST.get('id', -1)
+        hash = request.POST.get('hash')
+        valid = False
+
+        # Verify if it is a valid email
+        if id != None and id != -1 and hash != None:
+            try: 
+                finger = Fingerprint.objects.get(fingerprint_hash=hash)
+
+                username = finger.shared.get(id=id)
+
+                finger.shared.remove(username)
+
+
+                return Response({'success': True}, status=status.HTTP_200_OK)
+
+            except Fingerprint.DoesNotExist:
+                pass             
+               
+        return Response(result, status=status.HTTP_403_OK)
+
+############################################################
 ##### Population Check if exists - Web services
 ############################################################
 class PopulationCheckView(APIView):
@@ -214,25 +245,25 @@ class PopulationCheckView(APIView):
 
 
 class GetFileView(APIView):
-
-    authentication_classes = (SessionAuthentication, BasicAuthentication)
-    permission_classes = (IsAuthenticated,)
-
     def post(self, request, *args, **kw):
-        if request.user.is_authenticated():
-            # first we get the email parameter
-            name = request.POST.get('filename', '')
-            revision = request.POST.get('revision', '')
 
-            # Verify if we have name and revision
-            if not (name == None or name=='' or revision == None or revision == ''):
 
-                print name 
-                print revision
+        if request.POST.get('publickey') != "" and not hasFingerprintPermissions(request, request.POST.get('fingerprint')):
+            return HttpResponse("Access forbidden",status=403)
 
-                path_to_file = os.path.join(os.path.abspath(PATH_STORE_FILES), revision+name)
-                print path_to_file
-                return respond_as_attachment(request, path_to_file, name)
+        # first we get the email parameter
+        name = request.POST.get('filename', '')
+        revision = request.POST.get('revision', '')
+
+        # Verify if we have name and revision
+        if not (name == None or name=='' or revision == None or revision == ''):
+
+            print name 
+            print revision
+
+            path_to_file = os.path.join(os.path.abspath(PATH_STORE_FILES), revision+name)
+            print path_to_file
+            return respond_as_attachment(request, path_to_file, name)
 
         return Response({}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -341,22 +372,17 @@ class AddPublicLinkView(APIView):
         if request.user.is_authenticated():
             # first we get the email parameter
             fingerprint_id = request.POST.get('fingerprint_id', '')
-
+            description = request.POST.get('description', '')
 
             try:
                 fingerprint = Fingerprint.objects.get(fingerprint_hash=fingerprint_id)
 
-                # add only if necessary, try to get first...
-                share = None
-                try:
-                    share = PublicFingerprintShare.objects.get(fingerprint=fingerprint, user=request.user)
-
-                except PublicFingerprintShare.DoesNotExist:
-                    share = createFingerprintShare(fingerprint_id, request.user)
+                share = createFingerprintShare(fingerprint_id, request.user, description=description)
 
                 return Response({
                                     'hash': str(share.hash),
-                                    'id'  : share.id
+                                    'id'  : share.id,
+                                    'description': share.description
                                 }, status=status.HTTP_200_OK)
 
             except Fingerprint.DoesNotExist:

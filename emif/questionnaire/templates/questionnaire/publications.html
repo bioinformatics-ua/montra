@@ -284,7 +284,7 @@ function PublicationWidget ()
         var _publink = cleanUp($('[id="question_{{ question.number }}_publink"]').val());  
 
         if( !pw{{ question.number|removedots }}.validate_form(_pubmedid, _pubtitle, _pubjournal, _pubyear, _pubauthors, _publink) ){
-            alert('Error validating publication. You must fill the mandatory fields.');
+            bootbox.alert('Error validating publication. You must fill the mandatory fields.');
             return;
         }
         //selected_row != null && $('#'+selected_row).length !== 0 

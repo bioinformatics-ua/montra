@@ -39,6 +39,7 @@ class Migration(DataMigration):
             for doc in documents:
                 old = None
                 try:
+                    del doc['_version_']
                     old = doc['If_yes_:_repeated_measurements__t']
                     del doc['If_yes_:_repeated_measurements__t']
                 except:
@@ -110,7 +111,7 @@ class Migration(DataMigration):
 
         for doc in documents:
 
-            ignorelist = ['id', 'type_t', '_version_', 'text_t', 'date_last_modification_t', 'user_t', 'created_t']
+            ignorelist = ['id', 'type_t', '_version_', 'text_t', 'date_last_modification_t', 'user_t', 'created_t', 'list_of_peer_reviewed_papers_based_on_your_data_ba_t']
             this_id = doc['id']
             
             print "-- Processing ---------------------- " + this_id + "\n"
@@ -156,8 +157,16 @@ class Migration(DataMigration):
                         if question == None:
                             print "EMPTY KEY ON:"+key   
 
-                        ans = Answer(question=question, data=data, comment=comment, fingerprint_id=fingerprint_id) 
-                        ans.save()     
+                        try:
+                            existing_answer = Answer.objects.get(question=question, fingerprint_id=fingerprint_id)
+                            
+                            existing_answer.data = data
+                            existing_answer.comment = comment
+                            existing_answer.save()
+
+                        except Answer.DoesNotExist:
+                            ans = Answer(question=question, data=data, comment=comment, fingerprint_id=fingerprint_id) 
+                            ans.save()     
             print "---------------------------------------- "          
             print " "
         

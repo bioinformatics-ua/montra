@@ -35,6 +35,8 @@ from django.http import *
 
 from dateutil.tz import tzutc
 
+from public.utils import hasFingerprintPermissions
+
 UTC = tzutc()
 
 def serialize_date(dt):
@@ -51,7 +53,10 @@ def serialize_date(dt):
     return dt.isoformat() + 'Z'
 
 
-def jerboa_list_values(request, var, row, fingerprint_id, template_name='documents_upload_form.html'):
+def jerboa_list_values(request, var, row, fingerprint_id, revision, template_name='documents_upload_form.html'):
+
+    if not hasFingerprintPermissions(request, fingerprint_id):
+        return HttpResponse("Access forbidden",status=403)
 
     filters = []
 
@@ -59,18 +64,20 @@ def jerboa_list_values(request, var, row, fingerprint_id, template_name='documen
         # Get the filters to apply.
 
         filters = {}
-        
         myRq = dict(request.POST.lists())
+
         for i in myRq:
-            filters[i[0:-2]] = myRq[i]
+            if i == 'publickey':
+                continue
+            filters[i[8:-3]] = myRq[i]
 
-            filters[i[0:-2]] = myRq[i]
+            filters[i[8:-3]] = myRq[i]
 
-        
+        print filters    
     
 
     pc = PopulationCharacteristic(None)
-    values = pc.get_variables(var, row, fingerprint_id, filters=filters)
+    values = pc.get_variables(var, row, fingerprint_id, revision, filters=filters)
     data = {'values': values}
     response = JSONResponse(data, mimetype="application/json")
     response['Content-Disposition'] = 'inline; filename=files.json'
@@ -134,6 +141,9 @@ def comments(request, fingerprint_id=None, chart_id=None, comment_id=None):
 
 def filters(request, var, fingerprint_id, template_name='documents_upload_form.html'):
 
+    if not hasFingerprintPermissions(request, fingerprint_id):
+        return HttpResponse("Access forbidden",status=403)
+
     pc = PopulationCharacteristic(None)
     values = pc.filters(var, fingerprint_id)
     _values = []
@@ -154,8 +164,10 @@ def generic_filter(request, param, template_name='documents_upload_form.html'):
     return response
 
 def get_settings(request, runcode):
-    
-    if (runcode=="COMPARE"):
+    if not hasFingerprintPermissions(request, runcode):
+        return HttpResponse("Access forbidden",status=403)
+
+    if (runcode=="COMPARE/" or runcode == "COMPARE"):
         return get_compare_settings(request)
     pc = PopulationCharacteristic(None)
     values = pc.get_settings()
@@ -166,6 +178,9 @@ def get_settings(request, runcode):
     return response
 
 def list_jerboa_files(request, fingerprint):
+
+    if not hasFingerprintPermissions(request, fingerprint):
+        return HttpResponse("Access forbidden",status=403)
 
     # List the Jerboa files for a particular fingerprint
     jerboa_files = Characteristic.objects.filter(fingerprint_id=fingerprint)
@@ -189,6 +204,6 @@ def list_jerboa_files(request, fingerprint):
 def compare(request):
     return handle_compare(request)
 
-def compare_values(request,  var, row, fingerprint_id):
-    return handle_compare_values(request, var, row, fingerprint_id)
+def compare_values(request,  var, row, fingerprint_id, revision):
+    return handle_compare_values(request, var, row, fingerprint_id, revision)
 

@@ -20,7 +20,8 @@ function initializePaginatorSorter(base_filter, selected_name, selected_value, e
         $("#comparabtn").removeAttr('disabled');
         $("#comparabtn").bind('click',function(e)
         { 
-          postComparison();
+          $('#compare_form').attr('action', 'resultscomp');
+          postComparison(true);
           return false;
         });
 
@@ -36,10 +37,10 @@ function initializePaginatorSorter(base_filter, selected_name, selected_value, e
     
 
 }
-function setRefineEvent(is_advanced){
+function setRefineEvent(is_advanced, query_type, query_id){
       $("#refine_search_btn").click( function(){
       if(is_advanced)
-        window.location.replace($('#base_link').prop('href')+"advancedSearch/{{request.session.query_type}}/1/{{request.session.query_id}}");
+        window.location.replace($('#base_link').prop('href')+"advancedSearch/"+query_type+"/1/"+query_id);
       else
         $("input[name=query]").focus();
 
@@ -107,7 +108,7 @@ $("#comparabtn").bind('click',function(e)
         });
 
 //$("#comparabtn").unbind();
-function postComparison(){
+function postComparison(isdbs){
   //$('#result_form').submit();
   //console.log('A: '+a);
   //console.log('A-plugin: '+a.plugin);
@@ -127,8 +128,9 @@ function postComparison(){
       ids.push(id);
       
     });
-    checkExistsPopulation(ids); 
-    //$('#submitdbsimulate').click();
+    if(!isdbs)
+      checkExistsPopulation(ids); 
+    else $('#submitdbsimulate').click();
   }
   
 }
@@ -175,7 +177,8 @@ $('.checkbox').click(function()
       $("#comparabtn").attr('disabled', false);
          $("#comparabtn").bind('click',function(e)
         { 
-          postComparison();
+          $('#compare_form').attr('action', 'resultscomp');
+          postComparison(true);
           return false;
         });    
     }

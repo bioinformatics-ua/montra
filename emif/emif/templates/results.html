@@ -16,7 +16,7 @@
         {% endif %}
     {% endif %}
   {% elif alldatabases %}
-    {% breadcrumb "All databases" "alldatabases" %}
+    {% breadcrumb "All" "alldatabases" %}
   {% elif databases %}
     {% breadcrumb "Personal" "databases" %}
   {% endif %}
@@ -100,7 +100,7 @@
     <thead>
         <tr>
             <th class="sorter-database_name sorter {%if "icon-minus" not in sort_params.database_name.icon %}selected-sorter{% endif %}"  onclick="a.onClick('database_name', '{{sort_params.database_name.next}}');">
-            <div class="pull-left">Acronym</div>
+            <div class="pull-left">Name</div>
                  <div class="pull-right"><i class="{{sort_params.database_name.icon}}"></i></div>
             </th>
             <th class="sorter-institution sorter {%if "icon-minus" not in sort_params.institution.icon %}selected-sorter{% endif %}"  onclick="a.onClick('institution', '{{sort_params.institution.next}}');">
@@ -147,7 +147,7 @@
               <select id="type_filter" class="selectpicker" def_value="{{sort_params.type.filter}}">
                 <option value="">None</option>
                 <option value="adcohort">AD Cohort</option>
-                <option value="observationaldatasources">Observational Data Sources</option>
+                <option value="observationaldatasources">Observational Data</option>
               </select>
           </td>
           <td class="table_filter select_line">
@@ -251,7 +251,8 @@ $(function(){
   initializePaginatorSorter('{{sort_params.base_filter}}', '{{sort_params.selected_name}}', '{{sort_params.selected_value}}', '{{sort_params.extraObjects|safe}}');
   
 {% endif %}
-  setRefineEvent({% if isAdvanced %} true {% else %} false {% endif %});  
+
+  setRefineEvent({% if isAdvanced %} true, '{{request.session.query_type}}', '{{request.session.query_id}}' {% else %} false, null, null {% endif %});  
 
  {% if isAdvanced %}
     setBooleanPlugin('{{request.session.serialization_query}}', '{{request.session.query_type}}', '{{request.session.query_id}}');

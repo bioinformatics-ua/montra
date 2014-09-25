@@ -26,14 +26,14 @@ from datetime import timedelta, date
 from emif.settings import PUBLIC_LINK_MAX_VIEWS, PUBLIC_LINK_MAX_TIME
 import uuid
 
-def createFingerprintShare(fingerprint_id, user):
+def createFingerprintShare(fingerprint_id, user, description=None):
     try: 
         fingerprint = Fingerprint.objects.get(fingerprint_hash=fingerprint_id)
         expiration_date = timezone.now() + timedelta(hours=PUBLIC_LINK_MAX_TIME)
 
         new_share = PublicFingerprintShare(fingerprint=fingerprint, user=user, 
             hash=uuid.uuid4(),
-            expiration_date=expiration_date, remaining_views=PUBLIC_LINK_MAX_VIEWS)
+            expiration_date=expiration_date, remaining_views=PUBLIC_LINK_MAX_VIEWS, description=description)
 
         new_share.save()
 

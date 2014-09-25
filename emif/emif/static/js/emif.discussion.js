@@ -31,7 +31,7 @@ function bindPostCommentHandler(firstname, lastname, username, owners, fingerpri
                         }
                     },
                     error: function (XMLHttpRequest, textStatus, errorThrown) {
-                        alert('Your comment was unable to be posted at this time.  We apologise for the inconvenience.');
+                        bootbox.alert('Your comment was unable to be posted at this time.  We apologise for the inconvenience.');
                         $('#submit_button').button('reset');
                         $('#fillForm').hide();
 

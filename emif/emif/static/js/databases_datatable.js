@@ -42,7 +42,7 @@ $(document).ready(function() {
         });
 
         if (qsets_selected.length == 0) {
-            alert("There's no questionsets selected. Please select at least one to see the datatable view.");
+            bootbox.alert("There's no questionsets selected. Please select at least one to see the datatable view.");
             $('#tabular_container').html('<div class="well pull-center">To see a tabular view of all databases, please choose a database type and the questionsets.</div>');
         } else {
             $('#tabular_container').html('<div class="well pull-center">Loading...</div>');
@@ -84,7 +84,7 @@ $(document).ready(function() {
 
 
         } else {
-            alert('Please, choose a database type and questionsets, before trying to export.')
+            bootbox.alert('Please, choose a database type and questionsets, before trying to export.')
         }
            
     });

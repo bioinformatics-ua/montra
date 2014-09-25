@@ -4,12 +4,9 @@
 {% load django_bootstrap_breadcrumbs %}
 
 {% block breadcrumbs %}
-        {% breadcrumb "Databases" "home" %}
-        {% breadcrumb "My Public Links" "" %}
-{% endblock %}
+        {{ block.super }}
+        {% breadcrumb "My Private Links" "" %}
 
-{% block toolbar %}
-    {% include "menu_toolbar.html" with collapse=collapseall %}
 {% endblock %}
 
 {% block content %}
@@ -17,22 +14,23 @@
     {% if added %}
         <div style="margin-top: 50px;" class="alert alert-success">
         <a class="close" data-dismiss="alert" href="#">&times;</a>
-          Public link created successfully.
+          Private link created successfully.
         </div>
     {% endif %}
     {% if deleted %}
         <div style="margin-top: 50px;" class="alert alert-danger">
         <a class="close" data-dismiss="alert" href="#">&times;</a>
-          Public link deleted successfully.
+          Private link deleted successfully.
         </div>
     {% endif %}
     <table class="table table-bordered table-striped">
         <thead>
             <tr>
-                <th>Fingerprint</th>
-                <th>Url Expiration date</th>
-                <th>Remaining Views</th>
-                <th>Manage</th>
+                <th>Database Acronym</th>
+                <th style="width: 150px;">Expiration Date</th>
+                <th style="width: 80px;">Views Left</th>
+                <th style="max-width: 300px;">Description</th>
+                <th style="width: 150px;">Manage</th>
             </tr>
         </thead>
         <tbody>
@@ -40,16 +38,17 @@
             {% for link in links %}
                 <tr>
                     <td><a href="fingerprint/{{link.share.fingerprint}}/1/">{{link.name}}</a></td>
-                    <td>{{link.share.expiration_date|date:"Y-M-d H:i:s"}}</td>
-                    <td>{{link.share.remaining_views}}</td>
-                    <td><a class="pub_link" href="public/fingerprint/{{link.share.hash}}">Public Link</a><a class="pull-right" href="public/fingerprint/delete/{{link.share.id}}">
+                    <td><center>{{link.share.expiration_date|date:"Y-m-d H:i:s"}}</center></td>
+                    <td><center>{{link.share.remaining_views}}</center></td>
+                    <td>{%if link.share.description %}{{link.share.description}}{% endif %}</td>
+                    <td><a class="pub_link" href="public/fingerprint/{{link.share.hash}}">Private Link</a><a class="pull-right" href="public/fingerprint/delete/{{link.share.id}}">
                         <img src="static/img/glyphicons_192_circle_remove.png" alt="Delete" />
 
                     </button></td>
                 </tr>
             {% endfor %}
         {% else %}
-            <tr><td colspan="4"><center>No database is currently shared publicly, you can share a database by using the "Create Public Link" dropdown on the menu toolbar above.</center></td></tr>
+            <tr><td colspan="5"><center>No database is currently shared, you can share a database by using the "Create Private Link" dropdown on the menu toolbar above.</center></td></tr>
         {% endif %}
         </tbody>
     </table>

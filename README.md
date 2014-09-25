@@ -63,7 +63,7 @@ EMIF Platform - Fingerprint Browser
 
         sudo apt-get install libpython-dev
         sudo apt-get install build-essential
-        sudo pip install PIL --allow-external PIL --allow-unverified PIL
+        pip install -r requirements.txt --allow-all-external --allow-unverified pil
 
 
 9.  Install celery and memcached
@@ -114,7 +114,7 @@ EMIF Platform - Fingerprint Browser
     
 17. Install requirements.txt
 
-        pip install -r requirements.txt
+        pip install -r requirements.txt --allow-all-external
 
     NOTE: git must be in environment variables and PIP have to be installed.
 
@@ -189,13 +189,15 @@ EMIF Platform - Fingerprint Browser
         python manage.py runserver 0.0.0.0:8000
 
 
+
+
 #### Developers
 
  * Luís A. Bastião Silva <bastiao@ua.pt>
- * Rui Mendes <ruidamendes@ua.pt>
+ * Ricardo Ribeiro <ribeiro.r@ua.pt> 
  * Tiago Godinho <tmgodinho@ua.pt>
- * Ricardo Ribeiro <ribeiro.r@ua.pt>
- * José Melo <melojms@gmail.com>
+ 
+ 
 
 #### Lead developer
 
@@ -204,5 +206,13 @@ EMIF Platform - Fingerprint Browser
 #### Project Leader
 
  * José Luis Oliveira <jlo@ua.pt>
+
+
+#### Past Developers
+
+ * Rui Mendes <ruidamendes@ua.pt>
+ * José Melo <melojms@gmail.com>
+
+
 
  Enjoy!

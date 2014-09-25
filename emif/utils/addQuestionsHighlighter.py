@@ -4,6 +4,9 @@ from django.shortcuts import render_to_response, get_object_or_404
 import sys
 import re
 
+from django.conf import settings
+
+
 p = re.compile("(\\d{1,2})(\.\\d{2})*$", re.L)
 
 #qsets = QuestionSet.objects.all()
@@ -27,11 +30,7 @@ print slugs
 
 import pysolr
 
-host1 = "localhost"
-port1 = str(8983)
-
-
-solr = pysolr.Solr('http://' +host1+ ':'+ port1+'/solr')
+solr = pysolr.Solr('http://' +settings.SOLR_HOST+ ':'+ settings.SOLR_PORT+settings.SOLR_PATH)
 start=0
 rows=100
 fl=''

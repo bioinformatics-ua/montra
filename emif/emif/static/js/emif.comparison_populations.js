@@ -21,7 +21,7 @@
 
 function postComparisonPopulations(){
     $('#compare_form').attr('action', 'population/compare');
-    postComparison();
+    postComparison(false);
 
    return true; 
 };
@@ -33,10 +33,10 @@ function checkExistsPopulation(fingerprint_ids){
 			if(data.contains_population){
 				$('#submitdbsimulate').click();
 			} else {
-				alert('There are some databases without population characteristics, can\'t compare them. Please check all databases have population characteristics.');
+				bootbox.alert('There are some databases without population characteristics, can\'t compare them. Please check all databases have population characteristics.');
 			}
 	}).fail(function( data ) {
-		alert('Failed validating database population characteristics.');
+		bootbox.alert('Failed validating database population characteristics.');
 	});	
 }
 
@@ -45,7 +45,7 @@ $(document).ready(function(){
     $("#comparabtnPC").bind('click',function(e)
         { 
 
-                event.preventDefault();
+        event.preventDefault();
 
 
           postComparisonPopulations();

@@ -24,6 +24,9 @@
         <link rel="shortcut icon" href="{{ STATIC_URL }}img/favicon.ico" type="image/x-icon" />
         <link rel="stylesheet" href="{{ STATIC_URL }}css/bootstrap.min.css">
         <link rel="stylesheet" href="{{ STATIC_URL }}font-awesome/css/font-awesome.min.css">
+
+        <link rel="stylesheet" href="{{ STATIC_URL }}css/vendor/jquery-ui-1.10.4.custom.min.css">
+
         <link href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet">
         <!-- IE 7 doesnt recognize awesome icons correctly... -->
         <!--[if IE]>
@@ -52,6 +55,9 @@
         <script src="{{ STATIC_URL }}js/vendor/jquery.canclear.js"></script>
         <script src="{{ STATIC_URL }}js/vendor/jquery.highlight.js"></script>
         <script src="{{ STATIC_URL }}js/vendor/jquery.history.js"></script>
+
+        <script src="{{ STATIC_URL }}js/vendor/bootbox.min.js"></script>
+
         <script type="application/javascript">
         // We need to configure this to be able to send requests by json with the csrftoken
         var csrftoken = $.cookie('csrftoken');
@@ -100,7 +106,7 @@
                             <a class="brand" href="">EMIF Catalogue</a>
                             {% if not readOnly %}
                             <div class="nav-collapse collapse">
-                                {% if request.user.is_authenticated %}
+                                {% if user.is_authenticated %}
                                 <ul class="nav" style="margin-right: 0 !important;">
                                     <li id="search_li" class="pull-left">
                                         <form id="quicksearch" class="navbar-search pull-left" method="POST" action="resultsdiff/1">{% csrf_token %}
@@ -116,6 +122,7 @@
                                 {% endif %}
                                 <div class="pull-right">
                                 <ul class="nav">
+
                                     {% if request.user.is_authenticated %}
                                     <li id="li_notifications" style="padding-right: 5px;" class="dropdown">
                                         <a href="" class="dropdown-toggle" data-toggle="dropdown">
@@ -148,7 +155,7 @@
                                                     </li>
                                                     <li class="divider"></li>
                                                     <li>
-                                                        <a href="public/fingerprint">Public Links</a>
+                                                        <a href="public/fingerprint">Private Links</a>
                                                     </li>
                                                 </ul>
                                             </li>
@@ -185,20 +192,22 @@
                                             {% endcomment %}
                                             
                                             <li class="divider"></li>
+                                            {% if profiles|isDataCustodian %}
                                             <li class="dropdown-submenu">
                                                 <a href="" onclick="return false;">Add New</a>
                                                 <ul class="dropdown-menu">
-                                                    {% if request.user.get_profile %}
-                                                    {% show_fingerprints_interests request.user %}
+                                                    {% if user.get_profile %}
+                                                    {% show_fingerprints_interests user %}
                                                     {% else %}
                                                     {% show_fingerprints %}
                                                     {% endif %}
                                                 </ul>
                                             </li>
+                                            {% endif %}
                                             <li class="dropdown-submenu">
                                                 <a href="" onclick="return false;">Search</a>
                                                 <ul class="dropdown-menu">
-                                                    {% show_fingerprints_for_search %}
+                                                    {% show_fingerprints_for_search request.user %}
                                                     <li class="divider"></li>
                                                     <li><a tabindex="-1" href="advsearch/history">Search History</a></li>
                                                 </ul>
@@ -214,7 +223,7 @@
                                     </li>
                                     {% endif %}
                                     {% block headerlogin %}
-                                    {% if not request.user.is_authenticated %}
+                                    {% if not user.is_authenticated %}
                                     <li>
                                         <form class="navbar-form pull-right" method="post" action="accounts/signin/">
                                             {% csrf_token %}
@@ -227,15 +236,17 @@
                                     <li>
                                         <div class="btn-group">
                                             <button class="btn btn-success dropdown-toggle" data-toggle="dropdown" tabindex="-1">
-                                            {% if not request.user.first_name and not request.user.last_name %}
-                                            <i class="icon-user"></i><small>&nbsp; {{request.user.username|ellipsis:30}} &nbsp;</small><i class="icon-angle-down"></i>
+                                            {% if not user.first_name and not user.last_name %}
+                                            <i class="icon-user"></i><small>&nbsp; {{user.username|ellipsis:30}} &nbsp;</small><i class="icon-angle-down"></i>
                                             {% else %}
-                                            <i class="icon-user"></i><small>&nbsp; {{request.user.first_name|add:" "|add:request.user.last_name|ellipsis:30}} &nbsp;</small><i class="icon-angle-down"></i>
+                                            <i class="icon-user"></i><small>&nbsp; {{user.first_name|add:" "|add:user.last_name|ellipsis:30}} &nbsp;</small><i class="icon-angle-down"></i>
                                             {% endif %}
                                             </button>
                                             <ul class="dropdown-menu">
-                                                {% show_profiles request.user %}
-                                                {% show_fingerprints_interests_profile request.user %}
+                                                {% show_profiles user %}
+                                                {% show_fingerprints_interests_profile user %}
+                                                <li class="divider"></li>
+                                                <li>{% show_subscription user %}</li>
                                                 <li class="divider"></li>
                                                 <li><a href="accounts/profile_edit/" class="navbar-link"><i class="icon-edit"></i>&nbsp;Edit Profile</a></li>
                                                 <li><a href="accounts/signout/" class="navbar-link"><i class="icon-signout"></i>&nbsp;Sign out</a></li>
@@ -244,7 +255,7 @@
                                     </li>
                                     {% endif %}
                                     
-                                    {% if not request.user.is_authenticated %}
+                                    {% if not user.is_authenticated %}
                                     <li>
                                         <div class="btn-group">
                                             <button class="btn dropdown-toggle" data-toggle="dropdown" style="margin-left: 2px;" tabindex="-1"><i class="icon-align-justify"></i></button>
@@ -276,7 +287,7 @@
                 <div style="padding-top: 60px;" class="container">
                     {% if breadcrumb %}
                     {% block breadcrumbs %}
-                    {% breadcrumb "Databases" "databases" %}
+                    {% breadcrumb "Home" "home" %}
                     {% endblock %}
                     <div class="pull-left">
                         {% render_breadcrumbs %}
@@ -300,7 +311,7 @@
         <div class="footer" class="row" style="clear: both; text-align:center">
             <hr />
             <footer>
-                {% if request.user.is_authenticated %}
+                {% if user.is_authenticated %}
                 <a href="controlversion/history">History</a> ·
                 {%endif%}
                 <a href="feedback">Feedback</a> ·
