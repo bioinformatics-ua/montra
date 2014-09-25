@@ -157,7 +157,7 @@ def document_form_view(request, runcode, qs, activetab='summary', readOnly=False
     apiinfo = json.dumps(get_api_info(runcode))
     owner_fingerprint = False
 
-    print request.user.username
+    #print request.user.username
 
     for owner in db_owners.split(" "):
         #print request.user.username

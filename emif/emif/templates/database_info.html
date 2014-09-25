@@ -297,6 +297,10 @@ var global_fingerprint_id = '{{fingerprint_id}}';
 var global_public_key = '{{public_key.hash}}';
 var global_is_authenticated = {% if request.user.is_authenticated %}true{% else %}false{% endif %};
 
+{% if owner_fingerprint %}
+var global_owner = true;
+{% endif %}
+
 {%if latest_pop %}
 var global_revision = '{{latest_pop.revision}}';
 {% endif %}
