@@ -3,6 +3,7 @@
 {% load django_bootstrap_breadcrumbs %}
 {% load staticfiles %}
 {% with STATIC_URL=STATIC_URL BASE_URL=BASE_URL %}
+{% load compress %}
 
 <!DOCTYPE html>
 <!--[if lt IE 7]>      <html class="no-js ns lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
@@ -22,12 +23,12 @@
         <meta name="description" content="EMIF Catalogue">
         <meta name="viewport" content="width=device-width">
         <link rel="shortcut icon" href="{{ STATIC_URL }}img/favicon.ico" type="image/x-icon" />
+
+        {% compress css %}
         <link rel="stylesheet" href="{{ STATIC_URL }}css/bootstrap.min.css">
-        <link rel="stylesheet" href="{{ STATIC_URL }}font-awesome/css/font-awesome.min.css">
 
         <link rel="stylesheet" href="{{ STATIC_URL }}css/vendor/jquery-ui-1.10.4.custom.min.css">
 
-        <link href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet">
         <!-- IE 7 doesnt recognize awesome icons correctly... -->
         <!--[if IE]>
         <link rel="stylesheet" media="all" href="{{ STATIC_URL }}font-awesome/css/font-awesome-ie7.min.css" />
@@ -42,10 +43,20 @@
         </style>
         <link rel="stylesheet" href="{{ STATIC_URL }}css/bootstrap-responsive.min.css">
         <link rel="stylesheet" href="{{ STATIC_URL }}css/main.css" />
+        {% block styleinclude %}
+        {% endblock %}
         <style type="text/css">
         {% block styleextra %}
         {% endblock %}
         </style>
+        <link rel="stylesheet" href="{{ STATIC_URL }}font-awesome/css/font-awesome.min.css">
+        <link href="{{ STATIC_URL }}font-awesome-4.0.3/css/font-awesome.min.css" rel="stylesheet">
+
+
+        {% endcompress %}
+
+        {% compress js %}
+
         <script src="{{ STATIC_URL }}js/vendor/inheritance.js"></script>
         <script src="{{ STATIC_URL }}js/vendor/modernizr-2.6.2.min.js"></script>
         <script src="{{ STATIC_URL }}js/vendor/jquery-1.9.1.min.js"></script>
@@ -80,6 +91,8 @@
         <![endif]-->
         {% block headextra %}
         {% endblock %}
+        {% endcompress %}
+
     </head>
     <body>
         <div class="wrapper">
@@ -306,6 +319,10 @@
                 <p>&copy; EMIF Catalogue v{% get_version %}<br/><small id="supportability">This website is optimised to Safari, Chrome, Firefox, Opera and IE9+. <!--It runs in IE7-IE8, but it has low performance and no enhanced features.--></small></p>
             </footer>
         </div>
+
+        {% block uncompressed_js %}
+        {% endblock %}
+        {% compress js %}
         <!-- /container -->
         <script src="{{ STATIC_URL }}js/main.js"></script>
         <!-- backbone -->
@@ -317,10 +334,6 @@
         {% endcomment %} 
         {% block scriptextraincludes %} 
         {% endblock %}
-        <script type="text/javascript">
-        {% block scriptextra %}
-        {% endblock %}
-        </script>
         <script type="text/javascript">
         var _gaq = _gaq || [];
         _gaq.push(['_setAccount', 'UA-38876251-1']);
@@ -339,6 +352,13 @@
         s.parentNode.insertBefore(ga, s);
         })();
         </script>
+        {% endcompress %}
+
+        <script type="text/javascript">
+        {% block scriptextra %}
+        {% endblock %}
+        </script>
+
     </body>
 </html>
 

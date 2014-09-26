@@ -11,11 +11,22 @@
     {% include "menu_toolbar.html" with collapse=collapseall %}
 {% endblock %}
 
-{% block headextra %}
+{% block styleinclude %}
     <link rel="stylesheet" href="{{ STATIC_URL}}css/vendor/jquery.gridster.css" />
 
     <link rel="stylesheet" href="{{ STATIC_URL}}css/emif.dashboard.css" />
+{% endblock %}
 
+{% block uncompressed_js %}
+    {% if user.is_staff %}
+        <script src="{{ STATIC_URL}}js/vendor/widgets/widget.admin.lastusers.js"></script>
+        <script type="text/javascript">
+            var is_staff = true; 
+        </script>
+    {% endif %}
+{% endblock %}
+
+{% block headextra %}
     <script src="{{ STATIC_URL}}js/vendor/jquery.gridster.min.js"></script>
     <script src="{{ STATIC_URL}}js/vendor/jquery.tagcloud.js"></script>
 
@@ -25,13 +36,6 @@
     <script src="{{ STATIC_URL}}js/vendor/widgets/widget.userstats.js"></script>
     <script src="{{ STATIC_URL}}js/vendor/widgets/widget.mostviewed.js"></script>
     <script src="{{ STATIC_URL}}js/vendor/widgets/widget.tagcloud.js"></script>
-
-    {% if user.is_staff %}
-        <script src="{{ STATIC_URL}}js/vendor/widgets/widget.admin.lastusers.js"></script>
-        <script type="text/javascript">
-            var is_staff = true; 
-        </script>
-    {% endif %}
     <script src="{{ STATIC_URL}}js/emif.dashboard.js"></script>
 {% endblock %}
 

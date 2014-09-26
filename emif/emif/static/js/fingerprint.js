@@ -10,7 +10,7 @@ var getPlacement = function($el) {
         horizPlacement = horiz > 0 ? 'right' : 'left',
         placement = Math.abs(horiz) > Math.abs(vert) ? horizPlacement : vertPlacement;
     return placement;
-}
+};
 
     function help_text_popover() {
         $('.qtext').each(function() {
