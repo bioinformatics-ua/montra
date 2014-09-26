@@ -28,11 +28,9 @@ $(function(){
                 dashzone.addWidget("feed");
                 dashzone.addWidget("actions");
                 dashzone.addWidget("userstats");
-                dashzone.addWidget("mostviewed");
-
-                if(is_staff){
-                    dashzone.addWidget("lastusers");
-                }
+                //dashzone.addWidget("mostviewed");
+                dashzone.addWidget("mostviewedfingerprint");
+                dashzone.addWidget("tagcloud");
             }   
         });  
     // Registering plugins on dashboard
@@ -41,8 +39,9 @@ $(function(){
     dashzone.register(new UserStatsWidget("userstats",  2, 1, 5, 3));
 
     dashzone.register(new MostViewedWidget("mostviewed",  2, 1, 6, 4));
+    dashzone.register(new MostViewedFingerprintWidget("mostviewedfingerprint",  2, 1, 6, 4));
 
-    if(is_staff){
+    if(typeof(is_staff) != 'undefined' && is_staff == true){
         dashzone.register(new LastUsersWidget("lastusers",  2, 1, 6, 5));
     }
 

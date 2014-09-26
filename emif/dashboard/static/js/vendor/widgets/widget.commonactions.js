@@ -27,6 +27,8 @@ var CommonActionsWidget = function CommonActionsWidget(widgetname, width, height
     __init : function(gridster, parent){
         var self = this;
 
+        self.icon = '<i class="fa fa-cogs"></i>';
+
         self.content = "<center><h3>Loading...</h3></center>";
 
         CommonActionsWidget._super.__init.apply(self, [gridster, parent]);
@@ -39,21 +41,21 @@ var CommonActionsWidget = function CommonActionsWidget(widgetname, width, height
                 self.db_types = [];
             }
 
-            self.content=   '<div style="min-width: 180px; vertical-align: top; display: inline-block;"><span class="lead">View</span><br />'+
+            self.content=   '<div style="min-width: 180px; vertical-align: top; display: inline-block;"><span class="lead"><i class="fa fa-eye"></i> View</span><br />'+
                         ' <span style="margin-left: 20px;"><a href="databases">Personal Databases</a></span><br />'+
                         ' <span style="margin-left: 20px;"><a href="alldatabases">All Databases</a></span><br />'+
                         ' <span style="margin-left: 20px;"><a href="alldatabases/data-table">All Databases Datatable</a></span><br />'+
                         ' <span style="margin-left: 20px;"><a href="geo">Databases Geolocation</a></span><br />'+
                         ' <span style="margin-left: 20px;"><a href="public/fingerprint">Private Links</a></span><br />'+
                         ' <span style="margin-left: 20px;"><a href="api-info">API Information</a></span><br />'+
-                        '</div><div style="min-width: 200px; vertical-align: top; display: inline-block;"><span class="lead">Add New </span><br />';
+                        '</div><div style="min-width: 200px; vertical-align: top; display: inline-block;"><span class="lead"><i class="fa fa-plus-circle"></i> Add New </span><br />';
 
             for(var i=0;i<self.db_types.length;i++){
                 self.content+= ' <span style="margin-left: 20px;"><a href="add/'+self.db_types[i].id+'/0">'+self.db_types[i].name+'</a></span><br />'; 
             }
              
 
-            self.content+=  '</div><div style="min-width: 200px; vertical-align: top; display: inline-block;"><span class="lead">Search </span><br />';
+            self.content+=  '</div><div style="min-width: 200px; vertical-align: top; display: inline-block;"><span class="lead"><i class="fa fa-search"></i> Search </span><br />';
 
             for(var i=0;i<self.db_types.length;i++){
                 self.content+= ' <span style="margin-left: 20px;"><a href="advancedSearch/'+self.db_types[i].id+'/1">'+self.db_types[i].name+'</a></span><br />';  
