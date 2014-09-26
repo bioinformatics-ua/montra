@@ -311,7 +311,7 @@ INSTALLED_APPS = (
     'dashboard',
 
     # notifications
-    'notifications'
+    'notifications',
     # Django-Compressor
     "compressor",
 )
