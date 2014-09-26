@@ -16,11 +16,3 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
-
-from django.shortcuts import render
-
-from django.core import serializers
-from django.conf import settings
-from django.http import *
-from django.http import Http404 
-

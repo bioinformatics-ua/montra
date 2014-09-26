@@ -1,0 +1,177 @@
+{% extends 'base.html' %}
+{% load url from future %}
+{% load extra_tags %}
+{% load django_bootstrap_breadcrumbs %}
+{% block breadcrumbs %}
+    {% breadcrumb "Databases" "home" %}
+    {% breadcrumb "Notifications" "" %}
+{% endblock %}
+{% block toolbar %}
+    {% include "menu_toolbar.html" with collapse=collapseall %}
+{% endblock %}
+{% block content %}
+    <div style="margin-left:0px;" class="span12">
+        <div class="tabbable tabs-left">
+            <ul style="min-height: 480px" class="nav nav-tabs">
+                <li {% if source == '0'%} class="active" {% endif %}><a href="#allnot" data-toggle="tab">All Notifications</a></li>
+                <li {% if source == '1'%} class="active" {% endif %}><a href="#unreadnot" data-toggle="tab">Unread Notifications</a></li>
+                <li {% if source == '2'%} class="active" {% endif %}><a href="#readnot" data-toggle="tab">Read Notifications</a></li>
+            </ul>
+            <div class="tab-content">
+            <div class="tab-pane {% if source == '0' %} active {% endif%}" id="allnot">
+            <div id="user_notifications">
+                <table class="table table-bordered table-striped">
+                    <thead>
+                        <tr>
+                            <th>Notification</th>
+                            <th style="width: 150px;">Sender</th>
+                            <th style="width: 120px;">Date</th>
+                            <th style="width: 40px;"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for notification in notifications%}
+                            <tr data-ident="{{notification.id}}" data-link="{{notification.href}}" data-read="{{notification.read}}">
+                                <td class="notification_detail">{% if not notification.read %}<strong>{% endif%}
+                                {{notification}} {% if not notification.read %} </strong> {% endif %}</td>
+                                <td><small>{{notification.origin.get_full_name}}</small></td>
+                                <td><small>{{notification.created_date|date:"Y-m-d H:i:s"}}</small></td>
+                                <td><i class="notification_read {% if notification.read %} muted {% endif %} fa fa-eye"></i>&nbsp; &nbsp;<i class="notification_delete fa fa-times"></i></td>
+                            </tr>
+                        {% endfor%}
+                        {% if notifications|length == 0 %}
+                            <tr><td colspan="4"><center>There's no notifications.</center></td></tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+                <div style="font-size: 80%;" class="pull-left">Showing page {{ notifications.number }} of {{ notifications.paginator.num_pages }}</div>
+                <div style="text-align: center" class="pagination">
+                    <ul>
+                        {% if notifications.has_previous %}
+                            <li> <a href="notifications/{{ notifications.previous_page_number }}">« Previous Page</a></li>
+                        {% endif %}
+                        {% if notifications.has_next %}
+                            <li><a href="notifications/{{ notifications.next_page_number }}">Next Page »</a></li>
+                        {% endif %}
+                    </ul>
+                </div>
+                <form method="POST" >
+                    <div style="font-size: 80%; margin-top: -65px;" class="pull-right">Show <select style="width: 50px; margin-top: 10px;"  name="page_rows" class="page_rows span1 paginator-page-selector" >
+                        <option value="5" {% if page_rows == 5 %}selected{% endif %}>5</option>
+                        <option value="10" {% if page_rows == 10 %}selected{% endif %}>10</option>
+                        <option value="25" {% if page_rows == 25 %}selected{% endif %}>25</option>
+                        <option value="50" {% if page_rows == 50 %}selected{% endif %}>50</option>
+                        <option value="99999" {% if page_rows > 50 %}selected{% endif %}>All</option>
+                    </select>&nbsp; per page</div>
+                    {% csrf_token %}
+                </form>
+            </div>
+        </div>
+    <div class="tab-pane {% if source == '1' %} active {% endif%}" id="unreadnot">
+                <table class="table table-bordered table-striped">
+                    <thead>
+                        <tr>
+                            <th>Notification</th>
+                            <th style="width: 150px;">Sender</th>
+                            <th style="width: 120px;">Date</th>
+                            <th style="width: 40px;"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for notification in notifications_unread%}
+                            <tr data-ident="{{notification.id}}" data-link="{{notification.href}}" data-read="{{notification.read}}">
+                                <td class="notification_detail">{% if not notification.read %}<strong>{% endif%}
+                                {{notification}} {% if not notification.read %} </strong> {% endif %}</td>
+                                <td><small>{{notification.origin.get_full_name}}</small></td>
+                                <td><small>{{notification.created_date|date:"Y-m-d H:i:s"}}</small></td>
+                                <td><i class="notification_read {% if notification.read %} muted {% endif %} fa fa-eye"></i>&nbsp; &nbsp;<i class="notification_delete fa fa-times"></i></td>
+                            </tr>
+                        {% endfor%}
+                        {% if notifications_unread|length == 0 %}
+                            <tr><td colspan="4"><center>There's no notifications.</center></td></tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+    <div style="font-size: 80%;" class="pull-left">Showing page {{ notifications.number }} of {{ notifications.paginator.num_pages }}</div>
+                <div style="text-align: center" class="pagination">
+                    <ul>
+                        {% if notifications.has_previous %}
+                            <li> <a href="notifications/{{ notifications.previous_page_number }}">« Previous Page</a></li>
+                        {% endif %}
+                        {% if notifications.has_next %}
+                            <li><a href="notifications/{{ notifications.next_page_number }}">Next Page »</a></li>
+                        {% endif %}
+                    </ul>
+                </div>
+                <form method="POST" >
+                    <div style="font-size: 80%; margin-top: -65px;" class="pull-right">Show <select style="width: 50px; margin-top: 10px;"  name="page_rows" class="page_rows span1 paginator-page-selector" >
+                        <option value="5" {% if page_rows == 5 %}selected{% endif %}>5</option>
+                        <option value="10" {% if page_rows == 10 %}selected{% endif %}>10</option>
+                        <option value="25" {% if page_rows == 25 %}selected{% endif %}>25</option>
+                        <option value="50" {% if page_rows == 50 %}selected{% endif %}>50</option>
+                        <option value="99999" {% if page_rows > 50 %}selected{% endif %}>All</option>
+                    </select>&nbsp; per page</div>
+                    {% csrf_token %}
+                </form>
+</div>
+<div class="tab-pane {% if source == '2' %} active {% endif%}" id="readnot">
+                <table class="table table-bordered table-striped">
+                    <thead>
+                        <tr>
+                            <th>Notification</th>
+                            <th style="width: 150px;">Sender</th>
+                            <th style="width: 120px;">Date</th>
+                            <th style="width: 40px;"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for notification in notifications_read%}
+                            <tr data-ident="{{notification.id}}" data-link="{{notification.href}}" data-read="{{notification.read}}">
+                                <td class="notification_detail">{% if not notification.read %}<strong>{% endif%}
+                                {{notification}} {% if not notification.read %} </strong> {% endif %}</td>
+                                <td><small>{{notification.origin.get_full_name}}</small></td>
+                                <td><small>{{notification.created_date|date:"Y-m-d H:i:s"}}</small></td>
+                                <td><i class="notification_read {% if notification.read %} muted {% endif %} fa fa-eye"></i>&nbsp; &nbsp;<i class="notification_delete fa fa-times"></i></td>
+                            </tr>
+                        {% endfor%}
+                        {% if notifications_read|length == 0 %}
+                            <tr><td colspan="4"><center>There's no notifications.</center></td></tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+<div style="font-size: 80%;" class="pull-left">Showing page {{ notifications.number }} of {{ notifications.paginator.num_pages }}</div>
+                <div style="text-align: center" class="pagination">
+                    <ul>
+                        {% if notifications.has_previous %}
+                            <li> <a href="notifications/{{ notifications.previous_page_number }}">« Previous Page</a></li>
+                        {% endif %}
+                        {% if notifications.has_next %}
+                            <li><a href="notifications/{{ notifications.next_page_number }}">Next Page »</a></li>
+                        {% endif %}
+                    </ul>
+                </div>
+                <form method="POST" >
+                    <div style="font-size: 80%; margin-top: -65px;" class="pull-right">Show <select style="width: 50px; margin-top: 10px;"  name="page_rows" class="page_rows span1 paginator-page-selector" >
+                        <option value="5" {% if page_rows == 5 %}selected{% endif %}>5</option>
+                        <option value="10" {% if page_rows == 10 %}selected{% endif %}>10</option>
+                        <option value="25" {% if page_rows == 25 %}selected{% endif %}>25</option>
+                        <option value="50" {% if page_rows == 50 %}selected{% endif %}>50</option>
+                        <option value="99999" {% if page_rows > 50 %}selected{% endif %}>All</option>
+                    </select>&nbsp; per page</div>
+                    {% csrf_token %}
+                </form>
+</div>
+</div>
+</div>
+</div>
+<script type="text/javascript">
+$(function(){
+    $('.page_rows').change(function(){
+        $(this).closest('form').submit();
+    });
+});
+</script>
+{% endblock content %}
+{% block scriptextraincludes %}
+<script type="text/javascript" src="{{STATIC_URL}}js/emif.notifications.js"></script>
+{% endblock %}

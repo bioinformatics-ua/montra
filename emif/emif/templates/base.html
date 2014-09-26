@@ -137,7 +137,21 @@
                                 <ul class="nav">
 
                                     {% if request.user.is_authenticated %}
-
+                                    <li id="li_notifications" style="padding-right: 5px;" class="dropdown">
+                                        <a href="" class="dropdown-toggle" data-toggle="dropdown">
+                                        <i class="fa fa-bell"></i>&nbsp;<span id="notification_badge" class="depon_class badge badge-inverse">8</span>
+                                        
+                                        </a>
+                                        <ul class="dropdown-menu dropdown-menu-form pull-right">
+                                            <div class="notification_header lead">Latest Notifications</div>
+                                            <div id="notification_center">
+                                               <center> <div class="notification">There's no new notifications.</div>
+                                               </center>
+                                            </div>
+                                            <hr class="notification_divider" />
+                                            <center><a href="notifications">See All Notifications</a></center>
+                                        </ul>
+                                    </li>
                                     <li id="li_workspace" style="padding-right: 5px;" class="dropdown">
                                         <a href="" class="dropdown-toggle" data-toggle="dropdown">Databases
                                         <b class="caret"></b>

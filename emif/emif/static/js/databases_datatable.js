@@ -24,12 +24,6 @@ $(document).ready(function() {
         }
         $('#tabular_container').html('<div class="well pull-center">To see a tabular view of all databases, please choose a database type and questionsets.</div>');
     });
-
-    $('.dropdown-menu').on('click', function(e) {
-        if ($(this).hasClass('dropdown-menu-form')) {
-            e.stopPropagation();
-        }
-    });
     $('#update_table_button').click(function() {
         // get db type
         var db_selected = $('#db_type').val();

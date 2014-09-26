@@ -146,6 +146,13 @@ class FingerprintReturnedAdvanced(models.Model):
     date        = models.DateTimeField(auto_now_add=True)
     query_reference = models.ForeignKey('emif.AdvancedQuery')
 
+class AnswerRequest(models.Model):
+    fingerprint = models.ForeignKey(Fingerprint)
+    question    = models.ForeignKey(Question)
+    requester   = models.ForeignKey(User)
+    date        = models.DateTimeField(auto_now=True)
+    removed     = models.BooleanField(default=False)
+
 """
 This class wraps the Description of the Fingerprint.
 It will be used to list fingerprints, for instance.

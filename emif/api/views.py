@@ -67,12 +67,21 @@ from django.template.loader import render_to_string
 
 from emif.utils import send_custom_mail
 
-from fingerprint.models import Fingerprint
+from fingerprint.models import Fingerprint, AnswerRequest
+from fingerprint.services import findName
+
+from questionnaire.models import Question
 
 from public.views import PublicFingerprintShare
 from public.services import deleteFingerprintShare, createFingerprintShare
 
+from notifications.models import Notification
+from notifications.services import sendNotification
 from population_characteristics.models import Characteristic
+
+import time
+from django.utils import timezone
+from datetime import timedelta
 
 from public.utils import hasFingerprintPermissions
 
@@ -686,6 +695,26 @@ class NotifyOwnerView(APIView):
                     else:
                         user_fullname = this_user.username
 
+                    
+                    # Dont add more notifications unless theres been no notification of this type in a hour
+                    notification_message = str(fingerprint_name)+" has new comments, please click here to see them."
+                    old_not = Notification.objects.filter(notification = notification_message, destiny=this_user, removed=False,
+                                                created_date__gt=(timezone.now()-timedelta(hours=1)))
+
+                    print "EXISTEM ANTIGAS ?"+str(len(old_not))
+
+                    if len(old_not) > 0:
+                        old_not[0].read_date=None
+                        old_not[0].read = False
+                        old_not[0].created_date = timezone.now()
+                        old_not[0].save()
+                    else:
+                        new_notification = Notification(destiny=this_user ,origin=request.user, 
+        notification=notification_message, 
+        type=Notification.SYSTEM, href="fingerprint/"+fingerprint_id+"/1/discussion/")
+
+                        new_notification.save()
+
                     send_custom_mail('Emif Catalogue: There\'s a new comment on one of your databases',
                      render_to_string('emails/new_db_comment.html', {
                             'fingerprint_id': fingerprint_id,
@@ -695,7 +724,7 @@ class NotifyOwnerView(APIView):
                             'base_url': settings.BASE_URL,
                             'user_commented': user_commented
                         }), 
-                     settings.DEFAULT_FROM_EMAIL, [owner]);
+                     settings.DEFAULT_FROM_EMAIL, [this_user.email]);
 
                     return Response({}, status=status.HTTP_200_OK)
 
@@ -704,6 +733,180 @@ class NotifyOwnerView(APIView):
                     pass
 
         return Response({}, status=status.HTTP_400_BAD_REQUEST)
+
+############################################################
+##### Get notifications - Web services
+############################################################
+
+
+class NotificationsView(APIView):
+    authentication_classes = (SessionAuthentication, BasicAuthentication)
+    permission_classes = (IsAuthenticated,)    
+    def get(self, request, *args, **kw):
+        
+        if not request.user.is_authenticated():
+            return Response({"Request", "Invalid"}, status=status.HTTP_400_BAD_REQUEST)
+
+        notifications = Notification.objects.filter(destiny=request.user, type=Notification.SYSTEM, 
+            removed=False).order_by('-created_date')[:20]
+
+        notifications_array = []
+        unread = 0
+        for notification in notifications:
+
+            readtime=None
+            if notification.read_date:
+                readtime=notification.read_date.strftime("%Y-%m-%d %H:%M")
+
+            notifications_array.append({
+                    'id':   notification.id,
+                    'origin': notification.origin.get_full_name(),
+                    'message': notification.notification,
+                    'type': notification.type,
+                    'href': notification.href,
+                    'createddate': notification.created_date.strftime("%Y-%m-%d %H:%M"),
+                    'readdate': readtime,
+                    'read': notification.read,
+            })
+
+            if notification.read == False:
+                unread+=1
+
+        result = {
+            'unread': unread,
+            'notifications': notifications_array
+            }
+        response = Response(result, status=status.HTTP_200_OK)
+        return response
+
+############################################################
+##### Read notification - Web services
+############################################################
+
+
+class ReadNotificationView(APIView):
+    authentication_classes = (SessionAuthentication, BasicAuthentication)
+    permission_classes = (IsAuthenticated,)    
+    def post(self, request, *args, **kw):
+        
+        if not request.user.is_authenticated():
+            return Response({"Request", "Invalid"}, status=status.HTTP_400_BAD_REQUEST)
+
+        notification_id = request.POST.get('notification', '')
+        value = False
+
+        if request.POST.get('value', False) == 'true':
+            value = True
+
+        print value
+
+        if notification_id != '':
+            try:
+                # This may seem dumb, but i want to make sure the user is the "owner" of the notification
+                notification = Notification.objects.get(destiny=request.user, id=notification_id)
+
+                notification.read_date = timezone.now()
+                notification.read = value
+
+                notification.save()
+
+                return Response({'success': True }, status=status.HTTP_200_OK)              
+
+            except Notification.DoesNotExist:
+                print "Can't mark as read notification with id"+notification_id
+    
+        return Response({'success': False }, status=status.HTTP_400_BAD_REQUEST)
+
+############################################################
+##### Remove notification - Web services
+############################################################
+
+
+class RemoveNotificationView(APIView):
+    authentication_classes = (SessionAuthentication, BasicAuthentication)
+    permission_classes = (IsAuthenticated,)    
+    def post(self, request, *args, **kw):
+        
+        if not request.user.is_authenticated():
+            return Response({"Request", "Invalid"}, status=status.HTTP_400_BAD_REQUEST)
+
+        notification_id = request.POST.get('notification', '')
+        value = False
+
+        if request.POST.get('value', False) == 'true':
+            value = True
+
+        if notification_id != '':
+            try:
+                # This may seem dumb, but i want to make sure the user is the "owner" of the notification
+                notification = Notification.objects.get(destiny=request.user, id=notification_id)
+
+                notification.removed = value
+
+                notification.save()
+                
+                return Response({'success': True }, status=status.HTTP_200_OK)              
+
+            except Notification.DoesNotExist:
+                print "Can't mark as read notification with id"+notification_id
+    
+        return Response({'success': False }, status=status.HTTP_400_BAD_REQUEST)
+
+############################################################
+##### Request Answer - Web services
+############################################################
+class RequestAnswerView(APIView):
+    authentication_classes = (SessionAuthentication, BasicAuthentication)
+    permission_classes = (IsAuthenticated,)    
+    def post(self, request, *args, **kw):
+        # first we get the email parameter
+        fingerprint_id = request.POST.get('fingerprint_id', '')
+        question_id = request.POST.get('question', '')      
+
+        if request.user.is_authenticated():     
+            try:
+                fingerprint = Fingerprint.objects.get(fingerprint_hash=fingerprint_id)
+                question = Question.objects.get(id=question_id)
+
+                ansrequest = None
+                try:
+                    ansrequest = AnswerRequest.objects.get(
+                                    fingerprint=fingerprint, 
+                                    question=question, 
+                                    requester=request.user, removed = False)
+
+                    # If this user already request this answer, just update request time
+                    ansrequest.save()
+
+                # otherwise we must create the request as a new one
+                except:
+                    ansrequest = AnswerRequest(fingerprint=fingerprint, question=question, requester=request.user)
+                    ansrequest.save()
+
+                if ansrequest != None:
+
+                    message = str(ansrequest.requester.get_full_name())+" requested you to answer some unanswered questions on database "+str(findName(fingerprint))+"."
+
+                    sendNotification(timedelta(hours=12), fingerprint.owner, ansrequest.requester, 
+            "dbEdit/"+fingerprint.fingerprint_hash+"/"+str(fingerprint.questionnaire.id), message)
+
+                result = {
+                    'fingerprint_id': fingerprint_id,
+                    'question_id': question_id,
+                    'success': True
+                }
+                
+                return Response(result, status=status.HTTP_200_OK)
+
+            except Fingerprint.DoesNotExist:
+                pass
+
+            except Question.DoesNotExist:
+                pass
+    
+        return Response({'success': False }, status=status.HTTP_400_BAD_REQUEST)
+
+
 
 ############################################################
 ############ Auxiliar functions ############################

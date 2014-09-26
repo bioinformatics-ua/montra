@@ -331,21 +331,43 @@
          expandText: 'more',
          userCollapseText: 'less'
      });
-     // Add highlighting
-     /*{% if request.session.query and not isAdvanced %}
 
-            {% for word in request.session.query|whitespacesplit %}
-                $('#set_container, .tooltip').highlight('{{word}}');
-            {% endfor %}
-        {% endif %}*/
-     /*$('.comment_button', '#t2_{{qs.sortid}}').click(function(){
-        $(this).parent().find('.comment_text').toggle('fast');
-      });*/
      $('.comment_button', '#t2_' + sortid).popover({
          trigger: 'hover',
          html: true,
          template: '<div class="popover popover-medium"><div class="arrow"></div><div class="popover-inner"><h3 class="popover-title"></h3><div class="popover-content"><p></p></div></div></div>'
      });
+
+    $(function(){
+        $('.requestanswerbtn', $('#t2_'+sortid)).click(function(e){
+            var answer = $(this).data("question");
+
+            var confirmed = confirm("This question doesn't have an answer, do you want to request the owner of this database to answer this question ?");
+
+            if(confirmed){
+              $.post("api/requestanswer", { fingerprint_id: global_fingerprint_id, question: answer })
+                  .done(function(response) {
+                    if(response.success){
+                        alert('A request for this answer was sent to the owner of the database.');
+                    } else {
+                        alert("There was a problem requesting this answer. please try again. If the problem persists contact the database owner.")
+                    }
+                  })
+                  .fail(function(){
+                    console.log('Failed sending request for answer');
+                  });
+
+            }
+
+        });
+        $('.value_content').mouseover(function(e){
+            $(this).find('.requestlabel').show();
+        });
+        $('.value_content').mouseout(function(e){
+            $(this).find('.requestlabel').hide();
+        });
+    });
+
  }
  var abortAllRequests = function() {
      for (var request in ajaxRequests) {

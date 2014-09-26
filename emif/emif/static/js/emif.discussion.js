@@ -51,10 +51,10 @@ function notify_owner(owners, comment, user_commented, fingerprint_id, fingerpri
 
     // For each owner of this database (since it can be shared)
     for(var i=0;i < owners_array.length;i++){
-        var valid_email = /([\w_\-.]+@[\w_\-.]+)/g;
-        var is_valid = valid_email.test(owners_array[i]);
+        //var valid_email = /([\w_\-.]+@[\w_\-.]+)/g;
+        //var is_valid = valid_email.test(owners_array[i]);
         // If email is valid, send email warning about comment
-        if (is_valid){
+        //if (is_valid){
             console.log('Email is valid: ' + owners_array[i]);
                 
                 $.post( "api/notify_owner",
@@ -73,9 +73,9 @@ function notify_owner(owners, comment, user_commented, fingerprint_id, fingerpri
                   });
                 
         // Otherwise warn about username not being a valid email        
-        } else {
-            console.log('Email '+owners_array[i]+" is invalid.")
-        }
+        //} else {
+        //    console.log('Email '+owners_array[i]+" is invalid.")
+        //}
     }
 
 }

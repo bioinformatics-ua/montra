@@ -16,11 +16,12 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
+from django.conf.urls.defaults import *
+from views import *
 
-from django.shortcuts import render
-
-from django.core import serializers
-from django.conf import settings
-from django.http import *
-from django.http import Http404 
-
+urlpatterns = patterns('',
+    # Notifications list for a user
+    url(r'^$', 'notifications.views.see_notifications_defer_all'),   
+    url(r'^(?P<source>[0-9]+)$', 'notifications.views.see_notifications_defer_page'),  
+    url(r'^(?P<source>[0-9]+)/(?P<page>[0-9]+)$', 'notifications.views.see_notifications'),  
+)

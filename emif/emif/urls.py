@@ -184,11 +184,17 @@ urlpatterns = patterns('',
     # newsletter system
     url(r'^newsletter/', include('newsletter.urls')),
 
+    # Notifications URLs
+    url(r'notifications/', include('notifications.urls')),
+
     # Faq
     url('^faq/', include('fack.urls')),
 
     # unique views plugin
     url(r'^api/hit_counter/$', update_hit_count_ajax, name='hitcount_update_ajax'),
+
+    # Fingerprint
+    url('^fingerprint/', include('fingerprint.urls')),
 
     # DashBoard
     url(r'^dashboard', include('dashboard.urls')),
