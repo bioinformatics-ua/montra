@@ -226,13 +226,14 @@ function GraphicChartC3D3(divArg, dataArg)
       var possibilities = [];
       var length = possibilities_string.length;
 
-      for(var i=0;i<length;i++){
-        if(possibilities_string[i].indexOf('-') !== -1){
-          possibilities.push(i);
+      $.each(possibilities_string, function(index, value){
+        if(value.indexOf('-') !== -1 || isNaN(parseInt(value))){
+          possibilities.push(index);
         }
         else
-          possibilities.push(parseInt(possibilities_string[i]));
-      }
+          possibilities.push(parseInt(value));
+      });
+
       //console.log(start);
       //console.log(end);
 
@@ -282,19 +283,23 @@ function GraphicChartC3D3(divArg, dataArg)
             label_position : {},
             tick : { 
                 culling: true,
-                format: function (x) {
-                 return x;
-                 if ($.type(x) === "string") {
-                    return x;
-                }
-
-                return parseInt(x);
-              },
               values : 
                 function(domain) {
-                  console.log('here'); 
-                  console.log(domain);
-                }
+                      if(memoize == null){
+                        if(chartConfigs.axis.x.categories != undefined){
+                          memoize = chartConfigs.axis.x.categories;
+                        } else {
+                          var columns = chartConfigs.data.columns;
+                          $.each(columns, function(d){
+                              if (columns[d][0]=="x"){
+                                memoize = columns[d].slice(1, columns[d].length);
+                              }
+
+                          });
+                        }
+                      }
+                      return findIntermediary(memoize, domain[0], domain[1]);
+                    }
             }
           },
           y: {
@@ -473,6 +478,8 @@ function GraphicChartC3D3(divArg, dataArg)
             T: '#83bd59'
     };
 
+
+    //console.log(chartConfigs);
 
     try{chart = c3.generate(chartConfigs);}
     catch(ex)

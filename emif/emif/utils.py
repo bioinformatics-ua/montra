@@ -181,6 +181,7 @@ class QuestionGroup:
         self.name = ""
         self.sortid = ""
         self.qsid = ""
+        self.highlights = False
         #self.qsid = -1
 
         self.info = False
@@ -455,6 +456,18 @@ def send_custom_mail(title, description, from_mail, to_mail):
     msg.attach_alternative(email, "text/html")
 
     msg.send()
+
+def removehs(value):
+    value = value.replace('h0. ','')
+    value = value.replace('h1. ','')
+    value = value.replace('h2. ','')
+    value = value.replace('h3. ','')
+    value = value.replace('h4. ','')
+    value = value.replace('h5. ','')
+    value = value.replace('h6. ','')
+    value = value.replace('h7. ','')
+
+    return value
 
 def activate_user(activation_code, user, context = None):
     if (user==None or not user.is_authenticated()):

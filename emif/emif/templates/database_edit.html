@@ -61,10 +61,15 @@ text-decoration: none;
 
 
 {% block toolbar %}
-{% include "menu_toolbar.html" %}
-
+  {% include "menu_toolbar.html" %}
 {% endblock %}
 
+{% block styleinclude %}
+  <link rel="stylesheet" href="{{ STATIC_URL }}progressbar.css" />
+  {% for x in cssinclude %}
+    <link rel="stylesheet" href="{{ x }}" type="text/css" />
+  {% endfor %}
+{% endblock %}
 
 {% block headextra %}
 <!-- this was a duplicate import. may cause conflicts -->
@@ -75,13 +80,8 @@ text-decoration: none;
 
 <script type="text/javascript" src="{{ STATIC_URL }}js/fingerprint_edit.js"></script>
 
-<link rel="stylesheet" href="{{ STATIC_URL }}progressbar.css"></script>
 {% for x in jsinclude %}
 <script type="text/javascript" src="{{ x }}"></script>
-{% endfor %}
-
-    {% for x in cssinclude %}
-<link rel="stylesheet" href="{{ x }}" type="text/css" />
 {% endfor %}
 
     {% if async_progress %}
@@ -171,7 +171,7 @@ It was not possible to save this questionnary. Please try again in a few seconds
 <script src="{{ STATIC_URL}}js/vendor/bootstrap-tooltip.js"></script>
 <script src="{{ STATIC_URL}}js/vendor/bootstrap-popover.js"></script>
 <script src="{{ STATIC_URL}}js/fingerprint_validation.js"></script>
-<script src="{{ STATIC_URL }}js/vendor/jquery.inputmask.bundle.min.js" type="text/javascript"></script>
+<script src="{{ STATIC_URL }}js/vendor/jquery.inputmask.bundle.js" type="text/javascript"></script>
 <script src="{{ STATIC_URL}}js/fingerprint.js"></script>
 {% endblock %}
 

@@ -71,12 +71,16 @@ function getRevision(){
   var url = document.URL;
   var revision='-1';
 
-  try{
-    revision = global_revision;
+
+  if (url.indexOf("compare")==-1)
+  {
+    try{
+      revision = global_revision;
+    }
+    catch(err){
+      console.error('Error retrieving revision from pop.char.');
+    };
   }
-  catch(err){
-    console.error('Error retrieving revision from pop.char.');
-  };
   return revision;
 
 };

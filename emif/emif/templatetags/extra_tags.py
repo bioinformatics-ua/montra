@@ -30,6 +30,8 @@ from django.conf import settings
 
 from accounts.models import Profile
 
+from newsletter.models import Newsletter, Subscription
+
 register = template.Library()
 
 
@@ -254,6 +256,31 @@ def show_fingerprints_interests(user):
 
     return {'fingerprints':fingerprints_list_user(user)}
 register.inclusion_tag('menu_ttags.html')(show_fingerprints_interests)
+
+@register.simple_tag
+def show_subscription(user):
+    try:
+        newsl = Newsletter.objects.get(slug='emif-catalogue-newsletter')
+
+        link="newsletter/"+newsl.slug+"/subscribe"
+        label="Subscribe Newsletter"   
+
+        # create subscription
+        user_sub = None
+        try:
+            subscription = Subscription.objects.get(user=user,  newsletter=newsl)
+
+            if not subscription.unsubscribed:
+                link = "newsletter/"+newsl.slug+"/unsubscribe"
+                label = "Unsubscribe Newsletter"
+        except:
+            pass
+  
+
+    except Newsletter.DoesNotExist:
+        print "Problem finding default newsletter"    
+
+    return '<a href="'+link+'" class="navbar-link"><i class="fa fa-rss"></i>&nbsp;'+label+'</a>'
 
 def show_fingerprints():
     

@@ -23,6 +23,7 @@ from rest_framework.urlpatterns import format_suffix_patterns
 
 from api.views import SearchView
 from api.views import EmailCheckView
+from api.views import RemovePermissionsView
 from api.views import PopulationCheckView
 from api.views import GetFileView
 from api.views import DeleteFileView
@@ -35,10 +36,12 @@ from api.views import NotifyOwnerView
 from api.views import AddPublicLinkView
 from api.views import DeletePublicLinkView
 
+from dashboard.api import *
 
 urlpatterns = patterns('api.views',
     url(r'^root/$', 'api_root'),
     url(r'^emailcheck$', EmailCheckView.as_view(), name='emailcheck'),
+    url(r'^removePermissions$', RemovePermissionsView.as_view(), name='removepermissions'),
     url(r'^populationcheck$', PopulationCheckView.as_view(), name='populationcheck'),
     url(r'^getfile$', GetFileView.as_view(), name='getfile'),
     url(r'^deletefile$', DeleteFileView.as_view(), name='deletefile'),
@@ -51,6 +54,14 @@ urlpatterns = patterns('api.views',
     url(r'^notify_owner$', NotifyOwnerView.as_view(), name='notify_owner'),
     url(r'^addpubliclink$', AddPublicLinkView.as_view(), name='addpubliclink'),
     url(r'^deletepubliclink$', DeletePublicLinkView.as_view(), name='addpubliclink'),
+
+    # dashboard widgets services
+    url(r'^dbtypes$', DatabaseTypesView.as_view(), name='dbtypes'),
+    url(r'^userstats$', UserStatsView.as_view(), name='userstats'),
+    url(r'^mostviewed$', MostViewedView.as_view(), name='mostviewed'),
+    url(r'^lastusers$', LastUsersView.as_view(), name='lastusers'),
+    url(r'^feed$', FeedView.as_view(), name='feed'),
+    url(r'^tagcloud$', TagCloudView.as_view(), name='tagcloud'),
 
 )
 

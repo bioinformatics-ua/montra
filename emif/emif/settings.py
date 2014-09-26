@@ -171,6 +171,7 @@ STATICFILES_DIRS = (
     os.path.abspath(PROJECT_DIR_ROOT + MIDDLE_DIR + 'advancedsearch/static'),
     os.path.abspath(PROJECT_DIR_ROOT + MIDDLE_DIR + 'public/static'),
     os.path.abspath(PROJECT_DIR_ROOT + MIDDLE_DIR + 'accounts/static'),
+    os.path.abspath(PROJECT_DIR_ROOT + MIDDLE_DIR + 'dashboard/static'),
 )
 
 # List of finder classes that know how to find static files in
@@ -180,6 +181,10 @@ STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
     #    'django.contrib.staticfiles.finders.DefaultStorageFinder',
     #'djangobower.finders.BowerFinder',
+    'compressor.finders.CompressorFinder',
+)
+COMPRESS_JS_FILTERS = (
+    'compressor.filters.jsmin.JSMinFilter',
 )
 
 # Make this unique, and don't share it with anybody.
@@ -225,6 +230,8 @@ TEMPLATE_DIRS = (
     os.path.abspath(PROJECT_DIR_ROOT + MIDDLE_DIR + 'docs_manager/templates'),
     os.path.abspath(PROJECT_DIR_ROOT + MIDDLE_DIR + 'advancedsearch/templates'),
     os.path.abspath(PROJECT_DIR_ROOT + MIDDLE_DIR + 'public/templates'),
+    os.path.abspath(PROJECT_DIR_ROOT + MIDDLE_DIR + 'dashboard/templates'),
+
 )
 
 INSTALLED_APPS = (
@@ -285,6 +292,11 @@ INSTALLED_APPS = (
     # public links
     'public',
 
+    # newsletters
+    'django_extensions',
+    'sorl.thumbnail',
+    'newsletter',
+
     # FAQ
     'fack',
 
@@ -293,6 +305,12 @@ INSTALLED_APPS = (
 
     # unique views counter
     'hitcount',
+
+    # dashboard
+    'dashboard',
+
+    # Django-Compressor
+    "compressor",
 )
 
 # Userena settings
@@ -452,7 +470,7 @@ LOGIN_EXEMPT_URLS = (
     r'^literature/(?P<fingerprint_id>[^/]+)$',
     r'^fingerprintqs/(?P<runcode>[^/]+)/(?P<qsid>[0-9]+)/$',
     r'^population/jerboafiles/(?P<fingerprint_id>[^/]+)/$',
-    r'^population/jerboalistvalues/(?P<var>[^/]+)/(?P<row>[^/]+)/(?P<fingerprint_id>[^/]+)$',
+    r'^population/jerboalistvalues/(?P<var>[^/]+)/(?P<row>[^/]+)/(?P<fingerprint_id>[^/]+)/(?P<revision>[^/]+)$',
     r'^population/filters/(?P<var>[^/]+)/(?P<fingerprint_id>[^/]+)$',
     r'^population/genericfilter/(?P<param>[^/]+)$',
     r'^population/settings/(?P<runcode>[^/]+)/$',
@@ -470,6 +488,7 @@ DONTLOG_URLS = (
     r'^docsmanager/docfiles/(?P<fingerprint_id>[^/]+)/$',
     r'^population/settings/(?P<fingerprint_id>[^/]+)/$',
     r'^population/jerboafiles/(?P<fingerprint_id>[^/]+)/$',
+    r'^jerboalistvalues/(?P<var>[^/]+)/(?P<row>[^/]+)/(?P<fingerprint_id>[^/]+)/(?P<revision>[^/]+)$'
     r'^searchqs/(?P<questionnaire_id>[0-9]+)/(?P<sortid>[0-9]+)/(?P<aqid>[0-9]+)?$',
     r'^addqs/(?P<fingerprint_id>[^/]+)/(?P<questionnaire_id>[0-9]+)/(?P<sortid>[0-9]+)/$',
     r'^addPost/(?P<questionnaire_id>[0-9]+)/(?P<sortid>[0-9]+)/(?P<saveid>[0-9]+)$',
@@ -541,8 +560,8 @@ except ConnectionFailure, e:
     sys.exit(1)
 
 # REDIRECT USER ACCORDING TO PROFILE
-REDIRECT_DATACUSTODIAN = 'emif.views.databases'
-REDIRECT_RESEARCHER = 'emif.views.all_databases_user'
+REDIRECT_DATACUSTODIAN = 'dashboard.views.dashboard'
+REDIRECT_RESEARCHER = 'dashboard.views.dashboard'
 
 
 # MEMCACHED
@@ -563,3 +582,6 @@ PUBLIC_LINK_MAX_TIME = 24*30; # hours
 # Unique views definitions
 HITCOUNT_KEEP_HIT_ACTIVE = { 'days': 1 }
 
+# Django-Compressor activation
+COMPRESS_ENABLED = True
+COMPRESS_OFFLINE = True
