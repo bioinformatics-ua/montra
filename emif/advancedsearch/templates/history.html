@@ -10,8 +10,11 @@
 
 {% endblock %}
 
+{% block styleinclude %}
+  <link rel="stylesheet" href="{{ STATIC_URL }}css/vendor/jquery.boolrelwidget.css"></script>
+{% endblock %}
+
 {% block headextra %}
-    <link rel="stylesheet" href="{{ STATIC_URL }}css/vendor/jquery.boolrelwidget.css"></script>
     <script src="{{ STATIC_URL}}js/vendor/jquery.boolrelwidget.js"></script>
 {% endblock %}
 

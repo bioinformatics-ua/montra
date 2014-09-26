@@ -1225,8 +1225,8 @@ def get_databases_from_solr(request, query="*:*"):
     return list_databases
 
 def __get_scientific_contact(db, db_solr, type_name):
-    print "type_name" + type_name
-    print "type_name"
+    #print "type_name" + type_name
+    #print "type_name"
     if type_name == "Observational Data Sources":
         if (db_solr.has_key('institution_name_t')):
             db.admin_name = db_solr['institution_name_t']

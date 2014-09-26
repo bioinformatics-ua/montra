@@ -4,7 +4,7 @@ function OpenButtonValidator(context){
     this.context = context;
     this.database_name = null;
 }
-OpenButtonValidator.prototype ={
+OpenButtonValidator.prototype = {
     onInit : function(dom){
         if(this.database_name == null){
             var question_number = $(dom).attr("id").replace("open-button_validator_", "question_")
@@ -25,7 +25,7 @@ OpenButtonValidator.prototype ={
 
         if(text.length == 0){
             draw_validator(validator, false , "Database name must not be empty");
-            return false
+            return false;
         }
         if(text == this.database_name){
             draw_validator(validator, true , "");       
@@ -184,7 +184,7 @@ PublicationsValidator.prototype ={
         var validator = $('[id="url_validator_'+question_number+'"]');
         //console.log(validator);
         console.error('cDom:controllerDOM');
-        console.log(controllerDOM)
+        //console.log(controllerDOM);
         var text = $(controllerDOM).val().trim();
         if(text.length == 0){
             draw_validator(validator, true, "");

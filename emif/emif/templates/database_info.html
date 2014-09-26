@@ -5,22 +5,54 @@
 {% load comments %}
 {% load hitcount_tags %}
 
+{% block styleinclude %}
+    <link rel="stylesheet" href="{{ STATIC_URL}}css/database_info.css" />
+    <link rel="stylesheet" href="{{ STATIC_URL }}css/vendor/jquery.boolrelwidget.css"></script>
+
+    <!-- Generic page styles -->
+    <link rel="stylesheet" href="{{ STATIC_URL }}css/vendor/style.css">
+    <!-- CSS to style the file input field as button and adjust the Bootstrap progress bars -->
+    <link rel="stylesheet" href="{{ STATIC_URL }}css/vendor/jquery.fileupload-ui.css">
+    <link rel="stylesheet" href="{{ STATIC_URL }}css/c3.css">
+
+    <link rel="stylesheet" href="{{ STATIC_URL }}css/jquery.dyndropdown.css">
+    <link rel="stylesheet" href="{{ STATIC_URL }}css/pc.css">
+    <style type="text/css">
+
+    .axis path,
+    .axis line {
+      fill: none;
+      stroke: #000;
+      shape-rendering: crispEdges;
+    }
+
+    .bar {
+      fill: steelblue;
+    }
+
+    .x.axis path {
+      display: none;
+    }
+
+    #pctitle{
+        text-align: center;
+    }
+    #pc_chart_place{
+        /*margin-left: 60px;*/
+    }
+    #jerboaupload{
+        margin-left: 60px;
+        margin-top: 30px;
+
+    }
+    </style>
+{% endblock %}
+
 {% block headextra %}
 
 <script src="{{ STATIC_URL}}js/vendor/taskqueuer.js"></script>
-
 <script src="{{ STATIC_URL}}js/vendor/jquery.expander.min.js"></script>
-
 <script src="{{ STATIC_URL}}js/jquery.simplePagination.js"></script>
-
-
-<link rel="stylesheet" href="{{ STATIC_URL}}css/database_info.css" />
-<link rel="stylesheet" href="{{ STATIC_URL }}css/vendor/jquery.boolrelwidget.css"></script>
-
-<!-- Generic page styles -->
-<link rel="stylesheet" href="{{ STATIC_URL }}css/vendor/style.css">
-<!-- CSS to style the file input field as button and adjust the Bootstrap progress bars -->
-<link rel="stylesheet" href="{{ STATIC_URL }}css/vendor/jquery.fileupload-ui.css">
 
 <!--
 <link href="{{ STATIC_URL }}nvd3/src/nv.d3.css" rel="stylesheet" type="text/css">
@@ -35,8 +67,6 @@
 <script src="{{ STATIC_URL }}nvd3/src/models/discreteBarChart.js"></script>
 
 -->
-
-<link rel="stylesheet" href="{{ STATIC_URL }}css/c3.css">
 
 <script src="{{ STATIC_URL}}js/emif.documents.js"></script>
 
@@ -66,6 +96,13 @@
 <script src="{{ STATIC_URL }}js/vendor/jquery.cookie.js"></script>
 <script src="{{ STATIC_URL}}js/vendor/jquery.boolrelwidget.js"></script>
 
+
+<script src="{{ STATIC_URL}}js/jquery.dyndropdown.js"></script>
+<!--[if gte IE 9]><!-->
+<script src="{{ STATIC_URL}}js/emif.charts.filters.js"></script>
+<script src="{{ STATIC_URL}}js/emif.charts.draw.js"></script>
+
+<script src="{{ STATIC_URL}}js/emif.populationcharacteristics.comments.js"></script>
 {% endblock %} 
 {% block breadcrumbs %} 
 
@@ -261,9 +298,13 @@
 
     {% endblock %} 
 
+    {% block uncompressed_js %}
+       <script src="//bioinformatics.ua.pt/becas/embed-widget.js"></script> 
+    {% endblock %}
+
     {% block scriptextraincludes %}
     <!-- Include the widget embedding script -->
-    <script src="//bioinformatics.ua.pt/becas/embed-widget.js"></script>
+    
 
 
 <!--[if lte IE 8]>
@@ -288,7 +329,12 @@
     <!--<![endif]-->
 
     <script src="{{ STATIC_URL}}js/vendor/patternrecognizer.js"></script>
+    <!--[if gte IE 9]><!-->
+    <script src="{{ STATIC_URL}}js/emif.charts.c3d3.js"></script>
+    <script src="{{ STATIC_URL}}js/emif.charts.d3.js"></script>
 
+    <script src="{{ STATIC_URL}}js/emif.charts.js"></script>
+    <!--<![endif]-->
 
 {% endblock %}
 <script>
