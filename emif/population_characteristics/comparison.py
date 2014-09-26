@@ -64,7 +64,7 @@ def handle_compare(request, template_name="compare_populations.html"):
         # Get the filters to apply.
         
         filters = {}
-        print request.POST
+        #print request.POST
         myRq = dict(request.POST.lists())
         for i in myRq:
             if "chks_" in i:
@@ -73,7 +73,7 @@ def handle_compare(request, template_name="compare_populations.html"):
             filters[i[0:-2]] = myRq[i]
 
         
-        print "Filters" + str(filters)
+        #print "Filters" + str(filters)
         
         
         
@@ -83,7 +83,7 @@ def handle_compare(request, template_name="compare_populations.html"):
     #fingerprint_ids = ["66a47f694ffb676bf7676dfde24900e6", "3dc3d622130eac4d092786afb9a0ec76", "2e303fd12bc5e5fd03a54651dd8d6334"]
     var = "Active patients"
     row = "Count"
-    print cp.get_variables(var, row, fingerprints_id=fingerprint_ids, filters=filters)
+    cp.get_variables(var, row, fingerprints_id=fingerprint_ids, filters=filters)
 
     return render(request, template_name, {'request': request,  
         'owner_fingerprint':False,
