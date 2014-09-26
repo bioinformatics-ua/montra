@@ -45,6 +45,5 @@ django-adminplus==0.3
 -e git://github.com/leandrosouza/django-hitcount.git#egg=django-hitcount
 psycopg2==2.5.4
 biopython==1.64
-
 django_compressor==1.4
 rjsmin==1.0.9
