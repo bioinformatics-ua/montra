@@ -36,7 +36,6 @@ def saveFingerprintAnswers(qlist_general, fingerprint_id, questionnaire, user, e
         for qs_aux, qlist in qlist_general:
             for question, qdict in qlist:
                 value = getAnswerValue(question, qdict)
-
                 comment = getComment(question, extra_fields)
 
                 #print question.slug_fk.slug1 + ": '"+value+"' Comment: " + str(comment)
@@ -121,6 +120,7 @@ def checkMandatoryAnswers(fingerprint):
     return True
 
 def getAnswerValue(question, qdict):
+
     try:
         choices = None
         value = None
@@ -128,8 +128,8 @@ def getAnswerValue(question, qdict):
         if qdict.has_key('value'):
             value = qdict['value']
 
-            if "yes" in qdict['value']:
-                appending_text += question.text
+            #if "yes" in qdict['value']:
+            #    appending_text += question.text
 
         elif qdict.has_key('choices'):
             #import pdb
@@ -201,7 +201,7 @@ def getAnswerValue(question, qdict):
 
         return value
     except:
-        # raise
+        #raise
         pass
 
     return None
