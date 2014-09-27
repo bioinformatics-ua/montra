@@ -19,16 +19,15 @@
         <!-- Redirect browsers with JavaScript disabled to the origin page -->
         <!--<noscript><input type="hidden" name="redirect" value="http://blueimp.github.io/jQuery-File-Upload/"></noscript>-->
         <!-- The fileupload-buttonbar contains buttons to add/delete files and start/cancel the upload -->
-        <div class="row fileupload-buttonbar">                
+        <div class="offset1 span8 fileupload-buttonbar">                
                 <fieldset>
 
-                <label>Name:</label> <input size="255" class="span7" type="text" cols="100" name="pc_name" >
-                <label>Description about extracted population characteristics: </label>
-                <textarea class="span7 input-block-level" rows="4" name="pc_comments" ></textarea>
+                <input placeholder="Name" size="255" class="span12" type="text" cols="100" name="pc_name" >
+                <textarea placeholder="Description about extracted population characteristics" class="span12 input-block-level" rows="4" name="pc_comments" ></textarea>
 
                 <!-- The fileinput-button span is used to style the file input field as button -->
                 <br />
-                <div style="margin-left: 0px !important;" class="span7 btn btn-success fileinput-button">
+                <div style="margin-left: 0px !important;" class="span12 btn btn-success fileinput-button">
                     <i class="glyphicon glyphicon-plus"></i>
                     <span>Add files...</span>
                     <input type="file" name="file" multiple>
@@ -159,21 +158,22 @@
             </div>
             <div id='pc_chart_place'>
             </div>
-            <div id='pc_comments_placeholder' class="pc_comment">
-            </div>
+            
             {%if owner_fingerprint and not compare or request.user.is_superuser  and not compare %}
-                <div id="pc_comment_id" class="pc_comment">
+                <div class="span12">
+                <div id='pc_comments_placeholder' class="span12 pc_comment">
+                </div>
+                <div id="pc_comment_id" class="span12 pc_comment">
                 <form id="chartcomments" method="post" action="comments" >
                     {% csrf_token %}
                     <input id="pc_chart_comment_id" name="pc_chart_comment_id" type="hidden" value="">
                     <input id="pc_chart_comment_fingerprint_id" name="pc_chart_comment_fingerprint_id" type="hidden" value="">
-                    <label>Title:</label> <input size="255" maxlength="40" style='width:35em' class="" type="text" cols="80" name="pc_chart_comment_name" >
+                    <input placeholder="Title" size="255" maxlength="40" class="span12" type="text" name="pc_chart_comment_name" >
 
-                    <label>Comments about extracted data: </label>
-                    <textarea class=" input-block-level" rows="4" cols="80" name="pc_chart_comment_description" ></textarea>
-                    <label> </label>
-                    <input type="submit" class="btn btn-primary" id="pc_chart_comment_submit" name="pc_chart_comment_submit" disabled="">
+                    <textarea placeholder="Comments about extracted data" class="span12 input-block-level" rows="4" name="pc_chart_comment_description" ></textarea>
+                    <input type="submit" class="span12 btn btn-primary" id="pc_chart_comment_submit" name="pc_chart_comment_submit" disabled="">
                 </form>
+                </div>
                 </div>
             {%endif%}
 
