@@ -5,4 +5,4 @@ class Command(NoArgsCommand):
         from questionnaire.emails import send_emails
         res = send_emails()
         if res:
-            print res
+            #print res

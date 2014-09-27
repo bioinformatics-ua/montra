@@ -662,10 +662,10 @@ def export_csv(request, qid): # questionnaire_id
     For a first_name questionnaire id, generaete a CSV containing all the
     answers for all subjects.
     """
-    print "export_csv"
+    #print "export_csv"
     import tempfile, csv, cStringIO, codecs
     from django.core.servers.basehttp import FileWrapper
-    print qid
+    #print qid
     class UnicodeWriter:
         """
         COPIED from http://docs.python.org/library/csv.html example:

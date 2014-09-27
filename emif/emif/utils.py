@@ -63,7 +63,7 @@ def clean_value(v):
         v = re.sub(r"\[|\]", "", v)
         logging.debug("Value after clean: " + v)
     elif isinstance(v, list):
-        print "list"
+        #print "list"
         for v_aux in v:
             v += v_aux + " "
     return v
@@ -207,9 +207,9 @@ def get_database_from_id(id):
     for r in results:
         try:
             database_aux = Database()
-            print r['id']
-            print r['created_t']
-            print r['database_name_t']
+            #print r['id']
+            #print r['created_t']
+            #print r['database_name_t']
             database_aux.id = r['id']
             database_aux.date = convert_date(r['created_t'])
            
@@ -282,7 +282,7 @@ def convert_dict_to_query(params):
             i = i + 1
             if (size_params != i ):
                 query += " AND "
-    print query
+    #print query
     return query
 
 
@@ -338,14 +338,14 @@ def convert_query_from_boolean_widget(query, q_id):
     # Example of output
     # ..
 
-    print "PARA CONVERTER: "
+    #print "PARA CONVERTER: "
     #print query
 
     questionnarie = Questionnaire.objects.filter(id=q_id)[0]
     ttype = questionnarie.slug
 
     questionsets = QuestionSet.objects.filter(questionnaire=q_id)
-    print "convert_query_from_boolean_widget"
+    #print "convert_query_from_boolean_widget"
     #print query
     # I cant remove the symbol
     query = re.sub("_____[a-zA-Z0-9._()\[\]\/\-\+?!'@#$%&*=~^|\\<>;,\.\" ]+_____", "", query)
@@ -398,7 +398,7 @@ def convert_query_from_boolean_widget(query, q_id):
 
     r = r + " AND type_t:"+ttype
 
-    print r
+    #print r
 
     return r
 
@@ -547,5 +547,5 @@ def activate_user(activation_code, user, context = None):
     if context != None:
         return render(context, template_name, {'request': request, 'breadcrumb': True})
     else:
-        print 'Activation successfull'
+        #print 'Activation successfull'
         return True

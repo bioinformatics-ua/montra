@@ -89,7 +89,7 @@ def import_population_characteristics_data(user, fingerprint_id, revision, filen
         # print file_line_info
         json_data += comma + json.dumps(file_line_info)
         comma = ', '
-    print json_data
+    #print json_data
     f.close()
     return "[" + json_data + "]"
 #import_population_characteristics_data()

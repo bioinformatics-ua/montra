@@ -60,9 +60,6 @@ urlpatterns = patterns('',
 
     # must do this to be able to use custom paths on this css file
     url(r'^bootstrap_ie_compatibility$', 'emif.views.bootstrap_ie_compatibility'),
-    
-    # Quick Search
-    url(r'^search$', 'emif.views.quick_search'),
 
     # Advanced Search
     url(r'^advancedSearch/(?P<questionnaire_id>[0-9]+)/(?P<question_set>[0-9]+)/(?P<aqid>[0-9]+)?$', 'emif.views.advanced_search'),

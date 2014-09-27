@@ -421,7 +421,7 @@ def convert_value(value, type, search=False):
         try:
             # remove separators if they exist on representation
             value = re.sub("[^0-9.,]", "", value)
-            print ("value:"+value)
+            #print ("value:"+value)
             # replace usual mistake , to .
             value = re.sub("[,]", ".", value)
             value = float(value)

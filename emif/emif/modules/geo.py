@@ -35,10 +35,10 @@ def add_city(qlist_general):
                 try:
                     city = City.objects.get(name=city_name)
 
-                    print "-- City already is on the db."
+                    #print "-- City already is on the db."
                 # if dont have this city yet on the db
                 except City.DoesNotExist:
-                    print "City "+qdict['value'].lower()+" is not on the db yet"
+                    #print "City "+qdict['value'].lower()+" is not on the db yet"
 
                     #obtain lat and longitude
                     city = retrieve_geolocation(city_name)
@@ -54,7 +54,7 @@ def add_city(qlist_general):
                         return False
 
 
-    print "-- No city found at all on questionary"
+    #print "-- No city found at all on questionary"
     return False
 
 def retrieve_geolocation(city_name):

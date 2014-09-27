@@ -64,7 +64,7 @@ def handle_compare(request, template_name="compare_populations.html"):
         # Get the filters to apply.
         
         filters = {}
-        print request.POST
+        #print request.POST
         myRq = dict(request.POST.lists())
         for i in myRq:
             if "chks_" in i:
@@ -73,7 +73,7 @@ def handle_compare(request, template_name="compare_populations.html"):
             filters[i[0:-2]] = myRq[i]
 
         
-        print "Filters" + str(filters)
+        #print "Filters" + str(filters)
         
         
         
@@ -83,7 +83,7 @@ def handle_compare(request, template_name="compare_populations.html"):
     #fingerprint_ids = ["66a47f694ffb676bf7676dfde24900e6", "3dc3d622130eac4d092786afb9a0ec76", "2e303fd12bc5e5fd03a54651dd8d6334"]
     var = "Active patients"
     row = "Count"
-    print cp.get_variables(var, row, fingerprints_id=fingerprint_ids, filters=filters)
+    cp.get_variables(var, row, fingerprints_id=fingerprint_ids, filters=filters)
 
     return render(request, template_name, {'request': request,  
         'owner_fingerprint':False,
@@ -119,12 +119,12 @@ def handle_compare_values(request, var, row, fingerprint_id, revision, template_
             filters[i[8:-3]] = myRq[i]
 
 
-        print "----"
-        print "var:"+var
-        print "row:"+row
-        print "Filters" + str(filters)
-        print fingerprint_ids
-        print "----"
+        #print "----"
+        #print "var:"+var
+        #print "row:"+row
+        #print "Filters" + str(filters)
+        #print fingerprint_ids
+        #print "----"
 
     cp = ComparisonPopulation(None)
     # Only hard coded for testing 
@@ -220,7 +220,7 @@ class ComparisonPopulation(object):
                 
         if dict_query_general != []:
             dict_query["$and"]= dict_query_general
-        print dict_query
+        #print dict_query
         values =  jerboa_aggregation_collection.find(dict_query )
         
 
@@ -237,7 +237,7 @@ class ComparisonPopulation(object):
                     y = float(values[_v])
                     new_y = eval(transformation)
                     values[_v] = new_y
-                    print values[_v]
+                    #print values[_v]
             return values
         values_app = None
         for v in values:

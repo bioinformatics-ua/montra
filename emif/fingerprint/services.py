@@ -14,17 +14,17 @@ from datetime import timedelta
 def saveFingerprintAnswers(qlist_general, fingerprint_id, questionnaire, user, extra_fields=None, created_date=None):
 
     # Update or create fingerprint entry
-    print "Updating fingerprint "+fingerprint_id
+    #print "Updating fingerprint "+fingerprint_id
     fingerprint = updateFingerprint(fingerprint_id, questionnaire, user)
 
     # If no errors on getting the fingerprint, update/add the new questions
     if fingerprint != None:
-        print "Getting answers"
+        #print "Getting answers"
         # i get them all, instead of a query for each, is probabily faster this way
         answers = Answer.objects.filter(fingerprint_id=fingerprint)
 
         # TO DO
-        print "Updating answers "+fingerprint_id
+        #print "Updating answers "+fingerprint_id
         # For each response in qlist_general
 
         versionhead = None
@@ -258,7 +258,7 @@ def deleteFingerprint(fingerprint_id, username):
 
 
         if username.is_superuser or should_delete == True:
-            print "Should be deleted"
+            #print "Should be deleted"
             fingerprint.removed=True
             fingerprint.save()
             unindexFingerprint(fingerprint_id)
@@ -268,15 +268,15 @@ def deleteFingerprint(fingerprint_id, username):
 
 def belongsUser(fingerprint, username):
 
-    print "username: "+username
+    #print "username: "+username
 
-    print "owner: "+fingerprint.owner.email
+    #print "owner: "+fingerprint.owner.email
 
     if fingerprint.owner.email == username:
         return True
 
     for share in fingerprint.shared.all():
-        print "shared: "+share.email
+        #print "shared: "+share.email
         if share.email == username:
             return True
 
