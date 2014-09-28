@@ -87,11 +87,7 @@ urlpatterns = patterns('',
     url(r'^feedback$', 'emif.views.feedback', name="feedback"),
     url(r'^bugreport$', 'control_version.views.bug_report', name="bug_report"),
 
-
-    (r'^contact/thankyou/', 'searchengine.views.thankyou'),
-    (r'^contact$', 'searchengine.views.contactview'),
     # Results
-    #url(r'^results/(?P<query>[a-zA-Z0-9]+)/$', 'emif.views.results'),
     url(r'^results$', 'emif.views.results_fulltext'),
 
     #Statistics
@@ -130,7 +126,6 @@ urlpatterns = patterns('',
 
 
     url(r'^rm/(?P<id>[^/]+)', 'emif.views.delete_fingerprint'),
-    url(r'^force-rm/(?P<id>[^/]+)', 'emif.views.force_delete_fingerprint'),
     
     url(r'^share/activation/(?P<activation_code>[^/]+)', 'emif.views.sharedb_activation'),
     url(r'^share/(?P<db_id>[^/]+)', 'emif.views.sharedb'),

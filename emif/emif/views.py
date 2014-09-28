@@ -1182,24 +1182,6 @@ def intersect(answers, questionset):
 
     return non_empty
 
-def get_databases_from_db(request):
-    user = request.user
-    su = Subject.objects.filter(user=user)
-    databases = RunInfoHistory.objects.filter(subject=su)
-
-    list_databases = []
-    for database in databases:
-        database_aux = Database()
-        database_aux.id = database.runid
-        database_aux.date = database.completed
-        answers = Answer.objects.filter(runid=database.runid)
-        text = clean_value(str(answers[1].answer))
-        info = text[:75] + (text[75:] and '..')
-        database_aux.name = info
-        list_databases.append(database_aux)
-    return list_databases
-
-
 def get_databases_from_solr(request, query="*:*"):
 
     (list_databases, hits) = get_databases_from_solr_v2(request, query=query);
@@ -1420,25 +1402,7 @@ def delete_fingerprint(request, id):
 
     deleteFingerprint(id, request.user)
 
-    # i dont like this, it should redirect to databases, not show the url of the removal
-    # so i changed it from:
-    #return databases(request)
-    #to:
     return redirect('databases')
-
-def force_delete_fingerprint(request, id):
-    if not request.user.is_superuser:
-        return HttpResponse('Permission denied. Contact administrator of EMIF Catalogue Team', status=403)
-    user = request.user
-    c = CoreEngine()
-    results = c.search_fingerprint('id:' + id)
-
-    for result in results:
-        if (id == result['id']):
-            c.delete(id)
-            break
-
-    return databases(request)
 
 def query_solr(request, page=1):
     if not request.POST:
@@ -1498,7 +1462,7 @@ def databases(request, page=1, template_name='results.html', force=False):
 
     # Get the list of databases for a specific user
     user = request.user
-    #list_databases = get_databases_from_db(request)
+
     _filter = "user_t:" + '"' + user.username + '"'
     if user.is_superuser:
         _filter = "user_t:*"
