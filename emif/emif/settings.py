@@ -255,7 +255,7 @@ INSTALLED_APPS = (
     # Questionnaires
     'transmeta',
     'questionnaire',
-    'questionnaire.page',
+    #'questionnaire.page',
 
     # User signup/signin/management
     'userena',

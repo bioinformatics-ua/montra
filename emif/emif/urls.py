@@ -82,11 +82,6 @@ urlpatterns = patterns('',
 
     url(r'^editqs/(?P<fingerprint_id>[^/]+)/(?P<questionnaire_id>[0-9]+)/(?P<sort_id>[0-9]+)/$', 'emif.views.database_edit_qs'),
     url(r'^detailedqs/(?P<fingerprint_id>[^/]+)/(?P<questionnaire_id>[0-9]+)/(?P<sort_id>[0-9]+)/$', 'emif.views.database_detailed_qs'),
-    #url(r'^dbEdit/(?P<questionnaire_id>[0-9]+)/$$', 'emif.views.database_edit'),
-    url(r'^q3/(?P<runcode>[^/]+)/$', questionaries_with_sets, name='questionaries_with_sets'),
-    url(r'^q3/(?P<runcode>[^/]+)/(?P<qs>[-]{0,1}\d+)/$',
-            questionaries_with_sets, name='questionset_sets'),
-
 
     url(r'^feedback/thankyou/', 'emif.views.feedback_thankyou'),
     url(r'^feedback$', 'emif.views.feedback', name="feedback"),
@@ -149,11 +144,7 @@ urlpatterns = patterns('',
     url(r'^controlversion/', include('control_version.urls')),
 
     # Questionnaire URLs
-    #url(r'q/', include('questionnaire.urls')),
-
-    url(r'^take/(?P<questionnaire_id>[0-9]+)/$', 'questionnaire.views.generate_run'),
-    
-
+    #url(r'q/', include('questionnaire.urls')),    
     #
     # User accounts URLs
     #
