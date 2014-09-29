@@ -285,7 +285,7 @@ INSTALLED_APPS = (
     'bootstrap-pagination',
     'django_jenkins',
 
-    
+
     'djcelery',
     #'djangobower',
     'advancedsearch',
@@ -509,10 +509,7 @@ DONTLOG_URLS = (
 SESSION_IDLE_TIMEOUT = 7200
 SESSION_SAVE_EVERY_REQUEST = True
 
-try:
-    from local_settings import *
-except:
-    pass
+
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
@@ -588,3 +585,9 @@ HITCOUNT_KEEP_HIT_ACTIVE = { 'days': 1 }
 # Django-Compressor activation
 COMPRESS_ENABLED = True
 COMPRESS_OFFLINE = True
+
+
+try:
+    from local_settings import *
+except:
+    pass
