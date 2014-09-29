@@ -297,7 +297,7 @@ def process_multiple_options(question, answer):
 @show_summary('choice','choice-freeform','choice-multiple', 'choice-multiple-freeform', 'choice-multiple-freeform-options')
 def show_summ(value):
 
-    print value
+    #print value
 
     choices = value.split('#')
 

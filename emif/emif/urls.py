@@ -60,9 +60,6 @@ urlpatterns = patterns('',
 
     # must do this to be able to use custom paths on this css file
     url(r'^bootstrap_ie_compatibility$', 'emif.views.bootstrap_ie_compatibility'),
-    
-    # Quick Search
-    url(r'^search$', 'emif.views.quick_search'),
 
     # Advanced Search
     url(r'^advancedSearch/(?P<questionnaire_id>[0-9]+)/(?P<question_set>[0-9]+)/(?P<aqid>[0-9]+)?$', 'emif.views.advanced_search'),
@@ -85,21 +82,12 @@ urlpatterns = patterns('',
 
     url(r'^editqs/(?P<fingerprint_id>[^/]+)/(?P<questionnaire_id>[0-9]+)/(?P<sort_id>[0-9]+)/$', 'emif.views.database_edit_qs'),
     url(r'^detailedqs/(?P<fingerprint_id>[^/]+)/(?P<questionnaire_id>[0-9]+)/(?P<sort_id>[0-9]+)/$', 'emif.views.database_detailed_qs'),
-    #url(r'^dbEdit/(?P<questionnaire_id>[0-9]+)/$$', 'emif.views.database_edit'),
-    url(r'^q3/(?P<runcode>[^/]+)/$', questionaries_with_sets, name='questionaries_with_sets'),
-    url(r'^q3/(?P<runcode>[^/]+)/(?P<qs>[-]{0,1}\d+)/$',
-            questionaries_with_sets, name='questionset_sets'),
-
 
     url(r'^feedback/thankyou/', 'emif.views.feedback_thankyou'),
     url(r'^feedback$', 'emif.views.feedback', name="feedback"),
     url(r'^bugreport$', 'control_version.views.bug_report', name="bug_report"),
 
-
-    (r'^contact/thankyou/', 'searchengine.views.thankyou'),
-    (r'^contact$', 'searchengine.views.contactview'),
     # Results
-    #url(r'^results/(?P<query>[a-zA-Z0-9]+)/$', 'emif.views.results'),
     url(r'^results$', 'emif.views.results_fulltext'),
 
     #Statistics
@@ -138,7 +126,6 @@ urlpatterns = patterns('',
 
 
     url(r'^rm/(?P<id>[^/]+)', 'emif.views.delete_fingerprint'),
-    url(r'^force-rm/(?P<id>[^/]+)', 'emif.views.force_delete_fingerprint'),
     
     url(r'^share/activation/(?P<activation_code>[^/]+)', 'emif.views.sharedb_activation'),
     url(r'^share/(?P<db_id>[^/]+)', 'emif.views.sharedb'),
@@ -152,11 +139,7 @@ urlpatterns = patterns('',
     url(r'^controlversion/', include('control_version.urls')),
 
     # Questionnaire URLs
-    #url(r'q/', include('questionnaire.urls')),
-
-    url(r'^take/(?P<questionnaire_id>[0-9]+)/$', 'questionnaire.views.generate_run'),
-    
-
+    #url(r'q/', include('questionnaire.urls')),    
     #
     # User accounts URLs
     #

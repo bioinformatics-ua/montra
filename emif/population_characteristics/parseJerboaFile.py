@@ -95,4 +95,5 @@ def import_population_characteristics_data(user, fingerprint_id, revision, filen
     except:
         print "-- ERROR: The file "+str(filename)+" couldn't be open."
         return "[]"
+
 #import_population_characteristics_data()

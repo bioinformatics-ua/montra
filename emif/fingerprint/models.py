@@ -206,7 +206,7 @@ class FingerprintDescriptor(object):
 
     def __getattr__(self, name):
         try:
-            print name        
+            #print name        
             if name in self.static_attr:
                 return self.parse_static_args(name)
             elif name in self.slug_dict:

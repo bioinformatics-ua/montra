@@ -255,7 +255,7 @@ INSTALLED_APPS = (
     # Questionnaires
     'transmeta',
     'questionnaire',
-    'questionnaire.page',
+    #'questionnaire.page',
 
     # User signup/signin/management
     'userena',
@@ -583,7 +583,7 @@ PUBLIC_LINK_MAX_TIME = 24*30; # hours
 HITCOUNT_KEEP_HIT_ACTIVE = { 'days': 1 }
 
 # Django-Compressor activation
-COMPRESS_ENABLED = True
+COMPRESS_ENABLED = False
 COMPRESS_OFFLINE = True
 
 

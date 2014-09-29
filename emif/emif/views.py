@@ -84,19 +84,8 @@ from notifications.models import Notification
 
 from fingerprint.tasks import anotateshowonresults
 
-def list_questions():
-    print "list_questions"
-    objs = Questionnaire.objects.all()
-    results = {}
-    for q in objs:
-        results[q.id] = q.name
-
-    return results
-
-
 def index(request, template_name='index_new.html'):
     if request.user.is_authenticated():
-        #return HttpResponseRedirect('/wherenext/')
         return HttpResponseRedirect(settings.BASE_URL + 'wherenext')
     else:
         return render(request, template_name, {'request': request})
@@ -107,22 +96,15 @@ def about(request, template_name='about.html'):
 def bootstrap_ie_compatibility(request, template_name='bootstrap_ie_compatibility.css'):
     return render(request, template_name, {'request': request, 'breadcrumb': False})
 
-def quick_search(request, template_name='quick_search.html'):
-    return render(request, template_name, {'request': request})
-
-
-
 def results_comp(request, template_name='results_comp.html'):
     list_fingerprint_to_compare = []
-    print request.POST
+
     if request.POST:
         for k, v in request.POST.items():
             if k.startswith("chks_") and v == "on":
                 arr = k.split("_")
 
                 list_fingerprint_to_compare.append(arr[1])
-
-    print "list_fingerprint_to_compare" + str(list_fingerprint_to_compare)
 
     class Results:
         num_results = 0
@@ -167,7 +149,7 @@ def results_fulltext(request, page=1, full_text=True,template_name='results.html
 
     if isAdvanced == False:
         query = "text_t:"+escapeSolrArg(query)
-        print query
+        #print query
 
     return results_fulltext_aux(request, query, page, template_name, isAdvanced=isAdvanced, query_reference=query_reference)
 
@@ -259,7 +241,7 @@ def typeFilter(user):
 
 def store_query(user_request, query_executed):
     #print user_request.user.is_authenticated()
-    print "Store Query2"
+    #print "Store Query2"
 
     query = QueryLog()
     if user_request.user.is_authenticated():
@@ -340,7 +322,7 @@ def results_diff(request, page=1, template_name='results_diff.html'):
 
                 this_query_hash = hashlib.sha1(qserialization).hexdigest()
 
-                print "This query is new, adding it and answers to it..."
+                #print "This query is new, adding it and answers to it..."
 
                 quest = None
                 try:
@@ -433,7 +415,7 @@ def geo(request, template_name='geo.html'):
         else:
             query = "*:*"
 
-    print "query@" + query
+    #print "query@" + query
     list_databases = get_databases_from_solr(request, query)
 
     list_locations = []
@@ -471,7 +453,7 @@ def geo(request, template_name='geo.html'):
                 city = retrieve_geolocation(_loc.lower())
 
                 if city != None:
-                    print city
+                    #print city
 
                     city.save()
 
@@ -789,9 +771,9 @@ def render_one_questionset(request, q_id, qs_id, errors={}, aqid=None, fingerpri
         if is_new == False and readonly == False:
             ansrequests = AnswerRequest.objects.filter(fingerprint = this_fingerprint, question__questionset__sortid=qs_id, removed = False)
 
-            print "---"
-            print ansrequests
-            print "---"
+            #print "---"
+            #print ansrequests
+            #print "---"
 
         r = r2r(template_name, request,
                 questionset=question_set,
@@ -953,8 +935,8 @@ def extract_answers(request2, questionnaire_id, question_set, qs_list):
                 pass
     errors = {}
 
-    print "Extra comments"
-    print extra_comments
+    #print "Extra comments"
+    #print extra_comments
 
     # Verification of qprocessor answers
     def verify_answer(question, answer_dict):
@@ -1200,24 +1182,6 @@ def intersect(answers, questionset):
 
     return non_empty
 
-def get_databases_from_db(request):
-    user = request.user
-    su = Subject.objects.filter(user=user)
-    databases = RunInfoHistory.objects.filter(subject=su)
-
-    list_databases = []
-    for database in databases:
-        database_aux = Database()
-        database_aux.id = database.runid
-        database_aux.date = database.completed
-        answers = Answer.objects.filter(runid=database.runid)
-        text = clean_value(str(answers[1].answer))
-        info = text[:75] + (text[75:] and '..')
-        database_aux.name = info
-        list_databases.append(database_aux)
-    return list_databases
-
-
 def get_databases_from_solr(request, query="*:*"):
 
     (list_databases, hits) = get_databases_from_solr_v2(request, query=query);
@@ -1291,7 +1255,7 @@ def __get_scientific_contact(db, db_solr, type_name):
 
 
 def get_databases_process_results(results):
-    print "Solr"
+    #print "Solr"
     list_databases = []
     questionnaires_ids = {}
     qqs = Questionnaire.objects.all()
@@ -1438,25 +1402,7 @@ def delete_fingerprint(request, id):
 
     deleteFingerprint(id, request.user)
 
-    # i dont like this, it should redirect to databases, not show the url of the removal
-    # so i changed it from:
-    #return databases(request)
-    #to:
     return redirect('databases')
-
-def force_delete_fingerprint(request, id):
-    if not request.user.is_superuser:
-        return HttpResponse('Permission denied. Contact administrator of EMIF Catalogue Team', status=403)
-    user = request.user
-    c = CoreEngine()
-    results = c.search_fingerprint('id:' + id)
-
-    for result in results:
-        if (id == result['id']):
-            c.delete(id)
-            break
-
-    return databases(request)
 
 def query_solr(request, page=1):
     if not request.POST:
@@ -1464,7 +1410,7 @@ def query_solr(request, page=1):
 
     # Get the list of databases for a specific user
     _filter = request.POST["filter"];
-    print _filter
+    #print _filter
     rows = 5
     if page == None:
         page = 1
@@ -1516,7 +1462,7 @@ def databases(request, page=1, template_name='results.html', force=False):
 
     # Get the list of databases for a specific user
     user = request.user
-    #list_databases = get_databases_from_db(request)
+
     _filter = "user_t:" + '"' + user.username + '"'
     if user.is_superuser:
         _filter = "user_t:*"
@@ -1532,24 +1478,24 @@ def databases(request, page=1, template_name='results.html', force=False):
 
     sort_params["base_filter"] = _filter;
 
-    print filterString
+    #print filterString
 
     if len(filterString) > 0:
         _filter += " AND " + filterString
 
-    print _filter
+    #print _filter
 
     (list_databases,hits) = get_databases_from_solr_v2(request, _filter, sort=sortString, rows=rows, start=range)
     if range > hits and force < 2:
         return databases(request, page=1, force=True)
 
-    print "Range: "+str(range)
-    print "hits: "+str(hits)
-    print "len: "+str(len(list_databases))
+    #print "Range: "+str(range)
+    #print "hits: "+str(hits)
+    #print "len: "+str(len(list_databases))
 
     list_databases = paginator_process_list(list_databases, hits, range)
 
-    print "len: "+str(len(list_databases))
+    #print "len: "+str(len(list_databases))
     ## Paginator ##
     myPaginator = Paginator(list_databases, rows)
     try:
@@ -1595,7 +1541,7 @@ def paginator_process_params(request, page, rows, default_mode={"database_name":
     sortString = ""
     filterString = ""
     sort_params= {}
-    print request
+    #print request
     if "s" in request:
         mode = json.loads(request["s"])
     else:
@@ -1622,7 +1568,7 @@ def paginator_process_params(request, page, rows, default_mode={"database_name":
             if x[:-7] not in sort_params:
                 sort_params[x[:-7]] = {}
             sort_params[x[:-7]]["filter"] = mode[x]
-            print sort_params
+            #print sort_params
 
     if len(filterString) > 0:
         filterString = filterString[:-4]
@@ -1646,7 +1592,7 @@ def paginator_process_params(request, page, rows, default_mode={"database_name":
             sort_params[x]["next"]='asc'
             sort_params[x]["icon"]="icon-minus"
 
-    print sortString
+    #print sortString
 
     start = (int(page) - 1) * rows
 
@@ -1733,7 +1679,7 @@ def all_databases_user(request, page=1, template_name='results.html', force=Fals
         if len(filterString) > 0:
             query += " AND " + filterString
 
-        print query
+        #print query
 
         (list_databases,hits) = get_databases_from_solr_v2(request, query, sort=sortString, rows=rows, start=start)
 
@@ -1780,11 +1726,11 @@ def qs_data_table(request, template_name='qs_data_table.html'):
     cached = cache.get(hashed)
 
     if cached != None:
-        print "cache hit"
+        #print "cache hit"
         (titles, answers) = cached
 
     else :
-        print "need for cache"
+        #print "need for cache"
         qset_int = []
         for qs in qset_post:
             qset_int.append(int(qs))
@@ -1956,7 +1902,7 @@ def createhollowqsets(questionnaire, qsets=None, highlights=None):
 
 def createqset(runcode, qsid, qsets=None, clean=True, highlights=None):
     qsid = int(qsid)
-    print "Got into createqset!!" + str(qsid)
+    #print "Got into createqset!!" + str(qsid)
 
     try:
         fingerprint = Fingerprint.objects.get(fingerprint_hash=runcode)
@@ -2120,364 +2066,8 @@ def get_api_info(fingerprint_id):
         result[r.field] = r.value
     return result
 
-def get_questionsets_list(runinfo):
-    # Get questionnaire
-    current = runinfo.questionset
-    sets = current.questionnaire.questionsets()
-    return sets
-
-
-def show_full_questionnaire_ro(request, qs_id, runinfo, errors={},
-                               reverse_name='questionaries_with_sets'):
-    """
-    Return the QuestionSet template
-
-    Also add the javascript dependency code.
-    """
-
-    #r = assure_authenticated_or_redirect(request)
-
-    #if r:
-    #    return r
-    questionnaire_id = runinfo
-    qu = get_object_or_404(Questionnaire, id=questionnaire_id)
-
-    #qs = qu.questionsets()
-    qs = qu.questionsets()[0]
-    user = request.user
-    su = Subject.objects.filter(user=user)
-
-    if su:
-        su = su[0]
-    else:
-        su = Subject(user=user,
-                     first_name=user.first_name,
-                     last_name=user.last_name,
-                     email=user.email,
-                     state='active')
-        su.save()
-
-    qs = qs_id
-    try:
-        qsobj = QuestionSet.objects.filter(pk=qs)[0]
-    except:
-        pass
-
-    questionnaire = qsobj.questionnaire
-    questionset = qsobj
-
-    expected = questionset.questions()
-
-    items = request.POST.items()
-    extra = {} # question_object => { "ANSWER" : "123", ... }
-
-    # this will ensure that each question will be processed, even if we did not receive
-    # any fields for it. Also works to ensure the user doesn't add extra fields in
-    for x in expected:
-        items.append((u'question_%s_Trigger953' % x.number, None))
-
-    # generate the answer_dict for each question, and place in extra
-    for item in items:
-        key, value = item[0], item[1]
-        print key
-        print value
-        if key.startswith('question_'):
-            answer = key.split("_", 2)
-            question = get_question(answer[1], questionnaire)
-            if not question:
-                logging.warn("Unknown question when processing: %s" % answer[1])
-                continue
-            extra[question] = ans = extra.get(question, {})
-            print answer
-            if (len(answer) == 2):
-                ans['ANSWER'] = value
-            elif (len(answer) == 3):
-                ans[answer[2]] = value
-            else:
-                logging.warn("Poorly formed form element name: %r" % answer)
-                continue
-            extra[question] = ans
-
-    errors = {}
-    for question, ans in extra.items():
-        if not question_satisfies_checks(question, runinfo):
-            continue
-        if u"Trigger953" not in ans:
-            logging.warn("User attempted to insert extra question (or it's a bug)")
-            continue
-        try:
-            cd = question.getcheckdict()
-            # requiredif is the new way
-            depon = cd.get('requiredif', None) or cd.get('dependent', None)
-            if depon:
-                depparser = BooleanParser(dep_check, runinfo, extra)
-                if not depparser.parse(depon):
-                    # if check is not the same as answer, then we don't care
-                    # about this question plus we should delete it from the DB
-                    delete_answer(question, runinfo.subject, runinfo.runid)
-                    if cd.get('store', False):
-                        runinfo.set_cookie(question.number, None)
-                    continue
-            add_answer(runinfo, question, ans)
-            if cd.get('store', False):
-                runinfo.set_cookie(question.number, ans['ANSWER'])
-        except AnswerException, e:
-            errors[question.number] = e
-        except Exception:
-            logging.exception("Unexpected Exception")
-            transaction.rollback()
-            raise
-
-    if len(errors) > 0:
-        res = show_questionnaire(request, runinfo, errors=errors)
-        return res
-
-    next = questionset.next()
-
-    if next is None: # we are finished
-        return finish_questionnaire(runinfo, questionnaire)
-
-    return redirect_to_qs(runinfo)
-
-
-def show_full_questionnaire(request, runinfo, errors={},
-                            reverse_name='questionaries_with_sets'):
-    """
-    Return the QuestionSet template
-
-    Also add the javascript dependency code.
-    """
-
-
-    questionnaire_id = runinfo
-    qu = get_object_or_404(Questionnaire, id=questionnaire_id)
-
-    #qs = qu.questionsets()
-    qs = qu.questionsets()[0]
-    user = request.user
-    su = Subject.objects.filter(user=user)
-
-    if su:
-        su = su[0]
-    else:
-        su = Subject(user=user,
-                     first_name=user.first_name,
-                     last_name=user.last_name,
-                     email=user.email,
-                     state='active')
-        su.save()
-
-    hash = md5.new()
-    hash.update("".join(map(lambda i: chr(random.randint(0, 255)), range(16))))
-    hash.update(settings.SECRET_KEY)
-    key = hash.hexdigest()
-    run = RunInfo(subject=su, random=key, runid=key, questionset=qs)
-    run.save()
-    questionsets = run.questionset.questionnaire.questionsets()
-
-    return HttpResponseRedirect(reverse(reverse_name,
-                                        kwargs={'runcode': key}))
-
-
-def redirect_to_qs(runinfo):
-    "Redirect to the correct and current questionset URL for this RunInfo"
-
-    # cache current questionset
-    qs = runinfo.questionset
-
-    # skip questionsets that don't pass
-    if not questionset_satisfies_checks(runinfo.questionset, runinfo):
-
-        next = runinfo.questionset.next()
-
-        while next and not questionset_satisfies_checks(next, runinfo):
-            next = next.next()
-
-        runinfo.questionset = next
-        runinfo.save()
-
-        hasquestionset = bool(next)
-    else:
-        hasquestionset = True
-
-    # empty ?
-    if not hasquestionset:
-        logging.warn('no questionset in questionnaire which passes the check')
-        return finish_questionnaire(runinfo, qs.questionnaire)
-
-    url = reverse("questionset_sets",
-                  args=[runinfo.random, runinfo.questionset.sortid])
-
-    print "redirect to url: " + url
-    return HttpResponseRedirect(url)
-
-
-@transaction.commit_on_success
-def questionaries_with_sets(request, runcode=None, qs=None, template_name='database_edit.html'):
-    print "questionaries_with_sets"
-    print "RunCode: " + str(runcode)
-    print "Qs: " + str(qs)
-    # if runcode provided as query string, redirect to the proper page
-    if not runcode:
-        runcode = request.GET.get('runcode')
-        print "RunCode inside: " + runcode
-        if not runcode:
-            return HttpResponseRedirect("/")
-        else:
-
-            __qs = int(qs) + 1
-            __qs += 1
-            print HttpResponseRedirect(reverse("questionaries_with_sets", args=[runcode, str(__qs)]))
-            return HttpResponseRedirect(reverse("questionaries_with_sets", args=[runcode, str(__qs)]))
-
-    runinfo = get_runinfo(runcode)
-    print "Runinfo:" + str(runinfo)
-
-    if not runinfo:
-        transaction.commit()
-        return HttpResponseRedirect('/')
-
-
-    #qs = runinfo.questionset
-    if request.method != "POST":
-        if qs is not None:
-            qs = get_object_or_404(QuestionSet, sortid=qs, questionnaire=runinfo.questionset.questionnaire)
-            print "qs.sortid=" + str(qs.sortid)
-            print "runinfor.qs.sortid" + str(runinfo.questionset.sortid)
-            if runinfo.random.startswith('test:'):
-                pass # ok for testing
-            elif qs.sortid > runinfo.questionset.sortid:
-                # you may jump back, but not forwards
-                return redirect_to_qs(runinfo)
-            runinfo.questionset = qs
-            runinfo.save()
-            transaction.commit()
-            # no questionset id in URL, so redirect to the correct URL
-        if qs is None:
-            return redirect_to_qs(runinfo)
-        return show_fingerprint_page(request, runinfo)
-
-    # Get several questionsets
-    print "RunInfo: " + str(runinfo)
-    print "runcode: " + str(runcode)
-    print "QS: " + str(qs)
-
-    # -------------------------------------
-    # --- Process POST with QuestionSet ---
-    # -------------------------------------
-
-    # if the submitted page is different to what runinfo says, update runinfo
-    # XXX - do we really want this?
-    qs = request.POST.get('questionset_id', None)
-    try:
-        qsobj = QuestionSet.objects.filter(pk=qs)[0]
-        if qsobj.questionnaire == runinfo.questionset.questionnaire:
-            if runinfo.questionset != qsobj:
-                runinfo.questionset = qsobj
-                runinfo.save()
-    except:
-        pass
-
-    questionnaire = runinfo.questionset.questionnaire
-    questionset = runinfo.questionset
-
-    # to confirm that we have the correct answers
-    expected = questionset.questions()
-
-    items = request.POST.items()
-    extra = {} # question_object => { "ANSWER" : "123", ... }
-
-    # this will ensure that each question will be processed, even if we did not receive
-    # any fields for it. Also works to ensure the user doesn't add extra fields in
-    for x in expected:
-        items.append((u'question_%s_Trigger953' % x.number, None))
-
-    # generate the answer_dict for each question, and place in extra
-    for item in items:
-        key, value = item[0], item[1]
-        if key.startswith('question_'):
-            answer = key.split("_", 2)
-            question = get_question(answer[1], questionnaire)
-            if not question:
-                logging.warn("Unknown question when processing: %s" % answer[1])
-                continue
-            extra[question] = ans = extra.get(question, {})
-            if (len(answer) == 2):
-                ans['ANSWER'] = value
-            elif (len(answer) == 3):
-                ans[answer[2]] = value
-            else:
-                logging.warn("Poorly formed form element name: %r" % answer)
-                continue
-            extra[question] = ans
-
-    errors = {}
-    for question, ans in extra.items():
-        if not question_satisfies_checks(question, runinfo):
-            continue
-        if u"Trigger953" not in ans:
-            logging.warn("User attempted to insert extra question (or it's a bug)")
-            continue
-        try:
-            cd = question.getcheckdict()
-            # requiredif is the new way
-            depon = cd.get('requiredif', None) or cd.get('dependent', None)
-            if depon:
-                depparser = BooleanParser(dep_check, runinfo, extra)
-                if not depparser.parse(depon):
-                    # if check is not the same as answer, then we don't care
-                    # about this question plus we should delete it from the DB
-                    delete_answer(question, runinfo.subject, runinfo.runid)
-                    if cd.get('store', False):
-                        runinfo.set_cookie(question.number, None)
-                    continue
-            add_answer(runinfo, question, ans)
-            if cd.get('store', False):
-                runinfo.set_cookie(question.number, ans['ANSWER'])
-        except AnswerException, e:
-            errors[question.number] = e
-        except Exception:
-            logging.exception("Unexpected Exception")
-            transaction.rollback()
-            raise
-
-    if len(errors) > 0:
-        res = show_questionnaire(request, runinfo, errors=errors)
-        transaction.rollback()
-        return res
-
-    questionset_done.send(sender=None, runinfo=runinfo, questionset=questionset)
-
-    next = questionset.next()
-    while next and not questionset_satisfies_checks(next, runinfo):
-        next = next.next()
-    runinfo.questionset = next
-    runinfo.save()
-
-    if next is None: # we are finished
-        return finish_questionnaire(runinfo, questionnaire)
-
-    transaction.commit()
-    return redirect_to_qs(runinfo)
-
-
-def next_questionset_order_by_sortid(questionset_id, questionnaire_id):
-    qsobjs = QuestionSet.objects.filter(questionnaire=questionnaire_id).order_by('sortid')
-    next = False
-    next_qs = None
-    for qs in qsobjs:
-        #print qs.pk
-        #print questionset_id
-        if next:
-            next_qs = qs
-            next = False
-            break
-        if qs.pk == int(questionset_id):
-            next = True
-    return next_qs
-
 def handle_uploaded_file(f):
-    print "abspath"
+    #print "abspath"
 
     with open(os.path.join(os.path.abspath(settings.PROJECT_DIR_ROOT + 'emif/static/upload_images/'), f.name),
               'wb+') as destination:
@@ -2545,7 +2135,7 @@ def check_database_add_conditions(request, questionnaire_id, sortid, saveid,
 
             success = saveFingerprintAnswers(qlist_general, fingerprint_id, question_set2.questionnaire, users_db, extra_fields=extra_fields, created_date=created_date)
 
-            print "SUCCESS SAVING:"+str(success)
+            #print "SUCCESS SAVING:"+str(success)
 
             if not success:
 
@@ -2592,147 +2182,6 @@ def setNewPermissions(request):
 
 
     return False
-
-## ###############
-##  STIL MIGHT BE USEFULL FOR DEBUG PORPOSES
-## #######################
-
-    #return show_fingerprint_page_errors(request, questionnaire_id, question_set,
-    #                                    errors={}, template_name='database_add.html', next=True, sortid=sortid,
-    #                                    fingerprint_id=fingerprint_id, users_db=users_db, created_date=created_date)
-
-
-# def show_fingerprint_page_errors(request, q_id, qs_id, errors={}, template_name='database_add.html',
-#                                  next=False, sortid=0, fingerprint_id=None, users_db=None, created_date=None):
-#     """
-#     Return the QuestionSet template
-
-#     Also add the javascript dependency code.
-#     """
-#     try:
-
-#         qs_list = QuestionSet.objects.filter(questionnaire=q_id).order_by('sortid')
-
-#         initial_sort = sortid
-
-#         if (int(sortid) == 99):
-#             sortid = len(qs_list) - 1
-#         question_set = qs_list[int(sortid)]
-
-#         questions = question_set.questions()
-
-#         questions_list = {}
-#         for qset_aux in qs_list:
-#             questions_list[qset_aux.id] = qset_aux.questions()
-
-#         qlist = []
-#         jsinclude = []      # js files to include
-#         cssinclude = []     # css files to include
-#         jstriggers = []
-#         qvalues = {}
-
-#         qlist_general = []
-#         extra_fields = {}
-#         for k in qs_list:
-#             qlist = []
-#             qs_aux = None
-
-#             for question in questions_list[k.id]:
-
-#                 qs_aux = question.questionset
-
-#                 Type = question.get_type()
-#                 _qnum, _qalpha = split_numal(question.number)
-
-#                 qdict = {
-#                     'template': 'questionnaire/%s.html' % (Type),
-#                     'qnum': _qnum,
-#                     'qalpha': _qalpha,
-#                     'qtype': Type,
-#                     'qnum_class': (_qnum % 2 == 0) and " qeven" or " qodd",
-#                     'qalpha_class': _qalpha and (ord(_qalpha[-1]) % 2 \
-#                                                      and ' alodd' or ' aleven') or '',
-#                 }
-
-#                 # add javascript dependency checks
-#                 cd = question.getcheckdict()
-#                 depon = cd.get('requiredif', None) or cd.get('dependent', None)
-#                 if depon:
-#                     # extra args to BooleanParser are not required for toString
-#                     parser = BooleanParser(dep_check)
-#                     # qdict['checkstring'] = ' checks="%s"' % parser.toString(depon)
-
-#                     #It allows only 1 dependency
-#                     #The line above allows multiple dependencies but it has a bug when is parsing white spaces
-#                     qdict['checkstring'] = ' checks="dep_check(\'question_%s\')"' % depon
-
-#                     qdict['depon_class'] = ' depon_class'
-#                     jstriggers.append('qc_%s' % question.number)
-#                     if question.text[:2] == 'h1':
-#                         jstriggers.append('acc_qc_%s' % question.number)
-#                 if 'default' in cd and not question.number in cookiedict:
-#                     qvalues[question.number] = cd['default']
-#                 if Type in QuestionProcessors:
-#                     qdict.update(QuestionProcessors[Type](request, question))
-#                     if 'jsinclude' in qdict:
-#                         if qdict['jsinclude'] not in jsinclude:
-#                             jsinclude.extend(qdict['jsinclude'])
-#                     if 'cssinclude' in qdict:
-#                         if qdict['cssinclude'] not in cssinclude:
-#                             cssinclude.extend(qdict['jsinclude'])
-#                     if 'jstriggers' in qdict:
-#                         jstriggers.extend(qdict['jstriggers'])
-#                         #if 'qvalue' in qdict and not question.number in cookiedict:
-#                         #    qvalues[question.number] = qdict['qvalue']
-
-#                 qlist.append((question, qdict))
-#                 comment_id = "comment_question_"+question.number#.replace(".", "")
-#                 if request.POST and request.POST[comment_id]!='':
-#                     comment_id_index = "comment_question_"+question.slug
-#                     extra_fields[comment_id_index+'_t'] = request.POST[comment_id]
-#                     qdict['comment'] = request.POST[comment_id]
-
-
-#             if qs_aux == None:
-#                 qs_aux = k
-#             qlist_general.append((qs_aux, qlist))
-
-#         #print "Extra fields : " + str(extra_fields)
-#         if (fingerprint_id != None):
-
-#             if users_db==None:
-#                 users_db = request.user.username
-
-#             # adding city to cities database (if doesnt exist)
-#             add_city(qlist_general)
-
-#             index_answeres_from_qvalues(qlist_general, question_set.questionnaire, users_db,
-#                                         fingerprint_id, extra_fields=extra_fields, created_date=created_date)
-
-#         r = r2r(template_name, request,
-#                 questionset=question_set,
-#                 questionsets=question_set.questionnaire.questionsets,
-#                 runinfo=None,
-#                 errors=errors,
-#                 qlist=qlist,
-#                 progress=None,
-#                 triggers=jstriggers,
-#                 qvalues=qvalues,
-#                 jsinclude=jsinclude,
-#                 cssinclude=cssinclude,
-#                 async_progress=None,
-#                 async_url=None,
-#                 qs_list=qs_list,
-#                 questions_list=qlist_general,
-#                 fingerprint_id=fingerprint_id,
-#                 breadcrumb=True,
-#                 extra_fields=extra_fields
-#         )
-#         r['Cache-Control'] = 'no-cache'
-#         r['Expires'] = "Thu, 24 Jan 1980 00:00:00 GMT"
-#     except:
-#         raise
-#     return r
 
 def show_fingerprint_page_read_only(request, q_id, qs_id, SouMesmoReadOnly=False, aqid=None, errors={}, template_name='advanced_search.html'):
 
@@ -2843,131 +2292,6 @@ def feedback(request, template_name='feedback.html'):
 
 def feedback_thankyou(request, template_name='feedback_thankyou.html'):
     return render(request, template_name, {'request': request, 'breadcrumb': True})
-
-
-
-def show_fingerprint_page(request, runinfo, errors={}, template_name='database_edit.html'):
-    """
-    Return the QuestionSet template
-
-    Also add the javascript dependency code.
-    """
-    questions = runinfo.questionset.questions()
-
-    qlist = []
-    jsinclude = []      # js files to include
-    cssinclude = []     # css files to include
-    jstriggers = []
-    qvalues = {}
-
-    # initialize qvalues
-    cookiedict = runinfo.get_cookiedict()
-    for k, v in cookiedict.items():
-        qvalues[k] = v
-
-    substitute_answer(qvalues, runinfo.questionset)
-
-    for question in questions:
-
-        # if we got here the questionset will at least contain one question
-        # which passes, so this is all we need to check for
-        if not question_satisfies_checks(question, runinfo):
-            continue
-
-        Type = question.get_type()
-        _qnum, _qalpha = split_numal(question.number)
-
-        qdict = {
-            'template': 'questionnaire/%s.html' % (Type),
-            'qnum': _qnum,
-            'qalpha': _qalpha,
-            'qtype': Type,
-            'qnum_class': (_qnum % 2 == 0) and " qeven" or " qodd",
-            'qalpha_class': _qalpha and (ord(_qalpha[-1]) % 2 \
-                                             and ' alodd' or ' aleven') or '',
-        }
-
-        # substitute answer texts
-        substitute_answer(qvalues, question)
-
-        # add javascript dependency checks
-        cd = question.getcheckdict()
-        depon = cd.get('requiredif', None) or cd.get('dependent', None)
-        if depon:
-            # extra args to BooleanParser are not required for toString
-            parser = BooleanParser(dep_check)
-            # qdict['checkstring'] = ' checks="%s"' % parser.toString(depon)
-
-            #It allows only 1 dependency
-            #The line above allows multiple dependencies but it has a bug when is parsing white spaces
-            qdict['checkstring'] = ' checks="dep_check(\'question_%s\')"' % depon
-
-            qdict['depon_class'] = ' depon_class'
-            jstriggers.append('qc_%s' % question.number)
-            if question.text[:2] == 'h1':
-                jstriggers.append('acc_qc_%s' % question.number)
-        if 'default' in cd and not question.number in cookiedict:
-            qvalues[question.number] = cd['default']
-        if Type in QuestionProcessors:
-            qdict.update(QuestionProcessors[Type](request, question))
-            if 'jsinclude' in qdict:
-                if qdict['jsinclude'] not in jsinclude:
-                    jsinclude.extend(qdict['jsinclude'])
-            if 'cssinclude' in qdict:
-                if qdict['cssinclude'] not in cssinclude:
-                    cssinclude.extend(qdict['jsinclude'])
-            if 'jstriggers' in qdict:
-                jstriggers.extend(qdict['jstriggers'])
-            if 'qvalue' in qdict and not question.number in cookiedict:
-                qvalues[question.number] = qdict['qvalue']
-
-        qlist.append((question, qdict))
-
-    try:
-        has_progress = settings.QUESTIONNAIRE_PROGRESS in ('async', 'default')
-        async_progress = settings.QUESTIONNAIRE_PROGRESS == 'async'
-    except AttributeError:
-        has_progress = True
-        async_progress = False
-
-    if has_progress:
-        if async_progress:
-            progress = cache.get('progress' + runinfo.random, 1)
-        else:
-            progress = get_progress(runinfo)
-    else:
-        progress = 0
-
-    if request.POST:
-        for k, v in request.POST.items():
-            if k.startswith("question_"):
-                s = k.split("_")
-                if len(s) == 4:
-                    qvalues[s[1] + '_' + v] = '1' # evaluates true in JS
-                elif len(s) == 3 and s[2] == 'comment':
-                    qvalues[s[1] + '_' + s[2]] = v
-                else:
-                    qvalues[s[1]] = v
-    errors = {}
-    r = r2r(template_name, request,
-            questionset=runinfo.questionset,
-            questionsets=runinfo.questionset.questionnaire.questionsets,
-            runinfo=runinfo,
-            errors=errors,
-            qlist=qlist,
-            progress=progress,
-            triggers=jstriggers,
-            qvalues=qvalues,
-            jsinclude=jsinclude,
-            cssinclude=cssinclude,
-            async_progress=async_progress,
-            async_url=reverse('progress', args=[runinfo.random]),
-            breadcrumb=True
-    )
-    r['Cache-Control'] = 'no-cache'
-    r['Expires'] = "Thu, 24 Jan 1980 00:00:00 GMT"
-    return r
-
 
 def create_auth_token(request, page=1, templateName='api-key.html', force=False):
     """
@@ -3117,7 +2441,7 @@ def sharedb(request, db_id, template_name="sharedb.html"):
     new_notification.save()
 
     emails_to_feedback = []
-    print settings.ADMINS
+    #print settings.ADMINS
     for k, v in settings.ADMINS:
         emails_to_feedback.append(v)
 
@@ -3187,12 +2511,12 @@ def more_like_that(request, doc_id, mlt_query=None, page=1, template_name='more_
     (sortString, filterString, sort_params, range) = paginator_process_params(request.POST, page, rows, default_mode={"score":"desc"})
     sort_params["base_filter"] = _filter;
 
-    print filterString
+    #print filterString
 
     if len(filterString) > 0:
         _filter += " AND " + filterString
 
-    print _filter
+    #print _filter
 
     def fn(res, lst):
         m = {}
@@ -3209,13 +2533,13 @@ def more_like_that(request, doc_id, mlt_query=None, page=1, template_name='more_
     if range > hits and force < 2:
         return databases(request, page=1, force=True)
 
-    print "Range: "+str(range)
-    print "hits: "+str(hits)
-    print "len: "+str(len(list_databases))
+    #print "Range: "+str(range)
+    #print "hits: "+str(hits)
+    #print "len: "+str(len(list_databases))
 
     list_databases = paginator_process_list(list_databases, hits, range)
 
-    print "len: "+str(len(list_databases))
+    #print "len: "+str(len(list_databases))
     ## Paginator ##
     myPaginator = Paginator(list_databases, rows)
     try:
@@ -3231,89 +2555,6 @@ def more_like_that(request, doc_id, mlt_query=None, page=1, template_name='more_
                                            'database_name': database_name, 'isAdvanced': False,
                                            'hide_add': True, 'more_like_this': True,
                                            "sort_params": sort_params, "page":page})
-
-def generate_database_snipet(results, page=1, rows=5):
-    class ResultSnipet:
-        num_results = 0
-        list_results = []
-        paginator = None
-        paginator_url = None
-        paginator_kwargs = []
-
-        def setPage(self, pageN):
-            if self.paginator == None:
-                return
-            try:
-                self.list_results = self.paginator.page(pageN)
-            except PageNotAnInteger, e:
-                self.list_results = self.paginator.page(1)
-
-    questionnaires_ids = {}
-    qqs = Questionnaire.objects.all()
-    for q in qqs:
-        questionnaires_ids[q.slug] = (q.pk, q.name)
-
-    list_results = ResultSnipet()
-
-    list_databases = []
-    if len(results) == 0:
-        return list_results
-
-    for r in results:
-        try:
-            database_aux = Database()
-
-            if (not r.has_key('database_name_t')):
-                database_aux.name = '(Unnamed)'
-            else:
-                database_aux.name = r['database_name_t']
-
-            if (not r.has_key('location_t')):
-                database_aux.location = ''
-            else:
-                database_aux.location = r['location_t']
-            if (not r.has_key('institution_name_t')):
-                database_aux.institution = ''
-            else:
-                database_aux.institution = r['institution_name_t']
-
-            if (not r.has_key('contact_administrative_t')):
-                database_aux.email_contact = ''
-            else:
-                database_aux.email_contact = r['contact_administrative_t']
-
-            if (not r.has_key('number_active_patients_jan2012_t')):
-                database_aux.number_patients = ''
-            else:
-                database_aux.number_patients = r['number_active_patients_jan2012_t']
-            if (not r.has_key('upload-image_t')):
-                database_aux.logo = 'nopic.gif'
-            else:
-                database_aux.logo = r['upload-image_t']
-            database_aux.id = r['id']
-            database_aux.date = convert_date(r['created_t'])
-            try:
-                database_aux.date_modification = convert_date(r['date_last_modification_t'])
-            except KeyError:
-                pass
-
-            (ttype, type_name) = questionnaires_ids[r['type_t']]
-            database_aux.ttype = ttype
-            database_aux.type_name = type_name
-            list_databases.append(database_aux)
-        except:
-            raise
-
-    pp = Paginator(list_databases, rows)
-
-    list_results.num_results = results.hits
-    list_results.paginator = pp
-
-    list_results.setPage(page)
-
-    return list_results
-
-
 
 def clean_str_exp(s):
     return s.replace("\n", "|").replace(";", ",").replace("\t", "    ").replace("\r","").replace("^M","")
@@ -3389,11 +2630,11 @@ def export_datatable(request):
     cached = cache.get(hashed)
 
     if cached != None:
-        print "cache hit"
+        #print "cache hit"
         (titles, answers) = cached
 
     else :
-        print "need for cache"
+        #print "need for cache"
         qset_int = []
         for qs in qset_post:
             qset_int.append(int(qs))
@@ -3606,28 +2847,6 @@ def writeLog(log):
         f.write(log)
         f.close()
 
-# def get_slug(slug, q_id=None):
-#     slugs_objs = Slugs.objects.filter(slug1=slug, question__questionset__questionnaire=q_id)
-#     slug_aux = None
-#     if (len(slugs_objs)>0):
-#         slug_aux=slugs_objs[0]
-#     else:
-#         return slug
-#     slug_name_final = ""
-#     slug_arr = slug_aux.slug1.split("_")
-#     if len(slug_arr)>0:
-#         if (slug_arr[len(slug_arr)-1].isdigit()):
-#             slug_number = int(slug_arr[len(slug_arr)-1]) + 1
-#             slug_arr[len(slug_arr)-1] = str(slug_number)
-#             slug_name_final = "_".join(slug_arr)
-
-#         else:
-#             slug_name_final = slug_aux.slug1 + "_0"
-#     else:
-#         slug_name_final = slug_aux.slug1 + "_0"
-
-#     return slug_name_final
-
 def get_slug(slug):
     slugs_objs = Slugs.objects.filter(slug1=slug)
     slug_aux = None
@@ -3821,7 +3040,7 @@ def import_questionnaire(request, template_name='import_questionnaire.html'):
                             raise
 
                         #Create or load slug
-                        print slug
+                        #print slug
                         slugs = Slugs.objects.filter(slug1=slug, description=text_en)
                         if len(slugs) <= 0:
                             slug_db = Slugs(slug1=slug, description=text_en)
@@ -3908,7 +3127,7 @@ def import_questionnaire(request, template_name='import_questionnaire.html'):
                             writeLog(log)
                             raise
 
-                        print slug
+                        #print slug
                         #Create or load slug
                         slugs = Slugs.objects.filter(slug1=slug, description=text_en)
                         if len(slugs) <= 0:

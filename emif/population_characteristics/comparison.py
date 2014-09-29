@@ -119,12 +119,12 @@ def handle_compare_values(request, var, row, fingerprint_id, revision, template_
             filters[i[8:-3]] = myRq[i]
 
 
-        print "----"
-        print "var:"+var
-        print "row:"+row
-        print "Filters" + str(filters)
-        print fingerprint_ids
-        print "----"
+        #print "----"
+        #print "var:"+var
+        #print "row:"+row
+        #print "Filters" + str(filters)
+        #print fingerprint_ids
+        #print "----"
 
     cp = ComparisonPopulation(None)
     # Only hard coded for testing 
@@ -220,7 +220,7 @@ class ComparisonPopulation(object):
                 
         if dict_query_general != []:
             dict_query["$and"]= dict_query_general
-        print dict_query
+        #print dict_query
         values =  jerboa_aggregation_collection.find(dict_query )
         
 
@@ -237,7 +237,7 @@ class ComparisonPopulation(object):
                     y = float(values[_v])
                     new_y = eval(transformation)
                     values[_v] = new_y
-                    print values[_v]
+                    #print values[_v]
             return values
         values_app = None
         for v in values:

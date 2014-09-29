@@ -140,5 +140,5 @@ def add_invited(user, sender, **kwargs):
         indexFingerprint(fingerprint.fingerprint_hash)
 
 
-    print "Added invited user databases to+"+str(user.email)+"!"
+    #print "Added invited user databases to+"+str(user.email)+"!"
 

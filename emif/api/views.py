@@ -131,7 +131,7 @@ class SearchView(APIView):
             result['status'] = 'authenticated'
             result['method'] = 'GET'
             result['user'] = str(user)
-            print request.DATA
+            #print request.DATA
          #if query!=None:
         else:
             result = {'status': 'NOT authenticated', 'method': 'GET'}
@@ -218,20 +218,20 @@ class PopulationCheckView(APIView):
         # first we get the email parameter
         ids = request.POST.getlist('ids[]')
 
-        print ids
+        #print ids
 
         contains_population = True
 
         for id in ids:
-            print id
+            #print id
             jerboa_files = Characteristic.objects.filter(fingerprint_id=id)
             contains_population = len(jerboa_files)!=0
             if not contains_population:
                 break
 
-        print "---"
-        print contains_population
-        print "---"
+        #print "---"
+        #print contains_population
+        #print "---"
 
         result = {
             'contains_population': contains_population,
@@ -258,11 +258,11 @@ class GetFileView(APIView):
         # Verify if we have name and revision
         if not (name == None or name=='' or revision == None or revision == ''):
 
-            print name 
-            print revision
+            #print name 
+            #print revision
 
             path_to_file = os.path.join(os.path.abspath(PATH_STORE_FILES), revision+name)
-            print path_to_file
+            #print path_to_file
             return respond_as_attachment(request, path_to_file, name)
 
         return Response({}, status=status.HTTP_400_BAD_REQUEST)
@@ -501,16 +501,16 @@ class ValidateView(APIView):
     def post(self, request, *args, **kw):
         try:
 
-            print request.POST.items()
+            #print request.POST.items()
             for i in request.POST.items():
-                print i[0]
+                #print i[0]
                 json_test = json.loads(i[0])
-                print json_test
+                #print json_test
 
             result = {'test': 'teste2'}
             response = Response(result, status=status.HTTP_200_OK)
         except:
-            print("fuck")
+            #print("fuck")
             raise
         return response
 
@@ -558,7 +558,7 @@ class StatsView(APIView):
 
             response = Response(result, status=status.HTTP_200_OK)
         except:
-            print("fuck")
+            #print("fuck")
             raise
         return response
 
@@ -701,7 +701,7 @@ class NotifyOwnerView(APIView):
                     old_not = Notification.objects.filter(notification = notification_message, destiny=this_user, removed=False,
                                                 created_date__gt=(timezone.now()-timedelta(hours=1)))
 
-                    print "EXISTEM ANTIGAS ?"+str(len(old_not))
+                    #print "EXISTEM ANTIGAS ?"+str(len(old_not))
 
                     if len(old_not) > 0:
                         old_not[0].read_date=None
@@ -798,7 +798,7 @@ class ReadNotificationView(APIView):
         if request.POST.get('value', False) == 'true':
             value = True
 
-        print value
+        #print value
 
         if notification_id != '':
             try:

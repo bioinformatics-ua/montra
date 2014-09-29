@@ -95,8 +95,8 @@ def document_form_view(request, runcode, qs, template_name='documents_upload_for
     apiinfo = json.dumps(get_api_info(runcode));
     owner_fingerprint = False
     for owner in db_owners.split(" "):
-        print owner
-        print request.user.username
+        #print owner
+        #print request.user.username
         if (owner == request.user.username):
             owner_fingerprint = True
     
