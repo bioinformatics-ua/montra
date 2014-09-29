@@ -159,9 +159,10 @@
             </div>
             <div id='pc_chart_place'>
             </div>
+            {%if owner_fingerprint and not compare or request.user.is_superuser and not compare %}
+
             <div id='pc_comments_placeholder' class="pc_comment">
             </div>
-            {%if owner_fingerprint and not compare or request.user.is_superuser  and not compare %}
                 <div id="pc_comment_id" class="pc_comment">
                 <form id="chartcomments" method="post" action="comments" >
                     {% csrf_token %}
