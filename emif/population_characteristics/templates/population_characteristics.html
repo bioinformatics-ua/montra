@@ -11,7 +11,7 @@
          <h4 class="pull-center">No population characteristics associated with this database yet.</h4>
     <p class="pull-center">This database fingerprint does not have population characteristics. Submit the Population Characteristics file that can be extracted using <a onclick="return false;" href="">Jerboa</a>.</p>
 
-    
+
 
 
     <form id="jerboaupload" method="post" action="." enctype="multipart/form-data">
@@ -19,22 +19,21 @@
         <!-- Redirect browsers with JavaScript disabled to the origin page -->
         <!--<noscript><input type="hidden" name="redirect" value="http://blueimp.github.io/jQuery-File-Upload/"></noscript>-->
         <!-- The fileupload-buttonbar contains buttons to add/delete files and start/cancel the upload -->
-        <div class="row fileupload-buttonbar">                
+        <div class="offset1 span8 fileupload-buttonbar">
                 <fieldset>
 
-                <label>Name:</label> <input size="255" class="span7" type="text" cols="100" name="pc_name" >
-                <label>Description about extracted population characteristics: </label>
-                <textarea class="span7 input-block-level" rows="4" name="pc_comments" ></textarea>
+                <input placeholder="Name" size="255" class="span12" type="text" cols="100" name="pc_name" >
+                <textarea placeholder="Description about extracted population characteristics" class="span12 input-block-level" rows="4" name="pc_comments" ></textarea>
 
                 <!-- The fileinput-button span is used to style the file input field as button -->
                 <br />
-                <div style="margin-left: 0px !important;" class="span7 btn btn-success fileinput-button">
+                <div style="margin-left: 0px !important;" class="span12 btn btn-success fileinput-button">
                     <i class="glyphicon glyphicon-plus"></i>
                     <span>Add files...</span>
                     <input type="file" name="file" multiple>
                 </div>
-                
-                
+
+
                 <!-- The loading indicator is shown during file processing -->
                 <span class="fileupload-loading"></span>
                 </fieldset>
@@ -49,13 +48,13 @@
             </div>
         </div>
         <!-- The table listing the files available for upload/download -->
-        
-    </form> 
+
+    </form>
 
 
     <br>
     <br>
-    
+
     <table class="table table-striped">
     <tbody class="files" id="jerboafiles">
 
@@ -86,7 +85,7 @@
             </a>
 
             <ul class="dropdown-menu">
-                <!-- dropdown menu links -->                
+                <!-- dropdown menu links -->
                 <li>
                     <a id="chkpercentile1" href="#"> <i id="imatch" class="icon-ok icon-black active"></i>
                         1st Percentile
@@ -138,20 +137,20 @@
         </div>
     </div>
     </div>
-    
+
     <div class="row">
-    
+
     </div>
-    
+
     <div class="row">
 
     <div class="well span3" id="pc_list">
 
 
     </div>
-    
+
     <div class="span7" id="chart2">
-    
+
         <div style="margin-left: auto; margin-right: auto;" class='row'>
             <div id='pctitle'>
             </div>
@@ -159,29 +158,31 @@
             </div>
             <div id='pc_chart_place'>
             </div>
-            {%if owner_fingerprint and not compare or request.user.is_superuser and not compare %}
 
-            <div id='pc_comments_placeholder' class="pc_comment">
-            </div>
-                <div id="pc_comment_id" class="pc_comment">
+
+            {%if owner_fingerprint and not compare or request.user.is_superuser  and not compare %}
+                <div class="span12">
+                <div id='pc_comments_placeholder' class="span12 pc_comment">
+                </div>
+                <div id="pc_comment_id" class="span12 pc_comment">
+
                 <form id="chartcomments" method="post" action="comments" >
                     {% csrf_token %}
                     <input id="pc_chart_comment_id" name="pc_chart_comment_id" type="hidden" value="">
                     <input id="pc_chart_comment_fingerprint_id" name="pc_chart_comment_fingerprint_id" type="hidden" value="">
-                    <label>Title:</label> <input size="255" maxlength="40" style='width:35em' class="" type="text" cols="80" name="pc_chart_comment_name" >
+                    <input placeholder="Title" size="255" maxlength="40" class="span12" type="text" name="pc_chart_comment_name" >
 
-                    <label>Comments about extracted data: </label>
-                    <textarea class=" input-block-level" rows="4" cols="80" name="pc_chart_comment_description" ></textarea>
-                    <label> </label>
-                    <input type="submit" class="btn btn-primary" id="pc_chart_comment_submit" name="pc_chart_comment_submit" disabled="">
+                    <textarea placeholder="Comments about extracted data" class="span12 input-block-level" rows="4" name="pc_chart_comment_description" ></textarea>
+                    <input type="submit" class="span12 btn btn-primary" id="pc_chart_comment_submit" name="pc_chart_comment_submit" disabled="">
                 </form>
+                </div>
                 </div>
             {%endif%}
 
 
         </div>
     </div>
-    
+
 
     <div class="span2" id="pcBarContentRoot">
         <div class="pull-right" id="pcBarContent"></div>
@@ -192,7 +193,7 @@
 
     </div>
 
-  
+
 
     </div>
 

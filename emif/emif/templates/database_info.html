@@ -217,7 +217,7 @@
             <div class="span8"></div>
         </div>
         <div class="tab-pane {%if activetab == 'discussion'%}active{%endif%}" id="discussion">
-            <div class="container-fluid">
+            <div class="span8 offset2">
                 <div id="commentInserted" class="alert alert-success" style="display:none;">
                     <button type="button" class="close" data-dismiss="alert">&times;</button>
                     <strong>Comment sent!</strong> Your comment was posted successfully.
@@ -226,32 +226,38 @@
                     <button type="button" class="close" data-dismiss="alert" >&times;</button>
                     <strong><i class="fa fa-arrow-circle-o-down"></i></strong>&nbsp;You need to insert some words here
                 </div>
+                {% get_comment_count for fingerprint.fingerprint fingerprint_pk as comment_count %}
+
+                <center>
+                {% if comment_count == 0 %}
+                    <p>No comments yet.</p>
+                {% else %}
+                    <span id="comments_total">{{ comment_count }}</span> comment{{ comment_count|pluralize }}
+                {% endif %} 
+                </center>
                 {% if not readOnly %}
+
                     {% if user.is_authenticated %}
                     {% get_comment_form for fingerprint.fingerprint fingerprint_pk as form %}
 
-                    <form id="comment_form" action="{% comment_form_target %}" method="POST">
+                    <form class="span12" id="comment_form" action="{% comment_form_target %}" method="POST">
                         <fieldset>
                             {% csrf_token %}
-                            <textarea id="id_comment" rows="5" name="comment" class="span7" placeholder="Insert your comment or question here..." autofocus></textarea>
+                            <textarea id="id_comment" rows="5" name="comment" class="span12" placeholder="Insert your comment or question here..." autofocus></textarea>
                             {{ form.content_type }}
                             {{ form.object_pk }}
                             {{ form.timestamp }}
                             {{ form.security_hash }}
                             <br />
                             <!--<input type="hidden" name="next" value="{{request.get_full_path}}" />-->
-                            <button id="submit_button" class="btn btn-primary" type="submit"  data-loading-text="Sending comment...">Post comment</button>
+                            <button style="margin-left:0px;" id="submit_button" class="span12 btn btn-primary" type="submit"  data-loading-text="Sending comment...">Post comment</button>
                         </fieldset>
                     </form>
                     {% else %}
                     <p>Please <a href="{% url 'auth_login' %}">log in</a> to leave a comment.</p>
                     {% endif %}
                 {% endif %}
-                <br/>
-                {% get_comment_count for fingerprint.fingerprint fingerprint_pk as comment_count %}
-                <span id="comments_total">{{ comment_count }}</span> comment{{ comment_count|pluralize }}
-                <br/>
-                <br/>
+                <div class="clearfix span12">
                 {% get_comment_list for fingerprint.fingerprint fingerprint_pk as comment_list %}
                 <div id="newComments"></div>
                 {% for comment in comment_list reversed%}
@@ -262,8 +268,8 @@
                     </blockquote>
                 </div>
                 {% empty %}
-                <p>No comments yet.</p>
                 {% endfor %}
+                </div>
             </div>
         </div>
     </div>
