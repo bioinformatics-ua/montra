@@ -56,11 +56,12 @@ class PopulationCharacteristic(object):
         #f.close()
         json_data = json.loads(self._json)
         try:
-            # Create MONGO record
-            data_example = jerboa_collection.insert(json_data)
-            # get last inserted record
-            #print jerboa_collection.find_one()
-            print "Sucess "
+            if len(json_data) > 0:
+                # Create MONGO record
+                data_example = jerboa_collection.insert(json_data)
+                # get last inserted record
+                #print jerboa_collection.find_one()
+                print "Success "
         except OperationFailure:
             print "Failure"
         return json_data

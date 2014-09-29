@@ -40,56 +40,59 @@ def import_population_characteristics_data(user, fingerprint_id, revision, filen
 
     json_data = ''
     comma = ''
+    try:
+        f = open(filename)
+        log += '\nFile opened %s ' % filename
+        data = f.readlines()[1:]
+        for line in data:
+            file_line_info = {
+                'fingerprint_id': fingerprint_id,
+                'revision': revision,
+                'created_date': datetime.datetime.now().strftime("%Y%m%d-%H%M%S"),
+                'author': user.id,
+            }
+            line_data = {}
+            # parse input, assign values to variables
+            values = line.split('\t')
+            #print len(values)
+            if len(values) > 0:
+                line_data['Var'] = clean_value(values[0])
+            if len(values) > 1:
+                line_data['Name1'] = clean_value(values[1])
+            if len(values) > 2:
+                line_data['Value1'] = clean_value(values[2])
+            if len(values) > 2:
+                line_data['Name2'] = clean_value(values[3])
+            if len(values) > 4:
+                line_data['Value2'] = clean_value(values[4])
+            if len(values) > 5:
+                line_data['Gender'] = clean_value(values[5])
+            if len(values) > 6:
+                line_data['Min'] = clean_value(values[6])
+            if len(values) > 7:
+                line_data['Max'] = clean_value(values[7])
+            if len(values) > 8:
+                line_data['Count'] = clean_value(values[8])
+            if len(values) > 9:
+                line_data['Mean'] = clean_value(values[9])
+            if len(values) > 10:
+                line_data['perc25'] = clean_value(values[10])
+            if len(values) > 11:
+                line_data['Median'] = clean_value(values[11])
+            if len(values) > 12:
+                line_data['perc75'] = clean_value(values[12])
+            if len(values) > 13:
+                line_data['SD'] = clean_value(values[13])
 
-    f = open(filename)
-    log += '\nFile opened %s ' % filename
-    data = f.readlines()[1:]
-    for line in data:
-        file_line_info = {
-            'fingerprint_id': fingerprint_id,
-            'revision': revision,
-            'created_date': datetime.datetime.now().strftime("%Y%m%d-%H%M%S"),
-            'author': user.id,
-        }
-        line_data = {}
-        # parse input, assign values to variables
-        values = line.split('\t')
-        #print len(values)
-        if len(values) > 0:
-            line_data['Var'] = clean_value(values[0])
-        if len(values) > 1:
-            line_data['Name1'] = clean_value(values[1])
-        if len(values) > 2:
-            line_data['Value1'] = clean_value(values[2])
-        if len(values) > 2:
-            line_data['Name2'] = clean_value(values[3])
-        if len(values) > 4:
-            line_data['Value2'] = clean_value(values[4])
-        if len(values) > 5:
-            line_data['Gender'] = clean_value(values[5])
-        if len(values) > 6:
-            line_data['Min'] = clean_value(values[6])
-        if len(values) > 7:
-            line_data['Max'] = clean_value(values[7])
-        if len(values) > 8:
-            line_data['Count'] = clean_value(values[8])
-        if len(values) > 9:
-            line_data['Mean'] = clean_value(values[9])
-        if len(values) > 10:
-            line_data['perc25'] = clean_value(values[10])
-        if len(values) > 11:
-            line_data['Median'] = clean_value(values[11])
-        if len(values) > 12:
-            line_data['perc75'] = clean_value(values[12])
-        if len(values) > 13:
-            line_data['SD'] = clean_value(values[13])
-
-        # print line_data
-        file_line_info['values'] = line_data
-        # print file_line_info
-        json_data += comma + json.dumps(file_line_info)
-        comma = ', '
-    print json_data
-    f.close()
-    return "[" + json_data + "]"
+            # print line_data
+            file_line_info['values'] = line_data
+            # print file_line_info
+            json_data += comma + json.dumps(file_line_info)
+            comma = ', '
+        #print json_data
+        f.close()
+        return "[" + json_data + "]"
+    except:
+        print "-- ERROR: The file "+str(filename)+" couldn't be open."
+        return "[]"
 #import_population_characteristics_data()

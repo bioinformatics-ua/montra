@@ -126,5 +126,18 @@ def process_comment(question, answer):
     pass
 add_type('comment', 'Comment Only')
 
+@show_summary('choice-yesnodontknow')
+def show_summ(value):
+    valueclean = value.lower().strip()
+
+    if valueclean == 'yes':
+        return 'Yes'
+    elif valueclean == 'no':
+        return 'No'
+    elif valueclean == 'dontknow':
+        return "Don't Know"
+
+    return value
+
 
 
