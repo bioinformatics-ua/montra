@@ -4,21 +4,20 @@
          <h3>Update Population Characteristics</h3>
     </div>
     <div class="modal-body">
-                <form id="jerboaupload" method="post" action="." enctype="multipart/form-data">
+                <form style="margin-left: 0px;" id="jerboaupload" method="post" action="." enctype="multipart/form-data">
                     {% csrf_token %}
                     <!-- Redirect browsers with JavaScript disabled to the origin page -->
                     <!--<noscript><input type="hidden" name="redirect" value="http://blueimp.github.io/jQuery-File-Upload/"></noscript>-->
                     <!-- The fileupload-buttonbar contains buttons to add/delete files and start/cancel the upload -->
-                    <div class="  fileupload-buttonbar">                
+                    <div class="fileupload-buttonbar">                
                             <fieldset>
 
-                            <label>Name:</label> <input size="255" class="span7" type="text" cols="100" name="pc_name" >
-                            <label>Description about extracted population characteristics: </label>
-                            <textarea class="span7 input-block-level" rows="4" name="pc_comments" ></textarea>
+                            <input placeholder="Name" size="255" class="span12" type="text" cols="100" name="pc_name" >
+                            <textarea placeholder="Description about extracted population characteristics" class="span12 input-block-level" rows="4" name="pc_comments" ></textarea>
 
                             <!-- The fileinput-button span is used to style the file input field as button -->
                             <br />
-                            <div style="margin-left: 0px !important;" class="span7 btn btn-success fileinput-button">
+                            <div style="margin-left: 0px !important;" class="span12 btn btn-success fileinput-button">
                                 <i class="glyphicon glyphicon-plus"></i>
                                 <span>Add files...</span>
                                 <input type="file" name="file" multiple>
