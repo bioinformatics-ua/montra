@@ -54,8 +54,8 @@ def saveFingerprintAnswers(qlist_general, fingerprint_id, questionnaire, user, e
                         # update existing answers
                         this_ans.data=value;
 
-                        if comment != None:
-                            this_ans.comment=comment;
+                        #if comment != None:
+                        this_ans.comment=comment;
 
                         #print "UPDATE: "
                         #print this_ans
@@ -103,6 +103,7 @@ def getComment(question, extra_fields):
         return comment
     except:
         pass
+
 
     return None
 

@@ -36,7 +36,7 @@
             </tr>
             <tr>
                 <td>Allow printing ?</td>
-                <td> 
+                <td>
                     <label class="radio">
                         <input class="qspreference" type="radio" name="_qs_printing" value="true" {% if permissions.allow_printing %}checked{% endif %}>
                         Yes
@@ -76,10 +76,10 @@
       </ul>
     </div>
     {% endif %}
-    
+
     <div class="questionset-title" style="font-size:6px">
         <h3>
-        
+
         {{ questions_list.0.0.text|removeh1 }}
         <label></label>
         </h3>
@@ -87,7 +87,7 @@
     {% if questions_list.0.0.help_text != "" %}
     <div class="clearfix qs-description">{{questions_list.0.0.help_text|safe}}</div>
     {% endif %}
-    
+
     {% csrf_token %}
     <input type="hidden" name="questionset_id" value="{{ questionset.id }}" />
     <div class="accordion" id="accordion_{{ questions_list.0.0.sortid }}">
@@ -141,7 +141,7 @@
                 <span>{{ question.help_text|safe }}</span>
             </div>
             {% endif %}
-            </span> 
+            </span>
             {% comment %}
             {% if qdict.required %}<span title="This fields is required to be able to publish this database (and make it public)" class="reqfield lead text-error">*</span>
             {% endif %}
@@ -182,7 +182,7 @@
                 {% include qdict.template %}
                 <div id="comments_{{question.number|removedots}}" style="display:none;margin-left:40px;">
                     <a href="#" class="span6" onclick="toggle_comments('{{question.number|removedots}}'); return false;"><i class="icon-comment-alt">&nbsp;</i> Comments</a>
-                    <textarea style=" background-color:#EEE;color: #000;" class="span6" name="comment_question_{{ question.number }}" cols="50" rows="5">{{qdict.comment}}</textarea>
+                    <textarea style=" background-color:#EEE;color: #000;" class="span6" id="comment_question_{{ question.number }}"  name="comment_question_{{ question.number }}" cols="50" rows="5">{{qdict.comment}}</textarea>
                 </div>
             </div>
             {% endif %}
@@ -200,7 +200,7 @@
                     $(function(){
                         toggle_comments('{{question.number|removedots}}');
                     });
-                    
+
                 </script>
             {% endif %}
 
@@ -264,7 +264,7 @@ qvalues['question_{{ k|escapejs }}'] = '{{ v|escapejs }}';
     /* qvalues is supposed to give us the parents that open the childs ??*/
     for(key in qvalues) {
     valchanged(key, qvalues[key], this);
-    }      
+    }
 }
 
 $(function(){
