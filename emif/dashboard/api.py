@@ -135,12 +135,13 @@ class MostViewedFingerprintView(APIView):
         if request.user.is_authenticated():    
             list_viewed = []
 
-            most_hit = Hit.objects.filter(user=request.user).values('user','hitcount__object_pk').annotate(total_hits=Count('hitcount')).order_by('-total_hits')[:10]
+            most_hit = Hit.objects.filter(user=request.user).values('user','hitcount__object_pk').annotate(total_hits=Count('hitcount')).order_by('-total_hits')
+            
+            i=0
 
-            print most_hit
             for hit in most_hit:
                 try:
-                    this_fingerprint = Fingerprint.objects.get(id=hit['hitcount__object_pk'])
+                    this_fingerprint = Fingerprint.valid().get(id=hit['hitcount__object_pk'])
 
                     list_viewed.append(
                         {
@@ -148,7 +149,10 @@ class MostViewedFingerprintView(APIView):
                             'name': findName(this_fingerprint),
                             'count': hit['total_hits']
                         })
-
+                    i+=1
+                    if i == 10:
+                        break
+                        
                 except Fingerprint.DoesNotExist:
                     print "-- Error on hitcount for fingerprint with id "+hit['hitcount__object_pk']
 

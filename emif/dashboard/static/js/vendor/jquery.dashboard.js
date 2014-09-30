@@ -314,10 +314,18 @@ var DashboardWidget = function DashboardWidget(widgetname, header, width, height
     __init  :   function(gridster, parent){
         var self = this;
 
-        var widget = ['<li id="'+ this.widgetname+'"><div class="widget-header"><div title="Drag to change widget position" class="dragtooltip pull-left"><i class="icon-align-justify"></i></div>'+
-        '<span style="margin-right: 5px;" class="icon_place">'+this.icon+'</span>'+this.header+
+        var __widgetentry = '<li id="'+ this.widgetname+'"><div class="widget-header"><div title="Drag to change widget position" class="dragtooltip pull-left">';
+
+        if(this.icon != undefined && this.icon.trim() != '')
+            __widgetentry += this.icon;
+        else
+            __widgetentry += '<i class="icon-align-justify"></i>';
+        
+        __widgetentry += '</div>'+this.header+
         '<div class="pull-right removewidget"><i class="icon-remove"></i></div></div><div class="accordion-body"><div style="overflow-y:auto; height: auto;" data-clampedheight="#'+
-        this.widgetname+'" class="accordion-inner">'+this.content+'</div></div></li>', this.width, this.height, this.pos_x, this.pos_y];
+        this.widgetname+'" class="accordion-inner">'+this.content+'</div></div></li>';
+
+        var widget = [__widgetentry, this.width, this.height, this.pos_x, this.pos_y];
 
         gridster.add_widget.apply(gridster, widget);
 

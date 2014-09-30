@@ -88,6 +88,10 @@ class Fingerprint(models.Model):
             return False
         return a != None
 
+    @staticmethod
+    def valid():
+        return Fingerprint.objects.filter(removed=False)
+
 def FingerprintFromHash(hash):
     return Fingerprint.objects.get(fingerprint_hash=hash);
 

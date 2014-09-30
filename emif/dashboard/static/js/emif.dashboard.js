@@ -51,6 +51,8 @@ $(function(){
 
     if(any_configuration == false){
         dashzone.initial();
+
+        dashzone.loadConfiguration();
     }
 });
 
