@@ -28,7 +28,9 @@ from population_characteristics.serialize import serialize
 from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import user_passes_test, login_required
 
-from emif.views import createqsets, get_api_info
+from emif.views import get_api_info
+from questionnaire.services import createqsets
+ 
 from django.shortcuts import render
 
 import os

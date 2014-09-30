@@ -34,7 +34,7 @@ from emif.utils import generate_hash
 
 from fingerprint.services import *
 
-from emif.modules.geo import *
+from geolocation.services import *
 
 class RequestMonkeyPatch(object):
     POST = {}
@@ -170,6 +170,22 @@ def database_edit(request, fingerprint_id, questionnaire_id, sort_id=1, template
     # Something is really wrong if we get here...
     return HttpResponse('Error open edit for fingerprint '+str(fingerprint_id), status=500)
 
+def database_detailed_view(request, fingerprint_id, questionnaire_id, template_name="database_edit.html"):
+
+    return database_edit(request, fingerprint_id, questionnaire_id, template_name=template_name, readonly=True);
+
+# detailed view with direct linking to questionset
+def database_detailed_view_dl(request, fingerprint_id, questionnaire_id, sort_id, template_name="database_edit.html"):
+
+    return database_edit(request, fingerprint_id, questionnaire_id, sort_id=sort_id, template_name=template_name, readonly=True);
+
+
+def database_detailed_qs(request, fingerprint_id, questionnaire_id, sort_id):
+
+    response = render_one_questionset(request, questionnaire_id, sort_id, fingerprint_id = fingerprint_id, is_new=False, readonly=True,
+                                               template_name='fingerprint_add_qs.html')
+
+    return response
 
 def show_fingerprint_page_read_only(request, q_id, qs_id, SouMesmoReadOnly=False, aqid=None, errors={}, template_name='advanced_search.html'):
 
