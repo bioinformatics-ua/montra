@@ -18,7 +18,7 @@ class NavigationInterceptor:
         assert hasattr(request, 'user'), "The Navigation Interceptor middleware\
  requires authentication middleware to be installed. Edit your\
  MIDDLEWARE_CLASSES setting to insert\
- 'django.contrib.auth.middlware.AuthenticationMiddleware'. If that doesn't\
+ 'django.contrib.auth.middleware.AuthenticationMiddleware'. If that doesn't\
  work, ensure your TEMPLATE_CONTEXT_PROCESSORS setting includes\
  'django.core.context_processors.auth'."
         self.user = request.user

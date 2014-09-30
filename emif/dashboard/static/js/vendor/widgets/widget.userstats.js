@@ -27,6 +27,8 @@ var UserStatsWidget = function UserStatsWidget(widgetname, width, height, pos_x,
     __init : function(gridster, parent){
         var self = this;
 
+        self.icon = '<i class="fa fa-line-chart"></i>';
+
         self.content = "<center><h3>Loading...</h3></center>";
 
         UserStatsWidget._super.__init.apply(self, [gridster, parent]);
@@ -35,7 +37,8 @@ var UserStatsWidget = function UserStatsWidget(widgetname, width, height, pos_x,
         .done(function(data) {
            
             if(data.stats){
-                self.content = "<strong>Databases owned:</strong> "+data.stats.numberownerdb+"<br />"+
+                self.content = "<strong>Last Login: </strong>"+data.stats.lastlogin+"<br />"+
+                "<strong>Databases owned:</strong> "+data.stats.numberownerdb+"<br />"+
                 "<strong>Databases shared with me:</strong> "+data.stats.numbershareddb+"<br />";
 
                 var mostpop = data.stats.mostpopulardb;

@@ -21,21 +21,29 @@
 
 var FeedWidget = function FeedWidget(widgetname, width, height, pos_x, pos_y){
 
-    FeedWidget._base.apply(this, [widgetname, "Feed", width, height, pos_x, pos_y]);
+    FeedWidget._base.apply(this, [widgetname, "History", width, height, pos_x, pos_y]);
 
 }.inherit(DashboardWidget).addToPrototype({
     __init : function(gridster, parent){
         var self = this;
 
         self.content = "";
+        self.icon = '<i class="fa fa fa-newspaper-o" />';
 
         FeedWidget._super.__init.apply(self, [gridster, parent]);
 
         $.get("api/feed")
         .done(function(data) {
             if(data.hasfeed){
-                var renderQuestion = function(entry, collapsable){
-                    self.content += '<table style="width: 100%;"><tr><td><a href="fingerprint/'+entry.hash+'/1/">'+entry.name + "</a> updated on "+entry.date +".<br />";
+                var renderQuestion = function(entry, pos, collapsable, show_icon){
+                    self.content += '<table style="width: 100%;"><tr>';
+
+                    if(show_icon){
+                        if(entry.icon === 'edit')
+                            self.content += '<td style="width:30px;"><i class="fa fa-2x fa-pencil"></i></td>';
+                    }
+
+                    self.content += '<td><a href="fingerprint/'+entry.hash+'/1/">'+entry.name + "</a> updated on "+entry.date +".<br />";
 
 
                     if(collapsable){
@@ -45,18 +53,19 @@ var FeedWidget = function FeedWidget(widgetname, width, height, pos_x, pos_y){
 
                         var alterations = entry.alterations;
                         for(var j=0; j < alterations.length; j++){
-                            self.content += '<a class="popoverit" data-html="true" data-placement="bottom" data-toggle="popover" data-trigger="hover" data-content="<strong>Question:</strong> '+ alterations[j].number
+                            self.content += '<a class="popoverit" data-html="true" data-placement="bottom" data-toggle="popover" data-trigger="hover" data-content=\'<strong>Question:</strong> '+ alterations[j].number
                             alterations[j].text+'<br />';
 
-                            if(alterations[j].oldvalue != alterations[j].newvalue)
-                                self.content += '<br /><strong>Old Answer:</strong>'+alterations[j].oldvalue+
-                                                '<br /><strong>New Answer:</strong>'+alterations[j].newvalue;
+                            if(alterations[j].oldvalue != alterations[j].newvalue){
+                                self.content += '<br /><strong>Old Answer:</strong>'+alterations[j].oldvalue.replace(/'/g, "\\'")+
+                                                '<br /><strong>New Answer:</strong>'+alterations[j].newvalue.replace(/'/g, "\\'");
+                            }
 
                             if(alterations[j].oldcomment != alterations[j].newcomment)
-                                self.content += '<br /><strong>Old Comment:</strong>'+alterations[j].oldcomment+
-                                                '<br /> <strong>New Comment:</strong>'+alterations[j].newcomment;
+                                self.content += '<br /><strong>Old Comment:</strong>'+alterations[j].oldcomment.replace(/'/g, "\\'")+
+                                                '<br /> <strong>New Comment:</strong>'+alterations[j].newcomment.replace(/'/g, "\\'");
 
-                            self.content += '">'+
+                            self.content += '\'>'+
                             alterations[j].number + '</a>, ';
                         }
                         self.content += '</small>';
@@ -65,7 +74,7 @@ var FeedWidget = function FeedWidget(widgetname, width, height, pos_x, pos_y){
                     self.content += '</td>';
 
                     if(collapsable)
-                        self.content += '<td style="vertical-align:center;" class="pull-right markable"><i class="pull-right fa fa-plus"></i></td>';
+                        self.content += '<td style="vertical-align:center;" id="markable'+i+'" class="pull-right markable"><i class="pull-right fa fa-plus"></i></td>';
 
                     self.content +='</tr></table><hr />';
                 } 
@@ -73,16 +82,16 @@ var FeedWidget = function FeedWidget(widgetname, width, height, pos_x, pos_y){
                 for(var i=0;i<data.feed.length;i++){
                                         
                     if(data.feed[i].length == 1){
-                        renderQuestion(data.feed[i][0], false);
+                        renderQuestion(data.feed[i][0], i, false, true);
                     } else {
                         self.content +='<div data-id="'+i+'" class="aggheader">';
 
-                        renderQuestion(data.feed[i][0], true);
+                        renderQuestion(data.feed[i][0], i, true, true);
 
                         self.content+='</div><div style="margin-left: 30px; display: none;" id="agg'+i+'">';
 
-                        for(var j=1;j<data.feed[i].length;j++){
-                            renderQuestion(data.feed[i][j], false);
+                        for(var j=0;j<data.feed[i].length;j++){
+                            renderQuestion(data.feed[i][j], i, false, false);
                         }
 
                         self.content +='</div>';
@@ -95,20 +104,23 @@ var FeedWidget = function FeedWidget(widgetname, width, height, pos_x, pos_y){
 
             FeedWidget._super.__refresh.apply(self);
 
-            $('.popoverit').popover();
+            $('.popoverit').popover(
+                {
+                    container: 'body',
+                    template: '<div class="popover popover-small"><div class="arrow"></div><div class="popover-inner"><h3 class="popover-title"></h3><div class="popover-content"><p></p></div></div></div>'
+                });
             $('.aggheader').click(function(){
                 var openid = $(this).data('id');
 
                 var agg = $('#agg'+openid);
 
                 agg.toggle();
-
-                var plus = agg.parent().find('.fa-plus');
+                var plus = $('#markable'+openid).find('.fa-plus');
 
                 if(plus.length == 0){
-                    $('.markable', $(this)).html('<i class="pull-right fa fa-plus">');
+                    $('#markable'+openid, $(this)).html('<i class="pull-right fa fa-plus">');
                 } else {
-                    $('.markable', $(this)).html('<i class="pull-right fa fa-minus">');
+                    $('#markable'+openid, $(this)).html('<i class="pull-right fa fa-minus">');
                 }
 
 

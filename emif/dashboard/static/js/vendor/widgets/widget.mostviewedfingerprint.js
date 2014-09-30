@@ -19,38 +19,37 @@
     #
 */
 
-var LastUsersWidget = function LastUsersWidget(widgetname, width, height, pos_x, pos_y){
+var MostViewedFingerprintWidget = function MostViewedFingerprintWidget(widgetname, width, height, pos_x, pos_y){
 
-    LastUsersWidget._base.apply(this, [widgetname, "Last Users Logged In", width, height, pos_x, pos_y]);
+    MostViewedFingerprintWidget._base.apply(this, [widgetname, "Most Viewed Fingerprints", width, height, pos_x, pos_y]);
 
 }.inherit(DashboardWidget).addToPrototype({
     __init : function(gridster, parent){
         var self = this;
 
-        self.icon = '<i class="fa fa-users"></i>';
+        self.icon = '<i class="fa fa-star"></i>';
 
         self.content = "<center><h3>Loading...</h3></center>";
 
-        LastUsersWidget._super.__init.apply(self, [gridster, parent]);
+        MostViewedFingerprintWidget._super.__init.apply(self, [gridster, parent]);
 
-        $.get("api/lastusers")
+        $.get("api/mostviewedfingerprint")
         .done(function(data) {
-           self.content = '<table class="nomargins table table-bordered">';
-            if(data.lastusers){
-                for(var i=0;i<data.lastusers.length;i++){
-                    self.content += '<tr><td style="word-break: break-all;"><small>'+data.lastusers[i] + "</small></td></tr>";
+           self.content = '<table class="table">';
+            if(data.mostviewed){
+                for(var i=0;i<data.mostviewed.length;i++){
+                    self.content += '<tr><td style="word-break: break-all;"><small><a href="fingerprint/'+data.mostviewed[i].hash+'/1">'+data.mostviewed[i].name+ "</a></small></td><!--td>" + data.mostviewed[i].count+"</td--></tr>";
                 }
             }
 
-            LastUsersWidget._super.__refresh.apply(self);
+            MostViewedFingerprintWidget._super.__refresh.apply(self);
 
             $('.table', $('#'+self.widgetname)).parent().css('padding', '0px');
-
           })
         .fail(function() {
-            self.content = ' Error loading Last Users admin Widget';
+            self.content = ' Error loading Most Viewed admin Widget';
 
-            LastUsersWidget._super.__refresh.apply(self);
+            MostViewedFingerprintWidget._super.__refresh.apply(self);
         });
     }
 });

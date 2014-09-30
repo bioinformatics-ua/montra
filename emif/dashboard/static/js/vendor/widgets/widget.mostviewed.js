@@ -27,6 +27,8 @@ var MostViewedWidget = function MostViewedWidget(widgetname, width, height, pos_
     __init : function(gridster, parent){
         var self = this;
 
+        self.icon = '<i class="fa fa-star"></i>';
+
         self.content = "<center><h3>Loading...</h3></center>";
 
         MostViewedWidget._super.__init.apply(self, [gridster, parent]);
@@ -36,7 +38,7 @@ var MostViewedWidget = function MostViewedWidget(widgetname, width, height, pos_
            self.content = '<table class="table">';
             if(data.mostviewed){
                 for(var i=0;i<data.mostviewed.length;i++){
-                    self.content += '<tr><td style="word-break: break-all;"><small>'+data.mostviewed[i].page + "</small></td><td>" + data.mostviewed[i].count+"</td></tr>";
+                    self.content += '<tr><td style="word-break: break-all;"><small><a href="'+data.mostviewed[i].page+'">'+data.mostviewed[i].page + "</a></small></td><!--td>" + data.mostviewed[i].count+"</td--></tr>";
                 }
             }
 

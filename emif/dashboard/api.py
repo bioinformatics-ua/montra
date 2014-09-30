@@ -66,6 +66,8 @@ import urllib2
 
 import random
 
+from hitcount.models import Hit, HitCount
+
 ############################################################
 ##### Database Types - Web service
 ############################################################
@@ -98,15 +100,61 @@ class MostViewedView(APIView):
     authentication_classes = (SessionAuthentication, BasicAuthentication)
     permission_classes = (IsAuthenticated,)    
     def get(self, request, *args, **kw):
+        stopwords = ['jerboalistvalues', 'population/comments', 'population/filters', 'population/compare'];
+        if request.user.is_authenticated():    
+            list_viewed = []
+            i = 0
+
+            user_history = user_history = NavigationHistory.objects.filter(user=request.user)
+            most_viewed = user_history.values('path').annotate(number_viewed=Count('path')).order_by('-number_viewed')
+
+            for viewed in most_viewed: 
+                if i == 10:
+                    break  
+
+                if not [stopword for stopword in stopwords if stopword in viewed['path']]:
+                    list_viewed.append({'page': viewed['path'], 'count': viewed['number_viewed']})
+                    i+=1
+
+            response = Response({'mostviewed': list_viewed}, status=status.HTTP_200_OK)
+
+        else:
+            response = Response({}, status=status.HTTP_403_FORBIDDEN)
+        return response
+
+############################################################
+##### Most Viewed Fingerprint - Web service
+############################################################
+
+
+class MostViewedFingerprintView(APIView):
+    authentication_classes = (SessionAuthentication, BasicAuthentication)
+    permission_classes = (IsAuthenticated,)    
+    def get(self, request, *args, **kw):
 
         if request.user.is_authenticated():    
             list_viewed = []
 
-            user_history = user_history = NavigationHistory.objects.filter(user=request.user)
-            most_viewed = user_history.values('path').annotate(number_viewed=Count('path')).order_by('-number_viewed')[:10]
+            most_hit = Hit.objects.filter(user=request.user).values('user','hitcount__object_pk').annotate(total_hits=Count('hitcount')).order_by('-total_hits')
+            
+            i=0
 
-            for viewed in most_viewed:
-                list_viewed.append({'page': viewed['path'], 'count': viewed['number_viewed']})
+            for hit in most_hit:
+                try:
+                    this_fingerprint = Fingerprint.valid().get(id=hit['hitcount__object_pk'])
+
+                    list_viewed.append(
+                        {
+                            'hash': this_fingerprint.fingerprint_hash,
+                            'name': findName(this_fingerprint),
+                            'count': hit['total_hits']
+                        })
+                    i+=1
+                    if i == 10:
+                        break
+                        
+                except Fingerprint.DoesNotExist:
+                    print "-- Error on hitcount for fingerprint with id "+hit['hitcount__object_pk']
 
             response = Response({'mostviewed': list_viewed}, status=status.HTTP_200_OK)
 
@@ -157,13 +205,20 @@ class UserStatsView(APIView):
             # most popular database of this user(with most unique views)
             # main database type
 
+            stats['lastlogin'] = request.user.last_login.strftime("%Y-%m-%d %H:%M:%S") 
+
             my_db = Fingerprint.objects.filter(owner=request.user).order_by('-hits')
             my_db_share = Fingerprint.objects.filter(shared=request.user) 
 
             stats['numberownerdb'] = my_db.count()
             stats['numbershareddb'] = my_db_share.count()
 
-            mostpopular = my_db[0]
+            mostpopular = None
+            try:
+                mostpopular = my_db[0]
+            except:
+                # no database owned
+                pass
 
             if mostpopular == None:
                 stats['mostpopulardb'] = {'name': '---', 'hash': '---', 'hits': '---'}
@@ -246,6 +301,7 @@ class FeedView(APIView):
                     'hash': mod.fingerprint_id.fingerprint_hash,
                     'name': findName(mod.fingerprint_id),
                     'date': mod.date.strftime("%Y-%m-%d %H:%M"),
+                    'icon': 'edit',
                     'alterations': alterations,
                     'revision': mod.revision
                 })
