@@ -25,7 +25,8 @@ from django.shortcuts import render, redirect
 from django.http import HttpResponse
 
 from emif.models import AdvancedQuery, AdvancedQueryAnswer
-from emif.views import results_diff, RequestMonkeyPatch
+from emif.views import results_diff
+from fingerprint.views import RequestMonkeyPatch
 from emif.models import QueryLog
 
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger

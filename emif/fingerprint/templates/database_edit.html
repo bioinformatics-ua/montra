@@ -61,7 +61,7 @@ text-decoration: none;
 
 
 {% block toolbar %}
-  {% include "menu_toolbar.html" %}
+  {% include "reusable_blocks/menu_toolbar.html" %}
 {% endblock %}
 
 {% block styleinclude %}
@@ -155,9 +155,6 @@ It was not possible to save this questionnary. Please try again in a few seconds
 
 </div>
 </div>
-{% comment %}
-{% include "fingerprint_edit.html" %}
-{% endcomment %}
 {% if not readonly %}
 <input type="hidden" id="edit_db_inputs" value="0">
 {% else %}

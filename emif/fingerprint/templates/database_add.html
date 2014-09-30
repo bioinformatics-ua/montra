@@ -37,7 +37,7 @@ text-decoration: none;
 
 {% block toolbar %}
 
-{% include "menu_toolbar.html" %}
+{% include "reusable_blocks/menu_toolbar.html" %}
 
 {% endblock %}
 
@@ -130,9 +130,6 @@ It was not possible to save this questionnary. Please try again in a few seconds
 
 </div>
 </div>
-{% comment %}
-{% include "fingerprint_add.html" %}
-{% endcomment %}
 <div class="span8" id="set_container"></div>
 
 </div>

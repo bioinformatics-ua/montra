@@ -1,5 +1,7 @@
 from fingerprint.models import *
 from questionnaire.models import Questionnaire, QuestionSet, Question, QuestionSetPermissions
+from questionnaire.views import *
+
 from django.contrib.auth.models import User
 
 from searchengine.search_indexes import generateFreeText, setProperFields, CoreEngine
@@ -410,4 +412,271 @@ def markAnswerRequests(user, fingerprint, question, answer_requests):
         sendNotification(timedelta(hours=12), req.requester, fingerprint.owner, 
             "fingerprint/"+fingerprint.fingerprint_hash+"/1/", message)
 
+def intersect(answers, questionset):
 
+    # i know, this would be simpler if we just had the __in query, but we could only do this
+    # if we deleted entries on Answer, and i don't want to do that because of the versioning
+    # (on field can be empty, be filled, be empty and be filled again), the version has a pointer to the answer
+    # we can't go around deleting entries... is preferable to do the process of checking for emptyness in this query
+
+    non_empty = []
+    for ans in answers.filter(question__in=questionset.questions()):
+        if ans.data != None and ans.data != '':
+            non_empty.append(ans)
+
+    return non_empty
+
+# Set new permissions for a questionset, based on a post request
+def setNewPermissions(request):
+
+    if(request == None or not request.POST):
+        return False
+
+    id = request.POST['_qs_perm']
+
+    if(id != None):
+
+        try:
+            this_permissions                = QuestionSetPermissions.objects.get(id=id)
+
+            this_permissions.visibility     = int(request.POST['_qs_visibility'])
+            this_permissions.allow_printing = (request.POST['_qs_printing'] == 'true')
+            this_permissions.allow_indexing = (request.POST['_qs_indexing'] == 'true')
+            this_permissions.allow_exporting= (request.POST['_qs_exporting'] == 'true')
+
+            this_permissions.save()
+
+            return True
+
+        except QuestionSetPermissions.DoesNotExist:
+            print "Can't save this since, there's no permissions object to this questionset yet."
+        except QuestionSetPermissions.MultipleObjectsReturned:
+            print "Can't save this since there's several objects for this questionset permissions (should be only one)"
+
+
+    return False
+
+def extract_answers(request2, questionnaire_id, question_set, qs_list):
+
+
+    question_set2 = question_set
+    request = request2
+    # Extract files if they exits
+    try:
+        if request.FILES:
+            for name, f in request.FILES.items():
+                handle_uploaded_file(f)
+    except:
+        pass
+
+    qsobjs = QuestionSet.objects.filter(questionnaire=questionnaire_id)
+    questionnaire = qsobjs[0].questionnaire
+
+    sortid = 0
+
+    if request.POST:
+        try:
+            question_set = request.POST['active_qs']
+            sortid = request.POST['active_qs_sortid']
+            fingerprint_id = request.POST['fingerprint_id']
+        except:
+            for qs in qsobjs:
+                if qs.sortid == int(sortid):
+                    question_set = qs.pk
+                    break
+
+    expected = []
+    for qset in qsobjs:
+        questions = qset.questions()
+        for q in questions:
+            expected.append(q)
+
+    items = request.POST.items()
+    extra = {} # question_object => { "ANSWER" : "123", ... }
+    extra_comments = {}
+    extra_fields = {}
+    # this will ensure that each question will be processed, even if we did not receive
+    # any fields for it. Also works to ensure the user doesn't add extra fields in
+    '''for x in expected:
+        items.append((u'question_%s_Trigger953' % x.number, None))
+    '''
+    # generate the answer_dict for each question, and place in extra
+    for item in items:
+        key, value = item[0], item[1]
+        if key.startswith('comment_question_'):
+            continue
+        if key.startswith('question_'):
+            answer = key.split("_", 2)
+            question = get_question(answer[1], questionnaire)
+            if not question:
+                logging.warn("Unknown question when processing: %s" % answer[1])
+                continue
+            extra[question] = ans = extra.get(question, {})
+            if (len(answer) == 2):
+                ans['ANSWER'] = value
+            elif (len(answer) == 3):
+                ans[key] = value
+            else:
+                print "Poorly formed form element name: %r" % answer
+                logging.warn("Poorly formed form element name: %r" % answer)
+                continue
+            extra[question] = ans
+
+
+
+            comment_id = "comment_question_"+question.number#.replace(".", "")
+            try:
+                if request.POST and request.POST[comment_id]!='':
+                    #comment_id_index = "comment_question_"+question.slug
+                    comment_id_index = "comment_question_"+question.slug_fk.slug1
+                    extra_comments[question] = request.POST[comment_id]
+                    extra_fields[comment_id_index+'_t'] = request.POST[comment_id]
+            except KeyError:
+                pass
+    errors = {}
+
+    #print "Extra comments"
+    #print extra_comments
+
+    # Verification of qprocessor answers
+    def verify_answer(question, answer_dict):
+
+        type = question.get_type()
+
+        if "ANSWER" not in answer_dict:
+            answer_dict['ANSWER'] = None
+        answer = None
+        if type in Processors:
+            answer = Processors[type](question, answer_dict) or ''
+        else:
+            print AnswerException("No Processor defined for question type %s" % type)
+
+        return True
+
+    active_qs_with_errors = False
+
+    for question, ans in extra.items():
+
+        '''if u"Trigger953" not in ans:
+            logging.warn("User attempted to insert extra question (or it's a bug)")
+            continue
+        '''
+        try:
+            cd = question.getcheckdict()
+
+            depon = cd.get('requiredif', None) or cd.get('dependent', None)
+
+            verify_answer(question, ans)
+
+        except AnswerException, e:
+            errors[question.number] = e
+            print e
+
+            if (str(question.questionset.id) == question_set):
+                #print "active enable"
+                active_qs_with_errors = True
+        except Exception:
+            logging.exception("Unexpected Exception")
+            raise
+
+    try:
+        questions = question_set2.questions()
+
+        questions_list = {}
+        for qset_aux in qs_list:
+            questions_list[qset_aux.id] = qset_aux.questions()
+
+        qlist = []
+        jsinclude = []      # js files to include
+        cssinclude = []     # css files to include
+        jstriggers = []
+        qvalues = {}
+
+        qlist_general = []
+
+        for k in qs_list:
+            qlist = []
+            qs_aux = None
+            for question in questions_list[k.id]:
+                qs_aux = question.questionset
+                Type = question.get_type()
+                _qnum, _qalpha = split_numal(question.number)
+
+                qdict = {
+                    'template': 'questionnaire/%s.html' % (Type),
+                    'qnum': _qnum,
+                    'qalpha': _qalpha,
+                    'qtype': Type,
+                    'qnum_class': (_qnum % 2 == 0) and " qeven" or " qodd",
+                    'qalpha_class': _qalpha and (ord(_qalpha[-1]) % 2 \
+                                                     and ' alodd' or ' aleven') or '',
+                }
+
+                # add javascript dependency checks
+                cd = question.getcheckdict()
+                depon = cd.get('requiredif', None) or cd.get('dependent', None)
+                if depon:
+                    # extra args to BooleanParser are not required for toString
+                    parser = BooleanParser(dep_check)
+
+                    # qdict['checkstring'] = ' checks="%s"' % parser.toString(depon)
+
+                    #It allows only 1 dependency
+                    #The line above allows multiple dependencies but it has a bug when is parsing white spaces
+                    qdict['checkstring'] = ' checks="dep_check(\'question_%s\')"' % depon
+
+                    qdict['depon_class'] = ' depon_class'
+                    jstriggers.append('qc_%s' % question.number)
+                    if question.text[:2] == 'h1':
+                        jstriggers.append('acc_qc_%s' % question.number)
+                if 'default' in cd and not question.number in cookiedict:
+                    qvalues[question.number] = cd['default']
+                if Type in QuestionProcessors:
+
+                    qdict.update(QuestionProcessors[Type](request2, question))
+                    try:
+                        qdict['comment'] = extra_comments[question]
+                    except KeyError:
+                        pass
+
+                    if question.number in errors:
+                        qdict["qprocessor_errors"] = errors[question.number].message
+
+                    if 'jsinclude' in qdict:
+                        if qdict['jsinclude'] not in jsinclude:
+                            jsinclude.extend(qdict['jsinclude'])
+                    if 'cssinclude' in qdict:
+                        if qdict['cssinclude'] not in cssinclude:
+                            cssinclude.extend(qdict['jsinclude'])
+                    if 'jstriggers' in qdict:
+                        jstriggers.extend(qdict['jstriggers'])
+
+                qlist.append((question, qdict))
+
+            if qs_aux == None:
+                qs_aux = k
+            qlist_general.append((qs_aux, qlist))
+    except:
+        raise
+
+        ## HOT FIX for qvalues to work properly, THIS SHOULD BE FIXED IN THE CODE ABOVE
+
+    qvalues = {}
+    for question, qdict in qlist_general:
+        for k, v in qdict:
+            try:
+                qval = v['qvalue']
+
+                print str(k.number)+" - "+qval
+                if qval != None and qval != '':
+
+                    try:
+                        cutzone = qval.index('#');
+                        qvalues[k.number] = qval[0:cutzone]
+                    except ValueError:
+                        qvalues[k.number] = qval
+
+            except KeyError:
+                pass
+
+    return (qlist_general, qlist, jstriggers, qvalues, jsinclude, cssinclude, extra_fields, len(errors)!=0)
