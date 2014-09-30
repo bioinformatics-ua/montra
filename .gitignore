@@ -2,6 +2,8 @@
 *.pyc
 
 *.db2
+*.backup
+*.rej
 
 emif/emif/emif.db
 
@@ -23,3 +25,6 @@ emif/emif.db
 src/pip-delete-this-directory.txt
 emif/emif/local_settings.py
 fingerprints.pkl
+/.project
+
+emif/CACHE
