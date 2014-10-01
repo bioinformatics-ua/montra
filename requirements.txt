@@ -18,7 +18,7 @@ textile==2.1.5
 wsgiref==0.1.2
 djangorestframework==2.2.6
 django-bootstrap-breadcrumbs==0.6.2
-django-bootstrap-pagination==0.1.10
+-e git://github.com:ribeiroct/django-bootstrap-pagination.git#egg=django-bootstrap-pagination
 pysolr==3.0.6
 github3.py==0.8.1
 django-jenkins

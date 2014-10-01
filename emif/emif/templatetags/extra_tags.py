@@ -262,17 +262,17 @@ def profiles_list_user(user):
 def show_profiles(user):
 
     return {'profiles':profiles_list_user(user)}
-register.inclusion_tag('menu_ttags_profiles.html')(show_profiles)
+register.inclusion_tag('reusable_blocks/menu_ttags_profiles.html')(show_profiles)
 
 def show_fingerprints_interests_profile(user):
 
     return {'fingerprints':fingerprints_list_user(user)}
-register.inclusion_tag('menu_ttags_interests.html')(show_fingerprints_interests_profile)
+register.inclusion_tag('reusable_blocks/menu_ttags_interests.html')(show_fingerprints_interests_profile)
 
 def show_fingerprints_interests(user):
 
     return {'fingerprints':fingerprints_list_user(user)}
-register.inclusion_tag('menu_ttags.html')(show_fingerprints_interests)
+register.inclusion_tag('reusable_blocks/menu_ttags.html')(show_fingerprints_interests)
 
 @register.simple_tag
 def show_subscription(user):
@@ -302,19 +302,19 @@ def show_subscription(user):
 def show_fingerprints():
     
     return {'fingerprints':fingerprints_list()}
-register.inclusion_tag('menu_ttags.html')(show_fingerprints)
+register.inclusion_tag('reusable_blocks/menu_ttags.html')(show_fingerprints)
 
 
 def show_fingerprints_for_search(user):
     
     return {'fingerprints':fingerprints_list_user(user)}
-register.inclusion_tag('menu_ttags_for_search.html')(show_fingerprints_for_search)
+register.inclusion_tag('reusable_blocks/menu_ttags_for_search.html')(show_fingerprints_for_search)
 
 
 def show_fingerprints_for_statistics():
 
     return {'fingerprints':fingerprints_list()}
-register.inclusion_tag('menu_ttags_for_statistics.html')(show_fingerprints_for_statistics)
+register.inclusion_tag('reusable_blocks/menu_ttags_for_statistics.html')(show_fingerprints_for_statistics)
 
 
 

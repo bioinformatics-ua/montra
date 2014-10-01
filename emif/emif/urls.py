@@ -62,43 +62,43 @@ urlpatterns = patterns('',
     url(r'^bootstrap_ie_compatibility$', 'emif.views.bootstrap_ie_compatibility'),
 
     # Advanced Search
-    url(r'^advancedSearch/(?P<questionnaire_id>[0-9]+)/(?P<question_set>[0-9]+)/(?P<aqid>[0-9]+)?$', 'emif.views.advanced_search'),
+    url(r'^advancedSearch/(?P<questionnaire_id>[0-9]+)/(?P<question_set>[0-9]+)/(?P<aqid>[0-9]+)?$', 'advancedsearch.views.advanced_search'),
     
     # Database Add
 
-    url(r'^add/(?P<questionnaire_id>[0-9]+)/(?P<sortid>[0-9]+)/$', 'emif.views.database_add'),
-    url(r'^searchqs/(?P<questionnaire_id>[0-9]+)/(?P<sortid>[0-9]+)/((?P<aqid>[0-9]+)/)?$', 'emif.views.database_search_qs'),
-    url(r'^addqs/(?P<fingerprint_id>[^/]+)/(?P<questionnaire_id>[0-9]+)/(?P<sortid>[0-9]+)/$', 'emif.views.database_add_qs'),
+    url(r'^add/(?P<questionnaire_id>[0-9]+)/(?P<sortid>[0-9]+)/$', 'fingerprint.views.database_add'),
+    url(r'^searchqs/(?P<questionnaire_id>[0-9]+)/(?P<sortid>[0-9]+)/((?P<aqid>[0-9]+)/)?$', 'advancedsearch.views.database_search_qs'),
+    url(r'^addqs/(?P<fingerprint_id>[^/]+)/(?P<questionnaire_id>[0-9]+)/(?P<sortid>[0-9]+)/$', 'fingerprint.views.database_add_qs'),
 
-    url(r'^addPost/(?P<questionnaire_id>[0-9]+)/(?P<sortid>[0-9]+)/(?P<saveid>[0-9]+)$', 'emif.views.check_database_add_conditions'),
+    url(r'^addPost/(?P<questionnaire_id>[0-9]+)/(?P<sortid>[0-9]+)/(?P<saveid>[0-9]+)$', 'fingerprint.views.check_database_add_conditions'),
     
 
     
     # Database Edit
-    url(r'^dbEdit/(?P<fingerprint_id>[^/]+)/(?P<questionnaire_id>[0-9]+)$', 'emif.views.database_edit'),
-    url(r'^dbEdit/(?P<fingerprint_id>[^/]+)/(?P<questionnaire_id>[0-9]+)/(?P<sort_id>[0-9]+)/$', 'emif.views.database_edit_dl'),
-    url(r'^dbDetailed/(?P<fingerprint_id>[^/]+)/(?P<questionnaire_id>[0-9]+)$', 'emif.views.database_detailed_view'),
-    url(r'^dbDetailed/(?P<fingerprint_id>[^/]+)/(?P<questionnaire_id>[0-9]+)/(?P<sort_id>[0-9]+)$', 'emif.views.database_detailed_view_dl'),
+    url(r'^dbEdit/(?P<fingerprint_id>[^/]+)/(?P<questionnaire_id>[0-9]+)$', 'fingerprint.views.database_edit'),
+    url(r'^dbEdit/(?P<fingerprint_id>[^/]+)/(?P<questionnaire_id>[0-9]+)/(?P<sort_id>[0-9]+)/$', 'fingerprint.views.database_edit_dl'),
+    url(r'^dbDetailed/(?P<fingerprint_id>[^/]+)/(?P<questionnaire_id>[0-9]+)$', 'fingerprint.views.database_detailed_view'),
+    url(r'^dbDetailed/(?P<fingerprint_id>[^/]+)/(?P<questionnaire_id>[0-9]+)/(?P<sort_id>[0-9]+)$', 'fingerprint.views.database_detailed_view_dl'),
 
-    url(r'^editqs/(?P<fingerprint_id>[^/]+)/(?P<questionnaire_id>[0-9]+)/(?P<sort_id>[0-9]+)/$', 'emif.views.database_edit_qs'),
-    url(r'^detailedqs/(?P<fingerprint_id>[^/]+)/(?P<questionnaire_id>[0-9]+)/(?P<sort_id>[0-9]+)/$', 'emif.views.database_detailed_qs'),
+    url(r'^editqs/(?P<fingerprint_id>[^/]+)/(?P<questionnaire_id>[0-9]+)/(?P<sort_id>[0-9]+)/$', 'fingerprint.views.database_edit_qs'),
+    url(r'^detailedqs/(?P<fingerprint_id>[^/]+)/(?P<questionnaire_id>[0-9]+)/(?P<sort_id>[0-9]+)/$', 'fingerprint.views.database_detailed_qs'),
 
     url(r'^feedback/thankyou/', 'emif.views.feedback_thankyou'),
     url(r'^feedback$', 'emif.views.feedback', name="feedback"),
     url(r'^bugreport$', 'control_version.views.bug_report', name="bug_report"),
 
     # Results
-    url(r'^results$', 'emif.views.results_fulltext'),
+    url(r'^results$', 'fingerprint.listings.results_fulltext'),
 
     #Statistics
     url(r'^statistics/(?P<questionnaire_id>[0-9]+)/(?P<question_set>[0-9]+)/$', 'emif.views.statistics'),
     # url(r'^statistics$', 'emif.views.statistics'),
 
-    url(r'^geo$', 'emif.views.geo'),
+    url(r'^geo$', 'geolocation.views.geo'),
 
 
-    url(r'^resultsdiff/(?P<page>[-]{0,1}\d+)?$', 'emif.views.results_diff'),
-    url(r'^resultscomp', 'emif.views.results_comp'),
+    url(r'^resultsdiff/(?P<page>[-]{0,1}\d+)?$', 'fingerprint.listings.results_diff'),
+    url(r'^resultscomp', 'compare.views.results_comp'),
     #url(r'^fingerprint/(?P<runcode>[^/]+)/(?P<qs>[-]{0,1}\d+)/$', 'emif.views.fingerprint'),
     url(r'^fingerprint/(?P<runcode>[^/]+)/(?P<qs>[-]{0,1}\d+)/$', 'population_characteristics.documents.document_form_view'),
     url(r'^fingerprint/(?P<runcode>[^/]+)/(?P<qs>[-]{0,1}\d+)/(?P<activetab>[^/]+)/$', 'population_characteristics.documents.document_form_view'),
@@ -106,26 +106,26 @@ urlpatterns = patterns('',
     url(r'^fingerprintqs/(?P<runcode>[^/]+)/(?P<qsid>[0-9]+)/$', 'population_characteristics.documents.single_qset_view'),
 
     # List Databases
-    url(r'^query/(?P<page>[-]{0,1}\d+)?$', 'emif.views.query_solr'),
-    url(r'^databases/(?P<page>[-]{0,1}\d+)?$', 'emif.views.databases', name="databases"),
+    url(r'^query/(?P<page>[-]{0,1}\d+)?$', 'fingerprint.listings.query_solr'),
+    url(r'^databases/(?P<page>[-]{0,1}\d+)?$', 'fingerprint.listings.databases', name="databases"),
 #    url(r'^alldatabases/(?P<page>[-]{0,1}\d+)?$', 'emif.views.all_databases'),
-    url(r'^alldatabases/(?P<page>[-]{0,1}\d+)?$', 'emif.views.all_databases_user'),
-    url(r'^alldatabases/data-table$', 'emif.views.all_databases_data_table'),
-    url(r'^qs_data_table$', 'emif.views.qs_data_table'),    
-    url(r'^export_datatable$', 'emif.views.export_datatable'),
+    url(r'^alldatabases/(?P<page>[-]{0,1}\d+)?$', 'fingerprint.listings.all_databases_user'),
+    url(r'^alldatabases/data-table$', 'datatable.views.all_databases_data_table'),
+    url(r'^qs_data_table$', 'datatable.views.qs_data_table'),    
+    url(r'^export_datatable$', 'datatable.views.export_datatable'),
     url(r'^export_all_answers$', 'emif.views.export_all_answers'),
     url(r'^export_my_answers$', 'emif.views.export_my_answers'),
     url(r'^export_search_answers$', 'emif.views.export_search_answers'),
-    url(r'^export_bd_answers/(?P<runcode>[^/]+)/$', 'emif.views.export_bd_answers'),
-    url(r'^import-questionnaire', 'emif.views.import_questionnaire'),
+    url(r'^export_bd_answers/(?P<runcode>[^/]+)/$', 'fingerprint.views.export_bd_answers'),
+    url(r'^import-questionnaire', 'questionnaire.views.import_questionnaire'),
     url(r'^delete-questionnaire/(?P<qId>[0-9]+)/$', 'utils.delete_questionnaire.delete'),
     # Documentation
-    url(r'^docs/api$', 'emif.views.docs_api'),
+    url(r'^docs/api$', 'fingerprint.listings.docs_api'),
     #more like this    
-    url(r'^mlt/(?P<doc_id>[^/]+)/(?P<page>[-]{0,1}\d+)?$', 'emif.views.more_like_that'),
+    url(r'^mlt/(?P<doc_id>[^/]+)/(?P<page>[-]{0,1}\d+)?$', 'fingerprint.listings.more_like_that'),
 
 
-    url(r'^rm/(?P<id>[^/]+)', 'emif.views.delete_fingerprint'),
+    url(r'^rm/(?P<id>[^/]+)', 'fingerprint.views.delete_fingerprint'),
     
     url(r'^share/activation/(?P<activation_code>[^/]+)', 'emif.views.sharedb_activation'),
     url(r'^share/(?P<db_id>[^/]+)', 'emif.views.sharedb'),
@@ -146,8 +146,7 @@ urlpatterns = patterns('',
     url(r'^accounts/', include('accounts.urls')),
     
     # url(r'^api-upload-info/', 'rest_framework.authtoken.views.obtain_auth_token'),
-    url(r'^api-info/(?P<page>[-]{0,1}\d+)?', 'emif.views.create_auth_token', name="api-info"),
-    url(r'^docs/api', 'emif.views.docs_api'),
+    url(r'^api-info/(?P<page>[-]{0,1}\d+)?', 'fingerprint.listings.create_auth_token', name="api-info"),
 
     # Population Characteristics URLs
     url(r'population/', include('population_characteristics.urls')),

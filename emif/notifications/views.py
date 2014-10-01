@@ -20,7 +20,7 @@
 from django.shortcuts import render
 from django.http import HttpResponse
 from notifications.models import Notification
-from emif.views import define_rows
+from fingerprint.services import define_rows
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 def see_notifications_defer_all(request, template_name='notifications.html'):

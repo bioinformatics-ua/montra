@@ -51,7 +51,7 @@
 {% block toolbar %}
 
   {% if page_obj != None %}
-    {% include "menu_toolbar.html" with collapse=collapseall %}
+    {% include "reusable_blocks/menu_toolbar.html" with collapse=collapseall %}
   {% endif %}
 {% endblock %}
 
@@ -234,7 +234,7 @@
   {% endif %}
 
   {% if page_obj != None %}
-    {% include "post_paginator.html" %}
+    {% include "reusable_blocks/post_paginator.html" %}
 
 {% endif %}
 {% endblock %}

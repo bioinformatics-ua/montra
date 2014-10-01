@@ -30,6 +30,7 @@ from searchengine.models import Slugs
 from questionnaire.models import Question, Questionnaire, QuestionSet
 
 from emif.models import SharePending
+
 from fingerprint.models import Fingerprint
 from fingerprint.services import indexFingerprint, findName
 
@@ -41,6 +42,9 @@ from django.conf import settings
 
 from django.core.mail import BadHeaderError, EmailMultiAlternatives
 from django.template.loader import render_to_string
+
+import os
+import os.path
 
 def generate_hash():
     hash = md5.new()
@@ -92,36 +96,6 @@ def database_exists(database_name):
         return False
     else:
         return True
-
-class Database:
-    id = ''
-    name = ''
-    date = ''
-    date_modification = ''
-    institution = ''
-    location = ''
-    email_contact = ''
-    number_patients = ''
-    ttype = ''
-    type_name = ''
-    logo = ''
-    last_activity = ''
-
-    admin_name = ''
-    admin_address = ''
-    admin_email = ''
-    admin_phone = ''
-
-    scien_name = ''
-    scien_address = ''
-    scien_email = ''
-    scien_phone = ''
-
-    tec_name = ''
-    tec_address = ''
-    tec_email = ''
-    tec_phone = ''
-
 
 class ordered_dict(dict):
     def __init__(self, *args, **kwargs):

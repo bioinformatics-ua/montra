@@ -3,8 +3,9 @@
 {% load staticfiles %}
 {% load i18n %}
 {% load crispy_forms_tags %}
-{% with STATIC_URL=STATIC_URL BASE_URL=BASE_URL %}
 {% load compress %}
+
+{% with STATIC_URL=STATIC_URL BASE_URL=BASE_URL %}
 
 <!DOCTYPE html>
 <!--[if lt IE 7]>      <html class="no-js ns lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
@@ -39,6 +40,7 @@
         <link href='{{ STATIC_URL }}css/abel.css' rel='stylesheet' type='text/css'>
         <link rel="stylesheet" href="{{ STATIC_URL }}css/emif.landing.css" />
         <link rel="stylesheet" href="{{ STATIC_URL }}css/bootstrap-responsive.min.css">
+
     {% endcompress %}
     {% compress js %}
         <script src="{{ STATIC_URL }}js/vendor/modernizr-2.6.2.min.js"></script>
@@ -72,7 +74,7 @@
 
 
             <![endif]-->
-<script type="text/javascript">
+            <script type="text/javascript">
 var focusFirstField = function () {
   $('#signin_form input:nth(0)').focus();
 };
@@ -93,6 +95,31 @@ $(document).ready(function(){
         }, 400, 'linear', function() {
         });
     }, 600);
+
+    var focusFirstField = function () {
+      $('#signin_form input:nth(2)').focus();
+    };
+    $('#signin_form input[type="text"], #signin_form input[type="password"], #signup_form select').addClass('span6  ');
+    $('#id_remember_me').parent().wrap('<div style="position: relative; float: none; margin: auto;" class="span6">');
+
+    $('#signin_form .alert').wrap('<div style="position: relative; float: none; margin: auto;text-align: justify;" class="span6">');
+    
+    $('#signin_form .alert li').attr('style', 'list-style: none;');
+
+    $('#signin_form button[type="reset"]').on('click', focusFirstField);
+    focusFirstField();
+    $('#signin_form .control-label').each(function(e){
+    var fore = '#'+$(this).attr('for');
+    var destiny = $(fore);
+
+    if(destiny.get(0)){
+        var content = $(this).text().trim();
+
+        $(destiny).prop('placeholder', content);
+
+        $(this).hide();
+    }
+  }); 
 });
 
 
@@ -113,25 +140,24 @@ $(function(){
     s.parentNode.insertBefore(ga, s);
 })();
 </script>
-            {% endcompress %}
+        {% endcompress %}
         </head>
 
         <body>
             <div class="container">
                 <div class="row-fluid">
                     <div class="span8 offset2 panel">
-                        <div class="inside">
+                        <div class="inside" style="margin-bottom:0px;">
                             <p><img src="{{STATIC_URL}}img/emif_logo_trans.png"/></p>
                             <h1>EMIF Catalogue</h1>
 
                             <p class="lead">{% slogan %}</p>
                             <form action="accounts/signin/" id="signin_form" class="margin-base-vertical" method="post">
                                 {% csrf_token %}
-                                
-                                {% if referal != None %}
-                                <input name="referal" type="hidden" value="{{referal}}" />
-                                {% endif %}
 
+                                {% if referal != None %}
+                                <input type="hidden" name="referal" value="{{referal}}" />
+                                {% endif %}
                                 <div style="position: relative; float: none; margin: auto;" class="span6">
                                 <table style="width: 100%;">
                                     <tr><td style="text-align: left;"><h3>Sign in</h3></td>
@@ -140,16 +166,7 @@ $(function(){
                                 </table>
                                 </div>
                                 
-                                <div style="clear: both;" class="control-group">
-                                    <div class="controls">
-                                        <input class="span6" name="identification" class="signin-header-form-email" type="text" placeholder="Email">
-                                    </div>
-                                </div>
-                                <div class="control-group">
-                                    <div class="controls">
-                                      <input class="span6" name="password" class="signin-header-form-pass" type="password" placeholder="Password">
-                                  </div>
-                              </div>
+                                {{form|crispy}}
                               <div class="control-group">
                                 <div class="controls">
                                   <input id="id_remember_me" type="hidden" class="checkboxinput" name="remember_me" />
@@ -165,6 +182,8 @@ $(function(){
                 </div>
             </div>
             {% if next %}<input type="hidden" name="next" value="{{ next }}" />{% endif %}
+
+
         </form>
     </div>
     <div class="inside2">

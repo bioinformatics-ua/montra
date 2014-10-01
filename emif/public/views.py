@@ -28,6 +28,7 @@ from public.models import *
 from fingerprint.models import Answer
 from fingerprint.services import findName
 from public.services import createFingerprintShare, deleteFingerprintShare, shouldDelete
+
 from django.http import Http404 
 
 from population_characteristics.documents import document_form_view

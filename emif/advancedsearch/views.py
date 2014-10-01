@@ -25,10 +25,30 @@ from django.shortcuts import render, redirect
 from django.http import HttpResponse
 
 from emif.models import AdvancedQuery, AdvancedQueryAnswer
-from emif.views import results_diff, RequestMonkeyPatch
+from fingerprint.listings import results_diff
+from fingerprint.views import RequestMonkeyPatch, show_fingerprint_page_read_only, render_one_questionset
 from emif.models import QueryLog
 
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+
+def advanced_search(request, questionnaire_id, question_set, aqid):
+    try:
+        del request.session['isAdvanced']
+        del request.session['query']
+        del request.session['serialized_query']
+    except:
+        pass
+
+
+    return show_fingerprint_page_read_only(request, questionnaire_id, question_set, True, aqid)
+
+
+def database_search_qs(request, questionnaire_id, sortid, aqid):
+
+    response = render_one_questionset(request, questionnaire_id, sortid,aqid=aqid,
+                                               template_name='fingerprint_search_qs.html')
+
+    return response
 
 def history_defer(request, template_name='history.html'):
     return history(request, '0', 1)

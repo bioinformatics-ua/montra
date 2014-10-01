@@ -165,6 +165,7 @@ STATICFILES_DIRS = (
     # Don't forget to use absolute paths, not relative paths.
     os.path.abspath(PROJECT_DIR_ROOT + MIDDLE_DIR + 'emif/static'),
     os.path.abspath(PROJECT_DIR_ROOT + MIDDLE_DIR + 'questionnaire/static/'),
+    os.path.abspath(PROJECT_DIR_ROOT + MIDDLE_DIR + 'fingerprint/static/'),
     os.path.abspath(PROJECT_DIR_ROOT + MIDDLE_DIR + 'population_characteristics/static'),
     os.path.abspath(PROJECT_DIR_ROOT + MIDDLE_DIR + 'literature/static'),
     os.path.abspath(PROJECT_DIR_ROOT + MIDDLE_DIR + 'docs_manager/static'),
@@ -233,6 +234,7 @@ TEMPLATE_DIRS = (
     os.path.abspath(PROJECT_DIR_ROOT + MIDDLE_DIR + 'dashboard/templates'),
 
     os.path.abspath(PROJECT_DIR_ROOT + MIDDLE_DIR + 'notifications/templates'),
+    os.path.abspath(PROJECT_DIR_ROOT + MIDDLE_DIR + 'accounts/templates'),
 )
 
 INSTALLED_APPS = (
@@ -282,7 +284,7 @@ INSTALLED_APPS = (
     'population_characteristics',
     'literature',
     'django_bootstrap_breadcrumbs',
-    'bootstrap-pagination',
+    'bootstrap_pagination',
     'django_jenkins',
 
 
@@ -343,6 +345,7 @@ USERENA_WITHOUT_USERNAMES = True
 USERENA_DISABLE_PROFILE_LIST = True
 USERENA_USE_MESSAGES = False
 USERENA_REDIRECT_ON_SIGNOUT = BASE_URL
+USERENA_SIGNIN_REDIRECT_BASE = BASE_URL
 USERENA_SIGNIN_REDIRECT_URL = BASE_URL + 'wherenext'
 USERENA_MODERATE_REGISTRATION = True                    #True - need admin approval (activation)
 USERENA_ACTIVATION_REJECTED = 'ACTIVATION_REJECTED'

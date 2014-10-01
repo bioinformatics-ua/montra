@@ -9,6 +9,10 @@
 
 {% endblock %}
 
+{% block toolbar %}
+    {% include "reusable_blocks/menu_toolbar.html" with collapse=collapseall %}
+{% endblock %}
+
 {% block content %}
     
     {% if added %}

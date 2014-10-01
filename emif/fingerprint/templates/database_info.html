@@ -1,0 +1,426 @@
+{% extends 'base.html' %} 
+{% load url from future %} 
+{% load extra_tags %} 
+{% load django_bootstrap_breadcrumbs %} 
+{% load comments %}
+{% load hitcount_tags %}
+
+{% block styleinclude %}
+    <link rel="stylesheet" href="{{ STATIC_URL}}css/database_info.css" />
+    <link rel="stylesheet" href="{{ STATIC_URL }}css/vendor/jquery.boolrelwidget.css"></script>
+
+    <!-- Generic page styles -->
+    <link rel="stylesheet" href="{{ STATIC_URL }}css/vendor/style.css">
+    <!-- CSS to style the file input field as button and adjust the Bootstrap progress bars -->
+    <link rel="stylesheet" href="{{ STATIC_URL }}css/vendor/jquery.fileupload-ui.css">
+    <link rel="stylesheet" href="{{ STATIC_URL }}css/c3.css">
+
+    <link rel="stylesheet" href="{{ STATIC_URL }}css/jquery.dyndropdown.css">
+    <link rel="stylesheet" href="{{ STATIC_URL }}css/pc.css">
+    <style type="text/css">
+
+    .axis path,
+    .axis line {
+      fill: none;
+      stroke: #000;
+      shape-rendering: crispEdges;
+    }
+
+    .bar {
+      fill: steelblue;
+    }
+
+    .x.axis path {
+      display: none;
+    }
+
+    #pctitle{
+        text-align: center;
+    }
+    #pc_chart_place{
+        /*margin-left: 60px;*/
+    }
+    #jerboaupload{
+        margin-left: 60px;
+        margin-top: 30px;
+
+    }
+    </style>
+{% endblock %}
+
+{% block headextra %}
+
+<script src="{{ STATIC_URL}}js/vendor/taskqueuer.js"></script>
+<script src="{{ STATIC_URL}}js/vendor/jquery.expander.min.js"></script>
+<script src="{{ STATIC_URL}}js/jquery.simplePagination.js"></script>
+
+<!--
+<link href="{{ STATIC_URL }}nvd3/src/nv.d3.css" rel="stylesheet" type="text/css">
+<script src="{{ STATIC_URL }}nvd3/lib/d3.v3.js"></script>
+<script src="{{ STATIC_URL }}nvd3/nv.d3.js"></script>
+<script src="{{ STATIC_URL }}nvd3/src/models/axis.js"></script>
+<script src="{{ STATIC_URL }}nvd3/src/models/historicalBar.js"></script>
+<script src="{{ STATIC_URL }}nvd3/src/models/historicalBarChart.js"></script>
+<script src="{{ STATIC_URL }}nvd3/src/utils.js"></script>
+<script src="{{ STATIC_URL }}nvd3/src/models/axis.js"></script>
+<script src="{{ STATIC_URL }}nvd3/src/models/discreteBar.js"></script>
+<script src="{{ STATIC_URL }}nvd3/src/models/discreteBarChart.js"></script>
+
+-->
+
+<script src="{{ STATIC_URL}}js/emif.documents.js"></script>
+
+<script src="{{ STATIC_URL}}js/emif.jerboa.upload.js"></script>
+
+<!-- The jQuery UI widget factory, can be omitted if jQuery UI is already included -->
+<script src="{{ STATIC_URL }}js/vendor/jquery.ui.widget.js"></script>
+<!-- The Load Image plugin is included for the preview images and image resizing functionality -->
+<script src="{{ STATIC_URL }}js/vendor/load-image.min.js"></script>
+<!-- The Canvas to Blob plugin is included for image resizing functionality -->
+<script src="{{ STATIC_URL }}js/vendor/canvas-to-blob.min.js"></script>
+
+<!-- The Iframe Transport is required for browsers without support for XHR file uploads -->
+<script src="{{ STATIC_URL }}js/vendor/jquery.iframe-transport.js"></script>
+<!-- The basic File Upload plugin -->
+<script src="{{ STATIC_URL }}js/vendor/jquery.fileupload.js"></script>
+<!-- The File Upload processing plugin -->
+<script src="{{ STATIC_URL }}js/vendor/jquery.fileupload-process.js"></script>
+<!-- The File Upload image preview & resize plugin -->
+<script src="{{ STATIC_URL }}js/vendor/jquery.fileupload-image.js"></script>
+<!-- The File Upload audio preview plugin -->
+<script src="{{ STATIC_URL }}js/vendor/jquery.fileupload-audio.js"></script>
+<!-- The File Upload video preview plugin -->
+<script src="{{ STATIC_URL }}js/vendor/jquery.fileupload-video.js"></script>
+<!-- The File Upload validation plugin -->
+<script src="{{ STATIC_URL }}js/vendor/jquery.fileupload-validate.js"></script>
+<script src="{{ STATIC_URL }}js/vendor/jquery.cookie.js"></script>
+<script src="{{ STATIC_URL}}js/vendor/jquery.boolrelwidget.js"></script>
+
+
+<script src="{{ STATIC_URL}}js/jquery.dyndropdown.js"></script>
+<!--[if gte IE 9]><!-->
+<script src="{{ STATIC_URL}}js/emif.charts.filters.js"></script>
+<script src="{{ STATIC_URL}}js/emif.charts.draw.js"></script>
+
+<script src="{{ STATIC_URL}}js/emif.populationcharacteristics.comments.js"></script>
+{% endblock %} 
+{% block breadcrumbs %} 
+
+{% if readOnly %}
+    {% breadcrumb breadcrumb_name|ellipsis:40|add:" - Private View Link" "" %} 
+{% else %}
+
+    {{ block.super }} 
+    {% if search_old %}
+    {% breadcrumb "Search" "resultsdiff/1" %} 
+    {% breadcrumb breadcrumb_name "databases" %} 
+    {% elif request.session.list_origin == 'personal' %} 
+    {% breadcrumb "Personal" "databases" %} 
+    {% breadcrumb breadcrumb_name|ellipsis:40 "databases" %} 
+    {% else %} 
+    {% breadcrumb "All" "alldatabases" %} 
+    {% breadcrumb breadcrumb_name|ellipsis:40 "databases" %} 
+    {% endif %}
+
+{% endif %}
+
+{% endblock %}
+
+{% block toolbar %} 
+{% include "reusable_blocks/menu_toolbar.html" with collapse=collapseall %} 
+{% endblock %} 
+
+{% block content %} 
+
+{% if qsets %}
+
+<div style="margin-left: 0px;" class="span12">
+    <div class="row-fluid">
+        <div class="tabbable">
+            <ul class="nav nav-tabs">
+                <li class="{%if activetab == 'summary'%}active{%endif%}">
+                    <a href="#metadata" data-toggle="tab"><i class="icon-list"></i>&nbsp; Fingerprint</a>
+                </li>
+                <li class="{%if activetab == 'pc'%}active{%endif%}">
+                    <a href="#populationcharacteristics" data-toggle="tab"><i class="icon-signal"></i>&nbsp; Population Characteristics</a>
+                </li>
+                <li  class="{%if activetab == 'docs'%}active{%endif%}">
+                    <a href="#documents" data-toggle="tab"><i class="icon-folder-close"></i>&nbsp; Documents</a>
+                </li>
+                
+                <li class="{%if activetab == 'literature'%}active{%endif%}">
+                    <a href="#literature" data-toggle="tab"><i class="icon-book"></i>&nbsp; Literature</a>
+                </li>
+                
+                <li  class="{%if activetab == 'extra'%}active{%endif%}">
+                    <a href="#apiinfo" data-toggle="tab"><i class="icon-download-alt"></i> &nbsp; Extra Information</a>
+                </li>
+
+                <li  class="{%if activetab == 'discussion'%}active{%endif%}">
+                    <a href="#discussion" data-toggle="tab"><i class="fa fa-comment"></i> &nbsp; Discussion</a>
+            </ul>
+            <div style="margin-bottom: 50px;" class="tab-content">
+                <div class="tab-pane {%if activetab == 'summary'%}active{%endif%}" id="metadata">
+                    <div>
+                        {% if owner_fingerprint or user.is_staff %}
+                        <div class="pull-left">
+                            <small>
+                                <strong>Hits: </strong>{{hits}} &nbsp;&nbsp;
+                                <strong>Unique Views: </strong> {% get_hit_count for fingerprint %}
+                            </small>
+                        </div>
+                        {% endif %}
+                        <div class="pull-right btn-group">
+                            <button type="button" class="btn" id="show_hide_button">Hide Empty</button>
+
+                            <a id="collapseall_metadata" class="btn" href=""><i class="icon-plus"></i>&nbsp; Expand all</a>
+                        </div> 
+                        
+                    </div>
+                    <div class="accordion fullwidth pull-left " id="accordion1" style="margin-top: 10px;">
+                        <div id="set_container"></div>
+                    </div>
+
+
+                </div>
+            <div class="tab-pane {%if activetab == 'pc'%}active{%endif%}" id="populationcharacteristics" >
+
+              {% include "population_characteristics.html" %}
+
+          </div>
+
+          <div class="tab-pane {%if activetab == 'docs'%}active{%endif%}" id="documents">
+
+            {% include "documents.html" %}
+        </div>
+
+
+
+        <div class="tab-pane {%if activetab == 'literature'%}active{%endif%}" id="literature">
+            <h4 class="loadingsection pull-center">Loading...</h4>
+
+        </div>
+
+
+        <div class="tab-pane {%if activetab == 'extra'%}active{%endif%}" id="apiinfo">
+            <div>
+                <a id="btn_pivot_table" class="btn pull-right hidden" href="">Pivot table</a>
+            </div>
+            <div class="">
+                <div id="chart" class="span4" style="display:none;"></div>
+
+                <div  class='span10' id="pivot_table_extra_information">
+
+                </div>
+
+            </div>
+            <div class="span8"></div>
+        </div>
+        <div class="tab-pane {%if activetab == 'discussion'%}active{%endif%}" id="discussion">
+            <div class="span8 offset2">
+                <div id="commentInserted" class="alert alert-success" style="display:none;">
+                    <button type="button" class="close" data-dismiss="alert">&times;</button>
+                    <strong>Comment sent!</strong> Your comment was posted successfully.
+                </div>
+                <div id="fillForm" class="alert" style="display:none;">
+                    <button type="button" class="close" data-dismiss="alert" >&times;</button>
+                    <strong><i class="fa fa-arrow-circle-o-down"></i></strong>&nbsp;You need to insert some words here
+                </div>
+                {% get_comment_count for fingerprint.fingerprint fingerprint_pk as comment_count %}
+
+                <center>
+                {% if comment_count == 0 %}
+                    <p>No comments yet.</p>
+                {% else %}
+                    <span id="comments_total">{{ comment_count }}</span> comment{{ comment_count|pluralize }}
+                {% endif %} 
+                </center>
+                {% if not readOnly %}
+
+                    {% if user.is_authenticated %}
+                    {% get_comment_form for fingerprint.fingerprint fingerprint_pk as form %}
+
+                    <form class="span12" id="comment_form" action="{% comment_form_target %}" method="POST">
+                        <fieldset>
+                            {% csrf_token %}
+                            <textarea id="id_comment" rows="5" name="comment" class="span12" placeholder="Insert your comment or question here..." autofocus></textarea>
+                            {{ form.content_type }}
+                            {{ form.object_pk }}
+                            {{ form.timestamp }}
+                            {{ form.security_hash }}
+                            <br />
+                            <!--<input type="hidden" name="next" value="{{request.get_full_path}}" />-->
+                            <button style="margin-left:0px;" id="submit_button" class="span12 btn btn-primary" type="submit"  data-loading-text="Sending comment...">Post comment</button>
+                        </fieldset>
+                    </form>
+                    {% else %}
+                    <p>Please <a href="{% url 'auth_login' %}">log in</a> to leave a comment.</p>
+                    {% endif %}
+                {% endif %}
+                <div class="clearfix span12">
+                {% get_comment_list for fingerprint.fingerprint fingerprint_pk as comment_list %}
+                <div id="newComments"></div>
+                {% for comment in comment_list reversed%}
+                <div id="comment_{{ comment.id }}">
+                    <blockquote>
+                        <p style="font-size: 16px">{{ comment.comment }}</p>
+                        <small>{{ comment.name }} posted on {{ comment.submit_date }}</small>
+                    </blockquote>
+                </div>
+                {% empty %}
+                {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+</div>
+{% else %}
+<div class="row">
+    <div class="span4">
+        <div class="alert">
+            <a class="close" data-dismiss="error">×</a>
+            <strong>Warning!</strong>
+            You don't have results.
+        </div>
+    </div>
+</div>
+</div>
+{% endif %}
+
+<!-- Display a message to users with Javascript deactivated -->
+<noscript>
+    <div style="position:absolute;top:0;left:0;width:500px;height:250px;border:2px solid #A00;padding:6px;background-color:#fff;color:#600;text-align:center">
+        <h1>This page requires Javascript to function properly.</h1>
+
+        <h2>Please follow this instructions on how to
+            <a href="http://www.enable-javascript.com/" target="_blank">enable JavaScript in your web browser</a>.</h2>
+        </div>
+    </noscript>
+    {% if isAdvanced %}
+    <div id="bool_container"></div>
+    {% endif %}
+
+    {% endblock %} 
+
+    {% block uncompressed_js %}
+       <script src="//bioinformatics.ua.pt/becas/embed-widget.js"></script> 
+    {% endblock %}
+
+    {% block scriptextraincludes %}
+    <!-- Include the widget embedding script -->
+    
+
+
+<!--[if lte IE 8]>
+    <script src="{{ STATIC_URL}}js/d3/r2d3.min.js" charset="utf-8"></script>
+    <![endif]-->
+    <!--[if gte IE 9]><!-->
+
+    <script src="{{ STATIC_URL}}js/d3/d3.v3.min.js" charset="utf-8"></script>
+    <script src="{{ STATIC_URL}}js/d3/d3.layout.cloud.js"></script>
+    <script src="{{ STATIC_URL}}js/c3.js"></script>   
+    <!--<![endif]-->
+
+
+    <script src="{{ STATIC_URL}}js/database_info.js"></script>
+    <script src="{{ STATIC_URL }}js/emif.database.delete.js"></script>
+    <script src="{{ STATIC_URL}}js/emif.discussion.js"></script>
+
+    <!--[if gte IE 9]><!-->
+    <script src="{{ STATIC_URL}}js/emif.populationcharacteristics.charts.js"></script>
+
+    <script src="{{ STATIC_URL}}js/emif.populationcharacteristics.js"></script>
+    <!--<![endif]-->
+
+    <script src="{{ STATIC_URL}}js/vendor/patternrecognizer.js"></script>
+    <!--[if gte IE 9]><!-->
+    <script src="{{ STATIC_URL}}js/emif.charts.c3d3.js"></script>
+    <script src="{{ STATIC_URL}}js/emif.charts.d3.js"></script>
+
+    <script src="{{ STATIC_URL}}js/emif.charts.js"></script>
+    <!--<![endif]-->
+
+{% endblock %}
+<script>
+{% block scriptextra %}
+var global_fingerprint_id = '{{fingerprint_id}}';
+var global_public_key = '{{public_key.hash}}';
+var global_is_authenticated = {% if request.user.is_authenticated %}true{% else %}false{% endif %};
+
+{% if owner_fingerprint %}
+var global_owner = true;
+{% endif %}
+
+{%if latest_pop %}
+var global_revision = '{{latest_pop.revision}}';
+{% endif %}
+
+function load_questionnary(){
+
+console.log("Creating questionnary set containers (so they are in order)");
+        pushQsets();
+
+        //var threadpool = new ThreadPool(20);
+        //parts_missing = {{qsets|length}};
+
+        var priority=1;
+        {% for tuple, permissions in qsets %}
+            {% if permissions.visibility == 0 or owner_fingerprint or request.user.is_superuser %}
+        //        var thread = new Runnable(loadqspart, priority++, {{tuple.1.sortid}}, '{{fingerprint_id}}');
+
+        //        threadpool.run(thread);
+        //        threads['qs_{{ tuple.1.sortid }}'] = thread;
+            {% endif %}
+        {% endfor %}
+
+console.log( "Loading questionnary by parts, we have {{qsets|length}} sets");  
+
+{% for k, qs in qsets.ordered_items %}
+//var thread = new Runnable(loadqspart, priority++, {{qs.sortid}}, '{{fingerprint_id}}');
+
+//threadpool.run(thread);
+//threads['qs_{{ qs.sortid }}'] = thread;
+{% endfor %}
+
+//  we add the triggers thread
+//threadpool.destroy(function(){
+//    $('#show_hide_button').fadeIn();
+//});
+}
+$(function(){
+    var csrf_token = '{{ csrf_token }}';
+    {% get_hit_count_javascript for fingerprint %} 
+
+    initDatabaseInfo('{{apiinfo|safe}}');
+
+    bindPostCommentHandler('{{ request.user.first_name }}', '{{ request.user.last_name }}', '{{ request.user.username }}', '{{owners}}', '{{fingerprint_id}}', '{{breadcrumb_name}}');
+
+    {% if isAdvanced %}
+    initAdvSearchPlugin('{{request.session.serialization_query}}', '{{request.session.query_type}}', '{{request.session.query_id}}');
+    {% endif %}
+});
+
+function pushQsets(){
+    containers = []
+    // We build the qs containers in memory and just do dom op, on the end, for speed
+    // on ie joins are significantly faster than concatenation
+    // tuple = k, qs
+
+    {% for tuple, permissions in qsets %}
+            {% if permissions.visibility == 0 or owner_fingerprint or request.user.is_superuser %}
+                containers.push('<div class="{% if not permissions.allow_printing %}noprinting {% endif %}'+
+                '{% if not permissions.allow_exporting %}noexporting {% endif %}'+
+                '{%if permissions.visibility == 1 %}{% if owner_fingerprint or request.user.is_superuser %} privategroup{% endif %}{% endif %} accordion-group">'
+                +'<div class="accordion-heading"><a style="display: inline-block; width: 90%;" class="accordion-toggle" data-toggle="collapse" data-parent="#accordion1" href="#collapse{{ tuple.0|removespaces|safe|clean }}">{{ tuple.0|removeh1 }} </a>'+
+                '{% if permissions.visibility == 1 and owner_fingerprint %}<i class="tooltipit icon-eye-close" title="This questionset is private, only the data custodian can see it." ></i>{% endif %}'+
+                '{% if not permissions.allow_printing %}<img class="tooltipit" title="The data custodian doesn\'t allow this section to be printed." src="{{ STATIC_URL}}img/noprint.png"/>{% endif %}'+
+                '{% if not permissions.allow_exporting %}<img class="tooltipit" title="The data custodian doesn\'t allow this section to be exported." src="{{ STATIC_URL}}img/noexport.png"/>{% endif %}'+
+                '<span class="accordion-icon">{% if tuple.1.highlights %}<img title="This section has search keywords" class="markered" src="{{ STATIC_URL}}img/marker.png" /> {% endif %}</span></div><div id="collapse{{ tuple.0|removespaces|safe|clean }}" class="accordion-body collapse"><div id="qs_{{ tuple.1.sortid }}" class="accordion-inner"><h4 class="pull-center loadingsection">Loading...</h4></div></div></div>');
+            {% endif %}
+    {% endfor %}
+    $('#set_container').append(containers.join(''));
+}   
+{% endblock %}
+</script>
