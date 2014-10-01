@@ -28,7 +28,9 @@ from .serialize import serialize
 from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import user_passes_test, login_required
 
-from fingerprint.services import getPermissions, get_api_info, attachPermissions, merge_highlight_results
+from fingerprint.services import getPermissions, attachPermissions, merge_highlight_results
+
+from emif.views import get_api_info
 
 from questionnaire.services import createqsets, createqset
 

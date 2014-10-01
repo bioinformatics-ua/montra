@@ -36,54 +36,7 @@ from fingerprint.services import *
 
 from geolocation.services import *
 
-class RequestMonkeyPatch(object):
-    POST = {}
-
-    GET = {}
-
-    session = {}
-
-    META = None
-
-    COOKIES = None
-
-    method = POST
-
-    user = None
-
-    is_secure = False
-    path = "None"
-    host = None
-    def __init__(self):
-        self.POST = {}
-
-    def get_post(self):
-        return self.POST
-
-    def get_session(self):
-        return self.session
-
-    def set_session(self, session_params):
-        self.session = session_params
-
-    def set_user(self, user):
-        self.user = user
-
-    def set_meta(self, meta):
-        self.META = meta
-
-    def set_cookies(self, cookies):
-        self.COOKIES = cookies
-
-    def set_host(self, host):
-        self.host = host
-
-    # mock methods
-    def is_secure(self):
-        return False
-
-    def get_host(self):
-        return self.host
+from emif.models import QueryLog, AdvancedQuery, AdvancedQueryAnswer
 
 def export_bd_answers(request, runcode):
     """
@@ -101,6 +54,12 @@ def database_add(request, questionnaire_id, sortid):
                                                template_name='database_add.html')
 
     return response
+
+def delete_fingerprint(request, id):
+
+    deleteFingerprint(id, request.user)
+
+    return redirect('databases')
 
 # detailed view with direct linking to questionset
 def database_edit_dl(request, fingerprint_id, questionnaire_id, sort_id, template_name="database_edit.html"):

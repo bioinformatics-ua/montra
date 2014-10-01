@@ -80,9 +80,19 @@ from emif.utils import escapeSolrArg
 
 from notifications.models import Notification
     
-from fingerprint.tasks import anotateshowonresults
-
 from fingerprint.services import define_rows
+
+def get_api_info(fingerprint_id):
+    """This is an auxiliar method to get the API Info
+    """
+    result = {}
+
+
+    results = FingerprintAPI.objects.filter(fingerprintID=fingerprint_id)
+    result = {}
+    for r in results:
+        result[r.field] = r.value
+    return result
 
 def index(request, template_name='index_new.html'):
     if request.user.is_authenticated():
@@ -142,13 +152,6 @@ def calculate_databases_per_location():
         else:
             contries[u.contry.name] = number_of_dbs
 
-
-def delete_fingerprint(request, id):
-
-    deleteFingerprint(id, request.user)
-
-    return redirect('databases')
-
 def handle_uploaded_file(f):
     #print "abspath"
 
@@ -156,7 +159,6 @@ def handle_uploaded_file(f):
               'wb+') as destination:
         for chunk in f.chunks():
             destination.write(chunk)
-
 
 def feedback(request, template_name='feedback.html'):
 
@@ -196,48 +198,6 @@ def feedback(request, template_name='feedback.html'):
 
 def feedback_thankyou(request, template_name='feedback_thankyou.html'):
     return render(request, template_name, {'request': request, 'breadcrumb': True})
-
-def create_auth_token(request, page=1, templateName='api-key.html', force=False):
-    """
-    Method to create token to authenticate when calls REST API
-    """
-    rows = define_rows(request)
-    if request.POST and not force:
-        page = request.POST["page"]
-
-    if page == None:
-        page = 1
-
-    user = request.user
-    if not Token.objects.filter(user=user).exists():
-        token = Token.objects.create(user=request.user)
-    else:
-        token = Token.objects.get(user=user)
-
-    _filter = "user_t:" + '"' + user.username + '"'
-
-    (sortString, filterString, sort_params, range) = paginator_process_params(request.POST, page, rows)
-
-    sort_params["base_filter"] = _filter;
-
-    if len(filterString) > 0:
-        _filter += " AND " + filterString
-
-    (list_databases,hits) = get_databases_from_solr_v2(request, _filter, sort=sortString, rows=rows, start=range)
-    if range > hits and force < 2:
-        return create_auth_token(request, page=1, force=True)
-
-    list_databases = paginator_process_list(list_databases, hits, range)
-
-    myPaginator = Paginator(list_databases, rows)
-    try:
-        pager =  myPaginator.page(page)
-    except PageNotAnInteger, e:
-        pager =  myPaginator.page(1)
-    ## End Paginator ##
-
-    return render_to_response(templateName, {'list_databases': list_databases, 'token': token, 'user': user,
-                              'request': request, 'breadcrumb': True, 'page_obj': pager, 'page_rows': rows, "sort_params": sort_params, "page":page}, RequestContext(request))
 
 def invitedb(request, db_id, template_name="sharedb.html"):
 

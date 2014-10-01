@@ -16,6 +16,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
+import hashlib 
 
 from django.shortcuts import render
 
@@ -38,9 +39,14 @@ from searchengine.search_indexes import convert_text_to_slug
 
 from fingerprint.models import Database
 
-from emif.utils import convert_date
+from emif.models import QueryLog, AdvancedQuery, AdvancedQueryAnswer
+from emif.utils import convert_date, convert_qvalues_to_query, convert_query_from_boolean_widget, escapeSolrArg
 
-from fingerprint.services import define_rows
+from fingerprint.services import define_rows, merge_highlight_results
+
+from rest_framework.authtoken.models import Token
+
+from fingerprint.tasks import anotateshowonresults
 
 def query_solr(request, page=1):
     if not request.POST:
@@ -877,3 +883,45 @@ def paginator_process_list(list_databases, hits, start):
         nList.append(None)
 
     return nList
+
+def create_auth_token(request, page=1, templateName='api-key.html', force=False):
+    """
+    Method to create token to authenticate when calls REST API
+    """
+    rows = define_rows(request)
+    if request.POST and not force:
+        page = request.POST["page"]
+
+    if page == None:
+        page = 1
+
+    user = request.user
+    if not Token.objects.filter(user=user).exists():
+        token = Token.objects.create(user=request.user)
+    else:
+        token = Token.objects.get(user=user)
+
+    _filter = "user_t:" + '"' + user.username + '"'
+
+    (sortString, filterString, sort_params, range) = paginator_process_params(request.POST, page, rows)
+
+    sort_params["base_filter"] = _filter;
+
+    if len(filterString) > 0:
+        _filter += " AND " + filterString
+
+    (list_databases,hits) = get_databases_from_solr_v2(request, _filter, sort=sortString, rows=rows, start=range)
+    if range > hits and force < 2:
+        return create_auth_token(request, page=1, force=True)
+
+    list_databases = paginator_process_list(list_databases, hits, range)
+
+    myPaginator = Paginator(list_databases, rows)
+    try:
+        pager =  myPaginator.page(page)
+    except PageNotAnInteger, e:
+        pager =  myPaginator.page(1)
+    ## End Paginator ##
+
+    return render_to_response(templateName, {'list_databases': list_databases, 'token': token, 'user': user,
+                              'request': request, 'breadcrumb': True, 'page_obj': pager, 'page_rows': rows, "sort_params": sort_params, "page":page}, RequestContext(request))

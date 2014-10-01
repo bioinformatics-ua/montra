@@ -19,6 +19,8 @@ from datetime import timedelta
 
 from searchengine.search_indexes import CoreEngine
 
+
+
 def define_rows(request):
     if request.POST and "page_rows" in request.POST:
         rows = int(request.POST["page_rows"])
@@ -57,17 +59,6 @@ def merge_highlight_results(query, resultHighlights):
 
     return h
 
-def get_api_info(fingerprint_id):
-    """This is an auxiliar method to get the API Info
-    """
-    result = {}
-
-
-    results = FingerprintAPI.objects.filter(fingerprintID=fingerprint_id)
-    result = {}
-    for r in results:
-        result[r.field] = r.value
-    return result
 
 def saveFingerprintAnswers(qlist_general, fingerprint_id, questionnaire, user, extra_fields=None, created_date=None):
 
