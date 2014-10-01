@@ -155,6 +155,9 @@ $(function(){
                             <form action="accounts/signin/" id="signin_form" class="margin-base-vertical" method="post">
                                 {% csrf_token %}
 
+                                {% if referal != None %}
+                                <input type="hidden" name="referal" value="{{referal}}" />
+                                {% endif %}
                                 <div style="position: relative; float: none; margin: auto;" class="span6">
                                 <table style="width: 100%;">
                                     <tr><td style="text-align: left;"><h3>Sign in</h3></td>

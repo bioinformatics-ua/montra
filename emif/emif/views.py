@@ -95,10 +95,15 @@ def get_api_info(fingerprint_id):
     return result
 
 def index(request, template_name='index_new.html'):
+    referal = request.GET.get('ref', None)
+
     if request.user.is_authenticated():
-        return HttpResponseRedirect(settings.BASE_URL + 'wherenext')
+        if referal != None:
+            return HttpResponseRedirect(settings.BASE_URL + referal)
+        else:
+            return HttpResponseRedirect(settings.BASE_URL + 'wherenext')
     else:
-        return render(request, template_name, {'request': request})
+        return render(request, template_name, {'request': request, 'referal': referal})
 
 def about(request, template_name='about.html'):
     return render(request, template_name, {'request': request, 'breadcrumb': True})
