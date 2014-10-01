@@ -85,6 +85,16 @@ class RequestMonkeyPatch(object):
     def get_host(self):
         return self.host
 
+def export_bd_answers(request, runcode):
+    """
+    Method to export answers of a specific database to a csv file
+    :param request:
+    :param runcode:
+    """
+
+    list_databases = get_databases_from_solr(request, "id:" + runcode)
+    return save_answers_to_csv(list_databases, 'MyDB')
+
 def database_add(request, questionnaire_id, sortid):
 
     response = show_fingerprint_page_read_only(request, questionnaire_id, sortid,

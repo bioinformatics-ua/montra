@@ -283,7 +283,7 @@ INSTALLED_APPS = (
     'population_characteristics',
     'literature',
     'django_bootstrap_breadcrumbs',
-    'bootstrap-pagination',
+    'bootstrap_pagination',
     'django_jenkins',
 
 

@@ -29,6 +29,35 @@ from django.contrib.auth.models import User
 
 from description import fingerprint_description_slugs
 
+class Database:
+    id = ''
+    name = ''
+    date = ''
+    date_modification = ''
+    institution = ''
+    location = ''
+    email_contact = ''
+    number_patients = ''
+    ttype = ''
+    type_name = ''
+    logo = ''
+    last_activity = ''
+
+    admin_name = ''
+    admin_address = ''
+    admin_email = ''
+    admin_phone = ''
+
+    scien_name = ''
+    scien_address = ''
+    scien_email = ''
+    scien_phone = ''
+
+    tec_name = ''
+    tec_address = ''
+    tec_email = ''
+    tec_phone = ''
+
 class Fingerprint(models.Model):
     fingerprint_hash =  models.CharField(max_length=255, unique=True, blank=False, null=False)
     description = models.TextField(blank=True, null=True, validators=[MaxLengthValidator(600)])

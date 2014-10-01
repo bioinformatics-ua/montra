@@ -1,7 +1,11 @@
-from django.http import HttpResponse
+from django.shortcuts import render, redirect
+from django.http import HttpResponse, HttpResponseRedirect
 from django.core.urlresolvers import reverse
 from django.db import transaction
 from django.core.urlresolvers import *
+
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from emif.utils import QuestionGroup, ordered_dict
 
 from questionnaire.models import QuestionSet, Question
 from fingerprint.models import Answer, Fingerprint
@@ -9,6 +13,9 @@ from fingerprint.services import unique_users_string
 
 from emif.utils import QuestionGroup, ordered_dict, Tag, clean_value
 from questionnaire import Fingerprint_Summary
+
+from fingerprint.services import *
+from fingerprint.models import *
 
 # since createqset estructure isnt tippically made to be used in a row, i decided to implement it
 # separated since the purpose is different, and this way we try to reduce at a maximum the number of repeated procedures

@@ -27,7 +27,7 @@ from django.http import Http404
 
 from geopy import geocoders
 
-from emif.views import get_databases_from_solr
+from fingerprint.listings import get_databases_from_solr
 from emif.models import City
 
 from geolocation.services import *

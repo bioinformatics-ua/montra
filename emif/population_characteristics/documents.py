@@ -28,7 +28,7 @@ from .serialize import serialize
 from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import user_passes_test, login_required
 
-from emif.views import get_api_info, getPermissions, attachPermissions, merge_highlight_results
+from fingerprint.services import getPermissions, get_api_info, attachPermissions, merge_highlight_results
 
 from questionnaire.services import createqsets, createqset
 
@@ -48,8 +48,6 @@ from fingerprint.models import Fingerprint
 
 from docs_manager.views import get_revision
 from population_characteristics.tasks import aggregation
-
-from api.models import FingerprintAPI
 
 from public.models import PublicFingerprintShare
 

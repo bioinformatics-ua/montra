@@ -25,7 +25,7 @@ from django.shortcuts import render, redirect
 from django.http import HttpResponse
 
 from emif.models import AdvancedQuery, AdvancedQueryAnswer
-from emif.views import results_diff
+from fingerprint.listings import results_diff
 from fingerprint.views import RequestMonkeyPatch, show_fingerprint_page_read_only, render_one_questionset
 from emif.models import QueryLog
 

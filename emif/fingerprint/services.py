@@ -1,3 +1,5 @@
+import csv
+
 from fingerprint.models import *
 from questionnaire.models import Questionnaire, QuestionSet, Question, QuestionSetPermissions
 from questionnaire.views import *
@@ -12,6 +14,60 @@ from notifications.models import Notification
 from notifications.services import sendNotification
 
 from datetime import timedelta
+
+#import api.models.FingerprintAPI
+
+from searchengine.search_indexes import CoreEngine
+
+def define_rows(request):
+    if request.POST and "page_rows" in request.POST:
+        rows = int(request.POST["page_rows"])
+
+        profile = request.user.get_profile()
+
+        profile.paginator = rows
+
+        profile.save()
+
+    else:
+        # Otherwise get number of rows from preferences
+        rows = 5
+
+        try:
+            profile = request.user.get_profile()
+
+            rows = profile.paginator
+
+        except:
+            pass
+
+    if rows == -1:
+        rows = 99999
+
+    return rows
+
+def merge_highlight_results(query, resultHighlights):
+    c = CoreEngine()
+    h = {}
+    h["results"] = resultHighlights
+
+    if query:
+        qresults = c.highlight_questions(query)
+        h["questions"] = qresults.highlighting
+
+    return h
+
+def get_api_info(fingerprint_id):
+    """This is an auxiliar method to get the API Info
+    """
+    result = {}
+
+
+    results = FingerprintAPI.objects.filter(fingerprintID=fingerprint_id)
+    result = {}
+    for r in results:
+        result[r.field] = r.value
+    return result
 
 def saveFingerprintAnswers(qlist_general, fingerprint_id, questionnaire, user, extra_fields=None, created_date=None):
 
@@ -680,3 +736,55 @@ def extract_answers(request2, questionnaire_id, question_set, qs_list):
                 pass
 
     return (qlist_general, qlist, jstriggers, qvalues, jsinclude, cssinclude, extra_fields, len(errors)!=0)
+
+def save_answers_to_csv(list_databases, filename):
+    """
+    Method to export answers of a given database to a csv file
+    """
+    # Create the HttpResponse object with the appropriate CSV header.
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="EMIF_Catalogue_%s_%s.csv"' % (filename, datetime.datetime.now().strftime("%Y%m%d-%H%M%S"))
+
+    if list_databases:
+        writer = csv.writer(response, delimiter = '\t')
+        writer.writerow(['DB_ID', 'DB_name', 'Questionset', 'Question', 'QuestionNumber', 'Answer', 'Date Last Modification'])
+        for t in list_databases:
+            id = t.id
+
+            returned = createqsets(id, clean=False, changeSearch=True, noprocessing=False)
+
+            qsets, name, db_owners, fingerprint_ttype  = returned
+
+            qsets = attachPermissions(id, qsets)
+
+            for (k, qs), permissions in qsets:
+                if permissions.visibility == 0 and permissions.allow_exporting == True:
+                    writeGroup(id, k, qs, writer, name, t)
+
+        writer.writerow([id, name, "System", "Date", "99.0", t.date])
+        writer.writerow([id, name, "System", "Date Modification", "99.1", t.date_modification])
+        writer.writerow([id, name, "System", "Type", "99.2", t.type_name])
+        writer.writerow([id, name, "System", "Type Identifier", "99.3", t.ttype])
+    return response
+
+def attachPermissions(fingerprint_id, qsets):
+    zipper = qsets
+    zipee = []
+
+    for q, v in zipper.ordered_items():
+        qpermissions = getPermissions(fingerprint_id, QuestionSet.objects.get(id=v.qsid))
+        zipee.append(qpermissions)
+
+    merged = zip(zipper.ordered_items(), zipee)
+
+    return merged
+
+def writeGroup(id, k, qs, writer, name, t):
+    if (qs!=None and qs.list_ordered_tags!= None):
+        list_aux = sorted(qs.list_ordered_tags)
+
+        for q in list_aux:
+            _answer = clean_str_exp(str(q.value))
+            if (_answer == "" and q.ttype=='comment'):
+                _answer = "-"
+            writer.writerow([id, name, k.replace('h1. ', ''), clean_str_exp(str(q.tag)), str(q.number), _answer, q.lastChange])
