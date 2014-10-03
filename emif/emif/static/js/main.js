@@ -30,7 +30,10 @@ function refreshNotificationCenter() {
 
         if (data.unread && data.unread != 0) {
             $('#notification_badge').text(data.unread);
+            $('#notification_env').css('color', 'black');
             $('#notification_badge').show();
+        } else {
+            $('#notification_env').css('color', 'grey');
         }
         if (data.notifications) {
             resetNotificationCenter();
@@ -39,7 +42,7 @@ function refreshNotificationCenter() {
             }
 
             if(data.notifications.length == 0){
-                $('#notification_center').html('<center> <div class="notification">There\'s no new notifications.</div></center>'); 
+                $('#notification_center').html('<center> <div class="notification">There\'s no new notifications.</div></center>');
             }
         }
 
@@ -63,7 +66,7 @@ function insertNotification(notification) {
 
     }
     new_notification += '">' +
-        notification.message + '<br /> <div class="clearfix"><div class="notification_origin pull-right">by ' + notification.origin + " at " + notification.createddate +
+        notification.message + '<br /> <div class="clearfix"><div class="notification_origin"><i class="fa fa-user"></i> ' + notification.origin + " at " + notification.createddate +
         '</div></div></div></td><td class="notification_options"><i title="';
 
     if (notification.read)
@@ -153,14 +156,14 @@ function markRemoved(not_id) {
 function handleClick(not_id, href){
 
     var readnot = $('#not_id_' + not_id + ' .markread');
-    var value = readnot.hasClass('muted');   
+    var value = readnot.hasClass('muted');
 
     var callback = function(){ window.location.href = href; };
     if(!value){
         console.log('MARK AS READ')
         markRead(not_id, callback);
     }
-    else 
+    else
         callback();
 
 }

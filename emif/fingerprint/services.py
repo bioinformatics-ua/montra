@@ -456,7 +456,7 @@ def markAnswerRequests(user, fingerprint, question, answer_requests):
 
         message = "User "+str(fingerprint.owner.get_full_name())+" answered some questions you requested on database "+str(findName(fingerprint))+"."
 
-        sendNotification(timedelta(hours=12), req.requester, fingerprint.owner, 
+        sendNotification(timedelta(hours=12), req.requester, fingerprint.owner,
             "fingerprint/"+fingerprint.fingerprint_hash+"/1/", message)
 
 def intersect(answers, questionset):
@@ -550,7 +550,7 @@ def extract_answers(request2, questionnaire_id, question_set, qs_list):
     # generate the answer_dict for each question, and place in extra
     for item in items:
         key, value = item[0], item[1]
-        if key.startswith('comment_question_'):
+        if key.startswith('comment_question_') or key.endswith('_ignoreme_'):
             continue
         if key.startswith('question_'):
             answer = key.split("_", 2)

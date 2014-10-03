@@ -7,54 +7,55 @@
     <div class="control-group span12" >
         <label class="control-label span2">Pubmed id: </label>
         <input class="span5" type="text" id="question_{{ question.number|removedots }}_pubmedid" />
-        
+
         <button {% if readonly %} style="display: none;" {% endif %} id="loadpubbtn" style="margin-bottom:10px;" type="button" class="btn btn-primary disabled" ><i style="color:white;" class="icon-large icon-search icon-white"></i></button>
-        
+
     </div>
 
 
     <div class="control-group span12">
         <label class="control-label span2 ">Publication title *:</label>
-        <input class="span5" type="text" id="question_{{ question.number|removedots }}_pubtitle" cols="80" />    
+        <input class="span5" type="text" id="question_{{ question.number|removedots }}_pubtitle" cols="80" />
     </div>
     <div class="control-group span12">
         <label class="control-label span2">Journal:</label>
-        <input class="span5" type="text" id="question_{{ question.number|removedots }}_pubjournal" />    
+        <input class="span5" type="text" id="question_{{ question.number|removedots }}_pubjournal" />
     </div>
     <div class="control-group span12" >
         <label class="control-label span2">Year:</label>
-        <input class="span5" type="text" id="question_{{ question.number|removedots }}_pubyear" />  
+        <input class="span5" type="text" id="question_{{ question.number|removedots }}_pubyear" />
     </div>
     <div class="control-group span12">
         <label class="control-label span2">Volume:</label>
-        <input class="span5" type="text" id="question_{{ question.number|removedots }}_pubvolume" />    
+        <input class="span5" type="text" id="question_{{ question.number|removedots }}_pubvolume" />
     </div >
     <div class="control-group span12">
         <label class="control-label span2">Pages:</label>
-        <input class="span5" type="text" id="question_{{ question.number|removedots }}_pubpages" />    
+        <input class="span5" type="text" id="question_{{ question.number|removedots }}_pubpages" />
     </div>
     <div class="control-group span12">
         <label class="control-label span2">Authors:</label>
-        <input class="span5" type="text" id="question_{{ question.number|removedots }}_pubauthors" />    
+        <input class="span5" type="text" id="question_{{ question.number|removedots }}_pubauthors" />
     </div>
     <div style="margin-left: 30px;" class="control-group span12 url_validator" id='url_validator_{{question.number}}'>
         <label class="control-label span2">Url:</label>
         <input class="span5" type="text" name="question_{{ question.number }}_publink" id="question_{{ question.number }}_publink" /><br />
         <label class="control-label span2"> </label>
-        <span class="help-inline"></span>    
+        <span class="help-inline"></span>
     </div>
     <div class="span12" >
         <span class="help-inline">* required fields, and the authors should be with last name initials</span>
     </div>
-    
+
     <div class="control-group span12" style="padding-top:10px;">
     <button id="addpub" type="button" class="btn btn-primary"><i class="icon-large icon-white icon-plus-sign"></i> &nbsp; Add / Update Publication</button>
+    <button id="addbatch" type="button" class="btn btn-primary"><i class="fa fa-list-ol"></i> &nbsp; Add List of Publications</button>
     <button id="cleanpub" type="button" class="btn btn-primary"><i class="fa fa-trash-o"></i> Clean </button>
     <input type="hidden"  id="question_{{ question.number }}" name="question_{{ question.number }}" value='{{qdict.value}}' />
     </div>
-    
 
-    
+
+
     {% if qdict.value %}
         <script type="text/javascript">
             $('[id="answered_'+{{ question.number|removedots }}+'"]').show();
@@ -92,6 +93,8 @@
         </small></div>
 <div style="text-align: right; margin-top: -30px;" class="edit_paginator pagination"></div>
 
+{% include 'questionnaire/listpublications.html' %}
+
 <script type="text/javascript">
 var publications_counter = 0;
 var publication_ids = [];
@@ -117,26 +120,26 @@ function removePublication(id){
     $('#'+id).remove();
 }
 
-function PublicationWidget () 
+function PublicationWidget ()
 {
 
     this.publications = [];
 
     this.clear = function()
     {
-        $('#question_{{ question.number|removedots }}_pubtitle').val(""); 
+        $('#question_{{ question.number|removedots }}_pubtitle').val("");
         $('#question_{{ question.number|removedots }}_pubjournal').val("");
         $('#question_{{ question.number|removedots }}_pubyear').val("");
-        $('#question_{{ question.number|removedots }}_pubvolume').val("");   
-        $('#question_{{ question.number|removedots }}_pubpages').val(""); 
-        $('#question_{{ question.number|removedots }}_pubauthors').val(""); 
-        $('[id="question_{{ question.number }}_publink"]').val(""); 
+        $('#question_{{ question.number|removedots }}_pubvolume').val("");
+        $('#question_{{ question.number|removedots }}_pubpages').val("");
+        $('#question_{{ question.number|removedots }}_pubauthors').val("");
+        $('[id="question_{{ question.number }}_publink"]').val("");
     }
 
     this.updateInformationFromPubMed = function()
     {
         var _pubmedid = $("#question_{{ question.number|removedots }}_pubmedid").val();
-        
+
         if (_pubmedid==null)
             return;
         information = pw{{ question.number|removedots }}.getPubmedInformation(_pubmedid);
@@ -145,20 +148,20 @@ function PublicationWidget ()
             //console.log("timeout");
             return;
         }
-        $('#question_{{ question.number|removedots }}_pubtitle').val(information['title']); 
+        $('#question_{{ question.number|removedots }}_pubtitle').val(information['title']);
         $('#question_{{ question.number|removedots }}_pubjournal').val(information['journal']);
         $('#question_{{ question.number|removedots }}_pubyear').val(information['pub_year']);
-        $('#question_{{ question.number|removedots }}_pubvolume').val(information['volume']);  
-        $('#question_{{ question.number|removedots }}_pubpages').val(information['pages']);  
-        $('#question_{{ question.number|removedots }}_pubauthors').val(information['authors']);  
+        $('#question_{{ question.number|removedots }}_pubvolume').val(information['volume']);
+        $('#question_{{ question.number|removedots }}_pubpages').val(information['pages']);
+        $('#question_{{ question.number|removedots }}_pubauthors').val(information['authors']);
         $('[id="question_{{ question.number }}_publink"]').val(information['pubmed_url']);
     };
 
-    this.bindElements = function() 
+    this.bindElements = function()
     {
 
         $("#addpub" ).bind( "click", function() {
-            
+
             pw{{ question.number|removedots }}.addPublication();
             $('[id="answered_'+{{ question.number|removedots }}+'"]').show();
 
@@ -174,22 +177,26 @@ function PublicationWidget ()
 
         });
 
+        $('#addbatch').click(function(){
+            $('#modal-batch').modal('show');
+        });
+
         $("#cleanpub" ).bind( "click", function() {
-            
-            $('#question_{{ question.number|removedots }}_pubmedid').val(''); 
-            $('#question_{{ question.number|removedots }}_pubtitle').val(''); 
-                $('#question_{{ question.number|removedots }}_pubjournal').val(''); 
-                $('#question_{{ question.number|removedots }}_pubyear').val(''); 
-                $('#question_{{ question.number|removedots }}_pubvolume').val(''); 
-                $('#question_{{ question.number|removedots }}_pubpages').val(''); 
-                $('#question_{{ question.number|removedots }}_pubauthors').val(''); 
-                $('[id="question_{{ question.number }}_publink"]').val(''); 
+
+            $('#question_{{ question.number|removedots }}_pubmedid').val('');
+            $('#question_{{ question.number|removedots }}_pubtitle').val('');
+                $('#question_{{ question.number|removedots }}_pubjournal').val('');
+                $('#question_{{ question.number|removedots }}_pubyear').val('');
+                $('#question_{{ question.number|removedots }}_pubvolume').val('');
+                $('#question_{{ question.number|removedots }}_pubpages').val('');
+                $('#question_{{ question.number|removedots }}_pubauthors').val('');
+                $('[id="question_{{ question.number }}_publink"]').val('');
                 $('[id*="pub_"]').removeClass('success');
                 selected_row = null;
         });
 
         $("#loadpubbtn" ).bind( "click", function() {
-            if (!$(this).hasClass("disabled")) 
+            if (!$(this).hasClass("disabled"))
                 pw{{ question.number|removedots }}.updateInformationFromPubMed();
         });
 
@@ -198,17 +205,17 @@ function PublicationWidget ()
 
 
         });
-        
+
         $( "#question_{{ question.number|removedots }}_pubmedid").bind( "paste", function() {
-            
+
             pw{{ question.number|removedots }}.updateInformationFromPubMed();
         });
 
         $( "#question_{{ question.number|removedots }}_pubmedid").bind( "change", function() {
             if( $(this).val().length > 0){
-                $("#loadpubbtn").removeClass("disabled");       
+                $("#loadpubbtn").removeClass("disabled");
             }else{
-                $("#loadpubbtn").addClass("disabled");       
+                $("#loadpubbtn").addClass("disabled");
             }
         });
     };
@@ -223,7 +230,7 @@ function PublicationWidget ()
             }
             else
             {
-                var _objs = JSON.parse(_aux);    
+                var _objs = JSON.parse(_aux);
             }
 
             for (var i = 0 ; i<_objs.length; i++)
@@ -233,8 +240,8 @@ function PublicationWidget ()
 
                 //console.log(_objs[i]['title'].toLowerCase());
 
-                if( _objs[i]['title'].toLowerCase() === pubtitle.toLowerCase() 
-                    && _objs[i]['journal'].toLowerCase() === pubjournal.toLowerCase() 
+                if( _objs[i]['title'].toLowerCase() === pubtitle.toLowerCase()
+                    && _objs[i]['journal'].toLowerCase() === pubjournal.toLowerCase()
                     && _objs[i]['year'] === pubyear ){
                     //console.log('FOUND ONE EXACTLY THE SAME');
                     return true;
@@ -244,7 +251,7 @@ function PublicationWidget ()
         return false;
     }
     this.validate_form = function(pubmedid, pubtitle, pubjournal, pubyear, pubauthors, publink) {
-        pw{{ question.number|removedots }}.saveInformation();   
+        pw{{ question.number|removedots }}.saveInformation();
         // The pubmed id is not really necessary. It is because might be publications
         // without pubmed id, right? That's the reason I'm uncommenting.
         // Bastiao, 2014Feb08
@@ -253,13 +260,13 @@ function PublicationWidget ()
 
         if(pubtitle.length == 0)
             return false;
-        
+
         //if(pubjournal.length == 0)
         //    return false;
-        
+
         //if(pubyear.length == 0)
         //    return false;
-        
+
         //if(pubauthors.length == 0)
         //    return false;
 
@@ -272,23 +279,47 @@ function PublicationWidget ()
         return true;
     }
 
-    this.addPublication = function() 
+    this.addPublication = function()
     {
-        var _pubmedid = cleanUp($('#question_{{ question.number|removedots }}_pubmedid').val()); 
-        var _pubtitle = cleanUp($('#question_{{ question.number|removedots }}_pubtitle').val()); 
-        var _pubjournal = cleanUp($('#question_{{ question.number|removedots }}_pubjournal').val());  
-        var _pubyear = cleanUp($('#question_{{ question.number|removedots }}_pubyear').val());  
-        var _pubvolume = cleanUp($('#question_{{ question.number|removedots }}_pubvolume').val());  
-        var _pubpages = cleanUp($('#question_{{ question.number|removedots }}_pubpages').val());  
-        var _pubauthors = cleanUp($('#question_{{ question.number|removedots }}_pubauthors').val());  
-        var _publink = cleanUp($('[id="question_{{ question.number }}_publink"]').val());  
+        var _pubmedid;
+        var _pubtitle;
+        var _pubjournal;
+        var _pubyear;
+        var _pubvolume;
+        var _pubpages;
+        var _pubauthors;
+        var _publink;
+
+        if(arguments.length == 1){
+            var pubmed = arguments[0];
+
+            _pubmedid = cleanUp(pubmed['id']);
+            _pubtitle = cleanUp(pubmed['title']);
+            _pubjournal = cleanUp(pubmed['journal']);
+            _pubyear = cleanUp(pubmed['pub_year'])
+            _pubvolume = cleanUp(pubmed['volume']);
+            _pubpages = cleanUp(pubmed['pages']);
+            _pubauthors = cleanUp(pubmed['authors'].join(","));
+            _publink = cleanUp(pubmed['pubmed_url']);
+
+        } else {
+            _pubmedid = cleanUp($('#question_{{ question.number|removedots }}_pubmedid').val());
+            _pubtitle = cleanUp($('#question_{{ question.number|removedots }}_pubtitle').val());
+            _pubjournal = cleanUp($('#question_{{ question.number|removedots }}_pubjournal').val());
+            _pubyear = cleanUp($('#question_{{ question.number|removedots }}_pubyear').val());
+            _pubvolume = cleanUp($('#question_{{ question.number|removedots }}_pubvolume').val());
+            _pubpages = cleanUp($('#question_{{ question.number|removedots }}_pubpages').val());
+            _pubauthors = cleanUp($('#question_{{ question.number|removedots }}_pubauthors').val());
+            _publink = cleanUp($('[id="question_{{ question.number }}_publink"]').val());
+        }
+
 
         if( !pw{{ question.number|removedots }}.validate_form(_pubmedid, _pubtitle, _pubjournal, _pubyear, _pubauthors, _publink) ){
             bootbox.alert('Error validating publication. You must fill the mandatory fields.');
             return;
         }
-        //selected_row != null && $('#'+selected_row).length !== 0 
-        if(pw{{ question.number|removedots }}.isUpdate(_pubmedid, _pubtitle, _pubjournal, _pubyear, _pubauthors, _publink)){  
+        //selected_row != null && $('#'+selected_row).length !== 0
+        if(pw{{ question.number|removedots }}.isUpdate(_pubmedid, _pubtitle, _pubjournal, _pubyear, _pubauthors, _publink)){
             console.log('updating');
             var children = $('#'+selected_row).children();
 
@@ -316,20 +347,20 @@ function PublicationWidget ()
                 } else {
                     returnable+='<td class="selectable"></td>';
                 }
-                returnable += '</tr>';            
+                returnable += '</tr>';
             $('#question_{{ question.number|removedots }}_table > tbody:last').append(returnable);
 
             // Add to boolean container if possible
             if (!(typeof bool_container === 'undefined')) {
                 bool_container.pushWithDelegate('pub_'+_pubmedid, 'pub #'+_pubmedid+': '+_pubtitle,_pubtitle, 'removePublication("pub_'+_pubmedid+'");');
             }
-            
-            
+
+
             $(".deleteLink").click(function(e) {
                     e.preventDefault();
 
                     pubcounterupdate();
-                
+
                     // Add to boolean container if possible
                     if (!(typeof bool_container === 'undefined')) {
                         bool_container.splice('pub_'+_pubmedid, 'pub #'+_pubmedid+': '+_pubtitle,_pubtitle);
@@ -339,7 +370,7 @@ function PublicationWidget ()
                     removePublicationId(selected_tr.attr('id'));
 
                     selected_tr.remove();
-                    
+
                     if(pw{{ question.number|removedots }}.stringfy().length == 0) {
                         $('[id="answered_'+{{ question.number|removedots }}+'"]').hide();
                     }
@@ -355,8 +386,8 @@ function PublicationWidget ()
                     handleDelete();
 
                     return false;
-                    
-                    
+
+
             });
 
             handleAdd();
@@ -390,7 +421,7 @@ function PublicationWidget ()
             } catch(except){
                 $('[id="question_{{ question.number }}_publink"]').val('');
             }
-        });      
+        });
     }
     function refreshSelection(selected){
             $('[id*="pub_"').removeClass('success');
@@ -404,10 +435,10 @@ function PublicationWidget ()
 
         return stuff;
     }
-    this.removeSelectedPublication = function() 
+    this.removeSelectedPublication = function()
     {
         $("#question_{{ question.number|removedots }}_table").deleteRow(0);
-        pw{{ question.number|removedots }}.saveInformation();   
+        pw{{ question.number|removedots }}.saveInformation();
 
 
     };
@@ -417,7 +448,7 @@ function PublicationWidget ()
         var _value = pw{{ question.number|removedots }}.stringfy();
         //$("#question_{{ question.number }}").val(JSON.stringify(_value));
         document.getElementById("question_{{ question.number }}").value = JSON.stringify(_value);
-        
+
     };
     this.loadInformation = function()
     {
@@ -434,9 +465,9 @@ function PublicationWidget ()
         }
         else
         {
-            var _objs = JSON.parse(_aux);    
+            var _objs = JSON.parse(_aux);
         }
-        
+
         for (var i = 0 ; i<_objs.length; i++)
         {
             var _pubmedid = cleanUp(_objs[i]['pmid']);
@@ -462,7 +493,7 @@ function PublicationWidget ()
                     returnable+='<td class="selectable"></td>';
                 }
                 returnable += '</tr>';
-                 $('#question_{{ question.number|removedots }}_table > tbody:last').append(returnable); 
+                 $('#question_{{ question.number|removedots }}_table > tbody:last').append(returnable);
             }
 
         }
@@ -477,7 +508,7 @@ function PublicationWidget ()
                 removePublicationId(selected_tr.attr('id'));
 
                 selected_tr.remove();
-                
+
                 if(pw{{ question.number|removedots }}.stringfy().length == 0) {
                     $('[id="answered_'+{{ question.number|removedots }}+'"]').hide();
                 }
@@ -496,7 +527,7 @@ function PublicationWidget ()
         setEvents();
     };
 
-    this.getPubmedInformation = function(pubmedid) 
+    this.getPubmedInformation = function(pubmedid)
     {
 
         var result = "";
@@ -507,17 +538,17 @@ function PublicationWidget ()
             data: {
                 csrfmiddlewaretoken: $('input[name="csrfmiddlewaretoken"]').prop('value'),
                 pmid: pubmedid
-                
+
             },
             success: function (data) {
                 result = data;
                 information = data;
-                $('#question_{{ question.number|removedots }}_pubtitle').val(information['title']); 
+                $('#question_{{ question.number|removedots }}_pubtitle').val(information['title']);
                 $('#question_{{ question.number|removedots }}_pubjournal').val(information['journal']);
                 $('#question_{{ question.number|removedots }}_pubyear').val(information['pub_year']);
-                $('#question_{{ question.number|removedots }}_pubvolume').val(information['volume']);  
-                $('#question_{{ question.number|removedots }}_pubpages').val(information['pages']);  
-                $('#question_{{ question.number|removedots }}_pubauthors').val(information['authors']);  
+                $('#question_{{ question.number|removedots }}_pubvolume').val(information['volume']);
+                $('#question_{{ question.number|removedots }}_pubpages').val(information['pages']);
+                $('#question_{{ question.number|removedots }}_pubauthors').val(information['authors']);
                 $('[id="question_{{ question.number }}_publink"]').val(information['pubmed_url']);
             }
 
@@ -531,7 +562,7 @@ function PublicationWidget ()
         var result = [];
         $('#question_{{ question.number|removedots }}_table > tbody  > tr').each(function()
          {
-            
+
             var _aux = $(this).html();
             _aux = _aux.replace('<td class="selectable">', '');
             _aux = _aux.replace('<td>', '');
@@ -550,19 +581,19 @@ function PublicationWidget ()
                 }
                 else if (i==2)
                 {
-                    _pub['title'] = _aux2[i];    
+                    _pub['title'] = _aux2[i];
                 }
                 else if (i==3)
                 {
-                    _pub['journal'] = _aux2[i];    
+                    _pub['journal'] = _aux2[i];
                 }
                 else if (i==4)
                 {
-                    _pub['year'] = _aux2[i];    
+                    _pub['year'] = _aux2[i];
                 }
                 else if (i==5)
                 {
-                    _pub['pages'] = _aux2[i];    
+                    _pub['pages'] = _aux2[i];
                 }
                 else if (i==6)
                 {
@@ -570,7 +601,7 @@ function PublicationWidget ()
                 }
                 else if (i==7)
                 {
-                    _pub['authors'] = _aux2[i];    
+                    _pub['authors'] = _aux2[i];
                 }
                 else if (i==8)
                 {
@@ -583,12 +614,12 @@ function PublicationWidget ()
                     }
                     console.log(publi);
 
-                    _pub['link'] = publi;    
+                    _pub['link'] = publi;
                 }
             }
-            result.push(_pub); 
+            result.push(_pub);
         });
-        
+
         return result;
     }
 
@@ -597,7 +628,7 @@ function PublicationWidget ()
 pw{{ question.number|removedots }} = new PublicationWidget();
 pw{{ question.number|removedots }}.bindElements();
 
-pw{{ question.number|removedots }}.loadInformation();  
+pw{{ question.number|removedots }}.loadInformation();
 
 var per_page = 10;
 
@@ -650,7 +681,7 @@ function showPublicationPage(pageNumber){
         if (current > last){
             paginator.pagination('selectPage', last);
         } else {
-            paginator.pagination('selectPage', current); 
+            paginator.pagination('selectPage', current);
         }
         disableLinks();
 
@@ -677,7 +708,7 @@ function showPublicationPage(pageNumber){
         }
     }
     function redrawIndicator(start, end){
-            $('.showing_publications_info').html("Showing "+(start+1)+" - "+end+" of "+publications_counter+" Publications");    
+            $('.showing_publications_info').html("Showing "+(start+1)+" - "+end+" of "+publications_counter+" Publications");
     }
 </script>
 
