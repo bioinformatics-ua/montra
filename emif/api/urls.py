@@ -22,6 +22,7 @@ from django.conf.urls import patterns, url
 from rest_framework.urlpatterns import format_suffix_patterns
 
 from api.views import SearchView
+from api.views import SearchDatabasesView
 from api.views import EmailCheckView
 from api.views import RemovePermissionsView
 from api.views import PopulationCheckView
@@ -62,6 +63,9 @@ urlpatterns = patterns('api.views',
     url(r'^readnotification$', ReadNotificationView.as_view(), name='readnotification'),
     url(r'^removenotification$', RemoveNotificationView.as_view(), name='removenotification'),
     url(r'^requestanswer$', RequestAnswerView.as_view(), name='requestanswer'),
+
+    # search databases services
+    url(r'^searchdatabases$', SearchDatabasesView.as_view(), name='searchdatabases'),
 
     # dashboard widgets services
     url(r'^dbtypes$', DatabaseTypesView.as_view(), name='dbtypes'),
