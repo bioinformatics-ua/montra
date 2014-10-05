@@ -139,10 +139,10 @@
                                     {% if request.user.is_authenticated %}
                                     <li id="li_notifications" style="padding-right: 5px;" class="dropdown">
                                         <a href="" class="dropdown-toggle" data-toggle="dropdown">
-                                        <i class="fa fa-bell"></i>&nbsp;<span id="notification_badge" class="depon_class badge badge-inverse">8</span>
-                                        
+                                        <i id="notification_env" class="fa fa-envelope"></i>&nbsp;<span id="notification_badge" class="depon_class inlinebadge">99</span>
+
                                         </a>
-                                        <ul class="dropdown-menu dropdown-menu-form pull-right">
+                                        <ul style="width: 450px;" class="dropdown-menu dropdown-menu-form pull-right">
                                             <div class="notification_header lead">Latest Notifications</div>
                                             <div id="notification_center">
                                                <center> <div class="notification">There's no new notifications.</div>
@@ -172,7 +172,7 @@
                                                     </li>
                                                 </ul>
                                             </li>
-                                            
+
                                             {% comment %}
                                             <li>
                                                 <a href="databases">Edit Databases</a>
@@ -184,7 +184,7 @@
                                                 <a href="databases">Timeline</a>
                                             </li>
                                             {% endcomment %}
-                                            
+
                                             {% comment %}
                                             {% if request.user.is_superuser %}
                                             <li class="divider"></li>
@@ -196,14 +196,14 @@
                                             </li>
                                             {% endif %}
                                             {% endcomment %}
-                                            
+
                                             {% comment %}
                                             <li class="divider"></li>
                                             <li>
                                                 <a href="databases">Subscribe interests</a>
                                             </li>
                                             {% endcomment %}
-                                            
+
                                             <li class="divider"></li>
                                             {% if profiles|isDataCustodian %}
                                             <li class="dropdown-submenu">
@@ -267,22 +267,22 @@
                                         </div>
                                     </li>
                                     {% endif %}
-                                    
+
                                     {% if not user.is_authenticated %}
                                     <li>
                                         <div class="btn-group">
                                             <button class="btn dropdown-toggle" data-toggle="dropdown" style="margin-left: 2px;" tabindex="-1"><i class="icon-align-justify"></i></button>
                                             <ul class="dropdown-menu pull-right">
-                                                
+
                                                 <li id="li_signup">
                                                     <a href="accounts/signup/"><i class="fa fa-sign-in"></i>&nbsp;Sign up</a>
                                                 </li>
                                                 <li id="li_reset_password">
                                                     <a href="accounts/password/reset/"><i class="fa fa-question"></i>&nbsp;Forgot your password?</a>
                                                 </li>
-                                                
+
                                             </ul>
-                                            
+
                                         </div>
                                     </li>
                                     {%endif%}
@@ -290,7 +290,7 @@
                                 </ul>
                                 </div>
                             </div>
-                            
+
                             {% endif %}
 
                             <!--/.nav-collapse -->
@@ -310,12 +310,12 @@
                         {% block toolbar %} {% endblock %}
                     </div>
 
-                        
+
 <div style="display: none; z-index: 2000; position:fixed; bottom:20px; right: 20px;" class="alert alert-info" id="exporting-message">Databases of the current view are being exported, please wait.</div>
                     {% block content %}
 
                     {% endblock %}
-                    
+
                 </div>
             </div>
             <!-- END OF SUPPORTED -->
@@ -345,8 +345,8 @@
         <script type="text/javascript" src="{{ STATIC_URL }}contrib/backbone/json2.js"></script>
         <script type="text/javascript" src="{{ STATIC_URL }}contrib/backbone/underscore-min.js"></script>
         <script type="text/javascript" src="{{ STATIC_URL }}contrib/backbone/backbone-min.js"></script>
-        {% endcomment %} 
-        {% block scriptextraincludes %} 
+        {% endcomment %}
+        {% block scriptextraincludes %}
         {% endblock %}
         <script type="text/javascript">
         var _gaq = _gaq || [];

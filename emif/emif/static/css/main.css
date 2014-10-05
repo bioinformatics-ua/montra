@@ -57,7 +57,7 @@ div.input {
 
 /* ensure that all inputs have the same distance to the question */
 div.input input[type="text"], div.input textarea, div.input select {
-    margin: 10px 0 0 0;        
+    margin: 10px 0 0 0;
 }
 
 div.input span.add-on {
@@ -113,7 +113,7 @@ div.error {
 }
 
 .rangeinput label {
-    text-align: left; 
+    text-align: left;
     max-width: 40px;
     margin-left: 10px;
     padding-top: 4px;
@@ -124,24 +124,24 @@ div.error {
 }
 
 .rangeinput span.help-block {
-    clear: left; 
+    clear: left;
     margin-left: 35px;
 }
 
 input.sending {
     text-shadow: 0px 0px 5px white !important;
-    -webkit-transition: 0.3s linear all !important;  
+    -webkit-transition: 0.3s linear all !important;
        -moz-transition: 0.3s linear all !important;
          -o-transition: 0.3s linear all !important;
-            transition: 0.3s linear all !important;   
+            transition: 0.3s linear all !important;
 
 }
 
 .questionset-submit input:disabled {
-    -webkit-transition: 0.3s linear all !important;  
+    -webkit-transition: 0.3s linear all !important;
        -moz-transition: 0.3s linear all !important;
          -o-transition: 0.3s linear all !important;
-            transition: 0.3s linear all !important;  
+            transition: 0.3s linear all !important;
 }
 
 .block-message {
@@ -226,7 +226,7 @@ div .tooltip {
 clear: both;
 }
 .cleared_separator{
-    clear:both; 
+    clear:both;
     margin-bottom: -20px;
 }
 
@@ -241,7 +241,7 @@ clear: both;
 .ie9 #search_li, .gt-ie7 #li_advanced_search {
 
 list-style-type: none !important;
-    
+
 }
 
 .gt-ie7 #li_advanced_search{
@@ -339,7 +339,7 @@ box-shadow: inset 0 3px 8px rgba(0,0,0,0.125);
     background-color: orange;
     color: white;
     padding: 5px;
-    font-weight: bold; 
+    font-weight: bold;
 }
 
 .navbar .nav>li>a{
@@ -348,7 +348,7 @@ box-shadow: inset 0 3px 8px rgba(0,0,0,0.125);
 }
 .navbar .brand{
      /* Overriding default bootstrap behaviour*/
-    padding: 10px 10px 10px !important;   
+    padding: 10px 10px 10px !important;
 }
 
 .fullwidth {
@@ -374,13 +374,13 @@ box-shadow: inset 0 3px 8px rgba(0,0,0,0.125);
 }
 
 .counter_badge{
-  text-align: center; 
-  width: 35px; 
-  margin-top: -7px; 
+  text-align: center;
+  width: 35px;
+  margin-top: -7px;
   margin-left: 0px;
-  margin-bottom: -10px; 
-  margin-right:-15px; 
-  float:right; 
+  margin-bottom: -10px;
+  margin-right:-15px;
+  float:right;
   font-size:12px;
   word-wrap:break-word;
 }
@@ -420,13 +420,13 @@ box-shadow: inset 0 3px 8px rgba(0,0,0,0.125);
 }
 .database_listing{
   padding:2px;
-  min-width: 200px; 
+  min-width: 200px;
   display: table-cell;
 }
 
 .database_listing_names{
   padding:2px;
-  width: 200px; 
+  width: 200px;
   display: table-cell;
 }
 
@@ -445,7 +445,7 @@ box-shadow: inset 0 3px 8px rgba(0,0,0,0.125);
   font-size: 14px;
   line-height: 20px;
   vertical-align: middle;
-  border-color: #b3b3b3;  
+  border-color: #b3b3b3;
   -webkit-border-radius: 4px;
   -moz-border-radius: 4px;
   border-radius: 4px;
@@ -454,7 +454,7 @@ box-shadow: inset 0 3px 8px rgba(0,0,0,0.125);
   border: 1px solid #b3b3b3;
 -webkit-box-shadow: inset 0 1px 0 rgba(255,255,255,0.2),0 1px 2px rgba(0,0,0,0.05);
 -moz-box-shadow: inset 0 1px 0 rgba(255,255,255,0.2),0 1px 2px rgba(0,0,0,0.05);
-box-shadow: inset 0 1px 0 rgba(255,255,255,0.2),0 1px 2px rgba(0,0,0,0.05);  
+box-shadow: inset 0 1px 0 rgba(255,255,255,0.2),0 1px 2px rgba(0,0,0,0.05);
 }
 .database_title_text{
   font-size: 85%;
@@ -465,7 +465,7 @@ box-shadow: inset 0 1px 0 rgba(255,255,255,0.2),0 1px 2px rgba(0,0,0,0.05);
 }
 .database_title.affix {
 top: 50px;
-}  
+}
 /* ==========================================================================
    My databases table
    ========================================================================== */
@@ -488,7 +488,7 @@ top: 50px;
     background-repeat: repeat-x;
 }
 
-.table_filter{  
+.table_filter{
   margin:0px !important;
   padding: 4px !important;
   background-color: #eee !important;
@@ -499,7 +499,7 @@ top: 50px;
   height: 30px !important;
    box-sizing: border-box;
     -moz-box-sizing: border-box;
-    -webkit-box-sizing: border-box;  
+    -webkit-box-sizing: border-box;
 }
 #type_filter{
   margin:0px !important;
@@ -531,16 +531,16 @@ top: 50px;
 }
 .sorter-type{
   width: 18%;
-  } 
+  }
 .sorter-lastupdate{
   width: 12%;
-} 
+}
 .sorter-nrpatients{
   width: 11%;
-  } 
+  }
 .sorter-location {
   width: 18%;
-  } 
+  }
 .sorter-institution{
   width: 19%;
 }
@@ -548,7 +548,7 @@ top: 50px;
   width: 20%;
 }
 .sorter-score{
-  width: 6%;  
+  width: 6%;
 }
 
 label input[type="radio"], label input[type="checkbox"]{
@@ -564,19 +564,19 @@ label input[type="radio"], label input[type="checkbox"]{
 @media print{
   .visible-print  { display: inherit !important; }
   .hidden-print  .navbar, .btn-group, .pagination, .pagination-centered,
-  .btn, .select_line, .nav, .comment_button, #pc_comment_id, #fileupload, .btn_delete, 
+  .btn, .select_line, .nav, .comment_button, #pc_comment_id, #fileupload, .btn_delete,
   .deleteLink, .qslist, .table_filter, .publications-form, #comment_form
   { display: none !important; }
-  a:link, 
-  a:visited { 
-    color: blue !important; 
-    background: transparent !important; 
-    font-weight: bold !important; 
-    text-decoration: underline !important;  
+  a:link,
+  a:visited {
+    color: blue !important;
+    background: transparent !important;
+    font-weight: bold !important;
+    text-decoration: underline !important;
   }
   a[href]:after {
     content: none !important;
-  }  
+  }
   .nav-tabs{
     clear: both !important;
   }
@@ -611,7 +611,7 @@ label input[type="radio"], label input[type="checkbox"]{
   .dataTables_scrollBody{
     overflow: visible !important;
     width: 100% !important;
-  }  
+  }
   .tablesorter-filter{
     display: none !important;
   }
@@ -628,7 +628,7 @@ label input[type="radio"], label input[type="checkbox"]{
   color: #08c !important;
 }
 
-#edit_profile_form label input[type="radio"], 
+#edit_profile_form label input[type="radio"],
 #edit_profile_form  label input[type="checkbox"]{
   margin-top: 5px;
 }
@@ -653,7 +653,7 @@ label input[type="radio"], label input[type="checkbox"]{
   background-color: #f8f8f8;
 }
 
-.accordion-body.in:hover { 
+.accordion-body.in:hover {
    overflow: visible !important;
 }
 
@@ -766,7 +766,7 @@ height: 6em;
 }
 
 #notification_center{
-  width: 370px;
+  width: 450px;
   max-height: 400px;
   overflow: hidden;
   overflow-y: auto;
@@ -777,10 +777,12 @@ height: 6em;
 }
 
 #notification_center .notification, .notification_header {
-  margin:5px;
+  margin:5px 10px;
 }
 .notification_origin{
   font-size: 75%;
+  font-weight: normal;
+  color: grey;
 
 }
 .notification_unread{
@@ -814,9 +816,24 @@ height: 6em;
 }
 
 .comphidden{
-  width:0 !important; 
-  padding-left: 0px !important; 
+  width:0 !important;
+  padding-left: 0px !important;
   padding-right: 0px !important;
   margin-left: 0px !important;
   margin-right: 0px !important;
+}
+
+.inlinebadge{
+    position: absolute;
+    background: rgba(255,0,0,1);
+    margin-left: -10px;
+    margin-top: -8px;
+    height: 18px;
+    width: 18px;
+    border-radius: 50%;
+    color: white;
+    font-size: 11px;
+    line-height:  18px;
+    text-align: center;
+    font-weight: bold;
 }

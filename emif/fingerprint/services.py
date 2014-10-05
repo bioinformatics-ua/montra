@@ -550,7 +550,7 @@ def extract_answers(request2, questionnaire_id, question_set, qs_list):
     # generate the answer_dict for each question, and place in extra
     for item in items:
         key, value = item[0], item[1]
-        if key.startswith('comment_question_'):
+        if key.startswith('comment_question_') or key.endswith('_ignoreme_'):
             continue
         if key.startswith('question_'):
             answer = key.split("_", 2)
