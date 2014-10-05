@@ -461,27 +461,37 @@ function questionsets_handle(id_questionset, fingerprint_id, q_id, mode) {
 }
 var __internal_status = {};
 
-function setupHideEmpties(id){
+function setupHideEmpties(id, mode){
+    if(mode !== 'empty' && mode !== 'filled'){
+        console.error('Only modes available are empty or filled');
+        return false;
+    }
     // discover current status, default is inexistent in memory, is showing = true
     var showing = false;
 
-    if(__internal_status.hasOwnProperty(id)){
-        showing = !__internal_status[id];
+    if(__internal_status.hasOwnProperty(id+mode)){
+        showing = !__internal_status[id+mode];
     }
-    __internal_status[id] = showing;
+    __internal_status[id+mode] = showing;
 
     var questionset = $('#qform'+id);
-    var answers = questionset.find('[id^="answered_"]').filter(":not(:visible)").parent().parent().filter(':not(.dont_hide)').filter(':not(.depon_class)');
+
+    var answers;
+
+    if(mode === 'empty')
+        answers = questionset.find('[id^="answered_"]').filter(":not(:visible)").parent().parent().filter(':not(.dont_hide)').filter(':not(.depon_class)');
+    else
+        answers = questionset.find('[id^="answered_"]').filter(":visible").parent().parent().filter(':not(.dont_hide)').filter(':not(.depon_class)');
 
     //console.log(answers);
 
     if(showing){
-        $('#hide_empty_'+id).text('Hide Empty');
+        $('#hide_'+mode+'_'+id).find('.icon-white').addClass('icon-ok');
         //console.log('Showing empty questions for '+id);
-        answers.fadeIn();
+        answers.removeClass('database_listing_away');
     } else {
-        $('#hide_empty_'+id).text('Show Empty');
+        $('#hide_'+mode+'_'+id).find('.icon-white').removeClass('icon-ok');
         //console.log('Hiding empty questions for '+id);
-        answers.fadeOut();
+        answers.addClass('database_listing_away');
     }
 }
