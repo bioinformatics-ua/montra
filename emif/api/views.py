@@ -65,11 +65,11 @@ import mimetypes
 
 from django.template.loader import render_to_string
 
-from emif.utils import send_custom_mail
+from emif.utils import send_custom_mail, escapeSolrArg
 
 from fingerprint.models import Fingerprint, AnswerRequest
 from fingerprint.services import findName
-
+from fingerprint.listings import get_databases_from_solr_v2
 from questionnaire.models import Question
 
 from public.views import PublicFingerprintShare
@@ -144,6 +144,74 @@ class SearchView(APIView):
         return response
 
 
+############################################################
+##### Search Databases - Web services
+############################################################
+
+
+class SearchDatabasesView(APIView):
+    """
+    Class to search and return a list of databases matching a free text query
+    """
+    authentication_classes = (TokenAuthentication, SessionAuthentication, BasicAuthentication )
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request, *args, **kw):
+        sortmap = {
+            'name': 'database_name_t',
+            'type_name': 'type_t',
+            'id': 'id',
+            'last_activity': 'date_last_modification_t',
+            'date': 'created_t',
+        }
+        #defaults
+        rows=20
+        offset=0
+        sort_field='name'
+        sort_order='asc'
+
+        sortFilter = None
+
+        if request.user.is_authenticated():
+            search = request.DATA.get('search', None)
+            crows = request.DATA.get('rows', None)
+            coffset = request.DATA.get('offset', None)
+            csortf = request.DATA.get('sort_field', None)
+            csorto = request.DATA.get('sort_order', None)
+
+            if search == None or len(search.strip()) == 0:
+                return Response({'status': 'Authenticated', 'method': 'POST', 'Error': 'Must specify a search text filter'}, status=status.HTTP_400_BAD_REQUEST)
+
+            if crows != None:
+                rows = crows
+
+            if coffset != None:
+                offset = coffset
+
+            if csortf != None:
+                sort_field = csortf
+
+            if csorto != None:
+                sort_order = csorto
+
+            if sort_order != 'asc' and sort_order != 'desc':
+                return Response({'status': 'Authenticated', 'method': 'POST', 'Error': 'Available sort orders are "asc" and "desc"'}, status=status.HTTP_400_BAD_REQUEST)
+
+            try:
+                sortFilter = sortmap[sort_field] + " " + sort_order
+            except:
+                return Response({'status': 'Authenticated', 'method': 'POST', 'Error': 'sort_field can only be name, type_name, id, last_activity or date.'}, status=status.HTTP_400_BAD_REQUEST)
+
+
+
+            c = CoreEngine()
+            (list_databases,hits) = get_databases_from_solr_v2(request, "text_t:\"" +escapeSolrArg(search)+'"', sort=sortFilter, rows=rows, start=offset)
+
+            return Response({'link': {'status': 'Authenticated', 'method': 'POST'}, 'filters':{'search': search, 'rows': rows,
+                'offset':offset}, 'result': {'count': len(list_databases),
+                'databases': [d.__dict__ for d in list_databases]}}, status=status.HTTP_200_OK)
+
+        return Response({'status': 'NOT authenticated', 'method': 'POST'}, status=status.HTTP_401_UNAUTHORIZED)
 ############################################################
 ##### Email Share - Web services
 ############################################################
