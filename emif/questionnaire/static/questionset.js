@@ -174,8 +174,8 @@ function clear_selection(question_name, response) {
     }
 }
 
-/* 
- - disable the submit button once it's been clicked 
+/*
+ - disable the submit button once it's been clicked
  - do it for a total of 5 seconds by which time the page should've been sent
  - oscillate the sending class which does some fancy css transition trickery
 */
@@ -457,5 +457,31 @@ function questionsets_handle(id_questionset, fingerprint_id, q_id, mode) {
             errornavigator.nextError();
 
         }
+    }
+}
+var __internal_status = {};
+
+function setupHideEmpties(id){
+    // discover current status, default is inexistent in memory, is showing = true
+    var showing = false;
+
+    if(__internal_status.hasOwnProperty(id)){
+        showing = !__internal_status[id];
+    }
+    __internal_status[id] = showing;
+
+    var questionset = $('#qform'+id);
+    var answers = questionset.find('[id^="answered_"]').filter(":not(:visible)").parent().parent().filter(':not(.dont_hide)').filter(':not(.depon_class)');
+
+    //console.log(answers);
+
+    if(showing){
+        $('#hide_empty_'+id).text('Hide Empty');
+        //console.log('Showing empty questions for '+id);
+        answers.fadeIn();
+    } else {
+        $('#hide_empty_'+id).text('Show Empty');
+        //console.log('Hiding empty questions for '+id);
+        answers.fadeOut();
     }
 }
