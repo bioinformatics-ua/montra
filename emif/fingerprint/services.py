@@ -147,7 +147,7 @@ def saveFingerprintAnswers(qlist_general, fingerprint_id, questionnaire, user, e
 def getComment(question, extra_fields):
 
     try:
-        comment = extra_fields['comment_question_'+question.slug_fk.slug1+"_t"]
+        comment = extra_fields['comment_question_'+question.slug_fk.slug1+"_t"].strip()
 
         return comment
     except:
@@ -456,7 +456,7 @@ def markAnswerRequests(user, fingerprint, question, answer_requests):
 
         message = "User "+str(fingerprint.owner.get_full_name())+" answered some questions you requested on database "+str(findName(fingerprint))+"."
 
-        sendNotification(timedelta(hours=12), req.requester, fingerprint.owner, 
+        sendNotification(timedelta(hours=12), req.requester, fingerprint.owner,
             "fingerprint/"+fingerprint.fingerprint_hash+"/1/", message)
 
 def intersect(answers, questionset):
