@@ -14,17 +14,16 @@
     {% if questions_list.0.0.sortid != 0 and questions_list.0.0.sortid != 99 %}
 
     <div class="pull-right btn-group">
-      {% if readonly %}
       <div class="btn-group">
         <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
         Filters
         <span class="caret"></span></a>
         <ul class="dropdown-menu">
             <!-- dropdown menu links -->
-            <li><a id="hide_empty_{{ questions_list.0.0.sortid }}" href="javascript:void(0);"><i class="icon-ok icon-white active"></i>Show Empty Questions</a></li>
+            <li><a id="hide_empty_{{ questions_list.0.0.sortid }}" href="javascript:void(0);">
+            <i class="icon-ok icon-white active"></i> Show Empty Questions</a></li>
             <li><a id="hide_filled_{{ questions_list.0.0.sortid }}" href="javascript:void(0);"><i class="icon-ok icon-white active"></i> Show Filled Questions</a></li>
           </ul></div>
-      {% endif %}
       <a id="collapseall_qs_{{ questions_list.0.0.sortid }}"  class="btn" href="#">Collapse all </a>
       <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
         Permissions
@@ -331,14 +330,12 @@ $(function(){
     });
 
     $('.tooltippable', $('#qs_{{questions_list.0.0.sortid}}')).tooltip({container:'body'});
-    {% if readonly %}
         $('#hide_empty_{{questions_list.0.0.sortid}}').click(function(){
             setupHideEmpties({{questions_list.0.0.sortid}}, 'empty');
         });
         $('#hide_filled_{{questions_list.0.0.sortid}}').click(function(){
             setupHideEmpties({{questions_list.0.0.sortid}}, 'filled');
         });
-    {% endif %}
 });
 
 
