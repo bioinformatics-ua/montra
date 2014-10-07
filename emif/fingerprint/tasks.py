@@ -26,8 +26,8 @@ import time
 
 from searchengine.search_indexes import CoreEngine
 
-from fingerprint.models import Fingerprint, FingerprintReturnedSimple, FingerprintReturnedAdvanced
-from fingerprint.services import findName, unindexFingerprint
+from fingerprint.models import Fingerprint, FingerprintReturnedSimple, FingerprintReturnedAdvanced, Answer
+from fingerprint.services import findName, unindexFingerprint, getFillPercentage
 
 from django.utils import timezone
 from datetime import timedelta
@@ -64,6 +64,13 @@ def anotateshowonresults(query_filtered, user, isadvanced, query_reference):
 
     print "ends annotation of databases appearing on results"
     return 0
+
+@shared_task
+def calculateFillPercentage(fingerprint):
+    answers = Answer.objects.filter(fingerprint_id = fingerprint)
+
+    fingerprint.fill = getFillPercentage(fingerprint)
+    fingerprint.save()
 
 @periodic_task(run_every=crontab(minute=0, hour=3))
 def remove_orphans():

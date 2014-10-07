@@ -16,14 +16,14 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
-import hashlib 
+import hashlib
 
 from django.shortcuts import render
 
 from django.core import serializers
 from django.conf import settings
 from django.http import *
-from django.http import Http404 
+from django.http import Http404
 from django.utils import simplejson
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
@@ -438,6 +438,11 @@ def get_databases_process_results(results):
             database_aux = Database()
 
             database_aux.id = r['id']
+
+            try:
+                database_aux.percentage = r['percentage_d']
+            except KeyError:
+                pass
 
             if (not r.has_key('created_t')):
                 database_aux.date = ''
