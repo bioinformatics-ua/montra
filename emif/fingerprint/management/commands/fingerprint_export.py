@@ -170,9 +170,9 @@ class Command(BaseCommand):
 
         ids = Document.objects.filter(fingerprint_id=fingerprint.fingerprint_hash).values_list('id', flat=True)
 
-        relchar = Characteristic.objects.filter(id__in=ids)
+        relchar = Characteristic.objects.filter(id__in=ids).values_list('document_ptr', flat=True)
 
-        return self.__getCleanJson(relchar)
+        return json.dumps([e for e in relchar], indent=4, default=json_util.default)
 
     def __generatePopCharComments(self, fingerprint):
         popcomments = Comments.objects.filter(fingerprint_id=fingerprint.fingerprint_hash)
@@ -190,7 +190,7 @@ class Command(BaseCommand):
         return self.__getCleanJson(count)
 
     def __generatePermissions(self, fingerprint):
-        count = QuestionSetPermissions.objects.filter(fingerprint_id=fingerprint.id)
+        count = QuestionSetPermissions.objects.filter(fingerprint_id=fingerprint.fingerprint_hash)
 
         return self.__getCleanJson(count)
 
