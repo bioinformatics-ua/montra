@@ -36,6 +36,7 @@ from celery.decorators import periodic_task
 
 from questionnaire.models import *
 from searchengine.models import *
+from searchengine.search_indexes import CoreEngine
 from django.shortcuts import render_to_response, get_object_or_404
 import sys
 import re
@@ -46,34 +47,6 @@ import pysolr
 
 @periodic_task(run_every=crontab(minute=0, hour=3))
 def reindexQuestionnaires():
-    p = re.compile("(\\d{1,2})(\.\\d{2})*$", re.L)
+    c = CoreEngine()
 
-    #qsets = QuestionSet.objects.all()
-    slugs = []
-    questionaires = Questionnaire.objects.filter(disable=False)
-
-    solr = pysolr.Solr('http://' +settings.SOLR_HOST+ ':'+ settings.SOLR_PORT+settings.SOLR_PATH)
-    start=0
-    rows=100
-    fl=''
-
-    for quest in questionaires:
-        id = quest.id
-        obj = {"id":"questionaire_"+str(id)}
-        qsets = QuestionSet.objects.filter(questionnaire=quest)
-        for qs in qsets:
-            #print qs
-            questions = qs.questions()
-            for q in questions:
-                x = q.slug_fk
-                key = str(x.slug1) + "_qs"
-                obj[key] = q.text
-        slugs.append(obj)
-
-
-    for quest in questionaires:
-        solr.delete(id='questionaire_'+str(id))
-
-    solr.add(slugs)
-
-    print "QUITTING"
+    c.reindex_quest_solr()
