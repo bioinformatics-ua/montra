@@ -96,9 +96,9 @@ function PCDraw(actualChart,chartType, e)
               fV = translations[filters[data]];
           }
           if (fV=="Total") fV = "";
-          if (fV=="Male") fV = "(Male)";
-          if (fV=="Female") fV = "(Female)";
-          if (fV.indexOf('M') >= 0 &&  fV.indexOf('F') >= 0 && fV.indexOf('T') >= 0) //convert M/F/T to Male/Female
+          else if (fV=="Male") fV = "(Male)";
+          else if (fV=="Female") fV = "(Female)";
+          else if (fV.indexOf('M') >= 0 &&  fV.indexOf('F') >= 0 && fV.indexOf('T') >= 0) //convert M/F/T to Male/Female
           {
             fV = translations["ALL"];
           }
@@ -118,31 +118,36 @@ function PCDraw(actualChart,chartType, e)
           valuefilt += handleFilters(gender_values);
         }      
     
-      $("#pc_chart_place").html('');
-      $("#pc_chart_place").graphicChart('init');
-      $("#pc_chart_place").graphicChart('drawBarChart', valuesFromGraph,valuesFromGraph,valuesFromGraph);
+      var pc_chart_place = $("#pc_chart_place");
+      pc_chart_place.html('');
+      pc_chart_place.graphicChart('init');
+      pc_chart_place.graphicChart('drawBarChart', valuesFromGraph,valuesFromGraph,valuesFromGraph);
 
       
-      $("#pcBarContentRoot").removeClass("hidden");
-      $("#pcBarContentRoot").addClass("show");
+      var pcBarContentRoot = $("#pcBarContentRoot");
+
+      pcBarContentRoot.removeClass("hidden");
+      pcBarContentRoot.addClass("show");
 
       
-      
+      var actual_chart = this.actualChart;
 
-      $("#pctitle").html("<h2>"+ this.actualChart.title.fixed_title + valuefilt +"</h2>");
-      if(this.actualChart.hint != undefined)
-        $("#pchint").html("<center><h4>"+ this.actualChart.hint +"</h4></center>");
+      $("#pctitle").html("<h2>"+ actual_chart.title.fixed_title + valuefilt +"</h2>");
+      if(actual_chart.hint != undefined)
+        $("#pchint").html("<center><h4>"+ actual_chart.hint +"</h4></center>");
       else
         $("#pchint").html("<center><h4></h4></center>");
       if (this.e != null ) 
       {
-          if ($(this.e.target.firstChild).hasClass('icon-ok')) 
+          var firstChild = $(this.e.target.firstChild);
+
+          if (firstChild.hasClass('icon-ok')) 
           {
-            $(this.e.target.firstChild).removeClass('icon-ok') 
+            firstChild.removeClass('icon-ok') 
           }
           else
           {
-            $(this.e.target.firstChild).addClass('icon-ok') 
+            firstChild.addClass('icon-ok') 
           }
       }
       

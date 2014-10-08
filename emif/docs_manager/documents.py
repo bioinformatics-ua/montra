@@ -28,7 +28,9 @@ from population_characteristics.serialize import serialize
 from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import user_passes_test, login_required
 
-from emif.views import createqsets, get_api_info
+from emif.views import get_api_info
+from questionnaire.services import createqsets
+ 
 from django.shortcuts import render
 
 import os
@@ -95,8 +97,8 @@ def document_form_view(request, runcode, qs, template_name='documents_upload_for
     apiinfo = json.dumps(get_api_info(runcode));
     owner_fingerprint = False
     for owner in db_owners.split(" "):
-        print owner
-        print request.user.username
+        #print owner
+        #print request.user.username
         if (owner == request.user.username):
             owner_fingerprint = True
     

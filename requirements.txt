@@ -6,7 +6,7 @@ distribute==0.6.30
 django-admin-bootstrapped==0.3.2
 django-countries==1.5
 django-crispy-forms==1.2.3
-django-guardian==1.0.4
+django-guardian==1.2.4
 django-transmeta==0.6.9
 docutils==0.10
 easy-thumbnails==1.2
@@ -18,7 +18,7 @@ textile==2.1.5
 wsgiref==0.1.2
 djangorestframework==2.2.6
 django-bootstrap-breadcrumbs==0.6.2
-django-bootstrap-pagination==0.1.10
+-e git://github.com:ribeiroct/django-bootstrap-pagination.git#egg=django-bootstrap-pagination
 pysolr==3.0.6
 github3.py==0.8.1
 django-jenkins
@@ -34,9 +34,16 @@ celery==3.1.0
 django-celery==3.1.0
 python-memcached==1.48
 johnny-cache==1.4
+django-extensions
+vobject
+chardet
+surlex>=0.2.0
+sorl-thumbnail
+django-newsletter==0.4.1
 -e git://github.com/ribeiroct/django-fack.git#egg=django-fack
 django-adminplus==0.3
 -e git://github.com/leandrosouza/django-hitcount.git#egg=django-hitcount
 psycopg2==2.5.4
 biopython==1.64
-
+django_compressor==1.4
+rjsmin==1.0.9

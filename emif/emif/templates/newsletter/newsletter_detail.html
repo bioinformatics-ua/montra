@@ -1,0 +1,22 @@
+{% extends "newsletter/common.html" %}
+
+{% load i18n %}
+{% load url from future %}
+
+{% block title %}{% trans "Newsletter detail" %}{% endblock title %}
+
+{% block body %}
+<center><h3>{{ object.title }}</h3>
+<div style="max-width: 340px; padding: 8px 0;">
+<ul class="nav nav-tabs nav-stacked">
+  <li><a href="{% url "newsletter_subscribe_request" object.slug %}">Subscribe</a></li>
+  {% if not user.is_authenticated %}
+  <li><a href="{% url "newsletter_update_request" object.slug %}">Update</a></li>
+  {% endif %}
+  <li><a href="{% url "newsletter_unsubscribe_request" object.slug %}">Unsubscribe</a></li>
+  <li><a href="{% url "newsletter_archive" object.slug %}">Archive</a></li>
+  <li><a href="newsletter">Back to list</a></li>
+</ul>
+</div>
+</center>
+{% endblock body %}

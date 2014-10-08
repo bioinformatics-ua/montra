@@ -27,8 +27,15 @@ import time
 from searchengine.search_indexes import CoreEngine
 
 from fingerprint.models import Fingerprint, FingerprintReturnedSimple, FingerprintReturnedAdvanced
+from fingerprint.services import findName, unindexFingerprint
+
+from django.utils import timezone
+from datetime import timedelta
 
 from django.contrib.auth.models import User
+
+from celery.task.schedules import crontab
+from celery.decorators import periodic_task
 
 @shared_task
 def anotateshowonresults(query_filtered, user, isadvanced, query_reference):
@@ -39,7 +46,7 @@ def anotateshowonresults(query_filtered, user, isadvanced, query_reference):
     results = c.search_fingerprint(query_filtered)
     for result in results:
         fingerprint_id = result['id']
-        
+
         if not fingerprint_id.startswith("questionaire_"):
             try:
                 fp = Fingerprint.objects.get(fingerprint_hash=fingerprint_id)
@@ -54,7 +61,30 @@ def anotateshowonresults(query_filtered, user, isadvanced, query_reference):
 
             except Fingerprint.DoesNotExist:
                 print fingerprint_id + ' doesnt exist on db'
-        
+
     print "ends annotation of databases appearing on results"
+    return 0
+
+@periodic_task(run_every=crontab(minute=0, hour=3))
+def remove_orphans():
+    # Operations
+    print "start removing old orphans databases"
+
+    time = timezone.now() - timedelta(days=1)
+
+    fingers = Fingerprint.objects.filter(last_modification__lte = time)
+
+    for finger in fingers:
+
+        name = findName(finger)
+
+        if name == 'Unnamed':
+            print "-- Removing orphan "+str(finger.fingerprint_hash)
+            finger.removed=True
+            finger.save()
+            unindexFingerprint(finger.fingerprint_hash)
+
+
+    print "ends removing old orphans databases"
     return 0
 

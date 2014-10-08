@@ -69,11 +69,10 @@ def jerboa_list_values(request, var, row, fingerprint_id, revision, template_nam
         for i in myRq:
             if i == 'publickey':
                 continue
+                
             filters[i[8:-3]] = myRq[i]
 
-            filters[i[8:-3]] = myRq[i]
-
-        print filters    
+        #print filters    
     
 
     pc = PopulationCharacteristic(None)
@@ -167,7 +166,7 @@ def get_settings(request, runcode):
     if not hasFingerprintPermissions(request, runcode):
         return HttpResponse("Access forbidden",status=403)
 
-    if (runcode=="COMPARE/"):
+    if (runcode=="COMPARE/" or runcode == "COMPARE"):
         return get_compare_settings(request)
     pc = PopulationCharacteristic(None)
     values = pc.get_settings()
@@ -204,6 +203,6 @@ def list_jerboa_files(request, fingerprint):
 def compare(request):
     return handle_compare(request)
 
-def compare_values(request,  var, row, fingerprint_id):
-    return handle_compare_values(request, var, row, fingerprint_id)
+def compare_values(request,  var, row, fingerprint_id, revision):
+    return handle_compare_values(request, var, row, fingerprint_id, revision)
 

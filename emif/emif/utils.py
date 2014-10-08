@@ -30,6 +30,7 @@ from searchengine.models import Slugs
 from questionnaire.models import Question, Questionnaire, QuestionSet
 
 from emif.models import SharePending
+
 from fingerprint.models import Fingerprint
 from fingerprint.services import indexFingerprint, findName
 
@@ -41,6 +42,9 @@ from django.conf import settings
 
 from django.core.mail import BadHeaderError, EmailMultiAlternatives
 from django.template.loader import render_to_string
+
+import os
+import os.path
 
 def generate_hash():
     hash = md5.new()
@@ -63,7 +67,7 @@ def clean_value(v):
         v = re.sub(r"\[|\]", "", v)
         logging.debug("Value after clean: " + v)
     elif isinstance(v, list):
-        print "list"
+        #print "list"
         for v_aux in v:
             v += v_aux + " "
     return v
@@ -92,36 +96,6 @@ def database_exists(database_name):
         return False
     else:
         return True
-
-class Database:
-    id = ''
-    name = ''
-    date = ''
-    date_modification = ''
-    institution = ''
-    location = ''
-    email_contact = ''
-    number_patients = ''
-    ttype = ''
-    type_name = ''
-    logo = ''
-    last_activity = ''
-
-    admin_name = ''
-    admin_address = ''
-    admin_email = ''
-    admin_phone = ''
-
-    scien_name = ''
-    scien_address = ''
-    scien_email = ''
-    scien_phone = ''
-
-    tec_name = ''
-    tec_address = ''
-    tec_email = ''
-    tec_phone = ''
-
 
 class ordered_dict(dict):
     def __init__(self, *args, **kwargs):
@@ -181,6 +155,7 @@ class QuestionGroup:
         self.name = ""
         self.sortid = ""
         self.qsid = ""
+        self.highlights = False
         #self.qsid = -1
 
         self.info = False
@@ -206,9 +181,9 @@ def get_database_from_id(id):
     for r in results:
         try:
             database_aux = Database()
-            print r['id']
-            print r['created_t']
-            print r['database_name_t']
+            #print r['id']
+            #print r['created_t']
+            #print r['database_name_t']
             database_aux.id = r['id']
             database_aux.date = convert_date(r['created_t'])
            
@@ -281,7 +256,7 @@ def convert_dict_to_query(params):
             i = i + 1
             if (size_params != i ):
                 query += " AND "
-    print query
+    #print query
     return query
 
 
@@ -337,14 +312,14 @@ def convert_query_from_boolean_widget(query, q_id):
     # Example of output
     # ..
 
-    print "PARA CONVERTER: "
+    #print "PARA CONVERTER: "
     #print query
 
     questionnarie = Questionnaire.objects.filter(id=q_id)[0]
     ttype = questionnarie.slug
 
     questionsets = QuestionSet.objects.filter(questionnaire=q_id)
-    print "convert_query_from_boolean_widget"
+    #print "convert_query_from_boolean_widget"
     #print query
     # I cant remove the symbol
     query = re.sub("_____[a-zA-Z0-9._()\[\]\/\-\+?!'@#$%&*=~^|\\<>;,\.\" ]+_____", "", query)
@@ -397,7 +372,7 @@ def convert_query_from_boolean_widget(query, q_id):
 
     r = r + " AND type_t:"+ttype
 
-    print r
+    #print r
 
     return r
 
@@ -455,6 +430,18 @@ def send_custom_mail(title, description, from_mail, to_mail):
     msg.attach_alternative(email, "text/html")
 
     msg.send()
+
+def removehs(value):
+    value = value.replace('h0. ','')
+    value = value.replace('h1. ','')
+    value = value.replace('h2. ','')
+    value = value.replace('h3. ','')
+    value = value.replace('h4. ','')
+    value = value.replace('h5. ','')
+    value = value.replace('h6. ','')
+    value = value.replace('h7. ','')
+
+    return value
 
 def activate_user(activation_code, user, context = None):
     if (user==None or not user.is_authenticated()):
@@ -534,5 +521,5 @@ def activate_user(activation_code, user, context = None):
     if context != None:
         return render(context, template_name, {'request': request, 'breadcrumb': True})
     else:
-        print 'Activation successfull'
+        #print 'Activation successfull'
         return True

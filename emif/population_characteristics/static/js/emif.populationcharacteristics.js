@@ -71,12 +71,16 @@ function getRevision(){
   var url = document.URL;
   var revision='-1';
 
-  try{
-    revision = global_revision;
+
+  if (url.indexOf("compare")==-1)
+  {
+    try{
+      revision = global_revision;
+    }
+    catch(err){
+      console.error('Error retrieving revision from pop.char.');
+    };
   }
-  catch(err){
-    console.error('Error retrieving revision from pop.char.');
-  };
   return revision;
 
 };
@@ -88,12 +92,14 @@ var activeChart='';
 
 var actualChart = null; 
 
-
+var cache_json = {};
+var hashCode = function(s){
+  return s.split("").reduce(function(a,b){a=((a<<5)-a)+b.charCodeAt(0);return a&a},0);              
+}
 /** TODO: there are a lot of static and hardcore parameters in this function
   * This need to be fixed */ 
 function PCAPI (endpoint) 
 {
-
     if (endpoint==null)
     {
       this.endpoint="population/jerboalistvalues";  
@@ -115,40 +121,65 @@ function PCAPI (endpoint)
     this.getValuesRow = function(Var, Row, fingerprintID, revision){
         var result = {}
 
-        console.log(result);
-          
-        $.ajax({
-          dataType: "json",
-          url: this.endpoint+"/"+Var+"/"+Row+"/" + fingerprintID+"/"+revision,
+        var destiny = this.endpoint+"/"+Var+"/"+Row+"/" + fingerprintID+"/"+revision;
+        var key = hashCode(destiny);
+         if(cache_json.hasOwnProperty(key)){
+          result = cache_json[key];
 
-          async: false,
-          type: "POST",
-          data: { publickey: global_public_key, result: result },
-          success: function (data){result=data;}
-        });
-        return result;
+         } else {
+            $.ajax({
+              dataType: "json",
+              url: destiny,
+
+              async: false,
+              type: "POST",
+              data: { publickey: global_public_key, result: result },
+              success: function (data){result=data;}
+            });
+
+            cache_json[key] = result;
+          }
+
+            return result;         
     };
      this.getValuesRowWithFilters = function(Var, Row, fingerprintID, revision, filters){
         var result = {}
+        var destiny = this.endpoint+"/"+Var+"/"+Row+"/" + fingerprintID + "/" + revision;
 
-        $.ajax({
-          dataType: "json",
-          url: this.endpoint+"/"+Var+"/"+Row+"/" + fingerprintID + "/" + revision,
-          async: false,
-          type: "POST",
-          data: { publickey: global_public_key, filters: filters },
-          success: function (data){
-            result=data;
-          }
-        });
+        var key = hashCode(destiny + JSON.stringify(filters));
 
-        
+         if(cache_json.hasOwnProperty(key)){
+          result = cache_json[key];
 
-        return result;
+         } else {
+            $.ajax({
+              dataType: "json",
+              url: destiny,
+              async: false,
+              type: "POST",
+              data: { publickey: global_public_key, filters: filters },
+              success: function (data){
+                result=data;
+              }
+            }); 
+
+            cache_json[key] = result;
+         }
+
+
+          return result;
     };
 
     this.getFilter = function(Var, fingerprintID){
-        var result = {} ;
+        var result = {};
+        var destiny = "population/filters/"+Var+"/" + fingerprintID;
+
+        var key = hashCode(destiny);
+
+         if(cache_json.hasOwnProperty(key)){
+          result = cache_json[key];
+
+         } else {
         $.ajax({
           dataType: "json",
           url: "population/filters/"+Var+"/" + fingerprintID,
@@ -157,6 +188,9 @@ function PCAPI (endpoint)
           data: { publickey: global_public_key, result: result },        
           success: function (data){result=data;}
         });
+
+        cache_json[key] = result;
+      }
         return result;
     };
 
@@ -289,21 +323,15 @@ var stuff;
                         //console.log(selection);
                         
                         var charDraw = new PCDraw(actualChart, activeChart, null);
-
-                        for(filter in selection){
+                        $.each(selection, function(filter, options){
                           var options_translated = [];
-
-                          for(var i=0;i<selection[filter].length;i++){
-                            var _value = selection[filter][i];
-                            
-                            options_translated.push(_value);
-
-                          }
-
+                          
+                          $.each(options, function(index, value){
+                            options_translated.push(value);
+                          });
                           filtersMap['values.'+filter] = options_translated;
-                        }
-                        //console.log('NEW FILTERS:');
-                        //console.log(filtersMap);
+
+                        });
                         charDraw.refresh(filtersMap);
                     }
             });
@@ -514,7 +542,6 @@ var stuff;
       this.bindFilters = function(){
 
             /*** The magic of the changing of the type of the graph happens here */
-
             $(".graphTypes").bind('click',function(e)
                     { 
                       e.preventDefault(); 
@@ -535,18 +562,16 @@ var stuff;
                       $('.graphTypes').closest('li').removeClass('active')
                       $(this.parentNode).closest('li').addClass('active')
 
+                      var this_title = e.target.innerHTML;
+
                       chartTypes.forEach(function(a){
                           
-                          if (a.title.fixed_title==e.target.innerHTML) 
+                          if (a.title.fixed_title== this_title) 
                           {
                               actualChart = a;
                           }
                           
                       });
-                      if (actualChart==null)
-                      {
-                          // do something here like an abort or shit! 
-                      }
 
                       // Comments ids
                       var fid = getFingerprintID();
@@ -560,8 +585,9 @@ var stuff;
                       var _filters = {};
                       charDraw.draw(_filters);
                       charDraw.drawBar();
-                      $(".filterBar").last().click();   
-                      $(".filterBar").first().click(); 
+                      //var filterbar = $(".filterBar");
+                      //filterbar.last().click();   
+                      //filterbar.first().click(); 
 
                       
                       return false;

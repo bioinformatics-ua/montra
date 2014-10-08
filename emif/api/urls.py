@@ -22,7 +22,9 @@ from django.conf.urls import patterns, url
 from rest_framework.urlpatterns import format_suffix_patterns
 
 from api.views import SearchView
+from api.views import SearchDatabasesView
 from api.views import EmailCheckView
+from api.views import RemovePermissionsView
 from api.views import PopulationCheckView
 from api.views import GetFileView
 from api.views import DeleteFileView
@@ -35,11 +37,17 @@ from api.views import NotifyOwnerView
 from api.views import AddPublicLinkView
 from api.views import DeletePublicLinkView
 from api.views import SearchSuggestionsView
+from api.views import NotificationsView
+from api.views import ReadNotificationView
+from api.views import RemoveNotificationView
+from api.views import RequestAnswerView
 
+from dashboard.api import *
 
 urlpatterns = patterns('api.views',
     url(r'^root/$', 'api_root'),
     url(r'^emailcheck$', EmailCheckView.as_view(), name='emailcheck'),
+    url(r'^removePermissions$', RemovePermissionsView.as_view(), name='removepermissions'),
     url(r'^populationcheck$', PopulationCheckView.as_view(), name='populationcheck'),
     url(r'^getfile$', GetFileView.as_view(), name='getfile'),
     url(r'^deletefile$', DeleteFileView.as_view(), name='deletefile'),
@@ -54,6 +62,22 @@ urlpatterns = patterns('api.views',
     url(r'^deletepubliclink$', DeletePublicLinkView.as_view(), name='addpubliclink'),
     url(r'^searchsuggestions$', SearchSuggestionsView.as_view(), name='searchsuggestions'),
 
+    url(r'^notifications$', NotificationsView.as_view(), name='notifications'),
+    url(r'^readnotification$', ReadNotificationView.as_view(), name='readnotification'),
+    url(r'^removenotification$', RemoveNotificationView.as_view(), name='removenotification'),
+    url(r'^requestanswer$', RequestAnswerView.as_view(), name='requestanswer'),
+
+    # search databases services
+    url(r'^searchdatabases$', SearchDatabasesView.as_view(), name='searchdatabases'),
+
+    # dashboard widgets services
+    url(r'^dbtypes$', DatabaseTypesView.as_view(), name='dbtypes'),
+    url(r'^userstats$', UserStatsView.as_view(), name='userstats'),
+    url(r'^mostviewed$', MostViewedView.as_view(), name='mostviewed'),
+    url(r'^mostviewedfingerprint$', MostViewedFingerprintView.as_view(), name='mostviewedfingerprint'),
+    url(r'^lastusers$', LastUsersView.as_view(), name='lastusers'),
+    url(r'^feed$', FeedView.as_view(), name='feed'),
+    url(r'^tagcloud$', TagCloudView.as_view(), name='tagcloud'),
 
 )
 

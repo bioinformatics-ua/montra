@@ -109,10 +109,10 @@ f1.var = 'Name2'
 
 c.filters = [f1]
 
-print c.to_JSON()
+#print c.to_JSON()
 sc = SetCharst()
 sc.charts = [c,c]
-print sc.to_JSON()
+#print sc.to_JSON()
 
 
 ### Age starts at 
@@ -131,7 +131,7 @@ f1.name = 'Sex'
 f1.var = 'Name2'
 c.filters = [f1]
 
-print c.to_JSON()
+#print c.to_JSON()
 
 c = Chart()
 c.title = Title()

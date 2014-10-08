@@ -7,16 +7,33 @@
     {{ block.super }}
     {% breadcrumb "All databases" "alldatabases" %}
     {% breadcrumb "Data table" "alldatabases/data-table" %}
-
-
 {% endblock %}
 
 
-{% block headextra %}
-<link rel="stylesheet" href="{{STATIC_URL}}css/theme.blue.css">
-<link rel="stylesheet" href="{{STATIC_URL}}css/vendor/bootstrap-select.min.css">
+{% block styleinclude %}
+    <link rel="stylesheet" href="{{STATIC_URL}}css/theme.blue.css">
+    <link rel="stylesheet" href="{{STATIC_URL}}css/vendor/bootstrap-select.min.css">
 {% endblock %}
 
+{% block styleextra %}
+
+    button {
+        border: 1px #AAA solid;
+        padding: 4px 10px;
+    }
+    .hide {
+        display: none;
+    }
+    .ui-resizable-handle{
+    float: right;
+    height: 29px;
+    margin: -24px -22px -200px 0;
+    position: static;
+    width: 7px;
+    cursor: ew-resize;
+    }
+
+{% endblock %}
 
 {% block scriptextraincludes %}
 <script src="{{STATIC_URL}}js/vendor/jquery.tablesorter.min.js"></script>
@@ -28,29 +45,11 @@
 
 {% endblock %}
 
-{% block styleextra %}
 
-button {
-    border: 1px #AAA solid;
-    padding: 4px 10px;
-}
-.hide {
-    display: none;
-}
-.ui-resizable-handle{
-float: right;
-height: 29px;
-margin: -24px -22px -200px 0;
-position: static;
-width: 7px;
-cursor: ew-resize;
-}
-
-{% endblock %}
 
 
 {% block toolbar %}
-{% include "menu_toolbar.html" %}
+{% include "reusable_blocks/menu_toolbar.html" %}
 
 {% endblock %}
 

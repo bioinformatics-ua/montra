@@ -1,0 +1,38 @@
+{% extends "newsletter/common.html" %}
+{% load i18n %}
+{% load url from future %}
+{% block body %}
+    <div class="container-narrow">
+        <center>
+        <div class="jumbotron">
+            <br>
+            <div style="width: 700px;">
+                <div style="width: 100px; display: inline-block;">
+                    <i class="fa fa-check-circle fa-5x"></i>
+                </div>
+                <div style="text-align: justify; width: 400px; display: inline-block;" >
+                    <p  class="lead">
+                    {% if messages %}
+                            {% for message in messages %}
+                                {{ message }} <br />
+                            {% endfor %}
+                    </p>
+                    {% else %}
+                        <p  class="lead">
+                        Subscribe Emif Catalogue Newsletter
+                        </p>
+                        {% trans "Do you want to subscribe?" %}
+                        <form style="display: inline-block;" enctype="multipart/form-data" method="post" action="{% url "newsletter_subscribe_confirm" newsletter.slug %}">
+                            {% csrf_token %}
+                            <p><input style="margin-top: -3px;" class="btn btn-link" id="id_submit" name="submit" value="{% trans "Subscribe" %}" type="submit" /></p>
+                        </form>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div style="padding-top:20px">
+            </div>
+        </div>
+        </center>
+    </div>
+{% endblock %}

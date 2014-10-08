@@ -1,0 +1,216 @@
+{% load url from future %}
+{% load extra_tags %}
+{% load staticfiles %}
+{% load i18n %}
+{% load crispy_forms_tags %}
+{% load compress %}
+
+{% with STATIC_URL=STATIC_URL BASE_URL=BASE_URL %}
+
+<!DOCTYPE html>
+<!--[if lt IE 7]>      <html class="no-js ns lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js ns lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js ns lt-ie9 gt-ie7"> <![endif]-->
+<!--[if IE 9 ]>    <html class="no-js ie9 gt-ie7"> <![endif]-->
+<!--[if (gt IE 9)|!(IE)]><!-->
+<html lang="en" class="no-js">
+<!--<![endif]-->
+
+<head>
+    <!-- This is WRONG and just for testing, on deploy it must be changed to static base url -->
+    <base id="base_link" href="{{ BASE_URL }}">
+    <!--<base id="base_link" href="{{ request.get_host }}">-->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>{% block title %}EMIF Catalogue{% endblock title %}</title>
+    <meta name="description" content="EMIF Catalogue">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href="{{ STATIC_URL }}img/favicon.ico" type="image/x-icon" />
+
+    {% compress css %}
+    <link rel="stylesheet" href="{{ STATIC_URL }}css/bootstrap.min.css" />
+    <link rel="stylesheet" href="{{ STATIC_URL }}font-awesome/css/font-awesome.min.css" />
+    <link href="{{ STATIC_URL }}font-awesome-4.0.3/css/font-awesome.css" rel="stylesheet" />
+    <!-- IE 7 doesnt recognize awesome icons correctly... -->
+    <!--[if IE]>
+        <link rel="stylesheet" media="all" href="{{ STATIC_URL }}font-awesome/css/font-awesome-ie7.min.css" />
+        <script src="{{ STATIC_URL }}js/ie7_fixes.js"></script>
+        <![endif]-->
+        <link href='{{ STATIC_URL }}css/opensans.css' rel='stylesheet' type='text/css'>
+        <link href='{{ STATIC_URL }}css/abel.css' rel='stylesheet' type='text/css'>
+        <link rel="stylesheet" href="{{ STATIC_URL }}css/emif.landing.css" />
+        <link rel="stylesheet" href="{{ STATIC_URL }}css/bootstrap-responsive.min.css">
+
+    {% endcompress %}
+    {% compress js %}
+        <script src="{{ STATIC_URL }}js/vendor/modernizr-2.6.2.min.js"></script>
+        <script src="{{ STATIC_URL }}js/vendor/jquery-1.9.1.min.js"></script>
+        <script src="{{ STATIC_URL }}js/vendor/bootstrap.min.js"></script>
+        <script src="{{ STATIC_URL }}js/vendor/jquery.cookie.js"></script>
+        <script src="{{ STATIC_URL }}js/vendor/jquery.canclear.js"></script>
+        <script src="{{ STATIC_URL }}js/vendor/jquery.highlight.js"></script>
+
+        <script type="application/javascript">
+        // We need to configure this to be able to send requests by json with the csrftoken
+        var csrftoken = $.cookie('csrftoken');
+
+        function csrfSafeMethod(method) {
+                // these HTTP methods do not require CSRF protection
+                return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+            }
+            $.ajaxSetup({
+                crossDomain: false, // obviates need for sameOrigin test
+                beforeSend: function(xhr, settings) {
+                    if (!csrfSafeMethod(settings.type)) {
+                        xhr.setRequestHeader("X-CSRFToken", csrftoken);
+                    }
+                }
+            });
+            </script>
+    <!--[if lt IE 9]>
+
+            <script src="{{ STATIC_URL }}js/vendor/respond.min.js"></script>
+            <link rel="stylesheet" href="bootstrap_ie_compatibility" />
+
+
+            <![endif]-->
+            <script type="text/javascript">
+var focusFirstField = function () {
+  $('#signin_form input:nth(0)').focus();
+};
+focusFirstField();
+
+$(document).ready(function(){
+    setTimeout(function() {
+        $('html').css('visibility', 'visible').animate({
+            opacity: 1
+        }, 400, 'linear', function() {
+        });
+    }, 200);
+
+    setTimeout(function() {
+        $('.panel').css('visibility', 'visible').animate({
+            opacity: 1,
+            top: "20px"
+        }, 400, 'linear', function() {
+        });
+    }, 600);
+
+    var focusFirstField = function () {
+      $('#signin_form input:nth(2)').focus();
+    };
+    $('#signin_form input[type="text"], #signin_form input[type="password"], #signup_form select').addClass('span6  ');
+    $('#id_remember_me').parent().wrap('<div style="position: relative; float: none; margin: auto;" class="span6">');
+
+    $('#signin_form .alert').wrap('<div style="position: relative; float: none; margin: auto;text-align: justify;" class="span6">');
+    
+    $('#signin_form .alert li').attr('style', 'list-style: none;');
+
+    $('#signin_form button[type="reset"]').on('click', focusFirstField);
+    focusFirstField();
+    $('#signin_form .control-label').each(function(e){
+    var fore = '#'+$(this).attr('for');
+    var destiny = $(fore);
+
+    if(destiny.get(0)){
+        var content = $(this).text().trim();
+
+        $(destiny).prop('placeholder', content);
+
+        $(this).hide();
+    }
+  }); 
+});
+
+
+var _gaq = _gaq || [];
+_gaq.push(['_setAccount', 'UA-38876251-1']);
+_gaq.push(['_trackPageview']);
+$(function(){
+    if ($(".search-query").length > 0){
+        $('.search-query').canclear();
+    }
+});
+(function() {
+    var ga = document.createElement('script');
+    ga.type = 'text/javascript';
+    ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0];
+    s.parentNode.insertBefore(ga, s);
+})();
+</script>
+        {% endcompress %}
+        </head>
+
+        <body>
+            <div class="container">
+                <div class="row-fluid">
+                    <div class="span8 offset2 panel">
+                        <div class="inside" style="margin-bottom:0px;">
+                            <p><img src="{{STATIC_URL}}img/emif_logo_trans.png"/></p>
+                            <h1>EMIF Catalogue</h1>
+
+                            <p class="lead">{% slogan %}</p>
+                            <form action="accounts/signin/" id="signin_form" class="margin-base-vertical" method="post">
+                                {% csrf_token %}
+
+                                {% if referal != None %}
+                                <input type="hidden" name="referal" value="{{referal}}" />
+                                {% endif %}
+                                <div style="position: relative; float: none; margin: auto;" class="span6">
+                                <table style="width: 100%;">
+                                    <tr><td style="text-align: left;"><h3>Sign in</h3></td>
+                                    <td style="text-align: right;"> <small><a href="{% url 'userena_signup' %}">create a new account</a></small></td></tr>
+
+                                </table>
+                                </div>
+                                
+                                {{form|crispy}}
+                              <div class="control-group">
+                                <div class="controls">
+                                  <input id="id_remember_me" type="hidden" class="checkboxinput" name="remember_me" />
+                              </div>
+                          </div>
+                          <p><small><a href="accounts/password/reset/">Forgot your password?</a></small></p>
+                          <div class="control-group">
+                            <div class="controls">
+                      <!--<label class="checkbox">
+                        <input type="checkbox"> Remember me
+                    </label>-->
+                    <button style="position: relative; float: none; margin: auto;" type="submit" class="span6 btn btn-success btn-large">Sign in</button>
+                </div>
+            </div>
+            {% if next %}<input type="hidden" name="next" value="{{ next }}" />{% endif %}
+
+
+        </form>
+    </div>
+    <div class="inside2">
+        <hr>
+        <p><small>
+            <a href="feedback">Feedback</a> ·
+            <a href="faq">FAQ</a> ·
+            <a href="about">About</a>
+        </small></p>
+        <p class="muted credit"><small>&copy; EMIF Catalogue v{% get_version %}</small></p>
+        <!--<br/><small id="supportability">This website is optimised to Safari, Chrome, Firefox, Opera and IE9+. It runs in IE7-IE8, but it has low performance and no enhanced features.</small>-->
+    </div>
+</div>
+</div>
+</div>
+<!--<div class="navbar navbar-fixed-bottom"><div class="container">
+    <div class="row-fluid">
+        <div class="span8 offset2 panel2">
+            <div class="inside2">
+
+            
+        </div>
+        </div>
+    </div>
+</div>
+</div>-->
+</body>
+</html>
+
+{% endwith %}

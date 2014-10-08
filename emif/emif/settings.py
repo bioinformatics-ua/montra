@@ -165,12 +165,14 @@ STATICFILES_DIRS = (
     # Don't forget to use absolute paths, not relative paths.
     os.path.abspath(PROJECT_DIR_ROOT + MIDDLE_DIR + 'emif/static'),
     os.path.abspath(PROJECT_DIR_ROOT + MIDDLE_DIR + 'questionnaire/static/'),
+    os.path.abspath(PROJECT_DIR_ROOT + MIDDLE_DIR + 'fingerprint/static/'),
     os.path.abspath(PROJECT_DIR_ROOT + MIDDLE_DIR + 'population_characteristics/static'),
     os.path.abspath(PROJECT_DIR_ROOT + MIDDLE_DIR + 'literature/static'),
     os.path.abspath(PROJECT_DIR_ROOT + MIDDLE_DIR + 'docs_manager/static'),
     os.path.abspath(PROJECT_DIR_ROOT + MIDDLE_DIR + 'advancedsearch/static'),
     os.path.abspath(PROJECT_DIR_ROOT + MIDDLE_DIR + 'public/static'),
     os.path.abspath(PROJECT_DIR_ROOT + MIDDLE_DIR + 'accounts/static'),
+    os.path.abspath(PROJECT_DIR_ROOT + MIDDLE_DIR + 'dashboard/static'),
 )
 
 # List of finder classes that know how to find static files in
@@ -180,6 +182,10 @@ STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
     #    'django.contrib.staticfiles.finders.DefaultStorageFinder',
     #'djangobower.finders.BowerFinder',
+    'compressor.finders.CompressorFinder',
+)
+COMPRESS_JS_FILTERS = (
+    'compressor.filters.jsmin.JSMinFilter',
 )
 
 # Make this unique, and don't share it with anybody.
@@ -225,6 +231,10 @@ TEMPLATE_DIRS = (
     os.path.abspath(PROJECT_DIR_ROOT + MIDDLE_DIR + 'docs_manager/templates'),
     os.path.abspath(PROJECT_DIR_ROOT + MIDDLE_DIR + 'advancedsearch/templates'),
     os.path.abspath(PROJECT_DIR_ROOT + MIDDLE_DIR + 'public/templates'),
+    os.path.abspath(PROJECT_DIR_ROOT + MIDDLE_DIR + 'dashboard/templates'),
+
+    os.path.abspath(PROJECT_DIR_ROOT + MIDDLE_DIR + 'notifications/templates'),
+    os.path.abspath(PROJECT_DIR_ROOT + MIDDLE_DIR + 'accounts/templates'),
 )
 
 INSTALLED_APPS = (
@@ -247,7 +257,7 @@ INSTALLED_APPS = (
     # Questionnaires
     'transmeta',
     'questionnaire',
-    'questionnaire.page',
+    #'questionnaire.page',
 
     # User signup/signin/management
     'userena',
@@ -274,16 +284,21 @@ INSTALLED_APPS = (
     'population_characteristics',
     'literature',
     'django_bootstrap_breadcrumbs',
-    'bootstrap-pagination',
+    'bootstrap_pagination',
     'django_jenkins',
 
-    
+
     'djcelery',
     #'djangobower',
     'advancedsearch',
 
     # public links
     'public',
+
+    # newsletters
+    'django_extensions',
+    'sorl.thumbnail',
+    'newsletter',
 
     # FAQ
     'fack',
@@ -293,6 +308,14 @@ INSTALLED_APPS = (
 
     # unique views counter
     'hitcount',
+
+    # dashboard
+    'dashboard',
+
+    # notifications
+    'notifications',
+    # Django-Compressor
+    "compressor",
 )
 
 # Userena settings
@@ -322,6 +345,7 @@ USERENA_WITHOUT_USERNAMES = True
 USERENA_DISABLE_PROFILE_LIST = True
 USERENA_USE_MESSAGES = False
 USERENA_REDIRECT_ON_SIGNOUT = BASE_URL
+USERENA_SIGNIN_REDIRECT_BASE = BASE_URL
 USERENA_SIGNIN_REDIRECT_URL = BASE_URL + 'wherenext'
 USERENA_MODERATE_REGISTRATION = True                    #True - need admin approval (activation)
 USERENA_ACTIVATION_REJECTED = 'ACTIVATION_REJECTED'
@@ -452,7 +476,7 @@ LOGIN_EXEMPT_URLS = (
     r'^literature/(?P<fingerprint_id>[^/]+)$',
     r'^fingerprintqs/(?P<runcode>[^/]+)/(?P<qsid>[0-9]+)/$',
     r'^population/jerboafiles/(?P<fingerprint_id>[^/]+)/$',
-    r'^population/jerboalistvalues/(?P<var>[^/]+)/(?P<row>[^/]+)/(?P<fingerprint_id>[^/]+)$',
+    r'^population/jerboalistvalues/(?P<var>[^/]+)/(?P<row>[^/]+)/(?P<fingerprint_id>[^/]+)/(?P<revision>[^/]+)$',
     r'^population/filters/(?P<var>[^/]+)/(?P<fingerprint_id>[^/]+)$',
     r'^population/genericfilter/(?P<param>[^/]+)$',
     r'^population/settings/(?P<runcode>[^/]+)/$',
@@ -470,6 +494,7 @@ DONTLOG_URLS = (
     r'^docsmanager/docfiles/(?P<fingerprint_id>[^/]+)/$',
     r'^population/settings/(?P<fingerprint_id>[^/]+)/$',
     r'^population/jerboafiles/(?P<fingerprint_id>[^/]+)/$',
+    r'^jerboalistvalues/(?P<var>[^/]+)/(?P<row>[^/]+)/(?P<fingerprint_id>[^/]+)/(?P<revision>[^/]+)$'
     r'^searchqs/(?P<questionnaire_id>[0-9]+)/(?P<sortid>[0-9]+)/(?P<aqid>[0-9]+)?$',
     r'^addqs/(?P<fingerprint_id>[^/]+)/(?P<questionnaire_id>[0-9]+)/(?P<sortid>[0-9]+)/$',
     r'^addPost/(?P<questionnaire_id>[0-9]+)/(?P<sortid>[0-9]+)/(?P<saveid>[0-9]+)$',
@@ -487,10 +512,7 @@ DONTLOG_URLS = (
 SESSION_IDLE_TIMEOUT = 7200
 SESSION_SAVE_EVERY_REQUEST = True
 
-try:
-    from local_settings import *
-except:
-    pass
+
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
@@ -541,8 +563,8 @@ except ConnectionFailure, e:
     sys.exit(1)
 
 # REDIRECT USER ACCORDING TO PROFILE
-REDIRECT_DATACUSTODIAN = 'emif.views.databases'
-REDIRECT_RESEARCHER = 'emif.views.all_databases_user'
+REDIRECT_DATACUSTODIAN = 'dashboard.views.dashboard'
+REDIRECT_RESEARCHER = 'dashboard.views.dashboard'
 
 
 # MEMCACHED
@@ -563,3 +585,12 @@ PUBLIC_LINK_MAX_TIME = 24*30; # hours
 # Unique views definitions
 HITCOUNT_KEEP_HIT_ACTIVE = { 'days': 1 }
 
+# Django-Compressor activation
+COMPRESS_ENABLED = False
+COMPRESS_OFFLINE = True
+
+
+try:
+    from local_settings import *
+except:
+    pass

@@ -28,7 +28,11 @@ from .serialize import serialize
 from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import user_passes_test, login_required
 
-from emif.views import createqsets, createqset, get_api_info, getPermissions, attachPermissions, merge_highlight_results
+from fingerprint.services import getPermissions, attachPermissions, merge_highlight_results
+
+from emif.views import get_api_info
+
+from questionnaire.services import createqsets, createqset
 
 from questionnaire.models import QuestionSet
 
@@ -46,8 +50,6 @@ from fingerprint.models import Fingerprint
 
 from docs_manager.views import get_revision
 from population_characteristics.tasks import aggregation
-
-from api.models import FingerprintAPI
 
 from public.models import PublicFingerprintShare
 
@@ -140,7 +142,7 @@ def single_qset_view(request, runcode, qsid, template_name='fingerprint_qs.html'
 
     qset, name, db_owners, fingerprint_ttype = createqset(runcode, qsid, highlights=h)   
     
-    return render(request, template_name,{'request': request, 'qset': qset})   
+    return render(request, template_name,{'request': request, 'qset': qset, 'fingerprint_id': runcode})   
 
 
 def document_form_view(request, runcode, qs, activetab='summary', readOnly=False, public_key = None,
@@ -157,7 +159,7 @@ def document_form_view(request, runcode, qs, activetab='summary', readOnly=False
     apiinfo = json.dumps(get_api_info(runcode))
     owner_fingerprint = False
 
-    print request.user.username
+    #print request.user.username
 
     for owner in db_owners.split(" "):
         #print request.user.username
@@ -208,9 +210,6 @@ def document_form_view(request, runcode, qs, activetab='summary', readOnly=False
 
     public_links = None
 
-    print "owner ?"+str(owner_fingerprint)
-    print "fingerprint? "+str(fingerprint)
-
     if owner_fingerprint and fingerprint != None:
 
         public_links = PublicFingerprintShare.objects.filter(user=request.user, fingerprint=fingerprint)
@@ -231,6 +230,8 @@ def document_form_view(request, runcode, qs, activetab='summary', readOnly=False
                     'style': qs, 'collapseall': False, 
                     'owner_fingerprint':owner_fingerprint,
                     'owners': db_owners,
+                    'owner_obj': fingerprint.owner,
+                    'shared_obj': fingerprint.shared,
                     'fingerprint_dump': True,
                     'contains_population': contains_population, 
                     'latest_pop': latest_pop,

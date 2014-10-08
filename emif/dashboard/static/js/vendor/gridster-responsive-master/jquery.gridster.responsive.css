@@ -1,0 +1,25 @@
+.gridster ul, .gridster ol {
+    list-style: none;
+}
+.gridster{ display: none}
+.gridster .panel-heading{ min-height: 44px; overflow:hidden}
+.gridster .panel-body{
+	height:inherit;
+	overflow-y: auto;
+	overflow-x: hidden;
+}
+.gridster .panel{
+	height:100%;
+	padding-bottom: 60px;
+}
+.gridster .panel-heading {
+    cursor: pointer;
+}
+.gridster .preview-holder {
+    position: absolute;
+    background-color: #FFFFCC;
+    border-color: #000;
+	border: 1px dashed #000;
+    opacity: 0.3;
+}
+

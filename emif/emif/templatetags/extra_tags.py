@@ -19,16 +19,22 @@
 #
 #
 import re
+
+from django.template.loader import render_to_string
+
 from django import template
 from django.template.defaultfilters import stringfilter
 
 from questionnaire.models import Questionnaire
+from fingerprint.models import AnswerRequest
 
 import hashlib
 
 from django.conf import settings
 
 from accounts.models import Profile
+
+from newsletter.models import Newsletter, Subscription
 
 register = template.Library()
 
@@ -73,6 +79,19 @@ def removehs(value):
     value = value.replace('h7. ','')
 
     return value
+
+@register.simple_tag()
+def ans_requested(question, requests, *args, **kwargs):
+    try:
+        question_requests = requests.filter(question = question)
+
+        if len(question_requests) > 0:
+            return render_to_string('answer_requests.html', { "requests": question_requests })
+
+    except AnswerRequest.DoesNotExist:
+        pass
+
+    return ""
 
 @register.filter(name='datehhmm')
 @stringfilter
@@ -243,34 +262,59 @@ def profiles_list_user(user):
 def show_profiles(user):
 
     return {'profiles':profiles_list_user(user)}
-register.inclusion_tag('menu_ttags_profiles.html')(show_profiles)
+register.inclusion_tag('reusable_blocks/menu_ttags_profiles.html')(show_profiles)
 
 def show_fingerprints_interests_profile(user):
 
     return {'fingerprints':fingerprints_list_user(user)}
-register.inclusion_tag('menu_ttags_interests.html')(show_fingerprints_interests_profile)
+register.inclusion_tag('reusable_blocks/menu_ttags_interests.html')(show_fingerprints_interests_profile)
 
 def show_fingerprints_interests(user):
 
     return {'fingerprints':fingerprints_list_user(user)}
-register.inclusion_tag('menu_ttags.html')(show_fingerprints_interests)
+register.inclusion_tag('reusable_blocks/menu_ttags.html')(show_fingerprints_interests)
+
+@register.simple_tag
+def show_subscription(user):
+    try:
+        newsl = Newsletter.objects.get(slug='emif-catalogue-newsletter')
+
+        link="newsletter/"+newsl.slug+"/subscribe"
+        label="Subscribe Newsletter"   
+
+        # create subscription
+        user_sub = None
+        try:
+            subscription = Subscription.objects.get(user=user,  newsletter=newsl)
+
+            if not subscription.unsubscribed:
+                link = "newsletter/"+newsl.slug+"/unsubscribe"
+                label = "Unsubscribe Newsletter"
+        except:
+            pass
+  
+
+    except Newsletter.DoesNotExist:
+        print "Problem finding default newsletter"    
+
+    return '<a href="'+link+'" class="navbar-link"><i class="fa fa-rss"></i>&nbsp;'+label+'</a>'
 
 def show_fingerprints():
     
     return {'fingerprints':fingerprints_list()}
-register.inclusion_tag('menu_ttags.html')(show_fingerprints)
+register.inclusion_tag('reusable_blocks/menu_ttags.html')(show_fingerprints)
 
 
 def show_fingerprints_for_search(user):
     
     return {'fingerprints':fingerprints_list_user(user)}
-register.inclusion_tag('menu_ttags_for_search.html')(show_fingerprints_for_search)
+register.inclusion_tag('reusable_blocks/menu_ttags_for_search.html')(show_fingerprints_for_search)
 
 
 def show_fingerprints_for_statistics():
 
     return {'fingerprints':fingerprints_list()}
-register.inclusion_tag('menu_ttags_for_statistics.html')(show_fingerprints_for_statistics)
+register.inclusion_tag('reusable_blocks/menu_ttags_for_statistics.html')(show_fingerprints_for_statistics)
 
 
 

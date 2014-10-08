@@ -33,9 +33,3 @@ class Slugs(models.Model):
 
 class Nomenclature(models.Model):
     name = models.CharField(max_length=256)
-
-class ContactForm(forms.Form):
-    name = forms.CharField()
-    email = forms.EmailField()
-    topic = forms.CharField()
-    message = forms.CharField(widget=forms.Textarea)

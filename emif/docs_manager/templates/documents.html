@@ -7,41 +7,24 @@
 }
 </style>
 
-{% if documents_available %}
-    <div class="docs_available"> 
-        <p >
-          The documents that are available will be listed below. 
-        </p>
-    </div>
-{% else %}
-    {%if owner_fingerprint %}
-    <div class="docs_not_available"> 
-    </div>
-    <p class="nodocs">You can upload documents to associate them to the fingerprint browser</p>
-
-    {% else %}
-
-        <h4 class="pull-center">No documents associated with this database yet.</h4>
-    <p class="pull-center">This database fingerprint does not have documents yet. Please contact the database owner to get more information.</p>    
-
-    {% endif %}
-{%endif %}
+<div id="doc_status">
+    
+</div>
 {% if owner_fingerprint %}
 <form id="fileupload" method="post" action="." enctype="multipart/form-data">
 {% csrf_token %}
         <!-- Redirect browsers with JavaScript disabled to the origin page -->
         <!--<noscript><input type="hidden" name="redirect" value="http://blueimp.github.io/jQuery-File-Upload/"></noscript>-->
         <!-- The fileupload-buttonbar contains buttons to add/delete files and start/cancel the upload -->
-        <div class="row fileupload-buttonbar">
+        <div class="offset1 span8 fileupload-buttonbar">
             <fieldset>
 
-                <label>Name:</label> <input class="span7" size="255" type="text" cols="100" name="pc_name" >
-                <label>Description: </label>
-                <textarea class="span7 input-block-level" rows="4" name="pc_comments" ></textarea>
+                <input placeholder="Name" class="span12" size="255" type="text" cols="100" name="pc_name" >
+                <textarea placeholder="Description" class="span12 input-block-level" rows="4" name="pc_comments" ></textarea>
 
                 <!-- The fileinput-button span is used to style the file input field as button -->
 
-                <span style="margin-left: 0px !important;" class="span7 btn btn-success fileinput-button">
+                <span style="margin-left: 0px !important;" class="span12 btn btn-success fileinput-button">
                     <i class="glyphicon glyphicon-plus"></i>
                     <span>Add files...</span>
                     <input type="file" name="file" multiple>

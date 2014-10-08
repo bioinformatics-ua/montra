@@ -30,7 +30,6 @@ from rest_framework import renderers
 from rest_framework.authentication import TokenAuthentication
 
 from rest_framework.authentication import SessionAuthentication, BasicAuthentication
-from rest_framework.permissions import IsAuthenticated
 
 from rest_framework.decorators import api_view, parser_classes
 from rest_framework.response import Response
@@ -49,7 +48,7 @@ from django.views.decorators.csrf import csrf_exempt
 
 from rest_framework.permissions import AllowAny, IsAuthenticated
 
-# Import Search Engine 
+# Import Search Engine
 
 from searchengine.search_indexes import CoreEngine
 from api.models import *
@@ -66,19 +65,25 @@ import mimetypes
 
 from django.template.loader import render_to_string
 
-from emif.utils import send_custom_mail
+from emif.utils import send_custom_mail, escapeSolrArg
 
-from fingerprint.models import Fingerprint
+from fingerprint.models import Fingerprint, AnswerRequest
+from fingerprint.services import findName
+from fingerprint.listings import get_databases_from_solr_v2
+from questionnaire.models import Question
 
 from public.views import PublicFingerprintShare
 from public.services import deleteFingerprintShare, createFingerprintShare
 
+from notifications.models import Notification
+from notifications.services import sendNotification
 from population_characteristics.models import Characteristic
 
+import time
+from django.utils import timezone
+from datetime import timedelta
+
 from public.utils import hasFingerprintPermissions
-
-from django.contrib.staticfiles.templatetags.staticfiles import static
-
 
 class JSONResponse(HttpResponse):
     """
@@ -117,7 +122,7 @@ class SearchView(APIView):
     permission_classes = (IsAuthenticated,)
 
     def get(self, request, *args, **kw):
-        
+
         # If authenticated
         if request.auth:
             user = request.user
@@ -126,7 +131,7 @@ class SearchView(APIView):
             result['status'] = 'authenticated'
             result['method'] = 'GET'
             result['user'] = str(user)
-            print request.DATA
+            #print request.DATA
          #if query!=None:
         else:
             result = {'status': 'NOT authenticated', 'method': 'GET'}
@@ -140,13 +145,81 @@ class SearchView(APIView):
 
 
 ############################################################
+##### Search Databases - Web services
+############################################################
+
+
+class SearchDatabasesView(APIView):
+    """
+    Class to search and return a list of databases matching a free text query
+    """
+    authentication_classes = (TokenAuthentication, SessionAuthentication, BasicAuthentication )
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request, *args, **kw):
+        sortmap = {
+            'name': 'database_name_t',
+            'type_name': 'type_t',
+            'id': 'id',
+            'last_activity': 'date_last_modification_t',
+            'date': 'created_t',
+        }
+        #defaults
+        rows=20
+        offset=0
+        sort_field='name'
+        sort_order='asc'
+
+        sortFilter = None
+
+        if request.user.is_authenticated():
+            search = request.DATA.get('search', None)
+            crows = request.DATA.get('rows', None)
+            coffset = request.DATA.get('offset', None)
+            csortf = request.DATA.get('sort_field', None)
+            csorto = request.DATA.get('sort_order', None)
+
+            if search == None or len(search.strip()) == 0:
+                return Response({'status': 'Authenticated', 'method': 'POST', 'Error': 'Must specify a search text filter'}, status=status.HTTP_400_BAD_REQUEST)
+
+            if crows != None:
+                rows = crows
+
+            if coffset != None:
+                offset = coffset
+
+            if csortf != None:
+                sort_field = csortf
+
+            if csorto != None:
+                sort_order = csorto
+
+            if sort_order != 'asc' and sort_order != 'desc':
+                return Response({'status': 'Authenticated', 'method': 'POST', 'Error': 'Available sort orders are "asc" and "desc"'}, status=status.HTTP_400_BAD_REQUEST)
+
+            try:
+                sortFilter = sortmap[sort_field] + " " + sort_order
+            except:
+                return Response({'status': 'Authenticated', 'method': 'POST', 'Error': 'sort_field can only be name, type_name, id, last_activity or date.'}, status=status.HTTP_400_BAD_REQUEST)
+
+
+
+            c = CoreEngine()
+            (list_databases,hits) = get_databases_from_solr_v2(request, "text_t:\"" +escapeSolrArg(search)+'"', sort=sortFilter, rows=rows, start=offset)
+
+            return Response({'link': {'status': 'Authenticated', 'method': 'POST'}, 'filters':{'search': search, 'rows': rows,
+                'offset':offset}, 'result': {'count': len(list_databases),
+                'databases': [d.__dict__ for d in list_databases]}}, status=status.HTTP_200_OK)
+
+        return Response({'status': 'NOT authenticated', 'method': 'POST'}, status=status.HTTP_401_UNAUTHORIZED)
+############################################################
 ##### Email Share - Web services
 ############################################################
 
 
 class EmailCheckView(APIView):
     authentication_classes = (SessionAuthentication, BasicAuthentication)
-    permission_classes = (IsAuthenticated,)    
+    permission_classes = (IsAuthenticated,)
     def post(self, request, *args, **kw):
         # first we get the email parameter
         email = request.POST.get('email', '')
@@ -157,13 +230,13 @@ class EmailCheckView(APIView):
             # Verify if it is a valid user name
             username = None
             fullname = ""
-            try: 
+            try:
                 username = User.objects.get(email__exact=email)
                 fullname=username.get_full_name()
-                valid = True  
+                valid = True
             except User.DoesNotExist:
-                pass             
-               
+                pass
+
         result = {
             'email': email,
             'username': fullname,
@@ -173,30 +246,60 @@ class EmailCheckView(APIView):
         return response
 
 ############################################################
+##### RemovePermissions - Web services
+############################################################
+
+
+class RemovePermissionsView(APIView):
+    authentication_classes = (SessionAuthentication, BasicAuthentication)
+    permission_classes = (IsAuthenticated,)
+    def post(self, request, *args, **kw):
+        id = request.POST.get('id', -1)
+        hash = request.POST.get('hash')
+        valid = False
+
+        # Verify if it is a valid email
+        if id != None and id != -1 and hash != None:
+            try:
+                finger = Fingerprint.objects.get(fingerprint_hash=hash)
+
+                username = finger.shared.get(id=id)
+
+                finger.shared.remove(username)
+
+
+                return Response({'success': True}, status=status.HTTP_200_OK)
+
+            except Fingerprint.DoesNotExist:
+                pass
+
+        return Response(result, status=status.HTTP_403_OK)
+
+############################################################
 ##### Population Check if exists - Web services
 ############################################################
 class PopulationCheckView(APIView):
     authentication_classes = (SessionAuthentication, BasicAuthentication)
-    permission_classes = (IsAuthenticated,) 
+    permission_classes = (IsAuthenticated,)
 
     def post(self, request, *args, **kw):
         # first we get the email parameter
         ids = request.POST.getlist('ids[]')
 
-        print ids
+        #print ids
 
         contains_population = True
 
         for id in ids:
-            print id
+            #print id
             jerboa_files = Characteristic.objects.filter(fingerprint_id=id)
             contains_population = len(jerboa_files)!=0
             if not contains_population:
                 break
 
-        print "---"
-        print contains_population
-        print "---"
+        #print "---"
+        #print contains_population
+        #print "---"
 
         result = {
             'contains_population': contains_population,
@@ -223,7 +326,7 @@ class GetFileView(APIView):
         # Verify if we have name and revision
         if not (name == None or name=='' or revision == None or revision == ''):
 
-            #print name 
+            #print name
             #print revision
 
             path_to_file = os.path.join(os.path.abspath(PATH_STORE_FILES), revision+name)
@@ -249,15 +352,15 @@ class DeleteFileView(APIView):
         success = False
 
         # Verify if we have name and revision
-        if not (fingerprint_id == None or fingerprint_id =='' or 
+        if not (fingerprint_id == None or fingerprint_id =='' or
             name == None or name=='' or revision == None or revision == ''):
-            
+
             user = request.user
 
             try:
                 # We are setting as removed all revisions (not just the last one)
                 files = FingerprintDocuments.objects.filter(
-                        fingerprint_id=fingerprint_id, 
+                        fingerprint_id=fingerprint_id,
                         file_name=name)
 
                 # we only allow deleting for the owner of this file, or the administrators
@@ -265,9 +368,9 @@ class DeleteFileView(APIView):
 
                     for f in files:
                         f.removed = True
-                        
+
                         f.save()
-                    
+
                     success = True
 
             except FingerprintDocuments.DoesNotExist:
@@ -311,7 +414,7 @@ def respond_as_attachment(request, file_path, original_filename):
 
 class AdvancedSearchView(APIView):
     authentication_classes = (SessionAuthentication, BasicAuthentication)
-    permission_classes = (IsAuthenticated,)  
+    permission_classes = (IsAuthenticated,)
 
     def get(self, request, *args, **kw):
         # Process any get params that you may need
@@ -392,7 +495,7 @@ class MetaDataView(APIView):
     # Example request
     # curl -H "Content-Type: application/json" -X POST -d "{\"uid\":12,\"token\":\"asdert\"}" http://192.168.1.3:8000/api/metadata -H "Authorization: Token c6e25981c67ae45f98bdb380b0a9d8164e7ec4d1" -v
     authentication_classes = (TokenAuthentication,SessionAuthentication, BasicAuthentication,)
-    permission_classes = (IsAuthenticated,)  
+    permission_classes = (IsAuthenticated,)
     # permission_classes = (permissions.AllowAny,)
     # permission_classes = (permissions.IsAuthenticated,)
     parser_classes((JSONParser,))
@@ -441,22 +544,22 @@ class ValidateView(APIView):
     def get(self, request, *args, **kw):
 
         database_name = request.GET['name']
-        
+
         c = CoreEngine()
         results = c.search_fingerprint("database_name_t:\"" +database_name+'"')
 
         contain = len(results) != 0
         # Dirty hack: check if the database name is really equals
         if contain:
+            contain = False
             for r in results:
                 try:
-                    if database_name != r['database_name_t']:
-                        contain = False
+                    if database_name.lower().strip() == r['database_name_t'].lower().strip():
+                        contain = True
+                        break
 
                 except:
-                    raise
-                    contain = True
-
+                    pass
 
         result = {'contains': contain}
 
@@ -466,16 +569,16 @@ class ValidateView(APIView):
     def post(self, request, *args, **kw):
         try:
 
-            print request.POST.items()
+            #print request.POST.items()
             for i in request.POST.items():
-                print i[0]
+                #print i[0]
                 json_test = json.loads(i[0])
-                print json_test
+                #print json_test
 
             result = {'test': 'teste2'}
             response = Response(result, status=status.HTTP_200_OK)
         except:
-            print("fuck")
+            #print("fuck")
             raise
         return response
 
@@ -488,7 +591,7 @@ class ValidateView(APIView):
 
 class StatsView(APIView):
     authentication_classes = (SessionAuthentication, BasicAuthentication)
-    permission_classes = (IsAuthenticated,)    
+    permission_classes = (IsAuthenticated,)
     """
     Class that returns json values of answers to create stats (charts)
     """
@@ -523,7 +626,7 @@ class StatsView(APIView):
 
             response = Response(result, status=status.HTTP_200_OK)
         except:
-            print("fuck")
+            #print("fuck")
             raise
         return response
 
@@ -575,18 +678,18 @@ class StatsView(APIView):
 
 class PublicationsView(APIView):
     """
-    Class that returns the information of a publication 
+    Class that returns the information of a publication
     """
     authentication_classes = (SessionAuthentication, BasicAuthentication)
     permission_classes = (IsAuthenticated,)
-    
+
     def get(self, request, *args, **kw):
         results = dict()
         pmid = request.GET['pmid']
-        
+
         if (pmid==None or pmid==''):
-            return Response(results, status=status.HTTP_400_BAD_REQUEST)    
-        
+            return Response(results, status=status.HTTP_400_BAD_REQUEST)
+
         doi_object = PubMedObject(pmid)
         request_status = doi_object.fetch_info()
 
@@ -600,8 +703,8 @@ class PublicationsView(APIView):
             results['volume'] =  doi_object.volume
             return Response(results, status=status.HTTP_200_OK)
 
-        return Response(results, status=status.HTTP_400_BAD_REQUEST)    
-            
+        return Response(results, status=status.HTTP_400_BAD_REQUEST)
+
 
 
 
@@ -611,15 +714,15 @@ class PublicationsView(APIView):
 
 class PopulationView(APIView):
     """PopulationCharactersticsService
-    This web service is responsabible to handle jerboa documents 
+    This web service is responsabible to handle jerboa documents
 
     """
-    
+
     authentication_classes = (SessionAuthentication, BasicAuthentication)
-    permission_classes = (IsAuthenticated,)        
+    permission_classes = (IsAuthenticated,)
     def get(self, request, *args, **kw):
         """
-        List the Jerboa documents 
+        List the Jerboa documents
         """
         pass
 
@@ -660,6 +763,26 @@ class NotifyOwnerView(APIView):
                     else:
                         user_fullname = this_user.username
 
+
+                    # Dont add more notifications unless theres been no notification of this type in a hour
+                    notification_message = str(fingerprint_name)+" has new comments, please click here to see them."
+                    old_not = Notification.objects.filter(notification = notification_message, destiny=this_user, removed=False,
+                                                created_date__gt=(timezone.now()-timedelta(hours=1)))
+
+                    #print "EXISTEM ANTIGAS ?"+str(len(old_not))
+
+                    if len(old_not) > 0:
+                        old_not[0].read_date=None
+                        old_not[0].read = False
+                        old_not[0].created_date = timezone.now()
+                        old_not[0].save()
+                    else:
+                        new_notification = Notification(destiny=this_user ,origin=request.user,
+        notification=notification_message,
+        type=Notification.SYSTEM, href="fingerprint/"+fingerprint_id+"/1/discussion/")
+
+                        new_notification.save()
+
                     send_custom_mail('Emif Catalogue: There\'s a new comment on one of your databases',
                      render_to_string('emails/new_db_comment.html', {
                             'fingerprint_id': fingerprint_id,
@@ -668,8 +791,8 @@ class NotifyOwnerView(APIView):
                             'comment': comment,
                             'base_url': settings.BASE_URL,
                             'user_commented': user_commented
-                        }), 
-                     settings.DEFAULT_FROM_EMAIL, [owner]);
+                        }),
+                     settings.DEFAULT_FROM_EMAIL, [this_user.email]);
 
                     return Response({}, status=status.HTTP_200_OK)
 
@@ -679,6 +802,178 @@ class NotifyOwnerView(APIView):
 
         return Response({}, status=status.HTTP_400_BAD_REQUEST)
 
+############################################################
+##### Get notifications - Web services
+############################################################
+
+
+class NotificationsView(APIView):
+    authentication_classes = (SessionAuthentication, BasicAuthentication)
+    permission_classes = (IsAuthenticated,)
+    def get(self, request, *args, **kw):
+
+        if not request.user.is_authenticated():
+            return Response({"Request", "Invalid"}, status=status.HTTP_400_BAD_REQUEST)
+
+        notifications = Notification.objects.filter(destiny=request.user, type=Notification.SYSTEM,
+            removed=False).order_by('-created_date')[:20]
+
+        notifications_array = []
+        unread = 0
+        for notification in notifications:
+
+            readtime=None
+            if notification.read_date:
+                readtime=notification.read_date.strftime("%Y-%m-%d %H:%M")
+
+            notifications_array.append({
+                    'id':   notification.id,
+                    'origin': notification.origin.get_full_name(),
+                    'message': notification.notification,
+                    'type': notification.type,
+                    'href': notification.href,
+                    'createddate': notification.created_date.strftime("%Y-%m-%d %H:%M"),
+                    'readdate': readtime,
+                    'read': notification.read,
+            })
+
+            if notification.read == False:
+                unread+=1
+
+        result = {
+            'unread': unread,
+            'notifications': notifications_array
+            }
+        response = Response(result, status=status.HTTP_200_OK)
+        return response
+
+############################################################
+##### Read notification - Web services
+############################################################
+
+
+class ReadNotificationView(APIView):
+    authentication_classes = (SessionAuthentication, BasicAuthentication)
+    permission_classes = (IsAuthenticated,)
+    def post(self, request, *args, **kw):
+
+        if not request.user.is_authenticated():
+            return Response({"Request", "Invalid"}, status=status.HTTP_400_BAD_REQUEST)
+
+        notification_id = request.POST.get('notification', '')
+        value = False
+
+        if request.POST.get('value', False) == 'true':
+            value = True
+
+        #print value
+
+        if notification_id != '':
+            try:
+                # This may seem dumb, but i want to make sure the user is the "owner" of the notification
+                notification = Notification.objects.get(destiny=request.user, id=notification_id)
+
+                notification.read_date = timezone.now()
+                notification.read = value
+
+                notification.save()
+
+                return Response({'success': True }, status=status.HTTP_200_OK)
+
+            except Notification.DoesNotExist:
+                print "Can't mark as read notification with id"+notification_id
+
+        return Response({'success': False }, status=status.HTTP_400_BAD_REQUEST)
+
+############################################################
+##### Remove notification - Web services
+############################################################
+
+
+class RemoveNotificationView(APIView):
+    authentication_classes = (SessionAuthentication, BasicAuthentication)
+    permission_classes = (IsAuthenticated,)
+    def post(self, request, *args, **kw):
+
+        if not request.user.is_authenticated():
+            return Response({"Request", "Invalid"}, status=status.HTTP_400_BAD_REQUEST)
+
+        notification_id = request.POST.get('notification', '')
+        value = False
+
+        if request.POST.get('value', False) == 'true':
+            value = True
+
+        if notification_id != '':
+            try:
+                # This may seem dumb, but i want to make sure the user is the "owner" of the notification
+                notification = Notification.objects.get(destiny=request.user, id=notification_id)
+
+                notification.removed = value
+
+                notification.save()
+
+                return Response({'success': True }, status=status.HTTP_200_OK)
+
+            except Notification.DoesNotExist:
+                print "Can't mark as read notification with id"+notification_id
+
+        return Response({'success': False }, status=status.HTTP_400_BAD_REQUEST)
+
+############################################################
+##### Request Answer - Web services
+############################################################
+class RequestAnswerView(APIView):
+    authentication_classes = (SessionAuthentication, BasicAuthentication)
+    permission_classes = (IsAuthenticated,)
+    def post(self, request, *args, **kw):
+        # first we get the email parameter
+        fingerprint_id = request.POST.get('fingerprint_id', '')
+        question_id = request.POST.get('question', '')
+
+        if request.user.is_authenticated():
+            try:
+                fingerprint = Fingerprint.objects.get(fingerprint_hash=fingerprint_id)
+                question = Question.objects.get(id=question_id)
+
+                ansrequest = None
+                try:
+                    ansrequest = AnswerRequest.objects.get(
+                                    fingerprint=fingerprint,
+                                    question=question,
+                                    requester=request.user, removed = False)
+
+                    # If this user already request this answer, just update request time
+                    ansrequest.save()
+
+                # otherwise we must create the request as a new one
+                except:
+                    ansrequest = AnswerRequest(fingerprint=fingerprint, question=question, requester=request.user)
+                    ansrequest.save()
+
+                if ansrequest != None:
+
+                    message = str(ansrequest.requester.get_full_name())+" requested you to answer some unanswered questions on database "+str(findName(fingerprint))+"."
+
+                    sendNotification(timedelta(hours=12), fingerprint.owner, ansrequest.requester,
+            "dbEdit/"+fingerprint.fingerprint_hash+"/"+str(fingerprint.questionnaire.id), message)
+
+                result = {
+                    'fingerprint_id': fingerprint_id,
+                    'question_id': question_id,
+                    'success': True
+                }
+
+                return Response(result, status=status.HTTP_200_OK)
+
+            except Fingerprint.DoesNotExist:
+                pass
+
+            except Question.DoesNotExist:
+                pass
+
+        return Response({'success': False }, status=status.HTTP_400_BAD_REQUEST)
+
 
 ############################################################
 ##### Seach Suggestions - Web services
@@ -687,9 +982,9 @@ class NotifyOwnerView(APIView):
 
 class SearchSuggestionsView(APIView):
     authentication_classes = (SessionAuthentication, BasicAuthentication)
-    permission_classes = (IsAuthenticated,)    
+    permission_classes = (IsAuthenticated,)
     def get(self, request, *args, **kw):
-        
+
         if request.user.is_authenticated():
 
             path_to_file = os.path.join(os.path.abspath(PATH_STORE_FILES), "quicksearch/freetext.json")
@@ -697,8 +992,8 @@ class SearchSuggestionsView(APIView):
             print path_to_file
 
             data= None
-            with open(path_to_file) as data_file:    
-                data = json.load(data_file)            
+            with open(path_to_file) as data_file:
+                data = json.load(data_file)
 
             result = {
                 'suggestions': data
@@ -784,7 +1079,7 @@ def validate_and_save(user, data):
         # print "Não tem nenhuma chave fingerprint"
         result['error'] = "No fingerprintID detected"
 
-    
+
     c = CoreEngine()
     results = c.search_fingerprint("id:" + fingerprintID)
     _aux = None
@@ -794,7 +1089,7 @@ def validate_and_save(user, data):
 
 
     if (_aux!=None):
-        _aux['text_t']  = _aux['text_t'] + fields_text  
+        _aux['text_t']  = _aux['text_t'] + fields_text
         c.index_fingerprint_as_json(_aux)
 
     return result

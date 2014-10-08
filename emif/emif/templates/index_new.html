@@ -4,6 +4,7 @@
 {% load i18n %}
 {% load crispy_forms_tags %}
 {% with STATIC_URL=STATIC_URL BASE_URL=BASE_URL %}
+{% load compress %}
 
 <!DOCTYPE html>
 <!--[if lt IE 7]>      <html class="no-js ns lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
@@ -24,18 +25,22 @@
     <meta name="description" content="EMIF Catalogue">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="shortcut icon" href="{{ STATIC_URL }}img/favicon.ico" type="image/x-icon" />
+
+    {% compress css %}
     <link rel="stylesheet" href="{{ STATIC_URL }}css/bootstrap.min.css" />
     <link rel="stylesheet" href="{{ STATIC_URL }}font-awesome/css/font-awesome.min.css" />
-    <link href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet" />
+    <link href="{{ STATIC_URL }}font-awesome-4.0.3/css/font-awesome.css" rel="stylesheet" />
     <!-- IE 7 doesnt recognize awesome icons correctly... -->
     <!--[if IE]>
         <link rel="stylesheet" media="all" href="{{ STATIC_URL }}font-awesome/css/font-awesome-ie7.min.css" />
         <script src="{{ STATIC_URL }}js/ie7_fixes.js"></script>
         <![endif]-->
-        <link href='http://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
-        <link href='http://fonts.googleapis.com/css?family=Abel' rel='stylesheet' type='text/css'>
+        <link href='{{ STATIC_URL }}css/opensans.css' rel='stylesheet' type='text/css'>
+        <link href='{{ STATIC_URL }}css/abel.css' rel='stylesheet' type='text/css'>
         <link rel="stylesheet" href="{{ STATIC_URL }}css/emif.landing.css" />
         <link rel="stylesheet" href="{{ STATIC_URL }}css/bootstrap-responsive.min.css">
+    {% endcompress %}
+    {% compress js %}
         <script src="{{ STATIC_URL }}js/vendor/modernizr-2.6.2.min.js"></script>
         <script src="{{ STATIC_URL }}js/vendor/jquery-1.9.1.min.js"></script>
         <script src="{{ STATIC_URL }}js/vendor/bootstrap.min.js"></script>
@@ -67,6 +72,48 @@
 
 
             <![endif]-->
+<script type="text/javascript">
+var focusFirstField = function () {
+  $('#signin_form input:nth(0)').focus();
+};
+focusFirstField();
+
+$(document).ready(function(){
+    setTimeout(function() {
+        $('html').css('visibility', 'visible').animate({
+            opacity: 1
+        }, 400, 'linear', function() {
+        });
+    }, 200);
+
+    setTimeout(function() {
+        $('.panel').css('visibility', 'visible').animate({
+            opacity: 1,
+            top: "20px"
+        }, 400, 'linear', function() {
+        });
+    }, 600);
+});
+
+
+var _gaq = _gaq || [];
+_gaq.push(['_setAccount', 'UA-38876251-1']);
+_gaq.push(['_trackPageview']);
+$(function(){
+    if ($(".search-query").length > 0){
+        $('.search-query').canclear();
+    }
+});
+(function() {
+    var ga = document.createElement('script');
+    ga.type = 'text/javascript';
+    ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0];
+    s.parentNode.insertBefore(ga, s);
+})();
+</script>
+            {% endcompress %}
         </head>
 
         <body>
@@ -81,7 +128,9 @@
                             <form action="accounts/signin/" id="signin_form" class="margin-base-vertical" method="post">
                                 {% csrf_token %}
                                 
-
+                                {% if referal != None %}
+                                <input name="referal" type="hidden" value="{{referal}}" />
+                                {% endif %}
 
                                 <div style="position: relative; float: none; margin: auto;" class="span6">
                                 <table style="width: 100%;">
@@ -142,48 +191,6 @@
     </div>
 </div>
 </div>-->
-
-<script type="text/javascript">
-var focusFirstField = function () {
-  $('#signin_form input:nth(0)').focus();
-};
-focusFirstField();
-
-$(document).ready(function(){
-    setTimeout(function() {
-        $('html').css('visibility', 'visible').animate({
-            opacity: 1
-        }, 400, 'linear', function() {
-        });
-    }, 200);
-
-    setTimeout(function() {
-        $('.panel').css('visibility', 'visible').animate({
-            opacity: 1,
-            top: "20px"
-        }, 400, 'linear', function() {
-        });
-    }, 600);
-});
-
-
-var _gaq = _gaq || [];
-_gaq.push(['_setAccount', 'UA-38876251-1']);
-_gaq.push(['_trackPageview']);
-$(function(){
-    if ($(".search-query").length > 0){
-        $('.search-query').canclear();
-    }
-});
-(function() {
-    var ga = document.createElement('script');
-    ga.type = 'text/javascript';
-    ga.async = true;
-    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-    var s = document.getElementsByTagName('script')[0];
-    s.parentNode.insertBefore(ga, s);
-})();
-</script>
 </body>
 </html>
 

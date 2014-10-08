@@ -122,10 +122,10 @@ def list_fingerprint_files(request, fingerprint):
 
     file_records = []
     for file in files_latest_version:
-        print file['file_name']
+        #print file['file_name']
         file_records.append(jerboa_files.get(file_name = file['file_name'], latest_date = file['latest']))
 
-    print file_records
+    #print file_records
 
     _data = []    
 
