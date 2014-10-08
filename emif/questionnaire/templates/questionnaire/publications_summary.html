@@ -61,10 +61,10 @@
 
             $('.publication_details').popover({trigger: 'hover', html: 'true',
                 template: '<div class="popover popover-small"><div class="arrow"></div><div class="popover-inner"><h3 class="popover-title"></h3><div class="popover-content"><p></p></div></div></div>'
-            });   
+            });
         }
         function drawPublication(publication){
-            var line = '<li class="publication_details" data-container="body" data-toggle="popover" data-placement="left" data-content=\'<div style="text-align:justify;"><div class="well well-small"><small><strong>'+publication.title+'</strong></small></div>';
+            var line = '<li class="publication_details" data-container="body" data-toggle="popover" data-placement="left" data-content=\'<div style="text-align:justify;"><div class="well well-small"><small><strong>'+publication.titlec+'</strong></small></div>';
 
                 if( publication.authors != ""){
 
@@ -96,7 +96,7 @@
                     line += "<small><strong>Year: </strong>"+publication.year+"</small><br />";
                 }
                 if( publication.link != ""){
-                    line += "<small><strong>Url: </strong><a href=\""+publication.link+"\">"+publication.link+"</a></small><br />";
+                    line += "<small><strong>Url: </strong><a href=\""+publication.linkc+"\">"+publication.link+"</a></small><br />";
                 }
 
                 line += '</div>\'>'+publication.title+"</li>";
@@ -107,16 +107,18 @@
         $(function (){
             {% for pub in pubs%}
                     publications.push({
-                        title: "{{pub.title}}",
+                        titlec: "{{pub.title}}",
+                        title: "{{pub.title|safe}}",
                         authors: "{{pub.authors}}" ,
                         journal: "{{pub.journal}}",
                         volume: "{{pub.volume}}",
                         pages: "{{pub.pages}}",
                         year: "{{pub.year}}",
+                        linkc: "{{pub.link|striptags}}",
                         link: "{{pub.link}}"
                     });
                     publications_drawn.push(null);
-            {% endfor %}             
+            {% endfor %}
 
             $('.summary_paginator').pagination({
                 items: max,
