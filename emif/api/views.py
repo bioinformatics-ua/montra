@@ -85,6 +85,9 @@ from datetime import timedelta
 
 from public.utils import hasFingerprintPermissions
 
+import urllib2
+import urllib
+
 class JSONResponse(HttpResponse):
     """
     An HttpResponse that renders it's content into JSON.
@@ -986,18 +989,21 @@ class SearchSuggestionsView(APIView):
     def get(self, request, *args, **kw):
 
         if request.user.is_authenticated():
+            phrase = request.GET.get('term', '').strip()
 
-            path_to_file = os.path.join(os.path.abspath(PATH_STORE_FILES), "quicksearch/freetext.json")
+            result = []
 
-            print path_to_file
+            if len(phrase) > 0:
 
-            data= None
-            with open(path_to_file) as data_file:
-                data = json.load(data_file)
+                solrlink = 'http://' +settings.SOLR_HOST+ ':'+ settings.SOLR_PORT+settings.SOLR_PATH+ '/suggestions/select?q=query_autocomplete:('+urllib.quote(phrase)+')&fq=user_id:'+str(request.user.id)+'&wt=json'
 
-            result = {
-                'suggestions': data
-                }
+                facets = json.load(urllib2.urlopen(solrlink))['facet_counts']['facet_fields']['query']
+
+                i = 0
+                while i < len(facets):
+                    result.append(facets[i])
+                    i+=2
+
             response = Response(result, status=status.HTTP_200_OK)
             return response
 

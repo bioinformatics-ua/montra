@@ -888,3 +888,9 @@ height: 6em;
     text-align: center;
     font-weight: bold;
 }
+
+.ui-autocomplete{
+  width: 409px !important;
+  z-index: 9999 !important;
+  top: 37px !important;
+}

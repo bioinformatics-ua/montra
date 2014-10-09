@@ -38,25 +38,3 @@ from django.db.models import Count
 import os
 
 celery = Celery('emif', broker='amqp://guest@localhost//') #!
-
-@periodic_task(run_every=crontab(minute=0, hour=2))
-def generatesearchsuggestions():
-    # Operations
-    print "start generating free text suggestion file"
-
-    outFile = os.path.join(os.path.abspath(PATH_STORE_FILES), "quicksearch/freetext.json")
-
-    output = []
-
-    unique_queries = QueryLog.objects.values("query").annotate(times_appeared=Count('query')).order_by('-times_appeared')
-
-    for query in unique_queries:   
-        if "type_t:" not in query['query']:
-            #print str(query['query']) + ": " + str(query['times_appeared'])
-            output.append({"query": query['query'], "count": query['times_appeared']})
-
-    with open(outFile, 'w') as outfile:
-        json.dump(output, outfile, sort_keys=True,indent=4, separators=(',', ': '))
-        
-    print "end generating free text suggestion file"
-    return 0

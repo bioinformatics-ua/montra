@@ -54,19 +54,16 @@ $(function(){
 });
 
 function handleQuickSearch(){
-    $.get('api/searchsuggestions').done(function(data) {
-        if(data.suggestions){
-            $('.search-query').typeahead({
-              hint: true,
-              highlight: true,
-              minLength: 1
-            },
-            {
-              name: 'queries',
-              source: substringMatcher(data.suggestions),
-            });
-        }
-      })
+ $( ".search-query" ).autocomplete({
+source: "api/searchsuggestions",
+minLength: 2,
+open: function() {
+$( this ).removeClass( "ui-corner-all" ).addClass( "ui-corner-top" );
+},
+close: function() {
+$( this ).removeClass( "ui-corner-top" ).addClass( "ui-corner-all" );
+}
+});
 }
 
 $(function() {
