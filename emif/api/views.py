@@ -67,7 +67,7 @@ from django.template.loader import render_to_string
 
 from emif.utils import send_custom_mail, escapeSolrArg
 
-from fingerprint.models import Fingerprint, AnswerRequest
+from fingerprint.models import Fingerprint, AnswerRequest, FingerprintSubscription
 from fingerprint.services import findName
 from fingerprint.listings import get_databases_from_solr_v2
 from questionnaire.models import Question
@@ -973,6 +973,54 @@ class RequestAnswerView(APIView):
                 pass
 
         return Response({'success': False }, status=status.HTTP_400_BAD_REQUEST)
+
+############################################################
+##### Toggle Subscription Webservice
+############################################################
+
+class ToggleSubscriptionView(APIView):
+
+    authentication_classes = (SessionAuthentication, BasicAuthentication)
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request, *args, **kw):
+        if request.user.is_authenticated():
+            # first we get the email parameter
+            stat = request.POST.get('set', '')
+            fingerprint_hash = request.POST.get('hash', '')
+
+            if stat == 'true':
+                stat = True
+            else:
+                stat = False
+
+
+            print stat
+
+            if len(fingerprint_hash) > 0:
+                try:
+                    fingerprint = Fingerprint.objects.get(fingerprint_hash=fingerprint_hash)
+
+                    try:
+                        subscription = FingerprintSubscription.objects.get(user = request.user, fingerprint = fingerprint)
+                        subscription.removed = not stat
+                        subscription.save()
+
+                    except FingerprintSubscription.DoesNotExist:
+                        # we dont create in case its false it doesnt exist, pointless work
+                        if stat:
+                            subscription = FingerprintSubscription(user = request.user, fingerprint = fingerprint)
+                            subscription.save()
+
+                    return Response({'success': True,
+                                     'fingerprint': fingerprint_hash,
+                                     'subscription': stat
+                                    }, status=status.HTTP_200_OK)
+
+                except fingerprint.DoesNotExist:
+                    pass
+
+        return Response({}, status=status.HTTP_400_BAD_REQUEST)
 
 
 

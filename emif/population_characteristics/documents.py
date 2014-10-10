@@ -42,11 +42,11 @@ import os
 
 from django.conf import settings
 
-from .parseJerboaFile import * 
-from .services import * 
+from .parseJerboaFile import *
+from .services import *
 from docs_manager.storage_handler import *
 from population_characteristics.models import *
-from fingerprint.models import Fingerprint
+from fingerprint.models import Fingerprint, FingerprintSubscription
 
 from docs_manager.views import get_revision
 from population_characteristics.tasks import aggregation
@@ -56,13 +56,13 @@ from public.models import PublicFingerprintShare
 from public.utils import hasFingerprintPermissions
 
 def document_form_view_upload(request, fingerprint_id, template_name='documents_upload_form.html'):
-    """Store the files at the backend 
+    """Store the files at the backend
     """
 
     # compute revision
     revision = get_revision()
 
-    # Create the backend to store the file 
+    # Create the backend to store the file
     fh = FileSystemHandleFile()
     g_fh = HandleFile(fh)
 
@@ -72,13 +72,13 @@ def document_form_view_upload(request, fingerprint_id, template_name='documents_
     file_name = None
     if request.FILES:
         for name, f in request.FILES.items():
-            # Handle file 
+            # Handle file
             path_file = g_fh.handle_file(f, revision=revision)
-            file_name = f.name 
-            # Serialize the response 
+            file_name = f.name
+            # Serialize the response
             files.append(serialize(f))
 
-    
+
     data = {'files': files}
 
     # Store the metadata in the database
@@ -109,14 +109,14 @@ def document_form_view_upload(request, fingerprint_id, template_name='documents_
 def jerboa_form_view_upload(request, fingerprint_id, template_name='documents_upload_form.html'):
     """ Upload files from Jerboa
     """
-    # TODO: for now it is only calling the documents 
+    # TODO: for now it is only calling the documents
     return document_form_view_upload(request, fingerprint_id, template_name='documents_upload_form.html')
 
 def parsejerboa(request, template_name='documents_upload_form.html'):
     """ Parse files from Jerboa
     """
     path_file = "C:/Users/lbastiao/Projects/TEST_DataProfile_v1.5.6b.txt"
-    path_file = "/Volumes/EXT1/Dropbox/MAPi-Dropbox/EMIF/Jerboa/TEST_DataProfile_v1.5.6b.txt"  
+    path_file = "/Volumes/EXT1/Dropbox/MAPi-Dropbox/EMIF/Jerboa/TEST_DataProfile_v1.5.6b.txt"
 
 
     _json = import_population_characteristics_data(request.user, filename=path_file)
@@ -129,7 +129,7 @@ def parsejerboa(request, template_name='documents_upload_form.html'):
     return response
 
 def single_qset_view(request, runcode, qsid, template_name='fingerprint_qs.html'):
-        
+
     if not hasFingerprintPermissions(request, runcode):
         return HttpResponse("Access forbidden",status=403)
 
@@ -140,14 +140,14 @@ def single_qset_view(request, runcode, qsid, template_name='fingerprint_qs.html'
     #    h =  merge_highlight_results(request.session["query"] , request.session["highlight_results"][runcode])
     #   print h["questions"]
 
-    qset, name, db_owners, fingerprint_ttype = createqset(runcode, qsid, highlights=h)   
-    
-    return render(request, template_name,{'request': request, 'qset': qset, 'fingerprint_id': runcode})   
+    qset, name, db_owners, fingerprint_ttype = createqset(runcode, qsid, highlights=h)
+
+    return render(request, template_name,{'request': request, 'qset': qset, 'fingerprint_id': runcode})
 
 
 def document_form_view(request, runcode, qs, activetab='summary', readOnly=False, public_key = None,
     template_name='documents_upload_form.html'):
-    
+
     h = None
     if "query" in request.session and "highlight_results" in request.session:
         h = request.session["highlight_results"]
@@ -165,13 +165,13 @@ def document_form_view(request, runcode, qs, activetab='summary', readOnly=False
         #print request.user.username
         if (owner == request.user.username):
             owner_fingerprint = True
-    
+
     query_old = None
     try:
         query_old = request.session.get('query', "")
     except:
         query_old = None
-    
+
     name_bc = name
     try:
         name_bc = name.encode('utf-8')
@@ -179,12 +179,12 @@ def document_form_view(request, runcode, qs, activetab='summary', readOnly=False
         pass
 
     isAdvanced = None
-    
+
     if(request.session.get('isAdvanced') == True):
         isAdvanced = True
     else:
-        isAdvanced = False    
-        
+        isAdvanced = False
+
     qsets = attachPermissions(runcode, qsets)
     # GET fingerprint primary key (for comments)
     fingerprint = None
@@ -221,19 +221,29 @@ def document_form_view(request, runcode, qs, activetab='summary', readOnly=False
         fingerprint.hits = hits
         fingerprint.save()
 
-    return render(request, template_name, 
-        {'request': request, 'qsets': qsets, 'export_bd_answers': True, 
-        'apiinfo': apiinfo, 'fingerprint_id': runcode, 
+    subscription = False
+
+    try:
+        subs = FingerprintSubscription.objects.get(user = request.user, fingerprint = fingerprint)
+
+        subscription = not subs.removed
+
+    except FingerprintSubscription.DoesNotExist:
+        pass
+
+    return render(request, template_name,
+        {'request': request, 'qsets': qsets, 'export_bd_answers': True,
+        'apiinfo': apiinfo, 'fingerprint_id': runcode,
                     'fingerprint': fingerprint,
                     'fingerprint_pk': fingerprint_pk,
                    'breadcrumb': True, 'breadcrumb_name': name_bc.decode('utf-8'),
-                    'style': qs, 'collapseall': False, 
+                    'style': qs, 'collapseall': False,
                     'owner_fingerprint':owner_fingerprint,
                     'owners': db_owners,
                     'owner_obj': fingerprint.owner,
                     'shared_obj': fingerprint.shared,
                     'fingerprint_dump': True,
-                    'contains_population': contains_population, 
+                    'contains_population': contains_population,
                     'latest_pop': latest_pop,
                     'hide_add': True,
                     'fingerprint_ttype': fingerprint_ttype,
@@ -244,6 +254,7 @@ def document_form_view(request, runcode, qs, activetab='summary', readOnly=False
                     'public_link': public_links,
                     'public_key': public_key,
                     'hits': hits,
+                    'subscription': subscription,
                     })
 
 
