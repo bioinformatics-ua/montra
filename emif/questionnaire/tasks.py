@@ -45,7 +45,7 @@ from django.conf import settings
 import pysolr
 
 
-@periodic_task(run_every=crontab(minute=0, hour=3))
+@shared_task
 def reindexQuestionnaires():
     c = CoreEngine()
 
