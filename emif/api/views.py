@@ -68,7 +68,6 @@ from django.template.loader import render_to_string
 from emif.utils import send_custom_mail, escapeSolrArg
 
 from fingerprint.models import Fingerprint, AnswerRequest, FingerprintSubscription
-from fingerprint.services import findName
 from fingerprint.listings import get_databases_from_solr_v2
 from questionnaire.models import Question
 
@@ -953,7 +952,7 @@ class RequestAnswerView(APIView):
 
                 if ansrequest != None:
 
-                    message = str(ansrequest.requester.get_full_name())+" requested you to answer some unanswered questions on database "+str(findName(fingerprint))+"."
+                    message = str(ansrequest.requester.get_full_name())+" requested you to answer some unanswered questions on database "+str(fingerprint.findName())+"."
 
                     sendNotification(timedelta(hours=12), fingerprint.owner, ansrequest.requester,
             "dbEdit/"+fingerprint.fingerprint_hash+"/"+str(fingerprint.questionnaire.id), message)
@@ -994,23 +993,11 @@ class ToggleSubscriptionView(APIView):
             else:
                 stat = False
 
-
-            print stat
-
             if len(fingerprint_hash) > 0:
                 try:
                     fingerprint = Fingerprint.objects.get(fingerprint_hash=fingerprint_hash)
 
-                    try:
-                        subscription = FingerprintSubscription.objects.get(user = request.user, fingerprint = fingerprint)
-                        subscription.removed = not stat
-                        subscription.save()
-
-                    except FingerprintSubscription.DoesNotExist:
-                        # we dont create in case its false it doesnt exist, pointless work
-                        if stat:
-                            subscription = FingerprintSubscription(user = request.user, fingerprint = fingerprint)
-                            subscription.save()
+                    fingerprint.setSubscription(request.user, stat)
 
                     return Response({'success': True,
                                      'fingerprint': fingerprint_hash,

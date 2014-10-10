@@ -27,7 +27,7 @@ import time
 from searchengine.search_indexes import CoreEngine
 
 from fingerprint.models import Fingerprint, FingerprintReturnedSimple, FingerprintReturnedAdvanced
-from fingerprint.services import findName, unindexFingerprint
+from fingerprint.services import unindexFingerprint
 
 from django.utils import timezone
 from datetime import timedelta
@@ -76,7 +76,7 @@ def remove_orphans():
 
     for finger in fingers:
 
-        name = findName(finger)
+        name = finger.findName()
 
         if name == 'Unnamed':
             print "-- Removing orphan "+str(finger.fingerprint_hash)

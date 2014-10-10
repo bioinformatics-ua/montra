@@ -45,8 +45,6 @@ from questionnaire.models import Questionnaire, Question
 
 from fingerprint.models import Fingerprint, FingerprintHead, AnswerChange, Answer, FingerprintSubscription
 
-from fingerprint.services import findName
-
 from emif.utils import removehs
 
 import datetime
@@ -146,7 +144,7 @@ class MostViewedFingerprintView(APIView):
                     list_viewed.append(
                         {
                             'hash': this_fingerprint.fingerprint_hash,
-                            'name': findName(this_fingerprint),
+                            'name': this_fingerprint.findName(),
                             'count': hit['total_hits']
                         })
                     i+=1
@@ -224,7 +222,7 @@ class UserStatsView(APIView):
                 stats['mostpopulardb'] = {'name': '---', 'hash': '---', 'hits': '---'}
             else:
                 stats['mostpopulardb'] = {
-                                    'name': findName(mostpopular),
+                                    'name': mostpopular.findName(),
                                     'hash': mostpopular.fingerprint_hash,
                                     'hits': mostpopular.hits}
 
@@ -308,7 +306,7 @@ class FeedView(APIView):
 
                 aggregate.append({
                     'hash': mod.fingerprint_id.fingerprint_hash,
-                    'name': findName(mod.fingerprint_id),
+                    'name': mod.fingerprint_id.findName(),
                     'date': mod.date.strftime("%Y-%m-%d %H:%M"),
                     'icon': 'edit',
                     'alterations': alterations,
