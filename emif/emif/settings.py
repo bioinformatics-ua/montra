@@ -590,7 +590,13 @@ COMPRESS_ENABLED = False
 COMPRESS_OFFLINE = True
 
 
+# Periodic user updates newsletter settings
+NEWSLETTER_DAY='friday'
+NEWSLETTER_HOUR = 3
+NEWSLETTER_MIN = 0
+
 try:
     from local_settings import *
 except:
     pass
+

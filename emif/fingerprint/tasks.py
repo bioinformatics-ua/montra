@@ -30,12 +30,16 @@ from fingerprint.models import Fingerprint, FingerprintReturnedSimple, Fingerpri
 from fingerprint.services import unindexFingerprint
 
 from django.utils import timezone
+from django.conf import settings
+
 from datetime import timedelta
 
 from django.contrib.auth.models import User
 
 from celery.task.schedules import crontab
 from celery.decorators import periodic_task
+
+from newsletter.models import Newsletter, Subscription, Article, Message, Submission
 
 @shared_task
 def anotateshowonresults(query_filtered, user, isadvanced, query_reference):
@@ -64,6 +68,57 @@ def anotateshowonresults(query_filtered, user, isadvanced, query_reference):
 
     print "ends annotation of databases appearing on results"
     return 0
+
+@periodic_task(run_every=crontab(minute=settings.NEWSLETTER_MIN, hour=settings.NEWSLETTER_HOUR, day_of_week=settings.NEWSLETTER_DAY))
+def generate_newsmessages():
+    # Operations
+    print "start generating weekly newsletters messages"
+
+    fingerprints = Fingerprint.valid()
+
+    newsletters = Newsletter.objects.all().exclude(slug='emif-catalogue-newsletter')
+
+    for fingerprint in fingerprints:
+        try:
+            newsletter = newsletters.get(slug=fingerprint.fingerprint_hash)
+
+            report = generateWeekReport(fingerprint, newsletter)
+
+            sendWeekReport(report, newsletter)
+
+        except Newsletter.DoesNotExist:
+            print "-- Error: Found hash not existent on newsletters: "+fingerprint.fingerprint_hash
+
+    print "ends generation"
+    return 0
+
+def generateWeekReport(fingerprint, newsletter):
+    # test params
+    fingerprint = Fingerprint.objects.get(fingerprint_hash = '6d340c1ee62acd70412f1dbb0cf6493a')
+    newsletter = Newsletter.objects.get(slug='6d340c1ee62acd70412f1dbb0cf6493a')
+
+def sendWeekReport(report, newsletter):
+
+    now = timezone.now()
+
+    mess = Message(title=newsletter.title+" - Recent Changes - "+now.strftime("%Y-%m-%d %H:%M"),slug=newsletter.slug+'_'+now.strftime("%Y%m%d%H%M%S"), newsletter=newsletter)
+    mess.save()
+
+    art = Article(title="Changes on Database:", text="", post=mess)
+    art.save()
+
+    art2 = Article(title="New Discussion:", text="", post=mess)
+    art2.save()
+
+    art3 = Article(title="New Population Characteristic Data:", text="", post=mess)
+    art3.save()
+
+    subm = Submission.from_message(mess)
+
+    subm.prepared = True
+
+    subm.save()
+
 
 @periodic_task(run_every=crontab(minute=0, hour=3))
 def remove_orphans():
