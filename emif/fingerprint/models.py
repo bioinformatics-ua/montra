@@ -234,6 +234,20 @@ class FingerprintHead(models.Model):
     def __str__(self):
         return "FINGERPRINT_ID:"+str(self.fingerprint_id)+" REVISION: "+str(self.revision) + " DATE: "+ str(self.date)
 
+    def changes(self):
+        return AnswerChange.objects.filter(revision_head=self)
+
+    @staticmethod
+    def mergeChanges(fingerprintheads):
+        answermap = {}
+        for head in fingerprintheads.order_by('date'):
+            for change in head.changes():
+                answermap[change.answer] = change
+
+        return answermap.values()
+
+
+
 class AnswerChange(models.Model):
     revision_head = models.ForeignKey(FingerprintHead)
     answer        = models.ForeignKey(Answer)
@@ -241,6 +255,9 @@ class AnswerChange(models.Model):
     new_value     = models.TextField(null=True)
     old_comment   = models.TextField(null=True)
     new_comment   = models.TextField(null=True)
+
+    def __str__(self):
+        return "QUESTION: "+str(self.answer.question.number)
 
 ''' The idea is showing the number of times the db is returned over time
 '''

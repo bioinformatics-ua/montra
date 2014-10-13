@@ -41,6 +41,13 @@ from celery.decorators import periodic_task
 
 from newsletter.models import Newsletter, Subscription, Article, Message, Submission
 
+from django.contrib.comments import Comment
+from population_characteristics.models import Characteristic
+
+from django.template.loader import render_to_string
+
+from fingerprint.models import FingerprintHead, AnswerChange
+
 @shared_task
 def anotateshowonresults(query_filtered, user, isadvanced, query_reference):
     # Operations
@@ -93,25 +100,62 @@ def generate_newsmessages():
     return 0
 
 def generateWeekReport(fingerprint, newsletter):
-    # test params
-    fingerprint = Fingerprint.objects.get(fingerprint_hash = '6d340c1ee62acd70412f1dbb0cf6493a')
-    newsletter = Newsletter.objects.get(slug='6d340c1ee62acd70412f1dbb0cf6493a')
+
+    returnable = {}
+
+    latest_check = timezone.now() - timedelta(days=7)
+
+    fh = FingerprintHead.objects.filter(fingerprint_id = fingerprint, date__gte = latest_check)
+
+    if len(fh) == 0:
+        returnable['db_changes'] = None
+    else:
+        returnable['db_changes'] = render_to_string('subscriptions/fingerprint_changes.html', {
+                                        'changes': FingerprintHead.mergeChanges(fh),
+                                        'fingerprint': fingerprint.fingerprint_hash
+                                    })
+
+    discussion = Comment.objects.filter(object_pk = fingerprint.id, submit_date__gte = latest_check)
+    if len(discussion) == 0:
+        returnable['discussion'] = None
+    else:
+        returnable['discussion'] = render_to_string('subscriptions/discussion_changes.html', {
+                                        'discussions': discussion,
+                                        'fingerprint': fingerprint.fingerprint_hash
+                                    })
+
+    characteristic = Characteristic.objects.filter(created_date__gte = latest_check).order_by('-created_date')
+    if len(discussion) == 0:
+        returnable['characteristic'] = None
+    else:
+        returnable['characteristic'] = render_to_string('subscriptions/pop_changes.html', {
+                                        'pop': characteristic
+                                    })
+
+    return returnable
 
 def sendWeekReport(report, newsletter):
+
+    # if nothing changed, nothing to report, moving on.
+    if report['db_changes'] == None and report['discussion'] != None and report['characteristic'] != None:
+        return
 
     now = timezone.now()
 
     mess = Message(title=newsletter.title+" - Recent Changes - "+now.strftime("%Y-%m-%d %H:%M"),slug=newsletter.slug+'_'+now.strftime("%Y%m%d%H%M%S"), newsletter=newsletter)
     mess.save()
 
-    art = Article(title="Changes on Database:", text="", post=mess)
-    art.save()
+    if report['db_changes'] != None:
+        art = Article(title="Changes on Database:", text=report['db_changes'], post=mess)
+        art.save()
 
-    art2 = Article(title="New Discussion:", text="", post=mess)
-    art2.save()
+    if report['discussion'] != None:
+        art2 = Article(title="New Discussion:", text=report['discussion'], post=mess)
+        art2.save()
 
-    art3 = Article(title="New Population Characteristic Data:", text="", post=mess)
-    art3.save()
+    if report['characteristic'] != None:
+        art3 = Article(title="New Population Characteristic Data:", text=report['characteristic'], post=mess)
+        art3.save()
 
     subm = Submission.from_message(mess)
 
