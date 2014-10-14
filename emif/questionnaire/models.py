@@ -26,7 +26,7 @@ class Questionnaire(models.Model):
             self.__qscache = \
               QuestionSet.objects.filter(questionnaire=self).order_by('sortid')
         return self.__qscache
-        
+
     def questions(self):
         if not hasattr(self, "__questionscache"):
             questions = []
@@ -38,12 +38,12 @@ class Questionnaire(models.Model):
 
             self.__questionscache = questions
 
-        return self.__questionscache        
+        return self.__questionscache
 
     def findMandatoryQs(self):
         if not hasattr(self, "__mandatoryqscache"):
             self.__mandatoryqscache = None
-            try: 
+            try:
                 name = Question.objects.get(questionset__questionnaire=self, slug_fk__slug1="database_name")
 
                 self.__mandatoryqscache = name.questionset
@@ -51,7 +51,42 @@ class Questionnaire(models.Model):
             except Question.DoesNotExist:
                 print "does not exist question database_name"
                 pass
-        return self.__mandatoryqscache      
+        return self.__mandatoryqscache
+    def copy(self):
+        def __firstSlugFree(slug):
+            i=2
+            # if there's more than 100 copies, there's probably something wrong...
+            while i < 100:
+                try:
+                    quest = Questionnaire.objects.get(slug=(slug+str(i)))
+                except Questionnaire.DoesNotExist:
+                        return str(i)
+                i+=1
+
+            return None
+
+        clone = Questionnaire()
+
+        clone.__dict__ = self.__dict__.copy()
+
+        new_slug = __firstSlugFree(clone.slug)
+
+        if new_slug != None:
+            clone.id = None
+
+            clone.slug = clone.slug+new_slug
+            clone.name = clone.name+" "+new_slug
+            clone.save()
+
+            for questionset in self.questionsets():
+                questionset.copy(clone)
+
+            return clone
+
+        else:
+            print "-- Can't clone questionnaire safely."
+            return None
+
 
     class Meta:
         permissions = (
@@ -121,6 +156,20 @@ class QuestionSet(models.Model):
         except NameError:
             # should only occur if not yet saved
             return True
+    def copy(self, questionnaire):
+        clone = QuestionSet()
+
+        clone.__dict__ = self.__dict__.copy()
+
+        clone.id = None
+        clone.questionnaire = questionnaire
+
+        clone.save()
+
+        for question in self.questions():
+            question.copy(clone)
+
+        return clone
 
     def __unicode__(self):
         return u'%s: %s' % (self.questionnaire.name, self.heading)
@@ -199,12 +248,12 @@ class Question(models.Model):
 
     def __unicode__(self):
         return u'{%s} (%s) %s' % (unicode(self.questionset), self.number, self.text)
-        
+
     def sameas(self):
         if self.type == 'sameas':
             try:
-                self.__sameas = res = getattr(self, "__sameas", 
-                    Question.objects.get(number=self.checks, 
+                self.__sameas = res = getattr(self, "__sameas",
+                    Question.objects.get(number=self.checks,
                         questionset__questionnaire=self.questionset.questionnaire))
                 return res
             except Question.DoesNotExist:
@@ -241,6 +290,18 @@ class Question(models.Model):
     def questioninclude(self):
         return "questionnaire/" + self.get_type() + ".html"
 
+    def copy(self, questionset):
+        clone = Question()
+
+        clone.__dict__ = self.__dict__.copy()
+
+        clone.id = None
+        clone.questionset = questionset
+
+        clone.save()
+
+        return clone
+
     def __cmp__(a, b):
         anum, astr = split_numal(a.number)
         bnum, bstr = split_numal(b.number)
@@ -249,6 +310,8 @@ class Question(models.Model):
 
     class Meta:
         translate = ('text', 'extra', 'footer')
+
+
 
 
 class Choice(models.Model):
@@ -264,4 +327,3 @@ class Choice(models.Model):
 
     class Meta:
         translate = ('text',)
-
