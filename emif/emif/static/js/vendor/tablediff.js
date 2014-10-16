@@ -30,6 +30,78 @@ function cleanup(string){
     return string.replace(/\n\s*\n/g, '\n').replace(/(  )/gm,"").trim();
 }
 
+/* Handle that allows numeric ttype comparison */
+var handleNumeric = function(reference, other){
+    if(reference.length == 1 && other.length == 1){
+        var first_number = parseFloat(reference[0].replace(/'/g, ""));
+        var second_number = parseFloat(other[0].replace(/'/g, ""));
+
+        if(isNaN(first_number) || isNaN(second_number))
+            return 0;
+
+        if(first_number === second_number)
+            return 1;
+
+
+        var ratio = first_number / second_number;
+        // I try to compare the two numbers by checking if the numbers are in a 2% range between each other
+        if(ratio > 0.98 && ratio < 1.02)
+            return 2;
+        else
+            return 0;
+
+    } else {
+        return 0;
+    }
+};
+
+/* This handles every ttype that doesn't have a dedicated comparator */
+var freeTextHandle = function(reference, other){
+    if(reference.length == 1 && other.length == 1){
+        if (reference[0].toLowerCase().trim() === other[0].toLowerCase().trim()) {
+            return 1;
+        }
+        else if ( reference[0].length != 0 && other[0].length != 0
+                    && (reference[0].indexOf(other[0]) >= 0 || other[0].indexOf(reference[0]) >= 0 )
+            ) {
+
+            return 2;
+        }
+    }
+    else {
+        var matches = 0;
+        for(var i = 0; i < reference.length;i++){
+            var pos = $.inArray(reference[i], other);
+            if (pos != -1)
+                matches++;
+        }
+
+        if(matches === reference.length && matches === other.length){
+            return 1;
+
+        } else if(matches > 0){
+            return 2;
+        }
+    }
+
+    return 0;
+};
+
+function compareAnswers(type, reference, other){
+    handleMap = {'numeric': handleNumeric};
+    if (reference.length == 0 && other.length == 0) {
+        return 3;
+    }
+
+    if(handleMap.hasOwnProperty(type)){
+        return handleMap[type](reference, other);
+    } else {
+        return freeTextHandle(reference, other);
+    }
+
+    return undefined;
+}
+
 compare_cell = function(table, cell_name, value) {
     var result_final = 0;
     var row = "";
@@ -37,7 +109,7 @@ compare_cell = function(table, cell_name, value) {
     //console.log("Value: " + value.data);
     $('#' + table).each(function() {
         $(this).children().eq(1).children().each(function() {
-            
+
 
             //$('#t11').addClass("warning");
             //$(this.childNodes[1]).addClass("success");
@@ -48,6 +120,8 @@ compare_cell = function(table, cell_name, value) {
                 if ($(this).data('qid') === cell_name) {
 
                     row = discoverRowId($(this));
+
+                    type = $(this).data('type');
 
                     var this_response;
                     var reference_response;
@@ -61,48 +135,15 @@ compare_cell = function(table, cell_name, value) {
                     } catch(err){
                         reference_response = [];
                     }
-                    if (this_response.length == 0 && reference_response.length == 0) {
-                        result_final = 3;
 
-                        return {'value': result_final, 'row': row};
-                    }
-                    else if(this_response.length == 1 && reference_response.length == 1){
-                        if (this_response[0].toLowerCase().trim() === reference_response[0].toLowerCase().trim()) {
-                            result_final = 1;
+                    result_final = compareAnswers(type, this_response, reference_response);
 
-                            return {'value': result_final, 'row': row};
-                        }
-                        else if ( this_response[0].length != 0 && reference_response[0].length != 0 
-                                    && (this_response[0].indexOf(reference_response[0]) >= 0 || reference_response[0].indexOf(this_response[0]) >= 0 )
-                            ) {
+                    if($(this).data('qid') == '5429')
+                        console.log(result_final);
 
-                            result_final = 2;
+                    return {'value': result_final, 'row': row};
 
-                            return {'value': result_final, 'row': row};
-                        }
-                    }
-                    else {
-                        var matches = 0;
-                        for(var i = 0; i < this_response.length;i++){
-                            var pos = $.inArray(this_response[i], reference_response);
-                            if (pos != -1)
-                                matches++;
-                        }
-
-                        if(matches === this_response.length && matches === reference_response.length){
-                            result_final = 1;
-
-                            return {'value': result_final, 'row': row};
-
-                        } else if(matches > 0){
-                            result_final = 2;
-
-                            return {'value': result_final, 'row': row};
-                        }
-                    }
-
-                    //$(this.childNodes[1]).add("found");
-                }	
+                }
 
         });
     });
@@ -216,7 +257,6 @@ comparetable_two = function(table1, table2) {
                     var result = -2;
                     // if (response && response.length !== 0)
                     result = compare_cell(table2, $(this).data('qid'), response.context);
-                    //console.log(result);
 
                     if (result.value == 1) {
                         //console.log($('#' + table2));
@@ -228,7 +268,7 @@ comparetable_two = function(table1, table2) {
                         /*$(this).addClass("success"); */
                     } else if (result.value == 2) {
                         //$($('#' + table2).childNodes[1].childNodes[0]).addClass("warning");
-                        
+
                         /*$(this).addClass("warning");*/
 
                         paint_table2(table2, result.row, "warning");
@@ -302,14 +342,14 @@ tablediffall_two = function(table_base, list_tables) {
 	$(list_tables).each(function(table_tmp)
 	{
 		//console.log(list_tables[table_tmp]);
-		$('#'+ list_tables[table_tmp]).each(function() 
+		$('#'+ list_tables[table_tmp]).each(function()
 		{
 	  	//console.log($(this.childNodes[3].childNodes));
 	  	$(this.childNodes[3].childNodes).each(function()
 	  	{
 	  		//console.log($(this.childNodes));
 			$(this).each(function()
-		  	{	
+		  	{
 		  			if (this.tagName=="TR")
 		  			{
 		  				//console.log(this);
@@ -317,7 +357,7 @@ tablediffall_two = function(table_base, list_tables) {
 	  					$(this).removeClass("error");
 	  					$(this).removeClass("warning");
 		  			}
-		  	});		
+		  	});
 	  	});
 
 	});
@@ -330,7 +370,7 @@ cleantablediff = function() {
     $('.database_listing .success').removeClass('success');
     $('.database_listing .warning').removeClass('warning');
     $('.database_listing .emptycells').removeClass('emptycells');
-    $('.database_listing .entry').show();    
+    $('.database_listing .entry').show();
 }
 
 function hideTableCell(list_tables, table_tmp, word) {
@@ -338,7 +378,7 @@ function hideTableCell(list_tables, table_tmp, word) {
         var cell = $.trim($($(this).find('td')[0]).text()).toLowerCase();
         //console.log(cell + "==" + word +"?");
         if (cell.indexOf(word.toLowerCase()) == -1)
-        // $(this).closest('tr').show();    
+        // $(this).closest('tr').show();
         //else
             $(this).closest('tr').hide();
 
@@ -373,9 +413,9 @@ function hideEmptyCells(list_tables, table_tmp, show_emptyrows) {
     });
 }
 
-/* This function concatenates all previous functions of filtering in a unique function... 
-   It was getting hard to synchronize everything when we only have the information on the 
-   	dom and all was separated 
+/* This function concatenates all previous functions of filtering in a unique function...
+   It was getting hard to synchronize everything when we only have the information on the
+   	dom and all was separated
 */
 function reset_results(databases, reference){
 
@@ -393,12 +433,12 @@ function reset_results(databases, reference){
      });
      for(var i=0;i<databases.length;i++){
          var tables = $('table[id^="'+databases[i]+'_"] ');
-  
+
          tables.each(function(){
              $(this).parent().parent().parent().show();
              $(this).find(" .entry").show();
          });
- 
+
      }
 
 }
@@ -406,13 +446,13 @@ function reset_results(databases, reference){
  * We only can hide stuff if we dont have any ocurrence of the type on the showing databases
 
  */
-function showMinimumDenominator(condition, class_to_check, table, databases){  
+function showMinimumDenominator(condition, class_to_check, table, databases){
 
 
     // Showing is additive
     if(condition == true){
         $(table).find('.'+class_to_check).show();
-    } 
+    }
     // Adding requires the class_to_check to not appear in any of the lines.
     else {
         $(table).find('.entry').each(function(){
@@ -422,11 +462,11 @@ function showMinimumDenominator(condition, class_to_check, table, databases){
             if(fullfills_condition){
                 $('.rowid_'+row).hide();
             }
-           
+
         });
     }
 }
-function showMinimumDenominatorWord(word, table, databases){  
+function showMinimumDenominatorWord(word, table, databases){
 
         $(table).find('.entry').each(function(){
             var row = $(this).data('rowid');
@@ -435,9 +475,9 @@ function showMinimumDenominatorWord(word, table, databases){
             if(fullfills_condition){
                 $('.rowid_'+row).hide();
             }
-           
+
         });
-    
+
 }
 function dbindexOf(entry, array){
     for(var i=0;i<array.length;i++){
@@ -498,7 +538,7 @@ function filter_results(databases, reference, word, show_match, show_unmatch, sh
         tables.each(function(){
 
             // emptyrows
-            showMinimumDenominator(show_emptyrows,  'emptycells',  this, databases);    
+            showMinimumDenominator(show_emptyrows,  'emptycells',  this, databases);
 
             // match
             showMinimumDenominator(show_match,      'success',     this, databases);
@@ -516,9 +556,9 @@ function filter_results(databases, reference, word, show_match, show_unmatch, sh
             hide_uncessary_qs(this, databases);
 
         });
-    
+
         // remove unnecessary tables (empty)
-        
+
 
     /*$(list_tables).each(function(table_tmp) {
 
