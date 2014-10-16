@@ -234,7 +234,6 @@ function validateById(id_answered, id_answered_aux) {
 }
 
 $(document).ready(function() {
-
     $('.answered').each(function(ans) {
 
         var myId = this.id;
@@ -267,6 +266,17 @@ $(document).ready(function() {
     $(document).on('change', '.answer input,.answer select,.answer textarea', function(e) {
         e.preventDefault();
 
+        if($(this).hasClass('commentary')){
+            var qid = $(this).data('qid');
+            var is_empty = ($(this).val().trim() === "");
+
+            if(is_empty){
+                $('#commentary_'+qid).html('<i class="icon-comment-alt">&nbsp;</i>');
+            } else {
+                $('#commentary_'+qid).html('<i class="icon-comment">&nbsp;</i>');
+            }
+            return;
+        }
 
         if (endsWith($(this).attr('id'), "_opt") || endsWith($(this).attr('id'), "_ignoreme_"))
             return false;
@@ -320,7 +330,6 @@ $(document).ready(function() {
 
 
     });
-
 });
 
 function tabindexer(){
