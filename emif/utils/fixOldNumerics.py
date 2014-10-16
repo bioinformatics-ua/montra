@@ -3,13 +3,14 @@ from fingerprint.models import Answer, Fingerprint
 from fingerprint.services import indexFingerprint
 
 def fix():
-    qs = Question.objects.filter(type='numeric')
+    q = Question.objects.get(id=5358)
+    q.type='numeric'
+    q.save()
 
-    for q in qs:
-        ans = Answer.objects.filter(question = q)
-        for a in ans:
-            a.data=a.data.replace('.', "'")
-            a.save()
-            indexFingerprint(a.fingerprint_id.fingerprint_hash)
+    ans = Answer.objects.filter(question = q)
+    for a in ans:
+        a.data=a.data.replace('.', "'")
+        a.save()
+        indexFingerprint(a.fingerprint_id.fingerprint_hash)
 
 fix()

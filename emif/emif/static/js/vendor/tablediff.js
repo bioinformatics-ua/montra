@@ -55,9 +55,47 @@ var handleNumeric = function(reference, other){
     }
 };
 
+function checkMatches(reference, other){
+    var matches = 0;
+    for(var i = 0; i < reference.length;i++){
+        var pos = $.inArray(reference[i], other);
+        if (pos != -1)
+            matches++;
+    }
+
+    if(matches === reference.length && matches === other.length){
+        return 1;
+
+    } else if(matches > ((reference.length + other.length) / 4)){
+        return 2;
+    }
+
+    return 0;
+}
+
+function unique(array){
+    var unique = {};
+    var unique_array = [];
+
+    for(var i=0;i<array.length;i++){
+        unique[array[i]] = 1;
+    }
+
+    for(var prop in unique){
+        unique_array.push(prop);
+    }
+
+    return unique_array;
+}
+
 /* This handles every ttype that doesn't have a dedicated comparator */
 var freeTextHandle = function(reference, other){
     if(reference.length == 1 && other.length == 1){
+        var firstWords = unique(cleanup(reference[0].toLowerCase()).split(' '));
+        var secondWords = unique(cleanup(other[0].toLowerCase()).split(' '));
+
+        return checkMatches(firstWords, secondWords);
+        /* substring approximation to compare opentextfields
         if (reference[0].toLowerCase().trim() === other[0].toLowerCase().trim()) {
             return 1;
         }
@@ -67,21 +105,10 @@ var freeTextHandle = function(reference, other){
 
             return 2;
         }
+        */
     }
     else {
-        var matches = 0;
-        for(var i = 0; i < reference.length;i++){
-            var pos = $.inArray(reference[i], other);
-            if (pos != -1)
-                matches++;
-        }
-
-        if(matches === reference.length && matches === other.length){
-            return 1;
-
-        } else if(matches > 0){
-            return 2;
-        }
+        return checkMatches(reference, other);
     }
 
     return 0;
