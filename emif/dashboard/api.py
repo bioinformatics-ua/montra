@@ -74,16 +74,16 @@ from hitcount.models import Hit, HitCount
 
 class DatabaseTypesView(APIView):
     authentication_classes = (SessionAuthentication, BasicAuthentication)
-    permission_classes = (IsAuthenticated,)    
+    permission_classes = (IsAuthenticated,)
     def get(self, request, *args, **kw):
 
-        if request.user.is_authenticated():    
+        if request.user.is_authenticated():
             db_types = []
 
             types = Questionnaire.objects.filter(fingerprint__pk__isnull=False).distinct()
 
             for db in types:
-                db_types.append({'id': db.id, 'name': db.name})    
+                db_types.append({'id': db.id, 'name': db.name})
 
             response = Response({'types': db_types}, status=status.HTTP_200_OK)
 
@@ -98,19 +98,19 @@ class DatabaseTypesView(APIView):
 
 class MostViewedView(APIView):
     authentication_classes = (SessionAuthentication, BasicAuthentication)
-    permission_classes = (IsAuthenticated,)    
+    permission_classes = (IsAuthenticated,)
     def get(self, request, *args, **kw):
         stopwords = ['jerboalistvalues', 'population/comments', 'population/filters', 'population/compare'];
-        if request.user.is_authenticated():    
+        if request.user.is_authenticated():
             list_viewed = []
             i = 0
 
             user_history = user_history = NavigationHistory.objects.filter(user=request.user)
             most_viewed = user_history.values('path').annotate(number_viewed=Count('path')).order_by('-number_viewed')
 
-            for viewed in most_viewed: 
+            for viewed in most_viewed:
                 if i == 10:
-                    break  
+                    break
 
                 if not [stopword for stopword in stopwords if stopword in viewed['path']]:
                     list_viewed.append({'page': viewed['path'], 'count': viewed['number_viewed']})
@@ -129,14 +129,14 @@ class MostViewedView(APIView):
 
 class MostViewedFingerprintView(APIView):
     authentication_classes = (SessionAuthentication, BasicAuthentication)
-    permission_classes = (IsAuthenticated,)    
+    permission_classes = (IsAuthenticated,)
     def get(self, request, *args, **kw):
 
-        if request.user.is_authenticated():    
+        if request.user.is_authenticated():
             list_viewed = []
 
             most_hit = Hit.objects.filter(user=request.user).values('user','hitcount__object_pk').annotate(total_hits=Count('hitcount')).order_by('-total_hits')
-            
+
             i=0
 
             for hit in most_hit:
@@ -152,7 +152,7 @@ class MostViewedFingerprintView(APIView):
                     i+=1
                     if i == 10:
                         break
-                        
+
                 except Fingerprint.DoesNotExist:
                     print "-- Error on hitcount for fingerprint with id "+hit['hitcount__object_pk']
 
@@ -169,10 +169,10 @@ class MostViewedFingerprintView(APIView):
 
 class LastUsersView(APIView):
     authentication_classes = (SessionAuthentication, BasicAuthentication)
-    permission_classes = (IsAuthenticated,)    
+    permission_classes = (IsAuthenticated,)
     def get(self, request, *args, **kw):
 
-        if request.user.is_authenticated() and request.user.is_staff == True:    
+        if request.user.is_authenticated() and request.user.is_staff == True:
             last_users = []
 
             users = User.objects.all().order_by('-last_login')[:10]
@@ -193,10 +193,10 @@ class LastUsersView(APIView):
 
 class UserStatsView(APIView):
     authentication_classes = (SessionAuthentication, BasicAuthentication)
-    permission_classes = (IsAuthenticated,)    
+    permission_classes = (IsAuthenticated,)
     def get(self, request, *args, **kw):
 
-        if request.user.is_authenticated():    
+        if request.user.is_authenticated():
             stats = {}
 
             # statistics about the user
@@ -205,10 +205,10 @@ class UserStatsView(APIView):
             # most popular database of this user(with most unique views)
             # main database type
 
-            stats['lastlogin'] = request.user.last_login.strftime("%Y-%m-%d %H:%M:%S") 
+            stats['lastlogin'] = request.user.last_login.strftime("%Y-%m-%d %H:%M:%S")
 
             my_db = Fingerprint.objects.filter(owner=request.user).order_by('-hits')
-            my_db_share = Fingerprint.objects.filter(shared=request.user) 
+            my_db_share = Fingerprint.objects.filter(shared=request.user)
 
             stats['numberownerdb'] = my_db.count()
             stats['numbershareddb'] = my_db_share.count()
@@ -224,7 +224,7 @@ class UserStatsView(APIView):
                 stats['mostpopulardb'] = {'name': '---', 'hash': '---', 'hits': '---'}
             else:
                 stats['mostpopulardb'] = {
-                                    'name': findName(mostpopular), 
+                                    'name': findName(mostpopular),
                                     'hash': mostpopular.fingerprint_hash,
                                     'hits': mostpopular.hits}
 
@@ -251,23 +251,23 @@ class UserStatsView(APIView):
 
 class FeedView(APIView):
     authentication_classes = (SessionAuthentication, BasicAuthentication)
-    permission_classes = (IsAuthenticated,)    
+    permission_classes = (IsAuthenticated,)
     def get(self, request, *args, **kw):
 
-        if request.user.is_authenticated():    
-            
+        if request.user.is_authenticated():
+
             modifications = FingerprintHead.objects.filter(fingerprint_id__owner=request.user)
 
             modifications = modifications | FingerprintHead.objects.filter(fingerprint_id__shared=request.user).order_by("-date")
 
             feed = []
 
-            modifications = modifications[:50]   
+            modifications = modifications[:50]
 
             aggregate = []
             previous = None
             for mod in modifications:
-                
+
                 if previous != None and mod.fingerprint_id != previous.fingerprint_id and len(aggregate) != 0:
                     feed.append(aggregate)
                     aggregate = []
@@ -323,16 +323,17 @@ class FeedView(APIView):
 
 class TagCloudView(APIView):
     authentication_classes = (SessionAuthentication, BasicAuthentication)
-    permission_classes = (IsAuthenticated,)    
+    permission_classes = (IsAuthenticated,)
     def get(self, request, *args, **kw):
 
-        if request.user.is_authenticated():    
+        if request.user.is_authenticated():
 
             tags = []
 
             solrlink = 'http://' +settings.SOLR_HOST+ ':'+ settings.SOLR_PORT+settings.SOLR_PATH+'/admin/luke?fl=text_t&numTerms=50&wt=json'
 
-            stopwords = ['yes', 'and', 'not', 'the', 'for', 'all', 'more', 'with', 'than', 'please']
+            # stop word list of ~174 words came from http://www.ranks.nl/stopwords
+            stopwords = ['specific', 'specify', 'http', 'link', 'etc','yes', 'and', 'not', 'the', 'for', 'all', 'more', 'with', 'than', 'please', "a","about","above","after","again","against","all","am","an","and","any","are","aren't","as","at","be","because","been","before","being","below","between","both","but","by","can't","cannot","could","couldn't","did","didn't","do","does","doesn't","doing","don't","down","during","each","few","for","from","further","had","hadn't","has","hasn't","have","haven't","having","he","he'd","he'll","he's","her","here","here's","hers","herself","him","himself","his","how","how's","i","i'd","i'll","i'm","i've","if","in","into","is","isn't","it","it's","its","itself","let's","me","more","most","mustn't","my","myself","no","nor","not","of","off","on","once","only","or","other","ought","our","ours","ourselves","out","over","own","same","shan't","she","she'd","she'll","she's","should","shouldn't","so","some","such","than","that","that's","the","their","theirs","them","themselves","then","there","there's","these","they","they'd","they'll","they're","they've","this","those","through","to","too","under","until","up","very","was","wasn't","we","we'd","we'll","we're","we've","were","weren't","what","what's","when","when's","where","where's","which","while","who","who's","whom","why","why's","with","won't","would","wouldn't","you","you'd","you'll","you're","you've","your","yours","yourself","yourselves"]
 
             topwords = json.load(urllib2.urlopen(solrlink))['fields']['text_t']['topTerms']
 
@@ -352,8 +353,8 @@ class TagCloudView(APIView):
                 i+=2
 
             random.shuffle(tags, random.random)
-            
-         
+
+
             response = Response({'tags': tags}, status=status.HTTP_200_OK)
 
         else:
