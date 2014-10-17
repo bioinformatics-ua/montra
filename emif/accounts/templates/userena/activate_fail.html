@@ -11,12 +11,11 @@
 
 {% block title %}{% trans "Account activation failed." %}{% endblock %}
 {% block content_title %}<h2>{% trans "Your account could not be activated..." %}</h2>{% endblock %}
-
 <div style="margin-bottom: 50px;"></div>
 <div class="row">
-<div class="span6 center">
+<div class="span12">
 {% block content %}
-<p>{% trans "The account is already activated!" %}</p>
+<center><p class="lead">The account is already activated.</p></center>
 </div>
 </div>
 {% endblock %}
