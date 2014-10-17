@@ -250,9 +250,9 @@
                                         <div class="btn-group">
                                             <button class="btn btn-success dropdown-toggle" data-toggle="dropdown" tabindex="-1">
                                             {% if not user.first_name and not user.last_name %}
-                                            <i class="icon-user"></i><small>&nbsp; {{user.username|ellipsis:30}} &nbsp;</small><i class="icon-angle-down"></i>
+                                            <i class="icon-user"></i><small>&nbsp; <span class="name_container">{{user.username|ellipsis:30}} &nbsp;</span></small><i class="icon-angle-down"></i>
                                             {% else %}
-                                            <i class="icon-user"></i><small>&nbsp; {{user.first_name|add:" "|add:user.last_name|ellipsis:30}} &nbsp;</small><i class="icon-angle-down"></i>
+                                            <i class="icon-user"></i><small><span class="name_container">&nbsp; {{user.first_name|add:" "|add:user.last_name|ellipsis:30}} &nbsp;</span></small><i class="icon-angle-down"></i>
                                             {% endif %}
                                             </button>
                                             <ul class="dropdown-menu">
