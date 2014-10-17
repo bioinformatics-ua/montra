@@ -62,6 +62,7 @@ from docs_manager.models import *
 
 import os
 import mimetypes
+import urllib
 
 from django.template.loader import render_to_string
 
