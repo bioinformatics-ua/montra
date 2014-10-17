@@ -16,14 +16,14 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
-import hashlib 
+import hashlib
 
 from django.shortcuts import render
 
 from django.core import serializers
 from django.conf import settings
 from django.http import *
-from django.http import Http404 
+from django.http import Http404
 from django.utils import simplejson
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
@@ -108,7 +108,7 @@ def results_fulltext(request, page=1, full_text=True,template_name='results.html
     return results_fulltext_aux(request, query, page, template_name, isAdvanced=isAdvanced, query_reference=query_reference)
 
 
-def results_fulltext_aux(request, query, page=1, template_name='results.html', isAdvanced=False, force=False, query_reference=None):
+def results_fulltext_aux(request, query, page=1, template_name='results.html', isAdvanced=False, force=False, query_reference=None, advparams=None):
 
     rows = define_rows(request)
     if request.POST and "page" in request.POST and not force:
@@ -130,7 +130,11 @@ def results_fulltext_aux(request, query, page=1, template_name='results.html', i
     if len(filterString) > 0:
         query_filtered += " AND " + filterString
 
-    (list_databases, hits, hi) = get_databases_from_solr_with_highlight(request, query_filtered, sort=sortString, rows=rows, start=range)
+    if isAdvanced:
+        (list_databases, hits, hi) = get_databases_from_solr_with_highlight(request, query_filtered, sort=sortString, rows=rows, start=range, hlfl=",".join(advparams))
+    else:
+        (list_databases, hits, hi) = get_databases_from_solr_with_highlight(request, query_filtered, sort=sortString, rows=rows, start=range)
+
     if not isAdvanced:
         hi = merge_highlight_results( '"'+escapeSolrArg(request.session["query"])+'"' , hi)
     else:
@@ -262,7 +266,7 @@ def results_diff(request, page=1, template_name='results.html'):
                 return response
 
             query = convert_qvalues_to_query(qvalues, qid, qexpression)
-            query = convert_query_from_boolean_widget(qexpression, qid)
+            (query, advparams) = convert_query_from_boolean_widget(qexpression, qid)
             #print "Query: " + query
 
 
@@ -306,7 +310,7 @@ def results_diff(request, page=1, template_name='results.html'):
 
 
 
-            return results_fulltext_aux(request, query, isAdvanced=True, query_reference=this_query)
+            return results_fulltext_aux(request, query, isAdvanced=True, query_reference=this_query, advparams=advparams)
 
 
 
@@ -550,9 +554,9 @@ def get_query_from_more_like_this(doc_id, maxx=100):
 
     return (queryString, database_name)
 
-def get_databases_from_solr_with_highlight(request, query="*:*", sort="", rows=100, start=0):
+def get_databases_from_solr_with_highlight(request, query="*:*", sort="", rows=100, start=0, hlfl="*"):
     c = CoreEngine()
-    results = c.search_highlight(query, sort=sort, rows=rows, start=start, hlfl="*")
+    results = c.search_highlight(query, sort=sort, rows=rows, start=start, hlfl=hlfl)
 
     list_databases = get_databases_process_results(results)
 
