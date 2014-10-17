@@ -14,6 +14,16 @@
     {% if questions_list.0.0.sortid != 0 and questions_list.0.0.sortid != 99 %}
 
     <div class="pull-right btn-group">
+      <div class="btn-group">
+        <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
+        Filters
+        <span class="caret"></span></a>
+        <ul class="dropdown-menu">
+            <!-- dropdown menu links -->
+            <li><a id="hide_empty_{{ questions_list.0.0.sortid }}" href="javascript:void(0);">
+            <i class="icon-ok icon-white active"></i> Show Empty Questions</a></li>
+            <li><a id="hide_filled_{{ questions_list.0.0.sortid }}" href="javascript:void(0);"><i class="icon-ok icon-white active"></i> Show Filled Questions</a></li>
+          </ul></div>
       <a id="collapseall_qs_{{ questions_list.0.0.sortid }}"  class="btn" href="#">Collapse all </a>
       <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
         Permissions
@@ -104,7 +114,7 @@
 <!-- Set variable h1 to accordion -->
 {% setglobal h1_already 1 %}
 {% setglobal h1_last 1 %}
-<div class="accordion-group {{qdict.depon_class}}" id="acc_qc_{{ question.number }}" {{qdict.checkstring|safe}}>
+<div class="accordion-group {%if qdict.qtype == 'comment' %}dont_hide{% endif %} {{qdict.depon_class}}" id="acc_qc_{{ question.number }}" {{qdict.checkstring|safe}}>
 <div class="accordion-heading">
     {% if request.user.is_staff and not readonly %}
     <span class="pull-right"> <a href="admin/questionnaire/question/{{ question.id }}/">
@@ -117,7 +127,7 @@
     <span class="pull-right answered hide " id="answered_{{ question.number|removedots }}">
     <i class="icon-check green">&nbsp;</i>
     </span>
-    {% if answer_requests|length > 0 %} 
+    {% if answer_requests|length > 0 %}
         {% ans_requested question answer_requests %}
     {% endif %}
     {% endif %}
@@ -160,11 +170,11 @@
             <span class="pull-right answered hide" id="answered_{{ question.number|removedots }}">
             <i class="icon-check green">&nbsp;</i>
             </span>
-            {% if answer_requests|length > 0 %} 
+            {% if answer_requests|length > 0 %}
                 {% ans_requested question answer_requests %}
             {% endif %}
             {% endif %}
-            
+
         </div>
         {% if question.text|geths == 'h1' %}
         </a>
@@ -320,7 +330,12 @@ $(function(){
     });
 
     $('.tooltippable', $('#qs_{{questions_list.0.0.sortid}}')).tooltip({container:'body'});
-
+        $('#hide_empty_{{questions_list.0.0.sortid}}').click(function(){
+            setupHideEmpties({{questions_list.0.0.sortid}}, 'empty');
+        });
+        $('#hide_filled_{{questions_list.0.0.sortid}}').click(function(){
+            setupHideEmpties({{questions_list.0.0.sortid}}, 'filled');
+        });
 });
 
 

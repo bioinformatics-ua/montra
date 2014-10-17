@@ -65,9 +65,9 @@ class CoreEngine:
     """
 
     CONNECTION_TIMEOUT_DEFAULT = 10
-    def __init__(self, timeout=CONNECTION_TIMEOUT_DEFAULT):
+    def __init__(self, timeout=CONNECTION_TIMEOUT_DEFAULT, core='collection1'):
         # Setup a Solr instance. The timeout is optional.
-        self.solr = pysolr.Solr('http://' +settings.SOLR_HOST+ ':'+ settings.SOLR_PORT+settings.SOLR_PATH, timeout=timeout)
+        self.solr = pysolr.Solr('http://' +settings.SOLR_HOST+ ':'+ settings.SOLR_PORT+settings.SOLR_PATH+'/'+core, timeout=timeout)
 
 
     def reindex_quest_solr(self):
@@ -109,13 +109,23 @@ class CoreEngine:
         # index document
         self.index_fingerprint_as_json(doc)
 
-    def index_fingerprint_as_json(self, d):
+
+    def index_fingerprints(self, docs):
+        """Index fingerprint
+        """
+        # index document
+        self.index_fingerprint_as_json(docs, several = True)
+
+    def index_fingerprint_as_json(self, d, several=False):
         """Index fingerprint as json
         """
         # index document
+        xml_answer = None
+        if several:
+            xml_answer = self.solr.add(d)
+        else:
+            xml_answer = self.solr.add([d])
 
-        xml_answer = self.solr.add([d])
-        #print(xml_answer)
         self.optimize()
 
     def optimize(self):
@@ -139,13 +149,13 @@ class CoreEngine:
         """
         self.solr.delete(id=id_doc)
 
-    def search_fingerprint(self, query, start=0, rows=100, fl='', sort=''):
+    def search_fingerprint(self, query, start=0, rows=100, fl='', sort='', facet="off"):
         """search the fingerprint
         """
         # Later, searching is easy. In the simple case, just a plain Lucene-style
         # query is fine.
-
         results = self.solr.search(query,**{
+                'facet': facet,
                 'rows': rows,
                 'start': start,
                 'fl': fl,
