@@ -85,6 +85,9 @@ from datetime import timedelta
 
 from public.utils import hasFingerprintPermissions
 
+import urllib2
+import urllib
+
 class JSONResponse(HttpResponse):
     """
     An HttpResponse that renders it's content into JSON.
@@ -975,6 +978,36 @@ class RequestAnswerView(APIView):
         return Response({'success': False }, status=status.HTTP_400_BAD_REQUEST)
 
 
+############################################################
+##### Seach Suggestions - Web services
+############################################################
+
+
+class SearchSuggestionsView(APIView):
+    authentication_classes = (SessionAuthentication, BasicAuthentication)
+    permission_classes = (IsAuthenticated,)
+    def get(self, request, *args, **kw):
+
+        if request.user.is_authenticated():
+            phrase = request.GET.get('term', '').strip()
+
+            result = []
+
+            if len(phrase) > 0:
+
+                solrlink = 'http://' +settings.SOLR_HOST+ ':'+ settings.SOLR_PORT+settings.SOLR_PATH+ '/suggestions/select?q=query_autocomplete:('+urllib.quote(phrase)+')&fq=user_id:'+str(request.user.id)+'&wt=json'
+
+                facets = json.load(urllib2.urlopen(solrlink))['facet_counts']['facet_fields']['query']
+
+                i = 0
+                while i < len(facets):
+                    result.append(facets[i])
+                    i+=2
+
+            response = Response(result, status=status.HTTP_200_OK)
+            return response
+
+        return Response ({}, status=status.HTTP_400_BAD_REQUEST)
 
 ############################################################
 ############ Auxiliar functions ############################
