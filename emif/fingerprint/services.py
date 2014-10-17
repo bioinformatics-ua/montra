@@ -165,8 +165,8 @@ def getFillPercentage(fingerprint, answers):
     total = 0
     count = 0
 
-    for qset in fingerprint.questionnaire.questionsets():
-
+    qsets = fingerprint.questionnaire.questionsets()
+    for qset in qsets:
         total+=findDependantPercentage(qset, answers)
         count+=1
 
@@ -181,7 +181,11 @@ def findDependantPercentage(qset, answers):
     filled = 0
 
     def __getDependency(question):
-        checks = question.checks.strip()
+        checks = ""
+        try:
+            question.checks.strip()
+        except:
+            pass
 
         # not dependant in anyone
         if len(checks) == 0:

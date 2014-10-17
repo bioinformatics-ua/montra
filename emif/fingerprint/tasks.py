@@ -69,7 +69,7 @@ def anotateshowonresults(query_filtered, user, isadvanced, query_reference):
 def calculateFillPercentage(fingerprint):
     answers = Answer.objects.filter(fingerprint_id = fingerprint)
 
-    fingerprint.fill = getFillPercentage(fingerprint)
+    fingerprint.fill = getFillPercentage(fingerprint, answers)
     fingerprint.save()
 
 @periodic_task(run_every=crontab(minute=0, hour=3))
