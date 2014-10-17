@@ -48,6 +48,8 @@ from django.template.defaultfilters import slugify
 import datetime
 from fingerprint.models import Fingerprint
 
+from questionnaire.models import Questionnaire, QuestionSet
+
 logger = logging.getLogger()
 
 def generate_hash():
@@ -68,13 +70,45 @@ class CoreEngine:
         self.solr = pysolr.Solr('http://' +settings.SOLR_HOST+ ':'+ settings.SOLR_PORT+settings.SOLR_PATH+'/'+core, timeout=timeout)
 
 
+    def reindex_quest_solr(self):
+        p = re.compile("(\\d{1,2})(\.\\d{2})*$", re.L)
 
+        #qsets = QuestionSet.objects.all()
+        slugs = []
+        questionaires = Questionnaire.objects.filter(disable=False)
+
+        solr = pysolr.Solr('http://' +settings.SOLR_HOST+ ':'+ settings.SOLR_PORT+settings.SOLR_PATH)
+        start=0
+        rows=100
+        fl=''
+
+        for quest in questionaires:
+            id = quest.id
+            obj = {"id":"questionaire_"+str(id)}
+            qsets = QuestionSet.objects.filter(questionnaire=quest)
+            for qs in qsets:
+                #print qs
+                questions = qs.questions()
+                for q in questions:
+                    x = q.slug_fk
+                    key = str(x.slug1) + "_qs"
+                    obj[key] = q.text
+            slugs.append(obj)
+
+
+        for quest in questionaires:
+            solr.delete(id='questionaire_'+str(id))
+
+        solr.add(slugs)
+
+        print ("QUITTING")
 
     def index_fingerprint(self, doc):
         """Index fingerprint
         """
         # index document
         self.index_fingerprint_as_json(doc)
+
 
     def index_fingerprints(self, docs):
         """Index fingerprint
@@ -133,6 +167,11 @@ class CoreEngine:
         """search the fingerprint
         """
         #hl=true&hl.fl=text_t
+
+        print ("HIGHLIGHT WAY:")
+        print (hlfl)
+        print ("--")
+
         results = self.solr.search(query,**{
                 'rows': rows,
                 'start': start,
