@@ -1,0 +1,28 @@
+{% load extra_tags %}
+
+<div id="modal-batch" class="modal hide fade" style="display:none"  >
+    <div class="modal-header">
+        <a href="#" onclick="$('#modal-batch').modal('hide'); return false;" class="close">&times;</a>
+         <h3>Add List of Pubmed Publications</h3>
+    </div>
+    <div class="modal-body">
+      <div class="span5">
+        <textarea id="batch{{ question.number|removedots }}_ignoreme_" class="fullwidth" rows="10" placeholder="Input List of Pubmed Publications, separated by line breaks."></textarea>
+
+        <div class="fullwidth"><strong>Status:</strong> <span id="batchstatus{{ question.number|removedots }}">---</span></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+        <button id="addbatch{{ question.number|removedots }}" class="btn btn-success">Add Publications List</button>
+        <a href="#" onclick="$('#modal-batch').modal('hide'); return false;" class="btn btn-secondary">Cancel</a>
+    </div>
+</div>
+<script src="{{ STATIC_URL }}js/publications.batch.js"></script>
+<script type="text/javascript">
+  $('#addbatch{{ question.number|removedots }}').click(function(event){
+    event.preventDefault();
+    event.stopPropagation();
+
+    processBatch({{ question.number|removedots }}, pw{{ question.number|removedots }});
+  });
+</script>

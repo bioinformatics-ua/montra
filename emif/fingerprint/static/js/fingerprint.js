@@ -149,7 +149,7 @@ function validateById(id_answered, id_answered_aux) {
     var qc_id = $('[id="qc_' + id_answered + '"]');
 
     if (qc_id.hasClass('type_open') || qc_id.hasClass('type_email') || qc_id.hasClass('type_url') ||
-        qc_id.hasClass('type_numeric') 
+        qc_id.hasClass('type_numeric')
         || qc_id.hasClass('type_open-button') || qc_id.hasClass('type_open-upload-image') || qc_id.hasClass('type_open-textfield') || qc_id.hasClass('type_publication')) {
         var myValue = $('[id="answered_' + id_answered_aux + '"]').parent().parent()[0].id;
 
@@ -249,7 +249,7 @@ $(document).ready(function() {
         id_answered = id_answered.replace('qc_', '');
 
         //console.log("ID_ANSWERED: " + id_answered);
-        // Since were using name="" as selector, we dont need to do the escaping 
+        // Since were using name="" as selector, we dont need to do the escaping
         //id_answered = id_answered.replace('.','\\.');
         //id_answered = replaceall(id_answered, '.','\\.')
 
@@ -268,7 +268,7 @@ $(document).ready(function() {
         e.preventDefault();
 
 
-        if (endsWith($(this).attr('id'), "_opt"))
+        if (endsWith($(this).attr('id'), "_opt") || endsWith($(this).attr('id'), "_ignoreme_"))
             return false;
 
         var el = e.target;
@@ -291,7 +291,7 @@ $(document).ready(function() {
 
         var valueCounter = 0;
 
-        // Since were using name="" as selector, we dont need to do the escaping    
+        // Since were using name="" as selector, we dont need to do the escaping
         //id_answered = id_answered.replace('.','\\.');
         //id_answered = id_answered.replace(/\./g,'\\.');
 
@@ -304,7 +304,7 @@ $(document).ready(function() {
             }
             //console.log('QID: ' + qId);
             /* Update Counter */
-            try{ 
+            try{
                 var cc = new CounterCore(qId);
 
 

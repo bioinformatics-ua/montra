@@ -30,7 +30,7 @@
     {% compress css %}
     <link rel="stylesheet" href="{{ STATIC_URL }}css/bootstrap.min.css" />
     <link rel="stylesheet" href="{{ STATIC_URL }}font-awesome/css/font-awesome.min.css" />
-    <link href="{{ STATIC_URL }}font-awesome-4.0.3/css/font-awesome.css" rel="stylesheet" />
+    <link href="{{ STATIC_URL }}font-awesome-4.2.0/css/font-awesome.css" rel="stylesheet" />
     <!-- IE 7 doesnt recognize awesome icons correctly... -->
     <!--[if IE]>
         <link rel="stylesheet" media="all" href="{{ STATIC_URL }}font-awesome/css/font-awesome-ie7.min.css" />
@@ -103,7 +103,7 @@ $(document).ready(function(){
     $('#id_remember_me').parent().wrap('<div style="position: relative; float: none; margin: auto;" class="span6">');
 
     $('#signin_form .alert').wrap('<div style="position: relative; float: none; margin: auto;text-align: justify;" class="span6">');
-    
+
     $('#signin_form .alert li').attr('style', 'list-style: none;');
 
     $('#signin_form button[type="reset"]').on('click', focusFirstField);
@@ -119,7 +119,7 @@ $(document).ready(function(){
 
         $(this).hide();
     }
-  }); 
+  });
 });
 
 
@@ -165,7 +165,7 @@ $(function(){
 
                                 </table>
                                 </div>
-                                
+
                                 {{form|crispy}}
                               <div class="control-group">
                                 <div class="controls">
@@ -204,7 +204,7 @@ $(function(){
         <div class="span8 offset2 panel2">
             <div class="inside2">
 
-            
+
         </div>
         </div>
     </div>

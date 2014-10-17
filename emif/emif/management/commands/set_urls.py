@@ -34,18 +34,18 @@ class Command(BaseCommand):
         path500         = 'emif/templates/500.html'
         pathbase        = 'emif/templates/base.html'
         pathindex       = 'emif/templates/index_new.html'
-        signin_form     = 'emif/templates/userena/signin_form.html'
+        signin_form     = 'accounts/templates/userena/signin_form.html'
         static_patt     = 'STATIC_URL=("[^"]*"|STATIC_URL)'
         base_patt       = 'BASE_URL=("[^"]*"|BASE_URL)'
-        
+
         files = [path404, path500, pathbase, pathindex, signin_form]
 
         def changeOnFiles(static, base):
             if  os.path.exists(path404)   and \
                 os.path.exists(path500)   and \
                 os.path.exists(pathbase)  and \
-                os.path.exists(pathindex): 
-                    
+                os.path.exists(pathindex):
+
                     # Treat files
                     for file in files:
                         # Create file backup
@@ -63,9 +63,9 @@ class Command(BaseCommand):
 
             else:
                 self.stdout.write('One (or all) of the templates didn\'t exist. Please confirm the following files exist: \n'
-                + path404 + '\n' + path500 + '\n'+pathindex+'\n'+pathbase+'\n\n')  
+                + path404 + '\n' + path500 + '\n'+pathindex+'\n'+pathbase+'\n\n')
 
-            
+
 
 
         if len(args) == 1 and args[0] == 'reset':

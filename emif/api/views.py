@@ -66,11 +66,11 @@ import urllib
 
 from django.template.loader import render_to_string
 
-from emif.utils import send_custom_mail
+from emif.utils import send_custom_mail, escapeSolrArg
 
 from fingerprint.models import Fingerprint, AnswerRequest
 from fingerprint.services import findName
-
+from fingerprint.listings import get_databases_from_solr_v2
 from questionnaire.models import Question
 
 from public.views import PublicFingerprintShare
@@ -85,6 +85,9 @@ from django.utils import timezone
 from datetime import timedelta
 
 from public.utils import hasFingerprintPermissions
+
+import urllib2
+import urllib
 
 class JSONResponse(HttpResponse):
     """
@@ -145,6 +148,74 @@ class SearchView(APIView):
         return response
 
 
+############################################################
+##### Search Databases - Web services
+############################################################
+
+
+class SearchDatabasesView(APIView):
+    """
+    Class to search and return a list of databases matching a free text query
+    """
+    authentication_classes = (TokenAuthentication, SessionAuthentication, BasicAuthentication )
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request, *args, **kw):
+        sortmap = {
+            'name': 'database_name_t',
+            'type_name': 'type_t',
+            'id': 'id',
+            'last_activity': 'date_last_modification_t',
+            'date': 'created_t',
+        }
+        #defaults
+        rows=20
+        offset=0
+        sort_field='name'
+        sort_order='asc'
+
+        sortFilter = None
+
+        if request.user.is_authenticated():
+            search = request.DATA.get('search', None)
+            crows = request.DATA.get('rows', None)
+            coffset = request.DATA.get('offset', None)
+            csortf = request.DATA.get('sort_field', None)
+            csorto = request.DATA.get('sort_order', None)
+
+            if search == None or len(search.strip()) == 0:
+                return Response({'status': 'Authenticated', 'method': 'POST', 'Error': 'Must specify a search text filter'}, status=status.HTTP_400_BAD_REQUEST)
+
+            if crows != None:
+                rows = crows
+
+            if coffset != None:
+                offset = coffset
+
+            if csortf != None:
+                sort_field = csortf
+
+            if csorto != None:
+                sort_order = csorto
+
+            if sort_order != 'asc' and sort_order != 'desc':
+                return Response({'status': 'Authenticated', 'method': 'POST', 'Error': 'Available sort orders are "asc" and "desc"'}, status=status.HTTP_400_BAD_REQUEST)
+
+            try:
+                sortFilter = sortmap[sort_field] + " " + sort_order
+            except:
+                return Response({'status': 'Authenticated', 'method': 'POST', 'Error': 'sort_field can only be name, type_name, id, last_activity or date.'}, status=status.HTTP_400_BAD_REQUEST)
+
+
+
+            c = CoreEngine()
+            (list_databases,hits) = get_databases_from_solr_v2(request, "text_t:\"" +escapeSolrArg(search)+'"', sort=sortFilter, rows=rows, start=offset)
+
+            return Response({'link': {'status': 'Authenticated', 'method': 'POST'}, 'filters':{'search': search, 'rows': rows,
+                'offset':offset}, 'result': {'count': len(list_databases),
+                'databases': [d.__dict__ for d in list_databases]}}, status=status.HTTP_200_OK)
+
+        return Response({'status': 'NOT authenticated', 'method': 'POST'}, status=status.HTTP_401_UNAUTHORIZED)
 ############################################################
 ##### Email Share - Web services
 ############################################################
@@ -484,15 +555,15 @@ class ValidateView(APIView):
         contain = len(results) != 0
         # Dirty hack: check if the database name is really equals
         if contain:
+            contain = False
             for r in results:
                 try:
-                    if database_name != r['database_name_t']:
-                        contain = False
+                    if database_name.lower().strip() == r['database_name_t'].lower().strip():
+                        contain = True
+                        break
 
                 except:
-                    raise
-                    contain = True
-
+                    pass
 
         result = {'contains': contain}
 
@@ -908,6 +979,36 @@ class RequestAnswerView(APIView):
         return Response({'success': False }, status=status.HTTP_400_BAD_REQUEST)
 
 
+############################################################
+##### Seach Suggestions - Web services
+############################################################
+
+
+class SearchSuggestionsView(APIView):
+    authentication_classes = (SessionAuthentication, BasicAuthentication)
+    permission_classes = (IsAuthenticated,)
+    def get(self, request, *args, **kw):
+
+        if request.user.is_authenticated():
+            phrase = request.GET.get('term', '').strip()
+
+            result = []
+
+            if len(phrase) > 0:
+
+                solrlink = 'http://' +settings.SOLR_HOST+ ':'+ settings.SOLR_PORT+settings.SOLR_PATH+ '/suggestions/select?q=query_autocomplete:('+urllib.quote(phrase)+')&fq=user_id:'+str(request.user.id)+'&wt=json'
+
+                facets = json.load(urllib2.urlopen(solrlink))['facet_counts']['facet_fields']['query']
+
+                i = 0
+                while i < len(facets):
+                    result.append(facets[i])
+                    i+=2
+
+            response = Response(result, status=status.HTTP_200_OK)
+            return response
+
+        return Response ({}, status=status.HTTP_400_BAD_REQUEST)
 
 ############################################################
 ############ Auxiliar functions ############################

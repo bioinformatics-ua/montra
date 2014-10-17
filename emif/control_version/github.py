@@ -45,20 +45,29 @@ def report_bug(request):
 
             title = request.POST.get('title', '').encode('ascii', 'ignore')
             name = request.user.get_full_name()
-            description = request.POST.get('description', '').encode('ascii', 'ignore')
+
+            description = "<strong>Description: </strong>"+request.POST.get('description', '').encode('ascii', 'ignore')
+            description += "\n<strong>Steps to reproduce: </strong>"+request.POST.get('steps', '').encode('ascii', 'ignore')
+            description += "\n<strong>Expected result: </strong>"+request.POST.get('expected', '').encode('ascii', 'ignore')
+            description += "\n<strong>Priority: </strong>"+request.POST.get('priority', '').encode('ascii', 'ignore')
+
             from_email = request.user.email
             issue = IssueManager(settings.GITHUB_USERNAME, settings.GITHUB_PASSWD)
             browser = ''
-            try: 
+            try:
                 browser = request.META['HTTP_USER_AGENT']
             except:
                 pass
 
             description = description + "\n\nReported by %s, email: %s with: %s" % (name, from_email, browser)
             issue.create(title, description)
-            
+
+            emails_to_feedback = [from_email]
+            for k, v in settings.ADMINS:
+                emails_to_feedback.append(v)
+
             try:
-                send_custom_mail(title, description, settings.DEFAULT_FROM_EMAIL, [from_email])
+                send_custom_mail(title, description, settings.DEFAULT_FROM_EMAIL, emails_to_feedback)
             except:
                 pass
             return feedback_thankyou(request)
@@ -91,7 +100,7 @@ def issues_handler(request):
         error_loading_issues = True
 
 
-    
+
     return render(request, 'list_issues.html', {'request': request,
      'breadcrumb': True,
      'issues_open': issues_open, 'issues_closed':issues_closed, 'milestones': milestones})
@@ -99,7 +108,7 @@ def issues_handler(request):
 class IssueManager(object):
     def __init__(self, user, pw):
         self.gh = login(user, pw)
-	
+
     def create(self, title, body ):
         return self.gh.create_issue(settings.GITHUB_ACCOUNT,settings.GITHUB_REPO, title, body)
 
@@ -116,13 +125,13 @@ class IssueManager(object):
 
     def list_labels(self):
         # I'm adding this shit statically due to the use case of the EMIF Catalogue
-        # It's the only way that this will make sense. 
+        # It's the only way that this will make sense.
         return ['Use Case 1', 'Use Case 2', 'Use Case 3', 'Use Case 4', 'Use Case 5', 'Use Case 6']
-    
+
     def list_milestones(self):
         repo = self.gh.repository(settings.GITHUB_ACCOUNT,settings.GITHUB_REPO)
 
-        # for some reason i couldnt find out, 
+        # for some reason i couldnt find out,
         # milestones iterator only returns open milestones when used without state parameter
         # so i join them up myself...
         milestones = []

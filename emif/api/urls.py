@@ -22,6 +22,7 @@ from django.conf.urls import patterns, url
 from rest_framework.urlpatterns import format_suffix_patterns
 
 from api.views import SearchView
+from api.views import SearchDatabasesView
 from api.views import EmailCheckView
 from api.views import RemovePermissionsView
 from api.views import PopulationCheckView
@@ -35,6 +36,7 @@ from api.views import PopulationView
 from api.views import NotifyOwnerView
 from api.views import AddPublicLinkView
 from api.views import DeletePublicLinkView
+from api.views import SearchSuggestionsView
 from api.views import NotificationsView
 from api.views import ReadNotificationView
 from api.views import RemoveNotificationView
@@ -58,10 +60,15 @@ urlpatterns = patterns('api.views',
     url(r'^notify_owner$', NotifyOwnerView.as_view(), name='notify_owner'),
     url(r'^addpubliclink$', AddPublicLinkView.as_view(), name='addpubliclink'),
     url(r'^deletepubliclink$', DeletePublicLinkView.as_view(), name='addpubliclink'),
+    url(r'^searchsuggestions$', SearchSuggestionsView.as_view(), name='searchsuggestions'),
+
     url(r'^notifications$', NotificationsView.as_view(), name='notifications'),
     url(r'^readnotification$', ReadNotificationView.as_view(), name='readnotification'),
     url(r'^removenotification$', RemoveNotificationView.as_view(), name='removenotification'),
     url(r'^requestanswer$', RequestAnswerView.as_view(), name='requestanswer'),
+
+    # search databases services
+    url(r'^searchdatabases$', SearchDatabasesView.as_view(), name='searchdatabases'),
 
     # dashboard widgets services
     url(r'^dbtypes$', DatabaseTypesView.as_view(), name='dbtypes'),

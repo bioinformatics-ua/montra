@@ -1,4 +1,6 @@
-function showExportMessage() {
+var MAX_RESULTS = 10;
+
+function showExportMessage(){
     $('#exporting-message').fadeIn('fast');
 
 
@@ -17,6 +19,52 @@ function showExportMessage() {
         $('#exporting-message').fadeOut('fast');
     }, 4000);
 }
+var substringMatcher = function(strs) {
+  return function findMatches(q, cb) {
+    var matches, substringRegex;
+
+    // an array that will be populated with substring matches
+    matches = [];
+
+    // regex used to determine if a string contains the substring `q`
+    substrRegex = new RegExp(q, 'i');
+
+    // iterate through the pool of strings and for any string that
+    // contains the substring `q`, add it to the `matches` array
+    var i=0;
+    $.each(strs, function(i, str) {
+      if (substrRegex.test(str.query)) {
+        // the typeahead jQuery plugin expects suggestions to a
+        // JavaScript object, refer to typeahead docs for more info
+        matches.push({ value: str.query });
+      }
+
+    });
+
+    cb(matches.slice(0, MAX_RESULTS));
+  };
+};
+
+$(function(){
+    if ($(".search-query").length > 0){
+        $('.search-query').canclear();
+    }
+
+    handleQuickSearch();
+});
+
+function handleQuickSearch(){
+ $( ".search-query" ).autocomplete({
+source: "api/searchsuggestions",
+minLength: 2,
+open: function() {
+$( this ).removeClass( "ui-corner-all" ).addClass( "ui-corner-top" );
+},
+close: function() {
+$( this ).removeClass( "ui-corner-top" ).addClass( "ui-corner-all" );
+}
+});
+}
 
 $(function() {
     refreshNotificationCenter();
@@ -30,7 +78,10 @@ function refreshNotificationCenter() {
 
         if (data.unread && data.unread != 0) {
             $('#notification_badge').text(data.unread);
+            $('#notification_env').css('color', 'black');
             $('#notification_badge').show();
+        } else {
+            $('#notification_env').css('color', 'grey');
         }
         if (data.notifications) {
             resetNotificationCenter();
@@ -39,7 +90,7 @@ function refreshNotificationCenter() {
             }
 
             if(data.notifications.length == 0){
-                $('#notification_center').html('<center> <div class="notification">There\'s no new notifications.</div></center>'); 
+                $('#notification_center').html('<center> <div class="notification">There\'s no new notifications.</div></center>');
             }
         }
 
@@ -63,7 +114,7 @@ function insertNotification(notification) {
 
     }
     new_notification += '">' +
-        notification.message + '<br /> <div class="clearfix"><div class="notification_origin pull-right">by ' + notification.origin + " at " + notification.createddate +
+        notification.message + '<br /> <div class="clearfix"><div class="notification_origin"><i class="fa fa-user"></i> ' + notification.origin + " at " + notification.createddate +
         '</div></div></div></td><td class="notification_options"><i title="';
 
     if (notification.read)
@@ -153,14 +204,14 @@ function markRemoved(not_id) {
 function handleClick(not_id, href){
 
     var readnot = $('#not_id_' + not_id + ' .markread');
-    var value = readnot.hasClass('muted');   
+    var value = readnot.hasClass('muted');
 
     var callback = function(){ window.location.href = href; };
     if(!value){
         console.log('MARK AS READ')
         markRead(not_id, callback);
     }
-    else 
+    else
         callback();
 
 }
