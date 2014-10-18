@@ -57,6 +57,8 @@ SOLR_HOST = "localhost"
 SOLR_PORT = "8983"
 SOLR_PATH = "/solr"
 
+BROKER_CELERY='amqp://guest@localhost//'
+
 TEMPLATE_CONTEXT_PROCESSORS = (
     "django.contrib.auth.context_processors.auth",
     "django.core.context_processors.debug",

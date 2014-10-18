@@ -23,13 +23,13 @@
 from __future__ import absolute_import
 
 from celery import shared_task
-from celery import task  
+from celery import task
 
 from celery import Celery
 
-celery = Celery('emif', broker='amqp://guest@localhost//') #!
+from emif.settings import *
 
-
+celery = Celery('emif', broker=BROKER_CELERY) #!
 
 @shared_task
 def add(x, y):
