@@ -73,7 +73,7 @@
 
           <h4>
               <span id="results_size"></span>
-            {% if page_obj != None %}            
+            {% if page_obj != None %}
             {{num_results}} results found
             {%if not isAdvanced %}
                 for {{search_old}}
@@ -105,23 +105,23 @@
             <th class="sorter-institution sorter {%if "icon-minus" not in sort_params.institution.icon %}selected-sorter{% endif %}"  onclick="a.onClick('institution', '{{sort_params.institution.next}}');">
             <div class="pull-left">Institution Name</div>
                  <div class="pull-right"><i class="{{sort_params.institution.icon}}"></i></div>
-            </th>            
-            <!--<th>Creation Date</th>-->            
+            </th>
+            <!--<th>Creation Date</th>-->
             <th class="sorter-location sorter {%if "icon-minus" not in sort_params.location.icon %}selected-sorter{% endif %}" onclick="a.onClick('location', '{{sort_params.location.next}}');">
                 <div class="pull-left">Location</div>
-                <div class="pull-right"><i class="{{sort_params.location.icon}}"></i></div> 
-            </th>             
+                <div class="pull-right"><i class="{{sort_params.location.icon}}"></i></div>
+            </th>
             <th class="sorter-nrpatients sorter {%if "icon-minus" not in sort_params.nrpatients.icon %}selected-sorter{% endif %}" onclick="a.onClick('nrpatients', '{{sort_params.nrpatients.next}}');">
                 <div class="pull-left">Nr. Patients</div>
-                <div class="pull-right"><i class="{{sort_params.nrpatients.icon}}"></i></div> 
-            </th>            
+                <div class="pull-right"><i class="{{sort_params.nrpatients.icon}}"></i></div>
+            </th>
             <th class="sorter-lastupdate sorter {%if "icon-minus" not in sort_params.last_update.icon %}selected-sorter{% endif %}" onclick="a.onClick('last_update', '{{sort_params.last_update.next}}');">
             <div class="pull-left">Last update</div>
-                <div class="pull-right"><i class="{{sort_params.last_update.icon}}"></i></div> 
+                <div class="pull-right"><i class="{{sort_params.last_update.icon}}"></i></div>
             </th>
             <th class="sorter-type sorter {%if "icon-minus" not in sort_params.type.icon %}selected-sorter{% endif %}" onclick="a.onClick('type', '{{sort_params.type.next}}');">
             <div class="pull-left">Type</div>
-              <div class="pull-right"><i class="{{sort_params.type.icon}}"></i></div> 
+              <div class="pull-right"><i class="{{sort_params.type.icon}}"></i></div>
             </th>
             <th class="sorter-false filter-false select_line">Select</th>
 
@@ -159,14 +159,14 @@
     <tbody id="table_content">
 
   {% for t in page_obj %}
-   <tr>          
+   <tr>
           <td>
-            <a href="fingerprint/{{ t.id }}/1">{{ t.name }}</a>
+            <a data-acronym="{{ t.name }}" href="fingerprint/{{ t.id }}/1">{{ t.name }}</a>
         </td>
         <td>{{t.institution}}</td>
         <td>{{t.location}}</td>
         <td style="text-align: right;">{{t.number_patients}}</td>
-          <td style="text-align: center;" class="date">            
+          <td style="text-align: center;" class="date">
                 {% if t.last_activity %}
                     {{t.last_activity|datehhmm}}
                 {% else %}
@@ -174,11 +174,11 @@
                 {% endif %}
           </td>
           <td class="type">{{ t.type_name }} </td>
-          
-        
-          <td class="select_line"> <input class="checkbox dbtype_{{t.type_name|removespaces}}" type="checkbox" 
+
+
+          <td class="select_line"> <input class="checkbox dbtype_{{t.type_name|removespaces}}" type="checkbox"
           typedb="{{ t.type_name }}" name="chk_{{ t.id }}"></td>
-          
+
         </tr>
 
 
@@ -208,11 +208,11 @@
 
                 <div class="span3 pull-right " style="max-width:165px">
                   <a class="btn btn-small btn-success" href="contact/{{result.email_contact}}">Contact</a>
-                  
+
                   <a class="btn btn-small btn-success" href="fingerprint/{{result.id}}/1/">Fingerprint</a>
-                  
+
                   <a class="btn btn-small btn-success" href="advancedSearch/1">More like this</a>
-                  
+
                 </div>
 
               </div>
@@ -248,10 +248,10 @@ $(function(){
 {% if page_obj != None %}
 
   initializePaginatorSorter('{{sort_params.base_filter}}', '{{sort_params.selected_name}}', '{{sort_params.selected_value}}', '{{sort_params.extraObjects|safe}}');
-  
+
 {% endif %}
 
-  setRefineEvent({% if isAdvanced %} true, '{{request.session.query_type}}', '{{request.session.query_id}}' {% else %} false, null, null {% endif %});  
+  setRefineEvent({% if isAdvanced %} true, '{{request.session.query_type}}', '{{request.session.query_id}}' {% else %} false, null, null {% endif %});
 
  {% if isAdvanced %}
     setBooleanPlugin('{{request.session.serialization_query}}', '{{request.session.query_type}}', '{{request.session.query_id}}');

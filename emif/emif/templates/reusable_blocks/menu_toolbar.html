@@ -25,22 +25,22 @@
         Detailed
       </a>
       {% endif %}
-      {% if results or databases or alldatabases or more_like_this %}    
- 
+      {% if results or databases or alldatabases or more_like_this %}
+
           <div class="btn btn-group">
          <a class="btn dropdown-toggle" data-toggle="dropdown" href="#" id="add_list_toolbar">
           <i class="icon-retweet"></i> Compare
            <span class="caret"></span>
          </a>
          <ul class="dropdown-menu">
-            <li><a id="comparabtn"  href=""  rel="tooltip" data-container="body" data-placement="right" data-original-title="This allows to compare databases.<br /> It is only possible to compare databases of the same type. <br /> When you choose a database, the type is defined automatically, and databases of other types can't be choosen. <br /> If you want to choose other type of databases, you must only choose databases of this type." disabled> 
+            <li><a id="comparabtn"  href=""  rel="tooltip" data-container="body" data-placement="right" data-original-title="This allows to compare databases.<br /> It is only possible to compare databases of the same type. <br /> When you choose a database, the type is defined automatically, and databases of other types can't be choosen. <br /> If you want to choose other type of databases, you must only choose databases of this type." disabled>
            <i class="fa fa-columns"></i>&nbsp; Databases</a>
            </li>
-           <li><a id="comparabtnPC"  href=""  rel="tooltip" data-container="body" data-placement="right" data-original-title="This allows to compare databases.<br /> It is only possible to compare databases of the same type. <br /> When you choose a database, the type is defined automatically, and databases of other types can't be choosen. <br /> If you want to choose other type of databases, you must only choose databases of this type." disabled> 
+           <li><a id="comparabtnPC"  href=""  rel="tooltip" data-container="body" data-placement="right" data-original-title="This allows to compare databases.<br /> It is only possible to compare databases of the same type. <br /> When you choose a database, the type is defined automatically, and databases of other types can't be choosen. <br /> If you want to choose other type of databases, you must only choose databases of this type." disabled>
            <i class="fa fa-users"></i>&nbsp; Populations</a>
            </li>
          </ul>
-       </div>  
+       </div>
       {% endif %}
 
       {% if create_public and own_dbs|length > 0 %}
@@ -118,7 +118,7 @@
       {% endif %}
       {% if fingerprint_dump and owner_fingerprint or fingerprint_dump and request.user.is_superuser %}
       <div class="btn btn-group">
-        <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
+        <a id="managetoolbar" class="btn dropdown-toggle" data-toggle="dropdown" href="#">
           <i class="fa fa-cogs"></i> Manage
           <span class="caret"></span>
         </a>
@@ -192,7 +192,7 @@
         <p id="debug-url"></p>
     </div>
     <div class="modal-footer">
-        <a href="rm/ref" class="btn btn-danger">Yes</a>
+        <a id="delete_fingerprint" href="rm/ref" class="btn btn-danger">Yes</a>
         <!-- <a href="delete.php?some=param&ref=" class="btn danger">Yes 2</a> -->
         <a href="#" onclick="$('#modal-from-dom').modal('hide'); return false;" class="btn btn-secondary">Cancel</a>
     </div>
@@ -285,7 +285,7 @@ This is an invitation sent by {{request.user.first_name }} {{request.user.last_n
             <div style="display: table-cell; padding: 5px;" class="controls">
            <textarea rows="4" class="span5" style="margin-top:5px;" type="text" id="public_link_description" placeholder="Description for public link (optional)"></textarea>
           </div>
-          
+
         </div>
       </div>
     <div class="modal-footer">
@@ -582,7 +582,7 @@ function removeShared(ident){
         }
       });
 
-     
+
   }
 
 
