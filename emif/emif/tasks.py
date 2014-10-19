@@ -29,12 +29,16 @@ from celery import Celery
 
 from emif.settings import *
 
-celery = Celery('emif', broker=BROKER_CELERY) #!
+from docs_manager.storage_handler import *
+from emif.models import QueryLog
+from django.db.models import Count
+import os
+
+celery = Celery('emif', broker=BROKER_CELERY)
 
 @shared_task
 def add(x, y):
     return x + y
-
 
 @shared_task
 def mul(x, y):

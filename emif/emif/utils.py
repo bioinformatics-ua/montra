@@ -315,6 +315,8 @@ def convert_query_from_boolean_widget(query, q_id):
     #print "PARA CONVERTER: "
     #print query
 
+    advparams = []
+
     questionnarie = Questionnaire.objects.filter(id=q_id)[0]
     ttype = questionnarie.slug
 
@@ -352,6 +354,9 @@ def convert_query_from_boolean_widget(query, q_id):
         else:
             temp = q[0].slug + '_t'
 
+
+        advparams.append(temp)
+
         convert = convert_value(question_answer, q[0].type, True)
 
         #print "CONVERT*:"+convert
@@ -359,7 +364,6 @@ def convert_query_from_boolean_widget(query, q_id):
         if convert == None:
             if question_answer.startswith('[') and question_answer.endswith(']'):
                 question_answer = question_answer
-
             return escapeSolrArg(temp)+":"+question_answer
         # else
         return escapeSolrArg(temp)+":"+str(convert)
@@ -372,9 +376,8 @@ def convert_query_from_boolean_widget(query, q_id):
 
     r = r + " AND type_t:"+ttype
 
-    #print r
+    return (r, advparams)
 
-    return r
 
 ## Reference on how to escape this efficiently from:
 # - http://www.opensourceconnections.com/2013/01/17/escaping-solr-query-characters-in-python/

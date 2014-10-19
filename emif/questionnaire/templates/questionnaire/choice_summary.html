@@ -3,7 +3,7 @@
 <div>
     <ul style="list-style-type: none; margin:0px;">
         {% for choice in choices %}
-        <li>{{choice.key}}{%if choice.comment and choice.comment != ''%}: {{choice.comment}}{% endif %}</li>
+        <li>{{choice.key|safe}}{%if choice.comment and choice.comment != ''%}: {{choice.comment|safe}}{% endif %}</li>
         {% endfor %}
     </ul>
 </div>

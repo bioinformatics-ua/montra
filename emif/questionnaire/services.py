@@ -77,7 +77,7 @@ def creatematrixqsets(db_type, fingerprints, qsets):
 
     return (q_list, ans)
 
-def createqsets(runcode, qsets=None, clean=True, highlights=None, getAnswers=True, 
+def createqsets(runcode, qsets=None, clean=True, highlights=None, getAnswers=True,
     choosenqsets=None, fullmode=True, noprocessing=False, changeSearch=False):
     try:
         if fullmode:
@@ -200,7 +200,7 @@ def handle_qset(fingerprint, clean, qsets, qset, answers, fingerprint_ttype, rHi
     question_group.sortid = qset.sortid
     question_group.qsid = qset.id
     question_group.highlights = False
-    
+
     qsets[qset.text] = question_group
     # questions() already gives us questions ordered by number
     list_questions = qset.questions()
@@ -274,6 +274,7 @@ def handle_qset(fingerprint, clean, qsets, qset, answers, fingerprint_ttype, rHi
 
             if clean:
                 t.value = value.replace("#", " ")
+                highlighted = False
 
                 if rHighlights != None and slug+'_t' in rHighlights:
                     try:
@@ -282,12 +283,16 @@ def handle_qset(fingerprint, clean, qsets, qset, answers, fingerprint_ttype, rHi
                         pass
 
                     t.value = rHighlights[slug+'_t'][0].encode('utf-8')
+                    highlighted = True
                     #if len(highlights["results"][k])>1:
                     #print t.value
 
                 if not noprocessing:
                     if t.ttype in Fingerprint_Summary:
-                        t.value = Fingerprint_Summary[t.ttype](raw_value)
+                        if highlighted:
+                            t.value = Fingerprint_Summary[t.ttype](t.value)
+                        else:
+                            t.value = Fingerprint_Summary[t.ttype](raw_value)
 
             else:
                 t.value = value

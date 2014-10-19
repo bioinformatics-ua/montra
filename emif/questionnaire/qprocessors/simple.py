@@ -130,12 +130,12 @@ add_type('comment', 'Comment Only')
 def show_summ(value):
     valueclean = value.lower().strip()
 
-    if valueclean == 'yes':
-        return 'Yes'
-    elif valueclean == 'no':
-        return 'No'
-    elif valueclean == 'dontknow':
-        return "Don't Know"
+    if 'dontknow' in valueclean:
+        return valueclean.replace('dontknow', "Don't Know")
+    elif 'yes' in valueclean:
+        return valueclean.replace('yes', 'Yes')
+    elif 'no' in valueclean:
+        return valueclean.replace('no', 'No')
 
     return value
 
