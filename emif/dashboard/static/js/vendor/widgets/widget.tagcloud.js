@@ -28,6 +28,7 @@ var TagCloudWidget = function TagCloudWidget(widgetname, width, height, pos_x, p
         var self = this;
 
         self.icon = '<i class="fa fa-cloud"></i>';
+        self.header_tooltip = "The most common terms in the Catalogue.";
 
         self.content = "<center><h3>Loading...</h3></center>";
 

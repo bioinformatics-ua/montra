@@ -327,6 +327,7 @@ var DashboardWidget = function DashboardWidget(widgetname, header, width, height
         this.header = header;
         this.content = "";
         this.icon = '';
+        this.header_tooltip = null;
 
 }.addToPrototype({
     __init  :   function(gridster, parent){
@@ -361,6 +362,15 @@ var DashboardWidget = function DashboardWidget(widgetname, header, width, height
                     parent.removeWidget(self.widgetname);
             }
         });
+
+        if(self.header_tooltip != null){
+            $('#'+this.widgetname+' .widget-header').tooltip({
+                'trigger': 'hover',
+                'placement': 'top',
+                'title': self.header_tooltip,
+                'container': 'body',
+            });
+        }
 
     },
     __refresh    : function(){

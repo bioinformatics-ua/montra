@@ -21,13 +21,15 @@
 
 var MostViewedFingerprintWidget = function MostViewedFingerprintWidget(widgetname, width, height, pos_x, pos_y){
 
-    MostViewedFingerprintWidget._base.apply(this, [widgetname, "Most Viewed Fingerprints", width, height, pos_x, pos_y]);
+    MostViewedFingerprintWidget._base.apply(this, [widgetname, "Most Viewed Databases", width, height, pos_x, pos_y]);
 
 }.inherit(DashboardWidget).addToPrototype({
     __init : function(gridster, parent){
         var self = this;
 
         self.icon = '<i class="fa fa-star"></i>';
+
+        self.header_tooltip = "The databases that have more views in the Catalogue";
 
         self.content = "<center><h3>Loading...</h3></center>";
 
