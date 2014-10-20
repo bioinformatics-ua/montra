@@ -332,7 +332,7 @@ class TagCloudView(APIView):
 
             tags = []
 
-            solrlink = 'http://' +settings.SOLR_HOST+ ':'+ settings.SOLR_PORT+settings.SOLR_PATH+'/admin/luke?fl=text_t&numTerms=50&wt=json'
+            solrlink = 'http://' +settings.SOLR_HOST+ ':'+ settings.SOLR_PORT+settings.SOLR_PATH+'/admin/luke?fl=text_t&numTerms=300&wt=json'
 
 
             stopwords = cache.get('tagcloud_stopwords')
