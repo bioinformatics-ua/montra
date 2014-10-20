@@ -48,6 +48,8 @@ from django.template.defaultfilters import slugify
 import datetime
 from fingerprint.models import Fingerprint
 
+from questionnaire.models import Questionnaire, QuestionSet
+
 logger = logging.getLogger()
 
 def generate_hash():
@@ -61,28 +63,69 @@ class CoreEngine:
     """It is responsible for index the documents and search over them
     It also connects to SOLR
     """
-    
+
     CONNECTION_TIMEOUT_DEFAULT = 10
-    def __init__(self, timeout=CONNECTION_TIMEOUT_DEFAULT):
+    def __init__(self, timeout=CONNECTION_TIMEOUT_DEFAULT, core='collection1'):
         # Setup a Solr instance. The timeout is optional.
-        self.solr = pysolr.Solr('http://' +settings.SOLR_HOST+ ':'+ settings.SOLR_PORT+settings.SOLR_PATH, timeout=timeout)
+        self.solr = pysolr.Solr('http://' +settings.SOLR_HOST+ ':'+ settings.SOLR_PORT+settings.SOLR_PATH+'/'+core, timeout=timeout)
 
 
+    def reindex_quest_solr(self):
+        p = re.compile("(\\d{1,2})(\.\\d{2})*$", re.L)
 
+        #qsets = QuestionSet.objects.all()
+        slugs = []
+        questionaires = Questionnaire.objects.filter(disable=False)
+
+        solr = pysolr.Solr('http://' +settings.SOLR_HOST+ ':'+ settings.SOLR_PORT+settings.SOLR_PATH)
+        start=0
+        rows=100
+        fl=''
+
+        for quest in questionaires:
+            id = quest.id
+            obj = {"id":"questionaire_"+str(id)}
+            qsets = QuestionSet.objects.filter(questionnaire=quest)
+            for qs in qsets:
+                #print qs
+                questions = qs.questions()
+                for q in questions:
+                    x = q.slug_fk
+                    key = str(x.slug1) + "_qs"
+                    obj[key] = q.text
+            slugs.append(obj)
+
+
+        for quest in questionaires:
+            solr.delete(id='questionaire_'+str(id))
+
+        solr.add(slugs)
+
+        print ("QUITTING")
 
     def index_fingerprint(self, doc):
-        """Index fingerprint 
+        """Index fingerprint
         """
         # index document
         self.index_fingerprint_as_json(doc)
-    
-    def index_fingerprint_as_json(self, d):
+
+
+    def index_fingerprints(self, docs):
+        """Index fingerprint
+        """
+        # index document
+        self.index_fingerprint_as_json(docs, several = True)
+
+    def index_fingerprint_as_json(self, d, several=False):
         """Index fingerprint as json
         """
         # index document
+        xml_answer = None
+        if several:
+            xml_answer = self.solr.add(d)
+        else:
+            xml_answer = self.solr.add([d])
 
-        xml_answer = self.solr.add([d])
-        #print(xml_answer)
         self.optimize()
 
     def optimize(self):
@@ -106,13 +149,13 @@ class CoreEngine:
         """
         self.solr.delete(id=id_doc)
 
-    def search_fingerprint(self, query, start=0, rows=100, fl='', sort=''):
+    def search_fingerprint(self, query, start=0, rows=100, fl='', sort='', facet="off"):
         """search the fingerprint
         """
         # Later, searching is easy. In the simple case, just a plain Lucene-style
         # query is fine.
-
         results = self.solr.search(query,**{
+                'facet': facet,
                 'rows': rows,
                 'start': start,
                 'fl': fl,
@@ -124,6 +167,11 @@ class CoreEngine:
         """search the fingerprint
         """
         #hl=true&hl.fl=text_t
+
+        print ("HIGHLIGHT WAY:")
+        print (hlfl)
+        print ("--")
+
         results = self.solr.search(query,**{
                 'rows': rows,
                 'start': start,
@@ -182,7 +230,7 @@ def index_answeres_from_qvalues(qvalues, questionnaire, subject, fingerprint_id,
 
     c = CoreEngine()
     d = {}
-    
+
     # print("Indexing...")
     results = c.search_fingerprint("id:"+fingerprint_id)
     if (len(results)>0):
@@ -201,7 +249,7 @@ def index_answeres_from_qvalues(qvalues, questionnaire, subject, fingerprint_id,
     slugs = []
     for s in slugs_objs:
         slugs.append(s.description)
-    '''    
+    '''
     appending_text = ""
     #slugs_objs = None
     now = datetime.datetime.now()
@@ -223,7 +271,7 @@ def index_answeres_from_qvalues(qvalues, questionnaire, subject, fingerprint_id,
 
                 elif qdict.has_key('choices'):
                     #import pdb
-                    #pdb.set_trace()     
+                    #pdb.set_trace()
                     choices = qdict['choices']
                     qv = ""
                     try:
@@ -234,14 +282,14 @@ def index_answeres_from_qvalues(qvalues, questionnaire, subject, fingerprint_id,
                         pass
 
                     value = qv
-                    
+
                     do_again = False
                     try:
                         if len(choices[0])==3:
                             for choice, unk, checked  in choices:
                                 if checked == " checked":
-                                    value = value + "#" + choice.value   
-                                    
+                                    value = value + "#" + choice.value
+
                         elif len(choices[0])==4:
                             for choice, unk, checked, _aux  in choices:
                                 if checked == " checked":
@@ -249,14 +297,14 @@ def index_answeres_from_qvalues(qvalues, questionnaire, subject, fingerprint_id,
                                         value = value + "#" + choice.value + "{" + _aux +"}"
                                     else:
                                         value = value + "#" + choice.value
-                                    
+
 
                         elif len(choices[0])==2:
                             for checked, choice  in choices:
                                 # print("checked" + str(checked))
                                 if checked:
                                     value = value + "#" + choice.value
-                                    
+
                     except:
                         do_again = True
 
@@ -264,9 +312,9 @@ def index_answeres_from_qvalues(qvalues, questionnaire, subject, fingerprint_id,
                         for checked, choice  in choices:
                             # print("checked" + str(checked))
                             if checked:
-                                
+
                                 value = value + "#" + choice.value
-                                
+
 
                     # print("choice value " + value)
 
@@ -283,7 +331,7 @@ def index_answeres_from_qvalues(qvalues, questionnaire, subject, fingerprint_id,
                             if val:
                                 value = value + "||" + val
 
-                
+
                 else:
                     #print("continue")
                     pass
@@ -300,7 +348,7 @@ def index_answeres_from_qvalues(qvalues, questionnaire, subject, fingerprint_id,
                 #slug_final = slug+"_t"
 
                 #results = Slugs.objects.filter(description=question.text)
-                
+
                 #if slugs_dict==None or len(results)==0:
                 # if question.text not in slugs:
                 #     slugsAux = Slugs()
@@ -314,7 +362,7 @@ def index_answeres_from_qvalues(qvalues, questionnaire, subject, fingerprint_id,
 
                 #d[slug_final] = value
                 if value!=None:
-                    text += value + " " 
+                    text += value + " "
             except:
                 # raise
                 pass
@@ -333,16 +381,16 @@ def index_answeres_from_qvalues(qvalues, questionnaire, subject, fingerprint_id,
 
     if d.get('user_t') == None:
         d['user_t']= subject
-    # since its now by parts, we have absolutely no idea what was already there and what is new, 
+    # since its now by parts, we have absolutely no idea what was already there and what is new,
     # to this must be done again from scratch
     d['text_t']= generateFreeText(d)
 
     if extra_fields!=None:
         d = dict(d.items() + extra_fields.items())
-    
+
     #print(d)
 
-    # We only delete right before adding, so we dont lose what is on the database 
+    # We only delete right before adding, so we dont lose what is on the database
     # in case anything fails on the process above
     if(len(results) > 0):
         c.delete(results.docs[0]['id'])
@@ -374,7 +422,7 @@ def assert_suffix(type):
     elif type.lower() == "datepicker":
         return "_dt"
     # else
-    return None  
+    return None
 
 def convertDate(value):
     value = re.sub("\"", "", value)
@@ -403,7 +451,7 @@ def convertDate(value):
         #print('failed 3')
         pass
 
-    # failed conversion        
+    # failed conversion
     return None
 
 def replaceDate(m):
@@ -427,7 +475,7 @@ def convert_value(value, type, search=False):
             value = float(value)
             return value
         except ValueError:
-            pass            
+            pass
 
     elif type == "datepicker":
         if (value.startswith('[') and value.endswith(']')):
@@ -435,8 +483,8 @@ def convert_value(value, type, search=False):
             temp = re.sub("[0-9/-]+", replaceDate, temp)
 
             return temp
-        else:           
-            # for some weird reason, single date queries to solr returns error, 
+        else:
+            # for some weird reason, single date queries to solr returns error,
             # they must be in a range format always ? wth i just do a range query on the same date
             result = convertDate(value)
             if (result != None):
@@ -448,11 +496,11 @@ def convert_value(value, type, search=False):
 
     return None
 
-# Generates the freetext field, from current parameters       
+# Generates the freetext field, from current parameters
 def generateFreeText(d):
     freetext = ''
     dont_index = ['text_t', 'created_t','date_last_modification_t','type_t', 'user_t']
- 
+
     for q in d:
         if(q.endswith('_t') and q not in dont_index and d[q] != None and len(d[q]) > 0):
             freetext += (d[q] + ' ')

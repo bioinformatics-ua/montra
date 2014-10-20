@@ -3,7 +3,7 @@
 #
 # Authors: Luís A. Bastião Silva <bastiao@ua.pt>
 #          Tiago Godinho
-#          Ricardo Ribeiro 
+#          Ricardo Ribeiro
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -57,6 +57,8 @@ class Database:
     tec_address = ''
     tec_email = ''
     tec_phone = ''
+
+    percentage = 0
 
 
 class RequestMonkeyPatch(object):
@@ -116,9 +118,11 @@ class Fingerprint(models.Model):
     last_modification = models.DateTimeField(null=True)
     created = models.DateTimeField(auto_now_add=True, null=True)
     owner = models.ForeignKey(User, related_name="fingerprint_owner_fk")
-    shared = models.ManyToManyField(User, null=True, related_name="fingerprint_shared_fk") 
+    shared = models.ManyToManyField(User, null=True, related_name="fingerprint_shared_fk")
     hits = models.IntegerField(default=0, help_text="Hit count for this fingerprint")
     removed = models.BooleanField(default=False, help_text="Remove logically the fingerprint")
+
+    fill = models.FloatField(default=0, help_text="Database Questionset")
 
     def __unicode__(self):
         return self.fingerprint_hash
@@ -179,11 +183,11 @@ def FingerprintFromHash(hash):
 
 
 """
-    Answer of the Fingerprint 
+    Answer of the Fingerprint
 """
 class Answer(models.Model):
     question = models.ForeignKey(Question)
-    data = models.TextField() # Structure question 
+    data = models.TextField() # Structure question
     comment = models.TextField(null=True) # Comment
     fingerprint_id = models.ForeignKey(Fingerprint)
 
@@ -196,7 +200,7 @@ class Answer(models.Model):
 '''
     Fingerprint answers tracked change - a simple revision system
 
-        Each time a already existing fingerprint has answers modified, there's a new object 
+        Each time a already existing fingerprint has answers modified, there's a new object
         from this model, and one answer change for each answer change
 '''
 class FingerprintHead(models.Model):
@@ -239,11 +243,11 @@ class AnswerRequest(models.Model):
 """
 This class wraps the Description of the Fingerprint.
 It will be used to list fingerprints, for instance.
-It is useful to centralized the code. 
-Developed in first EMIF Hackthon. 
+It is useful to centralized the code.
+Developed in first EMIF Hackthon.
 """
 class FingerprintDescriptor(object):
-    static_attr = ["id", "date", "date_modification", "last_activity", "ttype", "type_name"] 
+    static_attr = ["id", "date", "date_modification", "last_activity", "ttype", "type_name"]
     slug_dict = {"name":"database_name",
                     "institution" : 'institution_name',
                     "email_contact" : 'contact_administrative',
@@ -289,7 +293,7 @@ class FingerprintDescriptor(object):
 
     def __getattr__(self, name):
         try:
-            #print name        
+            #print name
             if name in self.static_attr:
                 return self.parse_static_args(name)
             elif name in self.slug_dict:
@@ -320,7 +324,7 @@ class FingerprintDescriptor(object):
             return self.obj.last_modification
 
         if name == "ttype":
-            return self.obj.questionnaire.slug 
+            return self.obj.questionnaire.slug
 
         if name == "type_name":
             return self.obj.questionnaire.name

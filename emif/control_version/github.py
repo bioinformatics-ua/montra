@@ -110,7 +110,7 @@ class IssueManager(object):
         self.gh = login(user, pw)
 
     def create(self, title, body ):
-        return self.gh.create_issue(settings.GITHUB_ACCOUNT,settings.GITHUB_REPO, title, body)
+        return self.gh.create_issue(settings.GITHUB_ACCOUNT,settings.GITHUB_REPO, title, body, labels=['bugreport'])
 
     def list(self, state_of, labels_of):
         """

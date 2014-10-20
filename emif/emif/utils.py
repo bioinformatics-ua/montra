@@ -79,7 +79,7 @@ def convert_date(d):
 
 def get_nomenclature(institution_name, database_name):
     """
-    Get the nomenclature to the database based on institution name 
+    Get the nomenclature to the database based on institution name
     """
     value = clean_value(institution_name+"_"+database_name)
     slug = convert_text_to_slug(value)
@@ -119,14 +119,14 @@ class ordered_dict(dict):
         return [(key,self[key]) for key in self._order]
 
 
-        
+
 class Tag:
-        
+
         def __init__(self):
             self.id = -1
             self.tag = ''
             self.value = ''
-            self.extra = ''   
+            self.extra = ''
             self.number = ''
             self.comment = ''
             self.ttype = ''
@@ -146,10 +146,10 @@ class Tag:
             return other.__lt__(self)
 
         def __str__(self):
-            return self.tag + ", " + self.value 
+            return self.tag + ", " + self.value
 
 class QuestionGroup:
-    
+
     def __init__(self):
         self.list_ordered_tags = []
         self.name = ""
@@ -164,7 +164,7 @@ class QuestionGroup:
         return other.name == self.name
 
     def __lt__ (self, other):
-        
+
         return self.sortid < other.sortid
 
     def __gt__ (self, other):
@@ -186,9 +186,9 @@ def get_database_from_id(id):
             #print r['database_name_t']
             database_aux.id = r['id']
             database_aux.date = convert_date(r['created_t'])
-           
+
             database_aux.name = r['database_name_t']
-            
+
             break
         except:
             pass
@@ -204,7 +204,7 @@ def get_database_from_id_with_tlv(db):
     list_values = []
     blacklist = ['created_t', 'type_t', '_version_']
     name = "Not defined"
-    
+
     for result in results:
         questionnaire_slug = result['type_t']
         q_main = Questionnaire.objects.filter(slug=questionnaire_slug)[0]
@@ -215,7 +215,7 @@ def get_database_from_id_with_tlv(db):
             t = Tag()
             results = Slugs.objects.filter(slug1=k, question__questionset__questionnaire=q_main.pk)
             if len(results)>0:
-                text = results[0].description 
+                text = results[0].description
             else:
                 text = k
             info = text[:75] + (text[75:] and '..')
@@ -262,15 +262,15 @@ def convert_dict_to_query(params):
 
 def convert_qvalues_to_query(qvalues, questionnaire_id):
     questionsets = QuestionSet.objects.filter(questionnaire=questionnaire_id)
-    
+
     questions = Question.objects.filter(questionset__in=questionsets)
-    
+
     numbers = {}
 
     for q in questions:
         numbers[q.number] = q.slug
     query_parameters = {}
-    query = ""  
+    query = ""
     for k in qvalues:
         try:
             if (qvalues[k]!=None and qvalues[k]!="" ):
@@ -278,20 +278,20 @@ def convert_qvalues_to_query(qvalues, questionnaire_id):
             query = query + " " + qvalues[k]
         except:
             pass
-    
+
     return convert_dict_to_query(query_parameters)
 
 def convert_qvalues_to_query(qvalues, questionnaire_id, qexpression):
     questionsets = QuestionSet.objects.filter(questionnaire=questionnaire_id)
-    
+
     questions = Question.objects.filter(questionset__in=questionsets)
-    
+
     numbers = {}
 
     for q in questions:
         numbers[q.number] = q.slug
     query_parameters = {}
-    query = ""  
+    query = ""
     for k in qvalues:
         try:
             if (qvalues[k]!=None and qvalues[k]!="" ):
@@ -299,10 +299,10 @@ def convert_qvalues_to_query(qvalues, questionnaire_id, qexpression):
             query = query + " " + qvalues[k]
         except:
             pass
-    
+
     return convert_dict_to_query(query_parameters)
 
-# Example to test the funcion: 
+# Example to test the funcion:
 
 #a = "question_nr_1.01: 'sadsa' AND question_nr_1.02: 'dsadsadsa' AND question_nr_1.04: 'asdsaa'"
 #print convert_query_from_boolean_widget(a, 49)
@@ -315,6 +315,8 @@ def convert_query_from_boolean_widget(query, q_id):
     #print "PARA CONVERTER: "
     #print query
 
+    advparams = []
+
     questionnarie = Questionnaire.objects.filter(id=q_id)[0]
     ttype = questionnarie.slug
 
@@ -323,14 +325,14 @@ def convert_query_from_boolean_widget(query, q_id):
     #print query
     # I cant remove the symbol
     query = re.sub("_____[a-zA-Z0-9._()\[\]\/\-\+?!'@#$%&*=~^|\\<>;,\.\" ]+_____", "", query)
-    
+
     #print query
     #print "------------------"
 
     def check(m):
         q = None
         try:
-            
+
             question_id = m.group(1)
             #print "QUESTION_ID: "+question_id
             question_id = question_id.replace('question_nr_', '')
@@ -347,10 +349,13 @@ def convert_query_from_boolean_widget(query, q_id):
             return 'null'
 
         suffix = assert_suffix(q[0].type)
-        if suffix != None:    
+        if suffix != None:
             temp = q[0].slug + suffix
         else:
             temp = q[0].slug + '_t'
+
+
+        advparams.append(temp)
 
         convert = convert_value(question_answer, q[0].type, True)
 
@@ -359,12 +364,11 @@ def convert_query_from_boolean_widget(query, q_id):
         if convert == None:
             if question_answer.startswith('[') and question_answer.endswith(']'):
                 question_answer = question_answer
-
             return escapeSolrArg(temp)+":"+question_answer
         # else
         return escapeSolrArg(temp)+":"+str(convert)
-    
-    # how to escape everything but unescaped single quotes, very nice ref from : 
+
+    # how to escape everything but unescaped single quotes, very nice ref from :
     # http://stackoverflow.com/questions/249791/regex-for-quoted-string-with-escaping-quotes
     # this is non-greedy, giving the smallest match possible (as we want)
     r = re.sub("(question_nr_[10-9\\.]+)(:)( )?(\"(\\\.|[^\"])*\"|\[[0-9\.,\-a-zA-Z\* ]*\])", check, query)
@@ -372,11 +376,9 @@ def convert_query_from_boolean_widget(query, q_id):
 
     r = r + " AND type_t:"+ttype
 
-    #print r
+    return (r, advparams)
 
-    return r
-
-## Reference on how to escape this efficiently from: 
+## Reference on how to escape this efficiently from:
 # - http://www.opensourceconnections.com/2013/01/17/escaping-solr-query-characters-in-python/
 # These rules all independent, order of
 # escaping doesn't matter
@@ -417,7 +419,7 @@ def escapeSolrArg(term):
     return "".join([nextStr for nextStr in escapedSeq(term)])
 
 def send_custom_mail(title, description, from_mail, to_mail):
-    
+
     email = render_to_string('email_template.html', {
             'title': title,
             'description': description.replace('\n','<br />'),

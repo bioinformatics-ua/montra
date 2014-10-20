@@ -258,9 +258,9 @@ class FeedView(APIView):
 
         if request.user.is_authenticated():
 
-            modifications = FingerprintHead.objects.filter(fingerprint_id__owner=request.user)
+            modifications = FingerprintHead.objects.filter(fingerprint_id__owner=request.user, fingerprint_id__removed = False)
 
-            modifications = modifications | FingerprintHead.objects.filter(fingerprint_id__shared=request.user).order_by("-date")
+            modifications = modifications | FingerprintHead.objects.filter(fingerprint_id__shared=request.user, fingerprint_id__removed = False).order_by("-date")
 
             feed = []
 
@@ -290,13 +290,19 @@ class FeedView(APIView):
                         old_value = chg.old_value
                         new_value = chg.new_value
 
+                    def noneIsEmpty(value):
+                        if value == None:
+                            return ""
+
+                        return value
+
                     alterations.append({
                             'number': question.number,
                             'text': removehs(question.text),
-                            'oldvalue': old_value,
-                            'newvalue': new_value,
-                            'oldcomment': chg.old_comment,
-                            'newcomment': chg.new_comment
+                            'oldvalue': noneIsEmpty(old_value),
+                            'newvalue': noneIsEmpty(new_value),
+                            'oldcomment': noneIsEmpty(chg.old_comment),
+                            'newcomment': noneIsEmpty(chg.new_comment)
                         })
 
                 aggregate.append({
