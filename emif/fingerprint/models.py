@@ -29,6 +29,8 @@ from django.contrib.auth.models import User
 
 from description import fingerprint_description_slugs
 
+from newsletter.models import Newsletter, Subscription
+
 class Database:
     id = ''
     name = ''
@@ -175,6 +177,31 @@ class Fingerprint(models.Model):
     def valid():
         return Fingerprint.objects.filter(removed=False)
 
+    def setSubscription(self, user, value):
+        try:
+            subscription = FingerprintSubscription.objects.get(user = user, fingerprint = self)
+            subscription.removed = not value
+            subscription.save()
+
+        except FingerprintSubscription.DoesNotExist:
+            # we dont create in case its false it doesnt exist, pointless work
+            if value:
+                subscription = FingerprintSubscription(user = user, fingerprint = self)
+                subscription.save()
+
+    def findName(self):
+        name = ""
+        try:
+            name_ans = Answer.objects.get(question__slug_fk__slug1='database_name', fingerprint_id=self)
+
+            name = name_ans.data
+
+        except Answer.DoesNotExist:
+            name ="Unnamed"
+
+        return name
+
+
 def FingerprintFromHash(hash):
     return Fingerprint.objects.get(fingerprint_hash=hash);
 
@@ -211,6 +238,20 @@ class FingerprintHead(models.Model):
     def __str__(self):
         return "FINGERPRINT_ID:"+str(self.fingerprint_id)+" REVISION: "+str(self.revision) + " DATE: "+ str(self.date)
 
+    def changes(self):
+        return AnswerChange.objects.filter(revision_head=self)
+
+    @staticmethod
+    def mergeChanges(fingerprintheads):
+        answermap = {}
+        for head in fingerprintheads.order_by('date'):
+            for change in head.changes():
+                answermap[change.answer] = change
+
+        return answermap.values()
+
+
+
 class AnswerChange(models.Model):
     revision_head = models.ForeignKey(FingerprintHead)
     answer        = models.ForeignKey(Answer)
@@ -218,6 +259,9 @@ class AnswerChange(models.Model):
     new_value     = models.TextField(null=True)
     old_comment   = models.TextField(null=True)
     new_comment   = models.TextField(null=True)
+
+    def __str__(self):
+        return "QUESTION: "+str(self.answer.question.number)
 
 ''' The idea is showing the number of times the db is returned over time
 '''
@@ -337,3 +381,44 @@ class FingerprintDescriptor(object):
                 return self.obj['location']
             if "PI:_Address" in self.obj:
                 return self.obj['PI:_Address']
+
+class FingerprintSubscription(models.Model):
+    fingerprint     = models.ForeignKey(Fingerprint)
+    user            = models.ForeignKey(User)
+    date            = models.DateTimeField(auto_now_add=True)
+    latest_update   = models.DateTimeField(auto_now=True)
+    removed         = models.BooleanField(default=False)
+
+    def isSubscribed(self):
+        return not self.removed
+
+    def getNewsletter(self):
+        newsl = None
+        try:
+            newsl = Newsletter.objects.get(slug=self.fingerprint.fingerprint_hash)
+
+        except Newsletter.DoesNotExist:
+
+            newsl = Newsletter( title=self.fingerprint.findName()+' Updates',
+                            slug=self.fingerprint.fingerprint_hash,
+                            email=settings.DEFAULT_FROM_EMAIL,
+                            sender="Emif Catalogue")
+            newsl.save()
+
+        return newsl
+
+    def setNewsletterSubs(self, new_status):
+        newsl = self.getNewsletter()
+
+        newsl_sub = None
+        try:
+            newsl_sub = Subscription.objects.get(user=self.user,  newsletter=newsl)
+        except Subscription.DoesNotExist:
+            newsl_sub = Subscription(user=self.user, newsletter = newsl)
+
+        if(new_status):
+            newsl_sub.subscribe()
+        else:
+            newsl_sub.unsubscribe()
+
+        newsl_sub.save()

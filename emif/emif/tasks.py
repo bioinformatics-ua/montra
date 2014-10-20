@@ -3,7 +3,6 @@
 # Copyright (C) 2014 Luís A. Bastião Silva and Universidade de Aveiro
 #
 # Authors: Luís A. Bastião Silva <bastiao@ua.pt>
-#          Ricardo Ribeiro       <ribeiro.r@ua.pt>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -23,18 +22,29 @@
 
 from __future__ import absolute_import
 
+from celery import shared_task
+from celery import task
+
 from celery import Celery
 
-from celery.task.schedules import crontab
-from celery.decorators import periodic_task
-
-import json
-from django.conf import settings
+from emif.settings import *
 
 from docs_manager.storage_handler import *
 from emif.models import QueryLog
 from django.db.models import Count
-
 import os
 
-celery = Celery('emif', broker='amqp://guest@localhost//') #!
+celery = Celery('emif', broker=BROKER_CELERY)
+
+@shared_task
+def add(x, y):
+    return x + y
+
+@shared_task
+def mul(x, y):
+    return x * y
+
+
+@shared_task
+def xsum(numbers):
+    return sum(numbers)

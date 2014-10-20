@@ -86,7 +86,7 @@ def database_edit(request, fingerprint_id, questionnaire_id, sort_id=1, template
 
         # well this doesnt scale well, we should have the database name on the fingerprint
         # it probably will be mitigated by using the descriptor that should be updated on save...
-        fingerprint_name = findName(this_fingerprint)
+        fingerprint_name = this_fingerprint.findName()
 
         # count questionset filled answers
         qreturned = []

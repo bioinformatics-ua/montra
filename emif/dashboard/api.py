@@ -45,9 +45,7 @@ import mimetypes
 
 from questionnaire.models import Questionnaire, Question
 
-from fingerprint.models import Fingerprint, FingerprintHead, AnswerChange, Answer
-
-from fingerprint.services import findName
+from fingerprint.models import Fingerprint, FingerprintHead, AnswerChange, Answer, FingerprintSubscription
 
 from emif.utils import removehs
 
@@ -148,7 +146,7 @@ class MostViewedFingerprintView(APIView):
                     list_viewed.append(
                         {
                             'hash': this_fingerprint.fingerprint_hash,
-                            'name': findName(this_fingerprint),
+                            'name': this_fingerprint.findName(),
                             'count': hit['total_hits']
                         })
                     i+=1
@@ -226,7 +224,7 @@ class UserStatsView(APIView):
                 stats['mostpopulardb'] = {'name': '---', 'hash': '---', 'hits': '---'}
             else:
                 stats['mostpopulardb'] = {
-                                    'name': findName(mostpopular),
+                                    'name': mostpopular.findName(),
                                     'hash': mostpopular.fingerprint_hash,
                                     'hits': mostpopular.hits}
 
@@ -260,7 +258,16 @@ class FeedView(APIView):
 
             modifications = FingerprintHead.objects.filter(fingerprint_id__owner=request.user, fingerprint_id__removed = False)
 
-            modifications = modifications | FingerprintHead.objects.filter(fingerprint_id__shared=request.user, fingerprint_id__removed = False).order_by("-date")
+            modifications = modifications | FingerprintHead.objects.filter(fingerprint_id__shared=request.user, fingerprint_id__removed = False)
+
+
+            # get from subscriptions too
+            subs = FingerprintSubscription.objects.filter(user=request.user, removed=False)
+
+            for sub in subs:
+                modifications = modifications | FingerprintHead.objects.filter(fingerprint_id=sub.fingerprint, fingerprint_id__removed = False)
+
+            modifications = modifications.order_by("-date")
 
             feed = []
 
@@ -307,7 +314,7 @@ class FeedView(APIView):
 
                 aggregate.append({
                     'hash': mod.fingerprint_id.fingerprint_hash,
-                    'name': findName(mod.fingerprint_id),
+                    'name': mod.fingerprint_id.findName(),
                     'date': mod.date.strftime("%Y-%m-%d %H:%M"),
                     'icon': 'edit',
                     'alterations': alterations,

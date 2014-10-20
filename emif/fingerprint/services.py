@@ -139,6 +139,8 @@ def saveFingerprintAnswers(qlist_general, fingerprint_id, questionnaire, user, e
                         #print this_ans
                         this_ans.save()
 
+        fingerprint.save()
+
         #This is kind of heavy, so we do it on the background
         #because of cyclical dependencies, i just can import it here... i know its bad but i didn't knew of any other way
         from fingerprint.tasks import calculateFillPercentage
@@ -507,20 +509,6 @@ def unique_users_string(fingerprint):
 
     return users_string
 
-
-def findName(fingerprint):
-    name = ""
-    try:
-        name_ans = Answer.objects.get(question__slug_fk__slug1='database_name', fingerprint_id=fingerprint)
-
-        name = name_ans.data
-
-    except Answer.DoesNotExist:
-        name ="Unnamed"
-
-    return name
-
-
 # GET permissions model
 def getPermissions(fingerprint_id, question_set):
 
@@ -552,7 +540,7 @@ def markAnswerRequests(user, fingerprint, question, answer_requests):
         req.removed = True
         req.save()
 
-        message = "User "+str(fingerprint.owner.get_full_name())+" answered some questions you requested on database "+str(findName(fingerprint))+"."
+        message = "User "+str(fingerprint.owner.get_full_name())+" answered some questions you requested on database "+str(fingerprint.findName())+"."
 
         sendNotification(timedelta(hours=12), req.requester, fingerprint.owner,
             "fingerprint/"+fingerprint.fingerprint_hash+"/1/", message)

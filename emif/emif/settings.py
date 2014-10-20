@@ -57,6 +57,8 @@ SOLR_HOST = "localhost"
 SOLR_PORT = "8983"
 SOLR_PATH = "/solr"
 
+BROKER_CELERY='amqp://guest@localhost//'
+
 TEMPLATE_CONTEXT_PROCESSORS = (
     "django.contrib.auth.context_processors.auth",
     "django.core.context_processors.debug",
@@ -590,7 +592,13 @@ COMPRESS_ENABLED = False
 COMPRESS_OFFLINE = False
 
 
+# Periodic user updates newsletter settings
+NEWSLETTER_DAY='friday'
+NEWSLETTER_HOUR = 3
+NEWSLETTER_MIN = 0
+
 try:
     from local_settings import *
 except:
     pass
+

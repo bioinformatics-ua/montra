@@ -1,0 +1,10 @@
+{% for comment in discussions %}
+    <div id="comment_{{ comment.id }}">
+        <blockquote>
+            <p style="font-size: 16px">{{ comment.comment }}</p>
+            <small>{{ comment.name }} posted on {{ comment.submit_date }}</small>
+    </blockquote>
+{% endfor %}
+<br /><br />
+Click <a href="{{base_url}}/fingerprint/{{fingerprint}}/1/discussion">here</a> to see all the discussion. <br />
+

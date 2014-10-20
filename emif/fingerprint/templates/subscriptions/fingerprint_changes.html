@@ -1,0 +1,6 @@
+New answers on questions:
+{% for change in changes %}
+{{change.answer.question.number}},
+{% endfor %}
+<br />
+Click <a href="{{base_url}}/fingerprint/{{fingerprint}}/1/">here</a> to see the database. <br />

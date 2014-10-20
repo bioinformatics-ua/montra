@@ -68,8 +68,7 @@ from django.template.loader import render_to_string
 
 from emif.utils import send_custom_mail, escapeSolrArg
 
-from fingerprint.models import Fingerprint, AnswerRequest
-from fingerprint.services import findName
+from fingerprint.models import Fingerprint, AnswerRequest, FingerprintSubscription
 from fingerprint.listings import get_databases_from_solr_v2
 from questionnaire.models import Question
 
@@ -957,7 +956,7 @@ class RequestAnswerView(APIView):
 
                 if ansrequest != None:
 
-                    message = str(ansrequest.requester.get_full_name())+" requested you to answer some unanswered questions on database "+str(findName(fingerprint))+"."
+                    message = str(ansrequest.requester.get_full_name())+" requested you to answer some unanswered questions on database "+str(fingerprint.findName())+"."
 
                     sendNotification(timedelta(hours=12), fingerprint.owner, ansrequest.requester,
             "dbEdit/"+fingerprint.fingerprint_hash+"/"+str(fingerprint.questionnaire.id), message)
@@ -977,6 +976,42 @@ class RequestAnswerView(APIView):
                 pass
 
         return Response({'success': False }, status=status.HTTP_400_BAD_REQUEST)
+
+############################################################
+##### Toggle Subscription Webservice
+############################################################
+
+class ToggleSubscriptionView(APIView):
+
+    authentication_classes = (SessionAuthentication, BasicAuthentication)
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request, *args, **kw):
+        if request.user.is_authenticated():
+            # first we get the email parameter
+            stat = request.POST.get('set', '')
+            fingerprint_hash = request.POST.get('hash', '')
+
+            if stat == 'true':
+                stat = True
+            else:
+                stat = False
+
+            if len(fingerprint_hash) > 0:
+                try:
+                    fingerprint = Fingerprint.objects.get(fingerprint_hash=fingerprint_hash)
+
+                    fingerprint.setSubscription(request.user, stat)
+
+                    return Response({'success': True,
+                                     'fingerprint': fingerprint_hash,
+                                     'subscription': stat
+                                    }, status=status.HTTP_200_OK)
+
+                except fingerprint.DoesNotExist:
+                    pass
+
+        return Response({}, status=status.HTTP_400_BAD_REQUEST)
 
 
 ############################################################

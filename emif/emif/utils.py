@@ -32,7 +32,7 @@ from questionnaire.models import Question, Questionnaire, QuestionSet
 from emif.models import SharePending
 
 from fingerprint.models import Fingerprint
-from fingerprint.services import indexFingerprint, findName
+from fingerprint.services import indexFingerprint
 
 import md5
 import random
@@ -378,6 +378,7 @@ def convert_query_from_boolean_widget(query, q_id):
 
     return (r, advparams)
 
+
 ## Reference on how to escape this efficiently from:
 # - http://www.opensourceconnections.com/2013/01/17/escaping-solr-query-characters-in-python/
 # These rules all independent, order of
@@ -445,7 +446,7 @@ def removehs(value):
 
     return value
 
-def activate_user(activation_code, user, context = None):
+def activate_user(activation_code, user, context = None, template_name=None):
     if (user==None or not user.is_authenticated()):
         if context != None:
             return HttpResponse('You need to be authenticated.')
@@ -491,7 +492,7 @@ def activate_user(activation_code, user, context = None):
 
     sp.pending = False
     sp.save()
-    finger_name = findName(fingerprint)
+    finger_name = fingerprint.findName()
     try:
         subject = "EMIF Catalogue: Accepted database shared"
         message = """Dear %s,\n\n
@@ -521,7 +522,7 @@ def activate_user(activation_code, user, context = None):
             return False
 
     if context != None:
-        return render(context, template_name, {'request': request, 'breadcrumb': True})
+        return render(context, template_name, {'request': context, 'breadcrumb': True})
     else:
         #print 'Activation successfull'
         return True
