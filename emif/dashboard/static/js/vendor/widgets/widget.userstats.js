@@ -35,7 +35,7 @@ var UserStatsWidget = function UserStatsWidget(widgetname, width, height, pos_x,
 
         $.get("api/userstats")
         .done(function(data) {
-           
+
             if(data.stats){
                 self.content = "<strong>Last Login: </strong>"+data.stats.lastlogin+"<br />"+
                 "<strong>Databases owned:</strong> "+data.stats.numberownerdb+"<br />"+
@@ -43,14 +43,14 @@ var UserStatsWidget = function UserStatsWidget(widgetname, width, height, pos_x,
 
                 var mostpop = data.stats.mostpopulardb;
                 if(mostpop.name != '---'){
-                    self.content += '<strong>Most Popular:</strong> <a href="fingerprint/'+mostpop.hash+'/1/">'+
+                    self.content += '<strong>Most popular database:</strong> <a href="fingerprint/'+mostpop.hash+'/1/">'+
                     mostpop.name +"</a> ("+mostpop.hits+" hits)<br />";
                 }
 
                 console.log(data.stats);
 
                 if(data.stats.populartype != '---'){
-                    self.content += '<strong>Most Used Quest. Type: </strong>'+data.stats.populartype;
+                    self.content += '<strong>Most used database tSype: </strong>'+data.stats.populartype;
                 }
 
             } else {

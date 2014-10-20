@@ -587,7 +587,7 @@ HITCOUNT_KEEP_HIT_ACTIVE = { 'days': 1 }
 
 # Django-Compressor activation
 COMPRESS_ENABLED = False
-COMPRESS_OFFLINE = True
+COMPRESS_OFFLINE = False
 
 
 # Periodic user updates newsletter settings

@@ -13,6 +13,8 @@
 		{% if request.user.is_authenticated %}
 		<!--div class="btn-group" id="group_toolbar"-->
       {% if dashboard %}
+        <button id="dashboardreset" onclick="dashzone.reset();" class="btn"><i class="fa fa-trash"></i>
+ Reset to Default</button>
         <div id="dashboardselectbox" class="btn btn-group"></div>
       {% endif %}
       {% if fingerprint_dump %}

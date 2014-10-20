@@ -26,8 +26,8 @@ import time
 
 from searchengine.search_indexes import CoreEngine
 
-from fingerprint.models import Fingerprint, FingerprintReturnedSimple, FingerprintReturnedAdvanced
-from fingerprint.services import unindexFingerprint
+from fingerprint.models import Fingerprint, FingerprintReturnedSimple, FingerprintReturnedAdvanced, Answer
+from fingerprint.services import unindexFingerprint, getFillPercentage
 
 from django.utils import timezone
 from django.conf import settings
@@ -163,6 +163,13 @@ def sendWeekReport(report, newsletter):
 
     subm.save()
 
+
+@shared_task
+def calculateFillPercentage(fingerprint):
+    answers = Answer.objects.filter(fingerprint_id = fingerprint)
+
+    fingerprint.fill = getFillPercentage(fingerprint, answers)
+    fingerprint.save()
 
 @periodic_task(run_every=crontab(minute=0, hour=3))
 def remove_orphans():

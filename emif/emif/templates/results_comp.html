@@ -4,13 +4,13 @@
 {% load django_bootstrap_breadcrumbs %}
 
 {% block breadcrumbs %}
-    {{ block.super }} 
+    {{ block.super }}
     {% if request.session.query %}
-    {% breadcrumb "Search" "resultsdiff/1" %} 
-    {% elif request.session.list_origin == 'personal' %} 
-    {% breadcrumb "Personal" "databases" %} 
-    {% else %} 
-    {% breadcrumb "All" "alldatabases" %} 
+    {% breadcrumb "Search" "resultsdiff/1" %}
+    {% elif request.session.list_origin == 'personal' %}
+    {% breadcrumb "Personal" "databases" %}
+    {% else %}
+    {% breadcrumb "All" "alldatabases" %}
     {% endif %}
 
     {% breadcrumb "Compare Databases" "" %}
@@ -28,7 +28,7 @@
 
 
 {% block styleextra %}
-    
+
 
 
    table {
@@ -62,14 +62,14 @@ th, td {
     <div class="btn-group pull-right">
     <button type="button" class="btn" onclick="window.print();" title="Print">
       <i class="icon-print"></i>
-    </button>  
+    </button>
       <div class="btn-group"></div>
-      
+
       <a id="collapseall" class="btn" href="" >
        <i class="icon-plus"></i>&nbsp; Expand all
       </a>
 
-      
+
 
       <div class="btn-group">
         <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
@@ -106,9 +106,9 @@ th, td {
       <!--button id="compare_previous" class="btn"><i class="icon-arrow-left"></i></button>
       <span id="compare_id" class="btn disabled">1/{{results|length|add:-1}}</span>
       <button id="compare_next" class="btn"><i class="icon-arrow-right"></i></button-->
-      <table><tr><td>Comparing {{results|length}} databases &nbsp; &nbsp;</td><td style="margin-top: -25px; "> 
+      <table><tr><td>Comparing {{results|length}} databases &nbsp; &nbsp;</td><td style="margin-top: -25px; ">
       <i style="font-size: 30px;" id="compare_information" class="icon-question-sign" data-toggle="popover" data-placement="bottom" data-content="This is the compare databases page. <br /><br/>In this page it is possible to compare several database by analysing responses to the same question across several databases. <br /><br />
-      By default, the first three selected databases are compared, having the first database being the reference.<br /><br /> 
+      By default, the first three selected databases are compared, having the first database being the reference.<br /><br />
       If there are less than three databases, the user only will see two databases.<br /> <br />
       If there are more than three databases, the user will see the first three, and the others will be available to replace the current showing selection, by using the dropdowns on the databases.<br /><br />
       In any case, the database of reference can also be changed by using the dropdown." title="Compare Databases - Help"></i>
@@ -125,7 +125,7 @@ th, td {
      <div style="width: 220px;" class="clearfix database_title btn-darkgrey">
       <div style="height: 26px;" class="database_title_text pull-left"> &nbsp;
       </div>
-    </div>   
+    </div>
       {% for k,v in results.items.0.1.qset.ordered_items %}
       <div class="block_{{forloop.counter}} accordion-group">
         <div style="background-color: white;" title="{{k|removeh1}}" class="tooltippable accordion-heading">
@@ -142,14 +142,14 @@ th, td {
                 {% for t in v.list_ordered_tags %}
                   {% if t.ttype != 'publication' %}
 
-                  <tr data-qid="{{t.id}}" data-fingerprintid="HEADER" 
+                  <tr data-qid="{{t.id}}" data-fingerprintid="HEADER"
                   data-rowid="{{forloop.parentloop.counter}}_{{forloop.counter}}" class="entry rowid_{{forloop.parentloop.counter}}_{{forloop.counter}}">
                     <td style="background-color: white; font-size: 85%;" class="tooltippable" data-original-title='{{ t.tag|removehs }}' title="">
-                    
-                    
+
+
                     {{ t.tag|removehs }}
-                    
-                    </td> 
+
+                    </td>
 
                   </tr>
                   {% endif %}
@@ -163,9 +163,9 @@ th, td {
     </div>
     </div>
   <div style="display: table-cell;" id="database_listings">
-  <div id="database_rows">                   
+  <div id="database_rows">
     {% for fingerprint_id, content in results.items %}
-                      
+
     <div id="db_{{fingerprint_id}}" class="database_listing database_listing_away">
     <div {% if forloop.first%}style="margin-left: 0px;"{% endif %}>
      <div data-clampedwidth=".database_listing" class="clearfix database_title btn-darkgrey">
@@ -173,7 +173,7 @@ th, td {
       <div class="dropdown_placer pull-right">
           ---
       </div>
-    </div>   
+    </div>
       {% for k,v in content.qset.ordered_items %}
       <div style="background-color: white;" data-block="{{forloop.counter}}" class="block_{{forloop.counter}} elips accordion-group">
         <div title="{{k|removeh1}}" class="tooltippable accordion-heading">
@@ -189,10 +189,10 @@ th, td {
               <tbody>
                 {% for t in v.list_ordered_tags %}
                   {% if t.ttype != 'publication' %}
-                  <tr data-qid="{{t.id}}" data-fingerprintid="{{fingerprint_id}}" 
+                  <tr data-qid="{{t.id}}" data-type="{{t.ttype}}" data-fingerprintid="{{fingerprint_id}}"
                       data-rowid="{{forloop.parentloop.counter}}_{{forloop.counter}}"
                   class="entry rowid_{{forloop.parentloop.counter}}_{{forloop.counter}}">
-                    <td class="comphidden tooltippable" data-original-title="{{ t.tag|removehs }}" title="">{{ t.tag|removehs }}</td> 
+                    <td class="comphidden tooltippable" data-original-title="{{ t.tag|removehs }}" title="">{{ t.tag|removehs }}</td>
                      <td style="font-size: 95%;" class="tooltippable" data-original-title="{{ t.value.strip|force_escape|safe }}" title="">{{ t.value.strip|escape|safe }}</td>
                   </tr>
                   {% endif %}
@@ -215,7 +215,7 @@ th, td {
 
 <!--<![endif]-->
 
-</div>  
+</div>
 
 {% endblock %}
 <!--[if gte IE 9]><!-->
@@ -245,16 +245,16 @@ function applyFilters(){
 
 
 $("#match").bind('click',function(e)
-{ 
+{
 
-          e.preventDefault(); 
+          e.preventDefault();
           e.stopPropagation();
 
           match = !match;
 
           if (!match)
           {
-            $('#imatch').removeClass('icon-ok') 
+            $('#imatch').removeClass('icon-ok')
 
           }
           else
@@ -267,18 +267,18 @@ $("#match").bind('click',function(e)
 });
 
 $("#unmatch").bind('click',function(e)
-{ 
+{
 
-          e.preventDefault(); 
+          e.preventDefault();
           e.stopPropagation();
 
-          
+
 
           unmatch = !unmatch ;
           applyFilters();
           if (!unmatch)
           {
-            $('#iunmatch').removeClass('icon-ok') 
+            $('#iunmatch').removeClass('icon-ok')
           }
           else
           {
@@ -288,19 +288,19 @@ $("#unmatch").bind('click',function(e)
 });
 
 $("#emptyrows").bind('click',function(e)
-{ 
+{
 
-          e.preventDefault(); 
+          e.preventDefault();
           e.stopPropagation();
 
-          
+
 
           emptyrows = !emptyrows ;
           applyFilters();
           if (!emptyrows)
           {
-            $('#iemptyrows').removeClass('icon-ok') 
-            
+            $('#iemptyrows').removeClass('icon-ok')
+
           }
           else
           {
@@ -310,9 +310,9 @@ $("#emptyrows").bind('click',function(e)
 });
 
 $("#proximity").bind('click',function(e)
-{ 
+{
 
-          e.preventDefault(); 
+          e.preventDefault();
           e.stopPropagation();
 
 
@@ -321,8 +321,8 @@ $("#proximity").bind('click',function(e)
 
           if (!proximity)
           {
-            $('#iproximity').removeClass('icon-ok') 
-            
+            $('#iproximity').removeClass('icon-ok')
+
           }
           else
           {
@@ -358,8 +358,8 @@ function compareDbsSelected(initial){
       {%for fingerprint_id, content in results.items|slice:":1" %}
         {% for k,v in content.qset.ordered_items %}
           for( var i = 0; i < others.length;i++){
-            thread = new Runnable(compareDatabase, priority++, ref+'_{{k|removespaces|hash}}', others[i]+'_{{k|removespaces|hash}}'); 
-            threadpool.run(thread);  
+            thread = new Runnable(compareDatabase, priority++, ref+'_{{k|removespaces|hash}}', others[i]+'_{{k|removespaces|hash}}');
+            threadpool.run(thread);
           }
         {% endfor %}
       {% endfor %}
@@ -367,7 +367,7 @@ function compareDbsSelected(initial){
         function(){
             if(!initial && hasFilters()){
             $('#comparingwait').fadeOut('fast');
-            
+
             $('.database_listing_names').fadeIn('fast');
             $('.database_listing').fadeIn('fast');
             }
@@ -400,14 +400,14 @@ $(function(){
 
   {%for fingerprint_id, content in results.items %}
   dbs.addDatabase(
-    '{{fingerprint_id}}', 
+    '{{fingerprint_id}}',
     {
       label: '{{content.name|removespaces}}'
     });
   {% endfor %}
 
-  dbs.draw(); 
-  $('.database_listing_names').fadeTo( "fast", 1); 
+  dbs.draw();
+  $('.database_listing_names').fadeTo( "fast", 1);
   compareDbsSelected(true);
 
   $('[id^="{{database_to_compare|removespaces}}"] td').addClass("basetable");
@@ -415,7 +415,7 @@ $(function(){
   $('#compare_previous').prop('disabled', true);
   if(comparing_current == max_comparing)
      $('#compare_next').prop('disabled', true);
- 
+
 var first = null;
 
 $('[data-clampedwidth]').each(function () {
@@ -436,7 +436,7 @@ $('[data-clampedwidth]').each(function () {
               overflow: 'hidden',
               'text-overflow': 'ellipsis',
               'white-space': 'nowrap',
-              display: 'block' 
+              display: 'block'
             });
           });
         }

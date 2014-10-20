@@ -60,6 +60,8 @@ class Database:
     tec_email = ''
     tec_phone = ''
 
+    percentage = 0
+
 
 class RequestMonkeyPatch(object):
     POST = {}
@@ -121,6 +123,8 @@ class Fingerprint(models.Model):
     shared = models.ManyToManyField(User, null=True, related_name="fingerprint_shared_fk")
     hits = models.IntegerField(default=0, help_text="Hit count for this fingerprint")
     removed = models.BooleanField(default=False, help_text="Remove logically the fingerprint")
+
+    fill = models.FloatField(default=0, help_text="Database Questionset")
 
     def __unicode__(self):
         return self.fingerprint_hash

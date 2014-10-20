@@ -21,6 +21,7 @@
 from django.http import HttpResponse
 
 from django.contrib.auth.models import User, Group
+from django.core.cache import cache
 
 from rest_framework import permissions
 from rest_framework import renderers
@@ -40,6 +41,7 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 
 import os
 import mimetypes
+
 
 from questionnaire.models import Questionnaire, Question
 
@@ -254,16 +256,16 @@ class FeedView(APIView):
 
         if request.user.is_authenticated():
 
-            modifications = FingerprintHead.objects.filter(fingerprint_id__owner=request.user)
+            modifications = FingerprintHead.objects.filter(fingerprint_id__owner=request.user, fingerprint_id__removed = False)
 
-            modifications = modifications | FingerprintHead.objects.filter(fingerprint_id__shared=request.user).order_by("-date")
+            modifications = modifications | FingerprintHead.objects.filter(fingerprint_id__shared=request.user, fingerprint_id__removed = False)
 
 
             # get from subscriptions too
             subs = FingerprintSubscription.objects.filter(user=request.user, removed=False)
 
             for sub in subs:
-                modifications = modifications | FingerprintHead.objects.filter(fingerprint_id=sub.fingerprint)
+                modifications = modifications | FingerprintHead.objects.filter(fingerprint_id=sub.fingerprint, fingerprint_id__removed = False)
 
             modifications = modifications.order_by("-date")
 
@@ -295,13 +297,19 @@ class FeedView(APIView):
                         old_value = chg.old_value
                         new_value = chg.new_value
 
+                    def noneIsEmpty(value):
+                        if value == None:
+                            return ""
+
+                        return value
+
                     alterations.append({
                             'number': question.number,
                             'text': removehs(question.text),
-                            'oldvalue': old_value,
-                            'newvalue': new_value,
-                            'oldcomment': chg.old_comment,
-                            'newcomment': chg.new_comment
+                            'oldvalue': noneIsEmpty(old_value),
+                            'newvalue': noneIsEmpty(new_value),
+                            'oldcomment': noneIsEmpty(chg.old_comment),
+                            'newcomment': noneIsEmpty(chg.new_comment)
                         })
 
                 aggregate.append({
@@ -337,9 +345,26 @@ class TagCloudView(APIView):
 
             tags = []
 
-            solrlink = 'http://' +settings.SOLR_HOST+ ':'+ settings.SOLR_PORT+settings.SOLR_PATH+'/admin/luke?fl=text_t&numTerms=50&wt=json'
+            solrlink = 'http://' +settings.SOLR_HOST+ ':'+ settings.SOLR_PORT+settings.SOLR_PATH+'/admin/luke?fl=text_t&numTerms=300&wt=json'
 
-            stopwords = ['yes', 'and', 'not', 'the', 'for', 'all', 'more', 'with', 'than', 'please']
+
+            stopwords = cache.get('tagcloud_stopwords')
+
+            if stopwords == None:
+                module_dir = os.path.dirname(__file__)  # get current directory
+                file_path = os.path.join(module_dir, 'stopwords.txt')
+
+                stopwords = []
+                with open(file_path, 'r') as stopword_list:
+                    list = stopword_list.read().split('\n')
+
+
+                    for elem in list:
+                        clean = elem.strip().lower()
+                        if len(clean)  > 0:
+                            stopwords.append(clean)
+
+                cache.set('tagcloud_stopwords', stopwords, 1440) # 24 hours of cache
 
             topwords = json.load(urllib2.urlopen(solrlink))['fields']['text_t']['topTerms']
 

@@ -44,7 +44,7 @@ register = template.Library()
 @register.filter(name='removeh1')
 @stringfilter
 def removeh1(value):
-    
+
     return value.replace('h1. ','')
 
 @register.filter(name='clean')
@@ -96,16 +96,16 @@ def ans_requested(question, requests, *args, **kwargs):
 @register.filter(name='datehhmm')
 @stringfilter
 def datehhmm(value):
-    
+
     value = value[:-10]
-    
+
     return value
 
 @register.filter(name='trim')
 @stringfilter
 def trim(value):
     value = value.strip()
-    
+
     return value
 
 @register.filter(name='esc')
@@ -117,7 +117,7 @@ def esc(value):
 @stringfilter
 def removedots(value):
     value = value.replace('.','')
-    
+
     return value
 
 @register.filter(name='isnumber')
@@ -221,7 +221,7 @@ def isResearcher(profiles):
     return False
 
 def fingerprints_list():
-    
+
     try:
         objs = Questionnaire.objects.filter(disable=False)
     except:
@@ -229,7 +229,7 @@ def fingerprints_list():
     results = {}
     for q in objs:
         results[q.id] = q.name
-    
+
 
     return results
 
@@ -276,11 +276,13 @@ register.inclusion_tag('reusable_blocks/menu_ttags.html')(show_fingerprints_inte
 
 @register.simple_tag
 def show_subscription(user):
+    link = None
+    label = None
     try:
         newsl = Newsletter.objects.get(slug='emif-catalogue-newsletter')
 
         link="newsletter/"+newsl.slug+"/subscribe"
-        label="Subscribe Newsletter"   
+        label="Subscribe Newsletter"
 
         # create subscription
         user_sub = None
@@ -292,21 +294,21 @@ def show_subscription(user):
                 label = "Unsubscribe Newsletter"
         except:
             pass
-  
+
 
     except Newsletter.DoesNotExist:
-        print "Problem finding default newsletter"    
+        print "Problem finding default newsletter"
 
-    return '<a href="'+link+'" class="navbar-link"><i class="fa fa-rss"></i>&nbsp;'+label+'</a>'
+    return '<a href="'+str(link)+'" class="navbar-link"><i class="fa fa-rss"></i>&nbsp;'+str(label)+'</a>'
 
 def show_fingerprints():
-    
+
     return {'fingerprints':fingerprints_list()}
 register.inclusion_tag('reusable_blocks/menu_ttags.html')(show_fingerprints)
 
 
 def show_fingerprints_for_search(user):
-    
+
     return {'fingerprints':fingerprints_list_user(user)}
 register.inclusion_tag('reusable_blocks/menu_ttags_for_search.html')(show_fingerprints_for_search)
 

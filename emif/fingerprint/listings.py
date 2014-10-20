@@ -443,6 +443,11 @@ def get_databases_process_results(results):
 
             database_aux.id = r['id']
 
+            try:
+                database_aux.percentage = r['percentage_d']
+            except KeyError:
+                pass
+
             if (not r.has_key('created_t')):
                 database_aux.date = ''
             else:
