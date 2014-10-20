@@ -56,7 +56,7 @@ var TagCloudWidget = function TagCloudWidget(widgetname, width, height, pos_x, p
 
             $.fn.tagcloud.defaults = {
               size: {start: 10, end: 24, unit: 'pt'},
-              color: {start: '#000000', end: '#000000'}
+              color: {start: '#000000', end: '#00B3FF'}
             };
             var tags = $('#tag'+self.widgetname+' a');
             tags.tagcloud();
