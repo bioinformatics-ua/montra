@@ -29,7 +29,7 @@ var MostViewedFingerprintWidget = function MostViewedFingerprintWidget(widgetnam
 
         self.icon = '<i class="fa fa-star"></i>';
 
-        self.header_tooltip = "The databases that have more views in the Catalogue";
+        self.header_tooltip = "The databases that have more views in your account";
 
         self.content = "<center><h3>Loading...</h3></center>";
 
