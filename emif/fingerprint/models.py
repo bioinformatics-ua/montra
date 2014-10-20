@@ -201,6 +201,96 @@ class Fingerprint(models.Model):
 
         return name
 
+    def unique_users_string(self):
+        users = set()
+        users.add(self.owner.username)
+        for share in self.shared.all():
+            users.add(share.username)
+
+        users = list(users)
+        users_string = users[0]
+
+        for i in xrange(1, len(users)):
+            users_string+= ' \\ ' + users[i]
+
+        return users_string
+
+    # GET permissions model
+    def getPermissions(self, question_set):
+
+        if question_set == None:
+            return None
+
+
+        permissions = None
+        try:
+            permissions = QuestionSetPermissions.objects.get(fingerprint_id=self.fingerprint_hash, qs=question_set)
+
+        except QuestionSetPermissions.DoesNotExist:
+            print "Does not exist yet, creating a new permissions object."
+            permissions = QuestionSetPermissions(fingerprint_id=self.fingerprint_hash, qs=question_set, visibility=0,
+             allow_printing=True, allow_indexing=True, allow_exporting=True)
+            permissions.save()
+
+        except QuestionSetPermissions.MultipleObjectsReturned:
+            print "Error retrieved several models for this questionset, its impossible, so something went very wrong."
+
+        return permissions
+
+    def indexFingerprint(self):
+        def is_if_yes_no(question):
+            return question.type in 'choice-yesno' or \
+                    question.type in 'choice-yesnocomment' or \
+                    question.type in 'choice-yesnodontknow'
+
+        # circular imports, can only load this here...
+        from searchengine.search_indexes import generateFreeText, setProperFields, CoreEngine
+
+        d = {}
+
+        # Get parameters that are only on fingerprint
+        # type_t
+        d['id']=self.fingerprint_hash
+        d['type_t'] = self.questionnaire.slug
+        d['date_last_modification_t'] = self.last_modification.strftime('%Y-%m-%d %H:%M:%S.%f')
+        d['created_t'] = self.created.strftime('%Y-%m-%d %H:%M:%S.%f')
+
+        d['user_t'] = self.unique_users_string()
+
+        d['percentage_d'] = self.fill
+
+        adicional_text = ""
+
+
+        # Add answers
+        answers = Answer.objects.filter(fingerprint_id=self)
+
+        for answer in answers:
+            # We try to get permissions preferences for this question
+            permissions = self.getPermissions(QuestionSet.objects.get(id=answer.question.questionset.id))
+
+            slug = answer.question.slug_fk.slug1
+
+            if permissions.allow_indexing or slug == 'database_name':
+                setProperFields(d, answer.question, slug, answer.data)
+                if is_if_yes_no(answer.question) and 'yes' in answer.data:
+                    adicional_text += answer.question.text+ " "
+                if answer.comment != None:
+                    d['comment_question_'+slug+'_t'] = answer.comment
+
+
+        d['text_t']= generateFreeText(d) +  " " + adicional_text
+
+        c = CoreEngine()
+
+        results = c.search_fingerprint("id:"+self.fingerprint_hash)
+        if len(results) == 1:
+            # Delete old entry if any
+            c.delete(results.docs[0]['id'])
+
+        c.index_fingerprint_as_json(d)
+
+
 
 def FingerprintFromHash(hash):
     return Fingerprint.objects.get(fingerprint_hash=hash);
