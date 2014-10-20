@@ -31,6 +31,8 @@ from description import fingerprint_description_slugs
 
 from newsletter.models import Newsletter, Subscription
 
+from searchengine.search_indexes import CoreEngine, generateFreeText, setProperFields
+
 class Database:
     id = ''
     name = ''
@@ -237,14 +239,26 @@ class Fingerprint(models.Model):
 
         return permissions
 
-    def indexFingerprint(self):
+    @staticmethod
+    def index_all():
+        indexes = []
+        c = CoreEngine()
+
+        fingerprints = Fingerprint.valid()
+
+        c.deleteQuery('type_t:*')
+        for fingerprint in fingerprints:
+            print "-- Indexing fingerprint hash "+str(fingerprint.fingerprint_hash)
+            indexes.append(fingerprint.indexFingerprint(batch_mode=True))
+
+        print "-- Committing to solr"
+        c.index_fingerprints(indexes)
+
+    def indexFingerprint(self, batch_mode=False):
         def is_if_yes_no(question):
             return question.type in 'choice-yesno' or \
                     question.type in 'choice-yesnocomment' or \
                     question.type in 'choice-yesnodontknow'
-
-        # circular imports, can only load this here...
-        from searchengine.search_indexes import generateFreeText, setProperFields, CoreEngine
 
         d = {}
 
@@ -266,29 +280,35 @@ class Fingerprint(models.Model):
         answers = Answer.objects.filter(fingerprint_id=self)
 
         for answer in answers:
-            # We try to get permissions preferences for this question
-            permissions = self.getPermissions(QuestionSet.objects.get(id=answer.question.questionset.id))
+            question = answer.question
 
-            slug = answer.question.slug_fk.slug1
+            # We try to get permissions preferences for this question
+            permissions = self.getPermissions(QuestionSet.objects.get(id=question.questionset.id))
+
+            slug = question.slug_fk.slug1
 
             if permissions.allow_indexing or slug == 'database_name':
-                setProperFields(d, answer.question, slug, answer.data)
-                if is_if_yes_no(answer.question) and 'yes' in answer.data:
-                    adicional_text += answer.question.text+ " "
+                setProperFields(d, question, slug, answer.data)
+                if is_if_yes_no(question) and 'yes' in answer.data:
+                    adicional_text += question.text+ " "
                 if answer.comment != None:
                     d['comment_question_'+slug+'_t'] = answer.comment
 
 
         d['text_t']= generateFreeText(d) +  " " + adicional_text
 
-        c = CoreEngine()
+        if batch_mode:
+            return d
+        else:
+            print "-- Indexing unique fingerprint hash "+str(self.fingerprint_hash)
+            c = CoreEngine()
 
-        results = c.search_fingerprint("id:"+self.fingerprint_hash)
-        if len(results) == 1:
-            # Delete old entry if any
-            c.delete(results.docs[0]['id'])
+            results = c.search_fingerprint("id:"+self.fingerprint_hash)
+            if len(results) == 1:
+                # Delete old entry if any
+                c.delete(results.docs[0]['id'])
 
-        c.index_fingerprint_as_json(d)
+            c.index_fingerprint_as_json(d)
 
 
 
