@@ -3,6 +3,7 @@
 
 from django.contrib import admin
 from models import *
+from django.utils.safestring import mark_safe
 
 class ChoiceAdmin(admin.ModelAdmin):
     list_display = ['sortid', 'text', 'value', 'question']
@@ -29,9 +30,13 @@ class QuestionAdmin(admin.ModelAdmin):
         extra_context['questionnaires'] = Questionnaire.objects.all().order_by('name')
         return super(QuestionAdmin, self).changelist_view(request, extra_context)
 
-class QuestionnaireAdmin(admin.ModelAdmin):
-    pass
+def clone_questionnaires(modeladmin, request, queryset):
+    for query in queryset:
+        query.copy()
+clone_questionnaires.short_description = "Clone selected questionnaires"
 
+class QuestionnaireAdmin(admin.ModelAdmin):
+    actions = [clone_questionnaires]
 
 admin.site.register(Questionnaire, QuestionnaireAdmin)
 admin.site.register(Question, QuestionAdmin)

@@ -27,8 +27,8 @@ import json
 
 
 class Characteristic(Document):
-    pass
-
+    def __str__(self):
+        return str(self.id)
 
 class Comments(models.Model):
     user = models.ForeignKey(User, unique=False, blank=True, null=True)
@@ -40,9 +40,9 @@ class Comments(models.Model):
     title = models.TextField()
     description = models.TextField()
 
-    
-    
-        
+
+
+
     def __str__(self):
         s = "User: " + str(self.user) + "\n"
         s += "Fingerprint ID: " + self.fingerprint_id + "\n"

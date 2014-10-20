@@ -36,6 +36,7 @@ from django.dispatch import receiver
 from userena.signals import signup_complete
 
 from searchengine.search_indexes import CoreEngine
+from django.db.models.signals import post_save
 
 
 from newsletter.models import Subscription, Newsletter
@@ -47,6 +48,21 @@ class QueryLog(models.Model):
     created_date = models.DateTimeField(auto_now_add=True)
     latest_date = models.DateTimeField(auto_now=True)
     removed = models.BooleanField(default=False)
+
+def querylog_created(sender, **kwargs):
+    query = kwargs['instance']
+    c = CoreEngine(core='suggestions')
+    qdict = query.__dict__
+    cleanqdict = {}
+    cleanqdict['query'] = qdict['query'].strip().lower()
+    cleanqdict['user_id'] = qdict['user_id']
+    cleanqdict['id'] = qdict['id']
+    cleanqdict['created_date'] = qdict['created_date']
+
+
+    c.index_fingerprint(cleanqdict)
+
+post_save.connect(querylog_created, sender=QueryLog)
 
 class Log(models.Model):
     description = models.TextField()
@@ -70,7 +86,7 @@ class City(models.Model):
     name = models.TextField()
     lat = models.FloatField()
     long = models.FloatField()
-    
+
 class AdvancedQuery(models.Model):
     id = AutoField(primary_key=True)
     user = models.ForeignKey(User, unique=False, blank=False, null=False)
@@ -86,18 +102,18 @@ class AdvancedQuery(models.Model):
             advrep = AdvancedQueryAnswer.objects.get(refquery=self, question="boolrelwidget-boolean-representation")
 
             return True
-            
+
         except AdvancedQueryAnswer.DoesNotExist:
             return False
 
 
-    
+
 class AdvancedQueryAnswer(models.Model):
     id = AutoField(primary_key=True)
     refquery = models.ForeignKey('AdvancedQuery')
     question = models.TextField(unique=False)
     answer = models.TextField(unique=False)
-    
+
 class ContactForm(forms.Form):
     name = forms.CharField(label='Name')
     email = forms.EmailField(label='Email')
@@ -108,7 +124,7 @@ class ContactForm(forms.Form):
 def add_invited(user, sender, **kwargs):
 
     ## Add to subscription list
-    
+
     # get newsletter
     try:
         newsl = Newsletter.objects.get(slug='emif-catalogue-newsletter')
@@ -116,16 +132,16 @@ def add_invited(user, sender, **kwargs):
         # create subscription
         user_sub = Subscription(user=user,  newsletter=newsl)
 
-        user_sub.subscribe()  
+        user_sub.subscribe()
 
-        user_sub.save()      
+        user_sub.save()
 
     except Newsletter.DoesNotExist:
         print "Problem registering new user to emif default newsletter"
 
     # add invited dbs if any
     sps = InvitePending.objects.filter(email=user.email)
-        
+
     for sp in sps:
 
         fingerprint = sp.fingerprint
