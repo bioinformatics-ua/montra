@@ -37,6 +37,7 @@
 <script src="{{ STATIC_URL }}js/paginator-sorter.js"></script>
 <script src="{{ STATIC_URL }}js/emif.results.js"></script>
 <script src="{{ STATIC_URL }}js/emif.comparison_populations.js"></script>
+<script src="{{ STATIC_URL }}js/vendor/jquery.knob.js"
 
 {% endblock %}
 
@@ -124,6 +125,7 @@
               <div class="pull-right"><i class="{{sort_params.type.icon}}"></i></div>
             </th>
             <th class="sorter-false filter-false select_line">Select</th>
+            <th class="sorter-false filter-false">Filled</th>
 
         </tr>
         <tr>
@@ -154,6 +156,7 @@
               <i data-toggle="tooltip" data-placement="bottom" title="This allows to compare databases.<br /> It is only possible to compare databases of the same type.  For instance, you cannot compare databases from AD Cohort with a databases from Observational Data.<br /> When a database is selected, the type is defined automatically, and databases of other types cannot be chosen. <br /> To be able to select other type, you must unselect all the databases." class="help_selectresults icon-question-sign"></i>
             </div>
           </td>
+          <td class="table_filter">&nbsp;</td>
         </tr>
     </thead>
     <tbody id="table_content">
@@ -178,6 +181,11 @@
 
           <td class="select_line"> <input class="checkbox dbtype_{{t.type_name|removespaces}}" type="checkbox"
           typedb="{{ t.type_name }}" name="chk_{{ t.id }}"></td>
+
+          <td>
+            <input style="box-shadow: inset 0 0px 0px rgba(0,0,0,0.075);" type="text" value="{{t.percentage|stringformat:"d"}}" class="dial"
+             data-angleOffset=-125 data-angleArc=250 data-min="0" data.max="100" data-fgColor="#222222">
+          </td>
 
         </tr>
 
@@ -244,6 +252,12 @@
 {% endcomment %}
 
 {% block scriptextra %}
+
+    $(".dial").knob({
+      width: 50,
+      height: 46,
+      readOnly: 'true'
+    });
 $(function(){
 {% if page_obj != None %}
 
@@ -257,7 +271,6 @@ $(function(){
     setBooleanPlugin('{{request.session.serialization_query}}', '{{request.session.query_type}}', '{{request.session.query_id}}');
  {% endif %}
 });
-
 
 {% endblock %}
 

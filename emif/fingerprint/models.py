@@ -3,7 +3,7 @@
 #
 # Authors: Luís A. Bastião Silva <bastiao@ua.pt>
 #          Tiago Godinho
-#          Ricardo Ribeiro 
+#          Ricardo Ribeiro
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -28,6 +28,8 @@ from questionnaire.models import *
 from django.contrib.auth.models import User
 
 from description import fingerprint_description_slugs
+
+from newsletter.models import Newsletter, Subscription
 
 class Database:
     id = ''
@@ -57,6 +59,8 @@ class Database:
     tec_address = ''
     tec_email = ''
     tec_phone = ''
+
+    percentage = 0
 
 
 class RequestMonkeyPatch(object):
@@ -116,9 +120,11 @@ class Fingerprint(models.Model):
     last_modification = models.DateTimeField(null=True)
     created = models.DateTimeField(auto_now_add=True, null=True)
     owner = models.ForeignKey(User, related_name="fingerprint_owner_fk")
-    shared = models.ManyToManyField(User, null=True, related_name="fingerprint_shared_fk") 
+    shared = models.ManyToManyField(User, null=True, related_name="fingerprint_shared_fk")
     hits = models.IntegerField(default=0, help_text="Hit count for this fingerprint")
     removed = models.BooleanField(default=False, help_text="Remove logically the fingerprint")
+
+    fill = models.FloatField(default=0, help_text="Database Questionset")
 
     def __unicode__(self):
         return self.fingerprint_hash
@@ -171,6 +177,31 @@ class Fingerprint(models.Model):
     def valid():
         return Fingerprint.objects.filter(removed=False)
 
+    def setSubscription(self, user, value):
+        try:
+            subscription = FingerprintSubscription.objects.get(user = user, fingerprint = self)
+            subscription.removed = not value
+            subscription.save()
+
+        except FingerprintSubscription.DoesNotExist:
+            # we dont create in case its false it doesnt exist, pointless work
+            if value:
+                subscription = FingerprintSubscription(user = user, fingerprint = self)
+                subscription.save()
+
+    def findName(self):
+        name = ""
+        try:
+            name_ans = Answer.objects.get(question__slug_fk__slug1='database_name', fingerprint_id=self)
+
+            name = name_ans.data
+
+        except Answer.DoesNotExist:
+            name ="Unnamed"
+
+        return name
+
+
 def FingerprintFromHash(hash):
     return Fingerprint.objects.get(fingerprint_hash=hash);
 
@@ -179,11 +210,11 @@ def FingerprintFromHash(hash):
 
 
 """
-    Answer of the Fingerprint 
+    Answer of the Fingerprint
 """
 class Answer(models.Model):
     question = models.ForeignKey(Question)
-    data = models.TextField() # Structure question 
+    data = models.TextField() # Structure question
     comment = models.TextField(null=True) # Comment
     fingerprint_id = models.ForeignKey(Fingerprint)
 
@@ -196,7 +227,7 @@ class Answer(models.Model):
 '''
     Fingerprint answers tracked change - a simple revision system
 
-        Each time a already existing fingerprint has answers modified, there's a new object 
+        Each time a already existing fingerprint has answers modified, there's a new object
         from this model, and one answer change for each answer change
 '''
 class FingerprintHead(models.Model):
@@ -207,6 +238,20 @@ class FingerprintHead(models.Model):
     def __str__(self):
         return "FINGERPRINT_ID:"+str(self.fingerprint_id)+" REVISION: "+str(self.revision) + " DATE: "+ str(self.date)
 
+    def changes(self):
+        return AnswerChange.objects.filter(revision_head=self)
+
+    @staticmethod
+    def mergeChanges(fingerprintheads):
+        answermap = {}
+        for head in fingerprintheads.order_by('date'):
+            for change in head.changes():
+                answermap[change.answer] = change
+
+        return answermap.values()
+
+
+
 class AnswerChange(models.Model):
     revision_head = models.ForeignKey(FingerprintHead)
     answer        = models.ForeignKey(Answer)
@@ -214,6 +259,9 @@ class AnswerChange(models.Model):
     new_value     = models.TextField(null=True)
     old_comment   = models.TextField(null=True)
     new_comment   = models.TextField(null=True)
+
+    def __str__(self):
+        return "QUESTION: "+str(self.answer.question.number)
 
 ''' The idea is showing the number of times the db is returned over time
 '''
@@ -239,11 +287,11 @@ class AnswerRequest(models.Model):
 """
 This class wraps the Description of the Fingerprint.
 It will be used to list fingerprints, for instance.
-It is useful to centralized the code. 
-Developed in first EMIF Hackthon. 
+It is useful to centralized the code.
+Developed in first EMIF Hackthon.
 """
 class FingerprintDescriptor(object):
-    static_attr = ["id", "date", "date_modification", "last_activity", "ttype", "type_name"] 
+    static_attr = ["id", "date", "date_modification", "last_activity", "ttype", "type_name"]
     slug_dict = {"name":"database_name",
                     "institution" : 'institution_name',
                     "email_contact" : 'contact_administrative',
@@ -289,7 +337,7 @@ class FingerprintDescriptor(object):
 
     def __getattr__(self, name):
         try:
-            #print name        
+            #print name
             if name in self.static_attr:
                 return self.parse_static_args(name)
             elif name in self.slug_dict:
@@ -320,7 +368,7 @@ class FingerprintDescriptor(object):
             return self.obj.last_modification
 
         if name == "ttype":
-            return self.obj.questionnaire.slug 
+            return self.obj.questionnaire.slug
 
         if name == "type_name":
             return self.obj.questionnaire.name
@@ -333,3 +381,44 @@ class FingerprintDescriptor(object):
                 return self.obj['location']
             if "PI:_Address" in self.obj:
                 return self.obj['PI:_Address']
+
+class FingerprintSubscription(models.Model):
+    fingerprint     = models.ForeignKey(Fingerprint)
+    user            = models.ForeignKey(User)
+    date            = models.DateTimeField(auto_now_add=True)
+    latest_update   = models.DateTimeField(auto_now=True)
+    removed         = models.BooleanField(default=False)
+
+    def isSubscribed(self):
+        return not self.removed
+
+    def getNewsletter(self):
+        newsl = None
+        try:
+            newsl = Newsletter.objects.get(slug=self.fingerprint.fingerprint_hash)
+
+        except Newsletter.DoesNotExist:
+
+            newsl = Newsletter( title=self.fingerprint.findName()+' Updates',
+                            slug=self.fingerprint.fingerprint_hash,
+                            email=settings.DEFAULT_FROM_EMAIL,
+                            sender="Emif Catalogue")
+            newsl.save()
+
+        return newsl
+
+    def setNewsletterSubs(self, new_status):
+        newsl = self.getNewsletter()
+
+        newsl_sub = None
+        try:
+            newsl_sub = Subscription.objects.get(user=self.user,  newsletter=newsl)
+        except Subscription.DoesNotExist:
+            newsl_sub = Subscription(user=self.user, newsletter = newsl)
+
+        if(new_status):
+            newsl_sub.subscribe()
+        else:
+            newsl_sub.unsubscribe()
+
+        newsl_sub.save()

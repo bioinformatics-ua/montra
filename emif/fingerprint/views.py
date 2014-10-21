@@ -16,13 +16,13 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
+from django.shortcuts import render, redirect
 
-from django.shortcuts import render
 
 from django.core import serializers
 from django.conf import settings
 from django.http import *
-from django.http import Http404 
+from django.http import Http404
 from django.utils import simplejson
 
 
@@ -67,8 +67,8 @@ def database_edit_dl(request, fingerprint_id, questionnaire_id, sort_id, templat
 
 
 def database_edit(request, fingerprint_id, questionnaire_id, sort_id=1, template_name="database_edit.html", readonly=False):
-    
-    try: 
+
+    try:
         this_fingerprint = Fingerprint.objects.get(fingerprint_hash=fingerprint_id)
 
         users_db = unique_users_string(this_fingerprint)
@@ -86,7 +86,7 @@ def database_edit(request, fingerprint_id, questionnaire_id, sort_id=1, template
 
         # well this doesnt scale well, we should have the database name on the fingerprint
         # it probably will be mitigated by using the descriptor that should be updated on save...
-        fingerprint_name = findName(this_fingerprint)
+        fingerprint_name = this_fingerprint.findName()
 
         # count questionset filled answers
         qreturned = []

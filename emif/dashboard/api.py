@@ -21,6 +21,7 @@
 from django.http import HttpResponse
 
 from django.contrib.auth.models import User, Group
+from django.core.cache import cache
 
 from rest_framework import permissions
 from rest_framework import renderers
@@ -41,11 +42,10 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 import os
 import mimetypes
 
+
 from questionnaire.models import Questionnaire, Question
 
-from fingerprint.models import Fingerprint, FingerprintHead, AnswerChange, Answer
-
-from fingerprint.services import findName
+from fingerprint.models import Fingerprint, FingerprintHead, AnswerChange, Answer, FingerprintSubscription
 
 from emif.utils import removehs
 
@@ -74,16 +74,16 @@ from hitcount.models import Hit, HitCount
 
 class DatabaseTypesView(APIView):
     authentication_classes = (SessionAuthentication, BasicAuthentication)
-    permission_classes = (IsAuthenticated,)    
+    permission_classes = (IsAuthenticated,)
     def get(self, request, *args, **kw):
 
-        if request.user.is_authenticated():    
+        if request.user.is_authenticated():
             db_types = []
 
             types = Questionnaire.objects.filter(fingerprint__pk__isnull=False).distinct()
 
             for db in types:
-                db_types.append({'id': db.id, 'name': db.name})    
+                db_types.append({'id': db.id, 'name': db.name})
 
             response = Response({'types': db_types}, status=status.HTTP_200_OK)
 
@@ -98,19 +98,19 @@ class DatabaseTypesView(APIView):
 
 class MostViewedView(APIView):
     authentication_classes = (SessionAuthentication, BasicAuthentication)
-    permission_classes = (IsAuthenticated,)    
+    permission_classes = (IsAuthenticated,)
     def get(self, request, *args, **kw):
         stopwords = ['jerboalistvalues', 'population/comments', 'population/filters', 'population/compare'];
-        if request.user.is_authenticated():    
+        if request.user.is_authenticated():
             list_viewed = []
             i = 0
 
             user_history = user_history = NavigationHistory.objects.filter(user=request.user)
             most_viewed = user_history.values('path').annotate(number_viewed=Count('path')).order_by('-number_viewed')
 
-            for viewed in most_viewed: 
+            for viewed in most_viewed:
                 if i == 10:
-                    break  
+                    break
 
                 if not [stopword for stopword in stopwords if stopword in viewed['path']]:
                     list_viewed.append({'page': viewed['path'], 'count': viewed['number_viewed']})
@@ -129,14 +129,14 @@ class MostViewedView(APIView):
 
 class MostViewedFingerprintView(APIView):
     authentication_classes = (SessionAuthentication, BasicAuthentication)
-    permission_classes = (IsAuthenticated,)    
+    permission_classes = (IsAuthenticated,)
     def get(self, request, *args, **kw):
 
-        if request.user.is_authenticated():    
+        if request.user.is_authenticated():
             list_viewed = []
 
             most_hit = Hit.objects.filter(user=request.user).values('user','hitcount__object_pk').annotate(total_hits=Count('hitcount')).order_by('-total_hits')
-            
+
             i=0
 
             for hit in most_hit:
@@ -146,13 +146,13 @@ class MostViewedFingerprintView(APIView):
                     list_viewed.append(
                         {
                             'hash': this_fingerprint.fingerprint_hash,
-                            'name': findName(this_fingerprint),
+                            'name': this_fingerprint.findName(),
                             'count': hit['total_hits']
                         })
                     i+=1
                     if i == 10:
                         break
-                        
+
                 except Fingerprint.DoesNotExist:
                     print "-- Error on hitcount for fingerprint with id "+hit['hitcount__object_pk']
 
@@ -169,10 +169,10 @@ class MostViewedFingerprintView(APIView):
 
 class LastUsersView(APIView):
     authentication_classes = (SessionAuthentication, BasicAuthentication)
-    permission_classes = (IsAuthenticated,)    
+    permission_classes = (IsAuthenticated,)
     def get(self, request, *args, **kw):
 
-        if request.user.is_authenticated() and request.user.is_staff == True:    
+        if request.user.is_authenticated() and request.user.is_staff == True:
             last_users = []
 
             users = User.objects.all().order_by('-last_login')[:10]
@@ -193,10 +193,10 @@ class LastUsersView(APIView):
 
 class UserStatsView(APIView):
     authentication_classes = (SessionAuthentication, BasicAuthentication)
-    permission_classes = (IsAuthenticated,)    
+    permission_classes = (IsAuthenticated,)
     def get(self, request, *args, **kw):
 
-        if request.user.is_authenticated():    
+        if request.user.is_authenticated():
             stats = {}
 
             # statistics about the user
@@ -205,10 +205,10 @@ class UserStatsView(APIView):
             # most popular database of this user(with most unique views)
             # main database type
 
-            stats['lastlogin'] = request.user.last_login.strftime("%Y-%m-%d %H:%M:%S") 
+            stats['lastlogin'] = request.user.last_login.strftime("%Y-%m-%d %H:%M:%S")
 
             my_db = Fingerprint.objects.filter(owner=request.user).order_by('-hits')
-            my_db_share = Fingerprint.objects.filter(shared=request.user) 
+            my_db_share = Fingerprint.objects.filter(shared=request.user)
 
             stats['numberownerdb'] = my_db.count()
             stats['numbershareddb'] = my_db_share.count()
@@ -224,7 +224,7 @@ class UserStatsView(APIView):
                 stats['mostpopulardb'] = {'name': '---', 'hash': '---', 'hits': '---'}
             else:
                 stats['mostpopulardb'] = {
-                                    'name': findName(mostpopular), 
+                                    'name': mostpopular.findName(),
                                     'hash': mostpopular.fingerprint_hash,
                                     'hits': mostpopular.hits}
 
@@ -251,23 +251,32 @@ class UserStatsView(APIView):
 
 class FeedView(APIView):
     authentication_classes = (SessionAuthentication, BasicAuthentication)
-    permission_classes = (IsAuthenticated,)    
+    permission_classes = (IsAuthenticated,)
     def get(self, request, *args, **kw):
 
-        if request.user.is_authenticated():    
-            
-            modifications = FingerprintHead.objects.filter(fingerprint_id__owner=request.user)
+        if request.user.is_authenticated():
 
-            modifications = modifications | FingerprintHead.objects.filter(fingerprint_id__shared=request.user).order_by("-date")
+            modifications = FingerprintHead.objects.filter(fingerprint_id__owner=request.user, fingerprint_id__removed = False)
+
+            modifications = modifications | FingerprintHead.objects.filter(fingerprint_id__shared=request.user, fingerprint_id__removed = False)
+
+
+            # get from subscriptions too
+            subs = FingerprintSubscription.objects.filter(user=request.user, removed=False)
+
+            for sub in subs:
+                modifications = modifications | FingerprintHead.objects.filter(fingerprint_id=sub.fingerprint, fingerprint_id__removed = False)
+
+            modifications = modifications.order_by("-date")
 
             feed = []
 
-            modifications = modifications[:50]   
+            modifications = modifications[:50]
 
             aggregate = []
             previous = None
             for mod in modifications:
-                
+
                 if previous != None and mod.fingerprint_id != previous.fingerprint_id and len(aggregate) != 0:
                     feed.append(aggregate)
                     aggregate = []
@@ -288,18 +297,24 @@ class FeedView(APIView):
                         old_value = chg.old_value
                         new_value = chg.new_value
 
+                    def noneIsEmpty(value):
+                        if value == None:
+                            return ""
+
+                        return value
+
                     alterations.append({
                             'number': question.number,
                             'text': removehs(question.text),
-                            'oldvalue': old_value,
-                            'newvalue': new_value,
-                            'oldcomment': chg.old_comment,
-                            'newcomment': chg.new_comment
+                            'oldvalue': noneIsEmpty(old_value),
+                            'newvalue': noneIsEmpty(new_value),
+                            'oldcomment': noneIsEmpty(chg.old_comment),
+                            'newcomment': noneIsEmpty(chg.new_comment)
                         })
 
                 aggregate.append({
                     'hash': mod.fingerprint_id.fingerprint_hash,
-                    'name': findName(mod.fingerprint_id),
+                    'name': mod.fingerprint_id.findName(),
                     'date': mod.date.strftime("%Y-%m-%d %H:%M"),
                     'icon': 'edit',
                     'alterations': alterations,
@@ -323,16 +338,33 @@ class FeedView(APIView):
 
 class TagCloudView(APIView):
     authentication_classes = (SessionAuthentication, BasicAuthentication)
-    permission_classes = (IsAuthenticated,)    
+    permission_classes = (IsAuthenticated,)
     def get(self, request, *args, **kw):
 
-        if request.user.is_authenticated():    
+        if request.user.is_authenticated():
 
             tags = []
 
-            solrlink = 'http://' +settings.SOLR_HOST+ ':'+ settings.SOLR_PORT+settings.SOLR_PATH+'/admin/luke?fl=text_t&numTerms=50&wt=json'
+            solrlink = 'http://' +settings.SOLR_HOST+ ':'+ settings.SOLR_PORT+settings.SOLR_PATH+'/admin/luke?fl=text_t&numTerms=300&wt=json'
 
-            stopwords = ['yes', 'and', 'not', 'the', 'for', 'all', 'more', 'with', 'than', 'please']
+
+            stopwords = cache.get('tagcloud_stopwords')
+
+            if stopwords == None:
+                module_dir = os.path.dirname(__file__)  # get current directory
+                file_path = os.path.join(module_dir, 'stopwords.txt')
+
+                stopwords = []
+                with open(file_path, 'r') as stopword_list:
+                    list = stopword_list.read().split('\n')
+
+
+                    for elem in list:
+                        clean = elem.strip().lower()
+                        if len(clean)  > 0:
+                            stopwords.append(clean)
+
+                cache.set('tagcloud_stopwords', stopwords, 1440) # 24 hours of cache
 
             topwords = json.load(urllib2.urlopen(solrlink))['fields']['text_t']['topTerms']
 
@@ -352,8 +384,8 @@ class TagCloudView(APIView):
                 i+=2
 
             random.shuffle(tags, random.random)
-            
-         
+
+
             response = Response({'tags': tags}, status=status.HTTP_200_OK)
 
         else:

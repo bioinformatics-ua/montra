@@ -23,18 +23,22 @@
 from __future__ import absolute_import
 
 from celery import shared_task
-from celery import task  
+from celery import task
 
 from celery import Celery
 
-celery = Celery('emif', broker='amqp://guest@localhost//') #!
+from emif.settings import *
 
+from docs_manager.storage_handler import *
+from emif.models import QueryLog
+from django.db.models import Count
+import os
 
+celery = Celery('emif', broker=BROKER_CELERY)
 
 @shared_task
 def add(x, y):
     return x + y
-
 
 @shared_task
 def mul(x, y):

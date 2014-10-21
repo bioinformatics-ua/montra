@@ -20,7 +20,7 @@
         var in_use = {};
 
         var widgets = [
-            
+
         ];
 
         var private_funcs = {
@@ -99,10 +99,10 @@
             __updatecoords: function(widget){
                 for(var i=0;i<widgets.length;i++){
                     if(widgets[i].widgetname == widget.attr('id')){
-                        widgets[i].width = widget[0].dataset.sizex;
-                        widgets[i].height = widget[0].dataset.sizey;
-                        widgets[i].pos_x = widget[0].dataset.col;
-                        widgets[i].pos_y = widget[0].dataset.row;
+                        widgets[i].width = parseInt(widget[0].dataset.sizex);
+                        widgets[i].height = parseInt(widget[0].dataset.sizey);
+                        widgets[i].pos_x = parseInt(widget[0].dataset.col);
+                        widgets[i].pos_y = parseInt(widget[0].dataset.row);
                         break;
                     }
                 }
@@ -131,7 +131,7 @@
                         }
 
                     }
-                    
+
                     if(no_results)
                         to_render+='<li><a id="noresultswidget" href="javascript:void(0)">No more widgets available.</a></li>'
                     to_render+='</ul>';
@@ -166,8 +166,8 @@
                     }
 
                     private_funcs.__renderRegistry();
-                    
-                } else {    
+
+                } else {
                     console.error("You can only add DashboardWidget objects to this dashboard.");
                 }
 
@@ -191,6 +191,14 @@
                 }
 
                 gridster.remove_widget.apply(gridster, $('#'+widgetname));
+
+                public_funcs.saveConfiguration();
+                private_funcs.__renderRegistry();
+
+            },
+            clear: function(){
+                widgets = [];
+                gridster.remove_all_widgets.apply(gridster);
 
                 public_funcs.saveConfiguration();
                 private_funcs.__renderRegistry();
@@ -227,13 +235,13 @@
 
                         for(var i=0;i<parsed_configurations.length;i++){
                             var this_widget;
-                            // I dont know any other generic way of doing this without using eval, 
-                            // i know eval is evil... but its a controled environment without user input, 
+                            // I dont know any other generic way of doing this without using eval,
+                            // i know eval is evil... but its a controled environment without user input,
                             // dont beat me lol
                             try {
                                 var tryme = "this_widget = new "+parsed_configurations[i].type+"();";
                                 eval(tryme);
-                                console.log(parsed_configurations[i].type);
+
                                 this_widget.deserialize(parsed_configurations[i]);
 
                                 public_funcs.register(this_widget);
@@ -256,8 +264,8 @@
                         console.warn("There seems to be nothing to be loaded, going with default configuration.");
                         return false;
                     }
-                    
-                    
+
+
                 } else {
                     console.error("Your browser doesn't support local storage!");
                     return false;
@@ -269,7 +277,7 @@
                 for(var i=0;i<widgets.length;i++){
                     if(i == 0)
                         serialization+=widgets[i].serialize();
-                    else 
+                    else
                         serialization+=","+widgets[i].serialize();
                 }
                 serialization+="]";
@@ -278,6 +286,16 @@
             }, initial : function(){
                 if(settings.initial !== null && typeof(settings.initial) === 'function')
                     settings.initial();
+            }, reset   : function(){
+                if(private_funcs.__supports_storage()){
+                    localStorage.removeItem("dashboard_preferences");
+
+                    public_funcs.clear();
+
+                    public_funcs.initial();
+                    public_funcs.saveConfiguration();
+                    public_funcs.loadConfiguration();
+                }
             }
         };
 
@@ -309,7 +327,8 @@ var DashboardWidget = function DashboardWidget(widgetname, header, width, height
         this.header = header;
         this.content = "";
         this.icon = '';
-    
+        this.header_tooltip = null;
+
 }.addToPrototype({
     __init  :   function(gridster, parent){
         var self = this;
@@ -320,7 +339,7 @@ var DashboardWidget = function DashboardWidget(widgetname, header, width, height
             __widgetentry += this.icon;
         else
             __widgetentry += '<i class="icon-align-justify"></i>';
-        
+
         __widgetentry += '</div>'+this.header+
         '<div class="pull-right removewidget"><i class="icon-remove"></i></div></div><div class="accordion-body"><div style="overflow-y:auto; height: auto;" data-clampedheight="#'+
         this.widgetname+'" class="accordion-inner">'+this.content+'</div></div></li>';
@@ -343,6 +362,15 @@ var DashboardWidget = function DashboardWidget(widgetname, header, width, height
                     parent.removeWidget(self.widgetname);
             }
         });
+
+        if(self.header_tooltip != null){
+            $('#'+this.widgetname+' .widget-header').tooltip({
+                'trigger': 'hover',
+                'placement': 'top',
+                'title': self.header_tooltip,
+                'container': 'body',
+            });
+        }
 
     },
     __refresh    : function(){
@@ -392,12 +420,26 @@ var DashboardWidget = function DashboardWidget(widgetname, header, width, height
                 '}';
     }, deserialize : function(json){
         this.widgetname = json.widgetname;
-        this.width = json.width;
-        this.height = json.height;
-        this.pos_x = json.pos_x;
-        this.pos_y = json.pos_y;
+        this.width = parseInt(json.width);
+        this.height = parseInt(json.height);
+        this.pos_x = parseInt(json.pos_x);
+        this.pos_y = parseInt(json.pos_y);
         this.header = json.header;
         this.content = decodeURI(json.content);
+    }, copy : function(){
+        var this_widget;
+        var tryme = "this_widget = new "+this.constructor.name+"();";
+        eval(tryme);
+
+        this_widget.widgetname = this.widgetname;
+        this_widget.width = this.width;
+        this_widget.height = this.height;
+        this_widget.pos_x = this.pos_x;
+        this_widget.pos_y = this.pos_y;
+        this_widget.header = this.header;
+        this_widget.content = this.content;
+
+        return this_widget;
     }
 });
 

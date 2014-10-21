@@ -26,10 +26,9 @@ from django.http import *
 
 from public.models import *
 from fingerprint.models import Answer
-from fingerprint.services import findName
 from public.services import createFingerprintShare, deleteFingerprintShare, shouldDelete
 
-from django.http import Http404 
+from django.http import Http404
 
 from population_characteristics.documents import document_form_view
 
@@ -70,21 +69,21 @@ def fingerprint_list(request, template_name='fingerprints.html', added=False):
 
         linkedfingerprints.append(this_fingerprint.id)
 
-        name = findName(this_fingerprint)
+        name = this_fingerprint.findName()
 
         links.append({'name': name, 'share': link})
 
-    intersection = own_dbs | shared_dbs 
+    intersection = own_dbs | shared_dbs
     #intersection_clean = intersection.filter(~Q(id__in=linkedfingerprints))
 
     intersection_wnames = []
 
     for o in intersection:
-        name = findName(o)
+        name = o.findName()
 
         intersection_wnames.append({'name': name, 'fingerprint': o})
 
-    return render(request, template_name, {'request': request, 'links': links, 'create_public': True, 
+    return render(request, template_name, {'request': request, 'links': links, 'create_public': True,
         'own_dbs': intersection_wnames, 'hide_add': True, 'breadcrumb': True, 'added': alink, 'deleted': dlink})
 
 def fingerprint(request, fingerprintshare_id, template_name='fingerprint_summary.html'):
@@ -103,7 +102,7 @@ def fingerprint(request, fingerprintshare_id, template_name='fingerprint_summary
         fingerprintshare.save()
 
         return document_form_view(request, fingerprintshare.fingerprint.fingerprint_hash, 1, readOnly=True, public_key=fingerprintshare)
-    
+
     except PublicFingerprintShare.DoesNotExist:
         print "Fingerprint with id "+str(fingerprintshare_id) + " does not exist."
 
@@ -122,7 +121,7 @@ def fingerprint_create(request, fingerprint_id):
 def fingerprint_delete(request, share_id):
     if not request.user.is_authenticated():
         raise Http404
-        
+
     deleteFingerprintShare(share_id)
 
     request.session['deleted_public_link'] = True

@@ -62,13 +62,13 @@ from docs_manager.models import *
 
 import os
 import mimetypes
+import urllib
 
 from django.template.loader import render_to_string
 
 from emif.utils import send_custom_mail, escapeSolrArg
 
-from fingerprint.models import Fingerprint, AnswerRequest
-from fingerprint.services import findName
+from fingerprint.models import Fingerprint, AnswerRequest, FingerprintSubscription
 from fingerprint.listings import get_databases_from_solr_v2
 from questionnaire.models import Question
 
@@ -84,6 +84,9 @@ from django.utils import timezone
 from datetime import timedelta
 
 from public.utils import hasFingerprintPermissions
+
+import urllib2
+import urllib
 
 class JSONResponse(HttpResponse):
     """
@@ -953,7 +956,7 @@ class RequestAnswerView(APIView):
 
                 if ansrequest != None:
 
-                    message = str(ansrequest.requester.get_full_name())+" requested you to answer some unanswered questions on database "+str(findName(fingerprint))+"."
+                    message = str(ansrequest.requester.get_full_name())+" requested you to answer some unanswered questions on database "+str(fingerprint.findName())+"."
 
                     sendNotification(timedelta(hours=12), fingerprint.owner, ansrequest.requester,
             "dbEdit/"+fingerprint.fingerprint_hash+"/"+str(fingerprint.questionnaire.id), message)
@@ -974,7 +977,73 @@ class RequestAnswerView(APIView):
 
         return Response({'success': False }, status=status.HTTP_400_BAD_REQUEST)
 
+############################################################
+##### Toggle Subscription Webservice
+############################################################
 
+class ToggleSubscriptionView(APIView):
+
+    authentication_classes = (SessionAuthentication, BasicAuthentication)
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request, *args, **kw):
+        if request.user.is_authenticated():
+            # first we get the email parameter
+            stat = request.POST.get('set', '')
+            fingerprint_hash = request.POST.get('hash', '')
+
+            if stat == 'true':
+                stat = True
+            else:
+                stat = False
+
+            if len(fingerprint_hash) > 0:
+                try:
+                    fingerprint = Fingerprint.objects.get(fingerprint_hash=fingerprint_hash)
+
+                    fingerprint.setSubscription(request.user, stat)
+
+                    return Response({'success': True,
+                                     'fingerprint': fingerprint_hash,
+                                     'subscription': stat
+                                    }, status=status.HTTP_200_OK)
+
+                except fingerprint.DoesNotExist:
+                    pass
+
+        return Response({}, status=status.HTTP_400_BAD_REQUEST)
+
+
+############################################################
+##### Seach Suggestions - Web services
+############################################################
+
+
+class SearchSuggestionsView(APIView):
+    authentication_classes = (SessionAuthentication, BasicAuthentication)
+    permission_classes = (IsAuthenticated,)
+    def get(self, request, *args, **kw):
+
+        if request.user.is_authenticated():
+            phrase = request.GET.get('term', '').strip()
+
+            result = []
+
+            if len(phrase) > 0:
+
+                solrlink = 'http://' +settings.SOLR_HOST+ ':'+ settings.SOLR_PORT+settings.SOLR_PATH+ '/suggestions/select?q=query_autocomplete:('+urllib.quote(phrase)+')&fq=user_id:'+str(request.user.id)+'&wt=json'
+
+                facets = json.load(urllib2.urlopen(solrlink))['facet_counts']['facet_fields']['query']
+
+                i = 0
+                while i < len(facets):
+                    result.append(facets[i])
+                    i+=2
+
+            response = Response(result, status=status.HTTP_200_OK)
+            return response
+
+        return Response ({}, status=status.HTTP_400_BAD_REQUEST)
 
 ############################################################
 ############ Auxiliar functions ############################

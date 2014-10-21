@@ -79,7 +79,7 @@ import hashlib
 from emif.utils import escapeSolrArg
 
 from notifications.models import Notification
-    
+
 from fingerprint.services import define_rows
 
 def get_api_info(fingerprint_id):
@@ -304,8 +304,8 @@ def sharedb(request, db_id, template_name="sharedb.html"):
 
     link_activation = settings.BASE_URL + "share/activation/"+share_pending.activation_code
 
-    new_notification = Notification(destiny=username_to_share ,origin=request.user, 
-        notification=(findName(fingerprint)+" has been shared with you, please click here to activate it."), type=Notification.SYSTEM, href=link_activation)
+    new_notification = Notification(destiny=username_to_share ,origin=request.user,
+        notification=(fingerprint.findName()+" has been shared with you, please click here to activate it."), type=Notification.SYSTEM, href=link_activation)
 
     new_notification.save()
 
@@ -335,7 +335,7 @@ def sharedb(request, db_id, template_name="sharedb.html"):
 
 def sharedb_activation(request, activation_code, template_name="sharedb_invited.html"):
 
-    return activate_user(activation_code, request.user, context = request)
+    return activate_user(activation_code, request.user, context = request, template_name=template_name)
 
 def clean_str_exp(s):
     return s.replace("\n", "|").replace(";", ",").replace("\t", "    ").replace("\r","").replace("^M","")

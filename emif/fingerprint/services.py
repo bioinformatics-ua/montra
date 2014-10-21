@@ -1,6 +1,7 @@
 import csv
-
+from django.shortcuts import redirect
 from fingerprint.models import *
+
 from questionnaire.models import Questionnaire, QuestionSet, Question, QuestionSetPermissions
 from questionnaire.views import *
 
@@ -14,7 +15,6 @@ from notifications.models import Notification
 from notifications.services import sendNotification
 
 from datetime import timedelta
-
 #import api.models.FingerprintAPI
 
 from searchengine.search_indexes import CoreEngine
@@ -139,6 +139,13 @@ def saveFingerprintAnswers(qlist_general, fingerprint_id, questionnaire, user, e
                         #print this_ans
                         this_ans.save()
 
+        fingerprint.save()
+
+        #This is kind of heavy, so we do it on the background
+        #because of cyclical dependencies, i just can import it here... i know its bad but i didn't knew of any other way
+        from fingerprint.tasks import calculateFillPercentage
+        calculateFillPercentage.delay(fingerprint)
+
         return checkMandatoryAnswers(fingerprint)
 
 
@@ -155,6 +162,97 @@ def getComment(question, extra_fields):
 
 
     return None
+
+def getFillPercentage(fingerprint, answers):
+    total = 0
+    count = 0
+
+    qsets = fingerprint.questionnaire.questionsets()
+    for qset in qsets:
+        total+=findDependantPercentage(qset, answers)
+        count+=1
+
+    try:
+        return (total/count)
+    except ZeroDivisionError:
+        return 0
+
+def findDependantPercentage(qset, answers):
+    ref_cache = {}
+    total = 0
+    filled = 0
+
+    def __getDependency(question):
+        checks = ""
+        try:
+            question.checks.strip()
+        except:
+            pass
+
+        # not dependant in anyone
+        if len(checks) == 0:
+            return None
+        else:
+
+            extra = checks.split(" ")
+
+            for ex in extra:
+                if ex.startswith('dependent="'):
+                    return ex[11:-1]
+
+            return None
+
+    def __fills_condition(dep):
+        depl = dep.split(',')
+
+        if len(depl) == 2:
+            key = None
+            try:
+                key = ref_cache[depl[0]]
+            except:
+                try:
+                    key = answers.get(question__number=depl[0])
+                    ref_cache[depl[0]] = key
+
+                except Answer.DoesNotExist:
+                    return False
+
+            if depl[1].lower() == key.data.lower():
+                return True
+
+        return False
+
+    def __count(total, filled, question):
+        total+=1
+        try:
+            ans = answers.get(question=question)
+            if len(ans.data.strip()) != 0:
+                filled += 1
+        except Answer.DoesNotExist:
+            pass
+
+        return (total, filled)
+
+    for question in qset.questions():
+        dep = __getDependency(question)
+
+        # has dependency
+        if dep == None:
+            (total, filled) = __count(total, filled, question)
+
+        else:
+            if __fills_condition(dep):
+                (total, filled) = __count(total, filled, question)
+
+    try:
+        return (filled * 100) / total
+    except:
+        return 0
+
+
+
+
+
 
 # Checks if all mandatory answers have been answered, namely fingerprint name
 def checkMandatoryAnswers(fingerprint):
@@ -358,6 +456,8 @@ def indexFingerprint(fingerprint_id):
 
         d['user_t'] = unique_users_string(fingerprint)
 
+        d['percentage_d'] = fingerprint.fill
+
         adicional_text = ""
 
 
@@ -409,20 +509,6 @@ def unique_users_string(fingerprint):
 
     return users_string
 
-
-def findName(fingerprint):
-    name = ""
-    try:
-        name_ans = Answer.objects.get(question__slug_fk__slug1='database_name', fingerprint_id=fingerprint)
-
-        name = name_ans.data
-
-    except Answer.DoesNotExist:
-        name ="Unnamed"
-
-    return name
-
-
 # GET permissions model
 def getPermissions(fingerprint_id, question_set):
 
@@ -454,7 +540,7 @@ def markAnswerRequests(user, fingerprint, question, answer_requests):
         req.removed = True
         req.save()
 
-        message = "User "+str(fingerprint.owner.get_full_name())+" answered some questions you requested on database "+str(findName(fingerprint))+"."
+        message = "User "+str(fingerprint.owner.get_full_name())+" answered some questions you requested on database "+str(fingerprint.findName())+"."
 
         sendNotification(timedelta(hours=12), req.requester, fingerprint.owner,
             "fingerprint/"+fingerprint.fingerprint_hash+"/1/", message)

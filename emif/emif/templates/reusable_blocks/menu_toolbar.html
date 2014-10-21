@@ -13,9 +13,16 @@
 		{% if request.user.is_authenticated %}
 		<!--div class="btn-group" id="group_toolbar"-->
       {% if dashboard %}
+        <button id="dashboardreset" onclick="dashzone.reset();" class="btn"><i class="fa fa-trash"></i>
+ Reset to Default</button>
         <div id="dashboardselectbox" class="btn btn-group"></div>
       {% endif %}
       {% if fingerprint_dump %}
+      {% if not subscription %}
+        <button id="dbsubscription" data-subscribed="false" class="btn"><i class="fa fa-at"></i> Subscribe</button>
+      {% else %}
+        <button id="dbsubscription" data-subscribed="true" class="btn"><i class="fa fa-at"></i> Unsubscribe</button>
+      {% endif %}
       <a class="btn btn morelikethis" href="mlt/{{fingerprint_id}}" id="morelikethis_toolbar"> <i class="icon-search icon"></i>
         More Like This
       </a>
@@ -466,6 +473,16 @@ $(".sharedb_invite" ).click(function(e)
 
 });
 
+// This bind will share the email.
+$("#dbsubscription" ).click(function(e)
+{
+  e.preventDefault();
+
+  //post_to_url($(this).attr('href'), {"email": $("#share_email").val(), "csrfmiddlewaretoken": $('input[name="csrfmiddlewaretoken"]').prop('value')});
+  toggleSubscription(this);
+
+});
+
 function checkIfEmailExists(){
   $('#share_indicator').html('<i class="icon-refresh"></i>');
   $('#share_message').html('<p class="text-info">Checking if email is valid for share invitation.</p>');
@@ -584,7 +601,28 @@ function removeShared(ident){
 
 
   }
+}
+function toggleSubscription(context){
+        var subs = $(context);
+        var status = !($.parseJSON(subs.data('subscribed')));
 
+        $.post("api/togglesubscription", { set: status, hash: '{{fingerprint}}'})
+          .done(function(response) {
 
+            if(status){
+              subs.html('<i class="fa fa-at"></i> Unsubscribe');
+              bootbox.alert('Subscribed successfully');
+              subs.data('subscribed', ''+status)
+            } else {
+              subs.html('<i class="fa fa-at"></i> Subscribe');
+              bootbox.alert('Unsubscribed successfully');
+              subs.data('subscribed', ''+status)
+
+            }
+
+          })
+          .fail(function(){
+            bootbox.alert('Failed to update subscription.');
+          });
 }
 </script>
