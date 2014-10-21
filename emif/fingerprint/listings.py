@@ -37,7 +37,7 @@ import searchengine.search_indexes
 from searchengine.search_indexes import index_answeres_from_qvalues
 from searchengine.search_indexes import convert_text_to_slug
 
-from fingerprint.models import Database
+from fingerprint.models import Database, Fingerprint
 
 from emif.models import QueryLog, AdvancedQuery, AdvancedQueryAnswer
 from emif.utils import convert_date, convert_qvalues_to_query, convert_query_from_boolean_widget, escapeSolrArg
@@ -534,10 +534,10 @@ def get_databases_from_solr_v2(request, query="*:*", sort="", rows=100, start=0,
 
     return (list_databases,results.hits)
 
-def get_query_from_more_like_this(doc_id, maxx=100):
+def get_query_from_more_like_this(doc_id, type, maxx=100):
     c = CoreEngine()
     #results = c.search_fingerprint(query, sort=sort, rows=rows, start=start)
-    results = c.more_like_this(doc_id, maxx=maxx)
+    results = c.more_like_this(doc_id, type, maxx=maxx)
 
 
     if len(results)>0:
@@ -652,8 +652,10 @@ def more_like_that(request, doc_id, mlt_query=None, page=1, template_name='more_
 
     database_name = ""
 
+    fingerprint = Fingerprint.objects.get(fingerprint_hash=doc_id)
+
     if mlt_query == None:
-        (_filter, database_name) = get_query_from_more_like_this(doc_id)
+        (_filter, database_name) = get_query_from_more_like_this(doc_id, fingerprint.questionnaire.slug)
     else:
         _filter = mlt_query
 

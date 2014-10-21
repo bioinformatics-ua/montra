@@ -198,8 +198,8 @@ class CoreEngine:
                 })
         return results
 
-    def more_like_this(self, id_doc, start=0, fl='id, score', maxx=100):
-        similar = self.solr.more_like_this(q='id:'+id_doc,start=start, rows=maxx, mltcount=maxx, mltfl='text_t', mltmintf=2, mltmindf=2, mltminwl=4, fl=fl)
+    def more_like_this(self, id_doc, type, start=0, fl='id, score', maxx=100):
+        similar = self.solr.more_like_this(q='id:'+id_doc, fq='type_t:'+type, start=start, rows=maxx, mltcount=maxx, mltfl='text_t', mltmintf=2, mltmindf=2, mltminwl=4, fl=fl)
         return similar
 
 
