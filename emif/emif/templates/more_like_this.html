@@ -54,10 +54,10 @@
 
           <h4>
               <span id="results_size"></span>
-            {% if page_obj != None %}            
-            {{num_results}} databases like {{database_name}}            
+            {% if page_obj != None %}
+            {{num_results}} databases like {{database_name}}
             {% else %}
-            No databases like {{database_name}} were found            
+            No databases like {{database_name}} were found
           {% endif %}
           </h4>
         </div>
@@ -86,23 +86,23 @@
             <th class="sorter-institution sorter {%if "icon-minus" not in sort_params.institution.icon %}selected-sorter{% endif %}"  onclick="a.onClick('institution', '{{sort_params.institution.next}}');">
             <div class="pull-left">Institution Name</div>
                  <div class="pull-right"><i class="{{sort_params.institution.icon}}"></i></div>
-            </th>            
-            <!--<th>Creation Date</th>-->            
+            </th>
+            <!--<th>Creation Date</th>-->
             <th class="sorter-location sorter {%if "icon-minus" not in sort_params.location.icon %}selected-sorter{% endif %}" onclick="a.onClick('location', '{{sort_params.location.next}}');">
                 <div class="pull-left">Location</div>
-                <div class="pull-right"><i class="{{sort_params.location.icon}}"></i></div> 
-            </th>             
+                <div class="pull-right"><i class="{{sort_params.location.icon}}"></i></div>
+            </th>
             <th class="sorter-nrpatients sorter {%if "icon-minus" not in sort_params.nrpatients.icon %}selected-sorter{% endif %}" onclick="a.onClick('nrpatients', '{{sort_params.nrpatients.next}}');">
                 <div class="pull-left">Nr. Patients</div>
-                <div class="pull-right"><i class="{{sort_params.nrpatients.icon}}"></i></div> 
-            </th>            
+                <div class="pull-right"><i class="{{sort_params.nrpatients.icon}}"></i></div>
+            </th>
             <th class="sorter-lastupdate sorter {%if "icon-minus" not in sort_params.last_update.icon %}selected-sorter{% endif %}" onclick="a.onClick('last_update', '{{sort_params.last_update.next}}');">
             <div class="pull-left">Last update</div>
-                <div class="pull-right"><i class="{{sort_params.last_update.icon}}"></i></div> 
+                <div class="pull-right"><i class="{{sort_params.last_update.icon}}"></i></div>
             </th>
             <th class="sorter-type sorter {%if "icon-minus" not in sort_params.type.icon %}selected-sorter{% endif %}" onclick="a.onClick('type', '{{sort_params.type.next}}');">
             <div class="pull-left">Type</div>
-              <div class="pull-right"><i class="{{sort_params.type.icon}}"></i></div> 
+              <div class="pull-right"><i class="{{sort_params.type.icon}}"></i></div>
             </th>
             <th class="sorter-false filter-false select_line">Select</th>
 
@@ -145,15 +145,15 @@
     <tbody id="table_content">
 
   {% for t in page_obj %}
-   <tr> 
-        <td style="text-align: center;">{{t.score}}</td>         
+   <tr>
+        <td style="text-align: center;">{{t.score}}</td>
           <td>
             <a href="fingerprint/{{ t.id }}/1">{{ t.name }}</a>
         </td>
         <td>{{t.institution}}</td>
         <td >{{t.location}}</td>
         <td style="text-align: right;">{{t.number_patients}}</td>
-          <td style="text-align: center;" class="date">            
+          <td style="text-align: center;" class="date">
                 {% if t.last_activity %}
                     {{t.last_activity|datehhmm}}
                 {% else %}
@@ -161,11 +161,11 @@
                 {% endif %}
           </td>
           <td class="type">{{ t.type_name }} </td>
-          
-        
-          <td class="select_line"> <input class="checkbox dbtype_{{t.type_name|removespaces}}" type="checkbox" 
+
+
+          <td class="select_line"> <input class="checkbox dbtype_{{t.type_name|removespaces}}" type="checkbox"
           typedb="{{ t.type_name }}" name="chk_{{ t.id }}"></td>
-          
+
         </tr>
 
 
@@ -195,11 +195,11 @@
 
                 <div class="span3 pull-right " style="max-width:165px">
                   <a class="btn btn-small btn-success" href="contact/{{result.email_contact}}">Contact</a>
-                  
+
                   <a class="btn btn-small btn-success" href="fingerprint/{{result.id}}/1/">Fingerprint</a>
-                  
+
                   <a class="btn btn-small btn-success" href="advancedSearch/1">More like this</a>
-                  
+
                 </div>
 
               </div>
@@ -221,7 +221,7 @@
   {% endif %}
 
   {% if page_obj != None %}
-    {% include "reusable/blocks/post_paginator.html" %}
+    {% include "reusable_blocks/post_paginator.html" %}
 
 {% endif %}
 {% endblock %}
@@ -237,7 +237,7 @@
 var counter = 0;
 var a;
 $(document).ready(function(){
-    
+
     a = new PaginatorSorter("table_databases", '{{sort_params.base_filter}}', '{{sort_params.selected_name}}', '{{sort_params.selected_value}}', '{{sort_params.extraObjects|safe}}');
 
     //TO Be Applied in future releases.
@@ -252,7 +252,7 @@ $(document).ready(function(){
     if(dbcount >= 2){
         $("#comparabtn").removeAttr('disabled');
         $("#comparabtn").bind('click',function(e)
-        { 
+        {
           postComparison();
           return false;
         });
@@ -260,13 +260,13 @@ $(document).ready(function(){
     }
 
   }
-    
+
     $('a[href="#"]').attr('href', function(i, val){
         return window.location + val;
     });
 
     $('.help_selectresults').tooltip({container: 'body', 'html': true});
-    
+
 });
 {% endif %}
 
@@ -276,25 +276,25 @@ $(document).ready(function(){
       window.location.replace($('#base_link').prop('href')+"advancedSearch/{{request.session.query_type}}/1/{{request.session.query_id}}");
       {% else %}
         $("input[name=query]").focus();
-      {% endif %}  
-    });    
+      {% endif %}
+    });
 });
 
  {% if isAdvanced %}
  var bool_container;
 $(function(){
     bool_container = $('#bool_container').boolrelwidget({view_only: true, view_serialized_string: '{{request.session.serialization_query}}', link_back: $('#base_link').prop('href')+"advancedSearch/{{request.session.query_type}}/1/{{request.session.query_id}}" });
-   
+
     window.setTimeout(function(){window.location.hash = "#back";}, 100);
     window.setTimeout(function(){window.location.hash = "#search";}, 100);
 });
-  /* This is a trick, to be able to redirect on back button since browsers try to prevent us to do so 
+  /* This is a trick, to be able to redirect on back button since browsers try to prevent us to do so
    I must do this, because the back url is different from the url on history */
 window.onhashchange = function(){
    if (location.hash == "#back") {
         window.location.replace($('#base_link').prop('href')+"advancedSearch/{{request.session.query_type}}/1/{{request.session.query_id}}");
     }
-    
+
 }
   {% endif %}
 function updateSelectCount(){
@@ -304,16 +304,16 @@ function updateSelectCount(){
     var type = a.plugin.typedb;
 
     if(type)
-      $('#selected_dbstype').text(type); 
+      $('#selected_dbstype').text(type);
     else
-      $('#selected_dbstype').text("---"); 
+      $('#selected_dbstype').text("---");
 
-    $('#selected_dbscount').text(dbs.length); 
+    $('#selected_dbscount').text(dbs.length);
 
     return dbs.length;
 
     } catch(err){
-      $('#selected_dbscount').text(0); 
+      $('#selected_dbscount').text(0);
     }
 
     return 0;
@@ -321,10 +321,10 @@ function updateSelectCount(){
 function updateSelectCountJs(type, count){
 
     if(type)
-      $('#selected_dbstype').text(type); 
+      $('#selected_dbstype').text(type);
 
     if(count)
-      $('#selected_dbscount').text(count); 
+      $('#selected_dbscount').text(count);
 
 }
 function hidecheckbox()
@@ -333,9 +333,9 @@ function hidecheckbox()
 }
 
 $("#comparabtn").bind('click',function(e)
-        { 
-          
-          e.preventDefault(); 
+        {
+
+          e.preventDefault();
           e.stopPropagation();
           return false;
         });
@@ -356,14 +356,14 @@ function postComparison(){
 
     $('#submitdbsimulate').click();
   }
-  
+
 }
 $('.checkbox').click(function()
 {
 
     if($(this).is(':checked')){
         counter++;
-    } else 
+    } else
     {
         counter--;
     }
@@ -371,17 +371,17 @@ $('.checkbox').click(function()
 
 
     if(counter == 0){
-      updateSelectCountJs("---", ""+counter);   
+      updateSelectCountJs("---", ""+counter);
       $('input.checkbox').prop("disabled", false);
 
-      $("#comparabtn").attr("disabled", true);  
+      $("#comparabtn").attr("disabled", true);
     }
     else if(counter == 1){
     console.log('cai here');
 
       $("#comparabtn").attr('disabled', true);
 
-      var checkedtype; 
+      var checkedtype;
       if(a != undefined && a.plugin != undefined && a.plugin.typedb !=undefined){
         checkedtype = a.plugin.typedb;
       } else {
@@ -391,19 +391,19 @@ $('.checkbox').click(function()
 
       $('input.checkbox').prop("disabled", false);
 
-      $('input.checkbox:not([typedb="' + checkedtype 
+      $('input.checkbox:not([typedb="' + checkedtype
       + '"])').prop('disabled', true);
 
 
     }
     else if (counter >= 2){
-      updateSelectCountJs(null, counter); 
+      updateSelectCountJs(null, counter);
       $("#comparabtn").attr('disabled', false);
          $("#comparabtn").bind('click',function(e)
-        { 
+        {
           postComparison();
           return false;
-        });    
+        });
     }
 
 });
@@ -415,7 +415,7 @@ $('.popover').popover({
 $('.accordion-body.collapse').hover(
 function () {
 $(this).css('overflow','visible');
-}, 
+},
 function () {
 $(this).css('overflow','hidden');
 }
