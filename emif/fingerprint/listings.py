@@ -48,6 +48,8 @@ from rest_framework.authtoken.models import Token
 
 from fingerprint.tasks import anotateshowonresults
 
+from accounts.models import EmifProfile, RestrictedUserDbs
+
 def query_solr(request, page=1):
     if not request.POST:
         return
@@ -523,8 +525,34 @@ def get_databases_process_results(results):
 
     return list_databases
 
+def restriction(user):
+    dbs = RestrictedUserDbs.objects.filter(user=user)
+    rest = None
+
+    # The main principle is avoid iterations, since usually this number will be very restricted in comparison with the real value
+    for db in dbs:
+
+        hash = db.fingerprint.fingerprint_hash
+
+        if rest == None:
+            rest = " AND (id:"+hash
+        else:
+            rest += " OR id:"+hash
+
+    rest += ")"
+
+    return rest
+
 def get_databases_from_solr_v2(request, query="*:*", sort="", rows=100, start=0, fl='',post_process=None):
+    try:
+        eprofile = EmifProfile.objects.get(user=request.user)
+    except EmifProfile.DoesNotExist:
+        print "-- ERROR: Couldn't get emif profile for user"
     c = CoreEngine()
+
+    if eprofile.restricted == True:
+        query += restriction(request.user)
+
     results = c.search_fingerprint(query, sort=sort, rows=rows, start=start, fl=fl)
 
     list_databases = get_databases_process_results(results)
@@ -532,9 +560,16 @@ def get_databases_from_solr_v2(request, query="*:*", sort="", rows=100, start=0,
     if post_process:
         list_databases = post_process(results, list_databases)
 
-    return (list_databases,results.hits)
+    return (list_databases,len(list_databases))
 
-def get_query_from_more_like_this(doc_id, maxx=100):
+def get_query_from_more_like_this(request, doc_id, maxx=100):
+    try:
+        eprofile = EmifProfile.objects.get(user=request.user)
+    except EmifProfile.DoesNotExist:
+        print "-- ERROR: Couldn't get emif profile for user"
+    if eprofile.restricted == True:
+        query = restriction(request.user)
+
     c = CoreEngine()
     #results = c.search_fingerprint(query, sort=sort, rows=rows, start=start)
     results = c.more_like_this(doc_id, maxx=maxx)
@@ -552,7 +587,7 @@ def get_query_from_more_like_this(doc_id, maxx=100):
 
     ## PY SOLR IS STUPID, OTHERWISE THIS WOULD BE AVOIDED
     database_name = ""
-    results = c.search_fingerprint("id:"+doc_id, start=0, rows=1, fl="database_name_t")
+    results = c.search_fingerprint("id:"+doc_id + query, start=0, rows=1, fl="database_name_t")
     for r in results:
         if "database_name_t" in r:
             database_name = r["database_name_t"]
@@ -560,7 +595,15 @@ def get_query_from_more_like_this(doc_id, maxx=100):
     return (queryString, database_name)
 
 def get_databases_from_solr_with_highlight(request, query="*:*", sort="", rows=100, start=0, hlfl="*"):
+    try:
+        eprofile = EmifProfile.objects.get(user=request.user)
+    except EmifProfile.DoesNotExist:
+        print "-- ERROR: Couldn't get emif profile for user"
+    if eprofile.restricted == True:
+        query += restriction(request.user)
+
     c = CoreEngine()
+
     results = c.search_highlight(query, sort=sort, rows=rows, start=start, hlfl=hlfl)
 
     list_databases = get_databases_process_results(results)
@@ -653,7 +696,7 @@ def more_like_that(request, doc_id, mlt_query=None, page=1, template_name='more_
     database_name = ""
 
     if mlt_query == None:
-        (_filter, database_name) = get_query_from_more_like_this(doc_id)
+        (_filter, database_name) = get_query_from_more_like_this(request, doc_id)
     else:
         _filter = mlt_query
 
