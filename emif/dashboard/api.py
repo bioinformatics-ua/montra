@@ -411,28 +411,35 @@ class RecommendationsView(APIView):
         self.__mlt_fused = {}
 
         if request.user.is_authenticated():
-            maxx = 100
-            subscriptions = FingerprintSubscription.active().filter(user=request.user)
 
-            # first we generate the list of already subscribed databases, since they wont appear on suggestions
-            for subscription in subscriptions:
-                self.__subscribed.append(subscription.fingerprint.fingerprint_hash)
+            ordered = cache.get('recommendations_'+str(request.user.id))
 
-            c = CoreEngine()
-            for subscription in subscriptions:
-                fingerprint = subscription.fingerprint
-                this_mlt = c.more_like_this(fingerprint.fingerprint_hash, fingerprint.questionnaire.slug, maxx=maxx)
+            if ordered == None:
+                maxx = 100
+                subscriptions = FingerprintSubscription.active().filter(user=request.user)
 
-                self.__merge(this_mlt)
+                # first we generate the list of already subscribed databases, since they wont appear on suggestions
+                for subscription in subscriptions:
+                    self.__subscribed.append(subscription.fingerprint.fingerprint_hash)
 
-            ordered = sorted(self.__mlt_fused.values(), reverse=True, key=lambda x:x['score'])[:10]
+                c = CoreEngine()
+                for subscription in subscriptions:
+                    fingerprint = subscription.fingerprint
+                    this_mlt = c.more_like_this(fingerprint.fingerprint_hash, fingerprint.questionnaire.slug, maxx=maxx)
 
-            for entry in ordered:
-                fingerprint = Fingerprint.valid().get(fingerprint_hash=entry['id'])
+                    self.__merge(this_mlt)
 
-                entry['name'] = fingerprint.findName()
+                ordered = sorted(self.__mlt_fused.values(), reverse=True, key=lambda x:x['score'])[:10]
 
-                entry['href'] = 'fingerprint/'+fingerprint.fingerprint_hash+'/1/'
+                for entry in ordered:
+                    fingerprint = Fingerprint.valid().get(fingerprint_hash=entry['id'])
+
+                    entry['name'] = fingerprint.findName()
+
+                    entry['href'] = 'fingerprint/'+fingerprint.fingerprint_hash+'/1/'
+
+                cache.set('recommendations_'+str(request.user.id), ordered, 720)
+
 
             response = Response({'mlt': ordered}, status=status.HTTP_200_OK)
 

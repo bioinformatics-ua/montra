@@ -389,6 +389,10 @@ class FingerprintSubscription(models.Model):
     latest_update   = models.DateTimeField(auto_now=True)
     removed         = models.BooleanField(default=False)
 
+    @staticmethod
+    def active():
+        return FingerprintSubscription.objects.filter(removed=False)
+
     def isSubscribed(self):
         return not self.removed
 
