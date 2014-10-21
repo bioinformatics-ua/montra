@@ -7,7 +7,7 @@ from questionnaire.views import *
 
 from django.contrib.auth.models import User
 
-from searchengine.search_indexes import generateFreeText, setProperFields, CoreEngine
+from searchengine.search_indexes import generateFreeText, generateMltText, setProperFields, CoreEngine
 
 from django.utils import timezone
 
@@ -479,6 +479,8 @@ def indexFingerprint(fingerprint_id):
 
 
         d['text_t']= generateFreeText(d) +  " " + adicional_text
+        d['mlt_t'] = generateMltText(d)
+
 
         c = CoreEngine()
 
