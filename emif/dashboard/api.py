@@ -68,6 +68,8 @@ import random
 
 from hitcount.models import Hit, HitCount
 
+from searchengine.search_indexes import CoreEngine
+
 ############################################################
 ##### Database Types - Web service
 ############################################################
@@ -391,3 +393,63 @@ class TagCloudView(APIView):
         else:
             response = Response({}, status=status.HTTP_403_FORBIDDEN)
         return response
+
+############################################################
+##### Recommendations based on Subscriptions and More Like This - Web service
+############################################################
+
+
+class RecommendationsView(APIView):
+    authentication_classes = (SessionAuthentication, BasicAuthentication)
+    permission_classes = (IsAuthenticated,)
+
+    __subscribed = []
+    __mlt_fused = {}
+
+    def get(self, request, *args, **kw):
+        self.__subscribed = []
+        self.__mlt_fused = {}
+
+        if request.user.is_authenticated():
+            maxx = 100
+            subscriptions = FingerprintSubscription.active().filter(user=request.user)
+
+            # first we generate the list of already subscribed databases, since they wont appear on suggestions
+            for subscription in subscriptions:
+                self.__subscribed.append(subscription.fingerprint.fingerprint_hash)
+
+            c = CoreEngine()
+            for subscription in subscriptions:
+                fingerprint = subscription.fingerprint
+                this_mlt = c.more_like_this(fingerprint.fingerprint_hash, fingerprint.questionnaire.slug, maxx=maxx)
+
+                self.__merge(this_mlt)
+
+            ordered = sorted(self.__mlt_fused.values(), reverse=True, key=lambda x:x['score'])[:10]
+
+            for entry in ordered:
+                fingerprint = Fingerprint.valid().get(fingerprint_hash=entry['id'])
+
+                entry['name'] = fingerprint.findName()
+
+                entry['href'] = 'fingerprint/'+fingerprint.fingerprint_hash+'/1/'
+
+            response = Response({'mlt': ordered}, status=status.HTTP_200_OK)
+
+        else:
+            response = Response({}, status=status.HTTP_403_FORBIDDEN)
+
+        return response
+
+    def __merge(self, merging):
+
+        for db in merging:
+            if db['id'] not in self.__subscribed:
+                if db['id'] in self.__mlt_fused:
+                    current = self.__mlt_fused[db['id']]
+
+                    current['score'] += db['score']
+
+                    self.__mlt_fused[db['id']] = current
+                else:
+                    self.__mlt_fused[db['id']] = db
