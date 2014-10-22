@@ -25,9 +25,10 @@ from questionnaire.models import Questionnaire, Choice, Question, QuestionSet
 import os
 import re
 
-from openpyxl import Workbook
-from openpyxl.style import Color, Fill
+from openpyxl import Workbook, load_workbook
+from openpyxl.styles import Style, PatternFill, Alignment, Font, Border, Side
 from openpyxl.cell import Cell
+from openpyxl.worksheet.datavalidation import DataValidation, ValidationType
 
 class Command(BaseCommand):
 
@@ -36,6 +37,25 @@ class Command(BaseCommand):
 
     # dependency questions need to be able to translate question numbers into excel line numbers.
     __number_map = {}
+    __defaultstyle = Style(font=Font(name='Verdana', size=8),
+            alignment=Alignment(wrap_text=True),
+            border=Border(
+                left=Side(border_style='thin', color='FF000000'),
+                right=Side(border_style='thin', color='FF000000'),
+                top=Side(border_style='thin', color='FF000000'),
+                bottom=Side(border_style='thin', color='FF000000')
+                )
+            )
+    __boldstyle = Style(font=Font(bold=True))
+
+    __headerstyle = Style(alignment=Alignment(horizontal='center'),
+            fill=PatternFill(fill_type='solid', start_color='FFCCCCCC'))
+
+    __validatetype = DataValidation(type="list", formula1='"QuestionSet, Category, Question"', allow_blank=True)
+    __validateyesno = DataValidation(type="list", formula1='"Yes, No"', allow_blank=True)
+
+
+    __validateqtype = DataValidation(type="list", formula1='"open, open-button, open-upload-image, open-textfield, choice-yesno, choice-yesnocomment, choice-yesnodontknow, comment, choice, choice-freeform, choice-multiple, choice-multiple-freeform, range, timeperiod, publication, sameas, custom, datepicker"', allow_blank=True)
 
     def __boolean_to_string(self, value):
         if value == True:
@@ -47,20 +67,16 @@ class Command(BaseCommand):
 
 
     def __setDefaultStyle(self, _cell):
-        _cell.style.font.name = 'Verdana'
-        _cell.style.font.size = 8
-        _cell.style.alignment.wrap_text = True
+        _cell.style = self.__defaultstyle
 
     def __setBold(self, _cell):
-        _cell.style.font.bold = True
+        _cell.style = self.__defaultstyle.copy(font=Font(name='Verdana', size=8, bold=True))
 
     def __setHeader(self, _cell):
         _cell.style.font.bold = True
 
         # Cell background color
-        _cell.style.fill.fill_type = Fill.FILL_SOLID
-        _cell.style.fill.start_color.index = 'FFCCCCCC'
-        _cell.style.alignment.horizontal = 'center'
+        _cell.style = self.__headerstyle
 
     def __setColumnSizes(self, ws, sizes):
         columns = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K']
@@ -111,7 +127,7 @@ class Command(BaseCommand):
 
                 optionid = self.__getChoiceNumber(parent, option)
 
-                restring = '=ROW($'+str(line)+':$'+str(line)+') & "|'+str(optionid)+'"'
+                restring = str(line)+'|'+str(optionid)
 
                 return restring
 
@@ -121,10 +137,6 @@ class Command(BaseCommand):
         except KeyError:
             print "-- ERROR: Couldn't find a mapping for question "+str(question.number)
             return "error"
-
-
-
-
 
     def __addQuestion(self, line, ws, question):
         self.__number_map[question.number] = (line, question)
@@ -154,12 +166,16 @@ class Command(BaseCommand):
                     question.type,
                     choices,
                     question.help_text,
-                    question.tooltip,
+                    self.__boolean_to_string(question.tooltip),
                     question.slug_fk.slug1,
                     self.__processDependencies(question),
                     '',
                     '',
                 ])
+
+            for row in ws.iter_rows('A'+str(line)+":k"+str(line)):
+                for cell in row:
+                    self.__setDefaultStyle(cell)
 
             if question.category:
                 self.__setBold(ws.cell('B'+str(line)))
@@ -170,27 +186,19 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         self.__number_map = {}
+
         if len(args) == 2:
             slug = args[0]
             file_path = args[1]
 
             questionnaire = Questionnaire.objects.get(slug=slug)
 
-            wb = Workbook()
+            wb = load_workbook(filename =r'questionnaire/empty2.xlsx')
             ws = wb.get_active_sheet()
             ws.title = "Questionnaire"
 
-            ws.cell('A1').value = "Name"
-            self.__setHeader(ws.cell('A1'))
-            ws.cell('B1').value = slug
+            ws.cell('B1').value = questionnaire.name
             self.__setBold(ws.cell('B1'))
-
-            ws.append(['Type', 'Text/Question', 'Level/Number', 'Data Type', 'Value list', 'Help text/Description',
-                       'Tooltip', 'Slug', 'Dependencies', 'Stats', 'Comments State'])
-
-            for row in ws.range('A2:K2'):
-                for cell in row:
-                    self.__setHeader(cell)
 
             # for sanity, im keeping a pointer to the row im in...
             pointer = 3
@@ -200,6 +208,10 @@ class Command(BaseCommand):
                             questionset.sortid, '', '', questionset.help_text.replace('<br />', '\n'),
                             self.__boolean_to_string(questionset.tooltip), '',
                             '', '', '' ])
+
+                for row in ws.iter_rows('A'+str(pointer)+":k"+str(pointer)):
+                    for cell in row:
+                        self.__setDefaultStyle(cell)
 
                 self.__setBold(ws.cell('A'+str(pointer)))
                 self.__setBold(ws.cell('B'+str(pointer)))
@@ -216,11 +228,17 @@ class Command(BaseCommand):
                         print "-- ERROR PROCESSING QUESTION header for: "+str(question.text_en)
                         break
 
-            self.__setColumnSizes(ws, [10, 30, 15, 15, 30, 30, 12, 15, 15, 7, 15])
+            # Adding validation data, to create dropdown abilities as the original
+            self.__validatetype.ranges.append('A3:A'+str(pointer))
+            self.__validateqtype.ranges.append('D3:D'+str(pointer))
+            self.__validateyesno.ranges.append('G3:G'+str(pointer))
 
-            for row in ws.rows:
-                for cell in row:
-                    self.__setDefaultStyle(cell)
+            ws.add_data_validation(self.__validatetype)
+            ws.add_data_validation(self.__validateyesno)
+            ws.add_data_validation(self.__validateqtype)
+
+            # Freezing first two rows
+            ws.freeze_panes = ws.cell('A3')
 
             wb.save(file_path)
 
