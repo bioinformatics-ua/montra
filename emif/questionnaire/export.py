@@ -20,6 +20,7 @@
 from questionnaire.models import *
 
 
+# TODO: put this code in utils
 def removehs(value):
     value = value.replace('h0. ','')
     value = value.replace('h1. ','')
