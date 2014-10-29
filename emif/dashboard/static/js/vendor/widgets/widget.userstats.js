@@ -50,7 +50,7 @@ var UserStatsWidget = function UserStatsWidget(widgetname, width, height, pos_x,
                 console.log(data.stats);
 
                 if(data.stats.populartype != '---'){
-                    self.content += '<strong>Most used database tSype: </strong>'+data.stats.populartype;
+                    self.content += '<strong>Most used database type: </strong>'+data.stats.populartype;
                 }
 
             } else {
