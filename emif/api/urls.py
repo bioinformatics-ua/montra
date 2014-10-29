@@ -82,6 +82,7 @@ urlpatterns = patterns('api.views',
     url(r'^lastusers$', LastUsersView.as_view(), name='lastusers'),
     url(r'^feed$', FeedView.as_view(), name='feed'),
     url(r'^tagcloud$', TagCloudView.as_view(), name='tagcloud'),
+    url(r'^topusers$', TopUsersView.as_view(), name='topusers'),
 
 )
 

@@ -187,6 +187,47 @@ class LastUsersView(APIView):
         return response
 
 ############################################################
+##### Top Users - Web service
+############################################################
+
+
+class TopUsersView(APIView):
+    authentication_classes = (SessionAuthentication, BasicAuthentication)
+    permission_classes = (IsAuthenticated,)
+    def get(self, request, *args, **kw):
+
+        if request.user.is_authenticated():
+
+            top_users = cache.get('topusers')
+
+            if top_users == None:
+                top_users = {}
+
+                hitcounts = HitCount.objects.all()
+
+                for hitcount in hitcounts:
+                    try:
+                        fingerprint = Fingerprint.objects.get(id=hitcount.object_pk)
+
+                        if fingerprint.owner in top_users:
+                            top_users[fingerprint.owner]['count'] = top_users[fingerprint.owner]['count'] + hitcount.hits
+                        else:
+                            top_users[fingerprint.owner] = {'user': fingerprint.owner.get_full_name(), 'count': hitcount.hits}
+
+                    except Fingerprint.DoesNotExist:
+                        print "-- ERROR: Couldn't retrieve fingerprint refered by hitcount" + str(hitcount.id)
+
+                top_users = sorted(top_users.values(), reverse=True, key=lambda x:x['count'])[:10]
+
+                # keeping in cache 1 hour
+                cache.set('topusers', top_users, 60*60)
+            response = Response({'topusers': top_users}, status=status.HTTP_200_OK)
+
+        else:
+            response = Response({}, status=status.HTTP_403_FORBIDDEN)
+        return response
+
+############################################################
 ##### User Statistics - Web service
 ############################################################
 

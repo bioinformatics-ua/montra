@@ -16,6 +16,7 @@
         var gridster;
         var timer = 0;
 
+        var initial_widgets = {};
         var registered_widgets = {};
         var in_use = {};
 
@@ -141,10 +142,22 @@
                     $(".dashboardaddwidget",target).click(function(){
                         var key = $(this).data('widgetname');
                         public_funcs.addWidget(key);
+                        private_funcs.__clampHeight($('#'+key));
                     });
 
 
                 }
+            }, __deepcopy: function(dictionary){
+                var copy = {}
+                for (var key in dictionary) {
+                    if (dictionary.hasOwnProperty(key)) {
+                        copy[key] = dictionary[key].copy();
+                    }
+
+                }
+
+                return copy;
+
             }
 
         };
@@ -173,6 +186,9 @@
 
             },
             register: function(widget){
+                initial_widgets[widget.widgetname] = widget;
+            },
+            update: function(widget){
                 registered_widgets[widget.widgetname] = widget;
             },
             unregister: function(widgetname){
@@ -232,6 +248,9 @@
 
                     try{
                         var parsed_configurations = JSON.parse(localStorage.getItem("dashboard_preferences"));
+                        registered_widgets = private_funcs.__deepcopy(initial_widgets);
+
+                        console.log(registered_widgets);
 
                         for(var i=0;i<parsed_configurations.length;i++){
                             var this_widget;
@@ -244,7 +263,7 @@
 
                                 this_widget.deserialize(parsed_configurations[i]);
 
-                                public_funcs.register(this_widget);
+                                public_funcs.update(this_widget);
                                 public_funcs.addWidget(this_widget.widgetname);
 
                                 private_funcs.__clampHeight($('#'+this_widget.widgetname));
@@ -284,8 +303,11 @@
 
                 return serialization;
             }, initial : function(){
-                if(settings.initial !== null && typeof(settings.initial) === 'function')
+                if(settings.initial !== null && typeof(settings.initial) === 'function'){
+                    registered_widgets = private_funcs.__deepcopy(initial_widgets);
+
                     settings.initial();
+                }
             }, reset   : function(){
                 if(private_funcs.__supports_storage()){
                     localStorage.removeItem("dashboard_preferences");
