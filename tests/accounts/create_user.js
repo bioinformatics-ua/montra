@@ -12,9 +12,9 @@ module.exports = {
   "Create User" : function (browser) {
     browser
       .url("http://127.0.0.1:8000/")
-      .waitForElementVisible('body', 1000)
+      .waitForElementVisible('body', 1000, 'Page loads')
       .pause(1000)
-      .click('a[href="/accounts/"]')
+      .click('a[href="/accounts/signup/"]')
       .setValue('input[id=id_first_name]', 'Test')
       .setValue('input[id=id_last_name]', 'User')
       .setValue('input[id=id_organization]', 'Test Unit lda')
@@ -26,8 +26,8 @@ module.exports = {
       .click('input[id=id_interests_1]')
       .click('input[id=id_interests_2]')
       .click('button[type=submit]')
-      .waitForElementVisible('div[id=signupcomplete]', 1000)
-      .assert.urlContains('complete')
+      .waitForElementVisible('div[id=signupcomplete]', 1000, 'Signup Result Page Opens')
+      .assert.urlContains('complete', 'Creating user ends with success')
       .end();
   }
 };
