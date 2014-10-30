@@ -23,7 +23,7 @@ function postComparisonPopulations(){
     $('#compare_form').attr('action', 'population/compare');
     postComparison(false);
 
-   return true; 
+   return true;
 };
 
 function checkExistsPopulation(fingerprint_ids){
@@ -37,15 +37,15 @@ function checkExistsPopulation(fingerprint_ids){
 			}
 	}).fail(function( data ) {
 		bootbox.alert('Failed validating database population characteristics.');
-	});	
+	});
 }
 
 $(document).ready(function(){
 
     $("#comparabtnPC").bind('click',function(e)
-        { 
+        {
 
-        event.preventDefault();
+        e.preventDefault();
 
 
           postComparisonPopulations();
