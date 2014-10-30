@@ -29,7 +29,9 @@ var TopUsersWidget = function TopUsersWidget(widgetname, width, height, pos_x, p
 
         self.icon = '<i class="fa fa-user"></i>';
 
-        self.header_tooltip = "Users with most unique views on their databases.";
+        self.header_tooltip = "Users with most unique views on their databases.<br /><strong> (Only staff can see this widget)</strong>";
+
+        self.header_style = "background-color: #d79494; border: 1px solid #b74c4c;";
 
         self.content = "<center><h3>Loading...</h3></center>";
 

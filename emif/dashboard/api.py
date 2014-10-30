@@ -67,6 +67,7 @@ import urllib2
 import random
 
 from hitcount.models import Hit, HitCount
+from accounts.models import EmifProfile
 
 ############################################################
 ##### Database Types - Web service
@@ -178,7 +179,7 @@ class LastUsersView(APIView):
             users = User.objects.all().order_by('-last_login')[:10]
 
             for user in users:
-                last_users.append(user.username)
+                last_users.append(user.get_full_name())
 
             response = Response({'lastusers': last_users}, status=status.HTTP_200_OK)
 
@@ -196,31 +197,10 @@ class TopUsersView(APIView):
     permission_classes = (IsAuthenticated,)
     def get(self, request, *args, **kw):
 
-        if request.user.is_authenticated():
+        if request.user.is_authenticated() and request.user.is_staff == True:
 
-            top_users = cache.get('topusers')
+            top_users = EmifProfile.top_users(limit=10, days_to_count=30)
 
-            if top_users == None:
-                top_users = {}
-
-                hitcounts = HitCount.objects.all()
-
-                for hitcount in hitcounts:
-                    try:
-                        fingerprint = Fingerprint.objects.get(id=hitcount.object_pk)
-
-                        if fingerprint.owner in top_users:
-                            top_users[fingerprint.owner]['count'] = top_users[fingerprint.owner]['count'] + hitcount.hits
-                        else:
-                            top_users[fingerprint.owner] = {'user': fingerprint.owner.get_full_name(), 'count': hitcount.hits}
-
-                    except Fingerprint.DoesNotExist:
-                        print "-- ERROR: Couldn't retrieve fingerprint refered by hitcount" + str(hitcount.id)
-
-                top_users = sorted(top_users.values(), reverse=True, key=lambda x:x['count'])[:10]
-
-                # keeping in cache 1 hour
-                cache.set('topusers', top_users, 60*60)
             response = Response({'topusers': top_users}, status=status.HTTP_200_OK)
 
         else:

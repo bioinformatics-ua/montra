@@ -350,12 +350,13 @@ var DashboardWidget = function DashboardWidget(widgetname, header, width, height
         this.content = "";
         this.icon = '';
         this.header_tooltip = null;
+        this.header_style = '';
 
 }.addToPrototype({
     __init  :   function(gridster, parent){
         var self = this;
 
-        var __widgetentry = '<li id="'+ this.widgetname+'"><div class="widget-header"><div title="Drag to change widget position" class="dragtooltip pull-left">';
+        var __widgetentry = '<li id="'+ this.widgetname+'"><div style="'+this.header_style+'" class="widget-header"><div title="Drag to change widget position" class="dragtooltip pull-left">';
 
         if(this.icon != undefined && this.icon.trim() != '')
             __widgetentry += this.icon;
@@ -391,6 +392,7 @@ var DashboardWidget = function DashboardWidget(widgetname, header, width, height
                 'placement': 'top',
                 'title': self.header_tooltip,
                 'container': 'body',
+                'html': true
             });
         }
 

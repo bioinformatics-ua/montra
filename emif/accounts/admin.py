@@ -1,4 +1,4 @@
-from accounts.models import Profile, NavigationHistory
+from accounts.models import Profile, NavigationHistory, EmifProfile
 from django.contrib import admin
 from django.contrib.auth.models import User
 from adminplus.sites import AdminSitePlus
@@ -40,12 +40,13 @@ class UserStatistics(View):
 
         views_time, average_views = self.getViewTimes(history)
 
-        return render(request, self.template_name, {'choice': form, 'global': True, 
+        return render(request, self.template_name, {'choice': form, 'global': True,
                                                     'most_viewed': most_viewed,
                                                     'session_time': session_time,
                                                     'session_average': average_time,
                                                     'views_time': views_time,
-                                                    'views_average': average_views
+                                                    'views_average': average_views,
+                                                    'top_users': EmifProfile.top_users(limit=20, days_to_count=30)
                                                     })
 
     def post(self, request):
@@ -55,7 +56,7 @@ class UserStatistics(View):
             return self.get(request)
 
         form = ChoiceForm(initial = {'user': user})
-        
+
         user_history = NavigationHistory.objects.filter(user=user)
 
         most_viewed = user_history.values('path').annotate(number_viewed=Count('path')).order_by('-number_viewed')[:15]
@@ -69,8 +70,8 @@ class UserStatistics(View):
                                                     'session_time': session_time,
                                                     'session_average': average_time,
                                                     'views_time': views_time,
-                                                    'views_average': average_views
-                                                    }) 
+                                                    'views_average': average_views,
+                                                    })
 
     def getSessionTimes(self, user_history):
 
@@ -81,7 +82,7 @@ class UserStatistics(View):
 
         delta = datetime.timedelta(days=1)
         while d >= end_date:
-            
+
             user_day_history = user_history.filter(date__startswith=d)
 
             min = user_day_history.aggregate(Min('date'))['date__min']
@@ -95,7 +96,7 @@ class UserStatistics(View):
                 session_times.append({ 'label': d, 'value': session })
             except:
                 session_times.append({ 'label': d, 'value': 0 })
-                          
+
             d -= delta
 
         return [session_times[::-1], average/30]
@@ -109,7 +110,7 @@ class UserStatistics(View):
 
         delta = datetime.timedelta(days=1)
         while d >= end_date:
-            
+
             user_day_history = user_history.filter(date__startswith=d)
 
             try:
@@ -120,7 +121,7 @@ class UserStatistics(View):
                 view_times.append({ 'label': d, 'value': views })
             except:
                 view_times.append({ 'label': d, 'value': 0 })
-                          
+
             d -= delta
 
         return [view_times[::-1], average/30]
