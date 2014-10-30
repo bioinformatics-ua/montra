@@ -592,10 +592,10 @@ var stuff;
                 if (values[data]==="")
                     return;
 
-                var hint = "";
-                if(values[data].hint != null)
-                  hint = 'title="'+values[data].hint+'"';
-                tmpUl.append('<li '+hint+' class="graphLine"><a class="graphTypes" href="#" onclick="return false;">'+values[data].title+'</a></li>')
+                var tooltip = "";
+                if(values[data].tooltip != null)
+                  tooltip = 'title="'+values[data].tooltip+'"';
+                tmpUl.append('<li '+tooltip+' class="graphLine"><a class="graphTypes" href="#" onclick="return false;">'+values[data].title+'</a></li>')
             });
 
             var myPC = options;

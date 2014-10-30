@@ -187,6 +187,7 @@ class ConfCharts(object):
         c11.title.var = "Age at patient end"
         c11.title.fixed_title = "End Year"
         c11.hint = "Histogram of last year of data capturing"
+        c11.tooltip = "Histogram of last year of data capturing"
 
         c11.x_axis = Axis()
         c11.x_axis.operation = "unique"

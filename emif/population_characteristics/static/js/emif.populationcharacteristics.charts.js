@@ -52,9 +52,9 @@ function ChartLayout ()
         var charts_titles = [];
         charts.forEach(function(a){
             if (a.title.fixed_title!= 'None')
-                charts_titles.push({'hint': a.hint ,'title': a.title.fixed_title})
+                charts_titles.push({'tooltip': a.tooltip ,'title': a.title.fixed_title})
             else
-                charts_titles.push({'hint': a.hint ,'title': a.title['var']})
+                charts_titles.push({'tooltip': a.tooltip ,'title': a.title['var']})
         });
         return charts_titles;
     };
