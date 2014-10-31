@@ -897,14 +897,41 @@ height: 6em;
 
 .progressbar_back{
   display: inline-block;
-background-color: #F5F5F5;
-border: 1px solid #8A8A8A;
-border-radius: 25px;
-overflow: hidden;
-height: 10px;
+  background-color: #F5F5F5;
+  border: 1px solid #8A8A8A;
+  border-radius: 25px;
+  overflow: hidden;
+  height: 10px;
 }
 
 .progressbar_front{
   background-color: #BDBDBD;
   border-right: 1px solid #8A8A8A;
+}
+
+.progressbar_danger{
+  border: 1px solid #7c4343;
+}
+
+.progressbar_danger .progressbar_front{
+  background-color: #d04848;
+  border-right: 1px solid #7c4343;
+}
+
+.progressbar_warning{
+  border: 1px solid #8B8671;
+}
+
+.progressbar_warning .progressbar_front{
+  background-color: #f8dc58;
+  border-right: 1px solid #8B8671;
+}
+
+.progressbar_success{
+  border: 1px solid #888f72;
+}
+
+.progressbar_success .progressbar_front{
+  background-color: #a5f806;
+  border-right: 1px solid #888f72;
 }

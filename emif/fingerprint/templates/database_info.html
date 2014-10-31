@@ -176,7 +176,7 @@
                             </small>
                         </div>
                         <table><tr><td>
-                        <div style="width: 70px;" class="progressbar_back">
+                        <div style="width: 70px;" class="progressbar_back {% if fingerprint_fill < 30 %} progressbar_danger {% else %} {% if fingerprint_fill < 60 %} progressbar_warning {% else %} progressbar_success {% endif %} {% endif %}">
                             <div class="progressbar_front" style="width: {{fingerprint_fill}}%;">&nbsp;</div>
                         </div></td><td><small style="margin-top: -1px; display: block;">&nbsp; {{fingerprint_fill}} % filled </small></td></tr></table>
                         </div>
