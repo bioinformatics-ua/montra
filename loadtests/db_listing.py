@@ -17,13 +17,11 @@ class DBListing(TaskSet):
         self.login()
 
     def login(self):
-
-
         response = self.client.post("/accounts/signin/", {"identification":"admin", "password":"emif", 'csrfmiddlewaretoken': self.__getCsrf()})
 
-        if response.status_code != 200:
-            with open('log.html', 'w+') as file:
-                file.write(response.text)
+        #if response.status_code != 200:
+        #    with open('log.html', 'w+') as file:
+        #        file.write(response.text)
 
     @task(1)
     def personal(self):
@@ -34,12 +32,16 @@ class DBListing(TaskSet):
         self.client.get("/alldatabases/")
 
     @task(1)
+    def datatable(self):
+        response = self.client.post('/qs_data_table', {'db_type': 53, 'qsets[]': [491, 492, 493, 494, 495], 'csrfmiddlewaretoken': self.__getCsrf()})
+        with open('logdatatable.html', 'w+') as file:
+            file.write(response.text)
+    @task(1)
     def dashboard(self):
         self.client.get('/dashboard')
 
     @task(1)
-    def dashboard(self):
-
+    def freetext_search(self):
         self.client.post('/resultsdiff/1', {'query': 'cardiac', 'csrfmiddlewaretoken': self.__getCsrf()})
 
     @task(1)
@@ -51,5 +53,5 @@ class DBListing(TaskSet):
 class WebsiteUser(HttpLocust):
     host = "http://127.0.0.1:8000"
     task_set = DBListing
-    min_wait=5000
-    max_wait=9000
+    min_wait=5 * 1000 # stays on page min (ms)
+    max_wait=9 * 1000 # stays on page max (ms)
