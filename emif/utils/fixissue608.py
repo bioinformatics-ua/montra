@@ -25,9 +25,9 @@ def checkQuestionsEmpty():
 
 def removeQuestions():
     print "- Removing questions: "
-    questions = Question.object.filter(slug__in = array_slugs)
+    questions = Question.objects.filter(slug__in = array_slugs)
 
-    for question in question:
+    for question in questions:
         print "Removing question "+str(question.number)
         question.delete()
 

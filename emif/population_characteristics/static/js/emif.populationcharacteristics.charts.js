@@ -18,18 +18,18 @@
 #
 ***********************************************************************/
 
-// Load the configurations 
+// Load the configurations
 
 /***
 * This configuration will say what type of charts the tool will draw
-* 
+*
 */
 
-function PCConfs () 
+function PCConfs ()
 {
     this.getSettings = function(fingerprintId){
         var result = {};
-          
+
         $.ajax({
           dataType: "json",
           url: "population/settings/" + fingerprintId + "/",
@@ -39,11 +39,11 @@ function PCConfs ()
           success: function (data){result=data;}
         });
         return JSON.parse(result.conf).charts;
-        
+
     };
 };
 
-function ChartLayout () 
+function ChartLayout ()
 {
     var configs = null
     this.getChartTitles = function(fingerprintId){
@@ -52,9 +52,9 @@ function ChartLayout ()
         var charts_titles = [];
         charts.forEach(function(a){
             if (a.title.fixed_title!= 'None')
-                charts_titles.push(a.title.fixed_title)
+                charts_titles.push({'tooltip': a.tooltip ,'title': a.title.fixed_title})
             else
-                charts_titles.push(a.title['var'])
+                charts_titles.push({'tooltip': a.tooltip ,'title': a.title['var']})
         });
         return charts_titles;
     };
