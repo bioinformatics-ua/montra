@@ -21,7 +21,7 @@
 import json
 
 from django.utils import simplejson
-from population_characteristics.charts.operations import * 
+from population_characteristics.charts.operations import *
 json.dumps = simplejson.dumps
 
 """
@@ -35,7 +35,7 @@ class Title(object):
         self.fixed_title = 'None'
         self.operation = None
         self.var = None
-        
+
     def to_JSON(self):
         return json.dumps(self, default=lambda o: o.__dict__, sort_keys=True, indent=4)
 
@@ -52,8 +52,8 @@ class Axis(object):
         self.sort_func = None
         self.label = None
         self.legend = False
-        self.stacked = False 
-        
+        self.stacked = False
+
     def to_JSON(self):
         return json.dumps(self, default=lambda o: o.__dict__, sort_keys=True, indent=4)
 
@@ -62,6 +62,7 @@ class Chart(object):
     def __init__(self):
         self.title = None
         self.hint = None
+        self.tooltip = None
         self.x_axis = None
         self.y_axis = None
         self.filters = None
@@ -72,7 +73,7 @@ class Chart(object):
 class SetCharst(object):
     def __init__(self):
         self.charts = None
-        
+
     def to_JSON(self):
         return json.dumps(self, default=lambda o: o.__dict__, sort_keys=True, indent=4)
 
@@ -88,11 +89,11 @@ class SetCharst(object):
 # Observation time after a year
 # Observation time in a year
 
-### Active patients  
+### Active patients
 c = Chart()
 c.title = Title()
 c.title.operation = Operation.UNIQUE
-c.title.var = "Var" 
+c.title.var = "Var"
 c.x_axis = Axis()
 c.x_axis.operation = "unique"
 c.x_axis.var = "Name1"
@@ -115,11 +116,11 @@ sc.charts = [c,c]
 print sc.to_JSON()
 
 
-### Age starts at 
+### Age starts at
 c = Chart()
 c.title = Title()
 c.title.operation = Operation.UNIQUE
-c.title.var = "Var" 
+c.title.var = "Var"
 c.x_axis = Axis()
 c.x_axis.operation = "unique"
 c.x_axis.var = "Name1"
@@ -136,7 +137,7 @@ print c.to_JSON()
 c = Chart()
 c.title = Title()
 c.title.operation = Operation.UNIQUE
-c.title.var = "Var" 
+c.title.var = "Var"
 c.x_axis = Axis()
 c.x_axis.operation = "unique"
 c.x_axis.var = "Name1"
