@@ -29,7 +29,7 @@ except ImportError:
 
 setup(
     name='emif-fb',
-    version='0.1-dev',
+    version='0.5.1',
     description='EMIF FB',
     packages=[
         'emif',
