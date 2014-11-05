@@ -1,7 +1,7 @@
 module.exports = {
   "Redo a free text search through Search History" : function (browser) {
     browser
-      .url("http://127.0.0.1:8000/")
+      .url(browser.launchUrl)
       .waitForElementVisible('body', 1000, 'Page loads')
       .pause(1000)
       .setValue('input[name=identification]', 'admin')

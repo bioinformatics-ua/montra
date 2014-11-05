@@ -17,7 +17,7 @@
   },
   "test_settings" : {
     "default" : {
-      "launch_url" : "http://localhost",
+      "launch_url" : "http://localhost:8000",
       "selenium_port"  : 4444,
       "selenium_host"  : "localhost",
       "silent": true,
@@ -32,14 +32,6 @@
       }
     },
     "chrome" : {
-      "launch_url" : "http://localhost",
-      "selenium_port"  : 4444,
-      "selenium_host"  : "localhost",
-      "silent": true,
-      "screenshots" : {
-        "enabled" : false,
-        "path" : ""
-      },
       "desiredCapabilities": {
         "browserName": "chrome",
         "javascriptEnabled": true,
@@ -47,14 +39,6 @@
       }
     },
     "ie" : {
-      "launch_url" : "http://localhost",
-      "selenium_port"  : 4444,
-      "selenium_host"  : "localhost",
-      "silent": true,
-      "screenshots" : {
-        "enabled" : false,
-        "path" : ""
-      },
       "desiredCapabilities": {
         "browserName": "ie",
         "javascriptEnabled": true,

@@ -11,7 +11,7 @@ function generateUUID(){
 module.exports = {
   "Create User" : function (browser) {
     browser
-      .url("http://127.0.0.1:8000/")
+      .url(browser.launchUrl)
       .waitForElementVisible('body', 1000, 'Page loads')
       .pause(1000)
       .click('a[href="/accounts/signup/"]')
