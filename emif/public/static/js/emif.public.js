@@ -17,3 +17,31 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #*/
+
+$(function(){
+    var cbtns = $('.copy-button');
+
+    cbtns.each(function (i){
+
+      addClipboard(this);
+    });
+});
+
+function addClipboard(element){
+    if(hasFlash()){
+    var base = $('#base_link').attr('href');
+
+    $(element).attr('data-clipboard-text', base+$(element).data('clipboard-text'))
+    var client = new ZeroClipboard($(element));
+    } else {
+        $(element).hide();
+    }
+}
+function hasFlash(){
+    try {
+        if( new ActiveXObject('ShockwaveFlash.ShockwaveFlash') ) return true;
+    } catch(e){
+      if(navigator.mimeTypes ["application/x-shockwave-flash"] != undefined) return true;
+    }
+    return false;
+}

@@ -1,7 +1,7 @@
-{% extends 'base.html' %} 
-{% load url from future %} 
-{% load extra_tags %} 
-{% load django_bootstrap_breadcrumbs %} 
+{% extends 'base.html' %}
+{% load url from future %}
+{% load extra_tags %}
+{% load django_bootstrap_breadcrumbs %}
 {% load comments %}
 {% load hitcount_tags %}
 
@@ -103,34 +103,38 @@
 <script src="{{ STATIC_URL}}js/emif.charts.draw.js"></script>
 
 <script src="{{ STATIC_URL}}js/emif.populationcharacteristics.comments.js"></script>
-{% endblock %} 
-{% block breadcrumbs %} 
+<script src="{{ STATIC_URL }}js/vendor/ZeroClipboard.js"></script>
+
+<script src="{{ STATIC_URL}}js/emif.public.js"></script>
+
+{% endblock %}
+{% block breadcrumbs %}
 
 {% if readOnly %}
-    {% breadcrumb breadcrumb_name|ellipsis:40|add:" - Private View Link" "" %} 
+    {% breadcrumb breadcrumb_name|ellipsis:40|add:" - Private View Link" "" %}
 {% else %}
 
-    {{ block.super }} 
+    {{ block.super }}
     {% if search_old %}
-    {% breadcrumb "Search" "resultsdiff/1" %} 
-    {% breadcrumb breadcrumb_name "databases" %} 
-    {% elif request.session.list_origin == 'personal' %} 
-    {% breadcrumb "Personal" "databases" %} 
-    {% breadcrumb breadcrumb_name|ellipsis:40 "databases" %} 
-    {% else %} 
-    {% breadcrumb "All" "alldatabases" %} 
-    {% breadcrumb breadcrumb_name|ellipsis:40 "databases" %} 
+    {% breadcrumb "Search" "resultsdiff/1" %}
+    {% breadcrumb breadcrumb_name "databases" %}
+    {% elif request.session.list_origin == 'personal' %}
+    {% breadcrumb "Personal" "databases" %}
+    {% breadcrumb breadcrumb_name|ellipsis:40 "databases" %}
+    {% else %}
+    {% breadcrumb "All" "alldatabases" %}
+    {% breadcrumb breadcrumb_name|ellipsis:40 "databases" %}
     {% endif %}
 
 {% endif %}
 
 {% endblock %}
 
-{% block toolbar %} 
-{% include "reusable_blocks/menu_toolbar.html" with collapse=collapseall %} 
-{% endblock %} 
+{% block toolbar %}
+{% include "reusable_blocks/menu_toolbar.html" with collapse=collapseall %}
+{% endblock %}
 
-{% block content %} 
+{% block content %}
 
 {% if qsets %}
 
@@ -147,11 +151,11 @@
                 <li  class="{%if activetab == 'docs'%}active{%endif%}">
                     <a href="#documents" data-toggle="tab"><i class="icon-folder-close"></i>&nbsp; Documents</a>
                 </li>
-                
+
                 <li class="{%if activetab == 'literature'%}active{%endif%}">
                     <a href="#literature" data-toggle="tab"><i class="icon-book"></i>&nbsp; Literature</a>
                 </li>
-                
+
                 <li  class="{%if activetab == 'extra'%}active{%endif%}">
                     <a href="#apiinfo" data-toggle="tab"><i class="icon-download-alt"></i> &nbsp; Extra Information</a>
                 </li>
@@ -174,8 +178,8 @@
                             <button type="button" class="btn" id="show_hide_button">Hide Empty</button>
 
                             <a id="collapseall_metadata" class="btn" href=""><i class="icon-plus"></i>&nbsp; Expand all</a>
-                        </div> 
-                        
+                        </div>
+
                     </div>
                     <div class="accordion fullwidth pull-left " id="accordion1" style="margin-top: 10px;">
                         <div id="set_container"></div>
@@ -233,7 +237,7 @@
                     <p>No comments yet.</p>
                 {% else %}
                     <span id="comments_total">{{ comment_count }}</span> comment{{ comment_count|pluralize }}
-                {% endif %} 
+                {% endif %}
                 </center>
                 {% if not readOnly %}
 
@@ -302,15 +306,15 @@
     <div id="bool_container"></div>
     {% endif %}
 
-    {% endblock %} 
+    {% endblock %}
 
     {% block uncompressed_js %}
-       <script src="//bioinformatics.ua.pt/becas/embed-widget.js"></script> 
+       <script src="//bioinformatics.ua.pt/becas/embed-widget.js"></script>
     {% endblock %}
 
     {% block scriptextraincludes %}
     <!-- Include the widget embedding script -->
-    
+
 
 
 <!--[if lte IE 8]>
@@ -320,7 +324,7 @@
 
     <script src="{{ STATIC_URL}}js/d3/d3.v3.min.js" charset="utf-8"></script>
     <script src="{{ STATIC_URL}}js/d3/d3.layout.cloud.js"></script>
-    <script src="{{ STATIC_URL}}js/c3.js"></script>   
+    <script src="{{ STATIC_URL}}js/c3.js"></script>
     <!--<![endif]-->
 
 
@@ -375,7 +379,7 @@ console.log("Creating questionnary set containers (so they are in order)");
             {% endif %}
         {% endfor %}
 
-console.log( "Loading questionnary by parts, we have {{qsets|length}} sets");  
+console.log( "Loading questionnary by parts, we have {{qsets|length}} sets");
 
 {% for k, qs in qsets.ordered_items %}
 //var thread = new Runnable(loadqspart, priority++, {{qs.sortid}}, '{{fingerprint_id}}');
@@ -391,7 +395,7 @@ console.log( "Loading questionnary by parts, we have {{qsets|length}} sets");
 }
 $(function(){
     var csrf_token = '{{ csrf_token }}';
-    {% get_hit_count_javascript for fingerprint %} 
+    {% get_hit_count_javascript for fingerprint %}
 
     initDatabaseInfo('{{apiinfo|safe}}');
 
@@ -421,6 +425,6 @@ function pushQsets(){
             {% endif %}
     {% endfor %}
     $('#set_container').append(containers.join(''));
-}   
+}
 {% endblock %}
 </script>
