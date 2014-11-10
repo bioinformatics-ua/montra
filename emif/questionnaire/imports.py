@@ -33,6 +33,8 @@ from questionnaire.utils import *
 
 import datetime
 
+from django.db import transaction
+
 """This class is used to import the fingerprint template
 """
 class ImportQuestionnaire(object):
@@ -45,31 +47,33 @@ class ImportQuestionnaire(object):
         raise NotImplementedError("Please Implement this method")
 
     def writeLog(self, log):
-        with open("log_%s.txt" % datetime.datetime.now().strftime("%Y%m%d-%H%M%S"), "w") as f:
-            f.write(log)
-            f.close()
+        pass
+        #with open("log_%s.txt" % datetime.datetime.now().strftime("%Y%m%d-%H%M%S"), "w") as f:
+        #    f.write(log)
+        #    f.close()
 
-    def get_slug(self, slug):
-        slugs_objs = Slugs.objects.filter(slug1=slug)
-        slug_aux = None
-        if (len(slugs_objs)>0):
-            slug_aux=slugs_objs[0]
-        else:
-            return slug
-        slug_name_final = ""
-        slug_arr = slug_aux.slug1.split("_")
-        if len(slug_arr)>0:
-            if (slug_arr[len(slug_arr)-1].isdigit()):
-                slug_number = int(slug_arr[len(slug_arr)-1]) + 1
-                slug_arr[len(slug_arr)-1] = str(slug_number)
-                slug_name_final = "_".join(slug_arr)
+    def get_slug(self, slug, questionnaire):
+        return next_free_slug(slug, create=False, scope=questionnaire)
+        # slugs_objs = Slugs.objects.filter(slug1=slug)
+        # slug_aux = None
+        # if (len(slugs_objs)>0):
+        #     slug_aux=slugs_objs[0]
+        # else:
+        #     return slug
+        # slug_name_final = ""
+        # slug_arr = slug_aux.slug1.split("_")
+        # if len(slug_arr)>0:
+        #     if (slug_arr[len(slug_arr)-1].isdigit()):
+        #         slug_number = int(slug_arr[len(slug_arr)-1]) + 1
+        #         slug_arr[len(slug_arr)-1] = str(slug_number)
+        #         slug_name_final = "_".join(slug_arr)
 
-            else:
-                slug_name_final = slug_aux.slug1 + "_0"
-        else:
-            slug_name_final = slug_aux.slug1 + "_0"
+        #     else:
+        #         slug_name_final = slug_aux.slug1 + "_0"
+        # else:
+        #     slug_name_final = slug_aux.slug1 + "_0"
 
-        return slug_name_final
+        # return slug_name_final
 
     def format_number(self, number):
         # print number
@@ -105,13 +109,14 @@ class ImportQuestionnaireExcel(ImportQuestionnaire):
     def __init__(self, file_path):
         ImportQuestionnaire.__init__(self, file_path)
 
+    @transaction.commit_on_success
     def import_questionnaire(self):
         _debug = False
 
         qNumber = QuestionNumber()
         slugs = []
 
-        wb = load_workbook(filename = self.file_path)
+        wb = load_workbook(filename = self.file_path, data_only=True)
         ws = wb.get_active_sheet()
         log = ''
 
@@ -135,9 +140,8 @@ class ImportQuestionnaireExcel(ImportQuestionnaire):
             # Type of Row: QuestionSet, Category, Question
             # Columns: Type, Text/Question, Level/Number, Data type, Value list, Help text/Description, Tooltip, Slug, Stats
             #############################
-
             for row in ws.rows[2:]:
-                if len(row) > 0:
+                if len(row) > 0 and row[0].value != None:
                     type_Column = row[0]
 
                     text_question_Column = row[1]
@@ -151,6 +155,7 @@ class ImportQuestionnaireExcel(ImportQuestionnaire):
                     # Columns required:  Type, Text/Question
                     # Columns optional:  Help text/Description, Tooltip
                     if str(type_Column.value) == "QuestionSet":
+
                         sortid = str(level_number_column.value)
                         try:
                             qNumber.getNumber('h0', sortid)
@@ -192,7 +197,7 @@ class ImportQuestionnaireExcel(ImportQuestionnaire):
                             else:
                                 slug = convert_text_to_slug(str(row[1].value)[:50])
                                 #slug = self.get_slug(slug, questionnaire.pk)
-                                slug = self.get_slug(slug)
+                                slug = self.get_slug(slug, questionnaire)
 
                             if row[5].value:
                                 helpText = row[5].value
@@ -278,7 +283,7 @@ class ImportQuestionnaireExcel(ImportQuestionnaire):
                             else:
                                 slug = convert_text_to_slug(str(row[1].value)[:50])
                                 #slug = self.get_slug(slug, questionnaire.pk)
-                                slug = self.get_slug(slug)
+                                slug = self.get_slug(slug, questionnaire)
 
                             if row[5].value:
                                 helpText = row[5].value
@@ -351,6 +356,7 @@ class ImportQuestionnaireExcel(ImportQuestionnaire):
 
                             # slugs.append((questionslugs.slug,  question.text_en, question))
                             log += '\n%s - Question saved %s ' % (type_Column.row, question)
+
                             if dataType_column.value in ['choice', 'choice-freeform', 'choice-multiple', 'choice-multiple-freeform']:
                                 _choices_array_aux = []
                                 # Parse of values list
