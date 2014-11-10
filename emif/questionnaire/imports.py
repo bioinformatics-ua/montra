@@ -104,11 +104,147 @@ class ImportQuestionnaire(object):
         else:
             raise Exception("The supplied format is not supported")
 
+class CommentPlaceholder:
+    value='comment'
+
 class ImportQuestionnaireExcel(ImportQuestionnaire):
+
+    QUESTION=0
+    CATEGORY=1
 
     def __init__(self, file_path):
         ImportQuestionnaire.__init__(self, file_path)
 
+    def __handleQuestion(self, type, row,type_Column, level_number_column, text_question_Column, _questions_rows,
+        _choices_array, qNumber, questionset, log, _checks, _debug, questionnaire):
+        try:
+            text_en = str(level_number_column.value) + '. ' + str(text_question_Column.value)
+
+            dataType_column = None
+            if type == self.CATEGORY:
+                dataType_column = CommentPlaceholder()
+            else:
+                dataType_column = row[3]
+
+            if row[7].value:
+                slug = row[7].value
+            else:
+                slug = convert_text_to_slug(str(row[1].value)[:50])
+
+                slug = self.get_slug(slug, questionnaire)
+
+            if row[5].value:
+                helpText = row[5].value
+            else:
+                helpText = ''
+
+            _tooltip = False
+
+            if row[6].value:
+                if str(row[6].value).lower() == 'yes':
+                    _tooltip = True
+
+            #If has dependencies
+            if row[8].value:
+                try:
+                    dependencies_list = row[8]
+                    list_dep_aux = dependencies_list.value.split('|')
+                    question_num_parent = (_questions_rows.get(int(list_dep_aux[0])))
+
+
+                    index_aux = int(str(list_dep_aux[1]))-1
+                    choice_parent_list = _choices_array.get(int(list_dep_aux[0]))
+                    choice_parent = choice_parent_list[index_aux]
+                    _checks = 'dependent=\"' + str(question_num_parent) + ',' + str(choice_parent) + '\"'
+                except:
+                    raise
+
+            try:
+                questionNumber = qNumber.getNumber(level_number_column.value)
+                questionNumber = self.format_number(str(questionNumber))
+            except:
+                if type==self.QUESTION:
+                    log += "\n%s - Error to create question number %s" % (type_Column.row, text_en)
+                elif type==self.CATEGORY:
+                    log += "\n%s - Error to create Category number %s" % (type_Column.row, text_en)
+
+                self.writeLog(log)
+                raise
+
+            #print slug
+            #Create or load slug
+            slugs = Slugs.objects.filter(slug1=slug, description=text_en)
+            if len(slugs) <= 0:
+                slug_db = Slugs(slug1=slug, description=text_en)
+                slug_db.save()
+            else:
+                slug_db = slugs[0]
+
+            visible_default = False
+            if row[10].value:
+                if str(row[10].value).lower() == 'visible':
+                    visible_default = True
+
+            is_category=None
+            is_stats=None
+
+            if type==self.QUESTION:
+                is_stats=True
+                is_category=False
+            elif type==self.CATEGORY:
+                is_stats=False
+                is_category=True
+
+            question = Question(questionset=questionset, text_en=text_en, number=str(questionNumber),
+                                type=dataType_column.value, help_text=helpText, slug=slug, slug_fk=slug_db, stats=True,
+                                category=False, tooltip=_tooltip, checks=_checks, visible_default=visible_default)
+
+
+            if not _debug:
+                question.save()
+
+                if type==self.QUESTION:
+                    log += '\n%s - Question created %s ' % (type_Column.row, question)
+                elif type==self.CATEGORY:
+                    log += '\n%s - Category created %s ' % (type_Column.row, question)
+
+
+
+            _questions_rows[type_Column.row] = str(questionNumber)
+
+            if type == self.QUESTION:
+                if dataType_column.value in ['choice', 'choice-freeform', 'choice-multiple', 'choice-multiple-freeform']:
+                    _choices_array_aux = []
+                    # Parse of values list
+                    values_list = row[4]
+                    if (values_list!=None and values_list.value!=None):
+                        list_aux = values_list.value.split('|')
+                        i = 1
+                        for ch in list_aux:
+                            try:
+                                choice = Choice(question=question, sortid=i, text_en=ch, value=ch)
+                                log += '\n%s - Choice created %s ' % (type_Column.row, choice)
+                                if not _debug:
+                                    choice.save()
+                                _choices_array_aux.append(ch)
+
+                                log += '\n%s - Choice saved %s ' % (type_Column.row, choice)
+                                i += 1
+                            except:
+                                log += "\n%s - Error to save Choice %s" % (type_Column.row, choice)
+                                self.writeLog(log)
+                                raise
+                        _choices_array[type_Column.row] = _choices_array_aux
+
+                if dataType_column.value in ['choice-yesno', 'choice-yesnocomment',
+                                                     'choice-yesnodontknow']:
+                    _choices_array[type_Column.row] = ['yes', 'no', 'dontknow']
+
+        except:
+            log += "\n%s - Error to save question %s" % (type_Column.row, text_en)
+
+            self.writeLog(log)
+            raise
     @transaction.commit_on_success
     def import_questionnaire(self):
         _debug = False
@@ -189,219 +325,19 @@ class ImportQuestionnaireExcel(ImportQuestionnaire):
                     # Columns required:  Type, Text/Question, Level/Number, Category
                     # Columns optional:  Help text/Description, Slug, Tooltip, Dependencies
                     elif str(type_Column.value) == "Category":
-
-                        try:
-                            text_en = str(level_number_column.value) + '. ' + str(text_question_Column.value)
-                            if row[7].value:
-                                slug = row[7].value
-                            else:
-                                slug = convert_text_to_slug(str(row[1].value)[:50])
-                                #slug = self.get_slug(slug, questionnaire.pk)
-                                slug = self.get_slug(slug, questionnaire)
-
-                            if row[5].value:
-                                helpText = row[5].value
-                            else:
-                                helpText = ""
-                            # print "HELP_TEXT1: " + str(helpText)
-                            _tooltip = False
-
-                            if row[6].value:
-                                if str(row[6].value).lower() == 'yes':
-                                    _tooltip = True
-
-                            #If has dependencies
-                            if row[8].value:
-                                try:
-                                    dependencies_list = row[8]
-                                    list_dep_aux = dependencies_list.value.split('|')
-                                    question_num_parent = str(_questions_rows.get(int(list_dep_aux[0])))
-
-                                    # print str(row[0].row) + " str(list_dep_aux[0]: " + str(int(list_dep_aux[0]))
-                                    # print str(row[0].row) + " question_num_parent: " + question_num_parent
-                                    # print str(row[0].row) + " _questions_rows: " + str(_questions_rows)
-
-                                    index_aux = int(str(list_dep_aux[1]))-1
-                                    choice_parent_list = _choices_array.get(int(list_dep_aux[0]))
-                                    choice_parent = choice_parent_list[index_aux]
-                                    _checks = 'dependent=\"' + str(question_num_parent) + ',' + str(choice_parent) + '\"'
-
-                                except:
-                                    raise
-
-                            try:
-                                questionNumber = qNumber.getNumber(level_number_column.value)
-                                questionNumber = self.format_number(str(questionNumber))
-                            except:
-                                log += "\n%s - Error to create Category number %s" % (type_Column.row, text_en)
-                                self.writeLog(log)
-                                raise
-
-                            #Create or load slug
-                            #print slug
-                            slugs = Slugs.objects.filter(slug1=slug, description=text_en)
-                            if len(slugs) <= 0:
-                                slug_db = Slugs(slug1=slug, description=text_en)
-                                slug_db.save()
-                            else:
-                                slug_db = slugs[0]
-
-                            question = Question(questionset=questionset, text_en=text_en, number=str(questionNumber),
-                                                type='comment', help_text=helpText, slug=slug, slug_fk=slug_db, stats=False, category=True,
-                                                tooltip=_tooltip, checks=_checks)
-
-                            if not _debug:
-                                question.save()
-                                log += '\n%s - Category created %s ' % (type_Column.row, question)
-
-                            _questions_rows[type_Column.row] = str(questionNumber)
-
-                            #if not _debug:
-                                # TODO: I think we don't need this now, since question now has a slug foreign key
-                            #    save_slug(question.slug,  question.text_en, question)
-
-                            # slugs.append((question.slug,  question.text_en, question))
-                            log += '\n%s - Category saved %s ' % (type_Column.row, question)
-                        except:
-                            log += "\n%s - Error to save Category %s" % (type_Column.row, text_en)
-                            self.writeLog(log)
-                            raise
-
+                        self.__handleQuestion(self.CATEGORY, row, type_Column, level_number_column, text_question_Column,
+                            _questions_rows, _choices_array, qNumber, questionset, log, _checks, _debug, questionnaire)
                     # Type = QUESTION
                     # Columns required:  Type, Text/Question, Level/Number, Data Type, Category, Stats
                     # Columns optional:  Value List, Help text/Description, Tooltip, Dependencies
                     else:
-                        #try:
-                        text_en = str(level_number_column.value) + '. ' + str(text_question_Column.value)
-                        #except:
-                            #import pdb
-                            #pdb.set_trace()
-                        try:
-                            dataType_column = row[3]
-                            if row[7].value:
-                                slug = row[7].value
-                            else:
-                                slug = convert_text_to_slug(str(row[1].value)[:50])
-                                #slug = self.get_slug(slug, questionnaire.pk)
-                                slug = self.get_slug(slug, questionnaire)
-
-                            if row[5].value:
-                                helpText = row[5].value
-                            else:
-                                helpText = ''
-
-                            _tooltip = False
-
-                            if row[6].value:
-                                if str(row[6].value).lower() == 'yes':
-                                    _tooltip = True
-
-                            #If has dependencies
-                            if row[8].value:
-                                try:
-                                    dependencies_list = row[8]
-                                    list_dep_aux = dependencies_list.value.split('|')
-                                    question_num_parent = (_questions_rows.get(int(list_dep_aux[0])))
-
-                                    # print "###############"
-                                    # print str(row[0].row) + " dependencies_list: " + str(dependencies_list)
-                                    # print str(row[0].row) + " str(list_dep_aux[0]: " + str(int(list_dep_aux[0]))
-                                    # print str(row[0].row) + " question_num_parent: " + question_num_parent
-                                    # print str(row[0].row) + " _questions_rows: " + str(_questions_rows)
-                                    # print str(row[0].row) + " _choices_array: " + str(_choices_array)
-
-                                    index_aux = int(str(list_dep_aux[1]))-1
-                                    choice_parent_list = _choices_array.get(int(list_dep_aux[0]))
-                                    choice_parent = choice_parent_list[index_aux]
-                                    _checks = 'dependent=\"' + str(question_num_parent) + ',' + str(choice_parent) + '\"'
-                                except:
-                                    raise
-
-                            try:
-                                questionNumber = qNumber.getNumber(level_number_column.value)
-                                questionNumber = self.format_number(str(questionNumber))
-                            except:
-                                log += "\n%s - Error to create question number %s" % (type_Column.row, text_en)
-                                self.writeLog(log)
-                                raise
-
-                            #print slug
-                            #Create or load slug
-                            slugs = Slugs.objects.filter(slug1=slug, description=text_en)
-                            if len(slugs) <= 0:
-                                slug_db = Slugs(slug1=slug, description=text_en)
-                                slug_db.save()
-                            else:
-                                slug_db = slugs[0]
-
-                            visible_default = False
-                            if row[10].value:
-                                if str(row[10].value).lower() == 'visible':
-                                    visible_default = True
-
-                            question = Question(questionset=questionset, text_en=text_en, number=str(questionNumber),
-                                                type=dataType_column.value, help_text=helpText, slug=slug, slug_fk=slug_db, stats=True,
-                                                category=False, tooltip=_tooltip, checks=_checks, visible_default=visible_default)
-
-                            log += '\n%s - Question created %s ' % (type_Column.row, question)
-
-                            if not _debug:
-                                question.save()
-
-                            _questions_rows[type_Column.row] = str(questionNumber)
-
-                            #if not _debug:
-                                # TODO: I think we don't need this now, since question now has a slug foreign key
-                            #    save_slug(question.slug,  question.text_en, question)
-
-                            # slugs.append((questionslugs.slug,  question.text_en, question))
-                            log += '\n%s - Question saved %s ' % (type_Column.row, question)
-
-                            if dataType_column.value in ['choice', 'choice-freeform', 'choice-multiple', 'choice-multiple-freeform']:
-                                _choices_array_aux = []
-                                # Parse of values list
-                                values_list = row[4]
-                                if (values_list!=None and values_list.value!=None):
-                                    list_aux = values_list.value.split('|')
-                                    i = 1
-                                    for ch in list_aux:
-                                        try:
-                                            choice = Choice(question=question, sortid=i, text_en=ch, value=ch)
-                                            log += '\n%s - Choice created %s ' % (type_Column.row, choice)
-                                            if not _debug:
-                                                choice.save()
-                                            _choices_array_aux.append(ch)
-
-                                            log += '\n%s - Choice saved %s ' % (type_Column.row, choice)
-                                            i += 1
-                                        except:
-                                            log += "\n%s - Error to save Choice %s" % (type_Column.row, choice)
-                                            self.writeLog(log)
-                                            raise
-                                    _choices_array[type_Column.row] = _choices_array_aux
-
-                            if dataType_column.value in ['choice-yesno', 'choice-yesnocomment',
-                                                                 'choice-yesnodontknow']:
-                                _choices_array[type_Column.row] = ['yes', 'no', 'dontknow']
-                        except:
-                            log += "\n%s - Error to save question %s" % (type_Column.row, text_en)
-
-                            self.writeLog(log)
-                            raise
+                        self.__handleQuestion(self.QUESTION, row, type_Column, level_number_column, text_question_Column,
+                            _questions_rows, _choices_array, qNumber, questionset, log, _checks, _debug, questionnaire)
 
         except:
             log += '\nError to save questionsets and questions of the questionnaire %s ' % questionnaire
             self.writeLog(log)
             raise
-
-        # for a in slugs:
-        #     (_slug, _desc, question) = a
-        #     # Write Slug
-        #     slugsAux = Slugs()
-        #     slugsAux.slug1 = _slug
-        #     slugsAux.description = _desc
-        #     slugsAux.question = question
-        #     slugsAux.save()
 
         log += '\nQuestionnaire %s, questionsets, questions and choices created with success!! ' % questionnaire
         self.writeLog(log)
