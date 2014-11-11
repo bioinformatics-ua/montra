@@ -52,7 +52,7 @@ def creatematrixqsets(db_type, fingerprints, qsets):
                 else:
                     a_list.append([answer.data, question.type])
             except Answer.DoesNotExist:
-                a_list.append("")
+                a_list.append(["", question.type])
 
         name = "Unnamed"
 
