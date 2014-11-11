@@ -29,7 +29,7 @@ from django.contrib.auth.models import User
 
 from description import fingerprint_description_slugs
 
-from newsletter.models import Newsletter, Subscription
+from newsletter.models import Newsletter, Subscription, EmailTemplate
 
 class Database:
     id = ''
@@ -402,6 +402,7 @@ class FingerprintSubscription(models.Model):
             newsl = Newsletter( title=self.fingerprint.findName()+' Updates',
                             slug=self.fingerprint.fingerprint_hash,
                             email=settings.DEFAULT_FROM_EMAIL,
+                            message_template=EmailTemplate.objects.get(subject='aggregate'),
                             sender="Emif Catalogue")
             newsl.save()
 
