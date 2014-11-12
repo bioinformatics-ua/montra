@@ -42,6 +42,10 @@ var RecommendationsWidget = function RecommendationsWidget(widgetname, width, he
                 for(var i=0;i<data.mlt.length;i++){
                     self.content += '<tr><td style="word-break: break-all;"><small><a href="'+data.mlt[i].href+'">'+data.mlt[i].name+ "</a></small></td></tr>";
                 }
+
+                if(data.mlt.length ==0){
+                    self.content += '<tr><td style="text-align: justify;text-justify: inter-word;">There\'s no recommendations yet.<br /> To have recommendations you need to have databases subscribed.</td></tr>'
+                }
             }
 
             RecommendationsWidget._super.__refresh.apply(self);
