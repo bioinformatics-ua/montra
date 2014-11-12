@@ -30,8 +30,6 @@ from questionnaire.models import Questionnaire
 
 from fingerprint.models import Fingerprint
 
-from fingerprint.services import indexFingerprint
-
 from django.dispatch import receiver
 from userena.signals import signup_complete
 
@@ -153,7 +151,7 @@ def add_invited(user, sender, **kwargs):
         sp.delete()
 
         # must reindex, because databases lists come from solr, to update user_t
-        indexFingerprint(fingerprint.fingerprint_hash)
+        fingerprint.indexFingerprint()
 
 
     #print "Added invited user databases to+"+str(user.email)+"!"

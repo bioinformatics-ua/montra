@@ -13,9 +13,8 @@
 		{% if request.user.is_authenticated %}
 		<!--div class="btn-group" id="group_toolbar"-->
       {% if dashboard %}
-        <button id="dashboardreset" onclick="dashzone.reset();" class="btn"><i class="fa fa-trash"></i>
- Reset to Default</button>
         <div id="dashboardselectbox" class="btn btn-group"></div>
+        <button id="dashboardreset" onclick="dashzone.reset();" class="btn"><i class="fa fa-trash"></i> Reset</button>
       {% endif %}
       {% if fingerprint_dump %}
       {% if not subscription %}
@@ -43,6 +42,7 @@
             <li><a id="comparabtn"  href=""  rel="tooltip" data-container="body" data-placement="right" data-original-title="This allows to compare databases.<br /> It is only possible to compare databases of the same type. <br /> When you choose a database, the type is defined automatically, and databases of other types can't be choosen. <br /> If you want to choose other type of databases, you must only choose databases of this type." disabled>
            <i class="fa fa-columns"></i>&nbsp; Databases</a>
            </li>
+
            <li><a id="comparabtnPC"  href=""  rel="tooltip" data-container="body" data-placement="right" data-original-title="This allows to compare databases.<br /> It is only possible to compare databases of the same type. <br /> When you choose a database, the type is defined automatically, and databases of other types can't be choosen. <br /> If you want to choose other type of databases, you must only choose databases of this type." disabled>
            <i class="fa fa-users"></i>&nbsp; Populations</a>
            </li>
@@ -125,7 +125,7 @@
       {% endif %}
       {% if fingerprint_dump and owner_fingerprint or fingerprint_dump and request.user.is_superuser %}
       <div class="btn btn-group">
-        <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
+        <a id="managetoolbar" class="btn dropdown-toggle" data-toggle="dropdown" href="#">
           <i class="fa fa-cogs"></i> Manage
           <span class="caret"></span>
         </a>
@@ -199,7 +199,7 @@
         <p id="debug-url"></p>
     </div>
     <div class="modal-footer">
-        <a href="rm/ref" class="btn btn-danger">Yes</a>
+        <a id="delete_fingerprint" href="rm/ref" class="btn btn-danger">Yes</a>
         <!-- <a href="delete.php?some=param&ref=" class="btn danger">Yes 2</a> -->
         <a href="#" onclick="$('#modal-from-dom').modal('hide'); return false;" class="btn btn-secondary">Cancel</a>
     </div>

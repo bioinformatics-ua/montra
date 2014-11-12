@@ -46,7 +46,6 @@ from django.conf import settings
 from django.template.defaultfilters import slugify
 
 import datetime
-from fingerprint.models import Fingerprint
 
 from questionnaire.models import Questionnaire, QuestionSet
 
@@ -149,6 +148,11 @@ class CoreEngine:
         """
         self.solr.delete(id=id_doc)
 
+    def deleteQuery(self, q):
+        """Delete the document
+        """
+        self.solr.delete(q=q)
+
     def search_fingerprint(self, query, start=0, rows=100, fl='', sort='', facet="off"):
         """search the fingerprint
         """
@@ -235,13 +239,6 @@ def index_answeres_from_qvalues(qvalues, questionnaire, subject, fingerprint_id,
     results = c.search_fingerprint("id:"+fingerprint_id)
     if (len(results)>0):
         d = results.docs[0]
-    '''else:
-        try:
-            fp = Fingerprint(fingerprint_hash=fingerprint_id)
-            fp.save()
-        except:
-            print(fingerprint_id + ' already in DB')
-    '''
 
     text = ""
     ''' For god sake, i dont understand what this was doing here, since its not being used

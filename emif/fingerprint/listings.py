@@ -50,6 +50,9 @@ from fingerprint.tasks import anotateshowonresults
 
 from accounts.models import EmifProfile, RestrictedUserDbs
 
+from django.utils import timezone
+
+
 def query_solr(request, page=1):
     if not request.POST:
         return
@@ -291,7 +294,7 @@ def results_diff(request, page=1, template_name='results.html'):
                 except Questionnaire.DoesNotExist:
                     print "Questionnaire doesnt exist..."
 
-                this_query = AdvancedQuery(user=this_user,name=("Query on "+time.strftime("%c")),
+                this_query = AdvancedQuery(user=this_user,name=("Query on "+timezone.now().strftime("%Y-%m-%d %H:%M:%S.%f")),
                     serialized_query_hash=this_query_hash,
                     serialized_query=qserialization, qid=quest)
                 this_query.save()
