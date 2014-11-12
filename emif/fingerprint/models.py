@@ -64,6 +64,11 @@ class Database:
 
     percentage = 0
 
+    def __eq__(self, other):
+        return other.id == self.id
+
+    def __str__(self):
+        print id
 
 class RequestMonkeyPatch(object):
     POST = {}
@@ -177,6 +182,7 @@ class Fingerprint(models.Model):
 
     @staticmethod
     def valid():
+
         return Fingerprint.objects.filter(removed=False)
 
     def setSubscription(self, user, value):
@@ -309,6 +315,7 @@ class Fingerprint(models.Model):
                 c.delete(results.docs[0]['id'])
 
             c.index_fingerprint_as_json(d)
+
 
 
 
