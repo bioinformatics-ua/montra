@@ -65,7 +65,7 @@ class PrivateLinkEmailView(APIView):
                     fname = plink.fingerprint.findName()
 
                     message = """Dear Colleague,\n
-                            %s shared with you, a private link to their database "%s" on the platform <a href="http://bioinformatics.ua.pt/emif">EMIF Catalogue</a>. \n\n
+                            %s shared with you a private link to their database "%s" on the platform <a href="http://bioinformatics.ua.pt/emif">EMIF Catalogue</a>. \n\n
                             The database can be visualised in the link below:\n
                             <a href="%s">%s</a>\n\n
                             \n\nSincerely,\nEMIF Catalogue
