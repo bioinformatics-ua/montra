@@ -563,7 +563,7 @@ def get_databases_from_solr_v2(request, query="*:*", sort="", rows=100, start=0,
     if post_process:
         list_databases = post_process(results, list_databases)
 
-    return (list_databases,len(list_databases))
+    return (list_databases, results.hits)
 
 def get_query_from_more_like_this(request, doc_id, type, maxx=100):
     try:
@@ -663,7 +663,6 @@ def all_databases_user(request, page=1, template_name='results.html', force=Fals
         #list_databases = get_databases_from_solr(request, "*:*")
 
     ## Paginator ##
-
     myPaginator = Paginator(list_databases, rows)
     try:
         pager =  myPaginator.page(page)
