@@ -187,6 +187,7 @@ class ConfCharts(object):
         c11.title.var = "Age at patient end"
         c11.title.fixed_title = "End Year"
         c11.hint = "Histogram of last year of data capturing"
+        c11.tooltip = "Histogram of last year of data capturing"
 
         c11.x_axis = Axis()
         c11.x_axis.operation = "unique"
@@ -413,7 +414,64 @@ class ConfCharts(object):
 
 
 
+        #################################################
+        ### Age at start of year - percentiles
+        #################################################
+        c14 = Chart()
+        c14.uid = 11
+        c14.title = Title()
+        c14.legend = True
+        c14.title.operation = Operation.UNIQUE
+        c14.title.fixed_title = " Age Distribution at Start of Year - percentiles"
+        c14.title.var = "Age at start of year"
+        c14.x_axis = Axis()
+        c14.x_axis.operation = "unique"
+        c14.x_axis.var = 'Value1'
+        #c14.x_axis.var = 'Years'
 
+
+
+        c14.y_axis = Axis()
+        c14.y_axis.multivalue = True
+        c14.y_axis.operation = "unique"
+        c14.y_axis.var = ["perc25", "Mean", "perc75", "Median"]
+        c14.y_axis.static_filters = []
+        c14.y_axis.transformation = "y / 12"
+        c14.y_axis.label = "Age (years)"
+
+        fy1 = Filter()
+        fy1.name = 'Name2'
+        fy1.key = 'Name2'
+        fy1.value = ''
+
+        fy2 = Filter()
+        fy2.name = 'Value2'
+        fy2.key = 'Value2'
+        fy2.value = ''
+
+        fy3 = Filter()
+        fy3.name = 'Name1'
+        fy3.key = 'Name1'
+        fy3.value = 'YEAR'
+
+
+        c14.y_axis.static_filters = [fy1, fy2, fy3]
+
+
+        f1 = Filter()
+        f1.name = 'Year'
+        f1.key = 'Name1'
+        f1.value = 'Value1'
+
+        f2 = Filter()
+        f2.name = 'Gender'
+        f2.key = None
+        f2.value = 'Gender'
+        #f2.translation = {'M': 'Male', 'F': 'Female', 'T': 'Total',  'ALL': 'Male/Female'}
+        f2.translation = {'M': 'Male', 'F': 'Female', 'T': 'Total'}
+
+        c14.filters = [f2]
+        sc.charts.append(c14)
 
 
 
@@ -539,67 +597,6 @@ class ConfCharts(object):
 
 
         #################################################
-        ### Age at start of year - percentiles
-        #################################################
-        c14 = Chart()
-        c14.uid = 11
-        c14.title = Title()
-        c14.legend = True
-        c14.title.operation = Operation.UNIQUE
-        c14.title.fixed_title = " Age Distribution at Start of Year - percentiles"
-        c14.title.var = "Age at start of year"
-        c14.x_axis = Axis()
-        c14.x_axis.operation = "unique"
-        c14.x_axis.var = 'Value1'
-        #c14.x_axis.var = 'Years'
-
-
-
-        c14.y_axis = Axis()
-        c14.y_axis.multivalue = True
-        c14.y_axis.operation = "unique"
-        c14.y_axis.var = ["perc25", "Mean", "perc75", "Median"]
-        c14.y_axis.static_filters = []
-        c14.y_axis.transformation = "y / 12"
-        c14.y_axis.label = "Age (years)"
-
-        fy1 = Filter()
-        fy1.name = 'Name2'
-        fy1.key = 'Name2'
-        fy1.value = ''
-
-        fy2 = Filter()
-        fy2.name = 'Value2'
-        fy2.key = 'Value2'
-        fy2.value = ''
-
-        fy3 = Filter()
-        fy3.name = 'Name1'
-        fy3.key = 'Name1'
-        fy3.value = 'YEAR'
-
-
-        c14.y_axis.static_filters = [fy1, fy2, fy3]
-
-
-        f1 = Filter()
-        f1.name = 'Year'
-        f1.key = 'Name1'
-        f1.value = 'Value1'
-
-        f2 = Filter()
-        f2.name = 'Gender'
-        f2.key = None
-        f2.value = 'Gender'
-        #f2.translation = {'M': 'Male', 'F': 'Female', 'T': 'Total',  'ALL': 'Male/Female'}
-        f2.translation = {'M': 'Male', 'F': 'Female', 'T': 'Total'}
-
-        c14.filters = [f2]
-        sc.charts.append(c14)
-
-
-
-        #################################################
         ### Patient time before a year - percentile
         #################################################
         c14 = Chart()
@@ -622,7 +619,7 @@ class ConfCharts(object):
         c14.y_axis.var = ["perc25", "Mean", "perc75", "Median"]
         c14.y_axis.static_filters = []
         c14.y_axis.transformation = "y / 12"
-        c14.y_axis.label = "Age (years)"
+        c14.y_axis.label = "Patient Time (years)"
 
         fy1 = Filter()
         fy1.name = 'Name2'
@@ -682,7 +679,7 @@ class ConfCharts(object):
         c14.y_axis.var = ["perc25", "Mean", "perc75", "Median"]
         c14.y_axis.static_filters = []
         c14.y_axis.transformation = "y / 12"
-        c14.y_axis.label = "Age (years)"
+        c14.y_axis.label = "Patient Time (years)"
 
         fy1 = Filter()
         fy1.name = 'Name2'
@@ -768,7 +765,7 @@ class ConfCharts(object):
         c5.title = Title()
         c5.title.operation = Operation.UNIQUE
         c5.title.var = "Observation time in a year"
-        c5.title.fixed_title = "Patient time per year"
+        c5.title.fixed_title = "Patient time in a year"
 
         c5.x_axis = Axis()
         c5.x_axis.operation = "unique"
@@ -811,7 +808,7 @@ class ConfCharts(object):
 
         c5.filters = [f2]
 
-        sc.charts.append(c5)
+        #sc.charts.append(c5)
 
         return sc
 

@@ -26,6 +26,8 @@ $(function(){
             registryTarget: "#dashboardselectbox",
             initial: function () {
 
+                dashzone.register(new RecommendationsWidget("recommendations",  2, 1, 6, 6));
+
                 dashzone.addWidget("feed");
                 dashzone.addWidget("actions");
                 dashzone.addWidget("userstats");

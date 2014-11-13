@@ -48,6 +48,17 @@ from django.template.loader import render_to_string
 
 from fingerprint.models import FingerprintHead, AnswerChange
 
+# This indexes the fingerprint using the celery, so the interface doesn't have to block
+@shared_task
+def indexFingerprintCelery(fingerprint_hash):
+    try:
+        fingerprint = Fingerprint.objects.get(fingerprint_hash=fingerprint_hash)
+
+        fingerprint.indexFingerprint()
+
+    except Fingerprint.DoesNotExist:
+        print "-- ERROR: Can't index fingerprint, because fingerprint wasn't found."
+
 @shared_task
 def anotateshowonresults(query_filtered, user, isadvanced, query_reference):
     # Operations

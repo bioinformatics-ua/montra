@@ -22,7 +22,7 @@
             <td>{{query.created_date|date:"Y-m-d H:i:s"}}</td>
             <td>
             <a href="advsearch/results_simple/{{query.id}}" class="btn btn-info">Results</a>
-            <a class="btn" href="advsearch/history/remove_simple/{{query.id}}">Remove</a>
+            <a class="removebtn btn" href="advsearch/history/remove_simple/{{query.id}}">Remove</a>
             </td>
         </tr>
     {% endfor %}
@@ -44,7 +44,7 @@
         {% endif %}
   </ul>
 </div>
-<form id="send2" method="POST" > 
+<form id="send2" method="POST" >
 <div style="font-size: 80%; margin-top: -65px;" class="pull-right">Show <select style="width: 50px; margin-top: 10px;" id="paginator_rows" name="paginator_rows" class="span1 paginator-page-selector" >
   <option value="5" {% if page_rows == 5 %}selected{% endif %}>5</option>
   <option value="10" {% if page_rows == 10 %}selected{% endif %}>10</option>

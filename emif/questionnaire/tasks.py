@@ -44,9 +44,14 @@ import re
 from django.conf import settings
 import pysolr
 
+from django.core.cache import cache
 
 @shared_task
 def reindexQuestionnaires():
+    print "Reindexing questionnaires on solr"
+
     c = CoreEngine()
 
     c.reindex_quest_solr()
+
+    cache.delete('reindexingQuestionnaires')

@@ -2,11 +2,10 @@ from questionnaire.models import Question, Questionnaire
 
 from searchengine.search_indexes import CoreEngine
 from fingerprint.models import Answer, Fingerprint
-from fingerprint.services import indexFingerprint
 
 def old_publications_to_comments():
     # ars, gepard, hsd csd lpd, ipci, maas, pedianet, thin
-    greenlist = ['768185357ce7e4e0aeae6d2e69f6d7e0', '45b7ccb3aca47bc37f9bd82504f09b3b', 
+    greenlist = ['768185357ce7e4e0aeae6d2e69f6d7e0', '45b7ccb3aca47bc37f9bd82504f09b3b',
     '52d4981701f0126d947014244744efea', '54d8384917b21fb7928ba72a1e72326b', '7b128593480b53409ac83c9582badbb7',
     '5d8f88d91f1dc3e2806d825f61260b76', '7a205644571c31bc50965c68d7565622']
 
@@ -54,12 +53,12 @@ def old_publications_to_comments():
                         this_answer.save()
 
                     # after save must reindex to update solr too
-                    #indexFingerprint(this_fingerprint.fingerprint_hash)
+                    #this_fingerprint.indexFingerprint()
 
 
                 except Fingerprint.DoesNotExist:
                     print "--- ERROR: Fingerprint with id " + str(document.get('id')) + 'does not exist'
-        
+
         print "-----------------------------------------------"
         print " End"
         print "-----------------------------------------------"
@@ -67,4 +66,4 @@ def old_publications_to_comments():
     except Question.DoesNotExist:
         print "--- ERROR: Theres no question with slug Publications_t"
 
-old_publications_to_comments()   
+old_publications_to_comments()

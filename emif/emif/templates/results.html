@@ -164,7 +164,7 @@
   {% for t in page_obj %}
    <tr>
           <td>
-            <a href="fingerprint/{{ t.id }}/1">{{ t.name }}</a>
+            <a data-acronym="{{ t.name }}" href="fingerprint/{{ t.id }}/1">{{ t.name }}</a>
         </td>
         <td>{{t.institution}}</td>
         <td>{{t.location}}</td>

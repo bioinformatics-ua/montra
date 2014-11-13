@@ -83,7 +83,7 @@ urlpatterns = patterns('api.views',
     url(r'^feed$', FeedView.as_view(), name='feed'),
     url(r'^tagcloud$', TagCloudView.as_view(), name='tagcloud'),
     url(r'^topusers$', TopUsersView.as_view(), name='topusers'),
-
+    url(r'^recommendations$', RecommendationsView.as_view(), name='recommendations'),
 )
 
 urlpatterns = format_suffix_patterns(urlpatterns)

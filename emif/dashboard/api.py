@@ -55,7 +55,7 @@ from questionnaire import Processors, QuestionProcessors, Fingerprint_Summary
 
 from django.db.models import Count
 
-from accounts.models import NavigationHistory
+from accounts.models import NavigationHistory, RestrictedUserDbs, EmifProfile
 
 
 from django.conf import settings
@@ -68,6 +68,8 @@ import random
 
 from hitcount.models import Hit, HitCount
 from accounts.models import EmifProfile
+
+from searchengine.search_indexes import CoreEngine
 
 ############################################################
 ##### Database Types - Web service
@@ -136,6 +138,11 @@ class MostViewedFingerprintView(APIView):
         if request.user.is_authenticated():
             list_viewed = []
 
+            try:
+                eprofile = EmifProfile.objects.get(user=request.user)
+            except EmifProfile.DoesNotExist:
+                print "-- ERROR: Couldn't get emif profile for user"
+
             most_hit = Hit.objects.filter(user=request.user).values('user','hitcount__object_pk').annotate(total_hits=Count('hitcount')).order_by('-total_hits')
 
             i=0
@@ -143,6 +150,12 @@ class MostViewedFingerprintView(APIView):
             for hit in most_hit:
                 try:
                     this_fingerprint = Fingerprint.valid().get(id=hit['hitcount__object_pk'])
+
+                    if eprofile.restricted:
+                        try:
+                            allowed = RestrictedUserDbs.objects.get(user=request.user, fingerprint=this_fingerprint)
+                        except RestrictedUserDbs.DoesNotExist:
+                            continue
 
                     list_viewed.append(
                         {
@@ -412,3 +425,70 @@ class TagCloudView(APIView):
         else:
             response = Response({}, status=status.HTTP_403_FORBIDDEN)
         return response
+
+############################################################
+##### Recommendations based on Subscriptions and More Like This - Web service
+############################################################
+
+
+class RecommendationsView(APIView):
+    authentication_classes = (SessionAuthentication, BasicAuthentication)
+    permission_classes = (IsAuthenticated,)
+
+    __subscribed = []
+    __mlt_fused = {}
+
+    def get(self, request, *args, **kw):
+        self.__subscribed = []
+        self.__mlt_fused = {}
+
+        if request.user.is_authenticated():
+
+            ordered = cache.get('recommendations_'+str(request.user.id))
+
+            if ordered == None:
+                maxx = 100
+                subscriptions = FingerprintSubscription.active().filter(user=request.user)
+
+                # first we generate the list of already subscribed databases, since they wont appear on suggestions
+                for subscription in subscriptions:
+                    self.__subscribed.append(subscription.fingerprint.fingerprint_hash)
+
+                c = CoreEngine()
+                for subscription in subscriptions:
+                    fingerprint = subscription.fingerprint
+                    this_mlt = c.more_like_this(fingerprint.fingerprint_hash, fingerprint.questionnaire.slug, maxx=maxx)
+
+                    self.__merge(this_mlt)
+
+                ordered = sorted(self.__mlt_fused.values(), reverse=True, key=lambda x:x['score'])[:10]
+
+                for entry in ordered:
+                    fingerprint = Fingerprint.valid().get(fingerprint_hash=entry['id'])
+
+                    entry['name'] = fingerprint.findName()
+
+                    entry['href'] = 'fingerprint/'+fingerprint.fingerprint_hash+'/1/'
+
+                cache.set('recommendations_'+str(request.user.id), ordered, 720)
+
+
+            response = Response({'mlt': ordered}, status=status.HTTP_200_OK)
+
+        else:
+            response = Response({}, status=status.HTTP_403_FORBIDDEN)
+
+        return response
+
+    def __merge(self, merging):
+
+        for db in merging:
+            if db['id'] not in self.__subscribed:
+                if db['id'] in self.__mlt_fused:
+                    current = self.__mlt_fused[db['id']]
+
+                    current['score'] += db['score']
+
+                    self.__mlt_fused[db['id']] = current
+                else:
+                    self.__mlt_fused[db['id']] = db

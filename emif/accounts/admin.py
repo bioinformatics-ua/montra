@@ -18,9 +18,49 @@ from django.db.models import Count, Avg, Max, Min
 from django.utils import timezone
 import datetime
 
+from accounts.models import RestrictedUserDbs
+from fingerprint.models import Fingerprint
+
 class NavigationAdmin(admin.ModelAdmin):
     list_display = ['user', 'path', 'date']
     search_fields = ['user__username','user__email','path']
+    list_filter = ['user']
+
+def name(obj):
+    return "%s" % (obj.findName())
+name.short_description = 'Name'
+
+class RestrictedForm(forms.ModelForm):
+    def __findName(self, hash):
+        try:
+            fn = Fingerprint.objects.get(fingerprint_hash=hash)
+
+            return (fn.removed, fn.findName())
+
+        except Fingerprint.DoesNotExist:
+            return (False, hash)
+    def __init__(self, *args, **kwargs):
+        # initalize form
+        super(RestrictedForm, self).__init__(*args, **kwargs)
+
+        # rebuild choices
+        w = self.fields['fingerprint'].widget
+        choices = []
+        for key, value in w.choices:
+            (removed, name) = self.__findName(value)
+            if not removed:
+                choices.append((key, name))
+
+        w.choices = sorted(choices, key=lambda x: x[1])
+
+        z = self.fields['user'].widget
+
+        z.choices = sorted(z.choices, key=lambda x:x[1])
+
+class NavigationRestricted(admin.ModelAdmin):
+    form = RestrictedForm
+    list_display = ['user', name]
+    search_fields = ['user']
     list_filter = ['user']
 
 class ChoiceForm(forms.Form):
@@ -70,7 +110,7 @@ class UserStatistics(View):
                                                     'session_time': session_time,
                                                     'session_average': average_time,
                                                     'views_time': views_time,
-                                                    'views_average': average_views,
+                                                    'views_average': average_views
                                                     })
 
     def getSessionTimes(self, user_history):
@@ -131,3 +171,4 @@ admin.site.register_view('user_statistics', view=login_required(staff_member_req
 admin.site.register(Profile)
 
 admin.site.register(NavigationHistory, NavigationAdmin)
+admin.site.register(RestrictedUserDbs, NavigationRestricted)
