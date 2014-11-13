@@ -65,11 +65,11 @@ class PrivateLinkEmailView(APIView):
                     fname = plink.fingerprint.findName()
 
                     message = """Dear Colleague,\n
-                            Someone decided to share with you, a private link to their database "%s" on the platform EMIF Catalogue. \n\n
-                            The database can be seen in the link below:\n
+                            %s shared with you, a private link to their database "%s" on the platform <a href="http://bioinformatics.ua.pt/emif">EMIF Catalogue</a>. \n\n
+                            The database can be visualised in the link below:\n
                             <a href="%s">%s</a>\n\n
                             \n\nSincerely,\nEMIF Catalogue
-                    """ % (fname, settings.BASE_URL+'public/fingerprint/'+plink.hash, fname)
+                    """ % (request.user.get_full_name(), fname, settings.BASE_URL+'public/fingerprint/'+plink.hash, fname)
 
                     try:
                         send_custom_mail("EMIF Catalogue: A private link for a database is being shared with you.",
