@@ -32,6 +32,9 @@ function cleanup(string){
 
 /* Handle that allows numeric ttype comparison */
 var handleNumeric = function(reference, other){
+    if (reference.length == 0 && other.length == 0) {
+        return 3;
+    }
     if(reference.length == 1 && other.length == 1){
         var first_number = parseFloat(reference[0].replace(/'/g, ""));
         var second_number = parseFloat(other[0].replace(/'/g, ""));
@@ -90,6 +93,9 @@ function unique(array){
 
 /* This handles every ttype that doesn't have a dedicated comparator */
 var freeTextHandle = function(reference, other){
+    if (reference.length == 0 && other.length == 0) {
+        return 3;
+    }
     if(reference.length == 1 && other.length == 1){
         var firstWords = unique(cleanup(reference[0].toLowerCase()).split(' '));
         var secondWords = unique(cleanup(other[0].toLowerCase()).split(' '));
@@ -113,13 +119,16 @@ var freeTextHandle = function(reference, other){
 
     return 0;
 };
+var handleComment = function(){
+    console.log('cai here');
+    return -3;
+};
 
 function compareAnswers(type, reference, other){
-    handleMap = {'numeric': handleNumeric};
-    if (reference.length == 0 && other.length == 0) {
-        return 3;
-    }
-
+    handleMap = {
+                    'numeric': handleNumeric,
+                    'comment': handleComment,
+                };
     if(handleMap.hasOwnProperty(type)){
         return handleMap[type](reference, other);
     } else {
@@ -284,8 +293,11 @@ comparetable_two = function(table1, table2) {
                     var result = -2;
                     // if (response && response.length !== 0)
                     result = compare_cell(table2, $(this).data('qid'), response.context);
+                    if (result.value == -3){
+                        // do nothing
+                        console.log('cai here');
 
-                    if (result.value == 1) {
+                    } else if (result.value == 1) {
                         //console.log($('#' + table2));
                         //console.log($('#' + table1));
                         paint_table2(table2, result.row, "success");
