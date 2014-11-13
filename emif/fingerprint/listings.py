@@ -590,7 +590,7 @@ def get_query_from_more_like_this(request, doc_id, maxx=100):
 
     ## PY SOLR IS STUPID, OTHERWISE THIS WOULD BE AVOIDED
     database_name = ""
-    results = c.search_fingerprint("id:"+doc_id + query, start=0, rows=1, fl="database_name_t")
+    results = c.search_fingerprint("id:"+doc_id , start=0, rows=1, fl="database_name_t")
     for r in results:
         if "database_name_t" in r:
             database_name = r["database_name_t"]
