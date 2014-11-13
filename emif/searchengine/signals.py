@@ -22,8 +22,18 @@ from django.db.models.signals import post_save
 from questionnaire.tasks import reindexQuestionnaires
 from questionnaire.models import Questionnaire, QuestionSet, Question, Choice
 
+from django.core.cache import cache
+
 def questionnaire_updated(sender, **kwargs):
-    reindexQuestionnaires.delay()
+    # The cache key consists of the task name
+    lock_id = 'reindexingQuestionnaires'
+
+    # cache.add fails if if the key already exists
+    acquire_lock = lambda: cache.add(lock_id, 'true', 60 * 30)
+
+    if acquire_lock():
+        print "Scheduled reindex in 10 minutes"
+        reindexQuestionnaires.apply_async(countdown=60*10)
 
 post_save.connect(questionnaire_updated, sender=Questionnaire)
 post_save.connect(questionnaire_updated, sender=QuestionSet)
