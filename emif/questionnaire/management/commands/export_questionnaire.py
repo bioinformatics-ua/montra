@@ -26,7 +26,7 @@ from questionnaire.export import ExportQuestionnaire
 
 class Command(BaseCommand):
 
-    args = '<database_slug> <file_path>'
+    args = '<questionnaire_id> <file_path>'
     help = 'Export the questionnaire to excel'
 
     def handle(self, *args, **options):
@@ -34,10 +34,10 @@ class Command(BaseCommand):
             slug = args[0]
             file_path = args[1]
 
-            exporter = ExportQuestionnaire.factory("excel", Questionnaire.objects.get(slug=slug), file_path)
+            exporter = ExportQuestionnaire.factory("excel", Questionnaire.objects.get(id=slug), file_path)
             exporter.export()
 
         else:
             self.stdout.write('-- USAGE: \n    '+
-                'python manage.py export_questionnaire <database_slug> <path_file>'+
+                'python manage.py export_questionnaire <questionnaire_id> <path_file>'+
                 '\n\n')
