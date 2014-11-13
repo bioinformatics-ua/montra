@@ -25,19 +25,6 @@ $(function(){
             showRegistry: true,
             registryTarget: "#dashboardselectbox",
             initial: function () {
-                // Registering plugins on dashboard
-                dashzone.register(new FeedWidget("feed", 4, 2, 1, 1));
-                dashzone.register(new CommonActionsWidget("actions", 2, 2, 5, 2));
-                dashzone.register(new UserStatsWidget("userstats",  2, 1, 5, 3));
-
-                dashzone.register(new MostViewedWidget("mostviewed",  2, 1, 6, 4));
-                dashzone.register(new MostViewedFingerprintWidget("mostviewedfingerprint",  2, 1, 6, 4));
-
-                if(typeof(is_staff) != 'undefined' && is_staff == true){
-                    dashzone.register(new LastUsersWidget("lastusers",  2, 1, 6, 5));
-                }
-
-                dashzone.register(new TagCloudWidget("tagcloud",  2, 1, 6, 6));
 
                 dashzone.register(new RecommendationsWidget("recommendations",  2, 1, 6, 6));
 
@@ -51,12 +38,25 @@ $(function(){
         });
 
 
+    // Registering plugins on dashboard
+    dashzone.register(new FeedWidget("feed", 4, 2, 1, 1));
+    dashzone.register(new CommonActionsWidget("actions", 2, 2, 5, 2));
+    dashzone.register(new UserStatsWidget("userstats",  2, 1, 5, 3));
+
+    dashzone.register(new MostViewedWidget("mostviewed",  2, 1, 6, 4));
+    dashzone.register(new MostViewedFingerprintWidget("mostviewedfingerprint",  2, 1, 6, 4));
+
+    if(typeof(is_staff) != 'undefined' && is_staff == true){
+        dashzone.register(new LastUsersWidget("lastusers",  2, 1, 6, 5));
+        dashzone.register(new TopUsersWidget("topusers",  2, 1, 6, 5));
+    }
+
+    dashzone.register(new TagCloudWidget("tagcloud",  2, 1, 6, 6));
+
     var any_configuration = dashzone.loadConfiguration();
 
     if(any_configuration == false){
         dashzone.initial();
-
-        dashzone.loadConfiguration();
     }
 });
 

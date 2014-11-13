@@ -1,4 +1,4 @@
-from accounts.models import Profile, NavigationHistory
+from accounts.models import Profile, NavigationHistory, EmifProfile
 from django.contrib import admin
 from django.contrib.auth.models import User
 from adminplus.sites import AdminSitePlus
@@ -85,7 +85,8 @@ class UserStatistics(View):
                                                     'session_time': session_time,
                                                     'session_average': average_time,
                                                     'views_time': views_time,
-                                                    'views_average': average_views
+                                                    'views_average': average_views,
+                                                    'top_users': EmifProfile.top_users(limit=20, days_to_count=30)
                                                     })
 
     def post(self, request):

@@ -67,6 +67,7 @@ import urllib2
 import random
 
 from hitcount.models import Hit, HitCount
+from accounts.models import EmifProfile
 
 from searchengine.search_indexes import CoreEngine
 
@@ -191,9 +192,29 @@ class LastUsersView(APIView):
             users = User.objects.all().order_by('-last_login')[:10]
 
             for user in users:
-                last_users.append(user.username)
+                last_users.append(user.get_full_name())
 
             response = Response({'lastusers': last_users}, status=status.HTTP_200_OK)
+
+        else:
+            response = Response({}, status=status.HTTP_403_FORBIDDEN)
+        return response
+
+############################################################
+##### Top Users - Web service
+############################################################
+
+
+class TopUsersView(APIView):
+    authentication_classes = (SessionAuthentication, BasicAuthentication)
+    permission_classes = (IsAuthenticated,)
+    def get(self, request, *args, **kw):
+
+        if request.user.is_authenticated() and request.user.is_staff == True:
+
+            top_users = EmifProfile.top_users(limit=10, days_to_count=30)
+
+            response = Response({'topusers': top_users}, status=status.HTTP_200_OK)
 
         else:
             response = Response({}, status=status.HTTP_403_FORBIDDEN)

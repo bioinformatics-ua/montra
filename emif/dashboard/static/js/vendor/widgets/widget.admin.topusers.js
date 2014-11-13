@@ -19,42 +19,42 @@
     #
 */
 
-var LastUsersWidget = function LastUsersWidget(widgetname, width, height, pos_x, pos_y){
+var TopUsersWidget = function TopUsersWidget(widgetname, width, height, pos_x, pos_y){
 
-    LastUsersWidget._base.apply(this, [widgetname, "Last Users Logged In", width, height, pos_x, pos_y]);
+    TopUsersWidget._base.apply(this, [widgetname, "Top Users", width, height, pos_x, pos_y]);
 
 }.inherit(DashboardWidget).addToPrototype({
     __init : function(gridster, parent){
         var self = this;
 
-        self.icon = '<i class="fa fa-users"></i>';
+        self.icon = '<i class="fa fa-user"></i>';
 
-        self.header_tooltip = "Last Users Logged into the platform.<br /><strong> (Only staff can see this widget)</strong>";
+        self.header_tooltip = "Users with most unique views on their databases.<br /><strong> (Only staff can see this widget)</strong>";
 
         self.header_style = "background-color: #d79494; border: 1px solid #b74c4c;";
 
         self.content = "<center><h3>Loading...</h3></center>";
 
-        LastUsersWidget._super.__init.apply(self, [gridster, parent]);
+        TopUsersWidget._super.__init.apply(self, [gridster, parent]);
 
-        $.get("api/lastusers")
+        $.get("api/topusers")
         .done(function(data) {
            self.content = '<table class="nomargins table table-bordered">';
-            if(data.lastusers){
-                for(var i=0;i<data.lastusers.length;i++){
-                    self.content += '<tr><td style="word-break: break-all;"><small>'+data.lastusers[i] + "</small></td></tr>";
+            if(data.topusers){
+                for(var i=0;i<data.topusers.length;i++){
+                    self.content += '<tr><td style="word-break: break-all;"><small>'+data.topusers[i].user + "</small></td></tr>";
                 }
             }
 
-            LastUsersWidget._super.__refresh.apply(self);
+            TopUsersWidget._super.__refresh.apply(self);
 
             $('.table', $('#'+self.widgetname)).parent().css('padding', '0px');
 
           })
         .fail(function() {
-            self.content = ' Error loading Last Users admin Widget';
+            self.content = ' Error loading Top Users admin Widget';
 
-            LastUsersWidget._super.__refresh.apply(self);
+            TopUsersWidget._super.__refresh.apply(self);
         });
     }
 });
