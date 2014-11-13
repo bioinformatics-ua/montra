@@ -31,7 +31,7 @@ from description import fingerprint_description_slugs
 
 from newsletter.models import Newsletter, Subscription
 
-from searchengine.search_indexes import CoreEngine, generateFreeText, setProperFields
+from searchengine.search_indexes import CoreEngine, generateFreeText, setProperFields, generateMltText
 
 class Database:
     id = ''
@@ -302,6 +302,7 @@ class Fingerprint(models.Model):
 
 
         d['text_t']= generateFreeText(d) +  " " + adicional_text
+        d['mlt_t'] = generateMltText(d)
 
         if batch_mode:
             return d
