@@ -20,13 +20,13 @@
 
 
 /********************************************************
-**************** Population Characteristics API 
+**************** Population Characteristics API
 *********************************************************/
 
 
 
 
-// This is the mode 
+// This is the mode
 var PAGE_TYPE = "PC";
 // This is the mode that exists right now
 var PC_NORMAL = "PC_NORMAL"; // Population Characteristics for one database
@@ -90,24 +90,24 @@ var translations = {};
 var translationsBack = {};
 var activeChart='';
 
-var actualChart = null; 
+var actualChart = null;
 
 var cache_json = {};
 var hashCode = function(s){
-  return s.split("").reduce(function(a,b){a=((a<<5)-a)+b.charCodeAt(0);return a&a},0);              
+  return s.split("").reduce(function(a,b){a=((a<<5)-a)+b.charCodeAt(0);return a&a},0);
 }
 /** TODO: there are a lot of static and hardcore parameters in this function
-  * This need to be fixed */ 
-function PCAPI (endpoint) 
+  * This need to be fixed */
+function PCAPI (endpoint)
 {
     if (endpoint==null)
     {
-      this.endpoint="population/jerboalistvalues";  
+      this.endpoint="population/jerboalistvalues";
     }
     else {
       this.endpoint=endpoint;
     }
-    
+
     // This was already globally defined, but ie8, for some obscure reason cant find it...
     $.ajaxSetup({
                 crossDomain: false, // obviates need for sameOrigin test
@@ -117,14 +117,16 @@ function PCAPI (endpoint)
                     }
                 }
     });
-    
+
     this.getValuesRow = function(Var, Row, fingerprintID, revision){
         var result = {}
+
 
         var destiny = this.endpoint+"/"+Var+"/"+Row+"/" + fingerprintID+"/"+revision;
         var key = hashCode(destiny);
          if(cache_json.hasOwnProperty(key)){
           result = cache_json[key];
+
 
          } else {
             $.ajax({
@@ -140,7 +142,7 @@ function PCAPI (endpoint)
             cache_json[key] = result;
           }
 
-            return result;         
+            return result;
     };
      this.getValuesRowWithFilters = function(Var, Row, fingerprintID, revision, filters){
         var result = {}
@@ -161,10 +163,11 @@ function PCAPI (endpoint)
               success: function (data){
                 result=data;
               }
-            }); 
+            });
 
             cache_json[key] = result;
          }
+
 
 
           return result;
@@ -185,7 +188,7 @@ function PCAPI (endpoint)
           url: "population/filters/"+Var+"/" + fingerprintID,
           async: false,
           type: "POST",
-          data: { publickey: global_public_key, result: result },        
+          data: { publickey: global_public_key, result: result },
           success: function (data){result=data;}
         });
 
@@ -203,22 +206,22 @@ var stuff;
  (function( $ )
  {
 
-    /** Draft code */ 
+    /** Draft code */
     function getFiltersSelected(){
 
       return filtersMap;
 
     };
 
-    
+
     translations = {};
     translationsBack = {};
-    
+
 
     var methods = {
         init : function( options, name, fingerprintId ) {
 
-            
+
             /** Get a list of filters */
             values = options.getFilter(name,fingerprintId);
 
@@ -233,7 +236,7 @@ var stuff;
 
 
             filters_tmp = [];
-            
+
             JSON_OUTPUT = {};
             var default_options = {};
 
@@ -244,7 +247,7 @@ var stuff;
               filters_tmp.push(xFilter);
               if (!xFilter.show)
                 return;
-              
+
               self.append(xFilter.name+": ");
               var options = [];
 
@@ -252,23 +255,23 @@ var stuff;
 
               //self.append(tmpUl);
 
-              // This code is only for comparison mode 
+              // This code is only for comparison mode
               //console.log(xFilter);
               if (xFilter.name == "Gender")
               {
                   if (xFilter.translation.hasOwnProperty("ALL"))
                   {
-                    xFilter.values.push("ALL");  
-                    //options.push({'ALL': 'ALL'});               
+                    xFilter.values.push("ALL");
+                    //options.push({'ALL': 'ALL'});
                   }
-                  
+
               }
 
               xFilter.values.sort();
               xFilter.values.reverse();
 
               $.each(xFilter.values, function (data){
-                  
+
                   if (xFilter.values[data]==="")
                       return;
 
@@ -291,16 +294,16 @@ var stuff;
                         translationsBack[xFilter['translation'][originalValue]] = originalValue;
                         originalValue = xFilter['translation'][originalValue];
                     }
-                      
+
                   }
-                  
+
                   //tmpUl.append('<li><a class="filterBar '+fType+'" id=_'+fType+'_'+xFilter.values[data]+' href="#" onclick="return false;"> '+originalValue+'</a></li>')
-                  options.push({'key': xFilter.values[data], 'value': originalValue}); 
+                  options.push({'key': xFilter.values[data], 'value': originalValue});
 
                   // if('ALL' in default_option[xFilter.values[data]]){
 
-                  // }                 
-                    
+                  // }
+
               });
               JSON_OUTPUT[xFilter.value] = {values: options, name: xFilter.name};
               if($.inArray( 'ALL', xFilter.values ) != -1){
@@ -311,24 +314,25 @@ var stuff;
             });
             //console.log('JSON_OUTPUT');
             //console.log(JSON.stringify(JSON_OUTPUT));
-            
+
 
             filter_dropdown = $(this).dyndropdown({
-                    label: "Filter", 
-                    dropup: false, 
+                    label: "Filter",
+                    dropup: false,
                     alwaysOneOption: true,
                     defaultOptions: default_options,
                     onSelectionChanged: function(selection){
                         //console.log('callback called');
                         //console.log(selection);
-                        
+
                         var charDraw = new PCDraw(actualChart, activeChart, null);
                         $.each(selection, function(filter, options){
                           var options_translated = [];
-                          
+
                           $.each(options, function(index, value){
                             options_translated.push(value);
                           });
+
                           filtersMap['values.'+filter] = options_translated;
 
                         });
@@ -344,7 +348,7 @@ var stuff;
 
         },
         draw : function( options ) {
-            
+
         }
     };
 
@@ -362,28 +366,28 @@ var stuff;
 }( jQuery ));
 
 /********************************************************************
-**************** Population Characteristics - Bar (Jquery Plugin) 
+**************** Population Characteristics - Bar (Jquery Plugin)
 *********************************************************************/
 
  (function( $ )
  {
 
-    /** Draft code */ 
+    /** Draft code */
     function getFiltersSelected(){
 
       return filtersMap;
 
     };
 
-    
+
     translations = {};
     translationsBack = {};
-    
+
 
     var methods = {
         init : function( options, name, fingerprintId ) {
 
-            
+
             /** Get a list of filters */
             values = options.getFilter(name,fingerprintId);
 
@@ -398,7 +402,7 @@ var stuff;
 
 
             filters_tmp = [];
-            
+
             values.values.forEach(function(_value){
 
               var xFilter = JSON.parse(_value);
@@ -406,26 +410,26 @@ var stuff;
               filters_tmp.push(xFilter);
               if (!xFilter.show)
                 return;
-              
+
               self.append(xFilter.name+": ");
               var tmpUl = $('<ul class="nav nav-pills nav-stacked">');
 
               self.append(tmpUl);
 
-              // This code is only for comparison mode 
+              // This code is only for comparison mode
               console.log(xFilter);
               if (xFilter.name == "Gender")
               {
                   if (xFilter.translation.hasOwnProperty("ALL"))
                   {
-                    xFilter.values.push("ALL");                  
+                    xFilter.values.push("ALL");
                   }
-                  
+
               }
 
 
               $.each(xFilter.values, function (data){
-                  
+
                   if (xFilter.values[data]==="")
                       return;
 
@@ -447,26 +451,26 @@ var stuff;
                         translationsBack[xFilter['translation'][originalValue]] = originalValue;
                         originalValue = xFilter['translation'][originalValue];
                     }
-                      
+
                   }
-                  
-                 
+
+
                   tmpUl.append('<li><a class="filterBar '+fType+'" id=_'+fType+'_'+xFilter.values[data]+' href="#" onclick="return false;"> '+originalValue+'</a></li>')
-                    
-                  
-                    
+
+
+
               });
 
 
             });
-            
+
             actualChart.filters = filters_tmp;
 
 
-            /** The magic of the filters will happen here */ 
+            /** The magic of the filters will happen here */
             $(".filterBar").bind('click',function(e)
-                    { 
-                      e.preventDefault(); 
+                    {
+                      e.preventDefault();
                       e.stopPropagation();
 
                       console.log()
@@ -482,24 +486,24 @@ var stuff;
                       if (translationsBack.hasOwnProperty(_value))
                       {
                           _value = translationsBack[_value];
-                      } 
+                      }
                       /*if(filtersMap['values.'+filterType])
                       {
                         filtersMap['values.'+filterType] = [_value, filtersMap['values.'+filterType][0]];
                       }
                       else
                       {
-                        filtersMap['values.'+filterType] = [_value];  
+                        filtersMap['values.'+filterType] = [_value];
                       }*/
-                      filtersMap['values.'+filterType] = [_value];  
+                      filtersMap['values.'+filterType] = [_value];
                       console.log("filtersSelected:");
                       console.log(getFiltersSelected());
                       charDraw.refresh(getFiltersSelected());
-                      
-                      
+
+
                       $("." + filterType).closest('li').removeClass("active");
                       $(this.parentNode).closest('li').addClass("active");
-                      
+
 
                       return false;
                     });
@@ -508,7 +512,7 @@ var stuff;
 
         },
         draw : function( options ) {
-            
+
         }
     };
 
@@ -534,7 +538,7 @@ var stuff;
  {
 
     var PC = null;
-    var chartTypes = null; 
+    var chartTypes = null;
     function Filters()
     {
       this.drawFilters = function(){
@@ -543,8 +547,8 @@ var stuff;
 
             /*** The magic of the changing of the type of the graph happens here */
             $(".graphTypes").bind('click',function(e)
-                    { 
-                      e.preventDefault(); 
+                    {
+                      e.preventDefault();
                       e.stopPropagation();
 
                       // This code is needed for comparison zone
@@ -554,8 +558,8 @@ var stuff;
 
                       $("#pc_comments_placeholder").html("");
 
-  
-                      
+
+
                       // Anyone have a better suggestion to do it?
                       // I'm more focuses in other staff right now.
                       // Bastiao, 2014.Feb.09
@@ -565,13 +569,16 @@ var stuff;
                       var this_title = e.target.innerHTML;
 
                       chartTypes.forEach(function(a){
-                          
-                          if (a.title.fixed_title== this_title) 
+
+
+                          if (a.title.fixed_title== this_title)
+
                           {
                               actualChart = a;
                           }
-                          
+
                       });
+
 
                       // Comments ids
                       var fid = getFingerprintID();
@@ -580,23 +587,24 @@ var stuff;
 
                       cm = new CommentsManager();
                       cm.listComments(fid, actualChart.uid);
-                      
+
                       var charDraw = new PCDraw(actualChart, actualChart.title['var'], e);
                       var _filters = {};
                       charDraw.draw(_filters);
                       charDraw.drawBar();
-                      //var filterbar = $(".filterBar");
-                      //filterbar.last().click();   
-                      //filterbar.first().click(); 
 
-                      
+                      //var filterbar = $(".filterBar");
+                      //filterbar.last().click();
+                      //filterbar.first().click();
+
+
                       return false;
                     });
       };
       this.drawScales = function(){
       };
       this.bindScales = function(){
-      };   
+      };
     };
 
     var methods = {
@@ -614,17 +622,20 @@ var stuff;
                 if (values[data]==="")
                     return;
 
-                tmpUl.append('<li class=""><a class="graphTypes" href="#" onclick="return false;">'+values[data]+'</a></li>')
+                var tooltip = "";
+                if(values[data].tooltip != null)
+                  tooltip = 'title="'+values[data].tooltip+'"';
+                tmpUl.append('<li '+tooltip+' class="graphLine"><a class="graphTypes" href="#" onclick="return false;">'+values[data].title+'</a></li>')
             });
 
             var myPC = options;
-            
+
             filters = new Filters();
             filters.bindFilters();
 
         },
         draw : function( options ) {
-            
+          $('.graphLine').tooltip({'container': 'body'});
         }
     };
 
@@ -649,16 +660,16 @@ $(document).ready(
         var chartLayout = new ChartLayout();
 
         $("#pc_list").populationChartsTypes(chartLayout, PCAPI);
-        $("#pc_list").populationChartsTypes('draw', chartLayout); 
+        $("#pc_list").populationChartsTypes('draw', chartLayout);
 
           $('.tabbable a[data-toggle="tab"]').on('shown', function (e) {
             if($(e.target).text().indexOf('Population Characteristics')>-1){
               $(".graphTypes").first().click();
 
-              $(".filterBar").first().click(); 
+              $(".filterBar").first().click();
             }
           });
 
         }
-    
+
 );

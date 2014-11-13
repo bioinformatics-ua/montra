@@ -26,7 +26,7 @@
             {% if query.has_representation %}
             <a href="advsearch/results/{{query.id}}" class="btn btn-block btn-info">Results</a>
             {% endif %}
-            <a class="btn btn-block" href="advsearch/history/remove/{{query.id}}">Remove</a>
+            <a class="removebtn btn btn-block" href="advsearch/history/remove/{{query.id}}">Remove</a>
             </td>
         </tr>
     {% endfor %}
@@ -55,7 +55,7 @@
         {% endif %}
   </ul>
 </div>
-<form id="send2" method="POST" > 
+<form id="send2" method="POST" >
 <div style="font-size: 80%; margin-top: -65px;" class="pull-right">Show <select style="width: 50px; margin-top: 10px;" id="paginator_rows" name="paginator_rows" class="span1 paginator-page-selector" >
   <option value="5" {% if page_rows == 5 %}selected{% endif %}>5</option>
   <option value="10" {% if page_rows == 10 %}selected{% endif %}>10</option>

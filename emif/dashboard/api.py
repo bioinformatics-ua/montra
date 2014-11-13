@@ -55,7 +55,7 @@ from questionnaire import Processors, QuestionProcessors, Fingerprint_Summary
 
 from django.db.models import Count
 
-from accounts.models import NavigationHistory
+from accounts.models import NavigationHistory, RestrictedUserDbs, EmifProfile
 
 
 from django.conf import settings
@@ -137,6 +137,11 @@ class MostViewedFingerprintView(APIView):
         if request.user.is_authenticated():
             list_viewed = []
 
+            try:
+                eprofile = EmifProfile.objects.get(user=request.user)
+            except EmifProfile.DoesNotExist:
+                print "-- ERROR: Couldn't get emif profile for user"
+
             most_hit = Hit.objects.filter(user=request.user).values('user','hitcount__object_pk').annotate(total_hits=Count('hitcount')).order_by('-total_hits')
 
             i=0
@@ -144,6 +149,12 @@ class MostViewedFingerprintView(APIView):
             for hit in most_hit:
                 try:
                     this_fingerprint = Fingerprint.valid().get(id=hit['hitcount__object_pk'])
+
+                    if eprofile.restricted:
+                        try:
+                            allowed = RestrictedUserDbs.objects.get(user=request.user, fingerprint=this_fingerprint)
+                        except RestrictedUserDbs.DoesNotExist:
+                            continue
 
                     list_viewed.append(
                         {

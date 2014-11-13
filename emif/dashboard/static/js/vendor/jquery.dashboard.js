@@ -5,6 +5,9 @@
 
 (function($) {
     $.fn.dashboard = function(options) {
+        // This indicates plugin version, and allows to invalidate any existing caches
+        var __version = "0.1";
+
         var self = this;
 
         var settings = $.extend({
@@ -215,6 +218,7 @@
                     var serialization = public_funcs.serialize();
 
                     localStorage.setItem("dashboard_preferences", serialization);
+                    localStorage.setItem("__dashboard_version", __version);
 
                 } else {
                     console.error("Your browser doesn't support local storage!");
@@ -224,6 +228,12 @@
             },
             loadConfiguration: function(){
                 if(private_funcs.__supports_storage()){
+                    var stored_version = localStorage.getItem("__dashboard_version");
+                    console.log("STORED VERSION: "+stored_version);
+                    console.log("VERSION CURRENT: "+__version);
+
+                    if(stored_version !== __version)
+                        return false;
 
                     gridster.destroy();
                     $(self).html('<div class="gridster"><ul></ul></div>');
