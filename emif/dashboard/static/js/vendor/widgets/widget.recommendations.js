@@ -19,42 +19,43 @@
     #
 */
 
-var LastUsersWidget = function LastUsersWidget(widgetname, width, height, pos_x, pos_y){
+var RecommendationsWidget = function RecommendationsWidget(widgetname, width, height, pos_x, pos_y){
 
-    LastUsersWidget._base.apply(this, [widgetname, "Last Users Logged In", width, height, pos_x, pos_y]);
+    RecommendationsWidget._base.apply(this, [widgetname, "Database Recommendations", width, height, pos_x, pos_y]);
 
 }.inherit(DashboardWidget).addToPrototype({
     __init : function(gridster, parent){
         var self = this;
 
-        self.icon = '<i class="fa fa-users"></i>';
+        self.icon = '<i class="fa fa-bullhorn"></i>';
 
-        self.header_tooltip = "Last Users Logged into the platform.<br /><strong> (Only staff can see this widget)</strong>";
-
-        self.header_style = "background-color: #d79494; border: 1px solid #b74c4c;";
+        self.header_tooltip = "The databases that are recommended to you.";
 
         self.content = "<center><h3>Loading...</h3></center>";
 
-        LastUsersWidget._super.__init.apply(self, [gridster, parent]);
+        RecommendationsWidget._super.__init.apply(self, [gridster, parent]);
 
-        $.get("api/lastusers")
+        $.get("api/recommendations")
         .done(function(data) {
-           self.content = '<table class="nomargins table table-bordered">';
-            if(data.lastusers){
-                for(var i=0;i<data.lastusers.length;i++){
-                    self.content += '<tr><td style="word-break: break-all;"><small>'+data.lastusers[i] + "</small></td></tr>";
+           self.content = '<table class="table">';
+            if(data.mlt){
+                for(var i=0;i<data.mlt.length;i++){
+                    self.content += '<tr><td style="word-break: break-all;"><small><a href="'+data.mlt[i].href+'">'+data.mlt[i].name+ "</a></small></td></tr>";
+                }
+
+                if(data.mlt.length ==0){
+                    self.content += '<tr><td style="text-align: justify;text-justify: inter-word;">There\'s no recommendations yet.<br /> To have recommendations you need to have databases subscribed.</td></tr>'
                 }
             }
 
-            LastUsersWidget._super.__refresh.apply(self);
+            RecommendationsWidget._super.__refresh.apply(self);
 
             $('.table', $('#'+self.widgetname)).parent().css('padding', '0px');
-
           })
         .fail(function() {
-            self.content = ' Error loading Last Users admin Widget';
+            self.content = ' Error loading Recommendations Widget';
 
-            LastUsersWidget._super.__refresh.apply(self);
+            RecommendationsWidget._super.__refresh.apply(self);
         });
     }
 });

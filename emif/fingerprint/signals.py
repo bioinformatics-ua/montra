@@ -23,6 +23,7 @@ from django.db.models.signals import post_save, m2m_changed
 from django.conf import settings
 
 from fingerprint.models import Fingerprint, FingerprintSubscription
+from accounts.models import EmifProfile, RestrictedUserDbs
 
 def fingerprint_updated(sender, **kwargs):
     fingerprint = kwargs['instance']
@@ -30,7 +31,12 @@ def fingerprint_updated(sender, **kwargs):
     if fingerprint.findName() != 'Unnamed':
         fingerprint.setSubscription(fingerprint.owner, True)
 
+    # We also check if the fingerprint was added by a restricted user,
+    # if it was we must add this fingerprint to the restricted user, otherwise he wouldnt have access to his own database
+    RestrictedUserDbs.get_or_create(fingerprint.owner, fingerprint)
+
 post_save.connect(fingerprint_updated, sender=Fingerprint)
+
 
 
 def shared_updated(sender, **kwargs):
@@ -44,8 +50,15 @@ def shared_updated(sender, **kwargs):
                 shared_user = User.objects.get(id=pk)
                 if action == 'post_add':
                     fingerprint.setSubscription(shared_user, True)
+
+                    # we auto-add restricted users to the database when this database is shared with them
+                    RestrictedUserDbs.get_or_create(shared_user, fingerprint)
+
                 elif action == 'post_remove':
                     fingerprint.setSubscription(shared_user, False)
+
+                    # we also remove it automatically when its unshared
+                    RestrictedUserDbs.remove(shared_user, fingerprint)
 
             except User.DoesNotExist:
                 print "-- ERROR: Couldnt get user with primary key"+pk

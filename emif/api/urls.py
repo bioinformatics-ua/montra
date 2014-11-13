@@ -88,6 +88,9 @@ urlpatterns = patterns('api.views',
     # private links api services
     url(r'^plinkemails$', PrivateLinkEmailView.as_view(), name='plinkemails'),
 
+    url(r'^topusers$', TopUsersView.as_view(), name='topusers'),
+    url(r'^recommendations$', RecommendationsView.as_view(), name='recommendations'),
+
 )
 
 urlpatterns = format_suffix_patterns(urlpatterns)

@@ -195,6 +195,9 @@ def feedback(request, template_name='feedback.html'):
 
     else:
         form = ContactForm()  # An unbound form
+        if request.user.is_authenticated():
+            form=ContactForm(initial={'name': request.user.get_full_name(),'email':request.user.email})
+
     return render(request, template_name, {'form': form, 'request': request, 'breadcrumb': True})
 
         # return render_to_response('feedback.html', {'form': ContactForm()},
