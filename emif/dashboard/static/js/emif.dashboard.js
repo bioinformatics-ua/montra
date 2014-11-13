@@ -39,6 +39,8 @@ $(function(){
 
                 dashzone.register(new TagCloudWidget("tagcloud",  2, 1, 6, 6));
 
+                dashzone.register(new RecommendationsWidget("recommendations",  2, 1, 6, 6));
+
                 dashzone.addWidget("feed");
                 dashzone.addWidget("actions");
                 dashzone.addWidget("userstats");

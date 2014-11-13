@@ -7,7 +7,9 @@ from questionnaire.views import *
 
 from django.contrib.auth.models import User
 
-from searchengine.search_indexes import CoreEngine
+
+from searchengine.search_indexes import generateFreeText, generateMltText, setProperFields, CoreEngine
+
 
 from django.utils import timezone
 

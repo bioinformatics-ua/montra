@@ -231,6 +231,7 @@ class Question(models.Model):
     category = models.BooleanField(default=False)
     tooltip = models.BooleanField(default=False, help_text="If help text appears in a tooltip")
     visible_default = models.BooleanField(u"Comments visible by default", default=False)
+    mlt_ignore = models.BooleanField(u"Ignore on More Like This", default=False)
 
     def questionnaire(self):
         return self.questionset.questionnaire
