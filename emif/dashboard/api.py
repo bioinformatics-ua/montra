@@ -55,7 +55,7 @@ from questionnaire import Processors, QuestionProcessors, Fingerprint_Summary
 
 from django.db.models import Count
 
-from accounts.models import NavigationHistory, RestrictedUserDbs, EmifProfile
+from accounts.models import NavigationHistory, RestrictedUserDbs, RestrictedGroup, EmifProfile
 
 
 from django.conf import settings
@@ -154,7 +154,10 @@ class MostViewedFingerprintView(APIView):
                         try:
                             allowed = RestrictedUserDbs.objects.get(user=request.user, fingerprint=this_fingerprint)
                         except RestrictedUserDbs.DoesNotExist:
-                            continue
+                            restricted = RestrictedGroup.hashes(request.user)
+
+                            if this_fingerprint.fingerprint_hash not in RestrictedGroup.hashes(request.user):
+                                continue
 
                     list_viewed.append(
                         {

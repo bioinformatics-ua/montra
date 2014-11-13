@@ -18,7 +18,7 @@ from django.db.models import Count, Avg, Max, Min
 from django.utils import timezone
 import datetime
 
-from accounts.models import RestrictedUserDbs
+from accounts.models import RestrictedUserDbs, RestrictedGroup
 from fingerprint.models import Fingerprint
 
 class NavigationAdmin(admin.ModelAdmin):
@@ -57,11 +57,44 @@ class RestrictedForm(forms.ModelForm):
 
         z.choices = sorted(z.choices, key=lambda x:x[1])
 
+class RestrictedFormGroup(forms.ModelForm):
+    def __findName(self, hash):
+        try:
+            fn = Fingerprint.objects.get(fingerprint_hash=hash)
+
+            return (fn.removed, fn.findName(), fn.id)
+
+        except Fingerprint.DoesNotExist:
+            return (False, hash)
+    def __init__(self, *args, **kwargs):
+        # initalize form
+        super(RestrictedFormGroup, self).__init__(*args, **kwargs)
+
+        # rebuild choices
+        w = self.fields['fingerprints'].widget
+        choices = []
+        for key, value in w.choices:
+            (removed, name, fnid) = self.__findName(value)
+            if not removed:
+                choices.append((fnid, name))
+
+        w.choices = sorted(choices, key=lambda x: x[1])
+
 class NavigationRestricted(admin.ModelAdmin):
     form = RestrictedForm
     list_display = ['user', name]
     search_fields = ['user']
     list_filter = ['user']
+
+def Name(self):
+    return self.group.name
+
+class NavigationRestrictedGroup(admin.ModelAdmin):
+    form = RestrictedFormGroup
+    list_display = [Name]
+    #search_fields = ['user']
+    #list_filter = ['user']
+
 
 class ChoiceForm(forms.Form):
     user = forms.ModelChoiceField(User.objects.all())
@@ -171,3 +204,5 @@ admin.site.register(Profile)
 
 admin.site.register(NavigationHistory, NavigationAdmin)
 admin.site.register(RestrictedUserDbs, NavigationRestricted)
+
+admin.site.register(RestrictedGroup, NavigationRestrictedGroup)

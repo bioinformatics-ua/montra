@@ -55,6 +55,8 @@ from public.models import PublicFingerprintShare
 
 from public.utils import hasFingerprintPermissions
 
+from accounts.models import EmifProfile
+
 def document_form_view_upload(request, fingerprint_id, template_name='documents_upload_form.html'):
     """Store the files at the backend
     """
@@ -155,6 +157,17 @@ def document_form_view(request, runcode, qs, activetab='summary', readOnly=False
 
     if fingerprint_ttype == "":
         raise "There is a missing type of questionnarie, something is really wrong"
+
+    try:
+        eprofile = EmifProfile.objects.get(user=request.user)
+
+        if eprofile.restricted == True:
+            if not eprofile.has_permission(runcode):
+                return HttpResponse("Access forbidden",status=403)
+
+    except EmifProfile.DoesNotExist:
+        raise "-- ERROR: Couldn't get emif profile for user"
+
 
     apiinfo = json.dumps(get_api_info(runcode))
     owner_fingerprint = False
