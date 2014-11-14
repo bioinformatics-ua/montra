@@ -33,7 +33,7 @@ function FingerprintPCAPI()
     {
 
         var result = {}
-          
+
         $.ajax({
           dataType: "json",
           url: "population/genericfilter/Var",
@@ -47,18 +47,18 @@ function FingerprintPCAPI()
 };
 
 
-function PopulationCharacteristics (type) 
+function PopulationCharacteristics (type)
 {
     this.handle_type_chart = function(e)     {
         e.preventDefault();
         e.stopPropagation();
-        console.log("Type of graph is: "); 
+        console.log("Type of graph is: ");
 
     };
 
 
     this.handle_data = function(data){
-                    
+
 
 
     };
@@ -101,7 +101,7 @@ function fillList(admin){
 
             var content = "<td>File name: <button class=\"btn btn-link\" onclick=\"requestFile('"+
                 d.file_name+"','"+d.revision+"')\">" + d.file_name
-                            + "</button></td><td>Description: " + d.comments 
+                            + "</button></td><td>Description: " + d.comments
                             + "</td><td>Last update: " + d.latest_date +"</td>";
 
             if(admin == true)
@@ -112,8 +112,8 @@ function fillList(admin){
 
             var node = $('<tr>').html(content);
             node.appendTo('#files');
-            //node.appendTo(context);    
-        });  
+            //node.appendTo(context);
+        });
 }
 function requestFile(filename, revision){
     /*$.post( "api/getfile", { filename: filename, revision: revision })
@@ -132,10 +132,10 @@ function requestFile(filename, revision){
     df.submit();
 }
 function deleteFile(filename, revision){
-    $.post( "api/deletefile", 
-        {   fingerprint_id: getFingerprintID_new(), 
-            filename: filename, 
-            revision: revision 
+    $.post( "api/deletefile",
+        {   fingerprint_id: getFingerprintID_new(),
+            filename: filename,
+            revision: revision
         })
       .done(function(result) {
         if(result.result){
@@ -151,29 +151,29 @@ function deleteFile(filename, revision){
       });
 }
 /********************************************************
-**************** Document Manager - Uploads, etc 
+**************** Document Manager - Uploads, etc
 *********************************************************/
 
 
 /* JQuery Plugin for Population Characteristics */
- 
- 
+
+
  (function( $ )
  {
 
 
 
     var methods = {
-        init : function( options ) { 
+        init : function( options ) {
             console.log("init");
             console.log(options);
             $(".chart_pc" ).on(eventToCatch, options.handle_type_chart);
         },
         draw : function( options ) {
-            
-           
+
+
         },
-        
+
     };
 
     $.fn.populationCharts = function(method) {
@@ -195,7 +195,7 @@ $(document).ready(
         var pc = new PopulationCharacteristics("pc");
 
         $("#populationcharacteristics").populationCharts(pc);
-        $("#populationcharacteristics").populationCharts('draw', pc);    
+        $("#populationcharacteristics").populationCharts('draw', pc);
     }
 );
 
@@ -206,7 +206,7 @@ function csrfSafeMethod(method) {
     return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
 }
 $(function () {
-  
+
     'use strict';
     var csrftoken = $.cookie('csrftoken');
     // Change this to the location of your server-side upload handler:
@@ -264,7 +264,7 @@ $(function () {
             if (!index) {
                 uploadButton.clone(true).data(data).appendTo(data.context).wrap('<td style="text-align: right; width: 100px;">');
             }
-            
+
         });
     }).on('fileuploadprocessalways', function (e, data) {
         console.log('File Upload - fileuploadprocessalways');
@@ -285,11 +285,15 @@ $(function () {
         }
     }).on('fileuploadprogressall', function (e, data) {
         var progress = parseInt(data.loaded / data.total * 100, 10);
+
+        bootbox.dialog("<h3>Uploading, please wait.</h3>");
+
         $('#progress .progress-bar').css(
             'width',
             progress + '%'
         );
     }).on('fileuploaddone', function (e, data) {
+        bootbox.hideAll();
         $.each(data.result.files, function (index, file) {
             var link = $('<a>')
                 .attr('target', '_blank')
@@ -301,6 +305,7 @@ $(function () {
         fillList(isadmin);
 
     }).on('fileuploadfail', function (e, data) {
+        bootbox.hideAll();
         $.each(data.result.files, function (index, file) {
             var error = $('<span/>').text(file.error);
             $(data.context.children()[index])

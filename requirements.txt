@@ -18,15 +18,15 @@ textile==2.1.5
 wsgiref==0.1.2
 djangorestframework==2.2.6
 django-bootstrap-breadcrumbs==0.6.2
--e git://github.com:ribeiroct/django-bootstrap-pagination.git#egg=django-bootstrap-pagination
+-e git://github.com/ribeiroct/django-bootstrap-pagination.git#egg=django-bootstrap-pagination
 pysolr==3.0.6
 github3.py==0.8.1
 django-jenkins
 -e git://github.com/bioinformatics-ua/django-userena.git#egg=userena
 PIL==1.1.7
 geopy==0.96.2
-openpyxl==1.6.2
-requests==1.2.3
+openpyxl==2.1.1
+requests==2.4.3
 #biopython==1.63
 #django_nvd3==0.6.0
 python-dateutil==2.2
@@ -47,3 +47,5 @@ psycopg2==2.5.4
 biopython==1.64
 django-compressor==1.4
 rjsmin==1.0.9
+locustio==0.7.2
+pyquery==1.2.9

@@ -7,7 +7,9 @@ from questionnaire.views import *
 
 from django.contrib.auth.models import User
 
-from searchengine.search_indexes import generateFreeText, setProperFields, CoreEngine
+
+from searchengine.search_indexes import generateFreeText, generateMltText, setProperFields, CoreEngine
+
 
 from django.utils import timezone
 
@@ -343,103 +345,6 @@ def unindexFingerprint(fingerprint_id):
     c = CoreEngine()
     c.delete(fingerprint_id)
 
-
-def is_if_yes_no(question):
-    return question.type in 'choice-yesno' or \
-            question.type in 'choice-yesnocomment' or \
-            question.type in 'choice-yesnodontknow'
-
-def indexFingerprint(fingerprint_id):
-    try:
-        fingerprint = Fingerprint.objects.get(fingerprint_hash=fingerprint_id)
-
-
-        d = {}
-
-        # Get parameters that are only on fingerprint
-        # type_t
-        d['id']=fingerprint_id
-        d['type_t'] = fingerprint.questionnaire.slug
-        d['date_last_modification_t'] = fingerprint.last_modification.strftime('%Y-%m-%d %H:%M:%S.%f')
-        d['created_t'] = fingerprint.created.strftime('%Y-%m-%d %H:%M:%S.%f')
-
-        d['user_t'] = unique_users_string(fingerprint)
-
-        d['percentage_d'] = fingerprint.fill
-
-        adicional_text = ""
-
-
-        # Add answers
-        answers = Answer.objects.filter(fingerprint_id=fingerprint)
-
-        for answer in answers:
-            # We try to get permissions preferences for this question
-            permissions = getPermissions(fingerprint_id, QuestionSet.objects.get(id=answer.question.questionset.id))
-
-            slug = answer.question.slug_fk.slug1
-
-            if permissions.allow_indexing or slug == 'database_name':
-                setProperFields(d, answer.question, slug, answer.data)
-                if is_if_yes_no(answer.question) and 'yes' in answer.data:
-                    adicional_text += answer.question.text+ " "
-                if answer.comment != None:
-                    d['comment_question_'+slug+'_t'] = answer.comment
-
-
-        d['text_t']= generateFreeText(d) +  " " + adicional_text
-
-        c = CoreEngine()
-
-        results = c.search_fingerprint("id:"+fingerprint_id)
-        if len(results) == 1:
-            # Delete old entry if any
-            c.delete(results.docs[0]['id'])
-
-        c.index_fingerprint_as_json(d)
-
-    # In case is a new one, create it
-    except Fingerprint.DoesNotExist:
-        print "-- ERROR: Can't find the fingerprint with hash "+fingerprint_id+" to export."
-
-def unique_users_string(fingerprint):
-    # user_t (owner + shared)
-    # i don't know if the user is
-    users = set()
-    users.add(fingerprint.owner.username)
-    for share in fingerprint.shared.all():
-        users.add(share.username)
-
-    users = list(users)
-    users_string = users[0]
-
-    for i in xrange(1, len(users)):
-        users_string+= ' \\ ' + users[i]
-
-    return users_string
-
-# GET permissions model
-def getPermissions(fingerprint_id, question_set):
-
-    if fingerprint_id == None or question_set == None:
-        return None
-
-
-    permissions = None
-    try:
-        permissions = QuestionSetPermissions.objects.get(fingerprint_id=fingerprint_id, qs=question_set)
-
-    except QuestionSetPermissions.DoesNotExist:
-        print "Does not exist yet, creating a new permissions object."
-        permissions = QuestionSetPermissions(fingerprint_id=fingerprint_id, qs=question_set, visibility=0,
-         allow_printing=True, allow_indexing=True, allow_exporting=True)
-        permissions.save()
-
-    except QuestionSetPermissions.MultipleObjectsReturned:
-        print "Error retrieved several models for this questionset, its impossible, so something went very wrong."
-
-    return permissions
-
 def markAnswerRequests(user, fingerprint, question, answer_requests):
 
     this_requests = answer_requests.filter(question=question)
@@ -469,17 +374,18 @@ def intersect(answers, questionset):
     return non_empty
 
 # Set new permissions for a questionset, based on a post request
-def setNewPermissions(request):
+def setNewPermissions(request, fingerprint_id, identification):
 
     if(request == None or not request.POST):
         return False
 
-    id = request.POST['_qs_perm']
+    try:
+        fingerprint = Fingerprint.objects.get(fingerprint_hash = fingerprint_id)
 
-    if(id != None):
+        identification = request.POST.get('_qs_perm', None)
 
         try:
-            this_permissions                = QuestionSetPermissions.objects.get(id=id)
+            this_permissions                = fingerprint.getPermissions(QuestionSet.objects.get(id=identification))
 
             this_permissions.visibility     = int(request.POST['_qs_visibility'])
             this_permissions.allow_printing = (request.POST['_qs_printing'] == 'true')
@@ -495,6 +401,8 @@ def setNewPermissions(request):
         except QuestionSetPermissions.MultipleObjectsReturned:
             print "Can't save this since there's several objects for this questionset permissions (should be only one)"
 
+    except Fingerprint.DoesNotExist:
+        print "-- ERROR setting new permissions"
 
     return False
 
@@ -753,17 +661,26 @@ def save_answers_to_csv(list_databases, filename):
         writer.writerow([id, name, "System", "Type Identifier", "99.3", t.ttype])
     return response
 
-def attachPermissions(fingerprint_id, qsets):
+def attachPermissions(fingerprint_hash, qsets):
     zipper = qsets
     zipee = []
+    fingerprint = None
+    try:
+        fingerprint = Fingerprint.objects.get(fingerprint_hash=fingerprint_hash)
 
-    for q, v in zipper.ordered_items():
-        qpermissions = getPermissions(fingerprint_id, QuestionSet.objects.get(id=v.qsid))
-        zipee.append(qpermissions)
 
-    merged = zip(zipper.ordered_items(), zipee)
+        for q, v in zipper.ordered_items():
+            qpermissions = fingerprint.getPermissions(QuestionSet.objects.get(id=v.qsid))
+            zipee.append(qpermissions)
 
-    return merged
+        merged = zip(zipper.ordered_items(), zipee)
+
+        return merged
+
+    except Fingerprint.DoesNotExist:
+        print "-- ERROR: Fingerprint with id fingerprint_hash"+str(fingerprint_hash)+" doesn't exist"
+
+    return None
 
 def writeGroup(id, k, qs, writer, name, t):
     if (qs!=None and qs.list_ordered_tags!= None):

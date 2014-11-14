@@ -12,14 +12,18 @@
 				<tbody>
 					{% for t in qs.list_ordered_tags %}
 					<tr>
-						<!-- title="{{ t.tag|safe }}" -->
-						<td class="tooltipped" title="{{ t.tag|removehs|safe }}">
-							{{ t.tag|removehs|safe }}
-						</td>
-						{% if t.ttype|captioned %}
-						<td class="value_content captioned_content" style="white-space: normal;" data-title="{{ t.value|force_escape }}">
+						{% if t.ttype == 'comment' %}
+							<td colspan="2" class="selected-sorter tooltipped" title="{{ t.tag|removehs|safe }}">
+								<div class="pull-left"><strong><small>{{ t.number|removehs }} - {{ t.tag|removehs|safe }}</small></strong></div>
 						{% else %}
-						<td class="value_content" style="white-space: normal;">
+							<td class="tooltipped" title="{{ t.tag|removehs|safe }}">
+								{{ t.number|removehs }} - {{ t.tag|removehs|safe }}
+							</td>
+							{% if t.ttype|captioned %}
+							<td class="value_content captioned_content" style="white-space: normal;" data-title="{{ t.value|force_escape }}">
+							{% else %}
+							<td class="value_content" style="white-space: normal;">
+							{% endif %}
 						{% endif %}
 						<span class="summary_content">
 						{% if t.value == "" and user.is_authenticated %}

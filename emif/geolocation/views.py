@@ -23,7 +23,7 @@ from django.shortcuts import render
 from django.core import serializers
 from django.conf import settings
 from django.http import *
-from django.http import Http404 
+from django.http import Http404
 
 from geopy import geocoders
 
@@ -80,10 +80,10 @@ def geo(request, template_name='geo.html'):
             #except:
             #    continue
             try:
-                city = City.objects.get(name=_loc.lower())
+                city = City.objects.filter(name=_loc.lower())[0]
 
             # if dont have this city on the db
-            except City.DoesNotExist:
+            except:
                 print "-- Error: The city " + _loc + " doesnt exist on the database. Maybe too much requests were being made when it happened ? Trying again..."
 
                 #obtain lat and longitude
@@ -136,7 +136,7 @@ def geo(request, template_name='geo.html'):
 
         list_locations.append(_loc)
 
-    return render(request, template_name, {'request': request, 'db_list' : db_list, 
+    return render(request, template_name, {'request': request, 'db_list' : db_list,
                                            'search_old': request.session.get('query',''),
                                            'list_cities': list_locations,
                                            'lats_longs': _long_lats,
