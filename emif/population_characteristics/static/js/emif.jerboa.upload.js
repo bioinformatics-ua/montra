@@ -29,7 +29,7 @@ $(document).ready(
     function(){
 
         var result = {}
-        
+
         $.ajax({
           dataType: "json",
           url: "population/jerboafiles/"+getFingerprintID_new()+"/",
@@ -43,12 +43,12 @@ $(document).ready(
             var context = $('<tr>').prependTo('#jerboafiles');
             var node = $('<td colspan="3"/>')
                         .append($('<span/>').html("<p>File name: " + d.file_name
-                            + "</p><p>Description: " + d.comments 
+                            + "</p><p>Description: " + d.comments
                             + "</p><p>Last update: " + d.latest_date ));
             context.append(node);
-            //node.appendTo(context);    
+            //node.appendTo(context);
         });
-        
+
 
     }
 );
@@ -62,7 +62,7 @@ function csrfSafeMethod(method) {
     return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
 }
 $(function () {
-  
+
     'use strict';
     var csrftoken = $.cookie('cssrftoken');
     // Change this to the location of your server-side upload handler:
@@ -120,7 +120,7 @@ $(function () {
             if (!index) {
                 uploadButton.clone(true).data(data).appendTo(data.context).wrap('<td style="width: 100px;">');
             }
-            
+
         });
     }).on('fileuploadprocessalways', function (e, data) {
         console.log('File Upload - fileuploadprocessalways');
@@ -142,6 +142,9 @@ $(function () {
     }).on('fileuploadprogressall', function (e, data) {
         console.log('File Upload - progress all');
         var progress = parseInt(data.loaded / data.total * 100, 10);
+
+        bootbox.dialog("<h3>Uploading, please wait.</h3>");
+
         $('#progress .progress-bar').css(
             'width',
             progress + '%'
@@ -156,12 +159,12 @@ $(function () {
                 .wrap(link);
 
 
-            // Trigger the charts 
+            // Trigger the charts
             var url = document.URL;
             if(url.indexOf('pc/') == -1)
                 url = url + "pc/"
             window.location.assign(url);
-            
+
 
         });
     }).on('fileuploadfail', function (e, data) {

@@ -46,7 +46,6 @@ from django.conf import settings
 from django.template.defaultfilters import slugify
 
 import datetime
-from fingerprint.models import Fingerprint
 
 from questionnaire.models import Questionnaire, QuestionSet
 
@@ -149,6 +148,11 @@ class CoreEngine:
         """
         self.solr.delete(id=id_doc)
 
+    def deleteQuery(self, q):
+        """Delete the document
+        """
+        self.solr.delete(q=q)
+
     def search_fingerprint(self, query, start=0, rows=100, fl='', sort='', facet="off"):
         """search the fingerprint
         """
@@ -198,8 +202,8 @@ class CoreEngine:
                 })
         return results
 
-    def more_like_this(self, id_doc, start=0, fl='id, score', maxx=100):
-        similar = self.solr.more_like_this(q='id:'+id_doc,start=start, rows=maxx, mltcount=maxx, mltfl='text_t', mltmintf=2, mltmindf=2, mltminwl=4, fl=fl)
+    def more_like_this(self, id_doc, type, start=0, fl='id, score', maxx=100):
+        similar = self.solr.more_like_this(q='id:'+id_doc, fq='type_t:'+type, start=start, rows=maxx, mltcount=maxx, mltfl='mlt_t', mltmintf=2, mltmindf=2, mltminwl=4, fl=fl)
         return similar
 
 
@@ -235,13 +239,6 @@ def index_answeres_from_qvalues(qvalues, questionnaire, subject, fingerprint_id,
     results = c.search_fingerprint("id:"+fingerprint_id)
     if (len(results)>0):
         d = results.docs[0]
-    '''else:
-        try:
-            fp = Fingerprint(fingerprint_hash=fingerprint_id)
-            fp.save()
-        except:
-            print(fingerprint_id + ' already in DB')
-    '''
 
     text = ""
     ''' For god sake, i dont understand what this was doing here, since its not being used
@@ -384,6 +381,7 @@ def index_answeres_from_qvalues(qvalues, questionnaire, subject, fingerprint_id,
     # since its now by parts, we have absolutely no idea what was already there and what is new,
     # to this must be done again from scratch
     d['text_t']= generateFreeText(d)
+    d['mlt_t'] = generateMltText(d)
 
     if extra_fields!=None:
         d = dict(d.items() + extra_fields.items())
@@ -499,7 +497,7 @@ def convert_value(value, type, search=False):
 # Generates the freetext field, from current parameters
 def generateFreeText(d):
     freetext = ''
-    dont_index = ['text_t', 'created_t','date_last_modification_t','type_t', 'user_t']
+    dont_index = ['text_t', 'created_t','date_last_modification_t','type_t', 'user_t', 'mlt_t']
 
     for q in d:
         if(q.endswith('_t') and q not in dont_index and d[q] != None and len(d[q]) > 0):
@@ -507,4 +505,23 @@ def generateFreeText(d):
 
     return freetext.strip()
 
+# Generates the mlt field, from current parameters
+def generateMltText(d):
+    freetext = ''
+    dont_index = ['text_t', 'created_t','date_last_modification_t','type_t', 'user_t', 'database_name_t', 'mlt_t']
 
+    try:
+        quest = Questionnaire.objects.get(slug=d['type_t'])
+        questions = Question.objects.filter(questionset__questionnaire=quest, mlt_ignore=True)
+
+        for question in questions:
+            dont_index.append(question.slug_fk.slug1+'_t')
+
+    except Questionnaire.DoesNotExist:
+        print("-- Error retrieving questionnaire ignore mlt slugs")
+
+    for q in d:
+        if(q.endswith('_t') and not q.startswith('comment_') and q not in dont_index and d[q] != None and len(d[q]) > 0):
+            freetext += (d[q] + ' ')
+
+    return freetext.strip()

@@ -63,10 +63,29 @@
                 <svg></svg>
             </div>
         </div>
-         <div><strong>Average Views per day: </strong>{{views_average}} views</div> 
+         <div><strong>Average Views per day: </strong>{{views_average}} views</div>
+        </div>
+        <div class="row-fluid">
+        <h4>Top Users in the Last 30 days</h4>
+            <table class="userstatistics_table table table-striped table-bordered">
+            <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Owned Dbs</th>
+                <th>Net Count <br /><small>(sum of unique views on owned databases)</small></th>
+            </tr>
+            {% for user in top_users %}
+                <tr>
+                    <td>{{user.user}}</td>
+                    <td>{{user.email}}</td>
+                    <td>{{user.owned}}</td>
+                    <td>{{user.count}}</td>
+                </tr>
+            {% endfor %}
+            </table>
         </div>
           </div>
-          
+
         </div>
 
     </div>

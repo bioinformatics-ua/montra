@@ -27,7 +27,7 @@ import time
 from searchengine.search_indexes import CoreEngine
 
 from fingerprint.models import Fingerprint, FingerprintReturnedSimple, FingerprintReturnedAdvanced, Answer
-from fingerprint.services import unindexFingerprint, getFillPercentage
+from fingerprint.services import unindexFingerprint
 
 from django.utils import timezone
 from django.conf import settings
@@ -49,7 +49,20 @@ from django.template.loader import render_to_string
 
 from fingerprint.models import FingerprintHead, AnswerChange
 
+
 from django.db.models import Q
+
+# This indexes the fingerprint using the celery, so the interface doesn't have to block
+@shared_task
+def indexFingerprintCelery(fingerprint_hash):
+    try:
+        fingerprint = Fingerprint.objects.get(fingerprint_hash=fingerprint_hash)
+
+        fingerprint.indexFingerprint()
+
+    except Fingerprint.DoesNotExist:
+        print "-- ERROR: Can't index fingerprint, because fingerprint wasn't found."
+
 
 @shared_task
 def anotateshowonresults(query_filtered, user, isadvanced, query_reference):
@@ -233,10 +246,7 @@ def putWeekReport(report, newsletter):
 
 @shared_task
 def calculateFillPercentage(fingerprint):
-    answers = Answer.objects.filter(fingerprint_id = fingerprint)
-
-    fingerprint.fill = getFillPercentage(fingerprint, answers)
-    fingerprint.save()
+    fingerprint.updateFillPercentage()
 
 @periodic_task(run_every=crontab(minute=0, hour=3))
 def remove_orphans():

@@ -1,4 +1,42 @@
 #!/usr/bin/python
+from searchengine.models import Slugs
+
+def next_free_slug(slug_str, create=True, scope=None):
+    # avoiding circular imports... this is ugly... i know...
+    from questionnaire.models import Question, Questionnaire
+
+    i=-1
+
+    def success(this_try):
+        if create:
+            slug = Slugs(slug1=this_try)
+            slug.save()
+
+            return slug
+
+        else:
+            return this_try
+
+    # if we have 1000 slugs with the same name we have something wrong...
+    while i < 1000:
+        this_try = slug_str
+        if i >= 0:
+            this_try = slug_str+'_'+str(i)
+
+        slug = Slugs.objects.filter(slug1=this_try)
+
+        if len(slug) == 0:
+            return success(this_try)
+        else:
+            if scope != None:
+                inscope = Question.objects.filter(questionset__questionnaire=scope, slug_fk__slug1=this_try)
+
+                if len(inscope) == 0:
+                    return success(this_try)
+
+            i+=1
+
+    return None
 
 def split_numal(val):
     """Split, for example, '1a' into (1, 'a')
@@ -17,7 +55,7 @@ def split_numal(val):
         if not val[i].isdigit():
             return int(val[0:i] or '0'), val[i:]
     return int(val), ''
-        
+
 
 def numal_sort(a, b):
     """Sort a list numeric-alphabetically

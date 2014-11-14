@@ -87,7 +87,6 @@ class Questionnaire(models.Model):
             print "-- Can't clone questionnaire safely."
             return None
 
-
     class Meta:
         permissions = (
             ("export", "Can export questionnaire answers"),
@@ -171,9 +170,82 @@ class QuestionSet(models.Model):
 
         return clone
 
+    def findDependantPercentage(self, answers):
+        from fingerprint.models import Answer
+
+        ref_cache = {}
+        total = 0
+        filled = 0
+
+        def __getDependency(question):
+            checks = ""
+            try:
+                question.checks.strip()
+            except:
+                pass
+
+            # not dependant in anyone
+            if len(checks) == 0:
+                return None
+            else:
+
+                extra = checks.split(" ")
+
+                for ex in extra:
+                    if ex.startswith('dependent="'):
+                        return ex[11:-1]
+
+                return None
+
+        def __fills_condition(dep):
+            depl = dep.split(',')
+
+            if len(depl) == 2:
+                key = None
+                try:
+                    key = ref_cache[depl[0]]
+                except:
+                    try:
+                        key = answers.get(question__number=depl[0])
+                        ref_cache[depl[0]] = key
+
+                    except Answer.DoesNotExist:
+                        return False
+
+                if depl[1].lower() == key.data.lower():
+                    return True
+
+            return False
+
+        def __count(total, filled, question):
+            total+=1
+            try:
+                ans = answers.get(question=question)
+                if len(ans.data.strip()) != 0:
+                    filled += 1
+            except Answer.DoesNotExist:
+                pass
+
+            return (total, filled)
+
+        for question in self.questions():
+            dep = __getDependency(question)
+
+            # has dependency
+            if dep == None:
+                (total, filled) = __count(total, filled, question)
+
+            else:
+                if __fills_condition(dep):
+                    (total, filled) = __count(total, filled, question)
+
+        try:
+            return ((filled * 100) / total, filled, total)
+        except:
+            return (0,filled,total)
+
     def __unicode__(self):
         return u'%s: %s' % (self.questionnaire.name, self.heading)
-
     class Meta:
         translate = ('text',)
 
@@ -231,6 +303,7 @@ class Question(models.Model):
     category = models.BooleanField(default=False)
     tooltip = models.BooleanField(default=False, help_text="If help text appears in a tooltip")
     visible_default = models.BooleanField(u"Comments visible by default", default=False)
+    mlt_ignore = models.BooleanField(u"Ignore on More Like This", default=False)
 
     def questionnaire(self):
         return self.questionset.questionnaire

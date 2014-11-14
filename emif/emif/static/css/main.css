@@ -403,13 +403,13 @@ box-shadow: inset 0 3px 8px rgba(0,0,0,0.125);
 #no_results{
   display: none;
 }
-.basetable td{
+.basetable:not(.comp_category){
   /*background-color: #ECF3FF !important; */
-  background-color: #dff0d8;
+  background-color: #DFF0D8;
 }
 
 .basetable td:hover{
-  background-color: #d0e9c6;
+  background-color: #d0e9c6 !important;
 }
 
 .help_selectresults{
@@ -755,16 +755,31 @@ height: 6em;
   border:0px !important;
   margin:0px !important;
 }
-.database_listing_names .table tr,.database_listing .table tr{
+.database_listing_names .table tr:not(.comp_category),.database_listing .table tr:not(.comp_category){
   border:0px !important;
 }
 
-.database_listing_names .table tr td,.database_listing .table tr td{
+.database_listing_names .table tr td:not(.comp_category),.database_listing .table tr td:not(.comp_category){
   border:0px !important;
 }
 .database_listing_names .accordion-inner, .database_listing .accordion-inner{
   padding: 0px !important;
 
+}
+
+.comp_category{
+    font-weight: bold;
+    background-color: #f9f9f9;
+    background-image: -moz-linear-gradient(bottom,#fff,#f2f2f2);
+    background-image: -webkit-gradient(linear,0 0,0 100%,from(#fff),to(#f2f2f2));
+    background-image: -webkit-linear-gradient(bottom,#fff,#f2f2f2);
+    background-image: -o-linear-gradient(bottom,#fff,#f2f2f2);
+    background-image: linear-gradient(to top,#fff,#f2f2f2);
+    background-repeat: repeat-x;
+    border-top: 1px solid #eeeeee !important;
+    border-bottom: 1px solid #eeeeee !important;
+    border-left: 0px !important;
+    border-right: 0px !important;
 }
 
 .link_pubmed a{
@@ -893,4 +908,45 @@ height: 6em;
   width: 409px !important;
   z-index: 9999 !important;
   top: 37px !important;
+}
+
+.progressbar_back{
+  display: inline-block;
+  background-color: #F5F5F5;
+  border: 1px solid #8A8A8A;
+  border-radius: 25px;
+  overflow: hidden;
+  height: 10px;
+}
+
+.progressbar_front{
+  background-color: #BDBDBD;
+  border-right: 1px solid #8A8A8A;
+}
+
+.progressbar_danger{
+  border: 1px solid #7c4343;
+}
+
+.progressbar_danger .progressbar_front{
+  background-color: #d04848;
+  border-right: 1px solid #7c4343;
+}
+
+.progressbar_warning{
+  border: 1px solid #8B8671;
+}
+
+.progressbar_warning .progressbar_front{
+  background-color: #f8dc58;
+  border-right: 1px solid #8B8671;
+}
+
+.progressbar_success{
+  border: 1px solid #888f72;
+}
+
+.progressbar_success .progressbar_front{
+  background-color: #a5f806;
+  border-right: 1px solid #888f72;
 }

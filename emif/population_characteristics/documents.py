@@ -28,7 +28,7 @@ from .serialize import serialize
 from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import user_passes_test, login_required
 
-from fingerprint.services import getPermissions, attachPermissions, merge_highlight_results
+from fingerprint.services import attachPermissions, merge_highlight_results
 
 from emif.views import get_api_info
 
@@ -236,6 +236,7 @@ def document_form_view(request, runcode, qs, activetab='summary', readOnly=False
         'apiinfo': apiinfo, 'fingerprint_id': runcode,
                     'fingerprint': fingerprint,
                     'fingerprint_pk': fingerprint_pk,
+                    'fingerprint_fill': int(round(fingerprint.fill)),
                    'breadcrumb': True, 'breadcrumb_name': name_bc.decode('utf-8'),
                     'style': qs, 'collapseall': False,
                     'owner_fingerprint':owner_fingerprint,
