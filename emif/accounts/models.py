@@ -58,6 +58,51 @@ class EmifProfile(UserenaBaseProfile):
 
     restricted = models.BooleanField(default=False)
 
+    @staticmethod
+    def top_users(limit=None, days_to_count=None):
+        top_users = cache.get('topusers'+str(limit))
+
+        if top_users == None:
+            top_users = {}
+
+            hitcounts = HitCount.objects.all()
+
+            for hitcount in hitcounts:
+                try:
+                    fingerprint = Fingerprint.objects.get(id=hitcount.object_pk)
+
+
+                    cycle_count = hitcount.hits
+                    if(days_to_count != None):
+                        # we must count from hits, instead of used the summarized value
+                        limit_date =timezone.now() - timedelta(days=days_to_count)
+
+                        cycle_count = len(Hit.objects.filter(hitcount=hitcount, created__gte=limit_date))
+
+
+                    if cycle_count > 0:
+                        if fingerprint.owner in top_users:
+                            top_users[fingerprint.owner]['count'] = top_users[fingerprint.owner]['count'] + cycle_count
+                        else:
+                            top_users[fingerprint.owner] = {
+                            'user': fingerprint.owner.get_full_name(),
+                            'email': fingerprint.owner.email,
+                            'count': cycle_count,
+                            'owned': len(Fingerprint.objects.filter(owner=fingerprint.owner))}
+
+                except Fingerprint.DoesNotExist:
+                    print "-- ERROR: Couldn't retrieve fingerprint refered by hitcount" + str(hitcount.id)
+
+            top_users = sorted(top_users.values(), reverse=True, key=lambda x:x['count'])
+
+            if limit != None:
+                top_users = top_users[:limit]
+
+            # keeping in cache 1 hour
+            cache.set('topusers'+str(limit), top_users, 60*60)
+
+        return top_users
+
 class RestrictedUserDbs(models.Model):
     user = models.ForeignKey(User)
     fingerprint = models.ForeignKey(Fingerprint)
