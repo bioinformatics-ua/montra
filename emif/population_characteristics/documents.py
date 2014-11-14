@@ -236,6 +236,7 @@ def document_form_view(request, runcode, qs, activetab='summary', readOnly=False
         'apiinfo': apiinfo, 'fingerprint_id': runcode,
                     'fingerprint': fingerprint,
                     'fingerprint_pk': fingerprint_pk,
+                    'fingerprint_fill': int(round(fingerprint.fill)),
                    'breadcrumb': True, 'breadcrumb_name': name_bc.decode('utf-8'),
                     'style': qs, 'collapseall': False,
                     'owner_fingerprint':owner_fingerprint,
