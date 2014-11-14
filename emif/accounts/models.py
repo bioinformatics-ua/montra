@@ -19,6 +19,7 @@ from datetime import timedelta
 
 from fingerprint.models import Fingerprint
 
+from django.db.models import Count
 
 class Profile(models.Model):
     name = models.CharField(unique=True, max_length=60, verbose_name=_('Name'))
@@ -60,7 +61,7 @@ class EmifProfile(UserenaBaseProfile):
 
     @staticmethod
     def top_users(limit=None, days_to_count=None):
-        top_users = cache.get('topusers'+str(limit))
+        top_users = cache.get('topusers'+str(limit)+'_'+str(days_to_count))
 
         if top_users == None:
             top_users = {}
@@ -81,14 +82,15 @@ class EmifProfile(UserenaBaseProfile):
 
 
                     if cycle_count > 0:
-                        if fingerprint.owner in top_users:
-                            top_users[fingerprint.owner]['count'] = top_users[fingerprint.owner]['count'] + cycle_count
-                        else:
-                            top_users[fingerprint.owner] = {
-                            'user': fingerprint.owner.get_full_name(),
-                            'email': fingerprint.owner.email,
-                            'count': cycle_count,
-                            'owned': len(Fingerprint.objects.filter(owner=fingerprint.owner))}
+                        for user in fingerprint.unique_users():
+                            if user in top_users:
+                                top_users[user]['count'] = top_users[user]['count'] + cycle_count
+                            else:
+                                top_users[user] = {
+                                'user': user.get_full_name(),
+                                'email': user.email,
+                                'count': cycle_count,
+                                'owned': len(Fingerprint.objects.filter(owner=user)) + len(Fingerprint.objects.filter(shared__id=user.id))}
 
                 except Fingerprint.DoesNotExist:
                     print "-- ERROR: Couldn't retrieve fingerprint refered by hitcount" + str(hitcount.id)
@@ -99,7 +101,50 @@ class EmifProfile(UserenaBaseProfile):
                 top_users = top_users[:limit]
 
             # keeping in cache 1 hour
-            cache.set('topusers'+str(limit), top_users, 60*60)
+            cache.set('topusers'+str(limit)+'_'+str(days_to_count), top_users, 60*60)
+
+        return top_users
+
+    @staticmethod
+    def top_navigators(limit=None, days_to_count=None):
+        top_users = cache.get('topnavigators'+str(limit)+'_'+str(days_to_count))
+
+        if top_users == None:
+            top_users = []
+
+            limit_date = None
+
+            if(days_to_count != None):
+                # we must count from hits, instead of used the summarized value
+                limit_date = timezone.now() - timedelta(days=days_to_count)
+
+            log = None
+            if(limit_date != None):
+                log = NavigationHistory.objects.filter(date__gte=limit_date)
+            else:
+                log = NavigationHistory.objects.all()
+
+            log = log.values('user').annotate(total=Count('user')).order_by('-total')
+
+            if limit != None:
+                log = log[:limit]
+
+            for line in log:
+                try:
+                    this_user = User.objects.get(id=line['user'])
+
+                    top_users.append({
+                             'user': this_user.get_full_name(),
+                             'email': this_user.email,
+                             'count': line['total']
+                             }
+                    )
+
+                except User.DoesNotExist:
+                    print "-- ERROR: Cant find user with id "+str(line['user'])
+
+            # keeping in cache 1 hour
+            cache.set('topnavigators'+str(limit)+'_'+str(days_to_count), top_users, 60*60)
 
         return top_users
 

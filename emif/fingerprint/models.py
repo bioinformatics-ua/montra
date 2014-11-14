@@ -209,6 +209,16 @@ class Fingerprint(models.Model):
 
         return name
 
+    def unique_users(self):
+        users = set()
+
+        users.add(self.owner)
+
+        for share in self.shared.all():
+            users.add(share)
+
+        return users
+
     def unique_users_string(self):
         users = set()
         users.add(self.owner.username)
