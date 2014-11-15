@@ -33,6 +33,8 @@ from questionnaire.services import createhollowqsets, creatematrixqsets
 from fingerprint.models import Fingerprint
 from django.utils.html import strip_tags
 
+from accounts.models import RestrictedGroup, RestrictedUserDbs, EmifProfile
+
 import hashlib
 
 def qs_data_table(request, template_name='qs_data_table.html'):
@@ -66,6 +68,23 @@ def qs_data_table(request, template_name='qs_data_table.html'):
         qset = QuestionSet.objects.filter(id__in=qset_int)
 
         fingerprints = Fingerprint.objects.filter(questionnaire__id=db_type)
+
+        try:
+            eprofile = EmifProfile.objects.get(user=request.user)
+
+            if eprofile.restricted == True:
+                hashes = RestrictedGroup.hashes(request.user)
+
+
+                others = RestrictedUserDbs.objects.filter(user=request.user)
+
+                for db in others:
+                    hashes.add(db.fingerprint.fingerprint_hash)
+
+                fingerprints = fingerprints.filter(fingerprint_hash__in=hashes)
+
+        except EmifProfile.DoesNotExist:
+            print "-- ERROR: Couldn't get emif profile for user"
 
         (titles, answers) = creatematrixqsets(db_type, fingerprints, qset)
 

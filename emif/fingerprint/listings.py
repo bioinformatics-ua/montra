@@ -48,7 +48,7 @@ from rest_framework.authtoken.models import Token
 
 from fingerprint.tasks import anotateshowonresults
 
-from accounts.models import EmifProfile, RestrictedUserDbs
+from accounts.models import EmifProfile, RestrictedUserDbs, RestrictedGroup
 
 from django.utils import timezone
 
@@ -531,18 +531,30 @@ def get_databases_process_results(results):
 def restriction(user):
     dbs = RestrictedUserDbs.objects.filter(user=user)
     rest = None
+    i = 0
 
-    # The main principle is avoid iterations, since usually this number will be very restricted in comparison with the real value
-    for db in dbs:
-
-        hash = db.fingerprint.fingerprint_hash
+    def add_condition(i, rest, hash):
 
         if rest == None:
             rest = " AND (id:"+hash
         else:
             rest += " OR id:"+hash
 
-    rest += ")"
+        i += 1
+
+        return (i, rest)
+
+    # The main principle is avoid iterations, since usually this number will be very restricted in comparison with the real value
+    for db in dbs:
+        (i, rest) = add_condition(i, rest, db.fingerprint.fingerprint_hash)
+
+    dbs = RestrictedGroup.hashes(user)
+
+    for hash in dbs:
+        (i, rest) = add_condition(i, rest, hash)
+
+    if i>0:
+        rest += ")"
 
     return rest
 

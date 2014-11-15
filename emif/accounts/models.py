@@ -1,6 +1,6 @@
 from django.db import models
 
-from django.contrib.auth.models import User
+from django.contrib.auth.models import Group, User
 from django.utils.translation import ugettext as _
 from userena.models import UserenaBaseProfile
 from django_countries import CountryField
@@ -58,6 +58,59 @@ class EmifProfile(UserenaBaseProfile):
       default=10)
 
     restricted = models.BooleanField(default=False)
+
+
+    def has_permission(self, hash):
+        try:
+            fingerprint = Fingerprint.objects.get(fingerprint_hash=hash)
+
+            dbs = RestrictedGroup.hashes(self.user)
+
+            for db in dbs:
+                if db == hash:
+                    return True
+
+            dbs = RestrictedUserDbs.objects.filter(user=self.user)
+
+            for db in dbs:
+                if db.fingerprint.fingerprint_hash == hash:
+                    return True
+
+        except Fingerprint.DoesNotExist:
+            print "-- ERROR: Fingerprint with hash "+str(hash)+"does not exist."
+
+        return False
+
+class RestrictedGroup(models.Model):
+    group = models.OneToOneField(Group, unique=True)
+    fingerprints = models.ManyToManyField(Fingerprint)
+
+    def fingerprint_hashes(self):
+        fingerprints = set()
+
+        for fingerprint in self.fingerprints.all():
+            fingerprints.add(fingerprint.fingerprint_hash)
+
+        return fingerprints
+
+    @staticmethod
+    def hashes(user):
+        rgroups = RestrictedGroup.objects.all()
+
+        ugroups = user.groups.all()
+
+        fingerprints = set()
+
+        for group in ugroups:
+            try:
+                this_group = rgroups.get(group=group)
+
+                fingerprints.update(this_group.fingerprint_hashes())
+            except RestrictedGroup.DoesNotExist:
+                pass
+
+        return fingerprints
+
 
     @staticmethod
     def top_users(limit=None, days_to_count=None):
@@ -147,6 +200,7 @@ class EmifProfile(UserenaBaseProfile):
             cache.set('topnavigators'+str(limit)+'_'+str(days_to_count), top_users, 60*60)
 
         return top_users
+
 
 class RestrictedUserDbs(models.Model):
     user = models.ForeignKey(User)
