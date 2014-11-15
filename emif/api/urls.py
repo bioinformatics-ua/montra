@@ -46,6 +46,8 @@ from api.views import ToggleSubscriptionView
 
 from dashboard.api import *
 
+from public.api import *
+
 urlpatterns = patterns('api.views',
     url(r'^root/$', 'api_root'),
     url(r'^emailcheck$', EmailCheckView.as_view(), name='emailcheck'),
@@ -82,8 +84,14 @@ urlpatterns = patterns('api.views',
     url(r'^lastusers$', LastUsersView.as_view(), name='lastusers'),
     url(r'^feed$', FeedView.as_view(), name='feed'),
     url(r'^tagcloud$', TagCloudView.as_view(), name='tagcloud'),
+
+    # private links api services
+    url(r'^plinkemails$', PrivateLinkEmailView.as_view(), name='plinkemails'),
+
+    url(r'^topusers$', TopUsersView.as_view(), name='topusers'),
     url(r'^recommendations$', RecommendationsView.as_view(), name='recommendations'),
 
+    url(r'^topnavigators$', TopNavigatorsView.as_view(), name='topnavigators'),
 
 )
 

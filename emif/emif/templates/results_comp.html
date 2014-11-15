@@ -144,7 +144,7 @@ th, td {
 
                   <tr data-qid="{{t.id}}" data-fingerprintid="HEADER"
                   data-rowid="{{forloop.parentloop.counter}}_{{forloop.counter}}" class="entry rowid_{{forloop.parentloop.counter}}_{{forloop.counter}}">
-                    <td style="background-color: white; font-size: 85%;" class="tooltippable" data-original-title='{{ t.tag|removehs }}' title="">
+                    <td style="background-color: white; font-size: 85%;" class="{% if t.ttype == 'comment' %}comp_category {% endif %}tooltippable" data-original-title='{{ t.tag|removehs }}' title="">
 
 
                     {{ t.tag|removehs }}
@@ -191,9 +191,9 @@ th, td {
                   {% if t.ttype != 'publication' %}
                   <tr data-qid="{{t.id}}" data-type="{{t.ttype}}" data-fingerprintid="{{fingerprint_id}}"
                       data-rowid="{{forloop.parentloop.counter}}_{{forloop.counter}}"
-                  class="entry rowid_{{forloop.parentloop.counter}}_{{forloop.counter}}">
+                  class="entry rowid_{{forloop.parentloop.counter}}_{{forloop.counter}} {% if t.ttype == 'comment' %}comp_category {% endif %}">
                     <td class="comphidden tooltippable" data-original-title="{{ t.tag|removehs }}" title="">{{ t.tag|removehs }}</td>
-                     <td style="font-size: 95%;" class="tooltippable" data-original-title="{{ t.value.strip|force_escape|safe }}" title="">{{ t.value.strip|escape|safe }}</td>
+                     <td style="font-size: 95%;" class="tooltippable {% if t.ttype == 'comment' %}comp_category {% endif %}   " data-original-title="{{ t.value.strip|force_escape|safe }}" title="">{{ t.value.strip|escape|safe }}</td>
                   </tr>
                   {% endif %}
                 {% endfor %}

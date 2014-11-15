@@ -208,6 +208,55 @@ class Fingerprint(models.Model):
             name ="Unnamed"
 
         return name
+    def updateQsetFillPercentage(self, questionset):
+        answers = Answer.objects.filter(fingerprint_id=self, question__questionset=questionset)
+
+        (partial, answered, possible) = questionset.findDependantPercentage(answers)
+
+        QuestionSetCompletion.create_or_update(self, questionset, partial, answered, possible)
+
+        self.updateFillFromCache()
+
+    def updateFillFromCache(self):
+        qsets = QuestionSetCompletion.objects.filter(fingerprint=self)
+
+        total = 0
+        count = 0
+
+        for qset in qsets:
+            total+=qset.fill
+            count+=1
+
+        total_fill = 0
+        try:
+            total_fill = (total/count)
+        except ZeroDivisionError:
+            pass
+
+        self.fill = total_fill
+        self.save()
+
+
+    def updateFillPercentage(self):
+        answers = Answer.objects.filter(fingerprint_id = self)
+
+        qsets = self.questionnaire.questionsets()
+        for qset in qsets:
+            (partial, answered, possible) = qset.findDependantPercentage(answers)
+
+            QuestionSetCompletion.create_or_update(self, qset, partial, answered, possible)
+
+        self.updateFillFromCache()
+
+    def unique_users(self):
+        users = set()
+
+        users.add(self.owner)
+
+        for share in self.shared.all():
+            users.add(share)
+
+        return users
 
     def unique_users_string(self):
         users = set()
@@ -499,6 +548,30 @@ class FingerprintDescriptor(object):
                 return self.obj['location']
             if "PI:_Address" in self.obj:
                 return self.obj['PI:_Address']
+
+class QuestionSetCompletion(models.Model):
+    fingerprint     = models.ForeignKey(Fingerprint)
+    questionset     = models.ForeignKey(QuestionSet)
+    latest_update   = models.DateTimeField(auto_now=True)
+    fill            = models.FloatField(default=0)
+    answered        = models.IntegerField(default=0)
+    possible        = models.IntegerField(default=0)
+
+    @staticmethod
+    def create_or_update(fingerprint, questionset, fill, answered, possible):
+        qcompletion = None
+        try:
+            qcompletion = QuestionSetCompletion.objects.get(fingerprint=fingerprint, questionset=questionset)
+            qcompletion.fill = fill
+            qcompletion.answered = answered
+            qcompletion.possible = possible
+            qcompletion.save()
+
+        except QuestionSetCompletion.DoesNotExist:
+            qcompletion = QuestionSetCompletion(fingerprint=fingerprint, questionset=questionset, fill=fill, answered=answered, possible=possible)
+            qcompletion.save()
+
+        return qcompletion
 
 class FingerprintSubscription(models.Model):
     fingerprint     = models.ForeignKey(Fingerprint)

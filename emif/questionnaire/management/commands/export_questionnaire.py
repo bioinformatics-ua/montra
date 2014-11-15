@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 # Copyright (C) 2014 Ricardo Ribeiro and Universidade de Aveiro
 #
 # Authors: Ricardo Ribeiro <ribeiro.r@ua.pt>
@@ -18,40 +16,28 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-
-from __future__ import absolute_import
-
-from celery import shared_task
-import time
-
-from searchengine.search_indexes import CoreEngine
-
-from django.utils import timezone
-from datetime import timedelta
+from django.core.management.base import BaseCommand, CommandError
 
 from django.contrib.auth.models import User
 
-from celery.task.schedules import crontab
-from celery.decorators import periodic_task
+from questionnaire.models import Questionnaire
 
-from questionnaire.models import *
-from searchengine.models import *
-from searchengine.search_indexes import CoreEngine
-from django.shortcuts import render_to_response, get_object_or_404
-import sys
-import re
+from questionnaire.export import ExportQuestionnaire
 
-from django.conf import settings
-import pysolr
+class Command(BaseCommand):
 
-from django.core.cache import cache
+    args = '<questionnaire_id> <file_path>'
+    help = 'Export the questionnaire to excel'
 
-@shared_task
-def reindexQuestionnaires():
-    print "Reindexing questionnaires on solr"
+    def handle(self, *args, **options):
+        if len(args) == 2:
+            slug = args[0]
+            file_path = args[1]
 
-    c = CoreEngine()
+            exporter = ExportQuestionnaire.factory("excel", Questionnaire.objects.get(id=slug), file_path)
+            exporter.export()
 
-    c.reindex_quest_solr()
-
-    cache.delete('reindexingQuestionnaires')
+        else:
+            self.stdout.write('-- USAGE: \n    '+
+                'python manage.py export_questionnaire <questionnaire_id> <path_file>'+
+                '\n\n')

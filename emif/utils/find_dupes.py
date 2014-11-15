@@ -1,5 +1,6 @@
 from questionnaire.models import Question, Questionnaire
 from searchengine.models import Slugs
+from questionnaire.utils import next_free_slug
 
 def findDupes(q_slug):
 
@@ -39,30 +40,6 @@ def findDupes(q_slug):
 
     except Questionnaire.DoesNotExist:
         print "Error retrieving questionnaire with slug "+str(q_slug)
-
-
-def next_free_slug(slug_str):
-    i=0
-    worked = False
-    # if we have 1000 slugs with the same name we have something wrong...
-    while not worked and i < 1000:
-        this_try = slug_str+'_'+str(i)
-
-        slug = Slugs.objects.filter(slug1=this_try)
-
-        if len(slug) == 0:
-            worked=True
-
-            slug = Slugs(slug1=this_try)
-            slug.save()
-
-            return slug
-
-        else:
-            i+=1
-
-    return None
-
 
 print "[ Taking a look at adcohort ]"
 findDupes('adcohort')

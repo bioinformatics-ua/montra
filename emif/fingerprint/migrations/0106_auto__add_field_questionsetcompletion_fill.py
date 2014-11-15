@@ -6,37 +6,17 @@ from django.db import models
 
 
 class Migration(SchemaMigration):
-    depends_on = (
-        ("emif", "0001_initial"),
-    )
-    def forwards(self, orm):
-        # Adding model 'FingerprintReturnedAdvanced'
-        db.create_table('fingerprint_fingerprintreturnedadvanced', (
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('fingerprint', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['fingerprint.Fingerprint'])),
-            ('searcher', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User'])),
-            ('date', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
-            ('query_reference', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['emif.AdvancedQuery'])),
-        ))
-        db.send_create_signal('fingerprint', ['FingerprintReturnedAdvanced'])
 
-        # Adding model 'FingerprintReturnedSimple'
-        db.create_table('fingerprint_fingerprintreturnedsimple', (
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('fingerprint', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['fingerprint.Fingerprint'])),
-            ('searcher', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User'])),
-            ('date', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
-            ('query_reference', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['emif.QueryLog'])),
-        ))
-        db.send_create_signal('fingerprint', ['FingerprintReturnedSimple'])
+    def forwards(self, orm):
+        # Adding field 'QuestionSetCompletion.fill'
+        db.add_column('fingerprint_questionsetcompletion', 'fill',
+                      self.gf('django.db.models.fields.FloatField')(default=0),
+                      keep_default=False)
 
 
     def backwards(self, orm):
-        # Deleting model 'FingerprintReturnedAdvanced'
-        db.delete_table('fingerprint_fingerprintreturnedadvanced')
-
-        # Deleting model 'FingerprintReturnedSimple'
-        db.delete_table('fingerprint_fingerprintreturnedsimple')
+        # Deleting field 'QuestionSetCompletion.fill'
+        db.delete_column('fingerprint_questionsetcompletion', 'fill')
 
 
     models = {
@@ -114,10 +94,20 @@ class Migration(SchemaMigration):
             'old_value': ('django.db.models.fields.TextField', [], {'null': 'True'}),
             'revision_head': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['fingerprint.FingerprintHead']"})
         },
+        'fingerprint.answerrequest': {
+            'Meta': {'object_name': 'AnswerRequest'},
+            'date': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'}),
+            'fingerprint': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['fingerprint.Fingerprint']"}),
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'question': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['questionnaire.Question']"}),
+            'removed': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
+            'requester': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['auth.User']"})
+        },
         'fingerprint.fingerprint': {
             'Meta': {'object_name': 'Fingerprint'},
             'created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'null': 'True', 'blank': 'True'}),
             'description': ('django.db.models.fields.TextField', [], {'null': 'True', 'blank': 'True'}),
+            'fill': ('django.db.models.fields.FloatField', [], {'default': '0'}),
             'fingerprint_hash': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '255'}),
             'hits': ('django.db.models.fields.IntegerField', [], {'default': '0'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
@@ -149,6 +139,23 @@ class Migration(SchemaMigration):
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'query_reference': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['emif.QueryLog']"}),
             'searcher': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['auth.User']"})
+        },
+        'fingerprint.fingerprintsubscription': {
+            'Meta': {'object_name': 'FingerprintSubscription'},
+            'date': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
+            'fingerprint': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['fingerprint.Fingerprint']"}),
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'latest_update': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'}),
+            'removed': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
+            'user': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['auth.User']"})
+        },
+        'fingerprint.questionsetcompletion': {
+            'Meta': {'object_name': 'QuestionSetCompletion'},
+            'fill': ('django.db.models.fields.FloatField', [], {'default': '0'}),
+            'fingerprint': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['fingerprint.Fingerprint']"}),
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'latest_update': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'}),
+            'questionset': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['questionnaire.QuestionSet']"})
         },
         'questionnaire.question': {
             'Meta': {'object_name': 'Question'},

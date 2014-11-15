@@ -88,34 +88,36 @@
       </a>
       {% endif %}
 
-      {% if export_datatable and request.user.is_superuser %}
+      {% if user|has_group:'exporters' or user.is_superuser %}
+        {% if export_datatable %}
 
-        <button id="exportdatatable" class="btn" onclick="showExportMessage();"> <i class="fa fa-upload"></i> Export </button>
-      {% endif %}
+          <button id="exportdatatable" class="btn" onclick="showExportMessage();"> <i class="fa fa-upload"></i> Export </button>
+        {% endif %}
 
-      {% if export_all_answers and request.user.is_superuser %}
-      <a class="btn" href="export_all_answers" onclick="showExportMessage();" > <i class="fa fa-upload"></i>
-        Export
-      </a>
-      {% endif %}
+        {% if export_all_answers %}
+        <a class="btn" href="export_all_answers" onclick="showExportMessage();" > <i class="fa fa-upload"></i>
+          Export
+        </a>
+        {% endif %}
 
-      {% if export_bd_answers and request.user.is_superuser %}
-      <a class="btn" href="export_bd_answers/{{ fingerprint_id }}" onclick="showExportMessage();" > <i class="fa fa-upload"></i>
-        Export
-      </a>
-      {% endif %}
+        {% if export_bd_answers %}
+        <a class="btn" href="export_bd_answers/{{ fingerprint_id }}" onclick="showExportMessage();" > <i class="fa fa-upload"></i>
+          Export
+        </a>
+        {% endif %}
 
-      {% if export_my_answers and request.user.is_superuser %}
+        {% if export_my_answers%}
 
-      <a class="btn" href="export_my_answers" onclick="showExportMessage();" > <i class="fa fa-upload"></i>
-        Export
-      </a>
-      {% endif %}
-      {% if isSearch and request.user.is_superuser %}
-      <a class="btn" href="export_search_answers" onclick="showExportMessage();" > <i class="fa fa-upload"></i>
+        <a class="btn" href="export_my_answers" onclick="showExportMessage();" > <i class="fa fa-upload"></i>
+          Export
+        </a>
+        {% endif %}
+        {% if isSearch %}
+        <a class="btn" href="export_search_answers" onclick="showExportMessage();" > <i class="fa fa-upload"></i>
 
-        Export
-      </a>
+          Export
+        </a>
+        {% endif %}
       {% endif %}
       {% if request.user.is_superuser %}
             {% if  api_token %}
@@ -268,7 +270,7 @@ This is an invitation sent by {{request.user.first_name }} {{request.user.last_n
               <thead>
                 <tr>
                   <th>Description</th>
-                  <th style="width: 150px;"></th>
+                  <th style="width: 210px;"></th>
                 </tr>
               </thead>
               <tbody id="public_links_table">
@@ -276,7 +278,13 @@ This is an invitation sent by {{request.user.first_name }} {{request.user.last_n
                   {% for link in public_link %}
                     <tr id="publink_{{link.id}}">
                       <td>{% if link.description %} {{link.description}} {% endif %}</td>
-                      <td><a href="public/fingerprint/{{link.hash}}">Private Link</a>
+                      <td>
+                      <div class="btn-group">
+                        <a style="border: 1px solid #dddddd; background-color: white; box-shadow: 0px 1px 0px rgba(255, 255, 255, 0.2) inset, 0px 1px 2px rgba(0, 0, 0, 0.05);" class="btn btn-link btn-small pub_link" href="public/fingerprint/{{link.share.hash}}">Private Link</a>
+                        <button id="cbtn{{link.share.id}}" class="copy-button btn btn-small" data-clipboard-text="public/fingerprint/{{link.share.hash}}" title="Click to copy to clipboard."><i class="fa fa-clipboard"></i></button>
+                        <button title="Send by email" onclick="shareByEmail({{link.share.id}})" class="tooltippable btn btn-small"><i class="fa fa-share"></i></button>
+                    </div>
+
                       <button onclick="deletePublicLink({{link.id}});" class="btn btn-link"><img src="static/img/glyphicons_192_circle_remove.png" alt="Delete" /></button>
                       </td>
                     </tr>
@@ -528,7 +536,10 @@ function createPublicLink(){
 
     if(response.id){
       console.log(response);
-      $('#public_links_table').prepend('<tr id="publink_'+response.id+'"><td>'+response.description+'</td><td><a href="public/fingerprint/'+response.hash+'">Private Link</a><button onclick="deletePublicLink('+response.id+');" class="btn btn-link"><img src="static/img/glyphicons_192_circle_remove.png" alt="Delete" /></button></td></tr>');
+      $('#public_links_table').prepend('<tr id="publink_'+response.id+'"><td>'+response.description+'</td><td><div class="btn-group"><a style="border: 1px solid #dddddd; background-color: white; box-shadow: 0px 1px 0px rgba(255, 255, 255, 0.2) inset, 0px 1px 2px rgba(0, 0, 0, 0.05);" class="btn btn-link btn-small pub_link" href="public/fingerprint/'+response.hash+'">Private Link</a><button id="cbtn'+response.id+'" class="copy-button btn btn-small" data-clipboard-text="public/fingerprint/'+response.hash+'" title="Click to copy to clipboard."><i class="fa fa-clipboard"></i></button><button title="Send by email" onclick="shareByEmail('+response.id+')" class="tooltippable btn btn-small"><i class="fa fa-share"></i></button></div><button onclick="deletePublicLink('+response.id+');" class="btn btn-link"><img src="static/img/glyphicons_192_circle_remove.png" alt="Delete" /></button></td></tr>');
+
+        addClipboard(document.getElementById('cbtn'+response.id));
+
     } else {
       console.log('Error');
     }
