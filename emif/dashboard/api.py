@@ -221,6 +221,26 @@ class TopUsersView(APIView):
         return response
 
 ############################################################
+##### Top Navigators - Web service
+############################################################
+
+
+class TopNavigatorsView(APIView):
+    authentication_classes = (SessionAuthentication, BasicAuthentication)
+    permission_classes = (IsAuthenticated,)
+    def get(self, request, *args, **kw):
+
+        if request.user.is_authenticated() and request.user.is_staff == True:
+
+            top_users = EmifProfile.top_navigators(limit=10, days_to_count=30)
+
+            response = Response({'topnavigators': top_users}, status=status.HTTP_200_OK)
+
+        else:
+            response = Response({}, status=status.HTTP_403_FORBIDDEN)
+        return response
+
+############################################################
 ##### User Statistics - Web service
 ############################################################
 

@@ -91,6 +91,8 @@ urlpatterns = patterns('api.views',
     url(r'^topusers$', TopUsersView.as_view(), name='topusers'),
     url(r'^recommendations$', RecommendationsView.as_view(), name='recommendations'),
 
+    url(r'^topnavigators$', TopNavigatorsView.as_view(), name='topnavigators'),
+
 )
 
 urlpatterns = format_suffix_patterns(urlpatterns)
