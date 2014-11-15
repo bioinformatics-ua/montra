@@ -81,37 +81,6 @@ class EmifProfile(UserenaBaseProfile):
 
         return False
 
-class RestrictedGroup(models.Model):
-    group = models.OneToOneField(Group, unique=True)
-    fingerprints = models.ManyToManyField(Fingerprint)
-
-    def fingerprint_hashes(self):
-        fingerprints = set()
-
-        for fingerprint in self.fingerprints.all():
-            fingerprints.add(fingerprint.fingerprint_hash)
-
-        return fingerprints
-
-    @staticmethod
-    def hashes(user):
-        rgroups = RestrictedGroup.objects.all()
-
-        ugroups = user.groups.all()
-
-        fingerprints = set()
-
-        for group in ugroups:
-            try:
-                this_group = rgroups.get(group=group)
-
-                fingerprints.update(this_group.fingerprint_hashes())
-            except RestrictedGroup.DoesNotExist:
-                pass
-
-        return fingerprints
-
-
     @staticmethod
     def top_users(limit=None, days_to_count=None):
         top_users = cache.get('topusers'+str(limit)+'_'+str(days_to_count))
@@ -200,6 +169,37 @@ class RestrictedGroup(models.Model):
             cache.set('topnavigators'+str(limit)+'_'+str(days_to_count), top_users, 60*60)
 
         return top_users
+
+
+class RestrictedGroup(models.Model):
+    group = models.OneToOneField(Group, unique=True)
+    fingerprints = models.ManyToManyField(Fingerprint)
+
+    def fingerprint_hashes(self):
+        fingerprints = set()
+
+        for fingerprint in self.fingerprints.all():
+            fingerprints.add(fingerprint.fingerprint_hash)
+
+        return fingerprints
+
+    @staticmethod
+    def hashes(user):
+        rgroups = RestrictedGroup.objects.all()
+
+        ugroups = user.groups.all()
+
+        fingerprints = set()
+
+        for group in ugroups:
+            try:
+                this_group = rgroups.get(group=group)
+
+                fingerprints.update(this_group.fingerprint_hashes())
+            except RestrictedGroup.DoesNotExist:
+                pass
+
+        return fingerprints
 
 
 class RestrictedUserDbs(models.Model):
