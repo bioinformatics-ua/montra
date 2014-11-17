@@ -18,7 +18,7 @@ module.exports = {
       .click('.qset_option:nth-child(1)')
       .pause(1000)
       .click('#update_table_button')
-      .waitForElementVisible('#table_databases_names', 2000, 'Comparison Table shows up after selecting options')
+      .waitForElementVisible('#table_databases_names', 5000, 'Comparison Table shows up after selecting options')
       .end();
   }
 };
