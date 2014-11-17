@@ -9,7 +9,7 @@ module.exports = {
       .click('button[type=submit]')
       .waitForElementVisible('a[href="geo"]', 3000, 'Dashboards opens and link is visible')
       .click('a[href="geo"]')
-      .waitForElementVisible('.gmnoprint', 3000, 'Compare Geolocation opens')
+      .waitForElementVisible('.gmnoprint', 5000, 'Compare Geolocation opens')
       .end();
   }
 };

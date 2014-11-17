@@ -20,9 +20,9 @@ module.exports = {
       .setValue('#public_link_description', 'Example of description of public link.')
       .pause(500)
       .click('#createpubliclink')
-      .waitForElementVisible('#public_links_table', 4000, 'Private link appears')
+      .waitForElementVisible('#public_links_table .pub_link:first-child', 4000, 'Private link appears')
       .click('#public_links_table .pub_link:first-child')
-      .waitForElementVisible('a[href="#collapseDatabaseAdministrativeInformation"]', 3000, 'Private link Loaded with success')
+      .waitForElementVisible('a[href="#collapseDatabaseAdministrativeInformation"]', 5000, 'Private link Loaded with success')
       .end();
   }
 };

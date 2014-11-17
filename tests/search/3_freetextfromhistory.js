@@ -8,10 +8,10 @@ module.exports = {
       .setValue('input[name=password]', 'emif')
       .click('button[type=submit]')
       .waitForElementVisible('div[id=playground]', 3000, 'Login successful')
-      .waitForElementVisible('#actions a[href="advsearch/history"]', 3000, 'Dashboards opens and link is visible')
+      .waitForElementVisible('#actions a[href="advsearch/history"]', 5000, 'Dashboards opens and link is visible')
       .click('#actions a[href="advsearch/history"]')
-      .waitForElementVisible('#simple', 2000, 'Free Search history loads with success')
-      .waitForElementVisible('.btn-info', 2000, 'Free Search History entries exist')
+      .waitForElementVisible('#simple', 5000, 'Free Search history loads with success')
+      .waitForElementVisible('.btn-info', 5000, 'Free Search History entries exist')
       .click('.btn-info:first-child')
       .assert.elementPresent('#loading', 'Result loaded for simple search')
       .end();
