@@ -21,7 +21,7 @@ module.exports = {
       .pause(500)
       .click('#createpubliclink')
       .waitForElementVisible('#public_links_table', 4000, 'Private link appears')
-      .click('#public_links_table a')
+      .click('#public_links_table .pub_link:first-child')
       .waitForElementVisible('a[href="#collapseDatabaseAdministrativeInformation"]', 3000, 'Private link Loaded with success')
       .end();
   }
