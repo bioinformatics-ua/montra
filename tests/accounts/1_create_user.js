@@ -27,7 +27,7 @@ module.exports = {
       .click('input[id=id_interests_2]')
       // Cant do this so we dont spam users
       //.click('button[type=submit]')
-      //.waitForElementVisible('div[id=signupcomplete]', 1000, 'Signup Result Page Opens')
+      //.waitForElementVisible('div[id=signupcomplete]', 3000, 'Signup Result Page Opens')
       //.assert.urlContains('complete', 'Creating user ends with success')
       .end();
   }
