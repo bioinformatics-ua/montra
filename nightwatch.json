@@ -17,9 +17,9 @@
   },
   "test_settings" : {
     "default" : {
-      "launch_url" : "http://localhost:8000",
+      "launch_url" : "http://bioinformatics.ua.pt/emif-test",
       "selenium_port"  : 4444,
-      "selenium_host"  : "localhost",
+      "selenium_host"  : "192.168.10.66",
       "silent": true,
       "screenshots" : {
         "enabled" : false,
