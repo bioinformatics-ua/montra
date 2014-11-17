@@ -170,7 +170,6 @@ def aggregate_emails():
                 )
 
                 message.attach_alternative(html,"text/html")
-
                 message.send()
 
         for submission in submissions_waiting:
@@ -215,7 +214,7 @@ def generateWeekReport(fingerprint, newsletter):
 def putWeekReport(report, newsletter):
 
     # if nothing changed, nothing to report, moving on.
-    if report['db_changes'] == None and report['discussion'] != None and report['characteristic'] != None:
+    if report['db_changes'] == None and report['discussion'] == None and report['characteristic'] == None:
         return
 
     now = timezone.now()
