@@ -2,7 +2,7 @@
 
 startlocust() {
   echo 'Starting locust'
-  locust -f /var/lib/jenkins/jobs/emif-fb/workspace/loadtests/db_listing.py -P 8090 --host=http://bioinformatics.ua.pt/emif-test
+  locust -f /var/lib/jenkins/jobs/emif-fb/workspace/loadtests/db_listing.py -P 8090 --host=http://bioinformatics.ua.pt/emif-test &
 }
 
 stoplocust() {
