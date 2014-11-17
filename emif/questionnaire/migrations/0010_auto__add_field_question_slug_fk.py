@@ -6,7 +6,9 @@ from django.db import models
 
 
 class Migration(SchemaMigration):
-
+    depends_on = (
+        ("searchengine", "0001_initial"),
+    )
     def forwards(self, orm):
         # Adding field 'Question.slug_fk'
         db.add_column('questionnaire_question', 'slug_fk',

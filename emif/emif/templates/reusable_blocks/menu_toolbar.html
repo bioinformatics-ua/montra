@@ -13,9 +13,9 @@
 		{% if request.user.is_authenticated %}
 		<!--div class="btn-group" id="group_toolbar"-->
       {% if dashboard %}
-        <button id="dashboardreset" onclick="dashzone.reset();" class="btn"><i class="fa fa-trash"></i>
- Reset to Default</button>
         <div id="dashboardselectbox" class="btn btn-group"></div>
+        <button id="dashboardreset" onclick="dashzone.reset();" class="btn"><i class="fa fa-trash"></i> Reset</button>
+
       {% endif %}
       {% if fingerprint_dump %}
       {% if not subscription %}
@@ -268,7 +268,7 @@ This is an invitation sent by {{request.user.first_name }} {{request.user.last_n
               <thead>
                 <tr>
                   <th>Description</th>
-                  <th style="width: 150px;"></th>
+                  <th style="width: 210px;"></th>
                 </tr>
               </thead>
               <tbody id="public_links_table">
@@ -276,7 +276,13 @@ This is an invitation sent by {{request.user.first_name }} {{request.user.last_n
                   {% for link in public_link %}
                     <tr id="publink_{{link.id}}">
                       <td>{% if link.description %} {{link.description}} {% endif %}</td>
-                      <td><a href="public/fingerprint/{{link.hash}}">Private Link</a>
+                      <td>
+                      <div class="btn-group">
+                        <a style="border: 1px solid #dddddd; background-color: white; box-shadow: 0px 1px 0px rgba(255, 255, 255, 0.2) inset, 0px 1px 2px rgba(0, 0, 0, 0.05);" class="btn btn-link btn-small pub_link" href="public/fingerprint/{{link.share.hash}}">Private Link</a>
+                        <button id="cbtn{{link.share.id}}" class="copy-button btn btn-small" data-clipboard-text="public/fingerprint/{{link.share.hash}}" title="Click to copy to clipboard."><i class="fa fa-clipboard"></i></button>
+                        <button title="Send by email" onclick="shareByEmail({{link.share.id}})" class="tooltippable btn btn-small"><i class="fa fa-share"></i></button>
+                    </div>
+
                       <button onclick="deletePublicLink({{link.id}});" class="btn btn-link"><img src="static/img/glyphicons_192_circle_remove.png" alt="Delete" /></button>
                       </td>
                     </tr>
@@ -528,7 +534,10 @@ function createPublicLink(){
 
     if(response.id){
       console.log(response);
-      $('#public_links_table').prepend('<tr id="publink_'+response.id+'"><td>'+response.description+'</td><td><a href="public/fingerprint/'+response.hash+'">Private Link</a><button onclick="deletePublicLink('+response.id+');" class="btn btn-link"><img src="static/img/glyphicons_192_circle_remove.png" alt="Delete" /></button></td></tr>');
+      $('#public_links_table').prepend('<tr id="publink_'+response.id+'"><td>'+response.description+'</td><td><div class="btn-group"><a style="border: 1px solid #dddddd; background-color: white; box-shadow: 0px 1px 0px rgba(255, 255, 255, 0.2) inset, 0px 1px 2px rgba(0, 0, 0, 0.05);" class="btn btn-link btn-small pub_link" href="public/fingerprint/'+response.hash+'">Private Link</a><button id="cbtn'+response.id+'" class="copy-button btn btn-small" data-clipboard-text="public/fingerprint/'+response.hash+'" title="Click to copy to clipboard."><i class="fa fa-clipboard"></i></button><button title="Send by email" onclick="shareByEmail('+response.id+')" class="tooltippable btn btn-small"><i class="fa fa-share"></i></button></div><button onclick="deletePublicLink('+response.id+');" class="btn btn-link"><img src="static/img/glyphicons_192_circle_remove.png" alt="Delete" /></button></td></tr>');
+
+        addClipboard(document.getElementById('cbtn'+response.id));
+
     } else {
       console.log('Error');
     }

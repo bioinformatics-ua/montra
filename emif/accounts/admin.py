@@ -1,4 +1,4 @@
-from accounts.models import Profile, NavigationHistory
+from accounts.models import Profile, NavigationHistory, EmifProfile
 from django.contrib import admin
 from django.contrib.auth.models import User
 from adminplus.sites import AdminSitePlus
@@ -18,9 +18,49 @@ from django.db.models import Count, Avg, Max, Min
 from django.utils import timezone
 import datetime
 
+from accounts.models import RestrictedUserDbs
+from fingerprint.models import Fingerprint
+
 class NavigationAdmin(admin.ModelAdmin):
     list_display = ['user', 'path', 'date']
     search_fields = ['user__username','user__email','path']
+    list_filter = ['user']
+
+def name(obj):
+    return "%s" % (obj.findName())
+name.short_description = 'Name'
+
+class RestrictedForm(forms.ModelForm):
+    def __findName(self, hash):
+        try:
+            fn = Fingerprint.objects.get(fingerprint_hash=hash)
+
+            return (fn.removed, fn.findName())
+
+        except Fingerprint.DoesNotExist:
+            return (False, hash)
+    def __init__(self, *args, **kwargs):
+        # initalize form
+        super(RestrictedForm, self).__init__(*args, **kwargs)
+
+        # rebuild choices
+        w = self.fields['fingerprint'].widget
+        choices = []
+        for key, value in w.choices:
+            (removed, name) = self.__findName(value)
+            if not removed:
+                choices.append((key, name))
+
+        w.choices = sorted(choices, key=lambda x: x[1])
+
+        z = self.fields['user'].widget
+
+        z.choices = sorted(z.choices, key=lambda x:x[1])
+
+class NavigationRestricted(admin.ModelAdmin):
+    form = RestrictedForm
+    list_display = ['user', name]
+    search_fields = ['user']
     list_filter = ['user']
 
 class ChoiceForm(forms.Form):
@@ -40,12 +80,13 @@ class UserStatistics(View):
 
         views_time, average_views = self.getViewTimes(history)
 
-        return render(request, self.template_name, {'choice': form, 'global': True, 
+        return render(request, self.template_name, {'choice': form, 'global': True,
                                                     'most_viewed': most_viewed,
                                                     'session_time': session_time,
                                                     'session_average': average_time,
                                                     'views_time': views_time,
-                                                    'views_average': average_views
+                                                    'views_average': average_views,
+                                                    'top_users': EmifProfile.top_users(limit=20, days_to_count=30)
                                                     })
 
     def post(self, request):
@@ -55,7 +96,7 @@ class UserStatistics(View):
             return self.get(request)
 
         form = ChoiceForm(initial = {'user': user})
-        
+
         user_history = NavigationHistory.objects.filter(user=user)
 
         most_viewed = user_history.values('path').annotate(number_viewed=Count('path')).order_by('-number_viewed')[:15]
@@ -70,7 +111,7 @@ class UserStatistics(View):
                                                     'session_average': average_time,
                                                     'views_time': views_time,
                                                     'views_average': average_views
-                                                    }) 
+                                                    })
 
     def getSessionTimes(self, user_history):
 
@@ -81,7 +122,7 @@ class UserStatistics(View):
 
         delta = datetime.timedelta(days=1)
         while d >= end_date:
-            
+
             user_day_history = user_history.filter(date__startswith=d)
 
             min = user_day_history.aggregate(Min('date'))['date__min']
@@ -95,7 +136,7 @@ class UserStatistics(View):
                 session_times.append({ 'label': d, 'value': session })
             except:
                 session_times.append({ 'label': d, 'value': 0 })
-                          
+
             d -= delta
 
         return [session_times[::-1], average/30]
@@ -109,7 +150,7 @@ class UserStatistics(View):
 
         delta = datetime.timedelta(days=1)
         while d >= end_date:
-            
+
             user_day_history = user_history.filter(date__startswith=d)
 
             try:
@@ -120,7 +161,7 @@ class UserStatistics(View):
                 view_times.append({ 'label': d, 'value': views })
             except:
                 view_times.append({ 'label': d, 'value': 0 })
-                          
+
             d -= delta
 
         return [view_times[::-1], average/30]
@@ -130,3 +171,4 @@ admin.site.register_view('user_statistics', view=login_required(staff_member_req
 admin.site.register(Profile)
 
 admin.site.register(NavigationHistory, NavigationAdmin)
+admin.site.register(RestrictedUserDbs, NavigationRestricted)

@@ -6,7 +6,9 @@ from django.db import models
 
 
 class Migration(SchemaMigration):
-
+    depends_on = (
+        ("fingerprint", "0010_auto__add_fingerprintreturnedadvanced__add_fingerprintreturnedsimple"),
+    )
     def forwards(self, orm):
         # Adding model 'InvitePending'
         db.create_table('emif_invitepending', (

@@ -29,6 +29,10 @@ var LastUsersWidget = function LastUsersWidget(widgetname, width, height, pos_x,
 
         self.icon = '<i class="fa fa-users"></i>';
 
+        self.header_tooltip = "Last Users Logged into the platform.<br /><strong> (Only staff can see this widget)</strong>";
+
+        self.header_style = "background-color: #d79494; border: 1px solid #b74c4c;";
+
         self.content = "<center><h3>Loading...</h3></center>";
 
         LastUsersWidget._super.__init.apply(self, [gridster, parent]);

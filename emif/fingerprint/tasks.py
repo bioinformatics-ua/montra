@@ -51,6 +51,17 @@ from fingerprint.models import FingerprintHead, AnswerChange
 
 from django.db.models import Q
 
+# This indexes the fingerprint using the celery, so the interface doesn't have to block
+@shared_task
+def indexFingerprintCelery(fingerprint_hash):
+    try:
+        fingerprint = Fingerprint.objects.get(fingerprint_hash=fingerprint_hash)
+
+        fingerprint.indexFingerprint()
+
+    except Fingerprint.DoesNotExist:
+        print "-- ERROR: Can't index fingerprint, because fingerprint wasn't found."
+
 @shared_task
 def anotateshowonresults(query_filtered, user, isadvanced, query_reference):
     # Operations
@@ -237,6 +248,8 @@ def calculateFillPercentage(fingerprint):
 
     fingerprint.fill = getFillPercentage(fingerprint, answers)
     fingerprint.save()
+
+    fingerprint.indexFingerprint()
 
 @periodic_task(run_every=crontab(minute=0, hour=3))
 def remove_orphans():

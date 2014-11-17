@@ -9,7 +9,6 @@ from emif.utils import QuestionGroup, ordered_dict
 
 from questionnaire.models import QuestionSet, Question
 from fingerprint.models import Answer, Fingerprint
-from fingerprint.services import unique_users_string
 
 from emif.utils import QuestionGroup, ordered_dict, Tag, clean_value
 from questionnaire import Fingerprint_Summary
@@ -52,7 +51,7 @@ def creatematrixqsets(db_type, fingerprints, qsets):
                 else:
                     a_list.append([answer.data, question.type])
             except Answer.DoesNotExist:
-                a_list.append("")
+                a_list.append(["", question.type])
 
         name = "Unnamed"
 
@@ -99,7 +98,7 @@ def createqsets(runcode, qsets=None, clean=True, highlights=None, getAnswers=Tru
 
         fingerprint_ttype = fingerprint.questionnaire.pk
 
-        db_owners = unique_users_string(fingerprint)
+        db_owners = fingerprint.unique_users_string()
 
         qsets_query = None
         if choosenqsets != None:
@@ -171,7 +170,7 @@ def createqset(runcode, qsid, qsets=None, clean=True, highlights=None):
 
         fingerprint_ttype = fingerprint.questionnaire.pk
 
-        db_owners = unique_users_string(fingerprint)
+        db_owners = fingerprint.unique_users_string()
 
         try:
             qset = QuestionSet.objects.get(questionnaire=fingerprint.questionnaire, sortid=qsid)

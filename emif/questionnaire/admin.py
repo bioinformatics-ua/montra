@@ -13,11 +13,29 @@ class ChoiceInline(admin.TabularInline):
     model = Choice
     extra = 5
 
+def markall_ignoremlt(modeladmin, request, queryset):
+    for qset in queryset:
+        for question in qset.questions():
+            print question
+            question.mlt_ignore = True
+            question.save()
+
+markall_ignoremlt.short_description = "Mark all questions has ignored from MLT"
+
+def markall_noignoremlt(modeladmin, request, queryset):
+    for qset in queryset:
+        for question in qset.questions():
+            question.mlt_ignore = False
+            question.save()
+
+markall_noignoremlt.short_description = "Mark all questions has not ignored from MLT"
+
 class QuestionSetAdmin(admin.ModelAdmin):
     #ordering = ['questionnaire', 'sortid', ]
     list_filter = ['questionnaire', ]
     list_display = ['questionnaire', 'heading', 'sortid', ]
     list_editable = ['sortid', ]
+    actions = [markall_ignoremlt, markall_noignoremlt]
 
 class QuestionAdmin(admin.ModelAdmin):
     ordering = ['questionset__questionnaire', 'questionset', 'number']

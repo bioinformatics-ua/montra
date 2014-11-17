@@ -33,6 +33,7 @@ from emif.models import AdvancedQuery
 from emif.utils import generate_hash
 
 from fingerprint.services import *
+from fingerprint.tasks import indexFingerprintCelery
 
 from geolocation.services import *
 
@@ -71,7 +72,7 @@ def database_edit(request, fingerprint_id, questionnaire_id, sort_id=1, template
     try:
         this_fingerprint = Fingerprint.objects.get(fingerprint_hash=fingerprint_id)
 
-        users_db = unique_users_string(this_fingerprint)
+        users_db = this_fingerprint.unique_users_string()
         created_date = this_fingerprint.created
 
         qs_list = QuestionSet.objects.filter(questionnaire=questionnaire_id)
@@ -247,6 +248,7 @@ def render_one_questionset(request, q_id, qs_id, errors={}, aqid=None, fingerpri
     Also add the javascript dependency code.
     """
     request2 = None
+    this_fingerprint = None
 
     # In case we should be getting an advancedquery
     if aqid != None:
@@ -400,7 +402,9 @@ def render_one_questionset(request, q_id, qs_id, errors={}, aqid=None, fingerpri
         elif fingerprint_id != None and not is_new:
             (qlist_general, qlist, jstriggers, qvalues, jsinclude, cssinclude, extra_fields, hasErrors) = extract_answers(request2, q_id, question_set, qs_list)
 
-        permissions = getPermissions(fingerprint_id, question_set)
+        permissions = None
+        if this_fingerprint != None:
+            permissions = this_fingerprint.getPermissions(question_set)
 
         advanced_search=False
         if template_name == 'fingerprint_search_qs.html':
@@ -499,11 +503,6 @@ def check_database_add_conditions(request, questionnaire_id, sortid, saveid,
         if not hasErrors:
             add_city(qlist_general)
 
-            if request.POST:
-                setNewPermissions(request)
-            else:
-                setNewPermissions(request2)
-
             success = saveFingerprintAnswers(qlist_general, fingerprint_id, question_set2.questionnaire, users_db, extra_fields=extra_fields, created_date=created_date)
 
             #print "SUCCESS SAVING:"+str(success)
@@ -518,8 +517,13 @@ def check_database_add_conditions(request, questionnaire_id, sortid, saveid,
                 return HttpResponse(simplejson.dumps({'mandatoryqs': qs}),
                                     mimetype='application/json')
 
+            if request.POST:
+                setNewPermissions(request, fingerprint_id, sortid)
+            else:
+                setNewPermissions(request2, fingerprint_id, sortid)
+
             # new version that just serializes the created fingerprint object (this eventually can be done using celery)
-            indexFingerprint(fingerprint_id)
+            indexFingerprintCelery.delay(fingerprint_id)
 
     return HttpResponse(simplejson.dumps({'success': 'true'}),
                                     mimetype='application/json')

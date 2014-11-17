@@ -32,7 +32,6 @@ from questionnaire.models import Question, Questionnaire, QuestionSet
 from emif.models import SharePending
 
 from fingerprint.models import Fingerprint
-from fingerprint.services import indexFingerprint
 
 import md5
 import random
@@ -488,7 +487,7 @@ def activate_user(activation_code, user, context = None, template_name=None):
 
     fingerprint.save()
 
-    indexFingerprint(fingerprint.fingerprint_hash)
+    fingerprint.indexFingerprint()
 
     sp.pending = False
     sp.save()
