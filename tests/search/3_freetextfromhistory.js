@@ -12,8 +12,8 @@ module.exports = {
       .click('#actions a[href="advsearch/history"]')
       .waitForElementVisible('#simple', 2000, 'Free Search history loads with success')
       .waitForElementVisible('.btn-info', 2000, 'Free Search History entries exist')
-      .click('.btn-info:nth-child(1)')
-      .assert.elementPresent('#results_size', 'Result loaded for simple search')
+      .click('.btn-info:first-child')
+      .assert.elementPresent('#loading', 'Result loaded for simple search')
       .end();
   }
 };
