@@ -236,6 +236,10 @@ def findDependantPercentage(qset, answers):
         return (total, filled)
 
     for question in qset.questions():
+        # Categories can't have answers
+        if question.type == 'comment':
+            continue
+
         dep = __getDependency(question)
 
         # has dependency

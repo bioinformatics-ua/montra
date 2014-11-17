@@ -182,6 +182,8 @@ def calculateFillPercentage(fingerprint):
     fingerprint.fill = getFillPercentage(fingerprint, answers)
     fingerprint.save()
 
+    fingerprint.indexFingerprint()
+
 @periodic_task(run_every=crontab(minute=0, hour=3))
 def remove_orphans():
     # Operations
