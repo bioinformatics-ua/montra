@@ -35,11 +35,12 @@ from django.conf import settings
 from datetime import timedelta
 
 from django.contrib.auth.models import User
+from django.core.mail import EmailMultiAlternatives
 
 from celery.task.schedules import crontab
 from celery.decorators import periodic_task
 
-from newsletter.models import Newsletter, Subscription, Article, Message, Submission
+from newsletter.models import Newsletter, Subscription, Article, Message, Submission, Site, EmailTemplate, Context
 
 from django.contrib.comments import Comment
 from population_characteristics.models import Characteristic
@@ -47,6 +48,9 @@ from population_characteristics.models import Characteristic
 from django.template.loader import render_to_string
 
 from fingerprint.models import FingerprintHead, AnswerChange
+
+
+from django.db.models import Q
 
 # This indexes the fingerprint using the celery, so the interface doesn't have to block
 @shared_task
@@ -58,6 +62,7 @@ def indexFingerprintCelery(fingerprint_hash):
 
     except Fingerprint.DoesNotExist:
         print "-- ERROR: Can't index fingerprint, because fingerprint wasn't found."
+
 
 @shared_task
 def anotateshowonresults(query_filtered, user, isadvanced, query_reference):
@@ -98,17 +103,80 @@ def generate_newsmessages():
 
     for fingerprint in fingerprints:
         try:
+            print "Generating for "+fingerprint.fingerprint_hash
             newsletter = newsletters.get(slug=fingerprint.fingerprint_hash)
 
             report = generateWeekReport(fingerprint, newsletter)
 
-            sendWeekReport(report, newsletter)
+            putWeekReport(report, newsletter)
 
         except Newsletter.DoesNotExist:
             print "-- Error: Found hash not existent on newsletters: "+fingerprint.fingerprint_hash
 
     print "ends generation"
+
+    print "start sending emails"
+
+    aggregate_emails()
+
+    print "finished sending emails"
+
+    print "--"
     return 0
+
+def aggregate_emails():
+    submissions_waiting = Submission.objects.filter(prepared=True, sent=False)
+
+    if len(submissions_waiting) > 0:
+        subscribed_users = Subscription.objects.filter(~Q(newsletter__slug = 'emif-catalogue-newsletter'), subscribed=True).values('user').distinct()
+
+        for user in subscribed_users:
+            this_user = User.objects.get(id=user['user'])
+
+            related_submissions = submissions_waiting.filter(subscriptions__user=this_user)
+
+            if len(related_submissions) > 0:
+                htmlcache = []
+                textcache = []
+
+                for submission in related_submissions:
+                    subs=submission.subscriptions.get(user=this_user)
+                    variable_dict = {
+                        'subscription': subs,
+                        'site': Site.objects.get_current(),
+                        'submission': submission,
+                        'message': submission.message,
+                        'newsletter': submission.newsletter,
+                        'date': submission.publish_date,
+                        'STATIC_URL': settings.STATIC_URL,
+                        'MEDIA_URL': settings.MEDIA_URL
+                    }
+
+                    (subject_template, text_template, html_template) = EmailTemplate.get_templates('message', submission.message.newsletter)
+
+                    unescaped_context = Context(variable_dict, autoescape=False)
+
+                    subject = subject_template.render(unescaped_context).strip()
+                    textcache.append(text_template.render(unescaped_context))
+
+                    escaped_context = Context(variable_dict)
+                    htmlcache.append(html_template.render(escaped_context))
+
+                html = render_to_string("updates_email.html", {'content': ''.join(htmlcache)})
+
+
+                message = EmailMultiAlternatives('Emif Catalogue Newsletter - Database Updates on '+str(timezone.now().strftime('%d/%m/%Y %H:%M')),
+                ''.join(textcache),
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                to=[subs.get_recipient()]
+                )
+
+                message.attach_alternative(html,"text/html")
+                message.send()
+
+        for submission in submissions_waiting:
+            submission.sent=True
+            submission.save()
 
 def generateWeekReport(fingerprint, newsletter):
 
@@ -145,10 +213,10 @@ def generateWeekReport(fingerprint, newsletter):
 
     return returnable
 
-def sendWeekReport(report, newsletter):
+def putWeekReport(report, newsletter):
 
     # if nothing changed, nothing to report, moving on.
-    if report['db_changes'] == None and report['discussion'] != None and report['characteristic'] != None:
+    if report['db_changes'] == None and report['discussion'] == None and report['characteristic'] == None:
         return
 
     now = timezone.now()
@@ -178,6 +246,8 @@ def sendWeekReport(report, newsletter):
 @shared_task
 def calculateFillPercentage(fingerprint):
     fingerprint.updateFillPercentage()
+
+    fingerprint.indexFingerprint()
 
 @periodic_task(run_every=crontab(minute=0, hour=3))
 def remove_orphans():

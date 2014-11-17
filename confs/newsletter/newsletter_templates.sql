@@ -2,9 +2,9 @@
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 9.3.3
--- Dumped by pg_dump version 9.3.1
--- Started on 2014-07-05 14:46:42 WEST
+-- Dumped from database version 9.3.5
+-- Dumped by pg_dump version 9.3.5
+-- Started on 2014-11-11 15:21:43 WET
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -16,32 +16,9 @@ SET client_min_messages = warning;
 SET search_path = public, pg_catalog;
 
 --
--- TOC entry 2595 (class 0 OID 40233)
--- Dependencies: 272
--- Data for Name: newsletter_article; Type: TABLE DATA; Schema: public; Owner: -
---
-
-INSERT INTO newsletter_article VALUES (8, 10, 'New features', '- Feature A <br />
-- Feature B <br />
-- Feature C <br />', '', '', 5);
-INSERT INTO newsletter_article VALUES (9, 10, 'Fixed Problems', '- Issue A  <br />
-- Issue B  <br />
-- Issue C <br />', '', '', 5);
-
-
---
--- TOC entry 2607 (class 0 OID 0)
--- Dependencies: 271
--- Name: newsletter_article_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
---
-
-SELECT pg_catalog.setval('newsletter_article_id_seq', 9, true);
-
-
---
--- TOC entry 2589 (class 0 OID 40184)
--- Dependencies: 264
--- Data for Name: newsletter_emailtemplate; Type: TABLE DATA; Schema: public; Owner: -
+-- TOC entry 2418 (class 0 OID 91908)
+-- Dependencies: 301
+-- Data for Name: newsletter_emailtemplate; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
 INSERT INTO newsletter_emailtemplate VALUES (6, 'Subscribe', 'subscribe', 'Emif Catalogue - Subscribe Newsletter', 'Dear {{ subscription.name }},
@@ -155,72 +132,128 @@ Kind regards,
 {{ newsletter.sender }}
 
 </td></tr> </table> </div> <hr style="margin: 20px 0; border: 0; border-top: 1px solid #eee; border-bottom: 1px solid #fff;"/> <div style="min-height: 20px; margin-bottom: 20px; background-color: #f5f5f5; border: 1px solid #e3e3e3; -webkit-border-radius: 4px; -moz-border-radius: 4px; border-radius: 4px; -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,0.05); -moz-box-shadow: inset 0 1px 1px rgba(0,0,0,0.05); box-shadow: inset 0 1px 1px rgba(0,0,0,0.05);" class="well well-small"> <table style="width: 100%; "> <tr> <td></td> <td> <small>© EMIF Catalogue - {{date|date:"Y-M-d H:i:s"}}</small></td> <td style="text-align: right"><img style="width: 50px; height: 50px;" src="http://bioinformatics.ua.pt/emif/static/img/logo_emif_trans.png" /></td> </tr> </table> </div> </div> </body> </html> ');
+INSERT INTO newsletter_emailtemplate VALUES (9, 'aggregate', 'message', 'aggregate', '++++++++++++++++++++
+
+{% for article in message.articles.all %}
+{{ article.title }}
+{{ article.text|striptags|safe }}
+
+{% endfor %}
+
+++++++++++++++++++++
+{% if submission.publish %}
+Read Online: http://{{ site.domain }}/emif{{ submission.get_absolute_url }}
+{% endif %}
+Unsubscribe: http://{{ site.domain }}/emif/newsletter/{{newsletter.slug}}/unsubscribe', '        <table style="width: 100%; border-top: 1px solid #ddd; border-bottom: 1px solid #ddd; margin-top: 5px; margin-bottom: 5px;">
+            <tr>
+                <td style="padding: 25px;">
+                    <h2>{{ newsletter.title }}</h2>
+                    {% for article in message.articles.all %}
+                    <h3>{{ article.title }}</h3>
+                    <div>{{ article.text|safe }}</div>
+                    {% if article.url %}
+                    <div>
+                        <a href="{{ article.url }}">Read more</a>
+                    </div>
+                    {% endif %}
+                    {% endfor %}
+                    <hr/>
+                    <ul>
+                        {% if submission.publish %}
+                        <li>
+                            <a href="http://{{ site.domain }}/emif{{ submission.get_absolute_url }}">Read Online</a>
+                        </li>
+                        {% endif %}
+                        <li>
+                            <a href="http://{{ site.domain }}/emif/newsletter/{{newsletter.slug}}/unsubscribe">Unsubscribe</a>
+                        </li>
+                    </ul>
+                </td>
+            </tr>
+        </table>');
 
 
 --
--- TOC entry 2608 (class 0 OID 0)
--- Dependencies: 263
--- Name: newsletter_emailtemplate_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
---
-
-SELECT pg_catalog.setval('newsletter_emailtemplate_id_seq', 8, true);
-
-
---
--- TOC entry 2597 (class 0 OID 40245)
--- Dependencies: 274
--- Data for Name: newsletter_message; Type: TABLE DATA; Schema: public; Owner: -
---
-
-INSERT INTO newsletter_message VALUES (5, 'Testing release 0.1.2.3', 'testing-release-0123', 3, '2014-07-05 12:27:20.735102+01', '2014-07-05 12:27:20.73514+01');
-
-
---
--- TOC entry 2609 (class 0 OID 0)
--- Dependencies: 273
--- Name: newsletter_message_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
---
-
-SELECT pg_catalog.setval('newsletter_message_id_seq', 5, true);
-
-
---
--- TOC entry 2591 (class 0 OID 40197)
--- Dependencies: 266
--- Data for Name: newsletter_newsletter; Type: TABLE DATA; Schema: public; Owner: -
+-- TOC entry 2420 (class 0 OID 91921)
+-- Dependencies: 303
+-- Data for Name: newsletter_newsletter; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
 INSERT INTO newsletter_newsletter VALUES (3, 'EMIF Catalogue Newsletter', 'emif-catalogue-newsletter', 'bioinformatics@ua.pt', 'Emif Catalogue', true, 6, 7, 8, 5);
 
 
 --
--- TOC entry 2610 (class 0 OID 0)
--- Dependencies: 265
--- Name: newsletter_newsletter_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
+-- TOC entry 2426 (class 0 OID 91969)
+-- Dependencies: 311
+-- Data for Name: newsletter_message; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('newsletter_newsletter_id_seq', 3, true);
+INSERT INTO newsletter_message VALUES (5, 'Testing release 0.1.2.3', 'testing-release-0123', 3, '2014-07-05 12:27:20.735102+01', '2014-07-05 12:27:20.73514+01');
 
 
 --
--- TOC entry 2593 (class 0 OID 40210)
--- Dependencies: 268
--- Data for Name: newsletter_newsletter_site; Type: TABLE DATA; Schema: public; Owner: -
+-- TOC entry 2424 (class 0 OID 91957)
+-- Dependencies: 309
+-- Data for Name: newsletter_article; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+
+
+--
+-- TOC entry 2431 (class 0 OID 0)
+-- Dependencies: 308
+-- Name: newsletter_article_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('newsletter_article_id_seq', 25, true);
+
+
+--
+-- TOC entry 2432 (class 0 OID 0)
+-- Dependencies: 300
+-- Name: newsletter_emailtemplate_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('newsletter_emailtemplate_id_seq', 9, true);
+
+
+--
+-- TOC entry 2433 (class 0 OID 0)
+-- Dependencies: 310
+-- Name: newsletter_message_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('newsletter_message_id_seq', 17, true);
+
+
+--
+-- TOC entry 2434 (class 0 OID 0)
+-- Dependencies: 302
+-- Name: newsletter_newsletter_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('newsletter_newsletter_id_seq', 8, true);
+
+
+--
+-- TOC entry 2422 (class 0 OID 91934)
+-- Dependencies: 305
+-- Data for Name: newsletter_newsletter_site; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
 INSERT INTO newsletter_newsletter_site VALUES (5, 3, 1);
 
 
 --
--- TOC entry 2611 (class 0 OID 0)
--- Dependencies: 267
--- Name: newsletter_newsletter_site_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
+-- TOC entry 2435 (class 0 OID 0)
+-- Dependencies: 304
+-- Name: newsletter_newsletter_site_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('newsletter_newsletter_site_id_seq', 5, true);
+SELECT pg_catalog.setval('newsletter_newsletter_site_id_seq', 7, true);
 
 
--- Completed on 2014-07-05 14:46:42 WEST
+-- Completed on 2014-11-11 15:21:43 WET
 
 --
 -- PostgreSQL database dump complete
