@@ -255,11 +255,6 @@ def findDependantPercentage(qset, answers):
     except:
         return 0
 
-
-
-
-
-
 # Checks if all mandatory answers have been answered, namely fingerprint name
 def checkMandatoryAnswers(fingerprint):
     try:
