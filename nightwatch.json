@@ -9,7 +9,7 @@
     "start_process" : false,
     "server_path" : "",
     "log_path" : "",
-    "host" : "127.0.0.1",
+    "host" : "192.168.10.66",
     "port" : 4444,
     "cli_args" : {
       "webdriver.firefox.driver" : ""
