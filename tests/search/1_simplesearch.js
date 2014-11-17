@@ -7,7 +7,7 @@ module.exports = {
       .setValue('input[name=identification]', 'admin')
       .setValue('input[name=password]', 'emif')
       .click('button[type=submit]')
-      .waitForElementVisible('div[id=playground]', 1000, 'Login successful')
+      .waitForElementVisible('div[id=playground]', 3000, 'Login successful')
       .setValue('#edit-search-block-form--3', 'cardiac')
       .click('.canclear_search .icon-search')
       .pause(2000)

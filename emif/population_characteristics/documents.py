@@ -223,8 +223,7 @@ def document_form_view(request, runcode, qs, activetab='summary', readOnly=False
 
     public_links = None
 
-    if owner_fingerprint and fingerprint != None:
-
+    if (owner_fingerprint or request.user.is_staff) and fingerprint != None:
         public_links = PublicFingerprintShare.objects.filter(user=request.user, fingerprint=fingerprint)
 
     # increase database hits

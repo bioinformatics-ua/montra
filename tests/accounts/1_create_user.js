@@ -14,7 +14,7 @@ module.exports = {
       .url(browser.launchUrl)
       .waitForElementVisible('body', 1000, 'Page loads')
       .pause(1000)
-      .click('a[href="/accounts/signup/"]')
+      .click('a[href$="/accounts/signup/"]')
       .setValue('input[id=id_first_name]', 'Test')
       .setValue('input[id=id_last_name]', 'User')
       .setValue('input[id=id_organization]', 'Test Unit lda')

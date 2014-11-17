@@ -280,12 +280,12 @@ This is an invitation sent by {{request.user.first_name }} {{request.user.last_n
                       <td>{% if link.description %} {{link.description}} {% endif %}</td>
                       <td>
                       <div class="btn-group">
-                        <a style="border: 1px solid #dddddd; background-color: white; box-shadow: 0px 1px 0px rgba(255, 255, 255, 0.2) inset, 0px 1px 2px rgba(0, 0, 0, 0.05);" class="btn btn-link btn-small pub_link" href="public/fingerprint/{{link.share.hash}}">Private Link</a>
-                        <button id="cbtn{{link.share.id}}" class="copy-button btn btn-small" data-clipboard-text="public/fingerprint/{{link.share.hash}}" title="Click to copy to clipboard."><i class="fa fa-clipboard"></i></button>
-                        <button title="Send by email" onclick="shareByEmail({{link.share.id}})" class="tooltippable btn btn-small"><i class="fa fa-share"></i></button>
+                        <a style="border: 1px solid #dddddd; background-color: white; box-shadow: 0px 1px 0px rgba(255, 255, 255, 0.2) inset, 0px 1px 2px rgba(0, 0, 0, 0.05);" class="btn btn-link btn-small pub_link" href="public/fingerprint/{{link.hash}}">Private Link</a>
+                        <button id="cbtn{{link.id}}" class="copy-button btn btn-small" data-clipboard-text="public/fingerprint/{{link.hash}}" title="Click to copy to clipboard."><i class="fa fa-clipboard"></i></button>
+                        <button title="Send by email" onclick="shareByEmail({{link.id}})" class="tooltippable btn btn-small"><i class="fa fa-share"></i></button>
                     </div>
 
-                      <button onclick="deletePublicLink({{link.id}});" class="btn btn-link"><img src="static/img/glyphicons_192_circle_remove.png" alt="Delete" /></button>
+                      <button onclick="deletePublicLink({{link.id}});" class="btn btn-link privatedelete"><img src="static/img/glyphicons_192_circle_remove.png" alt="Delete" /></button>
                       </td>
                     </tr>
                   {% endfor %}
