@@ -7,7 +7,7 @@ module.exports = {
       .setValue('input[name=identification]', 'admin')
       .setValue('input[name=password]', 'emif')
       .click('button[type=submit]')
-      .waitForElementVisible('div[id=playground]', 3000, 'Login successful')
+      .waitForElementVisible('div[id=playground]', 5000, 'Login successful')
       .end();
   }
 };

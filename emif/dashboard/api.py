@@ -332,55 +332,67 @@ class FeedView(APIView):
 
             aggregate = []
             previous = None
+
+            hash = "feed_agg"
+
             for mod in modifications:
+                hash+=str(mod.id)+"_"
 
-                if previous != None and mod.fingerprint_id != previous.fingerprint_id and len(aggregate) != 0:
-                    feed.append(aggregate)
-                    aggregate = []
+            feed = cache.get(hash)
 
-                alterations = []
+            if feed == None:
+                feed = []
+                for mod in modifications:
 
-                anschg = AnswerChange.objects.filter(revision_head = mod)
+                    if previous != None and mod.fingerprint_id != previous.fingerprint_id and len(aggregate) != 0:
+                        feed.append(aggregate)
+                        aggregate = []
+
+                    alterations = []
+
+                    anschg = AnswerChange.objects.filter(revision_head = mod)
 
 
-                for chg in anschg:
+                    for chg in anschg:
 
-                    question = chg.answer.question
+                        question = chg.answer.question
 
-                    try:
-                        old_value = Fingerprint_Summary[question.type](chg.old_value)
-                        new_value = Fingerprint_Summary[question.type](chg.new_value)
-                    except:
-                        old_value = chg.old_value
-                        new_value = chg.new_value
+                        try:
+                            old_value = Fingerprint_Summary[question.type](chg.old_value)
+                            new_value = Fingerprint_Summary[question.type](chg.new_value)
+                        except:
+                            old_value = chg.old_value
+                            new_value = chg.new_value
 
-                    def noneIsEmpty(value):
-                        if value == None:
-                            return ""
+                        def noneIsEmpty(value):
+                            if value == None:
+                                return ""
 
-                        return value
+                            return value
 
-                    alterations.append({
-                            'number': question.number,
-                            'text': removehs(question.text),
-                            'oldvalue': noneIsEmpty(old_value),
-                            'newvalue': noneIsEmpty(new_value),
-                            'oldcomment': noneIsEmpty(chg.old_comment),
-                            'newcomment': noneIsEmpty(chg.new_comment)
-                        })
+                        alterations.append({
+                                'number': question.number,
+                                'text': removehs(question.text),
+                                'oldvalue': noneIsEmpty(old_value),
+                                'newvalue': noneIsEmpty(new_value),
+                                'oldcomment': noneIsEmpty(chg.old_comment),
+                                'newcomment': noneIsEmpty(chg.new_comment)
+                            })
 
-                aggregate.append({
-                    'hash': mod.fingerprint_id.fingerprint_hash,
-                    'name': mod.fingerprint_id.findName(),
-                    'date': mod.date.strftime("%Y-%m-%d %H:%M"),
-                    'icon': 'edit',
-                    'alterations': alterations,
-                    'revision': mod.revision
-                })
+                    aggregate.append({
+                        'hash': mod.fingerprint_id.fingerprint_hash,
+                        'name': mod.fingerprint_id.findName(),
+                        'date': mod.date.strftime("%Y-%m-%d %H:%M"),
+                        'icon': 'edit',
+                        'alterations': alterations,
+                        'revision': mod.revision
+                    })
 
-                previous = mod
+                    previous = mod
 
-            feed.append(aggregate)
+                feed.append(aggregate)
+
+                cache.set(hash, feed, 14400)
 
             response = Response({'hasfeed': True, 'feed': feed }, status=status.HTTP_200_OK)
 
