@@ -13,6 +13,7 @@ module.exports = {
       .click('a[href$="add/49/1"]')
       .waitForElementVisible('input[id="question_1.01"]', 5000, 'Questionset 1 Loaded with success')
       .setValue('input[id="question_1.01"]', 'TestUnitDatabase')
+      .setValue('input[id="question_1.02"]', '')
       .click('input[type=submit]')
       .waitForElementVisible('div[id="success-message"]', 5000, 'Questionnaire creation with success')
       .end();
