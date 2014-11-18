@@ -334,9 +334,8 @@ function initQsEnv(fingerprint_id, q_id, sortid, mode) {
 
     if (!(window.history && history.pushState)) {
         page = History.getState().hash.split('/')[2];
-
         if (page)
-            questionsets_handle(document.getElementById('qs_' + page), fingerprint_id, q_id, mode);
+            questionsets_handle(document.getElementById('qs_' + page).id, fingerprint_id, q_id, mode);
     }
 
 }
