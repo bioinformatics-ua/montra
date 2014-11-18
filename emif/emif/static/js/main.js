@@ -11,6 +11,7 @@ if (Function.prototype.name === undefined && Object.defineProperty !== undefined
         },
         set: function(value) {}
     });
+}
 
 var MAX_RESULTS = 10;
 
