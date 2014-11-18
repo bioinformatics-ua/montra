@@ -7,9 +7,9 @@ module.exports = {
       .setValue('input[name=identification]', 'admin')
       .setValue('input[name=password]', 'emif')
       .click('button[type=submit]')
-      .waitForElementVisible('a[href="geo"]', 3000, 'Dashboards opens and link is visible')
+      .waitForElementVisible('a[href="geo"]', 10000, 'Dashboards opens and link is visible')
       .click('a[href="geo"]')
-      .waitForElementVisible('.gmnoprint', 5000, 'Compare Geolocation opens')
+      .waitForElementVisible('.gmnoprint', 10000, 'Compare Geolocation opens')
       .end();
   }
 };

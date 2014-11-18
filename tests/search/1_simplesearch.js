@@ -7,13 +7,13 @@ module.exports = {
       .setValue('input[name=identification]', 'admin')
       .setValue('input[name=password]', 'emif')
       .click('button[type=submit]')
-      .waitForElementVisible('div[id=playground]', 3000, 'Login successful')
+      .waitForElementVisible('div[id=playground]', 10000, 'Login successful')
       .setValue('#edit-search-block-form--3', 'cardiac')
       .click('.canclear_search .icon-search')
-      .waitForElementVisible('#loading', 5000, 'Result loaded for simple search: cardiac')
+      .waitForElementVisible('#loading', 10000, 'Result loaded for simple search: cardiac')
       .setValue('#edit-search-block-form--3', "'''%&£ \"\"\"")
       .click('.canclear_search .icon-search')
-      .waitForElementVisible('#loading', 5000, 'Result loaded for simple search with characters that should be escaped')
+      .waitForElementVisible('#loading', 10000, 'Result loaded for simple search with characters that should be escaped')
       .end();
   }
 };
