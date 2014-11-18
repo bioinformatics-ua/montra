@@ -103,10 +103,11 @@
             __updatecoords: function(widget){
                 for(var i=0;i<widgets.length;i++){
                     if(widgets[i].widgetname == widget.attr('id')){
-                        widgets[i].width = parseInt(widget[0].dataset.sizex);
-                        widgets[i].height = parseInt(widget[0].dataset.sizey);
-                        widgets[i].pos_x = parseInt(widget[0].dataset.col);
-                        widgets[i].pos_y = parseInt(widget[0].dataset.row);
+                        // was using data set instead of jqueyr, but had to changed because of ie9 and ie10 support...
+                        widgets[i].width = parseInt($(widget[0]).data('sizex'));
+                        widgets[i].height = parseInt($(widget[0]).data('sizey'));
+                        widgets[i].pos_x = parseInt($(widget[0]).data('col'));
+                        widgets[i].pos_y = parseInt($(widget[0]).data('row'));
                         break;
                     }
                 }
