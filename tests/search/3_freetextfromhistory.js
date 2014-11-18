@@ -13,7 +13,7 @@ module.exports = {
       .waitForElementVisible('#simple', 10000, 'Free Search history loads with success')
       .waitForElementVisible('.btn-info', 10000, 'Free Search History entries exist')
       .click('.btn-info:first-child')
-      .assert.elementPresent('#loading', 'Result loaded for simple search')
+      .waitForElementVisible('#loading',10000, 'Result loaded for simple search')
       .end();
   }
 };
