@@ -12,13 +12,13 @@ module.exports = {
       .click('#actions a[href="advsearch/history"]')
       .waitForElementVisible('a[href="#advanced"]', 10000, 'History loads with success')
       .click('a[href="#advanced"]')
-      .waitForElementVisible('#advanced .btn-block', 10000, 'Free Search History entries exist')
+      .waitForElementVisible('#advanced .btn-block', 10000, 'Advanced Search History entries exist')
       .click('#advanced .btn-block')
       .waitForElementVisible('li[id="li_qs_1"]', 10000, 'Advanced search loads with success')
       .waitForElementVisible('input[id="question_1.01"]', 10000, 'Questionset 1 Loaded with success')
       .setValue('input[id="question_1.02"]', 'Agenzia regionale di sanità della Toscana')
       .click('button[type=submit]')
-      .assert.elementPresent('#results_size', 'Result loaded for advanced search')
+      .waitForElementVisible('#loading',10000, 'Result loaded for advanced search')
       .end();
   }
 };

@@ -499,7 +499,10 @@ class RecommendationsView(APIView):
                 ordered = sorted(self.__mlt_fused.values(), reverse=True, key=lambda x:x['score'])[:10]
 
                 for entry in ordered:
-                    fingerprint = Fingerprint.valid().get(fingerprint_hash=entry['id'])
+                    try:
+                        fingerprint = Fingerprint.valid().get(fingerprint_hash=entry['id'])
+                    except Fingerprint.DoesNotExist:
+                        continue
 
                     entry['name'] = fingerprint.findName()
 
