@@ -416,10 +416,12 @@ function questionsets_handle(id_questionset, fingerprint_id, q_id, mode) {
                         console.log(mode);
                         console.log(findPath(mode));
                         if (mode == QsType.SEARCH){
-                            if(q_id != null){
-                              History.pushState(null, null, findPath(mode) + fingerprint_id + "/" + obj.id.replace("qs_", "")+"/"+q_id);
-                            } else {
-                              History.pushState(null, null, findPath(mode) + fingerprint_id + "/" + obj.id.replace("qs_", ""));
+                            if (window.history && history.pushState) {
+                                if(q_id != null){
+                                  History.pushState(null, null, findPath(mode) + fingerprint_id + "/" + obj.id.replace("qs_", "")+"/"+q_id);
+                                } else {
+                                  History.pushState(null, null, findPath(mode) + fingerprint_id + "/" + obj.id.replace("qs_", ""));
+                                }
                             }
                         }
                         else{
