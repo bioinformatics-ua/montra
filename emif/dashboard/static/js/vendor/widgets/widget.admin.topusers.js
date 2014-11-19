@@ -42,13 +42,15 @@ var TopUsersWidget = function TopUsersWidget(widgetname, width, height, pos_x, p
            self.content = '<table class="nomargins table table-bordered">';
             if(data.topusers){
                 for(var i=0;i<data.topusers.length;i++){
-                    self.content += '<tr><td style="word-break: break-all;"><small>'+data.topusers[i].user + "</small></td></tr>";
+                    self.content += '<tr><td title="Count: '+data.topusers[i].count+'" style="word-break: break-all;"><small>'+data.topusers[i].user + "</small></td></tr>";
                 }
             }
 
             TopUsersWidget._super.__refresh.apply(self);
 
             $('.table', $('#'+self.widgetname)).parent().css('padding', '0px');
+
+            $('#'+self.widgetname+' td').tooltip({'container': 'body'});
 
           })
         .fail(function() {
