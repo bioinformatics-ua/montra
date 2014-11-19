@@ -7,7 +7,7 @@ module.exports = {
       .click('a[href$="accounts/password/reset/"]')
       .setValue('input[id=id_email]', 'ribeiro.r@ua.pt')
       .click('input[type=submit]')
-      .waitForElementVisible('div[id=resetcomplete]', 5000, 'Login successful')
+      .waitForElementVisible('div[id=resetcomplete]', 5000, 'Password reset successfuly')
       .assert.urlContains('done')
       .end();
   }
