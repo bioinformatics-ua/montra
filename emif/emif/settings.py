@@ -318,6 +318,8 @@ INSTALLED_APPS = (
     'notifications',
     # Django-Compressor
     "compressor",
+
+    "raven.contrib.django.raven_compat",
 )
 
 # Userena settings
