@@ -159,11 +159,12 @@ def document_form_view(request, runcode, qs, activetab='summary', readOnly=False
         raise "There is a missing type of questionnarie, something is really wrong"
 
     try:
-        eprofile = EmifProfile.objects.get(user=request.user)
+        if (not request.user.is_anonymous()):
+            eprofile = EmifProfile.objects.get(user=request.user)
 
-        if eprofile.restricted == True:
-            if not eprofile.has_permission(runcode):
-                return HttpResponse("Access forbidden",status=403)
+            if eprofile.restricted == True:
+                if not eprofile.has_permission(runcode):
+                    return HttpResponse("Access forbidden",status=403)
 
     except EmifProfile.DoesNotExist:
         raise "-- ERROR: Couldn't get emif profile for user"
@@ -236,9 +237,10 @@ def document_form_view(request, runcode, qs, activetab='summary', readOnly=False
     subscription = False
 
     try:
-        subs = FingerprintSubscription.objects.get(user = request.user, fingerprint = fingerprint)
+        if (not request.user.is_anonymous()):
+            subs = FingerprintSubscription.objects.get(user = request.user, fingerprint = fingerprint)
 
-        subscription = not subs.removed
+            subscription = not subs.removed
 
     except FingerprintSubscription.DoesNotExist:
         pass
