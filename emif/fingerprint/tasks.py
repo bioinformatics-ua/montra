@@ -133,6 +133,9 @@ def aggregate_emails():
         for user in subscribed_users:
             this_user = User.objects.get(id=user['user'])
 
+            if not this_user.is_active:
+                continue
+
             related_submissions = submissions_waiting.filter(subscriptions__user=this_user)
 
             if len(related_submissions) > 0:
