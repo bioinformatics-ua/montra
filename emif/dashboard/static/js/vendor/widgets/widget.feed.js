@@ -40,7 +40,7 @@ var FeedWidget = function FeedWidget(widgetname, width, height, pos_x, pos_y){
                     self.content += '<table style="width: 100%;"><tr>';
 
                     if(entry === undefined){
-                        self.content+="<td><center>There's no history on owned or subscribed database changes.</center></td>";
+                        self.content+='<td><center>There is no history on your databases yet and no changes in your subscribed database. <br /><br /><a id="nohistory" href="javascript:void(0);">Do you know how subscribe databases works ?</a></center></td>';
                     }
                     else {
                         if(show_icon){
@@ -136,6 +136,23 @@ var FeedWidget = function FeedWidget(widgetname, width, height, pos_x, pos_y){
 
 
             });
+
+            $('#nohistory').popover({
+                'container': 'body',
+                'placement': 'bottom',
+                'html': 'true',
+                'title': 'Database Subscription',
+                'content': '<div style="text-align: justify; text-justify: inter-word;">Sometimes there is interest on a database, and the user would possibly be interested in knowing about new information regarding the database, when it changes. '+
+                '<br /><br />With database subscription is possible to subscribe, allowing in this manner to follow up on any new updates regarding the database.'+
+                '<br /><br />By default, each user is subscribed to all the owned or shared databases.</div>'+
+                '<br /><br />It is possible to subscribe a database, by opening a database, and on the top menu clicking "Subscribe".'+
+                '<br /><br />Subscriptions will be available on the dashboard, under the History widget, but also through the weekly newsletter.',
+
+                'template': '<div class="popover popover-medium"><div class="arrow"></div><div class="popover-inner"><h3 class="popover-title"></h3><div class="popover-content"><p></p></div></div></div>'
+
+            });
+
+
           })
         .fail(function() {
             self.content = ' Error loading Common Actions Widget';
