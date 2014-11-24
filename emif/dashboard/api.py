@@ -379,11 +379,16 @@ class FeedView(APIView):
                                 'newcomment': noneIsEmpty(chg.new_comment)
                             })
 
+                    icon = 'edit'
+
+                    if(mod.revision == 1):
+                        icon = 'add'
+
                     aggregate.append({
                         'hash': mod.fingerprint_id.fingerprint_hash,
                         'name': mod.fingerprint_id.findName(),
                         'date': mod.date.strftime("%Y-%m-%d %H:%M"),
-                        'icon': 'edit',
+                        'icon': icon,
                         'alterations': alterations,
                         'revision': mod.revision
                     })

@@ -46,9 +46,14 @@ var FeedWidget = function FeedWidget(widgetname, width, height, pos_x, pos_y){
                         if(show_icon){
                             if(entry.icon === 'edit')
                                 self.content += '<td style="width:30px;"><i class="fa fa-2x fa-pencil"></i></td>';
+                            else if(entry.icon === 'add')
+                                self.content += '<td style="width:30px;"><i class="fa fa-2x fa-plus"></i></td>';
                         }
 
-                        self.content += '<td><a href="fingerprint/'+entry.hash+'/1/">'+entry.name + "</a> updated on "+entry.date +".<br />";
+                        if (entry.revision == 1)
+                            self.content += '<td><a href="fingerprint/'+entry.hash+'/1/">'+entry.name + "</a> created on "+entry.date +".<br />";
+                        else
+                            self.content += '<td><a href="fingerprint/'+entry.hash+'/1/">'+entry.name + "</a> updated on "+entry.date +".<br />";
 
 
                         if(collapsable){
