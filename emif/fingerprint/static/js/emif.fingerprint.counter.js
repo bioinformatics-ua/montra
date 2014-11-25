@@ -27,14 +27,13 @@
  */
 var questionSetsCounters = {};
 
-
 /**
-* Responsabible to keep the counting of each filled questions versus numbe 
+* Responsabible to keep the counting of each filled questions versus numbe
 * of total questions
 *
 * @class CounterCore
 * @constructor
-* @param {Integer} questionnaireId The id of the questionnaire type. 
+* @param {Integer} questionnaireId The id of the questionnaire type.
   It matches with the primary key of the template. - Not mandatory
 */
 function CounterCore(questionnaireId) {
@@ -49,7 +48,7 @@ function CounterCore(questionnaireId) {
      */
     this.countQuestionSet = function(qId) {
         var counter = 0;
-        // Go for each question set and counts the questions 
+        // Go for each question set and counts the questions
         $('#qs_' + qId + ' .question').each(function(question) {
             counter = counter + 1;
 
@@ -63,7 +62,7 @@ function CounterCore(questionnaireId) {
     *
     * @method countFilledQuestionSet
     * @param {Integer} qId Identifier of Question Set (sort to keep the order )
-    * @return {Integer} Returns the number of questions that are filled 
+    * @return {Integer} Returns the number of questions that are filled
       in the question set.
     */
     this.countFilledQuestionSet = function(qId) {
@@ -71,7 +70,7 @@ function CounterCore(questionnaireId) {
 
         counter = $('.icon-check.green:visible', $('#qs_' + qId)).length;
 
-        // Go for each question set and counts the questions 
+        // Go for each question set and counts the questions
         /*$('#qs_' + qId + ' .hasValue').each(function(question) {
 
             counter = counter + 1;
@@ -106,7 +105,7 @@ function CounterCore(questionnaireId) {
 *
 * @class CounterUI
 * @constructor
-* @param {Integer} questionnaireId The id of the questionnaire type. 
+* @param {Integer} questionnaireId The id of the questionnaire type.
   It matches with the primary key of the template.
 */
 function CounterUI() {
@@ -144,6 +143,23 @@ function CounterUI() {
         this_label1.removeClass('hidden');
     };
 
+    this.updateGlobal = function(){
+        var total=0;
+        var filled=0;
+
+        for(key in questionSetsCounters){
+
+            var divisor = questionSetsCounters[key]['count'];
+
+            if(divisor != 0)
+                filled += Math.round((questionSetsCounters[key]['filledQuestions'] / divisor) * 100);
+            total++;
+        }
+
+        var percentage = filled / total;
+        $('#globalprogress').css('width', percentage+'%');
+
+    };
 
     /**
      * This class update the counts in the graphical interface
@@ -153,8 +169,9 @@ function CounterUI() {
      * @param {Dictionary} counters dicionary with the values filledQuestions and count.
      */
     this.updateCountersClean = function(qId) {
-        console.log(qId);
         this.updateCounters(qId, questionSetsCounters[qId]);
+
+        this.updateGlobal();
     };
 
 
@@ -169,7 +186,7 @@ function CounterUI() {
 * @class CounterTasker
 * @constructor
 * @param {CounterUI} ui The wrapper to update the UI.
-* @param {Integer} questionnaireId The id of the questionnaire type. 
+* @param {Integer} questionnaireId The id of the questionnaire type.
   It matches with the primary key of the template. Not mandatory
 */
 function CounterTasker(ui, questionnaireId) {
@@ -183,7 +200,7 @@ function CounterTasker(ui, questionnaireId) {
      * Run all the task for update counters at init process
      *
      * @method run
-     
+
      */
     this.run = function() {
         var threadpool = new ThreadPool(this.POLL_MAX);
@@ -191,10 +208,10 @@ function CounterTasker(ui, questionnaireId) {
 
         function count(_core, qId, _ui) {
 
-            // Execute update 
+            // Execute update
             var counters = _core.fullCount(qId);
             _ui.updateCounters(qId, counters);
-            // Set this task to be completed. 
+            // Set this task to be completed.
             this.complete();
         }
         var self = this;
