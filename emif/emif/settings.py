@@ -44,7 +44,7 @@ if DEBUG:
     PROJECT_DIR_ROOT = "./"
     MIDDLE_DIR = ""
 else:
-    MIDDLE_DIR = "emif/emif/"
+    MIDDLE_DIR = "/emif/"
 
 ADMINS = (
     ('Luis A. Bastiao Silva', 'bastiao@ua.pt'),
@@ -318,6 +318,8 @@ INSTALLED_APPS = (
     'notifications',
     # Django-Compressor
     "compressor",
+
+    "raven.contrib.django.raven_compat",
 )
 
 # Userena settings

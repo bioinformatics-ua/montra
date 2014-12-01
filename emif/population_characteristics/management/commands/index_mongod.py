@@ -3,7 +3,7 @@ from django.core.management.base import BaseCommand, CommandError
 from emif.settings import jerboa_collection, jerboa_aggregation_collection
 
 from fingerprint.models import *
-from fingerprint.services import indexFingerprint
+#from fingerprint.services import indexFingerprint
 
 from population_characteristics.models import *
 from population_characteristics.tasks import aggregation
