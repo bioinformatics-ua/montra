@@ -1,13 +1,7 @@
 module.exports = {
   "Redo a advanced search through Search History, refining it" : function (browser) {
     browser
-      .url(browser.launchUrl)
-      .waitForElementVisible('body', 1000, 'Page loads')
-      .pause(1000)
-      .setValue('input[name=identification]', 'admin')
-      .setValue('input[name=password]', 'emif')
-      .click('button[type=submit]')
-      .waitForElementVisible('div[id=playground]', 3000, 'Login successful')
+      .login(browser.globals.username, browser.globals.password)
       .waitForElementVisible('#actions a[href="advsearch/history"]', 10000, 'Dashboards opens and link is visible')
       .click('#actions a[href="advsearch/history"]')
       .waitForElementVisible('a[href="#advanced"]', 10000, 'History loads with success')

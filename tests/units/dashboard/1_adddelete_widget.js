@@ -1,13 +1,7 @@
 module.exports = {
   "Dashboard Widget Removal/Addition" : function (browser) {
     browser
-      .url(browser.launchUrl)
-      .waitForElementVisible('body', 1000, 'Page loads')
-      .pause(1000)
-      .setValue('input[name=identification]', 'admin')
-      .setValue('input[name=password]', 'emif')
-      .click('button[type=submit]')
-      .waitForElementVisible('#playground', 1000, 'Login works')
+      .login(browser.globals.username, browser.globals.password)
       .click('#feed .removewidget')
       .pause(1000)
       .click('a[data-handler="1"]')
