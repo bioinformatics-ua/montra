@@ -12,6 +12,70 @@ from django.contrib.auth.models import User
 
 _numre = re.compile("(\d+)([a-z]+)", re.I)
 
+class DepQuestion:
+    answers = {}
+    def __init__(self):
+        self.answers = {}
+
+    def add_answer(self, answer, number):
+        if answer not in self.answers:
+            self.answers[answer] = [number]
+        else:
+            self.answers[answer].append(number)
+
+    def lengths(self):
+        lengths = {}
+
+        for key in self.answers:
+            lengths[key] = len(self.answers[key])
+
+        print lengths
+
+        return lengths
+
+class DepList:
+    dep_map = {}
+    question_counts = {}
+
+    def __separateCond(self, dep):
+        depl = dep.split(',')
+
+        if len(depl) == 2:
+            return (depl[0], depl[1])
+
+        return (None, None)
+
+    def __init__(self, questionset):
+        self.dep_map={}
+        self.question_counts = {}
+
+        questions = questionset.questions()
+
+        for question in questions:
+            if question.type != 'comment':
+                dep=questionset.getDependency(question)
+                if dep != None:
+                    (depnumber, answer) = self.__separateCond(dep)
+
+                    if depnumber not in self.dep_map:
+                        self.dep_map[depnumber] = DepQuestion()
+
+                    self.dep_map[depnumber].add_answer(answer, question.number)
+
+        # must do two rounds, because i dont know the full map until i go through them all since this i cant supose dependency order
+        for question in questions:
+            if question.type != 'comment':
+                self.question_counts[question.number] = 1
+
+                if question.number in self.dep_map:
+                    self.question_counts[question.number] = self.dep_map[question.number].lengths()
+
+                else:
+                    self.question_counts[question.number] = 1
+
+    def get(self):
+        return self.question_counts
+
 class Questionnaire(models.Model):
     name = models.CharField(max_length=128)
     redirect_url = models.CharField(max_length=128, help_text="URL to redirect to when Questionnaire is complete. Macros: $SUBJECTID, $RUNID, $LANG", default="/static/complete.html")
@@ -116,13 +180,10 @@ class QuestionSet(models.Model):
 
     # Returns the serverside total and filled count for this questionset
     def total_count(self):
-        if not hasattr(self, "__qcache"):
-            self.__qcache = list(Question.objects.filter(questionset=self).order_by('number'))
-            self.__qcache.sort()
+        if not hasattr(self, "__qtotal_count"):
+            self.__qtotal_count = len(Question.objects.filter(questionset=self).exclude(checks__contains='dependent').order_by('number'))
 
-        questions = self.__qcache
-
-        return len(questions);
+        return self.__qtotal_count
 
     def next(self):
         qs = self.questionnaire.questionsets()
@@ -170,6 +231,40 @@ class QuestionSet(models.Model):
 
         return clone
 
+    def dependency_tree(self):
+        dl = DepList(self)
+
+        return dl.get()
+
+        if not hasattr(self, "__questionstreecache"):
+            questions = self.questions()
+
+            dl = DepList(questions)
+
+            self.__questionstreecache = dl.get()
+
+        return self.__questionstreecache
+
+    def getDependency(self, question):
+        checks = ""
+        try:
+            checks = question.checks.strip()
+        except:
+            pass
+
+        # not dependant in anyone
+        if len(checks) == 0:
+            return None
+        else:
+
+            extra = checks.split(" ")
+
+            for ex in extra:
+                if ex.startswith('dependent="'):
+                    return ex[11:-1]
+
+            return None
+
     def findDependantPercentage(self, answers):
         from fingerprint.models import Answer
 
@@ -177,47 +272,30 @@ class QuestionSet(models.Model):
         total = 0
         filled = 0
 
-        def __getDependency(question):
-            checks = ""
-            try:
-                question.checks.strip()
-            except:
-                pass
-
-            # not dependant in anyone
-            if len(checks) == 0:
-                return None
-            else:
-
-                extra = checks.split(" ")
-
-                for ex in extra:
-                    if ex.startswith('dependent="'):
-                        return ex[11:-1]
-
-                return None
-
         def __fills_condition(dep):
             depl = dep.split(',')
 
             if len(depl) == 2:
-                key = None
+                answer = None
                 try:
-                    key = ref_cache[depl[0]]
+                    answer = ref_cache[depl[0]]
                 except:
                     try:
-                        key = answers.get(question__number=depl[0])
-                        ref_cache[depl[0]] = key
+                        answer = answers.get(question__number=depl[0])
+                        ref_cache[depl[0]] = answer
 
                     except Answer.DoesNotExist:
                         return False
 
-                if depl[1].lower() == key.data.lower():
+                if depl[1].lower() == answer.data.lower():
                     return True
 
             return False
 
         def __count(total, filled, question):
+            if question.type == 'comment':
+                return (total, filled)
+
             total+=1
             try:
                 ans = answers.get(question=question)
@@ -229,7 +307,7 @@ class QuestionSet(models.Model):
             return (total, filled)
 
         for question in self.questions():
-            dep = __getDependency(question)
+            dep = self.getDependency(question)
 
             # has dependency
             if dep == None:

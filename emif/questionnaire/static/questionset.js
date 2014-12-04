@@ -1,6 +1,8 @@
 var qvalues = new Array(); // used as dictionary
 var qtriggers = new Array();
 
+var depmaps = {};
+
 function dep_check(expr) {
     var exprs = expr.split(",", 2);
     var qnum = exprs[0];

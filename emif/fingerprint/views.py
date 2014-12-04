@@ -34,10 +34,14 @@ from emif.utils import generate_hash
 
 from fingerprint.services import *
 from fingerprint.tasks import indexFingerprintCelery
+from fingerprint.models import QuestionSetCompletion
 
 from geolocation.services import *
 
 from emif.models import QueryLog, AdvancedQuery, AdvancedQueryAnswer
+
+import json
+
 
 def export_bd_answers(request, runcode):
     """
@@ -95,23 +99,18 @@ def database_edit(request, fingerprint_id, questionnaire_id, sort_id=1, template
         # mark questionsets that have questions request by other users
         requests = AnswerRequest.objects.filter(fingerprint = this_fingerprint, removed=False)
 
-        for x in question_set.questionnaire.questionsets():
-            ttct = x.total_count()
-            ans = len(intersect(answers, x))
-            try:
-                percentage = (ans * 100) / ttct
-            except ZeroDivisionError:
-                percentage = 0
+        qscs = QuestionSetCompletion.objects.filter(fingerprint=this_fingerprint).order_by('questionset')
 
-            hasRequests = False
-            questionset_requests = requests.filter(question__questionset=x)
-
-            qreturned.append([x, ans, ttct, percentage, questionset_requests])
+        for qsc in qscs:
+            print qsc.possible
+            questionset_requests = requests.filter(question__questionset=qsc.questionset)
+            qreturned.append([qsc.questionset, qsc.answered, qsc.possible, qsc.fill, questionset_requests])
 
 
         r = r2r(template_name, request,
                 questionset=question_set,
                 questionsets=qreturned,
+                globalprogress = this_fingerprint.fill,
                 runinfo=None,
                 errors=None,
                 progress=None,
@@ -205,6 +204,7 @@ def show_fingerprint_page_read_only(request, q_id, qs_id, SouMesmoReadOnly=False
 
         r = r2r(template_name, request,
                         questionset=question_set,
+                        globalprogress = 0,
                         questionsets=qreturned,
                         runinfo=None,
                         progress=None,
@@ -376,17 +376,6 @@ def render_one_questionset(request, q_id, qs_id, errors={}, aqid=None, fingerpri
                         #if 'qvalue' in qdict and not question.number in cookiedict:
                         #    qvalues[question.number] = qdict['qvalue']
                         #
-
-                '''if(aqid != None):
-                    print this_query
-                    print 'question_'+question.number
-                    try:
-                        result = AdvancedQueryAnswer.objects.get(refquery=this_query, question='question_'+question.number)
-                        qdict['value']= result.answer
-                    except:
-                        print 'Failed to find result'
-                        pass
-                 '''
                 qlist.append((question, qdict))
             if qs_aux == None:
                 #print "$$$$$$ NONE"
@@ -414,12 +403,9 @@ def render_one_questionset(request, q_id, qs_id, errors={}, aqid=None, fingerpri
         if is_new == False and readonly == False:
             ansrequests = AnswerRequest.objects.filter(fingerprint = this_fingerprint, question__questionset__sortid=qs_id, removed = False)
 
-            #print "---"
-            #print ansrequests
-            #print "---"
-
         r = r2r(template_name, request,
                 questionset=question_set,
+                depmap = json.dumps(question_set.dependency_tree()),
                 questionsets=question_set.questionnaire.questionsets,
                 runinfo=None,
                 errors=errors,
