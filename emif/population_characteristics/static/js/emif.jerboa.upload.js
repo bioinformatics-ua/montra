@@ -176,4 +176,10 @@ $(function () {
         });
     }).prop('disabled', !$.support.fileInput)
         .parent().addClass($.support.fileInput ? undefined : 'disabled');
+
+    $('#fileupload_hook').bind('change', function (e) {
+        $('#jerboaupload').fileupload('add', {
+            fileInput: $(this)
+        });
+    });
 });

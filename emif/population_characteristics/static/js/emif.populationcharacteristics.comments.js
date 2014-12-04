@@ -24,7 +24,7 @@ function removeComment(commentId)
 {
 
   var result = {}
-          
+
   $.ajax({
     dataType: "json",
     url: "population/comments/" + commentId,
@@ -34,7 +34,7 @@ function removeComment(commentId)
     success: function (data){result=data;}
   });
   $("#comment_"+ commentId).remove();
-  
+
   return false;
 };
 
@@ -51,18 +51,18 @@ function CommentsManager()
           $("#pc_comments_placeholder").html("");
         }
         $("#pc_comments_placeholder").append('<div id="comment_'+data.id
-          +'"><blockquote><p style="font-size: 16px">'+data.t_title+' <a onclick="return removeComment('+data.id+')"; " href=""><i class="icon-remove icon"></i></a></p>'
+          +'"><blockquote><p style="font-size: 16px">'+data.t_title+' <a class="delete_comment" onclick="return removeComment('+data.id+')"; " href=""><i class="icon-remove icon"></i></a></p>'
                           + '<small>'+data.description+' <br />posted on '+data.latest_date+' </small>'
                           + '</blockquote>'
                         +'</div>');
-    }; 
+    };
 
 
 
     this.listComments = function(fingerprintID, chartID){
         var results = null;
         var result = {}
-          
+
         $.ajax({
           dataType: "json",
           url: "population/comments/" + fingerprintID + "/" + chartID,
@@ -72,14 +72,14 @@ function CommentsManager()
             result=data;
           }
         });
-        
+
         if (result.length==0)
           $("#pc_comments_placeholder").html(NONCONTACTCOMMENTS);
 
         $.each(result, function(data)
           {
             data = result[data];
-            
+
             self.addComment(data);
 
           });
@@ -104,7 +104,7 @@ $( document ).ready(function() {
                    data: $("#chartcomments").serialize(), // serializes the form's elements.
                    success: function(data)
                    {
-                       
+
                        cm.addComment(data);
                    }
                  });
