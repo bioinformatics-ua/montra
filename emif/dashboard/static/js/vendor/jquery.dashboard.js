@@ -103,11 +103,11 @@
             __updatecoords: function(widget){
                 for(var i=0;i<widgets.length;i++){
                     if(widgets[i].widgetname == widget.attr('id')){
-                        // was using data set instead of jqueyr, but had to changed because of ie9 and ie10 support...
-                        widgets[i].width = parseInt($(widget[0]).data('sizex'));
-                        widgets[i].height = parseInt($(widget[0]).data('sizey'));
-                        widgets[i].pos_x = parseInt($(widget[0]).data('col'));
-                        widgets[i].pos_y = parseInt($(widget[0]).data('row'));
+                        // was using data set instead of jquery, but had to changed because of ie9 and ie10 support...
+                        widgets[i].width = parseInt($(widget[0]).attr('data-sizex'));
+                        widgets[i].height = parseInt($(widget[0]).attr('data-sizey'));
+                        widgets[i].pos_x = parseInt($(widget[0]).attr('data-col'));
+                        widgets[i].pos_y = parseInt($(widget[0]).attr('data-row'));
                         break;
                     }
                 }
@@ -233,7 +233,6 @@
                     private_funcs.__updateAllcoords();
 
                     var serialization = public_funcs.serialize();
-
                     localStorage.setItem("dashboard_preferences", serialization);
                     localStorage.setItem("__dashboard_version", __version);
 
@@ -318,6 +317,9 @@
                     registered_widgets = private_funcs.__deepcopy(initial_widgets);
 
                     settings.initial();
+
+                    public_funcs.saveConfiguration();
+                    public_funcs.loadConfiguration();
                 }
             }, reset   : function(){
                 if(private_funcs.__supports_storage()){
@@ -326,8 +328,6 @@
                     public_funcs.clear();
 
                     public_funcs.initial();
-                    public_funcs.saveConfiguration();
-                    public_funcs.loadConfiguration();
                 }
             }
         };
