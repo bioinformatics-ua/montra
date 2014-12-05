@@ -263,7 +263,6 @@ function GraphicChartC3D3(divArg, dataArg)
     chartConfigs = {
          padding: {
         left: 100,
-
     },
         bindto: '#pc_chart_place',
         data: {
@@ -281,9 +280,9 @@ function GraphicChartC3D3(divArg, dataArg)
           x: {
             //type: 'categorized',
             label_position : {},
-            tick : { 
+            tick : {
                 culling: true,
-              values : 
+              values :
                 function(domain) {
                       if(memoize == null){
                         if(chartConfigs.axis.x.categories != undefined){
@@ -357,7 +356,7 @@ function GraphicChartC3D3(divArg, dataArg)
             x: {
                 //type: 'categorized',
                 label_position : {},
-                tick : { 
+                tick : {
                     culling: true,
                     /*format: function (x) {
                      return x;
@@ -367,7 +366,7 @@ function GraphicChartC3D3(divArg, dataArg)
 
                     return parseInt(x);
                   },*/
-                  values : 
+                  values :
                     function(domain) {
                       if(memoize == null){
                         if(chartConfigs.axis.x.categories != undefined){
@@ -427,8 +426,8 @@ function GraphicChartC3D3(divArg, dataArg)
               var arrY1 = datasetYs[0].slice(1);
               var arrY2 = datasetYs[1].slice(1);
 
-              chartConfigs.axis.y['max'] = Math.max(Array.max(arrY1), Array.max(arrY2));
-              chartConfigs.axis.y['min'] = 0;
+              //chartConfigs.axis.y['max'] = Math.max(Array.max(arrY1), Array.max(arrY2));
+              //chartConfigs.axis.y['min'] = 0;
             }
         }
 
@@ -478,10 +477,11 @@ function GraphicChartC3D3(divArg, dataArg)
             T: '#83bd59'
     };
 
+    chartConfigs.zoom.rescale = true;
 
-    //console.log(chartConfigs);
+    chartConfigs.padding.bottom = 5
 
-    try{chart = c3.generate(chartConfigs);}
+    try{chart = c3.generate((chartConfigs));}
     catch(ex)
     {
       console.log(ex);
@@ -503,7 +503,7 @@ function GraphicChartC3D3(divArg, dataArg)
     // Clean the legend container.
     $(".color_container").html("");
     // Draw legend manually
-    for (var i=0; i< columns.length;i++) {  
+    for (var i=0; i< columns.length;i++) {
             var row = columns[i][0];
 
             var drawLegend = function(row){
