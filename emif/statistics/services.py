@@ -47,19 +47,19 @@ class FingerprintSchemaStats(object):
 
     def totalDatabaseShared(self):
         try:
-            return Fingerprint.objects.filter(\
+            return Fingerprint.valid().filter(\
                 questionnaire=self.fingerprint_schema).annotate(\
                 num_shared=Count('shared')).aggregate(Sum('num_shared'))['num_shared__sum']
         except:
             return 0
     def avgDatabaseShared(self):
-        return round(Fingerprint.objects.filter(\
+        return round(Fingerprint.valid().filter(\
             questionnaire=self.fingerprint_schema).annotate(\
             num_shared=Count('shared')).aggregate(Avg('num_shared'))['num_shared__avg'],2)
 
 
     def maxDatabaseShared(self):
-        return Fingerprint.objects.filter(\
+        return Fingerprint.valid().filter(\
             questionnaire=self.fingerprint_schema).annotate(\
             num_shared=Count('shared')).aggregate(Max('num_shared'))['num_shared__max']
 
@@ -75,17 +75,17 @@ class FingerprintSchemaStats(object):
 
 
     def maxFilledFingerprints(self):
-        return round(Fingerprint.objects.filter(\
+        return round(Fingerprint.valid().filter(\
             questionnaire=self.fingerprint_schema).aggregate(Max('fill'))['fill__max'],2)
 
 
     def minFilledFingerprints(self):
-        return Fingerprint.objects.filter(\
+        return Fingerprint.valid().filter(\
             questionnaire=self.fingerprint_schema).aggregate(Min('fill'))['fill__min']
 
 
     def avgFilledFingerprints(self):
-        return round(Fingerprint.objects.filter(\
+        return round(Fingerprint.valid().filter(\
             questionnaire=self.fingerprint_schema).aggregate(Avg('fill'))['fill__avg'], 2)
 
 
@@ -102,26 +102,27 @@ class FingerprintSchemaStats(object):
 
 
     def maxHitsFingerprints(self):
-        return round(Fingerprint.objects.filter(\
+        return round(Fingerprint.valid().filter(\
             questionnaire=self.fingerprint_schema).aggregate(Max('hits'))['hits__max'],2)
 
 
     def minHitsFingerprints(self):
-        return Fingerprint.objects.filter(\
+        return Fingerprint.valid().filter(\
             questionnaire=self.fingerprint_schema).aggregate(Min('hits'))['hits__min']
 
 
     def avgHitsFingerprints(self):
-        return round(Fingerprint.objects.filter(\
+        return round(Fingerprint.valid().filter(\
             questionnaire=self.fingerprint_schema).aggregate(Avg('hits'))['hits__avg'], 2)
 
     def totalHitsFingerprints(self):
-        return round(Fingerprint.objects.filter(\
+        return round(Fingerprint.valid().filter(\
             questionnaire=self.fingerprint_schema).aggregate(Sum('hits'))['hits__sum'], 2)
 
     def calculatUniqueViews(self):
 
         most_hit = Hit.objects.all().values('user','hitcount__object_pk').annotate(total_hits=Count('hitcount')).order_by('-total_hits')
+        print most_hit[0]['total_hits']
         i=0
         counts = 0
         mmax = 0
@@ -132,7 +133,7 @@ class FingerprintSchemaStats(object):
 
         for hit in most_hit:
             try:
-                this_fingerprint = Fingerprint.objects.get(id=hit['hitcount__object_pk'])
+                this_fingerprint = Fingerprint.valid().get(id=hit['hitcount__object_pk'])
                 if this_fingerprint.questionnaire != self.fingerprint_schema:
                     continue
                 i = i + 1
@@ -171,3 +172,5 @@ class FingerprintStats(object):
         pass
 
 # AdvancedQuery.objects.filter(qid=qq).annotate(Count('user')).count()
+
+# QuestionSetCompletion.objects.filter(fingerprint__questionnaire=qq).values('questionset').annotate(fill_avg=Avg('fill'))

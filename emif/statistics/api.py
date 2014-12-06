@@ -79,7 +79,7 @@ class FingerprintSchemas(APIView):
         if request.user.is_authenticated():
 
             if operation == "all":
-                print fingerprint_schema_id
+
                 stats = FingerprintSchemaStats(Questionnaire.objects.get(id=fingerprint_schema_id))
                 statsList = {}
                 statsList['totalDatabases'] = stats.totalDatabases()
