@@ -40,6 +40,7 @@ var FingerprintSchemasStatsWidget = function FingerprintSchemasStatsWidget(widge
             } else {
                 self.db_types = [];
             }
+            self.content = "";
             $.each(data['types'], function (db){
 
                 $.get("api/statistics/"+data['types'][db].id+"/all/all/all")
