@@ -19,25 +19,13 @@
 from django.conf.urls.defaults import *
 from views import *
 
+from api import *
 
 urlpatterns = patterns('',
 
     # Statististics
     url(r'^statistics/(?P<questionnaire_id>[0-9]+)$', 'statistics.views.database_stats_qs'),
 
-
-    # statistics
-    # /statistics/<fingerprint_schema_id>/total/databases
-    # /statistics/<fingerprint_schema_id>/total/users
-    # /statistics/<fingerprint_schema_id>/total/filled/question
-    # /statistics/<fingerprint_schema_id>/total/filled/questionsets
-
-    # /statistics/<fingerprint_schema_id>/avg/filled/question
-
-    # /statistics/<fingerprint_id>/<question_id>/distribution
-
-    url(r'^statistics/(?P<fingerprint_id>[^/]+)/$', TopNavigatorsView.as_view(), name='topnavigators'),
-    url(r'^statistics/(?P<questionnaire_id>[0-9]+)/$', TopNavigatorsView.as_view(), name='topnavigators'),
 
 
 )

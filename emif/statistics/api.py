@@ -45,14 +45,14 @@ from questionnaire.models import Questionnaire, Question, Choice
 
 from fingerprint.models import Fingerprint, FingerprintHead, AnswerChange, Answer
 
-from fingerprint.services import findName
+
 
 from emif.utils import removehs
 
 import datetime
 
 from questionnaire import Processors, QuestionProcessors, Fingerprint_Summary
-from questionnaire.api import QuestionnaireManagement
+
 
 from django.db.models import Count
 
@@ -68,53 +68,39 @@ import urllib2
 import random
 
 
+from statistics.services import *
 
 
-
-class MostViewedFingerprintView(APIView):
+class FingerprintSchemas(APIView):
     authentication_classes = (SessionAuthentication, BasicAuthentication)
     permission_classes = (IsAuthenticated,)
-    def get(self, request, *args, **kw):
+    def get(self, request, fingerprint_schema_id=None, operation=None, \
+         ttype=None,ttype2=None,*args, **kw):
 
         if request.user.is_authenticated():
-            list_viewed = []
 
-            try:
-                eprofile = EmifProfile.objects.get(user=request.user)
-            except EmifProfile.DoesNotExist:
-                print "-- ERROR: Couldn't get emif profile for user"
+            if operation == "all":
+                print fingerprint_schema_id
+                stats = FingerprintSchemaStats(Questionnaire.objects.get(id=fingerprint_schema_id))
+                statsList = {}
+                statsList['totalDatabases'] = stats.totalDatabases()
+                statsList['totalDatabaseOwners'] = stats.totalDatabaseOwners()
+                statsList['totalDatabaseShared'] = stats.totalDatabaseShared()
+                statsList['maxDatabaseShared'] = stats.maxDatabaseShared()
+                statsList['avgDatabaseShared'] = stats.avgDatabaseShared()
+                statsList['totalFilledQuestions'] = stats.totalFilledQuestions()
+                statsList['maxFilledFingerprints'] = stats.maxFilledFingerprints()
+                statsList['minFilledFingerprints'] = stats.minFilledFingerprints()
+                statsList['avgFilledFingerprints'] = stats.avgFilledFingerprints()
+                statsList['totalDatabaseUsers'] = stats.totalDatabaseUsers()
+                statsList['totalInterested'] = stats.totalInterested()
 
-            most_hit = Hit.objects.filter(user=request.user).values('user','hitcount__object_pk').annotate(total_hits=Count('hitcount')).order_by('-total_hits')
+            else:
+                # Not implemented
+                # TODO: complete here if you want to respect it:
+                response = Response({}, status=status.HTTP_404_NOT_FOUND)
 
-            i=0
-
-            for hit in most_hit:
-                try:
-                    this_fingerprint = Fingerprint.valid().get(id=hit['hitcount__object_pk'])
-
-                    if eprofile.restricted:
-                        try:
-                            allowed = RestrictedUserDbs.objects.get(user=request.user, fingerprint=this_fingerprint)
-                        except RestrictedUserDbs.DoesNotExist:
-                            restricted = RestrictedGroup.hashes(request.user)
-
-                            if this_fingerprint.fingerprint_hash not in RestrictedGroup.hashes(request.user):
-                                continue
-
-                    list_viewed.append(
-                        {
-                            'hash': this_fingerprint.fingerprint_hash,
-                            'name': this_fingerprint.findName(),
-                            'count': hit['total_hits']
-                        })
-                    i+=1
-                    if i == 10:
-                        break
-
-                except Fingerprint.DoesNotExist:
-                    print "-- Error on hitcount for fingerprint with id "+hit['hitcount__object_pk']
-
-            response = Response({'mostviewed': list_viewed}, status=status.HTTP_200_OK)
+            response = Response({'stats': statsList}, status=status.HTTP_200_OK)
 
         else:
             response = Response({}, status=status.HTTP_403_FORBIDDEN)
@@ -122,40 +108,5 @@ class MostViewedFingerprintView(APIView):
 
 
 
-
-
-############################################################
-##### Statistics Database
-############################################################
-
-class StatisticsView(APIView):
-    authentication_classes = (SessionAuthentication, BasicAuthentication)
-    permission_classes = (IsAuthenticated,)
-    def get(self, request, *args, **kw):
-
-        if request.user.is_authenticated():
-
-            questionset = request.GET.get('questionset', 2)
-            questionnarie = request.GET.get('questionnarie', '49')
-            qm = QuestionnaireManagement(questionnarie)
-            questions = qm.questions(questionset)
-
-            db_types = []
-            #db_types.append({'name': 'What are?', 'id': '1', 'answers': [{'Yes': '10', 'No': '20', '_T': '30'}]})
-            #db_types.append({'name': 'What are?', 'id': '2', 'answers': [{'Yes': '10', 'No': '20', '_T': '30'}]})
-
-            for q in questions:
-                d = {'name': q['name'] , 'id': q['id'], 'type': q['type'], 'answers': [{'Yes': '10', 'No': '20', '_T': '30'}]}
-                choices = Choice.objects.filter(question=q['obj'])
-                for c in choices:
-                    d['answers'].append({c.value:c.text})
-                db_types.append(d)
-
-
-            response = Response({'questions': db_types}, status=status.HTTP_200_OK)
-
-        else:
-            response = Response({}, status=status.HTTP_403_FORBIDDEN)
-        return response
 
 

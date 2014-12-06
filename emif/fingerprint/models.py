@@ -296,8 +296,8 @@ class Fingerprint(models.Model):
 
 
     @staticmethod
-    def getActiveFingerprints(questionnaire):
-        return Fingerprint.objects.get(questionnaire=questionnaire, removed=False)
+    def getActiveFingerprints(questionnaire_id):
+        return Fingerprint.objects.filter(questionnaire=questionnaire_id, removed=False)
 
 
 

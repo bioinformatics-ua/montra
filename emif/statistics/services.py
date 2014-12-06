@@ -20,7 +20,7 @@
 
 from fingerprint.models import *
 from django.db.models import Avg, Count, Sum, Min, Max
-
+from accounts.models import *
 
 
 class FingerprintSchemaStats(object):
@@ -46,27 +46,32 @@ class FingerprintSchemaStats(object):
 
 
     def totalDatabaseShared(self):
+        try:
+            return Fingerprint.objects.filter(\
+                questionnaire=self.fingerprint_schema).annotate(\
+                num_shared=Count('shared')).aggregate(Sum('num_shared'))['num_shared__sum']
+        except:
+            return 0
+    def avgDatabaseShared(self):
         return Fingerprint.objects.filter(\
             questionnaire=self.fingerprint_schema).annotate(\
             num_shared=Count('shared')).aggregate(Sum('num_shared'))
+
 
     def maxDatabaseShared(self):
         return Fingerprint.objects.filter(\
             questionnaire=self.fingerprint_schema).annotate(\
-            num_shared=Count('shared')).aggregate(Sum('num_shared'))
-
-
-    def maxDatabaseShared(self):
-        return Fingerprint.objects.filter(\
-            questionnaire=self.fingerprint_schema).annotate(\
-            num_shared=Count('shared')).aggregate(Sum('num_shared'))
+            num_shared=Count('shared')).aggregate(Max('num_shared'))
 
 
 
     def totalFilledQuestions(self):
+
+        #Answer.objects.filter(fingerprint_id__questionnaire=qq).annotate(num_q=Count('question')).aggregate(Sum('num_q'))
+        #Answer.objects.filter(fingerprint_id__questionnaire=q).annotate(num_q=Count('question')).aggregate(Sum('num_q'))
+
         return Answer.objects.filter(\
-            fingerprint_id__questionnaire=self.fingerprint_schema).annotate(\
-            num_questions=Count('questions')).aggregate(Sum('num_questions'))
+            fingerprint_id__questionnaire=self.fingerprint_schema).count()
 
 
     def maxFilledFingerprints(self):
@@ -85,11 +90,13 @@ class FingerprintSchemaStats(object):
 
 
     def totalDatabaseUsers(self):
+        print self.totalDatabaseShared()
+        print self.totalDatabaseOwners()
         return self.totalDatabaseShared() + self.totalDatabaseOwners()
 
 
     def totalInterested(self):
-        return EmifProfile.objects.filter(interests__contains=self.fingerprint_schema).count()
+        return EmifProfile.objects.filter(interests=self.fingerprint_schema).count()
         EmifProfile.objects.filter(interests=qq).count()
 
 
@@ -101,4 +108,4 @@ class FingerprintStats(object):
     def questions(self):
         pass
 
-
+# AdvancedQuery.objects.filter(qid=qq).annotate(Count('user')).count()
