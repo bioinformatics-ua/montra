@@ -121,8 +121,8 @@ class FingerprintSchemaStats(object):
 
     def calculatUniqueViews(self):
 
-        most_hit = Hit.objects.all().values('user','hitcount__object_pk').annotate(total_hits=Count('hitcount')).order_by('-total_hits')
-        print most_hit[0]['total_hits']
+        most_hit = HitCount.objects.all()
+
         i=0
         counts = 0
         mmax = 0
@@ -133,15 +133,15 @@ class FingerprintSchemaStats(object):
 
         for hit in most_hit:
             try:
-                this_fingerprint = Fingerprint.valid().get(id=hit['hitcount__object_pk'])
+                this_fingerprint = Fingerprint.valid().get(id=hit.object_pk)
                 if this_fingerprint.questionnaire != self.fingerprint_schema:
                     continue
                 i = i + 1
-                counts += hit['total_hits']
-                if (hit['total_hits']>mmax):
-                    mmax = hit['total_hits']
-                if (hit['total_hits']<mmin):
-                    mmin = hit['total_hits']
+                counts += hit.hits
+                if (hit.hits>mmax):
+                    mmax = hit.hits
+                if (hit.hits<mmin):
+                    mmin = hit.hits
             except:
                 pass
         self.counts = counts
