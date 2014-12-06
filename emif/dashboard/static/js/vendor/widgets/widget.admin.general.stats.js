@@ -48,17 +48,15 @@ var FingerprintSchemasStatsWidget = function FingerprintSchemasStatsWidget(widge
                     if(dataJson.stats){
 
                         self.content += "Total databases: " + dataJson.stats.totalDatabases + "</br>";
-
                         self.content += "Total Database owners: " + dataJson.stats.totalDatabaseOwners +"</br>";;
                         self.content += "Total Shared Users: " + dataJson.stats.totalDatabaseShared + "</br>";
                         self.content += "Max DB Shared: " + dataJson.stats.maxDatabaseShared + "</br>";
                         self.content += "Avg DB Shared: " + dataJson.stats.avgDatabaseShared + "</br>";
                         self.content += "Total filled questions: " + dataJson.stats.totalFilledQuestions+ "</br>";
                         self.content += "Max filled questions: " + dataJson.stats.maxFilledFingerprints+ "</br>";
-                        self.content += "Avg filled questions: " + dataJson.stats.avgFilledFingerprints+ "</br>";
-                        self.content += "Avg filled questions: " + dataJson.stats.avgFilledFingerprints+ "</br>";
-                        self.content += "Total databases users: " + dataJson.stats.totalDatabaseUsers+ "</br>";
-                        self.content += "Total interested users: " + dataJson.stats.totalInterested+ "</br>";
+                        self.content += "Average filled questions: " + dataJson.stats.avgFilledFingerprints+ "</br>";
+                        self.content += "Total databases users (including shared and database owners): " + dataJson.stats.totalDatabaseUsers+ "</br>";
+                        self.content += "Total interested users (all profiles): " + dataJson.stats.totalInterested+ "</br>";
 
 
 
