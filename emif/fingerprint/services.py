@@ -4,6 +4,7 @@ from fingerprint.models import *
 
 from questionnaire.models import Questionnaire, QuestionSet, Question, QuestionSetPermissions
 from questionnaire.views import *
+from questionnaire.services import createqsets
 
 from django.contrib.auth.models import User
 
@@ -781,6 +782,9 @@ def attachPermissions(fingerprint_hash, qsets):
         print "-- ERROR: Fingerprint with id fingerprint_hash"+str(fingerprint_hash)+" doesn't exist"
 
     return None
+
+def clean_str_exp(s):
+    return s.replace("\n", "|").replace(";", ",").replace("\t", "    ").replace("\r","").replace("^M","")
 
 def writeGroup(id, k, qs, writer, name, t):
     if (qs!=None and qs.list_ordered_tags!= None):
