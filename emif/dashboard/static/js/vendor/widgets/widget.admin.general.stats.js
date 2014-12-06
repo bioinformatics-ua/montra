@@ -21,7 +21,7 @@
 
 var FingerprintSchemasStatsWidget = function FingerprintSchemasStatsWidget(widgetname, width, height, pos_x, pos_y){
 
-    FingerprintSchemasStatsWidget._base.apply(this, [widgetname, "My Statistics", width, height, pos_x, pos_y]);
+    FingerprintSchemasStatsWidget._base.apply(this, [widgetname, "Database Types - Statistics", width, height, pos_x, pos_y]);
 
 }.inherit(DashboardWidget).addToPrototype({
     __init : function(gridster, parent){
@@ -33,36 +33,57 @@ var FingerprintSchemasStatsWidget = function FingerprintSchemasStatsWidget(widge
 
         FingerprintSchemasStatsWidget._super.__init.apply(self, [gridster, parent]);
 
-        $.get("api/userstats")
+        $.get("api/dbtypes")
         .done(function(data) {
-
-            if(data.stats){
-                self.content = "<strong>Last Login: </strong>"+data.stats.lastlogin+"<br />"+
-                "<strong>Databases owned:</strong> "+data.stats.numberownerdb+"<br />"+
-                "<strong>Databases shared with me:</strong> "+data.stats.numbershareddb+"<br />";
-
-                var mostpop = data.stats.mostpopulardb;
-                if(mostpop.name != '---'){
-                    self.content += '<strong>Most popular database:</strong> <a href="fingerprint/'+mostpop.hash+'/1/">'+
-                    mostpop.name +"</a> ("+mostpop.hits+" hits)<br />";
-                }
-
-                console.log(data.stats);
-
-                if(data.stats.populartype != '---'){
-                    self.content += '<strong>Most used database type: </strong>'+data.stats.populartype;
-                }
-
+            if(data.types){
+                self.db_types = data.types;
             } else {
-                self.content = "Error Loading User Statistics Widget";
+                self.db_types = [];
             }
+            $.each(data['types'], function (db){
 
-            FingerprintSchemasStatsWidget._super.__refresh.apply(self);
-          })
+                $.get("api/statistics/"+data['types'][db].id+"/all/all/all")
+                .done(function(dataJson) {
+                    self.content += "<strong>"+data['types'][db].name+"</strong> <br/>";
+                    if(dataJson.stats){
+
+                        self.content += "Total databases: " + dataJson.stats.totalDatabases + "</br>";
+
+                        self.content += "Total Database owners: " + dataJson.stats.totalDatabaseOwners +"</br>";;
+                        self.content += "Total Shared Users: " + dataJson.stats.totalDatabaseShared + "</br>";
+                        self.content += "Max DB Shared: " + dataJson.stats.maxDatabaseShared + "</br>";
+                        self.content += "Avg DB Shared: " + dataJson.stats.avgDatabaseShared + "</br>";
+                        self.content += "Total filled questions: " + dataJson.stats.totalFilledQuestions+ "</br>";
+                        self.content += "Max filled questions: " + dataJson.stats.maxFilledFingerprints+ "</br>";
+                        self.content += "Avg filled questions: " + dataJson.stats.avgFilledFingerprints+ "</br>";
+                        self.content += "Avg filled questions: " + dataJson.stats.avgFilledFingerprints+ "</br>";
+                        self.content += "Total databases users: " + dataJson.stats.totalDatabaseUsers+ "</br>";
+                        self.content += "Total interested users: " + dataJson.stats.totalInterested+ "</br>";
+
+
+
+                    } else {
+                        self.content = "Error Loading User Statistics Widget";
+                    }
+                    FingerprintSchemasStatsWidget._super.__refresh.apply(self);
+
+
+                  })
+                .fail(function() {
+                    self.content = ' Error loading User Statistics Widget';
+                    FingerprintSchemasStatsWidget._super.__refresh.apply(self);
+
+                });
+
+            });
+
+
+        })
         .fail(function() {
-            self.content = ' Error loading User Statistics Widget';
+            self.content = ' Error loading Stats of the Fingerprint Schema Widget';
 
             FingerprintSchemasStatsWidget._super.__refresh.apply(self);
         });
+
     }
 });

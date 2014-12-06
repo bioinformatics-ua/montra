@@ -53,15 +53,15 @@ class FingerprintSchemaStats(object):
         except:
             return 0
     def avgDatabaseShared(self):
-        return Fingerprint.objects.filter(\
+        return round(Fingerprint.objects.filter(\
             questionnaire=self.fingerprint_schema).annotate(\
-            num_shared=Count('shared')).aggregate(Sum('num_shared'))
+            num_shared=Count('shared')).aggregate(Avg('num_shared'))['num_shared__avg'],2)
 
 
     def maxDatabaseShared(self):
         return Fingerprint.objects.filter(\
             questionnaire=self.fingerprint_schema).annotate(\
-            num_shared=Count('shared')).aggregate(Max('num_shared'))
+            num_shared=Count('shared')).aggregate(Max('num_shared'))['num_shared__max']
 
 
 
@@ -75,18 +75,18 @@ class FingerprintSchemaStats(object):
 
 
     def maxFilledFingerprints(self):
-        return Fingerprint.objects.filter(\
-            questionnaire=self.fingerprint_schema).aggregate(Max('fill'))
+        return round(Fingerprint.objects.filter(\
+            questionnaire=self.fingerprint_schema).aggregate(Max('fill'))['fill__max'],2)
 
 
     def minFilledFingerprints(self):
         return Fingerprint.objects.filter(\
-            questionnaire=self.fingerprint_schema).aggregate(Min('fill'))
+            questionnaire=self.fingerprint_schema).aggregate(Min('fill'))['fill__min']
 
 
     def avgFilledFingerprints(self):
-        return Fingerprint.objects.filter(\
-            questionnaire=self.fingerprint_schema).aggregate(Avg('fill'))
+        return round(Fingerprint.objects.filter(\
+            questionnaire=self.fingerprint_schema).aggregate(Avg('fill'))['fill__avg'], 2)
 
 
     def totalDatabaseUsers(self):
