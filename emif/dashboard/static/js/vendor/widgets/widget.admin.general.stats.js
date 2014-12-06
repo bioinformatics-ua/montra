@@ -58,6 +58,14 @@ var FingerprintSchemasStatsWidget = function FingerprintSchemasStatsWidget(widge
                         self.content += "Total databases users (including shared and database owners): " + dataJson.stats.totalDatabaseUsers+ "</br>";
                         self.content += "Total interested users (all profiles): " + dataJson.stats.totalInterested+ "</br>";
 
+                        self.content += "Max Hits: " + dataJson.stats.maxHitsFingerprints + "</br>";
+                        self.content += "Avg Hits: " + dataJson.stats.avgHitsFingerprints + "</br>";
+                        self.content += "Total hits: " + dataJson.stats.totalHitsFingerprints + "</br>";
+
+                        self.content += "Max Unique views: " + dataJson.stats.maxUniqueViewsFingerprints + "</br>";
+                        self.content += "Avg unique views: " + dataJson.stats.avgUniqueViewsFingerprints + "</br>";
+                        self.content += "Total unique views: " + dataJson.stats.totalUniqueViewsFingerprints + "</br>";
+
 
 
                     } else {

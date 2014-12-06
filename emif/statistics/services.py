@@ -16,13 +16,13 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
-
+import sys
 
 from fingerprint.models import *
 from django.db.models import Avg, Count, Sum, Min, Max
 from accounts.models import *
 
-
+from hitcount.models import Hit, HitCount
 class FingerprintSchemaStats(object):
 
 
@@ -32,7 +32,7 @@ class FingerprintSchemaStats(object):
         """
 
         self.fingerprint_schema = fingerprint_schema
-
+        self.calculatUniqueViews()
 
     def totalDatabases(self):
 
@@ -99,6 +99,68 @@ class FingerprintSchemaStats(object):
         return EmifProfile.objects.filter(interests=self.fingerprint_schema).count()
         EmifProfile.objects.filter(interests=qq).count()
 
+
+
+    def maxHitsFingerprints(self):
+        return round(Fingerprint.objects.filter(\
+            questionnaire=self.fingerprint_schema).aggregate(Max('hits'))['hits__max'],2)
+
+
+    def minHitsFingerprints(self):
+        return Fingerprint.objects.filter(\
+            questionnaire=self.fingerprint_schema).aggregate(Min('hits'))['hits__min']
+
+
+    def avgHitsFingerprints(self):
+        return round(Fingerprint.objects.filter(\
+            questionnaire=self.fingerprint_schema).aggregate(Avg('hits'))['hits__avg'], 2)
+
+    def totalHitsFingerprints(self):
+        return round(Fingerprint.objects.filter(\
+            questionnaire=self.fingerprint_schema).aggregate(Sum('hits'))['hits__sum'], 2)
+
+    def calculatUniqueViews(self):
+
+        most_hit = Hit.objects.all().values('user','hitcount__object_pk').annotate(total_hits=Count('hitcount')).order_by('-total_hits')
+        i=0
+        counts = 0
+        mmax = 0
+        mmin = sys.maxint
+        self.counts = counts
+        self.mmax = mmax
+        self.aavg = 0
+
+        for hit in most_hit:
+            try:
+                this_fingerprint = Fingerprint.objects.get(id=hit['hitcount__object_pk'])
+                if this_fingerprint.questionnaire != self.fingerprint_schema:
+                    continue
+                i = i + 1
+                counts += hit['total_hits']
+                if (hit['total_hits']>mmax):
+                    mmax = hit['total_hits']
+                if (hit['total_hits']<mmin):
+                    mmin = hit['total_hits']
+            except:
+                pass
+        self.counts = counts
+        self.mmax = mmax
+        self.aavg = counts/i
+
+        return (i, self.counts, self.aavg, self.mmax, )
+
+
+
+
+    def maxUniqueViewsFingerprints(self):
+        return self.mmax
+
+
+    def avgUniqueViewsFingerprints(self):
+        return self.aavg
+
+    def totalUniqueViewsFingerprints(self):
+        return self.counts
 
 class FingerprintStats(object):
 

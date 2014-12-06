@@ -94,6 +94,15 @@ class FingerprintSchemas(APIView):
                 statsList['totalDatabaseUsers'] = stats.totalDatabaseUsers()
                 statsList['totalInterested'] = stats.totalInterested()
 
+                statsList['maxHitsFingerprints'] = stats.maxHitsFingerprints()
+                statsList['minHitsFingerprints'] = stats.minHitsFingerprints()
+                statsList['avgHitsFingerprints'] = stats.avgHitsFingerprints()
+                statsList['totalHitsFingerprints'] = stats.totalHitsFingerprints()
+
+                statsList['avgUniqueViewsFingerprints'] = stats.avgUniqueViewsFingerprints()
+                statsList['maxUniqueViewsFingerprints'] = stats.maxUniqueViewsFingerprints()
+                statsList['totalUniqueViewsFingerprints'] = stats.totalUniqueViewsFingerprints()
+
             else:
                 # Not implemented
                 # TODO: complete here if you want to respect it:
