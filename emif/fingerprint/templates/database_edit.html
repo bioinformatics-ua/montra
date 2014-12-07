@@ -4,13 +4,13 @@
 {% load django_bootstrap_breadcrumbs %}
 
 {% block breadcrumbs %}
-    {{ block.super }} 
+    {{ block.super }}
     {% if request.session.query %}
-    {% breadcrumb "Search" "resultsdiff/1" %} 
-    {% elif request.session.list_origin == 'personal' %} 
-    {% breadcrumb "Personal" "databases" %} 
-    {% else %} 
-    {% breadcrumb "All" "alldatabases" %} 
+    {% breadcrumb "Search" "resultsdiff/1" %}
+    {% elif request.session.list_origin == 'personal' %}
+    {% breadcrumb "Personal" "databases" %}
+    {% else %}
+    {% breadcrumb "All" "alldatabases" %}
     {% endif %}
 
     {% breadcrumb name|ellipsis:40 "fingerprint/"|add:fingerprint_id|add:"/1" %}
@@ -29,7 +29,7 @@
                 {% breadcrumb "Detailed View" "databases" %}
             {% endwith %}
         {% endwith %}
-    {% endwith %}    
+    {% endwith %}
     {% endif %}
 {% endblock %}
 
@@ -108,7 +108,9 @@ Saving... please don't close this questionnary yet.</div>
 It was not possible to save this questionnary. Please try again in a few seconds.</div>
 
 <div style="margin-bottom: 60px;"></div>
-<hr>
+<hr style="margin-bottom: 0px;">
+<div id="globalprogress" style="margin-top: -1px; background-color: #8CCC72; height: 5px; width: {{globalprogress}}%;">&nbsp;</div>
+<br />
 <div class="row">
 <div class="span3">
   <div class="qslist well" style="max-width: 340px; padding: 8px 0;">
@@ -116,7 +118,7 @@ It was not possible to save this questionnary. Please try again in a few seconds
     <ul class="nav nav-list nav-pills nav-stacked ">
       <li class="nav-header">Step-by-Step</li>
       {% for qs, answered, total_count, percentage, requests in questionsets %}
-     
+
       <li{% if questionset.text == qs.text %} class="active" {% endif %} id="li_qs_{{qs.sortid}}">
         <!--<a href="q2/{{runinfo.random}}/{{ qs.sortid }}">
         -->
@@ -143,12 +145,12 @@ It was not possible to save this questionnary. Please try again in a few seconds
               {% if qs.sortid != 0 and qs.sortid != 99 %}
                <span id="counter1_{{ qs.sortid }}" class="counter_badge">{{percentage}}%</span>
                {%endif%}
-   
+
             </td>
           </tr>
         </table>
       </a>
-      
+
     </li>
     {% endfor %}
   </ul>
@@ -166,7 +168,7 @@ It was not possible to save this questionnary. Please try again in a few seconds
 
 {% endblock %}
 
-{% block scriptextraincludes %} 
+{% block scriptextraincludes %}
 <script src="{{ STATIC_URL}}js/emif.fingerprint.counter.js"></script>
 
 <!-- Fix later -->
@@ -205,17 +207,17 @@ $(function(){
     $('.tooltippable').tooltip({container:'body'});
 
   {% else %}
-    initQsEnv("{{fingerprint_id}}","{{q_id}}","{{questionset.sortid}}", QsType.VIEW); 
+    initQsEnv("{{fingerprint_id}}","{{q_id}}","{{questionset.sortid}}", QsType.VIEW);
   {% endif %}
 });
 //questionsets_handle(qs_0);
-function initialCounterSetup(){ 
+function initialCounterSetup(){
   {% for qs, answered, total_count, percentage in questionsets %}
-    questionSetsCounters["{{qs.sortid}}"] = { filledQuestions: {{answered}}, count: {{total_count}} }; 
+    questionSetsCounters["{{qs.sortid}}"] = { filledQuestions: {{answered}}, count: {{total_count}} };
 
   {% endfor %}
 }
-    
+
 {% endblock %}
 
 </script>

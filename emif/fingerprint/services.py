@@ -4,6 +4,7 @@ from fingerprint.models import *
 
 from questionnaire.models import Questionnaire, QuestionSet, Question, QuestionSetPermissions
 from questionnaire.views import *
+from questionnaire.services import createqsets
 
 from django.contrib.auth.models import User
 
@@ -174,96 +175,6 @@ def getComment(question, extra_fields):
 
 
     return None
-
-def getFillPercentage(fingerprint, answers):
-    total = 0
-    count = 0
-
-    qsets = fingerprint.questionnaire.questionsets()
-    for qset in qsets:
-        total+=findDependantPercentage(qset, answers)
-        count+=1
-
-    try:
-        return (total/count)
-    except ZeroDivisionError:
-        return 0
-
-def findDependantPercentage(qset, answers):
-    ref_cache = {}
-    total = 0
-    filled = 0
-
-    def __getDependency(question):
-        checks = ""
-        try:
-            question.checks.strip()
-        except:
-            pass
-
-        # not dependant in anyone
-        if len(checks) == 0:
-            return None
-        else:
-
-            extra = checks.split(" ")
-
-            for ex in extra:
-                if ex.startswith('dependent="'):
-                    return ex[11:-1]
-
-            return None
-
-    def __fills_condition(dep):
-        depl = dep.split(',')
-
-        if len(depl) == 2:
-            key = None
-            try:
-                key = ref_cache[depl[0]]
-            except:
-                try:
-                    key = answers.get(question__number=depl[0])
-                    ref_cache[depl[0]] = key
-
-                except Answer.DoesNotExist:
-                    return False
-
-            if depl[1].lower() == key.data.lower():
-                return True
-
-        return False
-
-    def __count(total, filled, question):
-        total+=1
-        try:
-            ans = answers.get(question=question)
-            if len(ans.data.strip()) != 0:
-                filled += 1
-        except Answer.DoesNotExist:
-            pass
-
-        return (total, filled)
-
-    for question in qset.questions():
-        # Categories can't have answers
-        if question.type == 'comment':
-            continue
-
-        dep = __getDependency(question)
-
-        # has dependency
-        if dep == None:
-            (total, filled) = __count(total, filled, question)
-
-        else:
-            if __fills_condition(dep):
-                (total, filled) = __count(total, filled, question)
-
-    try:
-        return (filled * 100) / total
-    except:
-        return 0
 
 # Checks if all mandatory answers have been answered, namely fingerprint name
 def checkMandatoryAnswers(fingerprint):
@@ -487,10 +398,10 @@ def setNewPermissions(request, fingerprint_id, identification):
         try:
             this_permissions                = fingerprint.getPermissions(QuestionSet.objects.get(id=identification))
 
-            this_permissions.visibility     = int(request.POST['_qs_visibility'])
-            this_permissions.allow_printing = (request.POST['_qs_printing'] == 'true')
-            this_permissions.allow_indexing = (request.POST['_qs_indexing'] == 'true')
-            this_permissions.allow_exporting= (request.POST['_qs_exporting'] == 'true')
+            this_permissions.visibility     = int(request.POST.get('_qs_visibility', '0'))
+            this_permissions.allow_printing = (request.POST.get('_qs_printing', 'true') == 'true')
+            this_permissions.allow_indexing = (request.POST.get('_qs_indexing', 'true') == 'true')
+            this_permissions.allow_exporting= (request.POST.get('_qs_exporting', 'true') == 'true')
 
             this_permissions.save()
 
@@ -781,6 +692,9 @@ def attachPermissions(fingerprint_hash, qsets):
         print "-- ERROR: Fingerprint with id fingerprint_hash"+str(fingerprint_hash)+" doesn't exist"
 
     return None
+
+def clean_str_exp(s):
+    return s.replace("\n", "|").replace(";", ",").replace("\t", "    ").replace("\r","").replace("^M","")
 
 def writeGroup(id, k, qs, writer, name, t):
     if (qs!=None and qs.list_ordered_tags!= None):

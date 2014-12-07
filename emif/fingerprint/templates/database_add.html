@@ -88,8 +88,9 @@ Saving... please don't close this questionnary yet.</div>
 It was not possible to save this questionnary. Please try again in a few seconds.</div>
 
 <div class="cleared_separator"></div>
-        <hr >
-<div class="row">
+<hr style="margin-bottom: 0px;">
+<div id="globalprogress" style="margin-top: -1px; background-color: #8CCC72; height: 5px; width: {{globalprogress}}%;">&nbsp;</div>
+<br /><div class="row">
 <div class="span3">
   <div class="qslist well" style="max-width: 340px; padding: 8px 0;">
 
@@ -98,7 +99,7 @@ It was not possible to save this questionnary. Please try again in a few seconds
 
 
       {% for qs, answered, total_count, percentage in questionsets %}
-     
+
       <li{% if questionset.text == qs.text %} class="active" {% endif %} id="li_qs_{{qs.sortid}}">
         <!--<a href="q2/{{runinfo.random}}/{{ qs.sortid }}">
         -->
@@ -117,12 +118,12 @@ It was not possible to save this questionnary. Please try again in a few seconds
               {% if qs.sortid != 0 and qs.sortid != 99 %}
                <span id="counter1_{{ qs.sortid }}" class="counter_badge">{{percentage}}%</span>
                {%endif%}
-   
+
             </td>
           </tr>
         </table>
       </a>
-      
+
     </li>
 
     {% endfor %}
@@ -141,7 +142,7 @@ It was not possible to save this questionnary. Please try again in a few seconds
 
 {% endblock %}
 
-{% block scriptextraincludes %} 
+{% block scriptextraincludes %}
 <script src="{{ STATIC_URL}}js/emif.fingerprint.counter.js"></script>
 
 <!-- Fix later -->
@@ -176,9 +177,9 @@ $(function(){
   initQsEnv("{{fingerprint_id}}","{{q_id}}","{{questionset.sortid}}", QsType.ADD);
 });
 
-function initialCounterSetup(){ 
+function initialCounterSetup(){
   {% for qs, answered, total_count, percentage in questionsets %}
-    questionSetsCounters["{{qs.sortid}}"] = { filledQuestions: {{answered}}, count: {{total_count}} }; 
+    questionSetsCounters["{{qs.sortid}}"] = { filledQuestions: {{answered}}, count: {{total_count}} };
 
   {% endfor %}
 }

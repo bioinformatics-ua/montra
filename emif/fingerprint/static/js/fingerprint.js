@@ -263,6 +263,7 @@ $(document).ready(function() {
         return str.indexOf(suffix, str.length - suffix.length) !== -1;
     }
     advValidator.onInit();
+
     $(document).on('change', '.answer input,.answer select,.answer textarea', function(e) {
         e.preventDefault();
 
@@ -282,6 +283,7 @@ $(document).ready(function() {
             return false;
 
         var el = e.target;
+
         var id_answered = el.id.split("_")[1];
         var id_answered_aux = el.id.split("_")[1].replace(/\./g, '');
         var toSum = $('[id="answered_' + id_answered_aux + '"]').hasClass('hasValue');
@@ -307,12 +309,34 @@ $(document).ready(function() {
 
         valueCounter = validateById(id_answered.trim(), id_answered_aux.trim());
 
+        var possible_change = 0;
+
+        if($(el).attr('type') =='radio'){
+
+            var depmap = depmaps[id_answered];
+            var old = $(el).data('old');
+
+            var newvalue = $('[name="'+$(el).attr('name')+'"]:checked').val();
+
+            if(typeof depmap === 'object'){
+                if(depmap[old]){
+                    possible_change -= depmap[old];
+                }
+                if(depmap[newvalue]){
+                    possible_change += depmap[newvalue];
+                }
+            }
+
+            $('[name="'+$(el).attr('name')+'"]').data('old', newvalue);
+        } else {
+            $(el).data('old', $(el).val());
+        }
+
         if (!(typeof questionSetsCounters === 'undefined')) {
             var toSum2 = $('[id="answered_' + id_answered_aux + '"]').hasClass('hasValue');
             if (toSum && toSum2) {
                 valueCounter = 0;
             }
-            //console.log('QID: ' + qId);
             /* Update Counter */
             try{
                 var cc = new CounterCore(qId);
@@ -320,6 +344,7 @@ $(document).ready(function() {
 
                 //questionSetsCounters[qId]['filledQuestions'] = questionSetsCounters[qId]['filledQuestions'] + valueCounter;
                 questionSetsCounters[qId]['filledQuestions'] = cc.countFilledQuestionSet(qId);
+                questionSetsCounters[qId]['count'] = questionSetsCounters[qId]['count']+possible_change
 
                 var ui = new CounterUI();
                 ui.updateCountersClean(qId);
