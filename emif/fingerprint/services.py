@@ -398,10 +398,10 @@ def setNewPermissions(request, fingerprint_id, identification):
         try:
             this_permissions                = fingerprint.getPermissions(QuestionSet.objects.get(id=identification))
 
-            this_permissions.visibility     = int(request.POST['_qs_visibility'])
-            this_permissions.allow_printing = (request.POST['_qs_printing'] == 'true')
-            this_permissions.allow_indexing = (request.POST['_qs_indexing'] == 'true')
-            this_permissions.allow_exporting= (request.POST['_qs_exporting'] == 'true')
+            this_permissions.visibility     = int(request.POST.get('_qs_visibility', '0'))
+            this_permissions.allow_printing = (request.POST.get('_qs_printing', 'true') == 'true')
+            this_permissions.allow_indexing = (request.POST.get('_qs_indexing', 'true') == 'true')
+            this_permissions.allow_exporting= (request.POST.get('_qs_exporting', 'true') == 'true')
 
             this_permissions.save()
 
