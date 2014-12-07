@@ -208,14 +208,6 @@ class Fingerprint(models.Model):
             name ="Unnamed"
 
         return name
-    def updateQsetFillPercentage(self, questionset):
-        answers = Answer.objects.filter(fingerprint_id=self, question__questionset=questionset)
-
-        (partial, answered, possible) = questionset.findDependantPercentage(answers)
-
-        QuestionSetCompletion.create_or_update(self, questionset, partial, answered, possible)
-
-        self.updateFillFromCache()
 
     def updateFillFromCache(self):
         qsets = QuestionSetCompletion.objects.filter(fingerprint=self)
@@ -565,6 +557,7 @@ class QuestionSetCompletion(models.Model):
             qcompletion.fill = fill
             qcompletion.answered = answered
             qcompletion.possible = possible
+
             qcompletion.save()
 
         except QuestionSetCompletion.DoesNotExist:
