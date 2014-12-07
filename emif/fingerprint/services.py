@@ -4,6 +4,7 @@ from fingerprint.models import *
 
 from questionnaire.models import Questionnaire, QuestionSet, Question, QuestionSetPermissions
 from questionnaire.views import *
+from questionnaire.services import createqsets
 
 from django.contrib.auth.models import User
 
@@ -68,6 +69,31 @@ def saveFingerprintAnswers(qlist_general, fingerprint_id, questionnaire, user, e
     #print "Updating fingerprint "+fingerprint_id
     fingerprint = updateFingerprint(fingerprint_id, questionnaire, user)
 
+
+    def saveChanges(versionhead, fingerprint, this_ans, current_value, value, current_comment, comment):
+        # create version head if not any yet
+        if versionhead == None:
+            # find out if we already have other revisions, if not revision starts at 1
+            revision = None
+
+            try:
+                last_revision = FingerprintHead.objects.filter(fingerprint_id=fingerprint).order_by('-id')[0]
+
+                revision = last_revision.revision+1
+            except:
+                revision = 1
+
+            versionhead = FingerprintHead(fingerprint_id=fingerprint, revision=revision)
+
+            versionhead.save()
+
+        # save answerchange
+        answerchange = AnswerChange(revision_head=versionhead, answer=this_ans, old_value=current_value, new_value=value, old_comment=current_comment, new_comment=comment)
+        answerchange.save()
+
+        return versionhead
+
+
     # If no errors on getting the fingerprint, update/add the new questions
     if fingerprint != None:
         #print "Getting answers"
@@ -114,25 +140,7 @@ def saveFingerprintAnswers(qlist_general, fingerprint_id, questionnaire, user, e
 
                         # if value or comment changed
                         if current_value != value or current_comment != comment:
-                            # create version head if not any yet
-                            if versionhead == None:
-                                # find out if we already have other revisions, if not revision starts at 1
-                                revision = None
-
-                                try:
-                                    last_revision = FingerprintHead.objects.filter(fingerprint_id=fingerprint).order_by('-id')[0]
-
-                                    revision = last_revision.revision+1
-                                except:
-                                    revision = 1
-
-                                versionhead = FingerprintHead(fingerprint_id=fingerprint, revision=revision)
-
-                                versionhead.save()
-
-                            # save answerchange
-                            answerchange = AnswerChange(revision_head=versionhead, answer=this_ans, old_value=current_value, new_value=value, old_comment=current_comment, new_comment=comment)
-                            answerchange.save()
+                            versionhead = saveChanges(versionhead, fingerprint, this_ans, current_value, value, current_comment, comment)
 
                     except Answer.DoesNotExist:
                         # new ,create new answer
@@ -140,6 +148,9 @@ def saveFingerprintAnswers(qlist_general, fingerprint_id, questionnaire, user, e
                         #print "NEW: "
                         #print this_ans
                         this_ans.save()
+                        if not ((value == None or value.strip() =='') and (comment == None or comment.strip() == '')):
+                            versionhead = saveChanges(versionhead, fingerprint, this_ans, None, value, None, comment)
+
 
         fingerprint.save()
 
@@ -681,6 +692,9 @@ def attachPermissions(fingerprint_hash, qsets):
         print "-- ERROR: Fingerprint with id fingerprint_hash"+str(fingerprint_hash)+" doesn't exist"
 
     return None
+
+def clean_str_exp(s):
+    return s.replace("\n", "|").replace(";", ",").replace("\t", "    ").replace("\r","").replace("^M","")
 
 def writeGroup(id, k, qs, writer, name, t):
     if (qs!=None and qs.list_ordered_tags!= None):

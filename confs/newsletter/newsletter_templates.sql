@@ -144,7 +144,7 @@ INSERT INTO newsletter_emailtemplate VALUES (9, 'aggregate', 'message', 'aggrega
 {% if submission.publish %}
 Read Online: http://{{ site.domain }}/emif{{ submission.get_absolute_url }}
 {% endif %}
-Unsubscribe: http://{{ site.domain }}/emif/newsletter/{{newsletter.slug}}/unsubscribe', '        <table style="width: 100%; border-top: 1px solid #ddd; border-bottom: 1px solid #ddd; margin-top: 5px; margin-bottom: 5px;">
+Unsubscribe: http://{{ site.domain }}/emif/newsletter/{{newsletter.slug}}/unsubscribe', '        <table style="width: 100%; border-bottom: 1px solid #ddd; margin-top: 5px; margin-bottom: 5px;">
             <tr>
                 <td style="padding: 25px;">
                     <h2>{{ newsletter.title }}</h2>

@@ -57,6 +57,8 @@ from public.utils import hasFingerprintPermissions
 
 from accounts.models import EmifProfile
 
+from django.core.exceptions import PermissionDenied
+
 def document_form_view_upload(request, fingerprint_id, template_name='documents_upload_form.html'):
     """Store the files at the backend
     """
@@ -133,7 +135,8 @@ def parsejerboa(request, template_name='documents_upload_form.html'):
 def single_qset_view(request, runcode, qsid, template_name='fingerprint_qs.html'):
 
     if not hasFingerprintPermissions(request, runcode):
-        return HttpResponse("Access forbidden",status=403)
+        raise PermissionDenied
+
 
     h = None
     if "query" in request.session and "highlight_results" in request.session:
@@ -162,9 +165,10 @@ def document_form_view(request, runcode, qs, activetab='summary', readOnly=False
         if (not request.user.is_anonymous()):
             eprofile = EmifProfile.objects.get(user=request.user)
 
-            if eprofile.restricted == True:
-                if not eprofile.has_permission(runcode):
-                    return HttpResponse("Access forbidden",status=403)
+        if eprofile.restricted == True:
+            if not eprofile.has_permission(runcode):
+                raise PermissionDenied
+
 
     except EmifProfile.DoesNotExist:
         raise "-- ERROR: Couldn't get emif profile for user"

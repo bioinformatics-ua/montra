@@ -28,3 +28,5 @@ fingerprints.pkl
 /.project
 
 emif/CACHE
+
+tests/reports

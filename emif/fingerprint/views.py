@@ -34,7 +34,11 @@ from emif.utils import generate_hash
 
 from fingerprint.services import *
 from fingerprint.tasks import indexFingerprintCelery
+
 from fingerprint.models import QuestionSetCompletion
+
+from fingerprint.listings import get_databases_from_solr
+
 
 from geolocation.services import *
 
