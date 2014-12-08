@@ -35,6 +35,7 @@ from django.conf import settings
 from hitcount.views import update_hit_count_ajax
 
 
+
 admin.site = AdminSitePlus()
 admin.autodiscover()
 
@@ -179,6 +180,11 @@ urlpatterns = patterns('',
 
     # DashBoard
     url(r'^dashboard', include('dashboard.urls')),
+
+
+    # Statistics
+    url(r'^statistics', include('statistics.urls')),
+
 )
 
 if settings.DEBUG:

@@ -50,6 +50,7 @@ $(function(){
         dashzone.register(new LastUsersWidget("lastusers",  2, 1, 6, 5));
         dashzone.register(new TopUsersWidget("topusers",  2, 1, 6, 5));
         dashzone.register(new TopNavigatorsWidget("topnavigators",  2, 1, 6, 5));
+        dashzone.register(new FingerprintSchemasStatsWidget("fingerprintschemasstats",  2, 1, 6, 5));
     }
 
     dashzone.register(new TagCloudWidget("tagcloud",  2, 1, 6, 6));
