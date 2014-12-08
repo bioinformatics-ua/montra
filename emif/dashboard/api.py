@@ -320,15 +320,18 @@ class FeedView(APIView):
 
             # get from subscriptions too
             subs = FingerprintSubscription.objects.filter(user=request.user, removed=False)
-
+            i = 0
             for sub in subs:
                 modifications = modifications | FingerprintHead.objects.filter(fingerprint_id=sub.fingerprint, fingerprint_id__removed = False)
+                i = i +1
+                if i==10:
+                    break
 
             modifications = modifications.order_by("-date")
 
             feed = []
 
-            modifications = modifications[:50]
+            modifications = modifications[:30]
 
             aggregate = []
             previous = None
