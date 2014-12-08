@@ -286,6 +286,13 @@ class Fingerprint(models.Model):
 
         return permissions
 
+
+    @staticmethod
+    def getActiveFingerprints(questionnaire_id):
+        return Fingerprint.objects.filter(questionnaire=questionnaire_id, removed=False)
+
+
+
     @staticmethod
     def index_all():
         indexes = []
