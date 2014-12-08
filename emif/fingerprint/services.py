@@ -4,6 +4,7 @@ from fingerprint.models import *
 
 from questionnaire.models import Questionnaire, QuestionSet, Question, QuestionSetPermissions
 from questionnaire.views import *
+from questionnaire.services import createqsets
 
 from django.contrib.auth.models import User
 
@@ -397,10 +398,10 @@ def setNewPermissions(request, fingerprint_id, identification):
         try:
             this_permissions                = fingerprint.getPermissions(QuestionSet.objects.get(id=identification))
 
-            this_permissions.visibility     = int(request.POST['_qs_visibility'])
-            this_permissions.allow_printing = (request.POST['_qs_printing'] == 'true')
-            this_permissions.allow_indexing = (request.POST['_qs_indexing'] == 'true')
-            this_permissions.allow_exporting= (request.POST['_qs_exporting'] == 'true')
+            this_permissions.visibility     = int(request.POST.get('_qs_visibility', '0'))
+            this_permissions.allow_printing = (request.POST.get('_qs_printing', 'true') == 'true')
+            this_permissions.allow_indexing = (request.POST.get('_qs_indexing', 'true') == 'true')
+            this_permissions.allow_exporting= (request.POST.get('_qs_exporting', 'true') == 'true')
 
             this_permissions.save()
 
@@ -691,6 +692,9 @@ def attachPermissions(fingerprint_hash, qsets):
         print "-- ERROR: Fingerprint with id fingerprint_hash"+str(fingerprint_hash)+" doesn't exist"
 
     return None
+
+def clean_str_exp(s):
+    return s.replace("\n", "|").replace(";", ",").replace("\t", "    ").replace("\r","").replace("^M","")
 
 def writeGroup(id, k, qs, writer, name, t):
     if (qs!=None and qs.list_ordered_tags!= None):

@@ -34,7 +34,11 @@ from emif.utils import generate_hash
 
 from fingerprint.services import *
 from fingerprint.tasks import indexFingerprintCelery
+
 from fingerprint.models import QuestionSetCompletion
+
+from fingerprint.listings import get_databases_from_solr
+
 
 from geolocation.services import *
 
@@ -102,9 +106,8 @@ def database_edit(request, fingerprint_id, questionnaire_id, sort_id=1, template
         qscs = QuestionSetCompletion.objects.filter(fingerprint=this_fingerprint).order_by('questionset')
 
         for qsc in qscs:
-            print qsc.possible
             questionset_requests = requests.filter(question__questionset=qsc.questionset)
-            qreturned.append([qsc.questionset, qsc.answered, qsc.possible, qsc.fill, questionset_requests])
+            qreturned.append([qsc.questionset, qsc.answered, qsc.possible, int(qsc.fill), questionset_requests])
 
 
         r = r2r(template_name, request,

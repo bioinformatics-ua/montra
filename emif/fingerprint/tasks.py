@@ -97,32 +97,35 @@ def generate_newsmessages():
     # Operations
     print "start generating weekly newsletters messages"
 
-    fingerprints = Fingerprint.valid()
+    if settings.DEBUG == False:
+        fingerprints = Fingerprint.valid()
 
-    newsletters = Newsletter.objects.all().exclude(slug='emif-catalogue-newsletter')
+        newsletters = Newsletter.objects.all().exclude(slug='emif-catalogue-newsletter')
 
-    for fingerprint in fingerprints:
-        try:
-            print "Generating for "+fingerprint.fingerprint_hash
-            newsletter = newsletters.get(slug=fingerprint.fingerprint_hash)
+        for fingerprint in fingerprints:
+            try:
+                print "Generating for "+fingerprint.fingerprint_hash
+                newsletter = newsletters.get(slug=fingerprint.fingerprint_hash)
 
-            report = generateWeekReport(fingerprint, newsletter)
+                report = generateWeekReport(fingerprint, newsletter)
 
-            putWeekReport(report, newsletter)
+                putWeekReport(report, newsletter)
 
-        except Newsletter.DoesNotExist:
-            print "-- Error: Found hash not existent on newsletters: "+fingerprint.fingerprint_hash
+            except Newsletter.DoesNotExist:
+                print "-- Error: Found hash not existent on newsletters: "+fingerprint.fingerprint_hash
 
-    print "ends generation"
+        print "ends generation"
 
-    print "start sending emails"
+        print "start sending emails"
 
-    aggregate_emails()
+        aggregate_emails()
 
-    print "finished sending emails"
+        print "finished sending emails"
 
-    print "--"
-    return 0
+        print "--"
+        return 0
+    else:
+        print 'Aborted since we are on DEBUG mode'
 
 def aggregate_emails():
     submissions_waiting = Submission.objects.filter(prepared=True, sent=False)
