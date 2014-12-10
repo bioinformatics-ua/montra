@@ -289,7 +289,7 @@
          });
      } else {
 
-         /* I decided to change this as this is was a very intensive process, 
+         /* I decided to change this as this is was a very intensive process,
             I instead tagged them, and add to the class the instance, this way i only have on instance per, table
             declaring a tooltip instance every td...*/
          $('td', $(table_id)).each(function() {
@@ -486,7 +486,7 @@
      });
 
      $("#collapseall_metadata").bind('click', function(e) {
-         //e.preventDefault(); 
+         //e.preventDefault();
          //e.stopPropagation();
 
          collapse_expand(this);
@@ -551,6 +551,10 @@
              $('.graphTypes').first().click();
          }
      });
+
+    $('#topnavigator').affix();
+    $('#summarynav').affix();
+
  }
 
  function initAdvSearchPlugin(serialization_query, query_type, query_id) {

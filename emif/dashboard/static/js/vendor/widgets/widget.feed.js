@@ -37,7 +37,7 @@ var FeedWidget = function FeedWidget(widgetname, width, height, pos_x, pos_y){
         .done(function(data) {
             if(data.hasfeed){
                 var renderQuestion = function(entry, pos, collapsable, show_icon){
-                    self.content += '<table style="width: 100%;"><tr>';
+                    self.content += '<table style="width: 100%; margin:5px;"><tr>';
 
                     if(entry === undefined){
                         self.content+='<td><center>There is no history on your databases yet and no changes in your subscribed database. <br /><br /><a id="nohistory" href="javascript:void(0);">Do you know how subscribe databases works ?</a></center></td>';
@@ -84,9 +84,9 @@ var FeedWidget = function FeedWidget(widgetname, width, height, pos_x, pos_y){
                         self.content += '</td>';
 
                         if(collapsable)
-                            self.content += '<td style="vertical-align:center;" id="markable'+i+'" class="pull-right markable"><i class="pull-right fa fa-plus"></i></td>';
+                            self.content += '<td style="vertical-align:middle; text-align: right;padding-right: 5px;" id="markable'+i+'" class="markable"><i class="fa fa-angle-right fa-2x"></i></td>';
                     }
-                    self.content +='</tr></table><hr />';
+                    self.content +='</tr></table><hr style="margin: 0px;" />';
                 };
 
                 for(var i=0;i<data.feed.length;i++){
@@ -125,12 +125,12 @@ var FeedWidget = function FeedWidget(widgetname, width, height, pos_x, pos_y){
                 var agg = $('#agg'+openid);
 
                 agg.toggle();
-                var plus = $('#markable'+openid).find('.fa-plus');
+                var plus = $('#markable'+openid).find('.fa-angle-right');
 
                 if(plus.length == 0){
-                    $('#markable'+openid, $(this)).html('<i class="pull-right fa fa-plus">');
+                    $('#markable'+openid, $(this)).html('<i class="pull-right fa fa-angle-right fa-2x">');
                 } else {
-                    $('#markable'+openid, $(this)).html('<i class="pull-right fa fa-minus">');
+                    $('#markable'+openid, $(this)).html('<i class="pull-right fa fa-angle-down fa-2x">');
                 }
 
 

@@ -136,7 +136,7 @@
                                 </ul>
                                 {% endif %}
                                 <div class="pull-right">
-                                <ul class="nav">
+                                <ul id="usernav" class="nav">
 
                                     {% if request.user.is_authenticated %}
                                     <li id="li_notifications" style="padding-right: 5px;" class="dropdown">
@@ -302,6 +302,8 @@
                     </div>
                 </div>
                 <div style="padding-top: 60px;" class="container">
+                    <div data-clamp=".container" id="topnavigator">
+                    <div>
                     {% if breadcrumb %}
                     {% block breadcrumbs %}
                     {% breadcrumb "Home" "home" %}
@@ -312,6 +314,8 @@
                     {% endif %}
                     <div class="pull-right">
                         {% block toolbar %} {% endblock %}
+                    </div>
+                    </div>
                     </div>
 
 
