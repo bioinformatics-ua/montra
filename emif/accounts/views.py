@@ -173,7 +173,7 @@ class EditProfileFormExtra(EditProfileForm):
 def profile_edit(request,
                  edit_profile_form=EditProfileFormExtra,
                  template_name='userena/profile_form.html',
-                 success_url=settings.BASE_URL + 'wherenext',
+                 success_url=settings.BASE_URL + 'dashboard',
                  extra_context=None, **kwargs):
 
     if request.user.is_authenticated():

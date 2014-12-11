@@ -43,9 +43,6 @@ urlpatterns = patterns('',
     # Comments
     url(r'^comments/', include('django.contrib.comments.urls')),
 
-    # Where to go when loggedin (according to Profile)
-    url(r'^wherenext/$', 'emif.views.wherenext'),
-
     # Uncomment the admin/doc line below to enable admin documentation:
     url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
 
