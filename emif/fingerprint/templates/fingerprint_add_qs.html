@@ -350,6 +350,26 @@ $(function(){
     });
 
     $('.tooltippable', $('#qs_{{questions_list.0.0.sortid}}')).tooltip({container:'body'});
+
+    var showPopover = function () {
+        var isVisible = $(this).data('popover').tip().hasClass('in');
+        if (!isVisible)
+            $(this).popover('show');
+    }
+    , hidePopover = function () {
+        $(this).popover('hide');
+    };
+
+    $('.popoverable', $('#qs_{{questions_list.0.0.sortid}}')).popover(
+        {
+            placement: 'left',
+            container:'body',
+            html: 'true',
+            'template': '<div class="popover popover-medium"><div class="arrow"></div><div class="popover-inner"><h3 class="popover-title"></h3><div class="popover-content"><p></p></div></div></div>'
+        }
+    ).hover(showPopover, function(){})
+    .blur(hidePopover);
+
         $('#hide_empty_{{questions_list.0.0.sortid}}').click(function(){
             setupHideEmpties({{questions_list.0.0.sortid}}, 'empty');
         });

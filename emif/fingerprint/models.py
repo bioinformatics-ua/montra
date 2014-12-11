@@ -449,6 +449,7 @@ class AnswerRequest(models.Model):
     question    = models.ForeignKey(Question)
     requester   = models.ForeignKey(User)
     date        = models.DateTimeField(auto_now=True)
+    comment     = models.CharField(max_length=1000, default='')
     removed     = models.BooleanField(default=False)
 
 """

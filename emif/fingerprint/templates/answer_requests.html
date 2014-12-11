@@ -1,7 +1,25 @@
 <span class="pull-right">
-    {% if requests|length == 1 %}
-    <i title="{% for req in requests %}{{req.requester.get_full_name}}{% endfor %} requested an answer for this question" class="tooltippable fa fa-bell">&nbsp;</i>
-    {% else %}
-    <i title="{% for req in requests %}{{req.requester.get_full_name}}, {% endfor %}requested an answer for this question" class="tooltippable fa fa-bell">&nbsp;</i>
-    {% endif %}
+    <i data-title="Requests for this answer: {{requests|length}}<br /><small>(Click the username to see the rationale behind the request of each user)</small>" data-content='<div id="accordion2" class="accordion">{% for req in requests %}
+        <div class="accordion-group">
+          <div class="accordion-heading">
+            <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapse{{req.id}}">
+              {{req.requester.get_full_name}}
+            </a>
+          </div>
+          <div style="height: 0px;" id="collapse{{req.id}}" class="accordion-body collapse">
+            <div class="accordion-inner">
+                {% if req.comment != '' %}
+                  <strong>Rationale behind the answer request:</strong><br />
+                  {{req.comment}}
+                {% else %}
+                    The user did not wrote any comment on the user request.
+                {% endif %}
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+    </div>' class="popoverable fa fa-bell">&nbsp;</i>
 </span>
+
+
+
