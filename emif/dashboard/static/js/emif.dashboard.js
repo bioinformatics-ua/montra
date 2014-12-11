@@ -59,5 +59,9 @@ $(function(){
     if(any_configuration == false){
         dashzone.initial();
     }
+
+    $('#dashboardreset').tooltip({
+        'container': 'body'
+    });
 });
 
