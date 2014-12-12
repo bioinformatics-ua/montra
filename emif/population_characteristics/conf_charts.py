@@ -316,7 +316,7 @@ class ConfCharts(object):
         c4.y_axis = Axis()
         c4.y_axis.operation = "unique"
         c4.y_axis.var = "Count"
-        c4.x_axis.label = "Number of patients"
+        c4.y_axis.label = "Number of patients"
         c4.y_axis.multivalue = True
 
         fy2 = Filter()
