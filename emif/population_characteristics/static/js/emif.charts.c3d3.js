@@ -281,9 +281,9 @@ function GraphicChartC3D3(divArg, dataArg)
           x: {
             //type: 'categorized',
             label_position : {},
-            tick : { 
+            tick : {
                 culling: true,
-              values : 
+              values :
                 function(domain) {
                       if(memoize == null){
                         if(chartConfigs.axis.x.categories != undefined){
@@ -357,7 +357,7 @@ function GraphicChartC3D3(divArg, dataArg)
             x: {
                 //type: 'categorized',
                 label_position : {},
-                tick : { 
+                tick : {
                     culling: true,
                     /*format: function (x) {
                      return x;
@@ -367,7 +367,7 @@ function GraphicChartC3D3(divArg, dataArg)
 
                     return parseInt(x);
                   },*/
-                  values : 
+                  values :
                     function(domain) {
                       if(memoize == null){
                         if(chartConfigs.axis.x.categories != undefined){
@@ -478,6 +478,13 @@ function GraphicChartC3D3(divArg, dataArg)
             T: '#83bd59'
     };
 
+    chartConfigs.tooltip =  {
+            format: {
+                value: function (value, ratio, id) {
+                    return d3.round(value, 2);
+                }
+            }
+        };
 
     //console.log(chartConfigs);
 
@@ -503,7 +510,7 @@ function GraphicChartC3D3(divArg, dataArg)
     // Clean the legend container.
     $(".color_container").html("");
     // Draw legend manually
-    for (var i=0; i< columns.length;i++) {  
+    for (var i=0; i< columns.length;i++) {
             var row = columns[i][0];
 
             var drawLegend = function(row){
