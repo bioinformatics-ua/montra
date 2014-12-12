@@ -57,6 +57,9 @@ class EmifProfile(UserenaBaseProfile):
       choices=options,
       default=10)
 
+    mail_news   = models.BooleanField(default=True)
+    mail_not    = models.BooleanField(default=False)
+
     restricted = models.BooleanField(default=False)
 
 

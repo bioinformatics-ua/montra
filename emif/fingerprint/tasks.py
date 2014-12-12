@@ -26,6 +26,8 @@ import time
 
 from searchengine.search_indexes import CoreEngine
 
+from accounts.models import EmifProfile
+
 from fingerprint.models import Fingerprint, FingerprintReturnedSimple, FingerprintReturnedAdvanced, Answer
 from fingerprint.services import unindexFingerprint
 
@@ -135,7 +137,7 @@ def aggregate_emails():
 
             related_submissions = submissions_waiting.filter(subscriptions__user=this_user)
 
-            if len(related_submissions) > 0:
+            if this_user.emif_profile.mail_news == True and len(related_submissions) > 0:
                 htmlcache = []
                 textcache = []
 
