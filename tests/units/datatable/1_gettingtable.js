@@ -1,12 +1,7 @@
 module.exports = {
   "Datatable, getting table" : function (browser) {
     browser
-      .url(browser.launchUrl)
-      .waitForElementVisible('body', 1000, 'Page loads')
-      .pause(1000)
-      .setValue('input[name=identification]', 'admin')
-      .setValue('input[name=password]', 'emif')
-      .click('button[type=submit]')
+      .login(browser.globals.username, browser.globals.password)
       .waitForElementVisible('a[href="alldatabases/data-table"]', 5000, 'Dashboards opens and link is visible')
       .click('a[href="alldatabases/data-table"]')
       .waitForElementVisible('button[data-id="db_type"]', 5000, 'Compare Datatable opens')

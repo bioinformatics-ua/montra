@@ -1,10 +1,8 @@
 {
-  "src_folders" : ["tests"],
-  "output_folder" : "reports",
-  "custom_commands_path" : "",
+  "src_folders" : ["tests/units"],
+  "output_folder" : "tests/reports",
+  "custom_commands_path" : "tests/commands",
   "custom_assertions_path" : "",
-  "globals_path" : "",
-
   "selenium" : {
     "start_process" : false,
     "server_path" : "",
@@ -17,9 +15,14 @@
   },
   "test_settings" : {
     "default" : {
-      "launch_url" : "http://bioinformatics.ua.pt/emif-test",
+      "globals": {
+        "username": "admin",
+        "password": "emif",
+        "TUdatabase": "TestUnitDatabase"
+      },
+      "launch_url" : "http://127.0.0.1:8000",
       "selenium_port"  : 4444,
-      "selenium_host"  : "192.168.10.66",
+      "selenium_host"  : "127.0.0.1",
       "silent": true,
       "screenshots" : {
         "enabled" : false,

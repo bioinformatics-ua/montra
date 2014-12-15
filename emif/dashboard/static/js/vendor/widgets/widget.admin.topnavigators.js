@@ -40,15 +40,18 @@ var TopNavigatorsWidget = function TopNavigatorsWidget(widgetname, width, height
         $.get("api/topnavigators")
         .done(function(data) {
            self.content = '<table class="nomargins table table-bordered">';
+
             if(data.topnavigators){
                 for(var i=0;i<data.topnavigators.length;i++){
-                    self.content += '<tr><td style="word-break: break-all;"><small>'+data.topnavigators[i].user + "</small></td></tr>";
+                    self.content += '<tr><td title="Count: '+data.topnavigators[i].count+'" style="word-break: break-all;"><small>'+data.topnavigators[i].user + "</small></td></tr>";
                 }
             }
 
             TopNavigatorsWidget._super.__refresh.apply(self);
 
             $('.table', $('#'+self.widgetname)).parent().css('padding', '0px');
+
+            $('#'+self.widgetname+' td').tooltip({'container': 'body'});
 
           })
         .fail(function() {

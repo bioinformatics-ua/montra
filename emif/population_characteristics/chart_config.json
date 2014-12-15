@@ -1,0 +1,617 @@
+{
+    "initial_settings": [
+        {
+            "uid": 1,
+            "title": {
+                "operation": "unique",
+                "var": "Active patients",
+                "fixed_title": "Active patients"
+            },
+            "hint": "Number of patient with a least one day of patient time in a year",
+            "x_axis": {
+                "operation": "unique",
+                "var": "Value1",
+                "label": "Years"
+            },
+            "y_axis": {
+                "operation": "unique",
+                "var": "Count",
+                "label": "Number of patients",
+                "multivalue": true
+            },
+            "filters": [
+                {
+                    "name": "Gender",
+                    "key": null,
+                    "value": "Gender",
+                    "translation": {
+                        "M": "Male",
+                        "F": "Female",
+                        "T": "Total",
+                        "ALL": "Male/Female"
+                    },
+                    "comparable": true,
+                    "comparable_values": ["M", "F"]
+                }
+            ]
+        },
+        {
+            "uid": 2,
+            "title": {
+                "operation": "unique",
+                "var": "Birth in year",
+                "fixed_title": "Birth Year"
+            },
+            "hint": "Birth year histogram",
+            "x_axis": {
+                "operation": "unique",
+                "var": "Value1",
+                "label": "Years"
+            },
+            "y_axis": {
+                "operation": "unique",
+                "var": "Count",
+                "label": "Number of patients",
+                "multivalue": true
+            },
+            "filters": [
+                {
+                    "name": "Gender",
+                    "key": null,
+                    "value": "Gender",
+                    "translation": {
+                        "M": "Male",
+                        "F": "Female",
+                        "T": "Total",
+                        "ALL": "Male/Female"
+                    }
+                }
+            ]
+        },
+        {
+            "uid": 3,
+            "title": {
+                "operation": "unique",
+                "var": "Age at patient start",
+                "fixed_title": "Start Year"
+            },
+            "hint": "Histogram of patients entering the database",
+            "x_axis": {
+                "operation": "unique",
+                "var": "Value1",
+                "label": "Years"
+            },
+            "y_axis": {
+                "operation": "unique",
+                "var": "Count",
+                "label": "Number of patients",
+                "multivalue": true,
+                "static_filters":
+                [
+                    {
+                        "name": "Name2",
+                        "key": "Name2",
+                        "value": ""
+                    },
+                    {
+                        "name": "Year",
+                        "key": "Value2",
+                        "value": ""
+                    },
+                    {
+                        "name": "Name1",
+                        "key": "Name1",
+                        "value": "YEAR"
+                    }
+                ]
+            },
+            "filters": [
+                {
+                    "name": "Gender",
+                    "key": null,
+                    "value": "Gender",
+                    "translation": {
+                        "M": "Male",
+                        "F": "Female",
+                        "T": "Total",
+                        "ALL": "Male/Female"
+                    }
+                }
+            ]
+        },
+        {
+            "uid": 4,
+            "title": {
+                "operation": "unique",
+                "var": "Age at patient end",
+                "fixed_title": "End Year"
+            },
+            "hint": "Histogram of last year of data capturing",
+            "tooltip": "Histogram of last year of data capturing",
+            "x_axis": {
+                "operation": "unique",
+                "var": "Value1",
+                "label": "Years"
+            },
+            "y_axis": {
+                "operation": "unique",
+                "var": "Count",
+                "label": "Number of patients",
+                "multivalue": true,
+                "static_filters":
+                [
+                    {
+                        "name": "Name2",
+                        "key": "Name2",
+                        "value": ""
+                    },
+                    {
+                        "name": "Year",
+                        "key": "Value2",
+                        "value": ""
+                    },
+                    {
+                        "name": "Name1",
+                        "key": "Name1",
+                        "value": "YEAR"
+                    }
+                ]
+            },
+            "filters": [
+                {
+                    "name": "Gender",
+                    "key": null,
+                    "value": "Gender",
+                    "translation": {
+                        "M": "Male",
+                        "F": "Female",
+                        "T": "Total",
+                        "ALL": "Male/Female"
+                    }
+                }
+            ]
+        },
+        {
+            "uid": 5,
+            "title": {
+                "operation": "unique",
+                "var": "Age at start of year",
+                "fixed_title": "Age Distribution at Start of Year"
+            },
+            "x_axis": {
+                "operation": "unique",
+                "var": "Value2",
+                "label": "Age (Years)",
+                "categorized": true,
+                "sort_func": "int(k[c1.x_axis.var].split('-')[0])"
+            },
+            "y_axis": {
+                "operation": "unique",
+                "var": "Count",
+                "label": "Number of patients",
+                "multivalue": true,
+                "static_filters":
+                [
+                    {
+                        "name": "Name2",
+                        "key": "Name2",
+                        "value": "AGE"
+                    },
+                    {
+                        "name": "Name1",
+                        "key": "Name1",
+                        "value": "YEAR"
+                    }
+                ]
+            },
+            "filters": [
+                {
+                    "name": "Gender",
+                    "key": null,
+                    "value": "Gender",
+                    "translation": {
+                        "M": "Male",
+                        "F": "Female",
+                        "T": "Total",
+                        "ALL": "Male/Female"
+                    }
+                },
+                {
+                    "name": "YEAR",
+                    "key": "Name1",
+                    "value": "Value1"
+                }
+            ]
+        },
+        {
+            "uid": 6,
+            "title": {
+                "operation": "unique",
+                "var": "Age at patient start",
+                "fixed_title": "Age Distribution of Patients Entering"
+            },
+            "x_axis": {
+                "operation": "unique",
+                "var": "Value2",
+                "label": "Age (Years)",
+                "categorized": true,
+                "sort_func": "int(k[c1.x_axis.var].split('-')[0])"
+            },
+            "y_axis": {
+                "operation": "unique",
+                "var": "Count",
+                "label": "Number of patients",
+                "multivalue": true,
+                "static_filters":
+                [
+                    {
+                        "name": "Name2",
+                        "key": "Name2",
+                        "value": "AGE"
+                    },
+                    {
+                        "name": "Name1",
+                        "key": "Name1",
+                        "value": "YEAR"
+                    }
+                ]
+            },
+            "filters": [
+                {
+                    "name": "Gender",
+                    "key": null,
+                    "value": "Gender",
+                    "translation": {
+                        "M": "Male",
+                        "F": "Female",
+                        "T": "Total",
+                        "ALL": "Male/Female"
+                    }
+                },
+                {
+                    "name": "YEAR",
+                    "key": "Name1",
+                    "value": "Value1"
+                }
+            ]
+        },
+        {
+            "uid": 7,
+            "title": {
+                "operation": "unique",
+                "var": "Age at patient end",
+                "fixed_title": "Age Distribution of Patients Exiting"
+            },
+            "x_axis": {
+                "operation": "unique",
+                "var": "Value2",
+                "label": "Age (Years)",
+                "categorized": true,
+                "sort_func": "int(k[c1.x_axis.var].split('-')[0])"
+            },
+            "y_axis": {
+                "operation": "unique",
+                "var": "Count",
+                "label": "Number of patients",
+                "multivalue": true,
+                "static_filters":
+                [
+                    {
+                        "name": "Name2",
+                        "key": "Name2",
+                        "value": "AGE"
+                    },
+                    {
+                        "name": "Name1",
+                        "key": "Name1",
+                        "value": "YEAR"
+                    }
+                ]
+            },
+            "filters": [
+                {
+                    "name": "Gender",
+                    "key": null,
+                    "value": "Gender",
+                    "translation": {
+                        "M": "Male",
+                        "F": "Female",
+                        "T": "Total",
+                        "ALL": "Male/Female"
+                    }
+                },
+                {
+                    "name": "YEAR",
+                    "key": "Name1",
+                    "value": "Value1"
+                }
+            ]
+        },
+        {
+            "uid": 11,
+            "legend": true,
+            "title": {
+                "operation": "unique",
+                "var": "Age at start of year",
+                "fixed_title": " Age Distribution at Start of Year - percentiles"
+            },
+            "x_axis": {
+                "operation": "unique",
+                "var": "Value1"
+            },
+            "y_axis": {
+                "operation": "unique",
+                "var": ["perc25", "Mean", "perc75", "Median"],
+                "label": "Age (years)",
+                "multivalue": true,
+                "static_filters":
+                [
+                    {
+                        "name": "Name2",
+                        "key": "Name2",
+                        "value": ""
+                    },
+                    {
+                        "name": "Value2",
+                        "key": "Value2",
+                        "value": ""
+                    },
+                    {
+                        "name": "Name1",
+                        "key": "Name1",
+                        "value": "YEAR"
+                    }
+                ],
+                "transformation": "y / 12"
+            },
+            "filters": [
+                {
+                    "name": "Gender",
+                    "key": null,
+                    "value": "Gender",
+                    "translation": {
+                        "M": "Male",
+                        "F": "Female",
+                        "T": "Total"
+                    }
+                }
+            ]
+        },
+        {
+            "uid": 9,
+            "legend": true,
+            "title": {
+                "operation": "unique",
+                "var": "Age at patient start",
+                "fixed_title": "Age Distribution of Patients Entering - percentiles"
+            },
+            "x_axis": {
+                "operation": "unique",
+                "var": "Value1",
+                "label": "Years"
+            },
+            "y_axis": {
+                "operation": "unique",
+                "var": ["perc25", "Mean", "perc75", "Median"],
+                "label": "Age (years)",
+                "multivalue": true,
+                "static_filters":
+                [
+                    {
+                        "name": "Name2",
+                        "key": "Name2",
+                        "value": ""
+                    },
+                    {
+                        "name": "Value2",
+                        "key": "Value2",
+                        "value": ""
+                    },
+                    {
+                        "name": "Name1",
+                        "key": "Name1",
+                        "value": "YEAR"
+                    }
+                ],
+                "transformation": "y / 12"
+            },
+            "filters": [
+                {
+                    "name": "Gender",
+                    "key": null,
+                    "value": "Gender",
+                    "translation": {
+                        "M": "Male",
+                        "F": "Female",
+                        "T": "Total"
+                    }
+                }
+            ]
+        },
+        {
+            "uid": 10,
+            "legend": true,
+            "title": {
+                "operation": "unique",
+                "var": "Age at patient end",
+                "fixed_title": "Age Distribution of Patients Exiting - percentiles"
+            },
+            "x_axis": {
+                "operation": "unique",
+                "var": "Value1",
+                "label": "Years"
+            },
+            "y_axis": {
+                "operation": "unique",
+                "var": ["perc25", "Mean", "perc75", "Median"],
+                "label": "Age (years)",
+                "multivalue": true,
+                "static_filters":
+                [
+                    {
+                        "name": "Name2",
+                        "key": "Name2",
+                        "value": ""
+                    },
+                    {
+                        "name": "Value2",
+                        "key": "Value2",
+                        "value": ""
+                    },
+                    {
+                        "name": "Name1",
+                        "key": "Name1",
+                        "value": "YEAR"
+                    }
+                ],
+                "transformation": "y / 12"
+            },
+            "filters": [
+                {
+                    "name": "Gender",
+                    "key": null,
+                    "value": "Gender",
+                    "translation": {
+                        "M": "Male",
+                        "F": "Female",
+                        "T": "Total"
+                    }
+                }
+            ]
+        },
+        {
+            "uid": 12,
+            "legend": true,
+            "title": {
+                "operation": "unique",
+                "var": "Observation time before a year",
+                "fixed_title": "Patient time before a year - percentile"
+            },
+            "x_axis": {
+                "operation": "unique",
+                "var": "Value1",
+                "label": "Years"
+            },
+            "y_axis": {
+                "operation": "unique",
+                "var": ["perc25", "Mean", "perc75", "Median"],
+                "label": "Patient Time (years)",
+                "multivalue": true,
+                "static_filters":
+                [
+                    {
+                        "name": "Name2",
+                        "key": "Name2",
+                        "value": ""
+                    },
+                    {
+                        "name": "Value2",
+                        "key": "Value2",
+                        "value": ""
+                    },
+                    {
+                        "name": "Name1",
+                        "key": "Name1",
+                        "value": "YEAR"
+                    }
+                ],
+                "transformation": "y / 12"
+            },
+            "filters": [
+                {
+                    "name": "Gender",
+                    "key": null,
+                    "value": "Gender",
+                    "translation": {
+                        "M": "Male",
+                        "F": "Female",
+                        "T": "Total"
+                    }
+                }
+            ]
+        },
+        {
+            "uid": 13,
+            "legend": true,
+            "title": {
+                "operation": "unique",
+                "var": "Observation time after a year",
+                "fixed_title": "Patient time after a year - percentile"
+            },
+            "x_axis": {
+                "operation": "unique",
+                "var": "Value1",
+                "label": "Years"
+            },
+            "y_axis": {
+                "operation": "unique",
+                "var": ["perc25", "Mean", "perc75", "Median"],
+                "label": "Patient Time (years)",
+                "multivalue": true,
+                "static_filters":
+                [
+                    {
+                        "name": "Name2",
+                        "key": "Name2",
+                        "value": ""
+                    },
+                    {
+                        "name": "Value2",
+                        "key": "Value2",
+                        "value": ""
+                    },
+                    {
+                        "name": "Name1",
+                        "key": "Name1",
+                        "value": "YEAR"
+                    }
+                ],
+                "transformation": "y / 12"
+            },
+            "filters": [
+                {
+                    "name": "Gender",
+                    "key": null,
+                    "value": "Gender",
+                    "translation": {
+                        "M": "Male",
+                        "F": "Female",
+                        "T": "Total"
+                    }
+                }
+            ]
+        },
+        {
+            "uid": 14,
+            "title": {
+                "operation": "unique",
+                "var": "Observation time in years",
+                "fixed_title": "Patient time"
+            },
+            "x_axis": {
+                "operation": "unique",
+                "var": "Value1",
+                "label": "Patient time (years)"
+            },
+            "y_axis": {
+                "operation": "unique",
+                "var": "Count",
+                "label": "Number of patients",
+                "multivalue": true
+            },
+            "filters": [
+                {
+                    "name": "Gender",
+                    "key": null,
+                    "value": "Gender",
+                    "translation": {
+                        "M": "Male",
+                        "F": "Female",
+                        "T": "Total",
+                        "ALL": "Male/Female"
+                    }
+                }
+            ]
+        }
+    ]
+}

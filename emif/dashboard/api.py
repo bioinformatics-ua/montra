@@ -320,15 +320,18 @@ class FeedView(APIView):
 
             # get from subscriptions too
             subs = FingerprintSubscription.objects.filter(user=request.user, removed=False)
-
+            i = 0
             for sub in subs:
                 modifications = modifications | FingerprintHead.objects.filter(fingerprint_id=sub.fingerprint, fingerprint_id__removed = False)
+                i = i +1
+                if i==10:
+                    break
 
             modifications = modifications.order_by("-date")
 
             feed = []
 
-            modifications = modifications[:50]
+            modifications = modifications[:30]
 
             aggregate = []
             previous = None
@@ -379,11 +382,16 @@ class FeedView(APIView):
                                 'newcomment': noneIsEmpty(chg.new_comment)
                             })
 
+                    icon = 'edit'
+
+                    if(mod.revision == 1):
+                        icon = 'add'
+
                     aggregate.append({
                         'hash': mod.fingerprint_id.fingerprint_hash,
                         'name': mod.fingerprint_id.findName(),
                         'date': mod.date.strftime("%Y-%m-%d %H:%M"),
-                        'icon': 'edit',
+                        'icon': icon,
                         'alterations': alterations,
                         'revision': mod.revision
                     })

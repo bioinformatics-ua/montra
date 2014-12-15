@@ -264,7 +264,6 @@ function GraphicChartC3D3(divArg, dataArg)
     chartConfigs = {
          padding: {
         left: 100,
-
     },
         bindto: '#pc_chart_place',
         data: {
@@ -428,8 +427,8 @@ function GraphicChartC3D3(divArg, dataArg)
               var arrY1 = datasetYs[0].slice(1);
               var arrY2 = datasetYs[1].slice(1);
 
-              chartConfigs.axis.y['max'] = Math.max(Array.max(arrY1), Array.max(arrY2));
-              chartConfigs.axis.y['min'] = 0;
+              //chartConfigs.axis.y['max'] = Math.max(Array.max(arrY1), Array.max(arrY2));
+              //chartConfigs.axis.y['min'] = 0;
             }
         }
 
@@ -479,6 +478,7 @@ function GraphicChartC3D3(divArg, dataArg)
             T: '#83bd59'
     };
 
+
     chartConfigs.tooltip =  {
             format: {
                 value: function (value, ratio, id) {
@@ -487,6 +487,9 @@ function GraphicChartC3D3(divArg, dataArg)
                 }
             }
         };
+
+    chartConfigs.zoom.rescale = true;
+
 
     $('#pc_tabular_place').c3js_to_tabular(chartConfigs, {
       callback: function(){
@@ -541,8 +544,10 @@ function GraphicChartC3D3(divArg, dataArg)
 
       }
     });
+    chartConfigs.padding.bottom = 5
 
-    try{chart = c3.generate(chartConfigs);}
+
+    try{chart = c3.generate((chartConfigs));}
     catch(ex)
     {
       console.log(ex);

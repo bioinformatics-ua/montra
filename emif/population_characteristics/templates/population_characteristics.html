@@ -6,13 +6,11 @@
 <div class="well">Currently IE 7 and 8 don't support this functionality. To use this functionality please update your browser to a modern browser, like IE 9 or better, Google Chrome, Firefox, Opera or Safari.</div>
 <![endif]-->
 <!--[if gte IE 9]><!-->
+    <input style="width:1px; height:1px;" type="file" id="fileupload_hook" />
 
     {% if not contains_population and owner_fingerprint or not contains_population and request.user.is_superuser %}
          <h4 class="pull-center">No population characteristics associated with this database yet.</h4>
     <p class="pull-center">This database fingerprint does not have population characteristics. Submit the Population Characteristics file that can be extracted using <a onclick="return false;" href="">Jerboa</a>.</p>
-
-
-
 
     <form id="jerboaupload" method="post" action="." enctype="multipart/form-data">
         {% csrf_token %}
@@ -70,7 +68,7 @@
         </div>
         {%if owner_fingerprint and not compare or request.user.is_superuser  and not compare %}
         <div class="pull-right">
-            <button onclick="$('#modal-updatepopchar').modal('show');" class="btn"><i class="fa fa-pencil-square-o"></i>&nbsp;Update</button>
+            <button id="upload_popchar" onclick="$('#modal-updatepopchar').modal('show');" class="btn"><i class="fa fa-pencil-square-o"></i>&nbsp;Update</button>
             {% include "population_characteristics_update.html" %}
         </div>
         {% endif %}
