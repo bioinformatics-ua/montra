@@ -31,9 +31,10 @@ from .charts.rule_matcher import *
 class PopulationCharacteristic(object):
     """PopulationCharacteristic: This class controls the Jerboa File
     """
-    def __init__(self, arg=None):
+    def __init__(self, arg=None, type=None):
 
         self.arg = arg
+        self.type = type
 
 
     def last_activity(self):
@@ -74,7 +75,7 @@ class PopulationCharacteristic(object):
         #pdb.set_trace()
         vars_that_should_exists = ['Count']
 
-        mrules = RuleMatcher()
+        mrules = RuleMatcher(type=Fingerprint.objects.get(fingerprint_hash=fingerprint_id).questionnaire.id)
         __filters = mrules.get_filter(var)
         c1 = mrules.get_chart(var)
 
@@ -267,4 +268,4 @@ class PopulationCharacteristic(object):
 
     def get_settings(self):
         cc = ConfCharts()
-        return cc.get_main_settings()
+        return cc.get_main_settings(type=self.type)

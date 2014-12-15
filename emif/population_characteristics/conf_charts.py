@@ -28,15 +28,25 @@ class ConfCharts(object):
         # TODO
         pass
 
-    def read_settings_from_file(self):
+    def read_settings_from_file(self, type):
 
         """ get the default settings to load
         """
         jr = JsonChartReader()
 
+        if type == 53:
+            return jr.read(os.path.abspath('population_characteristics/adcohort_config.json'))
+        elif type == 49:
+            return jr.read(os.path.abspath('population_characteristics/observational_config.json'))
+
+        # generic, otherwise
         return jr.read(os.path.abspath('population_characteristics/chart_config.json'))
 
-    def get_main_settings(self):
+    def get_main_settings(self, type=None):
+        #return self.read_settings_from_file(type)
+        return self.get_default_settings()
+
+    def get_default_settings(self):
 
         sc = SetCharst()
 

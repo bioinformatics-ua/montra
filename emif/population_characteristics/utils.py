@@ -51,7 +51,7 @@ class JsonChartReader:
             a.filters = self.__processFilters(axis['filters'])
 
         if 'static_filters' in axis:
-            a.static_filters = axis['static_filters']
+            a.static_filters = self.__processFilters(axis['static_filters'])
 
         if 'categorized' in axis:
             a.categorized = axis['categorized']
