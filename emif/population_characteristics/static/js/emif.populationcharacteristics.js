@@ -322,8 +322,6 @@ var stuff;
                     alwaysOneOption: true,
                     defaultOptions: default_options,
                     onSelectionChanged: function(selection){
-                        //console.log('callback called');
-                        //console.log(selection);
 
                         var charDraw = new PCDraw(actualChart, activeChart, null);
                         $.each(selection, function(filter, options){
