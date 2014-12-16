@@ -276,7 +276,53 @@ class RemovePermissionsView(APIView):
             except Fingerprint.DoesNotExist:
                 pass
 
-        return Response(result, status=status.HTTP_403_OK)
+        return Response({'success': False}, status=403)
+
+############################################################
+##### PassOwnership - Web services
+############################################################
+
+
+class PassOwnershipView(APIView):
+    authentication_classes = (SessionAuthentication, BasicAuthentication)
+    permission_classes = (IsAuthenticated,)
+    def post(self, request, *args, **kw):
+        id = request.POST.get('id', -1)
+        hash = request.POST.get('hash')
+        valid = False
+
+        # Verify if it is a valid email
+        if id != None and id != -1 and hash != None:
+            try:
+                finger = Fingerprint.objects.get(fingerprint_hash=hash)
+
+
+                if finger.owner == request.user or request.user.is_staff:
+
+                    username = finger.shared.get(id=id)
+                    old_owner = finger.owner
+
+                    finger.owner = username
+
+                    finger.shared.add(old_owner)
+
+                    finger.shared.remove(username)
+
+                    finger.save()
+
+                    finger.indexFingerprint()
+
+                    new_owner_mess = "%s passed you ownership of database %s" % (old_owner.get_full_name(), finger.findName())
+
+                    sendNotification(timedelta(hours=1), username, old_owner,
+                        "fingerprint/%s/1/"%(finger.fingerprint_hash), new_owner_mess)
+
+                    return Response({'success': True}, status=status.HTTP_200_OK)
+
+            except Fingerprint.DoesNotExist:
+                pass
+
+        return Response({'success': False}, status=403)
 
 ############################################################
 ##### Population Check if exists - Web services
