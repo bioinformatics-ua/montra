@@ -8,6 +8,7 @@
     var c3_chart_fn, c3_chart_internal_fn;
 
     function Chart(config) {
+
         var $$ = this.internal = new ChartInternal(this);
         $$.loadConfig(config);
         $$.init();
@@ -1106,6 +1107,7 @@
             tooltip_format_title: undefined,
             tooltip_format_name: undefined,
             tooltip_format_value: undefined,
+            tooltip_format_percentage: false,
             tooltip_contents: function (d, defaultTitleFormat, defaultValueFormat, color) {
                 return this.getTooltipContent ? this.getTooltipContent(d, defaultTitleFormat, defaultValueFormat, color) : '';
             },
@@ -3590,15 +3592,24 @@
             titleFormat = config.tooltip_format_title || defaultTitleFormat,
             nameFormat = config.tooltip_format_name || function (name) { return name; },
             valueFormat = config.tooltip_format_value || defaultValueFormat,
-            text, i, title, value, name, bgcolor;
+            text, i, title, value, name, bgcolor, total=0, percentage, colspan=2;
+
+        if(config.tooltip_format_percentage){
+            for (i = 0; i < d.length; i++) {
+                total += d[i].value;
+            }
+            colspan=3;
+        }
+
         for (i = 0; i < d.length; i++) {
             if (! (d[i] && (d[i].value || d[i].value === 0))) { continue; }
 
             if (! text) {
                 title = titleFormat ? titleFormat(d[i].x) : d[i].x;
-                text = "<table class='" + CLASS.tooltip + "'>" + (title || title === 0 ? "<tr><th colspan='2'>" + title + "</th></tr>" : "");
+                text = "<table class='" + CLASS.tooltip + "'>" + (title || title === 0 ? "<tr><th colspan='"+colspan+"'>" + title + "</th></tr>" : "");
             }
 
+            percentage = Math.round((d[i].value / total * 100) * 100) / 100;
             name = nameFormat(d[i].name, d[i].ratio, d[i].id, d[i].index);
             value = valueFormat(d[i].value, d[i].ratio, d[i].id, d[i].index);
             bgcolor = $$.levelColor ? $$.levelColor(d[i].value) : color(d[i].id);
@@ -3606,6 +3617,8 @@
             text += "<tr class='" + CLASS.tooltipName + "-" + d[i].id + "'>";
             text += "<td class='name'><span style='background-color:" + bgcolor + "'></span>" + name + "</td>";
             text += "<td class='value'>" + value + "</td>";
+            if(config.tooltip_format_percentage)
+                text += "<td class='percentage'>" + percentage + " %</td>";
             text += "</tr>";
         }
         return text + "</table>";
@@ -3618,7 +3631,12 @@
         if (dataToShow.length === 0 || !config.tooltip_show) {
             return;
         }
-        $$.tooltip.html(config.tooltip_contents.call($$, selectedData, $$.getXAxisTickFormat(), $$.getYFormat(forArc), $$.color)).style("display", "block");
+        var temporary = config.tooltip_contents.call($$, selectedData, $$.getXAxisTickFormat(), $$.getYFormat(forArc), $$.color)
+
+        //console.log(temporary);
+        $$.tooltip.html(
+            temporary
+            ).style("display", "block");
 
         // Get tooltip dimensions
         tWidth = $$.tooltip.property('offsetWidth');

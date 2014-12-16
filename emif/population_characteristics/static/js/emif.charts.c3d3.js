@@ -309,6 +309,11 @@ function GraphicChartC3D3(divArg, dataArg)
         zoom: {
           enabled: true,
 
+        },
+        tooltip: {
+          format: {
+            percentage: true
+          }
         }
 
       };
@@ -393,6 +398,11 @@ function GraphicChartC3D3(divArg, dataArg)
         zoom: {
           enabled: true,
 
+        },
+        tooltip: {
+          format: {
+            percentage: true
+          }
         }
 
       };
