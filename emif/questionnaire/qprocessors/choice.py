@@ -326,12 +326,12 @@ def show_flat(question, value):
     for choice in question.choices():
         if choice.text in ans_choices:
             comment = ans_choices[choice.text]['comment']
-            if len(comment) > 0:
-                comment=': %s'%(comment)
-            multiple_choices.append('Yes %s' % (comment))
-        else:
-            multiple_choices.append('')
 
+            multiple_choices.append(['Yes',''])
+            multiple_choices.append([comment,''])
+        else:
+            multiple_choices.append(['', ''])
+            multiple_choices.append(['', ''])
 
     return multiple_choices
 

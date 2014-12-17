@@ -20,16 +20,17 @@ def processFlatQuestion(list, question):
 
     if len(question.choices()) > 0:
         for choice in question.choices():
-            list.append(question.text+': '+choice.text)
+            choice_t = question.number+'.'+question.text+': '+choice.text
+            list.append(choice_t)
+            list.append(choice_t+' (Comment)')
     else:
-        list.append(question.text)
+        list.append(question.number+'.' +question.text)
 
 def processFlatAnswer(list, answer):
     question = answer.question
     if len(question.choices()) > 0:
         flatten = Fingerprint_Flat[question.type](question, answer.data)
-        for choice in question.choices():
-            list.extend([flatten])
+        list.extend(flatten)
     else:
         list.append([Fingerprint_Summary[question.type](answer.data), question.type])
 
@@ -58,7 +59,7 @@ def creatematrixqsets(db_type, fingerprints, qsets, flat=False):
             if flat:
                 processFlatQuestion(q_list, question)
             else:
-                q_list.append(question.text)
+                q_list.append(question.number+'.'+question.text)
 
     for fingerprint in fingerprints:
         answers = Answer.objects.filter(fingerprint_id=fingerprint)
