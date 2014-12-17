@@ -13,6 +13,7 @@
 {% block styleinclude %}
     <link rel="stylesheet" href="{{STATIC_URL}}css/theme.blue.css">
     <link rel="stylesheet" href="{{STATIC_URL}}css/vendor/bootstrap-select.min.css">
+<link rel="stylesheet" href="{{ STATIC_URL }}css/dataTables.bootstrap.css">
 {% endblock %}
 
 {% block styleextra %}
@@ -43,6 +44,11 @@
 
 <script src="{{STATIC_URL}}js/databases_datatable.js"></script>
 
+<script src="{{ STATIC_URL}}js/jquery.dataTables.js"></script>
+    <script src="{{ STATIC_URL}}js/dataTables.fixedColumns.js"></script>
+    <script src="{{ STATIC_URL}}js/dataTables.colResize.js"></script>
+
+    <script src="{{ STATIC_URL}}js/dataTables.bootstrap.js"></script>
 {% endblock %}
 
 

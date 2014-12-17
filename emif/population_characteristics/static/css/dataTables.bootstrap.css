@@ -251,3 +251,7 @@ table.dataTable thead th.sorting_desc:after {
     content: "\f078";
 }
 
+.dataTables_scrollBody thead th:after, .DTFC_LeftBodyLiner table thead th:after{
+    content:"" !important;
+}
+

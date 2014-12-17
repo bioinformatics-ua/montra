@@ -58,7 +58,7 @@ $(document).ready(function() {
     });
 
     $('#exportdatatable').click(function() {
-        var type_selected = $('#db_type').val();  
+        var type_selected = $('#db_type').val();
         if(type_selected != 0){
             console.log('SELECTED:'+type_selected);
 
@@ -71,9 +71,9 @@ $(document).ready(function() {
                             selected_options.push($(this).val());
                     });
                 }
-            }); 
+            });
 
-            console.log(selected_options);  
+            console.log(selected_options);
             var dtform = $('#senddatatable');
             dtform.html($('#senddatatablemodel').html());
             dtform.append('<input type="hidden" name="db_type" value="'+type_selected+'">');
@@ -86,7 +86,7 @@ $(document).ready(function() {
         } else {
             bootbox.alert('Please, choose a database type and questionsets, before trying to export.')
         }
-           
+
     });
 
 });
