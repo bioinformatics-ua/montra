@@ -933,6 +933,7 @@ class RequestAnswerView(APIView):
         # first we get the email parameter
         fingerprint_id = request.POST.get('fingerprint_id', '')
         question_id = request.POST.get('question', '')
+        comment = request.POST.get('comment', '')
 
         if request.user.is_authenticated():
             try:
@@ -947,11 +948,12 @@ class RequestAnswerView(APIView):
                                     requester=request.user, removed = False)
 
                     # If this user already request this answer, just update request time
+                    ansrequest.comment=comment
                     ansrequest.save()
 
                 # otherwise we must create the request as a new one
                 except:
-                    ansrequest = AnswerRequest(fingerprint=fingerprint, question=question, requester=request.user)
+                    ansrequest = AnswerRequest(fingerprint=fingerprint, question=question, requester=request.user, comment=comment)
                     ansrequest.save()
 
                 if ansrequest != None:

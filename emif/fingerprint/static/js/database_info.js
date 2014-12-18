@@ -342,23 +342,39 @@
         $('.requestanswerbtn', $('#t2_'+sortid)).click(function(e){
             var answer = $(this).data("question");
 
-            bootbox.confirm("This question doesn't have an answer, do you want to request the owner of this database to answer this question ?", function(confirmed) {
-                if(confirmed){
-                  $.post("api/requestanswer", { fingerprint_id: global_fingerprint_id, question: answer })
-                      .done(function(response) {
-                        if(response.success){
-                            alert('A request for this answer was sent to the owner of the database.');
-                        } else {
-                            alert("There was a problem requesting this answer. please try again. If the problem persists contact the database owner.")
+
+            var this_share = bootbox.dialog(
+                            '<div style="margin: -10px -10px 10px -10px;" class="modal-header">'+
+                            '<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>'+
+                            '<h3>Request answer</h3>'+
+                            '</div>'+
+                            "This question doesn't have an answer, do you want to request the owner of this database to answer this question ?<br/><br/>"+
+                            '<strong>Note:</strong> The database owner will be notified of this request.<br /><br />'+
+                            '<textarea rows="4" id="request_comment'+answer+'" class="span5" type="text" placeholder="Rationale behind this answer request (optional)">',
+                [{
+                        label: "Request",
+                        class: "btn-success",
+                        callback: function () {
+                            var request_comment = $('#request_comment'+answer).val();
+
+                          $.post("api/requestanswer", {
+                                fingerprint_id: global_fingerprint_id,
+                                question: answer,
+                                comment : request_comment
+                              })
+                              .done(function(response) {
+                                if(response.success){
+                                    bootbox.alert('A request for this answer was sent to the owner of the database.');
+                                } else {
+                                    bootbox.alert("There was a problem requesting this answer. please try again. If the problem persists contact the database owner.")
+                                }
+                              })
+                              .fail(function(){
+                                console.log('Failed sending request for answer');
+                              });
                         }
-                      })
-                      .fail(function(){
-                        console.log('Failed sending request for answer');
-                      });
-
-                }
-            });
-
+                }]
+            );
 
 
         });
