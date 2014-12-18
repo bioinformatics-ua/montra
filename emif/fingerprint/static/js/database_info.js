@@ -546,6 +546,10 @@
              $('.graphTypes').first().click();
          }
      });
+
+    $('#topnavigator').affix();
+    $('#summarynav').affix();
+
  }
 
  function initAdvSearchPlugin(serialization_query, query_type, query_id) {
