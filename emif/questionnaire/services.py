@@ -11,14 +11,35 @@ from questionnaire.models import QuestionSet, Question
 from fingerprint.models import Answer, Fingerprint
 
 from emif.utils import QuestionGroup, ordered_dict, Tag, clean_value
-from questionnaire import Fingerprint_Summary
+from questionnaire import Fingerprint_Summary, Fingerprint_Flat
 
 from fingerprint.services import *
 from fingerprint.models import *
 
+def processFlatQuestion(list, question):
+
+    if len(question.choices()) > 0:
+        for choice in question.choices():
+            choice_t = question.number+'.'+question.text+': '+choice.text
+            list.append(choice_t)
+            list.append(choice_t+' (Comment)')
+    else:
+        list.append(question.number+'.' +question.text)
+
+def processFlatAnswer(list, answer):
+    question = answer.question
+    if len(question.choices()) > 0:
+        flatten = Fingerprint_Flat[question.type](question, answer.data)
+        list.extend(flatten)
+    else:
+        list.append([Fingerprint_Summary[question.type](answer.data), question.type])
+
+    #list.append([Fingerprint_Flat[question.type](question, answer.data), question.type])
+    pass
+
 # since createqset estructure isnt tippically made to be used in a row, i decided to implement it
 # separated since the purpose is different, and this way we try to reduce at a maximum the number of repeated procedures
-def creatematrixqsets(db_type, fingerprints, qsets):
+def creatematrixqsets(db_type, fingerprints, qsets, flat=False):
     ans = []
 
     # questions stay in memory, are the same for all fingerprints
@@ -34,7 +55,11 @@ def creatematrixqsets(db_type, fingerprints, qsets):
         for question in questions:
             if question.slug_fk.slug1 == "database_name":
                 name_question = question
-            q_list.append(question.text)
+
+            if flat:
+                processFlatQuestion(q_list, question)
+            else:
+                q_list.append(question.number+'.'+question.text)
 
     for fingerprint in fingerprints:
         answers = Answer.objects.filter(fingerprint_id=fingerprint)
@@ -47,7 +72,10 @@ def creatematrixqsets(db_type, fingerprints, qsets):
 
 
                 if question.type in Fingerprint_Summary:
-                    a_list.append([Fingerprint_Summary[question.type](answer.data), question.type])
+                    if flat:
+                        processFlatAnswer(a_list, answer)
+                    else:
+                        a_list.append([Fingerprint_Summary[question.type](answer.data), question.type])
                 else:
                     a_list.append([answer.data, question.type])
             except Answer.DoesNotExist:
