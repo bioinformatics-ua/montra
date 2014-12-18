@@ -19,7 +19,9 @@
     <link rel="stylesheet" href="{{ STATIC_URL }}css/pc.css">
 
     <link rel="stylesheet" href="{{ STATIC_URL }}css/vendor/bootstrap-tagsinput.css" />
+    <link rel="stylesheet" href="{{ STATIC_URL }}css/dataTables.tableTools.css">
 
+    <link rel="stylesheet" href="{{ STATIC_URL }}css/dataTables.bootstrap.css">
 
     <style type="text/css">
 
@@ -117,6 +119,12 @@
 <script src="{{ STATIC_URL }}js/vendor/bootstrap-tagsinput.js"></script>
 <script src="{{ STATIC_URL}}js/emif.public.js"></script>
 
+<script src="{{ STATIC_URL}}js/emif.public.js"></script>
+
+<script src="{{ STATIC_URL}}js/jquery.dataTables.js"></script>
+<script src="{{ STATIC_URL}}js/dataTables.tableTools.js"></script>
+<script src="{{ STATIC_URL}}js/dataTables.bootstrap.js"></script>
+
 {% endblock %}
 {% block breadcrumbs %}
 
@@ -138,6 +146,10 @@
 
 {% endif %}
 
+{% endblock %}
+
+{% block title %}
+{{ block.super }} - {{breadcrumb_name}}
 {% endblock %}
 
 {% block toolbar %}
@@ -356,6 +368,7 @@
 
     <script src="{{ STATIC_URL}}js/vendor/patternrecognizer.js"></script>
     <!--[if gte IE 9]><!-->
+    <script src="{{ STATIC_URL}}js/emif.c3js.tabular.js"></script>
     <script src="{{ STATIC_URL}}js/emif.charts.c3d3.js"></script>
     <script src="{{ STATIC_URL}}js/emif.charts.d3.js"></script>
 
@@ -409,6 +422,7 @@ console.log( "Loading questionnary by parts, we have {{qsets|length}} sets");
 //    $('#show_hide_button').fadeIn();
 //});
 }
+var db_name = '{{breadcrumb_name}}';
 $(function(){
     var csrf_token = '{{ csrf_token }}';
     {% get_hit_count_javascript for fingerprint %}

@@ -27,6 +27,7 @@ Array.max = function( array ){
 Array.min = function( array ){
     return Math.min.apply( Math, array );
 };
+var old_table;
 
 var debug = null;
 var chart = null;
@@ -477,9 +478,74 @@ function GraphicChartC3D3(divArg, dataArg)
             T: '#83bd59'
     };
 
+
+    chartConfigs.tooltip =  {
+            format: {
+                value: function (value, ratio, id) {
+                    var value = d3.round(value, 2);
+                    return value;
+                }
+            }
+        };
+
     chartConfigs.zoom.rescale = true;
 
+
+    $('#pc_tabular_place').c3js_to_tabular(chartConfigs, {
+      callback: function(){
+        var base = $('#base_link').attr('href');
+
+        old_table = $('#pc_tabular_place table').dataTable();
+
+        var initializeTableTools = function(){
+            var title = db_name + " - " +$('#pctitle').text();
+            title = title.replace(/\//g, "");
+            var tableTools = new $.fn.dataTable.TableTools( old_table, {
+                "aButtons": [
+                {
+                    "sExtends": 'collection',
+                    "sButtonText": '<i class="fa fa-upload"></i> Export &nbsp;<span class="caret" />',
+                    "aButtons": [
+                        {
+                            sExtends: 'csv',
+                            sButtonText: '<i class="fa fa-file-excel-o"></i>&nbsp; CSV',
+                            sFileName: title+'.csv',
+                            sTitle: title,
+                            mColumns: 'visible',
+                            bSelectedOnly: true
+                        },
+                        {
+                            sButtonText: '<i class="fa fa-file-pdf-o"></i>&nbsp; PDF',
+                            sExtends: 'pdf',
+                            mColumns: 'visible',
+                            sTitle: title,
+                            sFileName: title+'.pdf',
+                            bSelectedOnly: true
+                        },
+                        {
+                            sButtonText: '<i class="fa fa-print"></i>&nbsp; Print',
+                            sExtends: 'print',
+                            mColumns: 'visible',
+                            sTitle: title,
+                            bSelectedOnly: true
+                        }
+                    ]
+                }],
+                    "sSwfPath": base+"static/swf/copy_csv_xls_pdf.swf"
+            } );
+
+            $('#export_btns').html(tableTools.fnContainer());
+        }
+        var tlink = $('#tabularlink');
+
+        $('#pc_tabular_place').on( "refresh_tabular", function( e ) {
+          initializeTableTools();
+        });
+
+      }
+    });
     chartConfigs.padding.bottom = 5
+
 
     try{chart = c3.generate((chartConfigs));}
     catch(ex)

@@ -154,15 +154,27 @@
             </div>
             <div id='pchint'>
             </div>
-            <div id='pc_chart_place'>
+            <ul class="nav nav-tabs">
+                <li class="pull-right"><a id="tabularlink" href="#tabularview" data-toggle="tab">Tabular</a></li>
+                <li class="pull-right active"><a href="#chartview" data-toggle="tab">Chart</a></li>
+            </ul>
+            <div class="tab-content">
+              <div class="tab-pane active" id="chartview">
+                <div id='pc_chart_place'>
+                </div>
+              </div>
+              <div class="tab-pane" id="tabularview">
+                <div id='pc_tabular_place'>
+                </div>
+              </div>
             </div>
 
 
             {%if owner_fingerprint and not compare or request.user.is_superuser  and not compare %}
-                <div class="span12">
+                <div style="margin-left:0px;" class="span12">
                 <div id='pc_comments_placeholder' class="span12 pc_comment">
                 </div>
-                <div id="pc_comment_id" class="span12 pc_comment">
+                <div style="margin-left:0px;" id="pc_comment_id" class="span12 pc_comment">
 
                 <form id="chartcomments" method="post" action="comments" >
                     {% csrf_token %}
