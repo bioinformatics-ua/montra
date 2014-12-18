@@ -64,19 +64,36 @@
         for(var i=0;i<col_length;i++){
             __col_map[i] = true;
         }
+        var categories;
+        try{
+            categories = config.axis.x.categories;
+            if(categories == undefined){
+                categories = [];
+            }
+        }
+        catch(ex){
+            categories = [];
+        }
+
+        var cat_length = categories.length;
 
         for(var j=1;j<__row_length;j++){
             var tmp2 = [];
 
             for(var i=0; i<col_length;i++){
-                if(columns[i] != undefined && columns[i].length > 1){
+                if((columns[i] != undefined && columns[i].length > 1)
+                    || columns[i][0] == 'x'){
 
                     var column = columns[i][j];
+
                     var cheader = columns[i][0];
 
                     if(cheader == 'x'){
                         __col_map[i] = false;
-                        tmp2.unshift('<td>'+column+'</td>');
+                        if(cat_length == 0)
+                            tmp2.unshift('<td>'+column+'</td>');
+                        else
+                            tmp2.unshift('<td>'+categories[j-1]+'</td>');
                     } else {
                         if(!isNaN(column)){
                             column = parseFloat(column).toFixed(2);
@@ -127,10 +144,17 @@
         var render = __renderTable(c3conf);
 
         $(self).html(render);
-        $('#rowcategories').attr('colspan', __countValid());
 
-        if(settings.callback){
-            settings.callback();
+        var cv = __countValid();
+        $('#rowcategories').attr('colspan', cv);
+
+        var trs = $('tbody tr', $(self) );
+        if(trs.length == 0){
+            $('tbody', $(self) ).html('<tr><td colspan="'+(cv+1)+'"><center>There\'s no data available.</center></td></tr>');
+        }else {
+            if(settings.callback){
+                settings.callback();
+            }
         }
 
         return this;

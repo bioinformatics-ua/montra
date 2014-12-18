@@ -489,13 +489,9 @@ function GraphicChartC3D3(divArg, dataArg)
     };
 
 
-    chartConfigs.tooltip =  {
-            format: {
-                value: function (value, ratio, id) {
+    chartConfigs.tooltip.format.value =  function (value, ratio, id) {
                     var value = d3.round(value, 2);
                     return value;
-                }
-            }
         };
 
     chartConfigs.zoom.rescale = true;

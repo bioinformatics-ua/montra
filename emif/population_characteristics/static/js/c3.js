@@ -3610,6 +3610,9 @@
             }
 
             percentage = Math.round((d[i].value / total * 100) * 100) / 100;
+            if(isNaN(percentage)){
+                percentage=0;
+            }
             name = nameFormat(d[i].name, d[i].ratio, d[i].id, d[i].index);
             value = valueFormat(d[i].value, d[i].ratio, d[i].id, d[i].index);
             bgcolor = $$.levelColor ? $$.levelColor(d[i].value) : color(d[i].id);
