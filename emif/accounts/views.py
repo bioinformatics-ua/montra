@@ -24,6 +24,13 @@ from userena.decorators import secure_required
 from guardian.decorators import permission_required_or_403
 from django.shortcuts import redirect, get_object_or_404
 
+options = (
+        (5, '5'),
+        (10, '10'),
+        (25, '25'),
+        (50, '50'),
+        (-1, 'All'),
+)
 
 class SignupFormExtra(SignupForm):
     """
@@ -52,6 +59,18 @@ class SignupFormExtra(SignupForm):
                                                 queryset=Questionnaire.objects.filter(disable='False'),
                                                 widget=forms.CheckboxSelectMultiple())
 
+    paginator = forms.ChoiceField(label=_('Select default value for paginations:'),
+                                        choices = options
+                                    )
+
+    mail_news = forms.BooleanField(label=_('Receive weekly newsletter e-mail with database updates ?'),
+                                    required=False, initial=True
+                                    )
+
+    mail_not = forms.BooleanField(label=_('Receive all notifications also over e-mail ?'),
+                                    required=False, initial=False
+                                    )
+
     def __init__(self, *args, **kw):
         """
         A bit of hackery to get the added fields at the top of the
@@ -65,13 +84,13 @@ class SignupFormExtra(SignupForm):
         # Put the new fields at the top
 
         if Profile.objects.all().count() and Questionnaire.objects.all().count():
-            self.fields.keyOrder = ['first_name', 'last_name', 'country', 'organization', 'email', 'password1', 'password2', 'profiles', 'interests']
+            self.fields.keyOrder = ['first_name', 'last_name', 'country', 'organization', 'email', 'password1', 'password2', 'profiles', 'interests', 'paginator','mail_news', 'mail_not']
         elif Profile.objects.all().count():
-            self.fields.keyOrder = ['first_name', 'last_name', 'country', 'organization', 'email', 'password1', 'password2', 'profiles']
+            self.fields.keyOrder = ['first_name', 'last_name', 'country', 'organization', 'email', 'password1', 'password2', 'profiles', 'paginator', 'mail_news', 'mail_not']
         elif Questionnaire.objects.all().count():
-            self.fields.keyOrder = ['first_name', 'last_name', 'country', 'organization', 'email', 'password1', 'password2', 'interests']
+            self.fields.keyOrder = ['first_name', 'last_name', 'country', 'organization', 'email', 'password1', 'password2', 'interests','paginator', 'mail_news', 'mail_not']
         else:
-            self.fields.keyOrder = ['first_name', 'last_name', 'country', 'organization', 'email', 'password1', 'password2']
+            self.fields.keyOrder = ['first_name', 'last_name', 'country', 'organization', 'email', 'password1', 'password2', 'paginator','mail_news', 'mail_not']
 
     def save(self):
         """
@@ -110,6 +129,16 @@ class SignupFormExtra(SignupForm):
         except KeyError:
             user_profile.paginator = 5
 
+        try:
+            user_profile.mail_news = self.cleaned_data['mail_news']
+        except KeyError:
+            user_profile.mail_news = True
+
+        try:
+            user_profile.mail_not = self.cleaned_data['mail_not']
+        except KeyError:
+            user_profile.mail_not = False
+
         # Add selected profiles
         if (Profile.objects.all().count()):
             selected_profiles = self.cleaned_data['profiles']
@@ -129,13 +158,6 @@ class SignupFormExtra(SignupForm):
         # Userena expects to get the new user from this form, so return the new
         # user.
         return new_user
-options = (
-        (5, '5'),
-        (10, '10'),
-        (25, '25'),
-        (50, '50'),
-        (-1, 'All'),
-)
 class EditProfileFormExtra(EditProfileForm):
 
     profiles = forms.ModelMultipleChoiceField(label=_('I am a (select all that apply):'),
@@ -151,7 +173,14 @@ class EditProfileFormExtra(EditProfileForm):
     paginator = forms.ChoiceField(label=_('Select default value for paginations:'),
                                         choices = options
                                     )
+    mail_news = forms.BooleanField(label=_('Receive weekly newsletter e-mail with database updates ?'),
+                                                required=False,
 
+                                    )
+
+    mail_not = forms.BooleanField(label=_('Receive all notifications also over e-mail ?'),
+                                                required=False,
+                                    )
 
     def __init__(self, *args, **kw):
         super(EditProfileFormExtra, self).__init__(*args, **kw)
@@ -159,13 +188,13 @@ class EditProfileFormExtra(EditProfileForm):
         del self.fields['privacy']
 
         if Profile.objects.all().count() and Questionnaire.objects.all().count():
-            self.fields.keyOrder = ['first_name', 'last_name', 'country', 'organization', 'profiles', 'interests', 'paginator']
+            self.fields.keyOrder = ['first_name', 'last_name', 'country', 'organization', 'profiles', 'interests', 'paginator', 'mail_news', 'mail_not']
         elif Profile.objects.all().count():
-            self.fields.keyOrder = ['first_name', 'last_name', 'country', 'organization', 'profiles', 'paginator']
+            self.fields.keyOrder = ['first_name', 'last_name', 'country', 'organization', 'profiles', 'paginator', 'mail_news', 'mail_not']
         elif Questionnaire.objects.all().count():
-            self.fields.keyOrder = ['first_name', 'last_name', 'country', 'organization', 'interests', 'paginator']
+            self.fields.keyOrder = ['first_name', 'last_name', 'country', 'organization', 'interests', 'paginator', 'mail_news', 'mail_not']
         else:
-            self.fields.keyOrder = ['first_name', 'last_name', 'country', 'organization']
+            self.fields.keyOrder = ['first_name', 'last_name', 'country', 'organization', 'paginator']
 
 # Prevent access to edit by not logged in users
 
