@@ -25,6 +25,7 @@ from api.views import SearchView
 from api.views import SearchDatabasesView
 from api.views import EmailCheckView
 from api.views import RemovePermissionsView
+from api.views import PassOwnershipView
 from api.views import PopulationCheckView
 from api.views import GetFileView
 from api.views import DeleteFileView
@@ -54,6 +55,7 @@ urlpatterns = patterns('api.views',
     url(r'^root/$', 'api_root'),
     url(r'^emailcheck$', EmailCheckView.as_view(), name='emailcheck'),
     url(r'^removePermissions$', RemovePermissionsView.as_view(), name='removepermissions'),
+    url(r'^passOwnership$', PassOwnershipView.as_view(), name='passownership'),
     url(r'^populationcheck$', PopulationCheckView.as_view(), name='populationcheck'),
     url(r'^getfile$', GetFileView.as_view(), name='getfile'),
     url(r'^deletefile$', DeleteFileView.as_view(), name='deletefile'),
