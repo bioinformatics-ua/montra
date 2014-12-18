@@ -1,225 +1,63 @@
 {% load extra_tags %}
 
-<div class="scroll_class dataTables_scrollBody2 pull-left" style="overflow: hidden; position: relative; height: 470px; width: 25%;">
-  <table id="table_databases_names" cellpadding="0" cellspacing="0" border="1" class="pull-left; table table-hover" style="width: 100%; margin: 0px;">
-  <thead>
-    <tr>
-      <th class="minwidth250" title="{{ titles.0|removehs }}">{{titles.0|truncate|removehs}} </th>
-    </tr>
-
-  </thead>
-    <tbody id="commonplacer">
-    {% for ans in answers %}
-      <tr data-common="{{forloop.counter}}"><td id="commonheight_{{forloop.counter}}"> {{ ans.0 }}</td>
-      </tr>
-    {% endfor %}
-    </tbody></table>
-</div>
-<div class="scroll_class pull-right dataTables_scrollBody" style="overflow-y: auto; position: relative; width: 75%; height: 470px;">
-    <table cellpadding="0" cellspacing="0" border="1" class="display dataTable table table-hover tablesorter "  data-provides="rowlink" id="table_databases" style="margin: 0px;">
+<div class="scroll_class" style="position: relative; width: 100%;">
+    <table class="table table-striped table-bordered" id="table_databases">
 	<thead>
 		<tr>
       {% for t in titles %}
-        <th {% if forloop.counter == 1 %} id="nametag" {% endif %} class="minwidth250" title="{{ t|removehs }}">{{t|truncate|removehs}} </th>
-        
-      {% endfor %}
-    </tr>
+        <th {% if forloop.counter == 1 %} id="nametag" {% endif %} class="colheader minwidth250" title="{{ t|removehs }}">{{t|truncate|removehs}} </th>
 
+      {% endfor %}
+        </tr>
+        <tr>
+            {% for t in titles %}
+            <th style="background-color: #eee !important; padding: 4px;">
+                <input class="filter_input finput{{forloop.counter0}}" placeholder="Filter" type="text" />
+            </th>
+            {% endfor %}
+        </tr>
 	</thead>
-    <tbody id="commonsource">
+    <tbody>
       {% for ans in answers %}
-        <tr class="commonheight" data-common="{{forloop.counter}}">
-          <td data-point="{{forloop.counter}}" class="syncpoint">{{ ans.0 }}</td>
+        <tr>
+          <td>{{ ans.0 }}</td>
           {% for a in ans.1 %}
-            {% if a.1 == 'publication' %} 
+            {% if a.1 == 'publication' %}
             {% elif a.1|captioned %}
               <td title="{{a.0|striptags}}"> {{ a.0|truncate }}</td>
             {% else %}
               <td>{{a.0}}</td>{% endif %}
-          {% endfor %}</tr>
+          {% endfor %}
+        </tr>
       {% endfor %}
-      </tbody></table>
+      </tbody>
+      </table>
 </div>
 <script type="application/javascript">
-var loco = null;
 $(function() {
 
-  $("#table_databases_names").tablesorter({
-    theme : 'blue',
+    var table = $('#table_databases').DataTable( {
+        "scrollY": "460px",
+        "scrollX": "100%",
+        "scrollCollapse": true,
+        "paging": false,
+        "orderCellsTop": true,
+        "sDom": '<"top">rt<"bottom"ilJp><"clear">',
+    } );
 
-    // sort on the first column and third column in ascending order
-    sortList: [[0,0]],
+    new $.fn.dataTable.FixedColumns( table );
 
-    // hidden filter input/selects will resize the columns, so try to minimize the change
-    //widthFixed : true,
+    table.columns().eq( 0 ).each( function ( colIdx ) {
 
-    // initialize zebra striping and filter widgets
-    widgets: ["zebra", 'stickyHeaders', "filter"],
-    widgetOptions: {
-      // extra class name added to the sticky header row
-      stickyHeaders : '',
-      // number or jquery selector targeting the position:fixed element
-      stickyHeaders_offset : null,
-      // added to table ID, if it exists
-      stickyHeaders_cloneId : '-sticky',
-      // trigger "resize" event on headers
-      stickyHeaders_addResizeEvent : true,
-      // if false and a caption exist, it won't be included in the sticky header
-      stickyHeaders_includeCaption : true,
-      // The zIndex of the stickyHeaders, allows the user to adjust this to their needs
-      stickyHeaders_zIndex : 2,
-      // jQuery selector or object to attach sticky header to
-      stickyHeaders_attachTo : $(".dataTables_scrollBody2"),
+        $('.finput'+colIdx).on( 'keyup change', function () {
+            table
+                .column( colIdx )
+                .search( this.value )
+                .draw();
+        } );
+    } );
 
-      // adding zebra striping, using content and default styles - the ui css removes the background from default
-      // even and odd class names included for this demo to allow switching themes
-      zebra   : ["ui-widget-content even", "ui-state-default odd"],
-      // use uitheme widget to apply defauly jquery ui (jui) class names
-      // see the uitheme demo for more details on how to change the class names
-      uitheme : 'jui'
-    }
-    
-  });
+    //table.colResize();
 
-  // call the tablesorter plugin
-  $("#table_databases").tablesorter({
-    theme : 'blue',
-
-    // sort on the first column and third column in ascending order
-    sortList: [[0,0]],
-
-    // hidden filter input/selects will resize the columns, so try to minimize the change
-    //widthFixed : true,
-
-    // initialize zebra striping and filter widgets
-    widgets: ["zebra", 'stickyHeaders', "filter"],
-    widgetOptions: {
-      // extra class name added to the sticky header row
-      stickyHeaders : '',
-      // number or jquery selector targeting the position:fixed element
-      stickyHeaders_offset : null,
-      // added to table ID, if it exists
-      stickyHeaders_cloneId : '-sticky',
-      // trigger "resize" event on headers
-      stickyHeaders_addResizeEvent : true,
-      // if false and a caption exist, it won't be included in the sticky header
-      stickyHeaders_includeCaption : true,
-      // The zIndex of the stickyHeaders, allows the user to adjust this to their needs
-      stickyHeaders_zIndex : 2,
-      // jQuery selector or object to attach sticky header to
-      stickyHeaders_attachTo : $(".dataTables_scrollBody"),
-
-      // adding zebra striping, using content and default styles - the ui css removes the background from default
-      // even and odd class names included for this demo to allow switching themes
-      zebra   : ["ui-widget-content even", "ui-state-default odd"],
-      // use uitheme widget to apply defauly jquery ui (jui) class names
-      // see the uitheme demo for more details on how to change the class names
-      uitheme : 'jui'
-    }
-    
-  });
-
-  $("#table_databases_names").bind("sortEnd", 
-      function(e, table) {
-        
-        if($(table).find('.tablesorter-headerDesc').length != 0){
-          $("#table_databases").trigger("sorton",[[[0,1]]]); 
-        } else {
-          $("#table_databases").trigger("sorton",[[[0,0]]]); 
-        }
-
-        
-      }
-  ).bind("filterStart", function(event, config){
-    console.log(config);
-    $('#table_databases').trigger('search', [config]);
-  });
-
-
-  
-
-  $('#table_databases').bind("filterEnd", function(event, config){
-      $('.syncpoint').each(function(){
-        var visible = $(this).parent().is(':visible');
-        var point = $(this).data('point');
-        if(!visible){
-          $('#commonheight_'+point).hide();
-        } else {
-          $('#commonheight_'+point).show();
-        }
-      });
-
-    }).bind("sortEnd", 
-      function(e, table) {
-        if(e.target.config.sortList[0][0] !== 0)
-          $('#table_databases_names').trigger('sortReset');
-
-        var detached = $('#commonplacer').detach();
-        loco=detached;
-        console.log(detached);
-
-        var newcontainer = $(document.createElement('tbody'));
-
-        newcontainer.attr("id", "commonplacer");
-        newcontainer.attr("aria-live", "polite");
-        newcontainer.attr("aria-relevant", "all");
-
-        $('#table_databases_names').append(newcontainer);
-
-        $('#commonsource').children().each(function(){
-          var ident = $(this).data('common');
-
-          var find = detached.find('[data-common="'+ident+'"]').detach()
-          $('#commonplacer').append(find);
-        })
-      }
-    );
-
-
-
-  // I also need to resize the sticky header conterpart... damn it
-  // tablesorter-stickyHeader
-  $( ".tablesorter-header" ).resizable({ handles: "e", 
-    resizableCallback: function(source, sizes){
-      console.log('Callback called ');
-      
-      var pos = source.data('pos');
-      console.log(pos);
-      if (pos !== undefined){
-        $('.pos'+pos).each(function(){
-          $(this).css(sizes);
-        });
-        
-      }
-    }
-  });
-
-  $('.commonheight').each(function () {
-    
-    var self = $(this);
-
-    var id = self.data('common');
-    var self_child = self.first();
-    $('#commonheight_'+id).height(self_child.height()-17);
-  });
-
-  // got the idea from http://stackoverflow.com/questions/18952623/synchronized-scrolling-using-jquery
-  var syncscroll = function(e) {
-        var scrollTop = $(e.target)[0].scrollTop;
-
-        var len = $('.scroll_class').length;
-        for (var i = 0; i < len; i++)
-        {
-            $('.scroll_class')[i].scrollTop = scrollTop;
-        }
-  };
-  
-  $('.dataTables_scrollBody').scroll(syncscroll);
-  $('.dataTables_scrollBody2').scroll(syncscroll);
-  console.log("-"+$('#nametag').width());
-  $('#table_databases').css('margin-left', "-"+(parseInt($('#nametag').width())+30)+"px");
-
-
-//$("#table_databases").stickyTableHeaders({container: ".dataTables_scrollBody"});
 });
 </script>
