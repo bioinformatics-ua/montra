@@ -20,14 +20,18 @@
 from notifications.models import Notification
 
 from django.contrib.auth.models import User
-from django.utils import timezone    
+from django.utils import timezone
 from datetime import timedelta
+from emif.utils import send_custom_mail
+from django.conf import settings
 
 '''
     Send a notification with a timeframe, if timeframe is None, there's no time frame,
     otherwise its a timeframe specified as a timedelta
 '''
-def sendNotification(timeframe, destiny, origin, href, message):
+def sendNotification(timeframe, destiny, origin, href, message, custom_mail_message=None):
+
+        notification = None
 
         timeout = timezone.now() - timeframe
 
@@ -44,6 +48,26 @@ def sendNotification(timeframe, destiny, origin, href, message):
             notification.save()
         else:
             # if theres no notification inside the time frame create a new one
-            new_notification = Notification(destiny = destiny, origin = origin, href=href,
+            notification = Notification(destiny = destiny, origin = origin, href=href,
             notification=message)
-            new_notification.save()
+            notification.save()
+
+        if notification != None and notification.destiny.emif_profile.mail_not == True:
+            subject = None
+            message = None
+            if custom_mail_message != None:
+                (subject, message) = custom_mail_message
+            else:
+                subject = "EMIF Catalogue: Notification"
+                message = """Dear %s,\n\n
+                    \n\n
+                    %s\n\n
+                    You can see it <a href="%s%s">here</a>.
+                    \n\nSincerely,\nEMIF Catalogue
+                """ % (notification.destiny.get_full_name(), notification.notification, settings.BASE_URL
+                    ,notification.href)
+
+            send_custom_mail(subject,
+                message, settings.DEFAULT_FROM_EMAIL,
+                [notification.destiny.email])
+

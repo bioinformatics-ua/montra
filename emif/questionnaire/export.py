@@ -217,7 +217,7 @@ class ExportQuestionnaireExcel(ExportQuestionnaire):
             return "error"
 
     def __addQuestion(self, line, ws, question):
-        self.__number_map[question.number] = (line, question)
+        self.__number_map[question.number] = (question.slug, question)
 
         valid = re.search('(h[0-9])+\. (.*)', question.text_en, re.IGNORECASE)
         choice_types = ['choice', 'choice-freeform', 'choice-multiple', 'choice-multiple-freeform', 'choice-multiple-freeform-options']

@@ -14,7 +14,7 @@
 		<!--div class="btn-group" id="group_toolbar"-->
       {% if dashboard %}
         <div id="dashboardselectbox" class="btn btn-group"></div>
-        <button id="dashboardreset" onclick="dashzone.reset();" class="btn"><i class="fa fa-trash"></i> Reset</button>
+        <button id="dashboardreset" title="Reset the dashboard widgets configuration to default original state. All personal preferences will be lost." onclick="dashzone.reset();" class="btn"><i class="fa fa-undo"></i> Reset</button>
 
       {% endif %}
       {% if fingerprint_dump %}
@@ -172,6 +172,7 @@
 		        {% if list_databases|length > 0 and not no_print %}
     <button type="button" class="btn btn" onclick="window.print();" title="Print">
       <i class="icon-print"></i> Print
+
     </button>
         {% endif  %}
 
@@ -327,7 +328,7 @@ This is an invitation sent by {{request.user.first_name }} {{request.user.last_n
           </thead>
           <tbody>
             <tr>
-              <td>{{owner_obj.get_full_name}}</td>
+              <td id="permissions_owner">{{owner_obj.get_full_name}}</td>
             </tr>
           </tbody>
         </table>
@@ -337,14 +338,18 @@ This is an invitation sent by {{request.user.first_name }} {{request.user.last_n
           <thead>
             <tr>
               <th>User</th>
-              <th style="width: 90px;"></th>
+              <th style="width: 220px;"></th>
             </tr>
           </thead>
-          <tbody>
+          <tbody id="permissions_tab">
             {% for this_user in shared_obj.all %}
             <tr id="permissions_{{this_user.id}}">
               <td>{{this_user.get_full_name}}</td>
-              <td><button onclick="removeShared({{this_user.id}});" class="btn">Remove</button></td>
+              <td>
+                {%if request.user == owner_obj or request.user.is_staff %}
+                <button onclick="passOwnership({{this_user.id}}, '{{this_user.get_full_name}}');"
+              class="pownership btn">Pass Ownership</button> {% endif %}
+ <button onclick="removeShared({{this_user.id}});" class="btn">Remove</button></td>
             </tr>
             {% endfor %}
           </tbody>
@@ -607,6 +612,46 @@ function removeShared(ident){
           })
           .fail(function(){
             bootbox.alert('Removing failed, please try again.');
+          });
+        }
+      });
+
+
+  }
+}
+var owner = '{{owner_obj.get_full_name}}';
+var owner_id = {{owner_obj.id}};
+function passOwnership(ident, name){
+  var ident = parseInt(ident);
+  if(ident){
+
+    var success = bootbox.confirm(
+      "Are you sure you want to pass ownership of this database to "+name+"?\n You will be downgraded to a shared user.", function(result){
+        if(result === true){
+        $.post("api/passOwnership", { id: ident, hash: '{{fingerprint}}'})
+          .done(function(response) {
+
+            if(response.success == true){
+
+              $('#permissions_'+ident).remove();
+              $('#permissions_tab').append('<tr id="permissions_'+owner_id+'"><td>'+owner+'</td><td>{%if request.user.is_staff %}<button onclick="passOwnership('+owner_id+', \''+owner+'\');" class="pownership btn">Pass Ownership</button>{% endif %} <button onclick="removeShared('+owner_id+');" class="btn">Remove</button></td></tr>');
+
+              owner = name;
+              owner_id = ident;
+
+              $('#permissions_owner').html(name);
+
+
+              {%if not request.user.is_staff %}
+              $('.pownership').remove();
+              {% endif %}
+
+            }
+
+
+          })
+          .fail(function(){
+            bootbox.alert('Passing ownership failed, please try again.');
           });
         }
       });

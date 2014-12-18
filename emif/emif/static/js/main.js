@@ -83,6 +83,19 @@ $( this ).removeClass( "ui-corner-top" ).addClass( "ui-corner-all" );
 
 $(function() {
     refreshNotificationCenter();
+
+    $('[data-clamp]').each(function () {
+        var elem = $(this);
+        var parentPanel = elem.data('clamp');
+
+        var resizeFn = function () {
+            var sideBarNavWidth = $(parentPanel).width() - parseInt(elem.css('paddingLeft')) - parseInt(elem.css('paddingRight')) - parseInt(elem.css('marginLeft')) - parseInt(elem.css('marginRight')) - parseInt(elem.css('borderLeftWidth')) - parseInt(elem.css('borderRightWidth'));
+            elem.css('width', sideBarNavWidth);
+        };
+
+        resizeFn();
+        $(window).resize(resizeFn);
+    });
 });
 
 function refreshNotificationCenter() {

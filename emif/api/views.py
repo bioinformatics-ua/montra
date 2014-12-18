@@ -175,7 +175,7 @@ class SearchDatabasesView(APIView):
 
         sortFilter = None
 
-        if request.user.is_authenticated():
+        if request.user.is_authenticated() and (request.user.is_staff or request.user.emif_profile.has_group('exporters')):
             search = request.DATA.get('search', None)
             crows = request.DATA.get('rows', None)
             coffset = request.DATA.get('offset', None)
@@ -276,7 +276,53 @@ class RemovePermissionsView(APIView):
             except Fingerprint.DoesNotExist:
                 pass
 
-        return Response(result, status=status.HTTP_403_OK)
+        return Response({'success': False}, status=403)
+
+############################################################
+##### PassOwnership - Web services
+############################################################
+
+
+class PassOwnershipView(APIView):
+    authentication_classes = (SessionAuthentication, BasicAuthentication)
+    permission_classes = (IsAuthenticated,)
+    def post(self, request, *args, **kw):
+        id = request.POST.get('id', -1)
+        hash = request.POST.get('hash')
+        valid = False
+
+        # Verify if it is a valid email
+        if id != None and id != -1 and hash != None:
+            try:
+                finger = Fingerprint.objects.get(fingerprint_hash=hash)
+
+
+                if finger.owner == request.user or request.user.is_staff:
+
+                    username = finger.shared.get(id=id)
+                    old_owner = finger.owner
+
+                    finger.owner = username
+
+                    finger.shared.add(old_owner)
+
+                    finger.shared.remove(username)
+
+                    finger.save()
+
+                    finger.indexFingerprint()
+
+                    new_owner_mess = "%s passed you ownership of database %s" % (old_owner.get_full_name(), finger.findName())
+
+                    sendNotification(timedelta(hours=1), username, old_owner,
+                        "fingerprint/%s/1/"%(finger.fingerprint_hash), new_owner_mess)
+
+                    return Response({'success': True}, status=status.HTTP_200_OK)
+
+            except Fingerprint.DoesNotExist:
+                pass
+
+        return Response({'success': False}, status=403)
 
 ############################################################
 ##### Population Check if exists - Web services
@@ -766,36 +812,21 @@ class NotifyOwnerView(APIView):
                     else:
                         user_fullname = this_user.username
 
+                    notification_message = "%s has new comments." % (str(fingerprint_name))
 
-                    # Dont add more notifications unless theres been no notification of this type in a hour
-                    notification_message = str(fingerprint_name)+" has new comments, please click here to see them."
-                    old_not = Notification.objects.filter(notification = notification_message, destiny=this_user, removed=False,
-                                                created_date__gt=(timezone.now()-timedelta(hours=1)))
-
-                    #print "EXISTEM ANTIGAS ?"+str(len(old_not))
-
-                    if len(old_not) > 0:
-                        old_not[0].read_date=None
-                        old_not[0].read = False
-                        old_not[0].created_date = timezone.now()
-                        old_not[0].save()
-                    else:
-                        new_notification = Notification(destiny=this_user ,origin=request.user,
-        notification=notification_message,
-        type=Notification.SYSTEM, href="fingerprint/"+fingerprint_id+"/1/discussion/")
-
-                        new_notification.save()
-
-                    send_custom_mail('Emif Catalogue: There\'s a new comment on one of your databases',
-                     render_to_string('emails/new_db_comment.html', {
-                            'fingerprint_id': fingerprint_id,
-                            'fingerprint_name': fingerprint_name,
-                            'owner': user_fullname,
-                            'comment': comment,
-                            'base_url': settings.BASE_URL,
-                            'user_commented': user_commented
-                        }),
-                     settings.DEFAULT_FROM_EMAIL, [this_user.email]);
+                    sendNotification(timedelta(hours=1), this_user, request.user,
+                        "fingerprint/"+fingerprint_id+"/1/discussion/", notification_message,
+                        custom_mail_message=('Emif Catalogue: There\'s a new comment on one of your databases',
+                           render_to_string('emails/new_db_comment.html', {
+                                'fingerprint_id': fingerprint_id,
+                                'fingerprint_name': fingerprint_name,
+                                'owner': user_fullname,
+                                'comment': comment,
+                                'base_url': settings.BASE_URL,
+                                'user_commented': user_commented
+                            })
+                           )
+                        )
 
                     return Response({}, status=status.HTTP_200_OK)
 
@@ -933,6 +964,7 @@ class RequestAnswerView(APIView):
         # first we get the email parameter
         fingerprint_id = request.POST.get('fingerprint_id', '')
         question_id = request.POST.get('question', '')
+        comment = request.POST.get('comment', '')
 
         if request.user.is_authenticated():
             try:
@@ -947,11 +979,12 @@ class RequestAnswerView(APIView):
                                     requester=request.user, removed = False)
 
                     # If this user already request this answer, just update request time
+                    ansrequest.comment=comment
                     ansrequest.save()
 
                 # otherwise we must create the request as a new one
                 except:
-                    ansrequest = AnswerRequest(fingerprint=fingerprint, question=question, requester=request.user)
+                    ansrequest = AnswerRequest(fingerprint=fingerprint, question=question, requester=request.user, comment=comment)
                     ansrequest.save()
 
                 if ansrequest != None:

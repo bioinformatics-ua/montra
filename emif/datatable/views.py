@@ -37,15 +37,15 @@ from accounts.models import RestrictedGroup, RestrictedUserDbs, EmifProfile
 
 import hashlib
 
-def qs_data_table(request, template_name='qs_data_table.html'):
-    db_type = int(request.POST.get("db_type"))
-    qset_post = request.POST.getlist("qsets[]")
+def get_matrix_data(db_type, qset_post, user, flat=False):
 
     # generate a mumbo jumbo digest for this combination of parameters, to be used as key for caching purposes
     string_to_be_hashed = "dbtype"+str(db_type)
 
     for post in qset_post:
         string_to_be_hashed+="qs"+post
+
+    string_to_be_hashed += "_hashed_"+str(flat)
 
     hashed = hashlib.sha256(string_to_be_hashed).hexdigest()
 
@@ -70,13 +70,13 @@ def qs_data_table(request, template_name='qs_data_table.html'):
         fingerprints = Fingerprint.objects.filter(questionnaire__id=db_type)
 
         try:
-            eprofile = EmifProfile.objects.get(user=request.user)
+            eprofile = EmifProfile.objects.get(user=user)
 
             if eprofile.restricted == True:
-                hashes = RestrictedGroup.hashes(request.user)
+                hashes = RestrictedGroup.hashes(user)
 
 
-                others = RestrictedUserDbs.objects.filter(user=request.user)
+                others = RestrictedUserDbs.objects.filter(user=user)
 
                 for db in others:
                     hashes.add(db.fingerprint.fingerprint_hash)
@@ -86,9 +86,17 @@ def qs_data_table(request, template_name='qs_data_table.html'):
         except EmifProfile.DoesNotExist:
             print "-- ERROR: Couldn't get emif profile for user"
 
-        (titles, answers) = creatematrixqsets(db_type, fingerprints, qset)
+        (titles, answers) = creatematrixqsets(db_type, fingerprints, qset, flat=flat)
 
         cache.set(hashed, (titles, answers), 720) # 12 hours of cache
+
+    return (hashed, titles, answers)
+
+def qs_data_table(request, template_name='qs_data_table.html'):
+    db_type = int(request.POST.get("db_type"))
+    qset_post = request.POST.getlist("qsets[]")
+
+    (hashed, titles, answers) = get_matrix_data(db_type, qset_post, request.user)
 
     return render(request, template_name, {'request': request,'hash': hashed, 'export_all_answers': True, 'breadcrumb': False, 'collapseall': False, 'geo': False, 'titles': titles, 'answers': answers})
 
@@ -117,37 +125,7 @@ def export_datatable(request):
     db_type = int(request.POST.get("db_type"))
     qset_post = request.POST.getlist("qsets[]")
 
-    # generate a mumbo jumbo digest for this combination of parameters, to be used as key for caching purposes
-    string_to_be_hashed = "dbtype"+str(db_type)
-
-    for post in qset_post:
-        string_to_be_hashed+="qs"+post
-
-    hashed = hashlib.sha256(string_to_be_hashed).hexdigest()
-
-    titles = None
-    answers = None
-
-    cached = cache.get(hashed)
-
-    if cached != None:
-        #print "cache hit"
-        (titles, answers) = cached
-
-    else :
-        #print "need for cache"
-        qset_int = []
-        for qs in qset_post:
-            qset_int.append(int(qs))
-
-
-        qset = QuestionSet.objects.filter(id__in=qset_int)
-
-        fingerprints = Fingerprint.objects.filter(questionnaire__id=db_type)
-
-        (titles, answers) = creatematrixqsets(db_type, fingerprints, qset)
-
-        cache.set(hashed, (titles, answers), 720) # 12 hours of cache
+    (hashed, titles, answers) = get_matrix_data(db_type, qset_post, request.user, flat=True)
 
     """
     Method to export all databases answers to a csv file

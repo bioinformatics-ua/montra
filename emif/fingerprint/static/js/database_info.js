@@ -289,7 +289,7 @@
          });
      } else {
 
-         /* I decided to change this as this is was a very intensive process, 
+         /* I decided to change this as this is was a very intensive process,
             I instead tagged them, and add to the class the instance, this way i only have on instance per, table
             declaring a tooltip instance every td...*/
          $('td', $(table_id)).each(function() {
@@ -342,22 +342,40 @@
         $('.requestanswerbtn', $('#t2_'+sortid)).click(function(e){
             var answer = $(this).data("question");
 
-            var confirmed = confirm("This question doesn't have an answer, do you want to request the owner of this database to answer this question ?");
 
-            if(confirmed){
-              $.post("api/requestanswer", { fingerprint_id: global_fingerprint_id, question: answer })
-                  .done(function(response) {
-                    if(response.success){
-                        alert('A request for this answer was sent to the owner of the database.');
-                    } else {
-                        alert("There was a problem requesting this answer. please try again. If the problem persists contact the database owner.")
-                    }
-                  })
-                  .fail(function(){
-                    console.log('Failed sending request for answer');
-                  });
+            var this_share = bootbox.dialog(
+                            '<div style="margin: -10px -10px 10px -10px;" class="modal-header">'+
+                            '<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>'+
+                            '<h3>Request answer</h3>'+
+                            '</div>'+
+                            "This question doesn't have an answer, do you want to request the owner of this database to answer this question ?<br/><br/>"+
+                            '<strong>Note:</strong> The database owner will be notified of this request.<br /><br />'+
+                            '<textarea rows="4" id="request_comment'+answer+'" class="span5" type="text" placeholder="Rationale behind this answer request (optional)">',
+                [{
+                        label: "Request",
+                        class: "btn-success",
+                        callback: function () {
+                            var request_comment = $('#request_comment'+answer).val();
 
-            }
+                          $.post("api/requestanswer", {
+                                fingerprint_id: global_fingerprint_id,
+                                question: answer,
+                                comment : request_comment
+                              })
+                              .done(function(response) {
+                                if(response.success){
+                                    bootbox.alert('A request for this answer was sent to the owner of the database.');
+                                } else {
+                                    bootbox.alert("There was a problem requesting this answer. please try again. If the problem persists contact the database owner.")
+                                }
+                              })
+                              .fail(function(){
+                                console.log('Failed sending request for answer');
+                              });
+                        }
+                }]
+            );
+
 
         });
         $('.value_content').mouseover(function(e){
@@ -412,17 +430,10 @@
      self.addClass('hiding_empty');
      self.text('Show Empty');
 
-     // Hide empty
-     $('.value_content').each(function() {
-         if ($(this).text().trim().length == 0) {
-             $(this).parent().addClass('hide_empty_content');
-         }
-     });
-
-     $('.hide_empty_content').parent().parent().each(function() {
-         var visible = self.find('tr:visible').length;
-         if (visible === 1) {
-             $(this).parent().parent().parent().addClass('hide_empty_content');
+     $('.empty').parent().parent().parent().each(function() {
+         var visible = $(this).is(":visible");
+         if (visible === true) {
+             $(this).addClass('hide_empty_content');
          }
      });
  }
@@ -486,7 +497,7 @@
      });
 
      $("#collapseall_metadata").bind('click', function(e) {
-         //e.preventDefault(); 
+         //e.preventDefault();
          //e.stopPropagation();
 
          collapse_expand(this);
@@ -551,6 +562,10 @@
              $('.graphTypes').first().click();
          }
      });
+
+    $('#topnavigator').affix();
+    $('#summarynav').affix();
+
  }
 
  function initAdvSearchPlugin(serialization_query, query_type, query_id) {

@@ -57,8 +57,14 @@ class EmifProfile(UserenaBaseProfile):
       choices=options,
       default=10)
 
+    mail_news   = models.BooleanField(default=True)
+    mail_not    = models.BooleanField(default=False)
+
     restricted = models.BooleanField(default=False)
 
+    def has_group(self, group_name):
+        group = Group.objects.get(name=group_name)
+        return True if group in self.user.groups.all() else False
 
     def has_permission(self, hash):
         try:

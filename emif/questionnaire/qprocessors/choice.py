@@ -80,7 +80,7 @@ def question_multiple(request, question):
     for choice in question.choices():
         counter += 1
         key = "question_%s_multiple_%d" % (question.number, choice.sortid)
-        
+
         if key in request.POST or (val!=None and val != '' and (choice.value in val)) or \
           (request.method == 'GET' and choice.value in defaults):
             choices.append( (choice, key, ' checked',) )
@@ -91,14 +91,14 @@ def question_multiple(request, question):
     if not extracount and question.type == 'choice-multiple-freeform':
         extracount = 1
     extras = []
-    
+
     for x in range(1, extracount+1):
 
         key = "question_%s_more%d" % (question.number, x)
         key_aux = "question_%s" % (question.number)
 
         if key_aux in request.POST :
-            
+
             extras_value = request.POST[key_aux].split("||")
             if (len(extras_value)>1):
                 extras.append( (key, extras_value[1]) )
@@ -161,7 +161,7 @@ def get_aux_text(full_value, choice_value, original_value=None):
     if (full_value==None):
         return original_value
     if isinstance(full_value, basestring):
-        #print "full_value is string" 
+        #print "full_value is string"
         _aux = full_value.split("#")
         #print _aux
         for v in _aux:
@@ -197,7 +197,7 @@ def question_multiple_options(request, question):
 
         key = "question_%s_multiple_%d" % (question.number, choice.sortid)
         key_value = "question_%s_%d_opt" % (question.number, choice.sortid)
-        
+
         if val == None or val == '':
             try:
                 val = request.POST.get(key, '')
@@ -217,39 +217,39 @@ def question_multiple_options(request, question):
                 _tmp_v = _aux
             choices.append( (choice, key, ' checked',_tmp_v) )
             hasValue = hasValue or True
-            
+
         else:
             _tmp_v = get_aux_text(val,choice.value, _aux )
             if _tmp_v == None or _tmp_v == '':
                 _tmp_v = _aux
             choices.append( (choice, key, '',_tmp_v) )
-            
+
     extracount = int(cd.get('extracount', 0))
     if not extracount and question.type == 'choice-multiple-freeform-options':
         extracount = 1
     extras = []
     #import pdb
     #pdb.set_trace()
-    
+
     for x in range(1, extracount+1):
 
         key = "question_%s_more%d" % (question.number, x)
         key_aux = "question_%s" % (question.number)
 
         if key_aux in request.POST :
-            
+
             extras_value = request.POST[key_aux].split("||")
             if (len(extras_value)>1):
                 extras.append( (key, extras_value[1]) )
-                
+
             else:
                 extras.append( (key, '') )
         elif key in request.POST:
             extras.append( (key, request.POST[key]) )
-            
+
         else:
             extras.append( (key, '',) )
-    
+
     return {
         "choices": choices,
         "extras": extras,
@@ -292,30 +292,48 @@ def process_multiple_options(question, answer):
 
     return dumps(multiple)
 
-
-
-@show_summary('choice','choice-freeform','choice-multiple', 'choice-multiple-freeform', 'choice-multiple-freeform-options')
-def show_summ(value):
-
-    #print value
-
+def __choice_list(value):
     choices = value.split('#')
 
-    multiple_choices = []
+    multiple_choices = {}
 
     for choice in choices[1:]:
-        
+
         if '{' in choice and '}' in choice:
             values = choice.split('{')
             key = values[0]
             comment = values[1].replace('}', '')
 
-            multiple_choices.append({'key': key, 'comment': comment})
+            multiple_choices[key] = {'key': key, 'comment': comment}
         else:
-            multiple_choices.append({'key': choice, 'comment': ''})
+            multiple_choices[choice] = {'key': choice, 'comment': ''}
 
-    #return value   
+    return multiple_choices
+
+@show_summary('choice','choice-freeform','choice-multiple', 'choice-multiple-freeform', 'choice-multiple-freeform-options')
+def show_summ(value):
+    multiple_choices = __choice_list(value).values()
+    #return value
     return render_to_string('questionnaire/choice_summary.html', {'choices':multiple_choices})
+
+
+@show_flat('choice','choice-freeform','choice-multiple', 'choice-multiple-freeform', 'choice-multiple-freeform-options')
+def show_flat(question, value):
+
+    multiple_choices = []
+    ans_choices = __choice_list(value)
+
+    for choice in question.choices():
+        if choice.text in ans_choices:
+            comment = ans_choices[choice.text]['comment']
+
+            multiple_choices.append(['Yes',''])
+            multiple_choices.append([comment,''])
+        else:
+            multiple_choices.append(['', ''])
+            multiple_choices.append(['', ''])
+
+    return multiple_choices
 
 add_type('choice-multiple', 'Multiple-Choice, Multiple-Answers [checkbox]')
 add_type('choice-multiple-freeform', 'Multiple-Choice, Multiple-Answers, plus freeform [checkbox, input]')
