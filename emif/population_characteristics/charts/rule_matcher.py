@@ -21,35 +21,36 @@
 
 from population_characteristics.conf_charts import *
 
+from fingerprint.models import Fingerprint
 
 class RuleMatcher(object):
 
-    def __init__(self, comp=False):
+    def __init__(self, comp=False, type=None):
         self.comp = comp
-        
+        self.ftype = type
 
     def get_filter(self, var):
         if self.comp:
             charts = conf.get_compare_settings().charts
         else:
-            charts = conf.get_main_settings().charts
-        filters = None 
+            charts = conf.get_main_settings(type=self.ftype).charts
+        filters = None
         for c in charts:
             if c.title.fixed_title==var:
                 filters = c.filters
-                break 
+                break
         return filters
 
     def get_chart(self, var):
         if self.comp:
             charts = conf.get_compare_settings().charts
         else:
-            charts = conf.get_main_settings().charts
-        result = None 
+            charts = conf.get_main_settings(type=self.ftype).charts
+        result = None
         for c in charts:
             if c.title.fixed_title==var:
                 result= c
-                break 
+                break
         return result
 
 

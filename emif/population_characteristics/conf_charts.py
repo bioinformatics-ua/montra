@@ -18,6 +18,7 @@
 #
 from population_characteristics.charts.operations import *
 from population_characteristics.charts.chart import *
+from questionnaire.models import Questionnaire
 
 import os
 
@@ -28,15 +29,31 @@ class ConfCharts(object):
         # TODO
         pass
 
-    def read_settings_from_file(self):
+    def read_settings_from_file(self, type):
 
         """ get the default settings to load
         """
         jr = JsonChartReader()
 
+        try:
+            quest = Questionnaire.objects.get(id=type)
+
+            read = jr.read(os.path.abspath('population_characteristics/%d.json' %(type)))
+
+            if read != None:
+                return read
+
+        except Questionnaire.DoesNotExist:
+            return None
+
+        # generic, otherwise
         return jr.read(os.path.abspath('population_characteristics/chart_config.json'))
 
-    def get_main_settings(self):
+    def get_main_settings(self, type=None):
+        #return self.read_settings_from_file(type)
+        return self.get_default_settings()
+
+    def get_default_settings(self):
 
         sc = SetCharst()
 
