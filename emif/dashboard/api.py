@@ -53,7 +53,7 @@ import datetime
 
 from questionnaire import Processors, QuestionProcessors, Fingerprint_Summary
 
-from django.db.models import Count
+from django.db.models import Count, Q
 
 from accounts.models import NavigationHistory, RestrictedUserDbs, RestrictedGroup, EmifProfile
 
@@ -313,21 +313,16 @@ class FeedView(APIView):
 
         if request.user.is_authenticated():
 
-            modifications = FingerprintHead.objects.filter(fingerprint_id__owner=request.user, fingerprint_id__removed = False)
-
-            modifications = modifications | FingerprintHead.objects.filter(fingerprint_id__shared=request.user, fingerprint_id__removed = False)
-
-
             # get from subscriptions too
-            subs = FingerprintSubscription.objects.filter(user=request.user, removed=False)
-            i = 0
-            for sub in subs:
-                modifications = modifications | FingerprintHead.objects.filter(fingerprint_id=sub.fingerprint, fingerprint_id__removed = False)
-                i = i +1
-                if i==10:
-                    break
+            subs = FingerprintSubscription.objects.filter(user=request.user, removed=False).values_list('fingerprint__id', flat=True)
 
-            modifications = modifications.order_by("-date")
+            modifications = FingerprintHead.objects.filter(
+                (
+                Q(fingerprint_id__id__in=subs)
+                | Q(fingerprint_id__owner=request.user)
+                | Q(fingerprint_id__shared=request.user)
+                ),
+                fingerprint_id__removed = False).distinct().order_by("-date")
 
             feed = []
 

@@ -67,13 +67,13 @@ var FeedWidget = function FeedWidget(widgetname, width, height, pos_x, pos_y){
                                 alterations[j].text+'<br />';
 
                                 if(alterations[j].oldvalue != alterations[j].newvalue){
-                                    self.content += '<br /><strong>Old Answer:</strong>'+alterations[j].oldvalue.replace(/'/g, "\\'")+
-                                                    '<br /><strong>New Answer:</strong>'+alterations[j].newvalue.replace(/'/g, "\\'");
+                                    self.content += '<br /><strong>Old Answer:</strong>'+alterations[j].oldvalue.replace(/'/g, "&#8216;")+
+                                                    '<br /><strong>New Answer:</strong>'+alterations[j].newvalue.replace(/'/g, "&#8216;");
                                 }
 
                                 if(alterations[j].oldcomment != alterations[j].newcomment)
-                                    self.content += '<br /><strong>Old Comment:</strong>'+alterations[j].oldcomment.replace(/'/g, "\\'")+
-                                                    '<br /> <strong>New Comment:</strong>'+alterations[j].newcomment.replace(/'/g, "\\'");
+                                    self.content += '<br /><strong>Old Comment:</strong>'+alterations[j].oldcomment.replace(/'/g, "&#8216;")+
+                                                    '<br /> <strong>New Comment:</strong>'+alterations[j].newcomment.replace(/'/g, "&#8216;");
 
                                 self.content += '\'>'+
                                 alterations[j].number + '</a>, ';
