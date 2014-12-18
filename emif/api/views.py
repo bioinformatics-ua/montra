@@ -175,7 +175,7 @@ class SearchDatabasesView(APIView):
 
         sortFilter = None
 
-        if request.user.is_authenticated():
+        if request.user.is_authenticated() and (request.user.is_staff or request.user.emif_profile.has_group('exporters')):
             search = request.DATA.get('search', None)
             crows = request.DATA.get('rows', None)
             coffset = request.DATA.get('offset', None)

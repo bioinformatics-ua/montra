@@ -103,7 +103,7 @@ def index(request, template_name='index_new.html'):
         if referal != None:
             return HttpResponseRedirect(settings.BASE_URL + referal)
         else:
-            return HttpResponseRedirect(settings.BASE_URL + 'wherenext')
+            return HttpResponseRedirect(reverse ('dashboard.views.dashboard'))
     else:
         return render(request, template_name, {'request': request, 'referal': referal})
 
@@ -387,23 +387,3 @@ def save_slug(slugName, desc):
     slugsAux.slug1 = slugName
     slugsAux.description = desc
     slugsAux.save()
-
-# Redirect user after login. Rules:
-# - settings value should be represented by "REDIRECT_" plus the profile.name in uppercase
-# and with out spaces. Ex: REDIRECT_DATACUSTODIAN - for profile.name="Data Custodian"
-@login_required
-def wherenext(request):
-    try:
-        emifprofile = request.user.get_profile()
-        if emifprofile.profiles.count():
-            for profile in emifprofile.profiles.all():
-                redirect = getattr(settings, "REDIRECT_" + profile.name.upper().strip().replace(" ", ""),
-                    'fingerprint.listings.all_databases_user')
-                return HttpResponseRedirect(reverse(redirect))
-
-        interests = emifprofile.interests.all()
-        if interests:
-            return HttpResponseRedirect(reverse('fingerprint.listings.all_databases_user'))
-    except:
-        logging.warn("User has no emifprofile nor interests")
-        return HttpResponseRedirect(reverse ('fingerprint.listings.all_databases'))

@@ -26,7 +26,7 @@ urlpatterns = patterns('',
     url(r'^signup/$',
         signup,
         {'signup_form': SignupFormExtra,
-         'success_url': settings.BASE_URL + 'wherenext'},
+         'success_url': settings.BASE_URL + 'dashboard'},
         name='userena_signup'),
 
     url(r'^signup/complete/$',
