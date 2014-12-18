@@ -118,6 +118,7 @@ class ImportQuestionnaireExcel(ImportQuestionnaire):
     def __handleQuestion(self, type, row,type_Column, level_number_column, text_question_Column, _questions_rows,
         _choices_array, qNumber, questionset, log, _checks, _debug, questionnaire):
         try:
+            slug = None
             text_en = str(level_number_column.value) + '. ' + str(text_question_Column.value)
 
             dataType_column = None
@@ -149,11 +150,10 @@ class ImportQuestionnaireExcel(ImportQuestionnaire):
                 try:
                     dependencies_list = row[8]
                     list_dep_aux = dependencies_list.value.split('|')
-                    question_num_parent = (_questions_rows.get(int(list_dep_aux[0])))
-
+                    question_num_parent = _questions_rows.get(list_dep_aux[0])
 
                     index_aux = int(str(list_dep_aux[1]))-1
-                    choice_parent_list = _choices_array.get(int(list_dep_aux[0]))
+                    choice_parent_list = _choices_array.get(list_dep_aux[0])
                     choice_parent = choice_parent_list[index_aux]
                     _checks = 'dependent=\"' + str(question_num_parent) + ',' + str(choice_parent) + '\"'
                 except:
@@ -210,7 +210,7 @@ class ImportQuestionnaireExcel(ImportQuestionnaire):
 
 
 
-            _questions_rows[type_Column.row] = str(questionNumber)
+            _questions_rows[slug] = str(questionNumber)
 
             if type == self.QUESTION:
                 if dataType_column.value in ['choice', 'choice-freeform', 'choice-multiple', 'choice-multiple-freeform']:
@@ -234,11 +234,11 @@ class ImportQuestionnaireExcel(ImportQuestionnaire):
                                 log += "\n%s - Error to save Choice %s" % (type_Column.row, choice)
                                 self.writeLog(log)
                                 raise
-                        _choices_array[type_Column.row] = _choices_array_aux
+                        _choices_array[slug] = _choices_array_aux
 
                 if dataType_column.value in ['choice-yesno', 'choice-yesnocomment',
                                                      'choice-yesnodontknow']:
-                    _choices_array[type_Column.row] = ['yes', 'no', 'dontknow']
+                    _choices_array[slug] = ['yes', 'no', 'dontknow']
 
         except:
             log += "\n%s - Error to save question %s" % (type_Column.row, text_en)
