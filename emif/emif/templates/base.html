@@ -25,6 +25,9 @@
         <link rel="shortcut icon" href="{{ STATIC_URL }}img/favicon.ico" type="image/x-icon" />
 
         {% compress css %}
+        <link href='{{ STATIC_URL }}css/opensans.css' rel='stylesheet' type='text/css'>
+        <link href='{{ STATIC_URL }}css/abel.css' rel='stylesheet' type='text/css'>
+
         <link rel="stylesheet" href="{{ STATIC_URL }}css/bootstrap.min.css">
 
         <link rel="stylesheet" href="{{ STATIC_URL }}css/vendor/jquery-ui-1.10.4.custom.min.css">
@@ -136,7 +139,7 @@
                                 </ul>
                                 {% endif %}
                                 <div class="pull-right">
-                                <ul class="nav">
+                                <ul id="usernav" class="nav">
 
                                     {% if request.user.is_authenticated %}
                                     <li id="li_notifications" style="padding-right: 5px;" class="dropdown">
@@ -302,6 +305,8 @@
                     </div>
                 </div>
                 <div style="padding-top: 60px;" class="container">
+                    <div data-clamp=".container" id="topnavigator">
+                    <div>
                     {% if breadcrumb %}
                     {% block breadcrumbs %}
                     {% breadcrumb "Home" "home" %}
@@ -312,6 +317,8 @@
                     {% endif %}
                     <div class="pull-right">
                         {% block toolbar %} {% endblock %}
+                    </div>
+                    </div>
                     </div>
 
 

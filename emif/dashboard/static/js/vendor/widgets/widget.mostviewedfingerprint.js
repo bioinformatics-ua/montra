@@ -39,6 +39,10 @@ var MostViewedFingerprintWidget = function MostViewedFingerprintWidget(widgetnam
         .done(function(data) {
            self.content = '<table class="table">';
             if(data.mostviewed){
+                if(data.mostviewed.length == 0){
+                    self.content+='<tr><td><center>No history yet. Start navigating in the databases.</center></td></tr>'
+                }
+
                 for(var i=0;i<data.mostviewed.length;i++){
                     self.content += '<tr><td style="word-break: break-all;"><small><a href="fingerprint/'+data.mostviewed[i].hash+'/1">'+data.mostviewed[i].name+ "</a></small></td><!--td>" + data.mostviewed[i].count+"</td--></tr>";
                 }

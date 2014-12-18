@@ -16,14 +16,14 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
-        
+
 from emif.settings import jerboa_collection, jerboa_aggregation_collection
 from pymongo.errors import OperationFailure
-from .parseJerboaFile import * 
-import json 
+from .parseJerboaFile import *
+import json
 
 from .conf_charts import *
-from .charts.rule_matcher import * 
+from .charts.rule_matcher import *
 
 #import pdb
 
@@ -32,7 +32,7 @@ class PopulationCharacteristic(object):
     """PopulationCharacteristic: This class controls the Jerboa File
     """
     def __init__(self, arg=None):
-        
+
         self.arg = arg
 
 
@@ -46,9 +46,9 @@ class PopulationCharacteristic(object):
         pass
 
     def submit_new_revision(self, user, fingerprint_id, revision, path_file=None):
-        
+
         #path_file = "C:/Users/lbastiao/Projects/TEST_DataProfile_v1.5.6b.txt"
-        #path_file = "/Volumes/EXT1/Dropbox/MAPi-Dropbox/EMIF/Jerboa/TEST_DataProfile_v1.5.6b.txt"        
+        #path_file = "/Volumes/EXT1/Dropbox/MAPi-Dropbox/EMIF/Jerboa/TEST_DataProfile_v1.5.6b.txt"
         self._json = import_population_characteristics_data(user, fingerprint_id, revision, filename=path_file)
         #print self._json
         #f = open('jerboaTmp', 'w')
@@ -70,20 +70,20 @@ class PopulationCharacteristic(object):
     def get_variables(self, var, row, fingerprint_id='abcd', revision='-1', filters=[], vars_that_should_exists=[]):
         #db.jerboa_files.distinct( 'values.Var' )
         # Need to filter by Fingerprint, otherwise, we're trapped.
-        
-        #pdb.set_trace() 
+
+        #pdb.set_trace()
         vars_that_should_exists = ['Count']
 
         mrules = RuleMatcher()
         __filters = mrules.get_filter(var)
         c1 = mrules.get_chart(var)
 
-        dict_query = {'fingerprint_id':fingerprint_id, 'revision': revision, 
+        dict_query = {'fingerprint_id':fingerprint_id, 'revision': revision,
             'values.Var': c1.title.var}
 
-        
-        # Comparable 
-        #comparable = True 
+
+        # Comparable
+        #comparable = True
         #values_compare = ["M", "F"]
 
         for ve in vars_that_should_exists:
@@ -94,15 +94,15 @@ class PopulationCharacteristic(object):
 
         #print "filters"
         #print filters
-        # Apply filters in the query 
+        # Apply filters in the query
         dict_query_general=[]
-        
-        
-        
+
+
+
         for ve in filters:
             #print "ve"
             #print ve
-            
+
             if  isinstance(filters[ve], list):
                 #if not "$or" in dict_query:
                 _or_dict_query = {}
@@ -110,16 +110,16 @@ class PopulationCharacteristic(object):
                 for _aux in filters[ve]:
                     _or_dict_query2 = {ve: _aux}
                     _or_dict_query["$or"].append(_or_dict_query2)
-                dict_query_general.append(_or_dict_query)    
+                dict_query_general.append(_or_dict_query)
             else:
                 dict_query[ve] = filters[ve]
-                
-                
+
+
         if dict_query_general != []:
             dict_query["$and"]= dict_query_general
         #print dict_query
         values =  jerboa_collection.find(dict_query )
-        
+
 
         results = []
 
@@ -166,7 +166,7 @@ class PopulationCharacteristic(object):
 
 
     def generic_filter(self, filters):
-        
+
         json_acceptable_string = filters.replace("'", "\"")
         #print json_acceptable_string
         d = json.loads(json_acceptable_string)
@@ -192,16 +192,16 @@ class PopulationCharacteristic(object):
         filters = mrules.get_filter(var)
         chart = mrules.get_chart(var)
         #_filter = charts_conf.
-        
+
         # Should check if any special operation, for now, let's assume: NO!
 
         for _filter in filters:
 
             # Generate query
 
-            dict_query = {'fingerprint_id':fingerprint_id, 
+            dict_query = {'fingerprint_id':fingerprint_id,
                 'values.Var': chart.title.var,
-                
+
                 }
             if comp:
                 dict_query = {'values.Var': chart.title.var,}
@@ -214,7 +214,7 @@ class PopulationCharacteristic(object):
                 values =  jerboa_aggregation_collection.find( dict_query ).distinct('values.' + _filter.value )#
             else:
                 values =  jerboa_collection.find( dict_query ).distinct('values.' + _filter.value )#
-            
+
             values = sorted(values)
 
             #values =  jerboa_collection.find( dict_query ).distinct('values.' + _filter.value )
@@ -238,9 +238,9 @@ class PopulationCharacteristic(object):
 
             # Generate query
 
-            dict_query = {'fingerprint_id':fingerprint_id, 
+            dict_query = {'fingerprint_id':fingerprint_id,
                 'values.Var': chart.title.var,
-                
+
                 }
             if comp:
                 dict_query = {'values.Var': chart.title.var,}
@@ -252,7 +252,7 @@ class PopulationCharacteristic(object):
             values =  jerboa_aggregation_collection.find( dict_query ).distinct('values.' + _filter.value )#
         else:
             values =  jerboa_collection.find( dict_query ).distinct('values.' + _filter.value )#
-        
+
         values = sorted(values)
 
         _filter.values = values
@@ -264,7 +264,7 @@ class PopulationCharacteristic(object):
 
     def get_x_y(self):
         pass
-    
+
     def get_settings(self):
         cc = ConfCharts()
         return cc.get_main_settings()

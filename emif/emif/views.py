@@ -33,6 +33,7 @@ from questionnaire.models import *
 from questionnaire.parsers import *
 from questionnaire.views import *
 from questionnaire.models import *
+
 from searchengine.search_indexes import CoreEngine
 from searchengine.models import Slugs
 import searchengine.search_indexes
@@ -43,6 +44,7 @@ from emif.models import *
 
 from fingerprint.services import *
 from fingerprint.models import *
+from fingerprint.listings import get_databases_from_solr
 
 from api.models import *
 
@@ -340,8 +342,6 @@ def sharedb_activation(request, activation_code, template_name="sharedb_invited.
 
     return activate_user(activation_code, request.user, context = request, template_name=template_name)
 
-def clean_str_exp(s):
-    return s.replace("\n", "|").replace(";", ",").replace("\t", "    ").replace("\r","").replace("^M","")
 
 def export_all_answers(request):
     """

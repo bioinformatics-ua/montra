@@ -208,14 +208,6 @@ class Fingerprint(models.Model):
             name ="Unnamed"
 
         return name
-    def updateQsetFillPercentage(self, questionset):
-        answers = Answer.objects.filter(fingerprint_id=self, question__questionset=questionset)
-
-        (partial, answered, possible) = questionset.findDependantPercentage(answers)
-
-        QuestionSetCompletion.create_or_update(self, questionset, partial, answered, possible)
-
-        self.updateFillFromCache()
 
     def updateFillFromCache(self):
         qsets = QuestionSetCompletion.objects.filter(fingerprint=self)
@@ -293,6 +285,13 @@ class Fingerprint(models.Model):
             print "Error retrieved several models for this questionset, its impossible, so something went very wrong."
 
         return permissions
+
+
+    @staticmethod
+    def getActiveFingerprints(questionnaire_id):
+        return Fingerprint.objects.filter(questionnaire=questionnaire_id, removed=False)
+
+
 
     @staticmethod
     def index_all():
@@ -566,6 +565,7 @@ class QuestionSetCompletion(models.Model):
             qcompletion.fill = fill
             qcompletion.answered = answered
             qcompletion.possible = possible
+
             qcompletion.save()
 
         except QuestionSetCompletion.DoesNotExist:

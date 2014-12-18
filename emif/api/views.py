@@ -1027,13 +1027,13 @@ class SearchSuggestionsView(APIView):
     def get(self, request, *args, **kw):
 
         if request.user.is_authenticated():
-            phrase = request.GET.get('term', '').strip()
+            phrase = request.GET.get('term', '').strip().encode('utf8')
 
             result = []
 
             if len(phrase) > 0:
 
-                solrlink = 'http://' +settings.SOLR_HOST+ ':'+ settings.SOLR_PORT+settings.SOLR_PATH+ '/suggestions/select?q=query_autocomplete:('+urllib.quote(phrase)+')&fq=user_id:'+str(request.user.id)+'&wt=json'
+                solrlink = 'http://' +settings.SOLR_HOST+ ':'+ settings.SOLR_PORT+settings.SOLR_PATH+ '/suggestions/select?q=query_autocomplete:('+urllib.quote(phrase.replace('"',''))+')&fq=user_id:'+str(request.user.id)+'&wt=json'
 
                 facets = json.load(urllib2.urlopen(solrlink))['facet_counts']['facet_fields']['query']
 

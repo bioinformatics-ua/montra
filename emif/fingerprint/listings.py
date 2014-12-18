@@ -94,7 +94,7 @@ def query_solr(request, page=1):
     return HttpResponse(json.dumps(ret), mimetype='application/json')
 
 
-def results_fulltext(request, page=1, full_text=True,template_name='results.html', isAdvanced=False, query_reference=None):
+def results_fulltext(request, page=1, full_text=True,template_name='results.html', isAdvanced=False, query_reference=None, advparams=None):
     query = ""
     in_post = True
     try:
@@ -110,7 +110,7 @@ def results_fulltext(request, page=1, full_text=True,template_name='results.html
         query = "text_t:"+escapeSolrArg(query)
         #print query
 
-    return results_fulltext_aux(request, query, page, template_name, isAdvanced=isAdvanced, query_reference=query_reference)
+    return results_fulltext_aux(request, query, page, template_name, isAdvanced=isAdvanced, query_reference=query_reference, advparams=advparams)
 
 
 def results_fulltext_aux(request, query, page=1, template_name='results.html', isAdvanced=False, force=False, query_reference=None, advparams=None):
@@ -135,8 +135,13 @@ def results_fulltext_aux(request, query, page=1, template_name='results.html', i
     if len(filterString) > 0:
         query_filtered += " AND " + filterString
 
+    try:
+        hlfl = ",".join(advparams)
+    except:
+        hlfl = None
+
     if isAdvanced:
-        (list_databases, hits, hi) = get_databases_from_solr_with_highlight(request, query_filtered, sort=sortString, rows=rows, start=range, hlfl=",".join(advparams))
+        (list_databases, hits, hi) = get_databases_from_solr_with_highlight(request, query_filtered, sort=sortString, rows=rows, start=range, hlfl=hlfl)
     else:
         (list_databases, hits, hi) = get_databases_from_solr_with_highlight(request, query_filtered, sort=sortString, rows=rows, start=range)
 
@@ -276,6 +281,7 @@ def results_diff(request, page=1, template_name='results.html'):
 
 
             request.session['query'] = query
+            request.session['advparams'] = advparams
 
             # We will be saving the query on to the serverside to be able to pull it all together at a later date
             try:
@@ -320,6 +326,7 @@ def results_diff(request, page=1, template_name='results.html'):
 
 
     query = ""
+    advparams=None
     simple_query=None
     in_post = True
     try:
@@ -341,6 +348,7 @@ def results_diff(request, page=1, template_name='results.html'):
         #raise
     if not in_post:
         query = request.session.get('query', "")
+        advparams=request.session.get('advparams', None)
 
     if query == "":
         return render(request, "results.html", {'request': request,
@@ -354,12 +362,12 @@ def results_diff(request, page=1, template_name='results.html'):
             print "try to get in session"
             search_full = request.session.get('search_full', "")
         if search_full == "search_full":
-            return results_fulltext(request, page, full_text=True, isAdvanced=request.session['isAdvanced'], query_reference=simple_query)
+            return results_fulltext(request, page, full_text=True, isAdvanced=request.session['isAdvanced'], query_reference=simple_query, advparams=advparams)
     except:
         raise
     #print "Printing the qexpression"
     #print request.POST['qexpression']
-    return results_fulltext(request, page, full_text=False, isAdvanced=request.session['isAdvanced'], query_reference=simple_query)
+    return results_fulltext(request, page, full_text=False, isAdvanced=request.session['isAdvanced'], query_reference=simple_query, advparams=advparams)
 
 
 def get_databases_from_solr(request, query="*:*"):
@@ -638,6 +646,7 @@ def all_databases_user(request, page=1, template_name='results.html', force=Fals
     # lets clear the geolocation session search filter (if any)
     try:
         del request.session['query']
+        del request.session['advparams']
         del request.session['isAdvanced']
         del request.session['serialized_query']
     except:
@@ -698,6 +707,9 @@ def more_like_that(request, doc_id, mlt_query=None, page=1, template_name='more_
     #first lets clean the query session log
     if 'query' in request.session:
         del request.session['query']
+
+    if 'advparams' in request.session:
+        del request.session['advparams']
 
     if 'isAdvanced' in request.session:
         del request.session['isAdvanced']
@@ -785,7 +797,8 @@ def databases(request, page=1, template_name='results.html', force=False):
      #first lets clean the query session log
     if 'query' in request.session:
         del request.session['query']
-
+    if 'advparams' in request.session:
+        del request.session['advparams']
     if 'isAdvanced' in request.session:
         del request.session['isAdvanced']
 

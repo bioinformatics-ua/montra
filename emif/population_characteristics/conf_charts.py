@@ -19,25 +19,24 @@
 from population_characteristics.charts.operations import *
 from population_characteristics.charts.chart import *
 
+import os
 
+from .utils import JsonChartReader
 
 class ConfCharts(object):
-
     def __init__(self):
         # TODO
         pass
 
     def read_settings_from_file(self):
-        # TODO
-        pass
 
-    """ get the default settings to load
-    """
+        """ get the default settings to load
+        """
+        jr = JsonChartReader()
+
+        return jr.read(os.path.abspath('population_characteristics/chart_config.json'))
 
     def get_main_settings(self):
-
-
-
 
         sc = SetCharst()
 

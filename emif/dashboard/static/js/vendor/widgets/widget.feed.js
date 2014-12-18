@@ -37,18 +37,23 @@ var FeedWidget = function FeedWidget(widgetname, width, height, pos_x, pos_y){
         .done(function(data) {
             if(data.hasfeed){
                 var renderQuestion = function(entry, pos, collapsable, show_icon){
-                    self.content += '<table style="width: 100%;"><tr>';
+                    self.content += '<table style="width: 100%; margin:5px;"><tr>';
 
                     if(entry === undefined){
-                        self.content+="<td><center>There's no history on owned or subscribed database changes.</center></td>";
+                        self.content+='<td><center>There is no history on your databases yet and no changes in your subscribed database. <br /><br /><a id="nohistory" href="javascript:void(0);">Do you know how subscribe databases works ?</a></center></td>';
                     }
                     else {
                         if(show_icon){
                             if(entry.icon === 'edit')
                                 self.content += '<td style="width:30px;"><i class="fa fa-2x fa-pencil"></i></td>';
+                            else if(entry.icon === 'add')
+                                self.content += '<td style="width:30px;"><i class="fa fa-2x fa-plus"></i></td>';
                         }
 
-                        self.content += '<td><a href="fingerprint/'+entry.hash+'/1/">'+entry.name + "</a> updated on "+entry.date +".<br />";
+                        if (entry.revision == 1)
+                            self.content += '<td><a href="fingerprint/'+entry.hash+'/1/">'+entry.name + "</a> created on "+entry.date +".<br />";
+                        else
+                            self.content += '<td><a href="fingerprint/'+entry.hash+'/1/">'+entry.name + "</a> updated on "+entry.date +".<br />";
 
 
                         if(collapsable){
@@ -79,9 +84,9 @@ var FeedWidget = function FeedWidget(widgetname, width, height, pos_x, pos_y){
                         self.content += '</td>';
 
                         if(collapsable)
-                            self.content += '<td style="vertical-align:center;" id="markable'+i+'" class="pull-right markable"><i class="pull-right fa fa-plus"></i></td>';
+                            self.content += '<td style="vertical-align:middle; text-align: right;padding-right: 5px;" id="markable'+i+'" class="markable"><i class="fa fa-angle-right fa-2x"></i></td>';
                     }
-                    self.content +='</tr></table><hr />';
+                    self.content +='</tr></table><hr style="margin: 0px;" />';
                 };
 
                 for(var i=0;i<data.feed.length;i++){
@@ -120,17 +125,34 @@ var FeedWidget = function FeedWidget(widgetname, width, height, pos_x, pos_y){
                 var agg = $('#agg'+openid);
 
                 agg.toggle();
-                var plus = $('#markable'+openid).find('.fa-plus');
+                var plus = $('#markable'+openid).find('.fa-angle-right');
 
                 if(plus.length == 0){
-                    $('#markable'+openid, $(this)).html('<i class="pull-right fa fa-plus">');
+                    $('#markable'+openid, $(this)).html('<i class="pull-right fa fa-angle-right fa-2x">');
                 } else {
-                    $('#markable'+openid, $(this)).html('<i class="pull-right fa fa-minus">');
+                    $('#markable'+openid, $(this)).html('<i class="pull-right fa fa-angle-down fa-2x">');
                 }
 
 
 
             });
+
+            $('#nohistory').popover({
+                'container': 'body',
+                'placement': 'bottom',
+                'html': 'true',
+                'title': 'Database Subscription',
+                'content': '<div style="text-align: justify; text-justify: inter-word;">Sometimes there is interest on a database, and the user would possibly be interested in knowing about new information regarding the database, when it changes. '+
+                '<br /><br />With database subscription is possible to subscribe, allowing in this manner to follow up on any new updates regarding the database.'+
+                '<br /><br />By default, each user is subscribed to all the owned or shared databases.</div>'+
+                '<br /><br />It is possible to subscribe a database, by opening a database, and on the top menu clicking "Subscribe".'+
+                '<br /><br />Subscriptions will be available on the dashboard, under the History widget, but also through the weekly newsletter.',
+
+                'template': '<div class="popover popover-medium"><div class="arrow"></div><div class="popover-inner"><h3 class="popover-title"></h3><div class="popover-content"><p></p></div></div></div>'
+
+            });
+
+
           })
         .fail(function() {
             self.content = ' Error loading Common Actions Widget';

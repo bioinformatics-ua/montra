@@ -342,6 +342,7 @@
         $('.requestanswerbtn', $('#t2_'+sortid)).click(function(e){
             var answer = $(this).data("question");
 
+
             var this_share = bootbox.dialog(
                             '<div style="margin: -10px -10px 10px -10px;" class="modal-header">'+
                             '<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>'+
@@ -374,6 +375,7 @@
                         }
                 }]
             );
+
 
         });
         $('.value_content').mouseover(function(e){
@@ -428,17 +430,10 @@
      self.addClass('hiding_empty');
      self.text('Show Empty');
 
-     // Hide empty
-     $('.value_content').each(function() {
-         if ($(this).text().trim().length == 0) {
-             $(this).parent().addClass('hide_empty_content');
-         }
-     });
-
-     $('.hide_empty_content').parent().parent().each(function() {
-         var visible = self.find('tr:visible').length;
-         if (visible === 1) {
-             $(this).parent().parent().parent().addClass('hide_empty_content');
+     $('.empty').parent().parent().parent().each(function() {
+         var visible = $(this).is(":visible");
+         if (visible === true) {
+             $(this).addClass('hide_empty_content');
          }
      });
  }
@@ -567,6 +562,10 @@
              $('.graphTypes').first().click();
          }
      });
+
+    $('#topnavigator').affix();
+    $('#summarynav').affix();
+
  }
 
  function initAdvSearchPlugin(serialization_query, query_type, query_id) {

@@ -281,6 +281,9 @@
 
 <script type="text/javascript">
 {% block scriptextra %}
+
+$.extend( depmaps, {{depmap|safe}} );
+
 function add_triggers{{ questions_list.0.0.sortid }}() {
 console.log('Adding triggers for qs {{ questions_list.0.0.sortid }}');
 {% for trigger in triggers %}
@@ -376,8 +379,14 @@ $(function(){
         $('#hide_filled_{{questions_list.0.0.sortid}}').click(function(){
             setupHideEmpties({{questions_list.0.0.sortid}}, 'filled');
         });
+
+    $('.answer input,.answer select,.answer textarea', $('#qs_{{questions_list.0.0.sortid}}')).each(function(index){
+        if($(this).attr('type') =='radio'){
+            $('[name="'+$(this).attr('name')+'"]').data('old', $('[name="'+$(this).attr('name')+'"]:checked').val());
+        } else {
+            $(this).data('old', $(this).val());
+        }
+    });
 });
-
-
 {% endblock %}
 </script>
