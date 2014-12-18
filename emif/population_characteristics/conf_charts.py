@@ -18,6 +18,7 @@
 #
 from population_characteristics.charts.operations import *
 from population_characteristics.charts.chart import *
+from questionnaire.models import Questionnaire
 
 import os
 
@@ -34,10 +35,16 @@ class ConfCharts(object):
         """
         jr = JsonChartReader()
 
-        if type == 53:
-            return jr.read(os.path.abspath('population_characteristics/adcohort_config.json'))
-        elif type == 49:
-            return jr.read(os.path.abspath('population_characteristics/observational_config.json'))
+        try:
+            quest = Questionnaire.objects.get(id=type)
+
+            read = jr.read(os.path.abspath('population_characteristics/%d.json' %(type)))
+
+            if read != None:
+                return read
+
+        except Questionnaire.DoesNotExist:
+            return None
 
         # generic, otherwise
         return jr.read(os.path.abspath('population_characteristics/chart_config.json'))

@@ -136,17 +136,20 @@ class JsonChartReader:
         return c
 
     def read(self, path):
-        with open(path) as json_data:
-            d = json.loads(json_data.read())
+        try:
+            with open(path) as json_data:
+                d = json.loads(json_data.read())
 
-            sc = SetCharst()
-            sc.charts = []
+                sc = SetCharst()
+                sc.charts = []
 
-            for entry in d['initial_settings']:
-                c = self.__processChart(entry)
+                for entry in d['initial_settings']:
+                    c = self.__processChart(entry)
 
-                sc.charts.append(c)
+                    sc.charts.append(c)
 
-            json_data.close()
+                json_data.close()
 
-            return sc
+                return sc
+        except IOError:
+            return None
