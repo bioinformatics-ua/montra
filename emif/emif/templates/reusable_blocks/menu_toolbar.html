@@ -619,8 +619,10 @@ function removeShared(ident){
 
   }
 }
+{% if owner_obj %}
 var owner = '{{owner_obj.get_full_name}}';
 var owner_id = {{owner_obj.id}};
+{% endif %}
 function passOwnership(ident, name){
   var ident = parseInt(ident);
   if(ident){
