@@ -249,7 +249,20 @@ class ImportQuestionnaireExcel(ImportQuestionnaire):
                 is_stats=False
                 is_category=True
 
-            question = Question(questionset=questionset, text_en=text_en, number=str(questionNumber),
+            try:
+                question = Question.objects.get(slug_fk=slug_db, questionset=questionset)
+                question.text_en=text_en
+                question.number=str(questionNumber)
+                question.type=dataType_column.value
+                question.help_text=helpText
+                question.stats=True
+                question.category=False
+                question.tooltip=_tooltip
+                question.checks=_checks
+                question.visible_default=visible_default
+
+            except Question.DoesNotExist:
+                question = Question(questionset=questionset, text_en=text_en, number=str(questionNumber),
                                 type=dataType_column.value, help_text=helpText, slug=slug, slug_fk=slug_db, stats=True,
                                 category=False, tooltip=_tooltip, checks=_checks, visible_default=visible_default)
 
@@ -396,9 +409,9 @@ class ImportQuestionnaireExcel(ImportQuestionnaire):
                             self.writeLog(log)
                             raise
 
-                        if not created:
-                            last_question = Question.objects.filter(questionset=questionset).order_by('-id')[0]
-                            qNumber.setState(last_question.number)
+                        #if not created:
+                        #    last_question = Question.objects.filter(questionset=questionset).order_by('-id')[0]
+                        #    qNumber.setState(last_question.number)
 
                     # Type = CATEGORY
                     # Columns required:  Type, Text/Question, Level/Number, Category
