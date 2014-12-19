@@ -435,6 +435,10 @@ $(function(){
     initAdvSearchPlugin('{{request.session.serialization_query}}', '{{request.session.query_type}}', '{{request.session.query_id}}');
     {% endif %}
 
+    if('{{activetab}}' == 'pc'){
+        $('.graphTypes:first').click();
+    }
+
 });
 
 function pushQsets(){

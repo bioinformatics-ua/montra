@@ -138,7 +138,8 @@
          var self = this;
 
          var settings = $.extend({
-            'callback': undefined
+            'callback': undefined,
+            'empty_callback': undefined
         }, options );
 
         var render = __renderTable(c3conf);
@@ -151,6 +152,9 @@
         var trs = $('tbody tr', $(self) );
         if(trs.length == 0){
             $('tbody', $(self) ).html('<tr><td colspan="'+(cv+1)+'"><center>There\'s no data available.</center></td></tr>');
+            if(settings.empty_callback){
+                settings.empty_callback();
+            }
         }else {
             if(settings.callback){
                 settings.callback();
