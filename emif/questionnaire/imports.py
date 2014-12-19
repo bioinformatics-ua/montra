@@ -134,7 +134,7 @@ class ImportQuestionnaireExcel(ImportQuestionnaire):
         '''
         if question.type in ['choice', 'choice-freeform', 'choice-multiple', 'choice-multiple-freeform']:
             choices = Choice.objects.get(question=question).values_list('value', flat=true)
-            print choices
+
             return choices
 
         elif question.type in ['choice-yesno', 'choice-yesnocomment', 'choice-yesnodontknow']:
@@ -287,6 +287,9 @@ class ImportQuestionnaireExcel(ImportQuestionnaire):
                     if (values_list!=None and values_list.value!=None):
                         list_aux = values_list.value.split('|')
                         i = 1
+                        old_choices = Choice.objects.filter(question=question)
+                        old_choices.delete()
+
                         for ch in list_aux:
                             try:
                                 choice = Choice(question=question, sortid=i, text_en=ch, value=ch)
