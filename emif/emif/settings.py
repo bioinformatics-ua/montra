@@ -487,11 +487,13 @@ LOGIN_EXEMPT_URLS = (
 
     r'^docsmanager/docfiles/(?P<fingerprint>[^/]+)/$',
     r'^api/getfile',
+    r'^controlversion/github_event$',
 
 )
 
 #Pages that wont be logged into user history
 DONTLOG_URLS = (
+    r'^controlversion/github_event$',
     r'^fingerprintqs/(?P<runcode>[^/]+)/(?P<qsid>[0-9]+)/$',
     r'^api/(?P<anything>[^/]*)',
     r'^docsmanager/uploadfile/(?P<fingerprint_id>[^/]+)/$',

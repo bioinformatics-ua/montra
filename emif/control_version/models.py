@@ -25,7 +25,59 @@ from django.db import models
 from django.db.models.fields import *
 from django import forms
 
+from emif.utils import send_custom_mail
+from django.conf import settings
+from django.utils import timezone
 
+class OpenBugReportManager(models.Manager):
+    def get_queryset(self):
+        return super(OpenBugReportManager, self).get_queryset().filter(closed=False)
+
+class BugReport(models.Model):
+    # github issue generated
+    issue = models.IntegerField()
+    requester = models.ForeignKey(User)
+    report = models.TextField()
+    create_date = models.DateTimeField(auto_now_add=True)
+    close_date = models.DateTimeField(null=True)
+    closed = models.BooleanField(default=False)
+
+    # Manager that returns only open issues
+    open = OpenBugReportManager()
+
+    @staticmethod
+    def close(issue_number, send_mail=False):
+        try:
+           bugreport = BugReport.open.get(issue=issue_number)
+
+           bugreport.closed = True
+           bugreport.close_date = timezone.now()
+
+
+           if send_mail:
+               send_custom_mail('EMIF Catalogue: Bug Report #%d solved' % (issue_number),
+                """ Dear %s,\n\n
+                    The following bug report:\n
+                    <blockquote>
+                    %s\n
+                    </blockquote>
+                    has been solved by our development team, and will be incorporated in our next scheduled system update.
+                    \n\n
+                    Sincerely,\n
+                    EMIF Catalogue
+                """ % (bugreport.requester.get_full_name(), bugreport.report),
+                settings.DEFAULT_FROM_EMAIL,
+                [bugreport.requester.email])
+
+
+
+           bugreport.save()
+
+        except BugReport.DoesNotExist:
+            pass
+
+    def __str__(self):
+        return self.issue
 
 class BugReportForm(forms.Form):
     NOP = 'Not really a problem'

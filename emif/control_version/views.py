@@ -20,6 +20,11 @@
 
 from django.shortcuts import render
 from control_version.github import report_bug, issues_handler
+from django.http import HttpResponse
+from django.views.decorators.csrf import csrf_exempt
+import json
+
+from control_version.models import BugReport
 
 # Bug Report
 def bug_report(request, template_name='bugreport.html'):
@@ -30,3 +35,22 @@ def list_issues(request, template_name='list_issues.html'):
 
 def list_labels(request, template_name='bugreport.html'):
     return report_bug(request)
+
+@csrf_exempt
+def github_event(request):
+
+    body = json.loads(request.body)
+
+    try:
+        action = body.get('action')
+
+        if action == 'closed':
+            issue = body.get('issue')
+            number = issue['number']
+
+            BugReport.close(number, send_mail=True)
+
+    except KeyError:
+        return HttpResponse('Forbidden', status=403)
+
+    return HttpResponse('')

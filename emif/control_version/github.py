@@ -60,7 +60,12 @@ def report_bug(request):
                 pass
 
             description = description + "\n\nReported by %s, email: %s with: %s" % (name, from_email, browser)
-            issue.create(title, description)
+            newissue = issue.create(title, description)
+
+            if newissue.number != None:
+                br = BugReport(issue=newissue.number, requester=request.user, report=description)
+
+                br.save()
 
             emails_to_feedback = [from_email]
             for k, v in settings.ADMINS:

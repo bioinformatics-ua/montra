@@ -19,11 +19,11 @@
 #
 
 from django.conf.urls import patterns, url
-from control_version.views import * 
+from control_version.views import *
 
 urlpatterns = patterns('api.views',
-    
+
     url(r'^history$', list_issues),
     url(r'^bugreport$', bug_report),
-    
+    url(r'^github_event$', github_event)
 )
