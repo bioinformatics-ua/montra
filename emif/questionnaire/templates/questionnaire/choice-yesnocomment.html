@@ -3,13 +3,12 @@
 <div class="clearfix">
     {% if not readonly %}
     <div class="pull-right">
-        <br />
     <button onclick="clear_selection('question_nr_{{ question.number }}', '{{ question.number }}. {{ question.text|removehs }}');" class="btn btn-small" type="button">Clear Selection</button>
     </div>
     {% endif %}
     <div class="input">
-        <ul class="inputs-list unstyled">
-            
+        <ul class="inputs-list unstyled {%if question.disposition == question.HORIZONTAL %} inline {% endif %}">
+
             <!-- yes -->
             <li>
                 <label>
@@ -27,7 +26,7 @@
             </li>
 
             <!-- don't know -->
-            {% if qdict.hasdontknow %}        
+            {% if qdict.hasdontknow %}
             <li>
                 <label>
                     <input type="radio" id="question_{{ question.number }}_dontknow" name="question_{{ question.number }}" value="dontknow" onClick="valchanged('question_{{ question.number }}', this.value, this);" {% ifequal qdict.value "dontknow" %} checked {% endifequal %} />
@@ -35,7 +34,7 @@
                 </label>
             </li>
             {% endif %}
-            
+
             <!-- comment -->
             {% if qdict.hascomment %}
             <li>

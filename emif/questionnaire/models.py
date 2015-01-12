@@ -346,6 +346,12 @@ class QuestionSetPermissions(models.Model):
 
 class Question(models.Model):
     __metaclass__ = TransMeta
+    VERTICAL = 0
+    HORIZONTAL = 1
+    DISPOSITION_TYPES = (
+        (VERTICAL, 'Vertical'),
+        (HORIZONTAL, 'Horizontal'),
+    )
 
     questionset = models.ForeignKey(QuestionSet)
     number = models.CharField(max_length=255, help_text=
@@ -382,6 +388,7 @@ class Question(models.Model):
     tooltip = models.BooleanField(default=False, help_text="If help text appears in a tooltip")
     visible_default = models.BooleanField(u"Comments visible by default", default=False)
     mlt_ignore = models.BooleanField(u"Ignore on More Like This", default=False)
+    disposition = models.IntegerField(default=VERTICAL, choices=DISPOSITION_TYPES)
 
     def questionnaire(self):
         return self.questionset.questionnaire

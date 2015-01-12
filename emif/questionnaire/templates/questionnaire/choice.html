@@ -10,7 +10,7 @@
     </div>
     {% endif %}
     <div class="input">
-        <ul class="inputs-list unstyled">
+        <ul class="inputs-list unstyled {%if question.disposition == question.HORIZONTAL %} inline {% endif %}">
         {% for sel, choice in qdict.choices %}
             <li>
                 <label>

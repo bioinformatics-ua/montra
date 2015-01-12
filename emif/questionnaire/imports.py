@@ -115,6 +115,12 @@ class ImportQuestionnaireExcel(ImportQuestionnaire):
     def __init__(self, file_path):
         ImportQuestionnaire.__init__(self, file_path)
 
+    def __processDisposition(self, disposition):
+        if disposition == 'horizontal':
+            return 1
+
+        return 0
+
     def __handleQuestion(self, type, row,type_Column, level_number_column, text_question_Column, _questions_rows,
         _choices_array, qNumber, questionset, log, _checks, _debug, questionnaire):
         try:
@@ -197,7 +203,9 @@ class ImportQuestionnaireExcel(ImportQuestionnaire):
 
             question = Question(questionset=questionset, text_en=text_en, number=str(questionNumber),
                                 type=dataType_column.value, help_text=helpText, slug=slug, slug_fk=slug_db, stats=True,
-                                category=False, tooltip=_tooltip, checks=_checks, visible_default=visible_default)
+                                category=False, tooltip=_tooltip,
+                                checks=_checks, visible_default=visible_default,
+                                disposition=self.__processDisposition(row[11].value.lower()))
 
 
             if not _debug:
