@@ -145,11 +145,7 @@
                  <input class="filter_input" id="last_update_filter" type="text" value="{{sort_params.last_update.filter}}" placeholder="Filter">
           </td>
            <td class="table_filter">
-              <select id="type_filter" class="selectpicker" def_value="{{sort_params.type.filter}}">
-                <option value="">None</option>
-                <option value="adcohort">AD Cohort</option>
-                <option value="observationaldatasources">Observational Data</option>
-              </select>
+              {% show_fingerprints_dropdown request.user sort_params %}
           </td>
           <td class="table_filter select_line">
             <div style="text-align: center;">

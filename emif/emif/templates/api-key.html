@@ -57,23 +57,23 @@
             <th class="sorter-institution sorter {%if "icon-minus" not in sort_params.institution.icon %}selected-sorter{% endif %}"  onclick="a.onClick('institution', '{{sort_params.institution.next}}');">
             <div class="pull-left">Institution Name</div>
                  <div class="pull-right"><i class="{{sort_params.institution.icon}}"></i></div>
-            </th>            
-            <!--<th>Creation Date</th>-->            
+            </th>
+            <!--<th>Creation Date</th>-->
             <th class="sorter-location sorter {%if "icon-minus" not in sort_params.location.icon %}selected-sorter{% endif %}" onclick="a.onClick('location', '{{sort_params.location.next}}');">
                 <div class="pull-left">Location</div>
-                <div class="pull-right"><i class="{{sort_params.location.icon}}"></i></div> 
-            </th>             
+                <div class="pull-right"><i class="{{sort_params.location.icon}}"></i></div>
+            </th>
             <th class="sorter-nrpatients sorter {%if "icon-minus" not in sort_params.nrpatients.icon %}selected-sorter{% endif %}" onclick="a.onClick('nrpatients', '{{sort_params.nrpatients.next}}');">
                 <div class="pull-left">Nr. Patients</div>
-                <div class="pull-right"><i class="{{sort_params.nrpatients.icon}}"></i></div> 
-            </th>            
+                <div class="pull-right"><i class="{{sort_params.nrpatients.icon}}"></i></div>
+            </th>
             <th class="sorter-lastupdate sorter {%if "icon-minus" not in sort_params.last_update.icon %}selected-sorter{% endif %}" onclick="a.onClick('last_update', '{{sort_params.last_update.next}}');">
             <div class="pull-left">Last update</div>
-                <div class="pull-right"><i class="{{sort_params.last_update.icon}}"></i></div> 
+                <div class="pull-right"><i class="{{sort_params.last_update.icon}}"></i></div>
             </th>
             <th class="sorter-type sorter {%if "icon-minus" not in sort_params.type.icon %}selected-sorter{% endif %}" onclick="a.onClick('type', '{{sort_params.type.next}}');">
             <div class="pull-left">Type</div>
-              <div class="pull-right"><i class="{{sort_params.type.icon}}"></i></div> 
+              <div class="pull-right"><i class="{{sort_params.type.icon}}"></i></div>
             </th>
         </tr>
          <tr>
@@ -93,11 +93,7 @@
                  <input class="filter_input" id="last_update_filter" type="text" value="{{sort_params.last_update.filter}}" placeholder="Filter">
           </td>
            <td class="table_filter">
-              <select id="type_filter" class="selectpicker" def_value="{{sort_params.type.filter}}">
-                <option value="">None</option>
-                <option value="adcohort">AD Cohort</option>
-                <option value="observationaldatasources">Observational Data Sources</option>
-              </select>
+              {% show_fingerprints_dropdown request.user sort_params %}
           </td>
         </tr>
     </thead>
@@ -140,16 +136,16 @@
         a = new PaginatorSorter("table_databases", '{{sort_params.base_filter}}', '{{sort_params.selected_name}}', '{{sort_params.selected_value}}');
    });
     </script>
-    
+
     {% include "reusable_blocks/post_paginator.html" %}
 
     {% else %}
     <p><strong>Info: </strong> Currently, there are no databases in your account. You can add new ones through the
         option "Databases -> New"</p>
     {% endif %}
-    <form id="send2" method="POST" > 
+    <form id="send2" method="POST" >
       <input id="page" type="hidden" name="page" value="{{page}}"></input>
-      <input id="s" type="hidden" name="s" value=""></input>  
+      <input id="s" type="hidden" name="s" value=""></input>
     {% csrf_token %}
     </form>
 
