@@ -131,7 +131,7 @@ class ExportQuestionnaireExcel(ExportQuestionnaire):
 
     __validatecstate = DataValidation(type="list", formula1='"visible"', allow_blank=True)
 
-    __validatedisp = DataValidation(type="list", formula1='"vertical, horizontal"', allow_blank=True)
+    __validatedisp = DataValidation(type="list", formula1='"vertical, horizontal, dropdown"', allow_blank=True)
 
 
     def __init__(self, questionnaire, file_path):
@@ -226,6 +226,9 @@ class ExportQuestionnaireExcel(ExportQuestionnaire):
             return 'vertical'
         elif disposition == 1:
             return 'horizontal'
+
+        elif disposition == 2:
+            return 'dropdown'
 
         return ''
 

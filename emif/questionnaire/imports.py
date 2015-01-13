@@ -118,6 +118,8 @@ class ImportQuestionnaireExcel(ImportQuestionnaire):
     def __processDisposition(self, disposition):
         if disposition == 'horizontal':
             return 1
+        elif disposition == 'dropdown':
+            return 2
 
         return 0
 

@@ -1,40 +1,50 @@
 {% load i18n %}
 {% load extra_tags %}
 <div class="clearfix">
+    <div class="input">
+        {% if question.disposition == question.DROPDOWN %}
+        <select id="question_{{ question.number }}" class="span6" onChange="valchanged('question_{{ question.number }}', this.value, this);" name="question_{{ question.number }}">
+            <option></option>
+            <option value="yes" {% ifequal qdict.value "yes" %} selected="true" {% endifequal %} id="question_{{ question.number }}_yes">Yes</option>
+            <option {% ifequal qdict.value "no" %} selected="true" {% endifequal %}  value="no" id="question_{{ question.number }}_no">No</option>
+            {% if qdict.hasdontknow %}
+            <option {% ifequal qdict.value "dontknow" %} selected="true" {% endifequal %}  value="dontknow" id="question_{{ question.number }}_dontknow">Don't Know</option>
+            {%endif%}
+        </select>
+        {% else %}
     {% if not readonly %}
     <div class="pull-right">
     <button onclick="clear_selection('question_nr_{{ question.number }}', '{{ question.number }}. {{ question.text|removehs }}');" class="btn btn-small" type="button">Clear Selection</button>
     </div>
     {% endif %}
-    <div class="input">
-        <ul class="inputs-list unstyled {%if question.disposition == question.HORIZONTAL %} inline {% endif %}">
+            <ul class="inputs-list unstyled {%if question.disposition == question.HORIZONTAL %} inline {% endif %}">
 
-            <!-- yes -->
-            <li>
-                <label>
-                    <input type="radio" id="question_{{ question.number }}_yes" name="question_{{ question.number }}" value="yes" onClick="valchanged('question_{{ question.number }}', this.value, this);" {% ifequal qdict.value "yes" %} checked{% endifequal %} />
-                    <span>{% trans "Yes" %}</span>
-                </label>
-            </li>
+                <!-- yes -->
+                <li>
+                    <label>
+                        <input type="radio" id="question_{{ question.number }}_yes" name="question_{{ question.number }}" value="yes" onClick="valchanged('question_{{ question.number }}', this.value, this);" {% ifequal qdict.value "yes" %} checked{% endifequal %} />
+                        <span>{% trans "Yes" %}</span>
+                    </label>
+                </li>
 
-            <!-- no -->
-            <li>
-                <label>
-                    <input type="radio" id="question_{{ question.number }}_no" name="question_{{ question.number }}" value="no" onClick="valchanged('question_{{ question.number }}', this.value, this);" {% ifequal qdict.value "no" %} checked {% endifequal %} />
-                    <span>{% trans "No" %}</span>
-                </label>
-            </li>
+                <!-- no -->
+                <li>
+                    <label>
+                        <input type="radio" id="question_{{ question.number }}_no" name="question_{{ question.number }}" value="no" onClick="valchanged('question_{{ question.number }}', this.value, this);" {% ifequal qdict.value "no" %} checked {% endifequal %} />
+                        <span>{% trans "No" %}</span>
+                    </label>
+                </li>
 
-            <!-- don't know -->
-            {% if qdict.hasdontknow %}
-            <li>
-                <label>
-                    <input type="radio" id="question_{{ question.number }}_dontknow" name="question_{{ question.number }}" value="dontknow" onClick="valchanged('question_{{ question.number }}', this.value, this);" {% ifequal qdict.value "dontknow" %} checked {% endifequal %} />
-                    <span>{% trans "Don't Know" %}</span>
-                </label>
-            </li>
+                <!-- don't know -->
+                {% if qdict.hasdontknow %}
+                <li>
+                    <label>
+                        <input type="radio" id="question_{{ question.number }}_dontknow" name="question_{{ question.number }}" value="dontknow" onClick="valchanged('question_{{ question.number }}', this.value, this);" {% ifequal qdict.value "dontknow" %} checked {% endifequal %} />
+                        <span>{% trans "Don't Know" %}</span>
+                    </label>
+                </li>
+                {% endif %}
             {% endif %}
-
             <!-- comment -->
             {% if qdict.hascomment %}
             <li>

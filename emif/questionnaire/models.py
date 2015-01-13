@@ -348,9 +348,12 @@ class Question(models.Model):
     __metaclass__ = TransMeta
     VERTICAL = 0
     HORIZONTAL = 1
+    DROPDOWN = 2
+
     DISPOSITION_TYPES = (
         (VERTICAL, 'Vertical'),
         (HORIZONTAL, 'Horizontal'),
+        (DROPDOWN, 'Dropdown')
     )
 
     questionset = models.ForeignKey(QuestionSet)
