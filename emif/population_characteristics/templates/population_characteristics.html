@@ -160,6 +160,22 @@
             </ul>
             <div class="tab-content">
               <div class="tab-pane active" id="chartview">
+                    <div style="display: none;" class="exportmychart fullwidth clearfix">
+                    <div style="margin-bottom: 5px;" class="pull-right btn-group">
+                        <a class="btn dropdown-toggle" data-toggle="dropdown" href="javascript: void(0)">
+                        <i class="fa fa-upload"></i>
+                        &nbsp;Export
+                        <span class="caret"></span>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li>
+                                <a id="downloadpng" onclick="generatePdf();">
+                                As PNG
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                    </div>
                 <div id='pc_chart_place'>
                 </div>
               </div>
@@ -172,8 +188,7 @@
 
             {%if owner_fingerprint and not compare or request.user.is_superuser  and not compare %}
                 <div style="margin-left:0px;" class="span12">
-                <button id="downloadpng" onclick="generatePdf();">Download pdf</button>
-                <canvas style="position: absolute; left:-9999px;top: -9999px;" class="preview-pane"></canvas>
+                <canvas style="background-color: white; position:absolute; left:-9999px; top: -9999px;" class="preview-pane"></canvas>
                 <div id='pc_comments_placeholder' class="span12 pc_comment">
                 </div>
                 <div style="margin-left:0px;" id="pc_comment_id" class="span12 pc_comment">

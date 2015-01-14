@@ -586,9 +586,11 @@ function GraphicChartC3D3(divArg, dataArg)
               /*legend.append('span').attr('data-id', row).attr('data-opacity', '1').attr('style', 'cursor: pointer;').html(
                 '<div style="display: inline-block; width: 10px; height: 10px; margin-left: 20px;" class="color_container"></div>&nbsp;'+row);*/
 
-              $('.legend').html($('.legend').html()+'<g transform="translate(-'+place+',0)"><text font-size="10" x="15" y="9">'+row+
-                '</text><rect class="color_container" style="cursor: pointer;" data-opacity="1" data-id="'+
-                row+'" width="10" height="10" /></g>');
+              var g = d3.select('.legend').insert('g').attr('transform','translate(-'+place+',0)');
+
+              g.insert('text').attr('font-size',"10").attr('x',"15").attr('y', '9').text(row);
+              g.insert('rect').attr('class', 'color_container').attr('style', "cursor: pointer;")
+              .attr('data-opacity', "1").attr('data-id', row).attr('width', '10').attr('height', '10');
 
               place=$('.legend g:last text').width()+30+place;
             };
@@ -604,7 +606,6 @@ function GraphicChartC3D3(divArg, dataArg)
             }
 
     }
-
     d3.selectAll('.legend .color_container')
     .each(function () {
         var id = d3.select(this).attr('data-id');
@@ -640,6 +641,10 @@ function GraphicChartC3D3(divArg, dataArg)
 
         chart.toggle(id);
     });
+
+    if(!!window.HTMLCanvasElement){
+      $('.exportmychart').show();
+    }
 
    };
 };

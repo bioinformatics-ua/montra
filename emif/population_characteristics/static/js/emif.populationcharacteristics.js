@@ -679,20 +679,20 @@ function generatePdf(){
        // Copy CSS styles to Canvas
 
        // Remove all defs, which botch PNG output
-       //$('defs', $('#pc_chart_clone')).remove();
+       //$('defs', $('#pc_chart_place')).remove();
 
        inlineAllStyles($('#pc_chart_place'));
        // Create PNG image
        var canvas = $('.preview-pane').empty()[0];
-       canvas.width = $('#pc_chart_place').width() * 2;
-       canvas.height = $('#pc_chart_place').height() * 2;
+       canvas.width = $('#pc_chart_place').width();
+       canvas.height = $('#pc_chart_place').height();
 
        var canvasContext = canvas.getContext('2d');
-       var svg = $.trim($('#pc_chart_place').html());
+       var svg = $.trim($('#pc_chart_place svg').prop('outerHTML'));
        canvasContext.drawSvg(svg, 0, 0);
        $("#downloadpng").attr("href", canvas.toDataURL("png"))
            .attr("download", function() {
-               return "_llamacharts.png";
+               return db_name + " - " +$('#pctitle').text();
         });
 }
 var styles;
@@ -726,13 +726,13 @@ var styles;
                    // $(selector).hide();
                    $(selector).not($('.c3-chart path')).css(styles);
                }
-               $('.c3-chart path', context)
+               $('.c3-chart path')
                    .filter(function() {
                        return $(this).css('fill') === 'none';
                    })
                    .attr('fill', 'none');
 
-               $('.c3-chart path', context)
+               $('.c3-chart path')
                    .filter(function() {
                        return !$(this).css('fill') === 'none';
                    })
