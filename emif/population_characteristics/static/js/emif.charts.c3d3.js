@@ -582,7 +582,7 @@ function GraphicChartC3D3(divArg, dataArg)
 
     $('#pc_tabular_place').c3js_to_tabular(chartConfigs, {
       empty_callback: function(){
-        $('#pc_chart_place').html("<center><h4>There's no data available.</h4></center>");
+        $('#pc_chart_place').html("<center><h4>There is no data available.</h4></center>");
         $('#comment_place').hide();
       },
       callback: function(){
