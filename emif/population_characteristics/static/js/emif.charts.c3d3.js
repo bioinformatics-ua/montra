@@ -540,7 +540,7 @@ function GraphicChartC3D3(divArg, dataArg)
               g.insert('rect').attr('class', 'color_container').attr('style', "cursor: pointer;")
               .attr('data-opacity', "1").attr('data-id', row).attr('width', '10').attr('height', '10');
 
-              place=$('.legend g:last text').width()+30+place;
+              place=(10*(row.length-1))+30+place;
             };
 
             if(row.toLowerCase() == 't'){

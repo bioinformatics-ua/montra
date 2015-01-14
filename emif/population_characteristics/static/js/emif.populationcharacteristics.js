@@ -672,7 +672,7 @@ $(document).ready(
 
 );
 
-function generatePdf(){
+function generatePng(){
        // Zoom! Enhance!
        // $('#chart > svg').attr('transform', 'scale(2)');
 
@@ -684,12 +684,12 @@ function generatePdf(){
        inlineAllStyles($('#pc_chart_place'));
        // Create PNG image
        var canvas = $('.preview-pane').empty()[0];
-       canvas.width = $('#pc_chart_place').width();
-       canvas.height = $('#pc_chart_place').height();
+       canvas.width = $('#pc_chart_place').width()*1.8;
+       canvas.height = $('#pc_chart_place').height()*1.8;
 
        var canvasContext = canvas.getContext('2d');
        var svg = $.trim($('#pc_chart_place svg').prop('outerHTML'));
-       canvasContext.drawSvg(svg, 0, 0);
+       canvasContext.drawSvg(svg, 0, 0,canvas.width, canvas.height);
        $("#downloadpng").attr("href", canvas.toDataURL("png"))
            .attr("download", function() {
                return db_name + " - " +$('#pctitle').text();
@@ -708,6 +708,17 @@ function generateSvg(){
            .attr("download", function() {
                return db_name + " - " +$('#pctitle').text()+'.svg';
         });
+}
+function generatePdf(){
+  generatePng();
+
+  var doc = new jsPDF('l', 'pt', 'a4');
+  var canvas = $('.preview-pane');
+  doc.setFontSize(20);
+  doc.text(35, 65, db_name + " - " +$('#pctitle').text());
+  doc.addImage($("#downloadpng").attr('href'), 'png', 15, 90, 750, 376);
+
+  doc.save(db_name + " - " +$('#pctitle').text()+'.pdf');
 }
 var styles;
    var inlineAllStyles = function(context) {
