@@ -51,7 +51,7 @@ text-decoration: none;
 
 
 <script src="{{ STATIC_URL}}questionset.js"></script>
-<script src="{{ STATIC_URL}}js/vendor/threadpool.js"></script>
+<script src="{{ STATIC_URL}}js/vendor/taskqueuer.js"></script>
 <script src="{{ STATIC_URL}}js/vendor/bootstrap-tooltip.js"></script>
 <script src="{{ STATIC_URL}}js/vendor/bootstrap-popover.js"></script>
 <script src="{{ STATIC_URL}}js/fingerprint_validation.js"></script>
@@ -129,28 +129,28 @@ text-decoration: none;
             <input type="hidden" name="qid" value="{{q_id}}" />
                     <div id="set_container">
                     </div>
-                    
+
         </form>
         </div>
-    
+
 </div>
        <div id="bool_container"></div>
 {% endblock %}
 
 {% block scriptextra %}
-var parts_missing = 0;    
+var parts_missing = 0;
 
 function add_triggers() {
-            
+
             console.log("adding triggers");
             {% for trigger in triggers %}
                 addtrigger("{{trigger}}");
             {% endfor %}
-            
+
             {% for k,v in qvalues.items %}
                 qvalues['{{ k|escapejs }}'] = '{{ v|escapejs }}';
             {% endfor %}
-            
+
             for(key in qvalues) {
                 valchanged(key, qvalues[key], this);
             }
@@ -202,7 +202,7 @@ $( document ).ready(function(e) {
 
                             if(list_invalid.length == 0){
                               // Update hidden inputs (in case they are not updated because we are using the other buttons not in control by the plugin)
-                              bool_container.readyToSubmit(); 
+                              bool_container.readyToSubmit();
 
 
                             } else {
@@ -219,29 +219,29 @@ $( document ).ready(function(e) {
           // jump to first problem
           errornavigator.nextError();
 
-        
+
 
                               return false;
                             }
                             }
-                    }     
+                    }
         );
     }
-    
+
     {% if aqid %}
       initQsEnv("{{q_id}}", "{{questionset.sortid}}", "{{aqid}}", QsType.SEARCH);
     {% else %}
       initQsEnv("{{q_id}}", "{{questionset.sortid}}", null, QsType.SEARCH);
     {% endif %}
 });
-function initialCounterSetup(){ 
+function initialCounterSetup(){
   // currently we are not showing any counters on search, may change in the future
 }
 var threads = {};
 function load_questionnary(){
 
         console.log("Creating questionnary set containers (so they are in order)");
-        
+
         var containers = [];
 
         // We build the qs containers in memory and just do dom op, on the end, for speed
@@ -252,8 +252,8 @@ function load_questionnary(){
 
         $('#set_container').append(containers.join(''));
 
-        console.log( "Loading questionnary by parts, we have {{questionset.questionnaire.questionsets.count}} sets");  
-        
+        console.log( "Loading questionnary by parts, we have {{questionset.questionnaire.questionsets.count}} sets");
+
         var threadpool = new ThreadPool(20);
         parts_missing = {{ questionset.questionnaire.questionsets.count }};
 

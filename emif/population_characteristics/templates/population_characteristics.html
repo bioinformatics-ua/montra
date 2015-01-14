@@ -182,6 +182,7 @@
                     </div>
                     </div>
                 <div id='pc_chart_place'>
+                    <center><h4>Loading...</h4></center>
                 </div>
               </div>
               <div class="tab-pane" id="tabularview">
@@ -190,10 +191,12 @@
               </div>
             </div>
 
+			<canvas style="background-color: white; position:absolute; left:-9999px; top: -9999px;" class="preview-pane"></canvas>
 
             {%if owner_fingerprint and not compare or request.user.is_superuser  and not compare %}
-                <div style="margin-left:0px;" class="span12">
-                <canvas style="background-color: white; position:absolute; left:-9999px; top: -9999px;" class="preview-pane"></canvas>
+                <div id="comment_place" style="margin-left:0px; display: none;" class="span12">
+
+
                 <div id='pc_comments_placeholder' class="span12 pc_comment">
                 </div>
                 <div style="margin-left:0px;" id="pc_comment_id" class="span12 pc_comment">

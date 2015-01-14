@@ -197,6 +197,8 @@ function GraphicChartC3D3(divArg, dataArg)
   *
   */
   this.draw = function(div, dataset){
+    $('#comment_place').show();
+
     var findMin = function(possibilities, start){
       var pointer = 0;
       var max = possibilities.length;
@@ -496,60 +498,6 @@ function GraphicChartC3D3(divArg, dataArg)
 
     chartConfigs.zoom.rescale = true;
 
-
-    $('#pc_tabular_place').c3js_to_tabular(chartConfigs, {
-      callback: function(){
-        var base = $('#base_link').attr('href');
-
-        old_table = $('#pc_tabular_place table').dataTable();
-
-        var initializeTableTools = function(){
-            var title = db_name + " - " +$('#pctitle').text();
-            title = title.replace(/\//g, "");
-            var tableTools = new $.fn.dataTable.TableTools( old_table, {
-                "aButtons": [
-                {
-                    "sExtends": 'collection',
-                    "sButtonText": '<i class="fa fa-upload"></i> Export &nbsp;<span class="caret" />',
-                    "aButtons": [
-                        {
-                            sExtends: 'csv',
-                            sButtonText: '<i class="fa fa-file-excel-o"></i>&nbsp; CSV',
-                            sFileName: title+'.csv',
-                            sTitle: title,
-                            mColumns: 'visible',
-                            bSelectedOnly: true
-                        },
-                        {
-                            sButtonText: '<i class="fa fa-file-pdf-o"></i>&nbsp; PDF',
-                            sExtends: 'pdf',
-                            mColumns: 'visible',
-                            sTitle: title,
-                            sFileName: title+'.pdf',
-                            bSelectedOnly: true
-                        },
-                        {
-                            sButtonText: '<i class="fa fa-print"></i>&nbsp; Print',
-                            sExtends: 'print',
-                            mColumns: 'visible',
-                            sTitle: title,
-                            bSelectedOnly: true
-                        }
-                    ]
-                }],
-                    "sSwfPath": base+"static/swf/copy_csv_xls_pdf.swf"
-            } );
-
-            $('#export_btns').html(tableTools.fnContainer());
-        }
-        var tlink = $('#tabularlink');
-
-        $('#pc_tabular_place').on( "refresh_tabular", function( e ) {
-          initializeTableTools();
-        });
-
-      }
-    });
     chartConfigs.padding.bottom = 5
 
 
@@ -642,10 +590,68 @@ function GraphicChartC3D3(divArg, dataArg)
         chart.toggle(id);
     });
 
+
     if(!!window.HTMLCanvasElement){
       $('.exportmychart').show();
     }
 
+    $('#pc_tabular_place').c3js_to_tabular(chartConfigs, {
+      empty_callback: function(){
+        $('#pc_chart_place').html("<center><h4>There is no data available.</h4></center>");
+        $('#comment_place').hide();
+      },
+      callback: function(){
+        var base = $('#base_link').attr('href');
+
+        old_table = $('#pc_tabular_place table').dataTable();
+
+        var initializeTableTools = function(){
+            var title = db_name + " - " +$('#pctitle').text();
+            title = title.replace(/\//g, "");
+            var tableTools = new $.fn.dataTable.TableTools( old_table, {
+                "aButtons": [
+                {
+                    "sExtends": 'collection',
+                    "sButtonText": '<i class="fa fa-upload"></i> Export &nbsp;<span class="caret" />',
+                    "aButtons": [
+                        {
+                            sExtends: 'csv',
+                            sButtonText: '<i class="fa fa-file-excel-o"></i>&nbsp; CSV',
+                            sFileName: title+'.csv',
+                            sTitle: title,
+                            mColumns: 'visible',
+                            bSelectedOnly: true
+                        },
+                        {
+                            sButtonText: '<i class="fa fa-file-pdf-o"></i>&nbsp; PDF',
+                            sExtends: 'pdf',
+                            mColumns: 'visible',
+                            sTitle: title,
+                            sFileName: title+'.pdf',
+                            bSelectedOnly: true
+                        },
+                        {
+                            sButtonText: '<i class="fa fa-print"></i>&nbsp; Print',
+                            sExtends: 'print',
+                            mColumns: 'visible',
+                            sTitle: title,
+                            bSelectedOnly: true
+                        }
+                    ]
+                }],
+                    "sSwfPath": base+"static/swf/copy_csv_xls_pdf.swf"
+            } );
+
+            $('#export_btns').html(tableTools.fnContainer());
+        }
+        var tlink = $('#tabularlink');
+
+        $('#pc_tabular_place').on( "refresh_tabular", function( e ) {
+          initializeTableTools();
+        });
+
+      }
+    });
    };
 };
 
