@@ -151,7 +151,7 @@
 
         var trs = $('tbody tr', $(self) );
         if(trs.length == 0){
-            $('tbody', $(self) ).html('<tr><td colspan="'+(cv+1)+'"><center>There\'s no data available.</center></td></tr>');
+            $('tbody', $(self) ).html('<tr><td colspan="'+(cv+1)+'"><center>There is no data available.</center></td></tr>');
             if(settings.empty_callback){
                 settings.empty_callback();
             }
