@@ -250,7 +250,8 @@ class ImportQuestionnaireExcel(ImportQuestionnaire):
                 is_category=True
 
             try:
-                question = Question.objects.get(slug_fk=slug_db, questionset=questionset)
+                question = Question.objects.get(slug_fk__slug1=slug_db.slug1, questionset=questionset)
+
                 question.text_en=text_en
                 question.number=str(questionNumber)
                 question.type=dataType_column.value
