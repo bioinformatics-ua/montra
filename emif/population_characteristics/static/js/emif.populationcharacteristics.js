@@ -695,6 +695,20 @@ function generatePdf(){
                return db_name + " - " +$('#pctitle').text();
         });
 }
+function generateSvg(){
+       inlineAllStyles($('#pc_chart_place'));
+
+       var svg = $.trim($('#pc_chart_place svg').prop('outerHTML'));
+
+       var data = new Blob([svg], {type: 'image/svg+xml'});
+
+       var svgfile = window.URL.createObjectURL(data);
+
+       $("#downloadsvg").attr("href", svgfile)
+           .attr("download", function() {
+               return db_name + " - " +$('#pctitle').text()+'.svg';
+        });
+}
 var styles;
    var inlineAllStyles = function(context) {
        var chartStyle, selector;
