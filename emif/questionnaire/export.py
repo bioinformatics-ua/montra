@@ -306,8 +306,9 @@ class ExportQuestionnaireExcel(ExportQuestionnaire):
 
             ws.append(['QuestionSet', questionset.text_en.replace('h1. ',''),
                         questionset.sortid, '', '', questionset.help_text.replace('<br />', '\n'),
-                        self.__boolean_to_string(questionset.tooltip), '',
+                        self.__boolean_to_string(questionset.tooltip), questionset.heading,
                         '', '', '','' ])
+
 
             for row in ws.iter_rows('A'+str(pointer)+":k"+str(pointer)):
                 for cell in row:

@@ -352,13 +352,7 @@
         {% compress js %}
         <!-- /container -->
         <script src="{{ STATIC_URL }}js/main.js"></script>
-        <!-- backbone -->
-        {% comment %}
-        <script type="text/javascript" src="{{ STATIC_URL }}contrib/backbone/ICanHaz.min.js"></script>
-        <script type="text/javascript" src="{{ STATIC_URL }}contrib/backbone/json2.js"></script>
-        <script type="text/javascript" src="{{ STATIC_URL }}contrib/backbone/underscore-min.js"></script>
-        <script type="text/javascript" src="{{ STATIC_URL }}contrib/backbone/backbone-min.js"></script>
-        {% endcomment %}
+
         {% block scriptextraincludes %}
         {% endblock %}
         <script type="text/javascript">

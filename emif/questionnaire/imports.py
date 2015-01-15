@@ -43,7 +43,7 @@ class ImportQuestionnaire(object):
     def __init__(self, file_path):
         self.file_path = file_path
 
-    def import_questionnaire(self):
+    def import_questionnaire(self, merge=None):
         raise NotImplementedError("Please Implement this method")
 
     def writeLog(self, log):
@@ -54,26 +54,6 @@ class ImportQuestionnaire(object):
 
     def get_slug(self, slug, questionnaire):
         return next_free_slug(slug, create=False, scope=questionnaire)
-        # slugs_objs = Slugs.objects.filter(slug1=slug)
-        # slug_aux = None
-        # if (len(slugs_objs)>0):
-        #     slug_aux=slugs_objs[0]
-        # else:
-        #     return slug
-        # slug_name_final = ""
-        # slug_arr = slug_aux.slug1.split("_")
-        # if len(slug_arr)>0:
-        #     if (slug_arr[len(slug_arr)-1].isdigit()):
-        #         slug_number = int(slug_arr[len(slug_arr)-1]) + 1
-        #         slug_arr[len(slug_arr)-1] = str(slug_number)
-        #         slug_name_final = "_".join(slug_arr)
-
-        #     else:
-        #         slug_name_final = slug_aux.slug1 + "_0"
-        # else:
-        #     slug_name_final = slug_aux.slug1 + "_0"
-
-        # return slug_name_final
 
     def format_number(self, number):
         # print number
@@ -115,6 +95,7 @@ class ImportQuestionnaireExcel(ImportQuestionnaire):
     def __init__(self, file_path):
         ImportQuestionnaire.__init__(self, file_path)
 
+
     def __processDisposition(self, disposition):
         if disposition == 'horizontal':
             return 1
@@ -123,11 +104,66 @@ class ImportQuestionnaireExcel(ImportQuestionnaire):
 
         return 0
 
+    def __handleQuestionNumber(self, level, qNumber, questionset):
+        questionNumber = None
+
+        if level.startswith('h'):
+            questionNumber = qNumber.getNumber(level)
+            questionNumber = self.format_number(str(questionNumber))
+
+        else:
+            questionNumber = level
+
+            pos = level.split('.')
+            poslen = len(pos)
+
+            for question in questionset.questions():
+                this_q = question.number.split('.')
+
+                if poslen == len(this_q):
+
+                    if pos[poslen-1] <= this_q[poslen-1]:
+                        n = int(this_q[poslen-1])+1
+                        if n < 10:
+                            this_q[poslen-1] = '0'+str(n)
+                        else:
+                            this_q[poslen-1] = str(n)
+
+                        question.number = ".".join(this_q)
+                        question.save()
+
+            #raise Exception('STOP THERE')
+
+        return questionNumber
+
+
+    def __getChoices(self, question):
+        ''' Gets the choices_array from a question back into an choices_array.
+            Useful on merge operation that point dependencies to questions already on the database
+        '''
+        if question.type in ['choice', 'choice-freeform', 'choice-multiple', 'choice-multiple-freeform']:
+            choices = Choice.objects.get(question=question).values_list('value', flat=true)
+
+            return choices
+
+        elif question.type in ['choice-yesno', 'choice-yesnocomment', 'choice-yesnodontknow']:
+            return ['yes', 'no', 'dontknow']
+
+        return []
+
+
     def __handleQuestion(self, type, row,type_Column, level_number_column, text_question_Column, _questions_rows,
         _choices_array, qNumber, questionset, log, _checks, _debug, questionnaire):
         try:
             slug = None
-            text_en = str(level_number_column.value) + '. ' + str(text_question_Column.value)
+            text_en = None
+            if level_number_column.value.startswith('h'):
+                text_en = str(level_number_column.value) + '. ' + str(text_question_Column.value)
+            else:
+                level = len(level_number_column.value.split('.'))-1
+
+                text_en = 'h%s. %s' % (str(level),str(text_question_Column.value))
+
 
             dataType_column = None
             if type == self.CATEGORY:
@@ -158,18 +194,38 @@ class ImportQuestionnaireExcel(ImportQuestionnaire):
                 try:
                     dependencies_list = row[8]
                     list_dep_aux = dependencies_list.value.split('|')
-                    question_num_parent = _questions_rows.get(list_dep_aux[0])
+                    question_num_parent = None
+                    try:
+                        question_num_parent = _questions_rows.get(list_dep_aux[0]).number
+                    except AttributeError:
+                        ''' If this is a merge, the dependant question can already be on the questionset,
+                            lets try looking for it
+                        '''
+                        try:
+                            question = Question.objects.get(slug_fk__slug1=list_dep_aux[0],
+                                questionset=questionset)
+                            _questions_rows[list_dep_aux[0]] = question_num_parent
+
+                            question_num_parent = question.number
+
+                            _choices_array[list_dep_aux[0]] = self.__getChoices(question)
+
+                        except Question.DoesNotExist:
+                            raise Exception('The dependant with slug %s does not exist.' %(list_dep_aux[0]))
+
+
+
 
                     index_aux = int(str(list_dep_aux[1]))-1
                     choice_parent_list = _choices_array.get(list_dep_aux[0])
                     choice_parent = choice_parent_list[index_aux]
-                    _checks = 'dependent=\"' + str(question_num_parent) + ',' + str(choice_parent) + '\"'
+                    _checks = 'dependent=\"%s,%s\"' % (str(question_num_parent), str(choice_parent))
                 except:
                     raise
 
             try:
-                questionNumber = qNumber.getNumber(level_number_column.value)
-                questionNumber = self.format_number(str(questionNumber))
+                questionNumber = self.__handleQuestionNumber(level_number_column.value, qNumber, questionset)
+
             except:
                 if type==self.QUESTION:
                     log += "\n%s - Error to create question number %s" % (type_Column.row, text_en)
@@ -203,7 +259,21 @@ class ImportQuestionnaireExcel(ImportQuestionnaire):
                 is_stats=False
                 is_category=True
 
-            question = Question(questionset=questionset, text_en=text_en, number=str(questionNumber),
+            try:
+                question = Question.objects.get(slug_fk__slug1=slug_db.slug1, questionset=questionset)
+
+                question.text_en=text_en
+                question.number=str(questionNumber)
+                question.type=dataType_column.value
+                question.help_text=helpText
+                question.stats=True
+                question.category=False
+                question.tooltip=_tooltip
+                question.checks=_checks
+                question.visible_default=visible_default
+
+            except Question.DoesNotExist:
+                question = Question(questionset=questionset, text_en=text_en, number=str(questionNumber),
                                 type=dataType_column.value, help_text=helpText, slug=slug, slug_fk=slug_db, stats=True,
                                 category=False, tooltip=_tooltip,
                                 checks=_checks, visible_default=visible_default,
@@ -220,7 +290,7 @@ class ImportQuestionnaireExcel(ImportQuestionnaire):
 
 
 
-            _questions_rows[slug] = str(questionNumber)
+            _questions_rows[slug] = question
 
             if type == self.QUESTION:
                 if dataType_column.value in ['choice', 'choice-freeform', 'choice-multiple', 'choice-multiple-freeform']:
@@ -230,6 +300,9 @@ class ImportQuestionnaireExcel(ImportQuestionnaire):
                     if (values_list!=None and values_list.value!=None):
                         list_aux = values_list.value.split('|')
                         i = 1
+                        old_choices = Choice.objects.filter(question=question)
+                        old_choices.delete()
+
                         for ch in list_aux:
                             try:
                                 choice = Choice(question=question, sortid=i, text_en=ch, value=ch)
@@ -256,7 +329,7 @@ class ImportQuestionnaireExcel(ImportQuestionnaire):
             self.writeLog(log)
             raise
     @transaction.commit_on_success
-    def import_questionnaire(self):
+    def import_questionnaire(self, merge=None):
         _debug = False
 
         qNumber = QuestionNumber()
@@ -271,13 +344,22 @@ class ImportQuestionnaireExcel(ImportQuestionnaire):
         slugQ = convert_text_to_slug(ws.cell('B1').value)
         disable = False
 
-        questionnaire = Questionnaire(name=name, disable=disable, slug=slugQ, redirect_url='/')
-        log += '\nQuestionnaire created %s ' % questionnaire
+        questionnaire = None
+        if merge != None:
+            try:
+                questionnaire = Questionnaire.objects.get(id=merge)
 
-        try:
+            except Questionnaire.DoesNotExist:
+                raise Exception('Questionnaire does not exist, so cant merge against it.')
+
+        else:
+            questionnaire = Questionnaire(name=name, disable=disable, slug=slugQ, redirect_url='/')
+            log += '\nQuestionnaire created %s ' % questionnaire
             if not _debug:
                 questionnaire.save()
                 log += '\nQuestionnaire saved %s ' % questionnaire
+
+        try:
             _choices_array = {}
             _questions_rows = {}
 
@@ -309,7 +391,13 @@ class ImportQuestionnaireExcel(ImportQuestionnaire):
                             self.writeLog(log)
                             raise
                         text_en = 'h1. %s' % text_question_Column.value
-                        slug_qs = str(slugQ) + "_" + convert_text_to_slug(str(text_question_Column.value))
+
+                        slug_qs = None
+                        if row[7].value:
+                            slug_qs = row[7].value
+                        else:
+                            slug_qs = str(slugQ) + "_" + convert_text_to_slug(str(text_question_Column.value))
+
                         if row[5].value:
                             helpText = row[5].value
                         else:
@@ -319,8 +407,20 @@ class ImportQuestionnaireExcel(ImportQuestionnaire):
                             if str(row[6].value).lower() == 'yes':
                                 tooltip = True
 
-                        questionset = QuestionSet(questionnaire=questionnaire, checks='required', sortid=sortid, text_en=text_en, heading=slug_qs, help_text=helpText, tooltip=tooltip)
-                        log += '\n%s - QuestionSet created %s - %s ' % (type_Column.row, sortid, text_en)
+                        questionset = None
+                        created = False
+                        try:
+                            questionset = QuestionSet.objects.get(questionnaire=questionnaire, sortid=sortid, heading=slug_qs)
+
+                        except QuestionSet.DoesNotExist:
+                            questionset = QuestionSet(questionnaire=questionnaire, sortid=sortid, heading=slug_qs, checks='required', text_en=text_en, help_text=helpText, tooltip=tooltip)
+                            created=True
+
+                        if created:
+                            log += '\n%s - QuestionSet created %s - %s ' % (type_Column.row, sortid, text_en)
+                        else:
+                            log += '\n%s - QuestionSet retrieved %s - %s ' % (type_Column.row, sortid, text_en)
+
                         try:
                             if not _debug:
                                 questionset.save()
@@ -330,6 +430,10 @@ class ImportQuestionnaireExcel(ImportQuestionnaire):
                             log += "\n%s - Error to save questionset %s - %s" % (type_Column.row, sortid, text_en)
                             self.writeLog(log)
                             raise
+
+                        #if not created:
+                        #    last_question = Question.objects.filter(questionset=questionset).order_by('-id')[0]
+                        #    qNumber.setState(last_question.number)
 
                     # Type = CATEGORY
                     # Columns required:  Type, Text/Question, Level/Number, Category
@@ -351,3 +455,6 @@ class ImportQuestionnaireExcel(ImportQuestionnaire):
 
         log += '\nQuestionnaire %s, questionsets, questions and choices created with success!! ' % questionnaire
         self.writeLog(log)
+
+        #raise Exception('Dont commit me dude')
+        return True
