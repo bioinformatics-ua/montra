@@ -671,3 +671,110 @@ $(document).ready(
         }
 
 );
+
+function generatePng(){
+       // Zoom! Enhance!
+       // $('#chart > svg').attr('transform', 'scale(2)');
+
+       // Copy CSS styles to Canvas
+
+       // Remove all defs, which botch PNG output
+       //$('defs', $('#pc_chart_place')).remove();
+
+       inlineAllStyles($('#pc_chart_place'));
+       // Create PNG image
+       var canvas = $('.preview-pane').empty()[0];
+       canvas.width = $('#pc_chart_place').width()*1.8;
+       canvas.height = $('#pc_chart_place').height()*1.8;
+
+       var canvasContext = canvas.getContext('2d');
+       var svg = $.trim($('#pc_chart_place svg').prop('outerHTML'));
+       canvasContext.drawSvg(svg, 0, 0,canvas.width, canvas.height);
+       $("#downloadpng").attr("href", canvas.toDataURL("png"))
+           .attr("download", function() {
+               return db_name + " - " +$('#pctitle').text();
+        });
+}
+function generateSvg(){
+       inlineAllStyles($('#pc_chart_place'));
+
+       var svg = $.trim($('#pc_chart_place svg').prop('outerHTML'));
+
+       var data = new Blob([svg], {type: 'image/svg+xml'});
+
+       var svgfile = window.URL.createObjectURL(data);
+
+       $("#downloadsvg").attr("href", svgfile)
+           .attr("download", function() {
+               return db_name + " - " +$('#pctitle').text()+'.svg';
+        });
+}
+function generatePdf(){
+  generatePng();
+
+  var doc = new jsPDF('l', 'pt', 'a4');
+  var canvas = $('.preview-pane');
+  doc.setFontSize(20);
+  doc.text(35, 65, db_name + " - " +$('#pctitle').text());
+  doc.addImage($("#downloadpng").attr('href'), 'png', 15, 90, 750, 376);
+
+  doc.save(db_name + " - " +$('#pctitle').text()+'.pdf');
+}
+var styles;
+   var inlineAllStyles = function(context) {
+       var chartStyle, selector;
+       // Get rules from c3.css
+       for (var i = 0; i <= document.styleSheets.length - 1; i++) {
+           if (document.styleSheets[i].href && document.styleSheets[i].href.indexOf('c3.css') !== -1) {
+               if (document.styleSheets[i].rules !== undefined) {
+                   chartStyle = document.styleSheets[i].rules;
+               } else {
+                   chartStyle = document.styleSheets[i].cssRules;
+               }
+           }
+
+       }
+       if (chartStyle !== null && chartStyle !== undefined) {
+           // SVG doesn't use CSS visibility and opacity is an attribute, not a style property. Change hidden stuff to "display: none"
+           var changeToDisplay = function() {
+               if ($(this).css('visibility') === 'hidden' || $(this).css('opacity') === '0') {
+                   $(this).css('display', 'none');
+               }
+           };
+           // Inline apply all the CSS rules as inline
+           for (i = 0; i < chartStyle.length; i++) {
+
+               if (chartStyle[i].type === 1) {
+                   selector = chartStyle[i].selectorText;
+                   styles = makeStyleObject(chartStyle[i]);
+                   $('svg *').each(changeToDisplay);
+                   // $(selector).hide();
+                   $(selector).not($('.c3-chart path')).css(styles);
+               }
+               $('.c3-chart path')
+                   .filter(function() {
+                       return $(this).css('fill') === 'none';
+                   })
+                   .attr('fill', 'none');
+
+               $('.c3-chart path')
+                   .filter(function() {
+                       return !$(this).css('fill') === 'none';
+                   })
+                   .attr('fill', function() {
+                       return $(this).css('fill');
+                   });
+           }
+       }
+   };
+   // Create an object containing all the CSS styles.
+   // TODO move into inlineAllStyles
+   var makeStyleObject = function(rule) {
+       var styleDec = rule.style;
+       var output = {};
+       var s;
+       for (s = 0; s < styleDec.length; s++) {
+           output[styleDec[s]] = styleDec[styleDec[s]];
+       }
+       return output;
+   };
