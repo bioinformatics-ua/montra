@@ -129,6 +129,10 @@ class ExportQuestionnaireExcel(ExportQuestionnaire):
 
     __validateqtype = DataValidation(type="list", formula1='"open, open-button, open-upload-image, open-textfield, choice-yesno, choice-yesnocomment, choice-yesnodontknow, comment, choice, choice-freeform, choice-multiple, choice-multiple-freeform, range, timeperiod, publication, sameas, custom, datepicker"', allow_blank=True)
 
+    __validatecstate = DataValidation(type="list", formula1='"visible"', allow_blank=True)
+
+    __validatedisp = DataValidation(type="list", formula1='"vertical, horizontal, dropdown"', allow_blank=True)
+
 
     def __init__(self, questionnaire, file_path):
         ExportQuestionnaire.__init__(self, questionnaire, file_path)
@@ -157,7 +161,7 @@ class ExportQuestionnaireExcel(ExportQuestionnaire):
         _cell.style = self.__headerstyle
 
     def __setColumnSizes(self, ws, sizes):
-        columns = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K']
+        columns = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L']
 
         for i in xrange(len(columns)):
             ws.column_dimensions[columns[i]].width = sizes[i]
@@ -216,6 +220,25 @@ class ExportQuestionnaireExcel(ExportQuestionnaire):
             print "-- ERROR: Couldn't find a mapping for question "+str(question.number)
             return "error"
 
+    def __processDisposition(self, disposition):
+
+        if disposition == 0:
+            return 'vertical'
+        elif disposition == 1:
+            return 'horizontal'
+
+        elif disposition == 2:
+            return 'dropdown'
+
+        return ''
+
+    def __processCommentVisible(self, visible):
+
+        if visible:
+            return 'visible'
+
+        return ''
+
     def __addQuestion(self, line, ws, question):
         self.__number_map[question.number] = (question.slug, question)
 
@@ -247,11 +270,12 @@ class ExportQuestionnaireExcel(ExportQuestionnaire):
                     self.__boolean_to_string(question.tooltip),
                     question.slug_fk.slug1,
                     self.__processDependencies(question),
-                    '',
-                    '',
+                    self.__boolean_to_string(question.stats),
+                    self.__processCommentVisible(question.visible_default),
+                    self.__processDisposition(question.disposition)
                 ])
 
-            for row in ws.iter_rows('A'+str(line)+":k"+str(line)):
+            for row in ws.iter_rows('A'+str(line)+":L"+str(line)):
                 for cell in row:
                     self.__setDefaultStyle(cell)
 
@@ -283,7 +307,8 @@ class ExportQuestionnaireExcel(ExportQuestionnaire):
             ws.append(['QuestionSet', questionset.text_en.replace('h1. ',''),
                         questionset.sortid, '', '', questionset.help_text.replace('<br />', '\n'),
                         self.__boolean_to_string(questionset.tooltip), questionset.heading,
-                        '', '', '' ])
+                        '', '', '','' ])
+
 
             for row in ws.iter_rows('A'+str(pointer)+":k"+str(pointer)):
                 for cell in row:
@@ -308,10 +333,14 @@ class ExportQuestionnaireExcel(ExportQuestionnaire):
         self.__validatetype.ranges.append('A3:A'+str(pointer))
         self.__validateqtype.ranges.append('D3:D'+str(pointer))
         self.__validateyesno.ranges.append('G3:G'+str(pointer))
+        self.__validatecstate.ranges.append('K3:K'+str(pointer))
+        self.__validatedisp.ranges.append('L3:L'+str(pointer))
 
         ws.add_data_validation(self.__validatetype)
         ws.add_data_validation(self.__validateyesno)
         ws.add_data_validation(self.__validateqtype)
+        ws.add_data_validation(self.__validatecstate)
+        ws.add_data_validation(self.__validatedisp)
 
         # Freezing first two rows
         ws.freeze_panes = ws.cell('A3')

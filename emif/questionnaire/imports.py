@@ -95,6 +95,15 @@ class ImportQuestionnaireExcel(ImportQuestionnaire):
     def __init__(self, file_path):
         ImportQuestionnaire.__init__(self, file_path)
 
+
+    def __processDisposition(self, disposition):
+        if disposition == 'horizontal':
+            return 1
+        elif disposition == 'dropdown':
+            return 2
+
+        return 0
+
     def __handleQuestionNumber(self, level, qNumber, questionset):
         questionNumber = None
 
@@ -141,6 +150,7 @@ class ImportQuestionnaireExcel(ImportQuestionnaire):
             return ['yes', 'no', 'dontknow']
 
         return []
+
 
     def __handleQuestion(self, type, row,type_Column, level_number_column, text_question_Column, _questions_rows,
         _choices_array, qNumber, questionset, log, _checks, _debug, questionnaire):
@@ -265,7 +275,9 @@ class ImportQuestionnaireExcel(ImportQuestionnaire):
             except Question.DoesNotExist:
                 question = Question(questionset=questionset, text_en=text_en, number=str(questionNumber),
                                 type=dataType_column.value, help_text=helpText, slug=slug, slug_fk=slug_db, stats=True,
-                                category=False, tooltip=_tooltip, checks=_checks, visible_default=visible_default)
+                                category=False, tooltip=_tooltip,
+                                checks=_checks, visible_default=visible_default,
+                                disposition=self.__processDisposition(row[11].value.lower()))
 
 
             if not _debug:
