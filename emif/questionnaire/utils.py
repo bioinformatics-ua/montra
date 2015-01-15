@@ -99,6 +99,54 @@ class QuestionNumber:
         self._state = 'h1'
         self._nQuestion = ''
 
+    def __str__(self):
+        tmp = ""
+
+        tmp += '%s.' % self._t0
+
+        if self._t1:
+            tmp += '%s.' % self._t1
+        if self._t2:
+            tmp += '%s.' % self._t2
+        if self._t3:
+            tmp += '%s.' % self._t3
+        if self._t4:
+            tmp += '%s.' % self._t4
+
+        return tmp[:-1]
+
+    def setState(self, number):
+        ''' Jump starts the question number into a given state. Useful for merging operations
+            P.S. I really dont like the way this function works, it limits the level to 4 levels only
+            and makes us lose time repeating statements. We should use an array for state keeping...
+        '''
+        partials = number.split('.')
+        plen = len(partials)
+
+        if plen <= 5:
+            self._t0 = partials[0]
+            self._n0 = int(partials[0])+1
+
+            if plen >= 2:
+                self._t1 = partials[1]
+                self._n1 = int(partials[1])+1
+
+                if plen >= 3:
+                    self._t2 = partials[2]
+                    self._n2 = int(partials[2])+1
+
+
+                    if plen >= 4:
+                        self._t3 = partials[3]
+                        self._n3 = int(partials[3])+1
+
+                        if plen == 5:
+                            self._t4 = partials[4]
+                            self._n4 = int(partials[4])+1
+
+        else:
+            raise Exception('Tried to configure an invalid number of levels, max levels are %d', len(self.states))
+
     def saveQuestionNumber(self):
         self._nQuestion = ''
         if self._t0:
