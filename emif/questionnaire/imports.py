@@ -379,7 +379,13 @@ class ImportQuestionnaireExcel(ImportQuestionnaire):
                             self.writeLog(log)
                             raise
                         text_en = 'h1. %s' % text_question_Column.value
-                        slug_qs = str(slugQ) + "_" + convert_text_to_slug(str(text_question_Column.value))
+
+                        slug_qs = None
+                        if row[7].value:
+                            slug_qs = row[7].value
+                        else:
+                            slug_qs = str(slugQ) + "_" + convert_text_to_slug(str(text_question_Column.value))
+
                         if row[5].value:
                             helpText = row[5].value
                         else:
