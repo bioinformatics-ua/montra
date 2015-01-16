@@ -142,7 +142,6 @@ INSERT INTO newsletter_emailtemplate VALUES (9, 'aggregate', 'message', 'aggrega
 
 ++++++++++++++++++++
 {% if submission.publish %}
-Read Online: http://{{ site.domain }}/emif{{ submission.get_absolute_url }}
 {% endif %}
 Unsubscribe: http://{{ site.domain }}/emif/newsletter/{{newsletter.slug}}/unsubscribe', '        <table style="width: 100%; border-bottom: 1px solid #ddd; margin-top: 5px; margin-bottom: 5px;">
             <tr>
@@ -160,9 +159,6 @@ Unsubscribe: http://{{ site.domain }}/emif/newsletter/{{newsletter.slug}}/unsubs
                     <hr/>
                     <ul>
                         {% if submission.publish %}
-                        <li>
-                            <a href="http://{{ site.domain }}/emif{{ submission.get_absolute_url }}">Read Online</a>
-                        </li>
                         {% endif %}
                         <li>
                             <a href="http://{{ site.domain }}/emif/newsletter/{{newsletter.slug}}/unsubscribe">Unsubscribe</a>
