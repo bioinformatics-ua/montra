@@ -235,7 +235,7 @@ def fingerprints_list():
 
     return results
 
-def fingerprints_list_user(user):
+def fingerprints_list_user(user, use_slugs=False):
 
     interests = user.get_profile().interests.all()
     quests = []
@@ -249,7 +249,10 @@ def fingerprints_list_user(user):
 
     results = {}
     for q in quests:
-        results[q.id] = q.name
+        if use_slugs:
+            results[q.slug] = q.name
+        else:
+            results[q.id] = q.name
 
     return results
 
@@ -313,6 +316,11 @@ def show_fingerprints_for_search(user):
 
     return {'fingerprints':fingerprints_list_user(user)}
 register.inclusion_tag('reusable_blocks/menu_ttags_for_search.html')(show_fingerprints_for_search)
+
+def show_fingerprints_dropdown(user, sort_params):
+
+    return {'fingerprints':fingerprints_list_user(user, use_slugs=True), 'sort_params': sort_params}
+register.inclusion_tag('reusable_blocks/selectfdropdown.html')(show_fingerprints_dropdown)
 
 
 def show_fingerprints_for_statistics():

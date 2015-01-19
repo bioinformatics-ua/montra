@@ -160,6 +160,32 @@
             </ul>
             <div class="tab-content">
               <div class="tab-pane active" id="chartview">
+                    <div style="display: none;" class="exportmychart fullwidth clearfix">
+                    <div style="margin-bottom: 5px;" class="pull-right btn-group">
+                        <a class="btn dropdown-toggle" data-toggle="dropdown" href="javascript: void(0)">
+                        <i class="fa fa-upload"></i>
+                        &nbsp;Export
+                        <span class="caret"></span>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li>
+                                <a id="downloadpng" onclick="generatePng();">
+                                As PNG
+                                </a>
+                            </li>
+                            <li>
+                                <a id="downloadsvg" onclick="generateSvg();">
+                                As SVG
+                                </a>
+                            </li>
+                            <li>
+                                <a id="downloadpdf" onclick="generatePdf();">
+                                As PDF
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                    </div>
                 <div id='pc_chart_place'>
                     <center><h4>Loading...</h4></center>
                 </div>
@@ -170,9 +196,12 @@
               </div>
             </div>
 
+			<canvas style="background-color: white; position:absolute; left:-9999px; top: -9999px;" class="preview-pane"></canvas>
 
             {%if owner_fingerprint and not compare or request.user.is_superuser  and not compare %}
                 <div id="comment_place" style="margin-left:0px; display: none;" class="span12">
+
+
                 <div id='pc_comments_placeholder' class="span12 pc_comment">
                 </div>
                 <div style="margin-left:0px;" id="pc_comment_id" class="span12 pc_comment">

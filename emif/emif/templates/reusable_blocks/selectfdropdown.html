@@ -1,0 +1,8 @@
+
+<select id="type_filter" class="selectpicker" def_value="{{sort_params.type.filter}}">
+    <option value="">None</option>
+    {% for k,v in fingerprints.items %}
+        <option value="{{k}}">{{ v }}</option>
+    {% endfor %}
+</select>
+

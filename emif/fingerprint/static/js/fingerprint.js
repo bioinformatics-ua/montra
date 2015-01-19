@@ -89,6 +89,10 @@ function validate1(element, id_answered, dirty_id_answered) {
                 bool_container.pushWithDelegate('question_nr_' + number_correct,
                     $('#question_nr_' + id_answered).text().trim() + " " + just_question,
                     $(':input[name="question_' + dirty + '"]').val(), 'clear_selection("question_nr_' + dirty + '", "");');
+            } else if($('select[name="question_' + dirty + '"]').prop('type') == 'select-one') {
+                bool_container.pushWithDelegate('question_nr_' + number_correct,
+                    $('#question_nr_' + id_answered).text().trim() + " " + just_question,
+                    $('select[name="question_' + dirty + '"]').val(), 'clear_selection("question_nr_' + dirty + '", "");');
             } else {
                 bool_container.pushWithDelegate('question_nr_' + number_correct,
                     $('#question_nr_' + id_answered).text().trim() + " " + just_question,
@@ -198,18 +202,34 @@ function validateById(id_answered, id_answered_aux) {
 
     } else if (qc_id.hasClass('type_choice') || qc_id.hasClass('type_choice-freeform') || qc_id.hasClass('type_choice-yesnodontknow') || qc_id.hasClass('type_choice-yesnocomment') || qc_id.hasClass('type_choice-yesno')) {
 
-        if ($('[name="question_' + id_answered + '"]').is(':checked')) {
+        var element = $('[name="question_' + id_answered + '"]');
 
-            $('[id="answered_' + id_answered_aux + '"]').show();
-            $('[id="answered_' + id_answered_aux + '"]').addClass("hasValue");
-            valueCounter = 1;
+        if( element.prop('type') == 'select-one' ) {
+            var valchoosen = element.val();
 
+            if(valchoosen == ''){
+                $('[id="answered_' + id_answered_aux + '"]').hide();
+                $('[id="answered_' + id_answered_aux + '"]').removeClass("hasValue");
+                valueCounter = -1;
+            } else {
+                $('[id="answered_' + id_answered_aux + '"]').show();
+                $('[id="answered_' + id_answered_aux + '"]').addClass("hasValue");
+                valueCounter = 1;
+            }
         } else {
-            $('[id="answered_' + id_answered_aux + '"]').hide();
-            $('[id="answered_' + id_answered_aux + '"]').removeClass("hasValue");
+            if ($('[name="question_' + id_answered + '"]').is(':checked')) {
 
-            valueCounter = -1;
+                $('[id="answered_' + id_answered_aux + '"]').show();
+                $('[id="answered_' + id_answered_aux + '"]').addClass("hasValue");
+                valueCounter = 1;
 
+            } else {
+                $('[id="answered_' + id_answered_aux + '"]').hide();
+                $('[id="answered_' + id_answered_aux + '"]').removeClass("hasValue");
+
+                valueCounter = -1;
+
+            }
         }
         // I need this call because i hookup the answer to the boolean plugin here.
         if (!(typeof bool_container === 'undefined')) {
@@ -311,12 +331,7 @@ $(document).ready(function() {
 
         var possible_change = 0;
 
-        if($(el).attr('type') =='radio'){
-
-            var depmap = depmaps[id_answered];
-            var old = $(el).data('old');
-
-            var newvalue = $('[name="'+$(el).attr('name')+'"]:checked').val();
+        var handleChanges = function(){
 
             if(typeof depmap === 'object'){
                 if(depmap[old]){
@@ -328,10 +343,26 @@ $(document).ready(function() {
             }
 
             $('[name="'+$(el).attr('name')+'"]').data('old', newvalue);
-        } else {
+        };
+        if($(el).attr('type') =='radio'){
+
+            var depmap = depmaps[id_answered];
+            var old = $(el).data('old');
+
+            var newvalue = $('[name="'+$(el).attr('name')+'"]:checked').val();
+
+            handleChanges(depmap, old, newvalue);
+
+        } else if($(el).prop('type') == 'select-one'){
+            var depmap = depmaps[id_answered];
+            var old = $(el).data('old');
+            var newvalue = $('[name="'+$(el).attr('name')+'"]').val();
+
+            handleChanges(depmap, old, newvalue);
+        }
+        else {
             $(el).data('old', $(el).val());
         }
-
         if (!(typeof questionSetsCounters === 'undefined')) {
             var toSum2 = $('[id="answered_' + id_answered_aux + '"]').hasClass('hasValue');
             if (toSum && toSum2) {
