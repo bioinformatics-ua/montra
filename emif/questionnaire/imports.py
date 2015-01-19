@@ -200,6 +200,38 @@ class ImportQuestionnaireExcel(ImportQuestionnaire):
                                 category=False, tooltip=_tooltip, checks=_checks, visible_default=visible_default)
 
 
+            if dataType_column.value in ['open-validated']:
+                ardict = {}
+
+                if row[4].value:
+                    try:
+                        re.compile(row[4].value)
+                        ardict['regex'] = row[4].value
+                    except re.error:
+                        raise Exception("--ERROR: The regex on row %d, column 4 is not valid" % (type_Column.row))
+
+                if row[5].value:
+                    split = row[5].value.split('|')
+                    lensplit = len(split)
+
+                    if lensplit == 1:
+                        ardict['unit'] = split[0]
+
+                    elif lensplit == 2:
+                        ardict['unit'] = split[0]
+                        ardict['unit_desc'] = split[1]
+
+                    elif lensplit == 3:
+                        ardict['unit'] = split[0]
+                        ardict['unit_desc'] = split[1]
+                        question.help_text = split[2]
+
+                    else:
+                        raise Exception("-- ERROR: Invalid number of segments on help text row %d, column 5. Max syntax is unit|desc|help_text" % (type_Column.row)
+
+
+                question.metadata = json.dumps(ardict)
+
             if not _debug:
                 question.save()
 

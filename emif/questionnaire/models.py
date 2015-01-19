@@ -10,6 +10,8 @@ from parsers import parse_checks, ParseException
 from django.conf import settings
 from django.contrib.auth.models import User
 
+import json
+
 _numre = re.compile("(\d+)([a-z]+)", re.I)
 
 class DepQuestion:
@@ -382,6 +384,18 @@ class Question(models.Model):
     tooltip = models.BooleanField(default=False, help_text="If help text appears in a tooltip")
     visible_default = models.BooleanField(u"Comments visible by default", default=False)
     mlt_ignore = models.BooleanField(u"Ignore on More Like This", default=False)
+
+    metadata = models.TextField(blank=True, null=True)
+
+    def meta(self):
+        if not hasattr(self, "__metadict"):
+            try:
+                self.__metadict = json.loads(self.metadata)
+            except:
+                print "-- ERROR: Couldn't parse json for question meta"
+                self.__metadict = {}
+
+        return self.__metadict
 
     def questionnaire(self):
         return self.questionset.questionnaire
