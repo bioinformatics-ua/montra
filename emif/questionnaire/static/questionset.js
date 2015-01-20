@@ -200,7 +200,7 @@ function setsaveqs(id, fingerprint_id, q_id, mode) {
             advValidator.reload();
 
             var list_invalid = advValidator.validateFormContext(e, self);
-            //console.log(list_invalid);
+            console.log(list_invalid);
 
 
             if (list_invalid.length == 0) {
