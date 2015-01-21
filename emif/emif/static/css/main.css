@@ -910,9 +910,10 @@ height: 6em;
 }
 
 .ui-autocomplete{
-  width: 409px !important;
   z-index: 9999 !important;
-  top: 37px !important;
+  /*
+  width: 409px !important;
+  top: 37px !important;*/
 }
 
 .progressbar_back{
