@@ -196,6 +196,7 @@ def generateWeekReport(fingerprint, newsletter):
         returnable['db_changes'] = None
     else:
         returnable['db_changes'] = render_to_string('subscriptions/fingerprint_changes.html', {
+                                        'base_url': settings.BASE_URL,
                                         'changes': FingerprintHead.mergeChanges(fh),
                                         'fingerprint': fingerprint.fingerprint_hash
                                     })
@@ -205,6 +206,7 @@ def generateWeekReport(fingerprint, newsletter):
         returnable['discussion'] = None
     else:
         returnable['discussion'] = render_to_string('subscriptions/discussion_changes.html', {
+                                        'base_url': settings.BASE_URL,
                                         'discussions': discussion,
                                         'fingerprint': fingerprint.fingerprint_hash
                                     })
@@ -214,6 +216,7 @@ def generateWeekReport(fingerprint, newsletter):
         returnable['characteristic'] = None
     else:
         returnable['characteristic'] = render_to_string('subscriptions/pop_changes.html', {
+                                        'base_url': settings.BASE_URL,
                                         'pop': characteristic
                                     })
 
