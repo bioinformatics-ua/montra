@@ -131,7 +131,7 @@
     <span class="pull-right answered hide " id="answered_{{ question.number|removedots }}">
     <i class="icon-check green">&nbsp;</i>
     </span>
-    {% if answer_requests|length > 0 %}
+    {% if config.Request_Answer and answer_requests|length > 0 %}
         {% ans_requested question answer_requests %}
     {% endif %}
     {% endif %}
@@ -187,7 +187,7 @@
             <span class="pull-right answered hide" id="answered_{{ question.number|removedots }}">
             <i class="icon-check green">&nbsp;</i>
             </span>
-            {% if answer_requests|length > 0 %}
+            {% if config.Request_Answer and answer_requests|length > 0 %}
                 {% ans_requested question answer_requests %}
             {% endif %}
             {% endif %}

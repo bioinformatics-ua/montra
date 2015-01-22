@@ -131,7 +131,7 @@ It was not possible to save this questionnary. Please try again in a few seconds
           <table class="fullwidth">
             <tr>
               <td style="width: 80%; font-size: 93%;">
-              {% if requests|length > 0 %}
+              {% if config.Request_Answer and requests|length > 0 %}
               <div style="margin-left:-32px; color: black;" class="pull-left">
               <i title="Some users requested questions on this section to be filled." class="tooltippable fa fa-bell"></i>
               </div>
