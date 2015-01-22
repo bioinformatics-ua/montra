@@ -722,10 +722,10 @@ padding: 0 !important;
 min-height: 100%;
 height: auto !important;
 height: 100%;
-margin: 0 auto -6em;
+margin: 0 auto -4em;
 }
 .footer, .push {
-height: 6em;
+height: 4em;
 }
 
 .qset_option{
