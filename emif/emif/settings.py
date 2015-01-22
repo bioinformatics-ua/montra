@@ -32,7 +32,7 @@ TEMPLATE_DEBUG = DEBUG
 SITE_NAME = "EMIF Catalogue"
 
 GLOBALS = {
-    'BRAND': "Emif Cat",
+    'BRAND': "EMIF Catalogue",
     # url based upon STATIC_URL
     'BRAND_LOGO': "img/emif_logo_trans.png",
     'COPYRIGHT': "© EMIF Catalogue v",
