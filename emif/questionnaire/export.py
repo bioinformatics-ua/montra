@@ -127,7 +127,7 @@ class ExportQuestionnaireExcel(ExportQuestionnaire):
     __validateyesno = DataValidation(type="list", formula1='"Yes, No"', allow_blank=True)
 
 
-    __validateqtype = DataValidation(type="list", formula1='"open, open-validated, open-button, open-upload-image, open-textfield, choice-yesno, choice-yesnocomment, choice-yesnodontknow, comment, choice, choice-freeform, choice-multiple, choice-multiple-freeform, range, timeperiod, publication, sameas, custom, datepicker"', allow_blank=True)
+    __validateqtype = DataValidation(type="list", formula1='"open,open-button,open-upload-image,open-textfield,open-validated,choice-yesno,choice-yesnocomment,choice-yesnodontknow,comment,choice,choice-freeform,choice-multiple,choice-multiple-freeform,range,timeperiod,publication,sameas,custom,datepicker"', allow_blank=True)
 
     __validatecstate = DataValidation(type="list", formula1='"visible"', allow_blank=True)
 
@@ -142,9 +142,9 @@ class ExportQuestionnaireExcel(ExportQuestionnaire):
 
     def __boolean_to_string(self, value):
         if value == True:
-            return 'yes'
+            return 'Yes'
         elif value == False:
-            return 'no'
+            return 'No'
 
         return 'error'
 
@@ -170,10 +170,12 @@ class ExportQuestionnaireExcel(ExportQuestionnaire):
 
         if question.type == 'open-validated':
             try:
-                print question.meta()['regex']
-                return question.meta()['regex']
+                return question.meta()['base']
             except KeyError:
-                return ""
+                try:
+                    return question.meta()['regex']
+                except KeyError:
+                    return ""
 
         else:
             choices = Choice.objects.filter(question=question)
