@@ -30,8 +30,9 @@
 						    <div class="requestanswerbtn empty" data-question="{{t.id}}">
 						    	<button style="margin-top: -6px;margin-bottom: -6px;" class="btn input-block-level requestlabel depon_class">Request Answer</button>
 						    </div>
+						{% else %}
+							{{ t.value|safe }} {{t.meta.unit}}
 						{% endif %}
-						{{ t.value|safe }}
 						</span>
 
 						{% if not t.comment|safe == None and not t.comment.strip|safe == "" %}

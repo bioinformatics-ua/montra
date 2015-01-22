@@ -127,7 +127,7 @@ class ExportQuestionnaireExcel(ExportQuestionnaire):
     __validateyesno = DataValidation(type="list", formula1='"Yes, No"', allow_blank=True)
 
 
-    __validateqtype = DataValidation(type="list", formula1='"open, open-button, open-upload-image, open-textfield, choice-yesno, choice-yesnocomment, choice-yesnodontknow, comment, choice, choice-freeform, choice-multiple, choice-multiple-freeform, range, timeperiod, publication, sameas, custom, datepicker"', allow_blank=True)
+    __validateqtype = DataValidation(type="list", formula1='"open,open-button,open-upload-image,open-textfield,open-validated,choice-yesno,choice-yesnocomment,choice-yesnodontknow,comment,choice,choice-freeform,choice-multiple,choice-multiple-freeform,range,timeperiod,publication,sameas,custom,datepicker"', allow_blank=True)
 
     __validatecstate = DataValidation(type="list", formula1='"visible"', allow_blank=True)
 
@@ -142,9 +142,9 @@ class ExportQuestionnaireExcel(ExportQuestionnaire):
 
     def __boolean_to_string(self, value):
         if value == True:
-            return 'yes'
+            return 'Yes'
         elif value == False:
-            return 'no'
+            return 'No'
 
         return 'error'
 
@@ -168,15 +168,48 @@ class ExportQuestionnaireExcel(ExportQuestionnaire):
     def __getChoices(self, question):
         retstring = ""
 
-        choices = Choice.objects.filter(question=question)
+        if question.type == 'open-validated':
+            try:
+                return question.meta()['base']
+            except KeyError:
+                try:
+                    return question.meta()['regex']
+                except KeyError:
+                    return ""
 
-        for choice in choices:
-            retstring+=choice.value+'|'
+        else:
+            choices = Choice.objects.filter(question=question)
 
-        if(len(retstring) > 1):
-            return retstring[:-1]
+            for choice in choices:
+                retstring+=choice.value+'|'
+
+            if(len(retstring) > 1):
+                return retstring[:-1]
 
         return retstring
+
+    def __getHelp(self, question):
+        if question.type == 'open-validated':
+            unit = None
+            desc = None
+            try:
+                unit = question.meta()['unit']
+            except KeyError:
+                unit = ""
+            try:
+                desc = question.meta()['unit_desc']
+            except KeyError:
+                desc = ""
+
+            if question.help_text != '':
+                return "%s|%s|%s" % (unit, desc, question.help_text)
+            else:
+                if desc != '':
+                    return "%s|%s" % (unit, desc)
+
+                return unit
+
+        return question.help_text
 
     def __getChoiceNumber(self, parent, option):
         yesno_questions = ['choice-yesno','choice-yesnocomment','choice-yesnodontknow']
@@ -243,7 +276,7 @@ class ExportQuestionnaireExcel(ExportQuestionnaire):
         self.__number_map[question.number] = (question.slug, question)
 
         valid = re.search('(h[0-9])+\. (.*)', question.text_en, re.IGNORECASE)
-        choice_types = ['choice', 'choice-freeform', 'choice-multiple', 'choice-multiple-freeform', 'choice-multiple-freeform-options']
+        choice_types = ['open-validated', 'choice', 'choice-freeform', 'choice-multiple', 'choice-multiple-freeform', 'choice-multiple-freeform-options']
 
         if valid:
             level = str(valid.group(1))
@@ -266,7 +299,7 @@ class ExportQuestionnaireExcel(ExportQuestionnaire):
                     level,
                     question.type,
                     choices,
-                    question.help_text,
+                    self.__getHelp(question),
                     self.__boolean_to_string(question.tooltip),
                     question.slug_fk.slug1,
                     self.__processDependencies(question),

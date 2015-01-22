@@ -13,7 +13,7 @@ def baseurl(request):
         scheme = 'https://'
     else:
         scheme = 'http://'
-        
+
     return {'BASE_URL': scheme + request.get_host() + settings.BASE_URL,}
 
 # make user personal profiles available everywhere
@@ -22,12 +22,17 @@ def profiles_processor(request):
 
     if request.user.is_authenticated():
         try:
-        
+
             user_profile = EmifProfile.objects.get(user = request.user)
 
             profiles = user_profile.profiles.all()
-        
+
         except EmifProfile.DoesNotExist:
             pass
 
     return { 'profiles': profiles }
+
+# making certain globals like brand and footer available everywhere
+
+def globals(request):
+    return settings.GLOBALS

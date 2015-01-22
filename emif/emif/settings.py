@@ -31,6 +31,20 @@ TEMPLATE_DEBUG = DEBUG
 
 SITE_NAME = "EMIF Catalogue"
 
+GLOBALS = {
+    'BRAND': "EMIF Catalogue",
+    # url based upon STATIC_URL
+    'BRAND_LOGO': "img/emif_logo_trans.png",
+    'COPYRIGHT': "© EMIF Catalogue v",
+    'FOOTER_EXTRA': """
+                    <!-- EXTRA HTML FOOTER CODE HERE -->
+                    <small id="supportability">This website is optimised to Safari, Chrome, Firefox, Opera and IE9+.
+                    <!--It runs in IE7-IE8, but it has low performance and no enhanced features.--></small>
+                   """
+}
+# Header and Footer Settings
+
+
 #BASE_URL = '/emif-dev/'
 # Note: When changing this to something not /, all is automatically changed on the links (except for links inside css files)
 # for this files we must change it manually (or serve them as dinamic files), this problem only ocurrs on IE
@@ -71,6 +85,7 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     "emif.context_processors.baseurl",
     "emif.context_processors.profiles_processor",
     'constance.context_processors.config',
+    "emif.context_processors.globals"
 )
 
 MANAGERS = ADMINS

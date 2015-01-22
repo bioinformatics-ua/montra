@@ -240,6 +240,7 @@ def handle_qset(fingerprint, clean, qsets, qset, answers, fingerprint_ttype, rHi
         t.number = question.number
         t.ttype = question.type
         t.lastChange = None
+        t.meta = question.meta()
         question_group.list_ordered_tags.append(t)
 
     qsets[qset.text] = question_group
