@@ -50,7 +50,7 @@ def question_yesno(request, question):
         'template' : 'questionnaire/choice-yesnocomment.html',
     }
 
-@question_proc('open', 'email', 'url', 'open-textfield', 'open-button', 'open-upload-image', 'comment')
+@question_proc('open', 'open-validated','email', 'url', 'open-textfield', 'open-button', 'open-upload-image', 'comment')
 def question_open(request, question):
     key = "question_%s" % question.number
     value = question.getcheckdict().get('default','')
@@ -83,7 +83,7 @@ def question_datepicker(request, question):
         'template' : 'questionnaire/datepicker.html',
     }
 
-@answer_proc('open', 'email', 'url' 'open-textfield', 'choice-yesno', 'choice-yesnocomment', 'choice-yesnodontknow',  'open-button', 'open-upload-image')
+@answer_proc('open', 'open-validated', 'email', 'url' 'open-textfield', 'choice-yesno', 'choice-yesnocomment', 'choice-yesnodontknow',  'open-button', 'open-upload-image')
 def process_simple(question, ansdict):
     checkdict = question.getcheckdict()
     required = question.getcheckdict().get('required', 0)
@@ -109,6 +109,7 @@ def process_simple(question, ansdict):
         return dumps([ans])
     return dumps([])
 add_type('open', 'Open Answer, single line [input]')
+add_type('open-validated', 'Open Validated Answer, single line validated with a regex[input]')
 add_type('open-button', 'Open Answer, single line [input] with a button to validate')
 add_type('open-upload-image', 'Upload Image')
 add_type('open-textfield', 'Open Answer, multi-line [textarea]')
@@ -138,6 +139,3 @@ def show_summ(value):
         return valueclean.replace('no', 'No')
 
     return value
-
-
-

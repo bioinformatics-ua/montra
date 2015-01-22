@@ -21,6 +21,8 @@ from questionnaire.models import Questionnaire, Choice, Question, QuestionSet
 import os
 import re
 
+import json
+
 from openpyxl import Workbook, load_workbook
 from openpyxl.styles import Style, PatternFill, Alignment, Font, Border, Side
 from openpyxl.cell import Cell
@@ -279,6 +281,56 @@ class ImportQuestionnaireExcel(ImportQuestionnaire):
                                 checks=_checks, visible_default=visible_default,
                                 disposition=self.__processDisposition(row[11].value.lower()))
 
+
+            if dataType_column.value in ['open-validated']:
+                ardict = {}
+
+                if row[4].value:
+                    # some basic types dont need regex
+                    known_validations = {
+                        "integer": "[+-]?\d+",
+                        "decimal": "[+-]?\d*([.]\d*)?",
+                        "scientific": "[+-]?\d*([.]\d*)?e[+-]?\d*([.]\d*)?",
+                        "range": "[+\-]?\d*([.]\d*);[+\-]?\d*([.]\d*)",
+                        "date": "\d{2}/\d{2}/\d{4}",
+                        "time": "\d{2}:\d{2}:\d{2}",
+                        "datetime": "\d{2}/\d{2}/\d{4} \d{2}:\d{2}:\d{2}",
+                        "text": ".*"
+                    }
+                    try:
+                       ardict['regex'] = known_validations[row[4].value]
+                       ardict['base'] = row[4].value
+                    except KeyError:
+                        # If this is not known, try to validate it as a regex
+                        try:
+                            re.compile(row[4].value)
+                            ardict['regex'] = row[4].value
+                        except re.error:
+                            raise Exception("--ERROR: The regex on row %d, column 4 is not valid" % (type_Column.row))
+
+                if row[5].value:
+                    split = row[5].value.split('|')
+                    lensplit = len(split)
+
+                    if lensplit == 1:
+                        ardict['unit'] = split[0]
+                        question.help_text=""
+
+                    elif lensplit == 2:
+                        ardict['unit'] = split[0]
+                        ardict['unit_desc'] = split[1]
+                        question.help_text=""
+
+                    elif lensplit == 3:
+                        ardict['unit'] = split[0]
+                        ardict['unit_desc'] = split[1]
+                        question.help_text = split[2]
+
+                    else:
+                        raise Exception("-- ERROR: Invalid number of segments on help text row %d, column 5. Max syntax is unit|desc|help_text" % (type_Column.row))
+
+
+                question.metadata = json.dumps(ardict)
 
             if not _debug:
                 question.save()
