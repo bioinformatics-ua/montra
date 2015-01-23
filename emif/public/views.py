@@ -32,9 +32,11 @@ from django.http import Http404
 
 from population_characteristics.documents import document_form_view
 
+from constance import config
+
 def fingerprint_list(request, template_name='fingerprints.html', added=False):
 
-    if not request.user.is_authenticated():
+    if not config.private_links or not request.user.is_authenticated():
         raise Http404
 
     alink = request.session.get('created_public_link')

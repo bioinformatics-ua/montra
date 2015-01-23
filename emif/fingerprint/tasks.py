@@ -54,6 +54,8 @@ from fingerprint.models import FingerprintHead, AnswerChange
 
 from django.db.models import Q
 
+from constance import config
+
 # This indexes the fingerprint using the celery, so the interface doesn't have to block
 @shared_task
 def indexFingerprintCelery(fingerprint_hash):
@@ -99,7 +101,10 @@ def generate_newsmessages():
     # Operations
     print "start generating weekly newsletters messages"
 
-    if settings.DEBUG == False:
+    if not config.newsletter:
+        print 'Ignored, newsletter is disabled'
+
+    elif settings.DEBUG == False:
         fingerprints = Fingerprint.valid()
 
         newsletters = Newsletter.objects.all().exclude(slug='emif-catalogue-newsletter')
@@ -204,7 +209,7 @@ def generateWeekReport(fingerprint, newsletter):
                                     })
 
     discussion = Comment.objects.filter(object_pk = fingerprint.id, submit_date__gte = latest_check)
-    if len(discussion) == 0:
+    if not config.discussion or len(discussion) == 0:
         returnable['discussion'] = None
     else:
         returnable['discussion'] = render_to_string('subscriptions/discussion_changes.html', {
@@ -214,7 +219,7 @@ def generateWeekReport(fingerprint, newsletter):
                                     })
 
     characteristic = Characteristic.objects.filter(created_date__gte = latest_check).order_by('-created_date')
-    if len(discussion) == 0:
+    if not config.population_characteristics or len(characteristic) == 0:
         returnable['characteristic'] = None
     else:
         returnable['characteristic'] = render_to_string('subscriptions/pop_changes.html', {

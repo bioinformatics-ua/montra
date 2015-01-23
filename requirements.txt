@@ -1,7 +1,7 @@
 Django==1.4.5
 lxml==3.4.0
 PyYAML==3.10
-South==0.7.6
+South==1.0.2
 autopep8==0.8.6
 distribute==0.6.30
 django-admin-bootstrapped==0.3.2
@@ -51,3 +51,4 @@ rjsmin==1.0.9
 locustio==0.7.2
 pyquery==1.2.9
 raven==5.1.1
+django-constance[database]==1.0.1

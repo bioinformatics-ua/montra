@@ -171,10 +171,12 @@
                                                     <li>
                                                         <a href="alldatabases">All</a>
                                                     </li>
+                                                    {% if config.private_links %}
                                                     <li class="divider"></li>
                                                     <li>
                                                         <a href="public/fingerprint">Private Links</a>
                                                     </li>
+                                                    {% endif %}
                                                 </ul>
                                             </li>
 

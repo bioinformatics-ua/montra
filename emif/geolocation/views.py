@@ -34,7 +34,12 @@ from geolocation.services import *
 
 from questionnaire.models import Questionnaire
 
+from constance import config
+
 def geo(request, template_name='geo.html'):
+
+    if not config.geolocation:
+        raise Http404
 
     query = None
     isAdvanced = False

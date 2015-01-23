@@ -84,6 +84,7 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     "emif.context_processors.debug",
     "emif.context_processors.baseurl",
     "emif.context_processors.profiles_processor",
+    'constance.context_processors.config',
     "emif.context_processors.globals"
 )
 
@@ -335,7 +336,27 @@ INSTALLED_APPS = (
     "compressor",
 
     "raven.contrib.django.raven_compat",
+
+    # django-constance
+    'constance.backends.database',
+    "constance"
 )
+
+CONSTANCE_BACKEND = 'constance.backends.database.DatabaseBackend'
+
+CONSTANCE_CONFIG = {
+    'Request_Answer': (True, 'Controls whether we activate/deactivate the request answer functionality.'),
+    'population_characteristics': (True, 'Controls whether we activate/deactivate the Population Characteristics functionality.'),
+    'documents': (True, 'Controls whether we activate/deactivate the Documents functionality.'),
+    'literature': (True, 'Controls whether we activate/deactivate the Literature functionality.'),
+    'extra_information': (True, 'Controls whether we activate/deactivate the Extra Information functionality.'),
+    'discussion': (True, 'Controls whether we activate/deactivate the discussion functionality.'),
+    'newsletter': (True, 'Controls whether we activate/deactivate the newsletter functionality.'),
+    'private_links': (True, 'Controls whether we activate/deactivate the private links functionality.'),
+    'more_like_this': (True, 'Controls whether we activate/deactivate the more like this functionality.'),
+    'geolocation': (True, 'Controls whether we activate/deactivate the geolocation functionality.'),
+    'datatable': (True, 'Controls whether we activate/deactivate the datatable functionality.'),
+}
 
 # Userena settings
 

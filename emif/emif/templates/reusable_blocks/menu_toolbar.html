@@ -18,14 +18,18 @@
 
       {% endif %}
       {% if fingerprint_dump %}
-      {% if not subscription %}
-        <button id="dbsubscription" data-subscribed="false" class="btn"><i class="fa fa-at"></i> Subscribe</button>
-      {% else %}
-        <button id="dbsubscription" data-subscribed="true" class="btn"><i class="fa fa-at"></i> Unsubscribe</button>
+      {%if config.newsletter %}
+        {% if not subscription %}
+          <button id="dbsubscription" data-subscribed="false" class="btn"><i class="fa fa-at"></i> Subscribe</button>
+        {% else %}
+          <button id="dbsubscription" data-subscribed="true" class="btn"><i class="fa fa-at"></i> Unsubscribe</button>
+        {% endif %}
       {% endif %}
-      <a class="btn btn morelikethis" href="mlt/{{fingerprint_id}}" id="morelikethis_toolbar"> <i class="icon-search icon"></i>
-        More Like This
-      </a>
+        {% if config.more_like_this %}
+        <a class="btn btn morelikethis" href="mlt/{{fingerprint_id}}" id="morelikethis_toolbar"> <i class="icon-search icon"></i>
+          More Like This
+        </a>
+        {% endif %}
       {% endif %}
       {% if fingerprint_dump and not owner_fingerprint %}
       <a class="btn" href="dbDetailed/{{fingerprint_id}}/{{fingerprint_ttype}}" id="detailed_list_toolbar" title="Detailed View of Database" title="Detailed View Database"> <i class="icon-eye-open icon"></i>
@@ -76,16 +80,20 @@
             Expand all
          </a>
         {% endif %}
-	  {% if geo or alldatabases or databases or results or more_like_this %}
-      <a class="btn" href="geo" onclick="" > <i class=" icon"></i>
-        <i class="icon-globe"></i> Geolocation
-      </a>
-      {% endif %}
+        {% if config.geolocation %}
+    	    {% if geo or alldatabases or databases or results or more_like_this %}
+            <a class="btn" href="geo" onclick="" > <i class=" icon"></i>
+              <i class="icon-globe"></i> Geolocation
+            </a>
+          {% endif %}
+        {% endif %}
 
-      {% if data_table or isSearch or databases %}
-      <a class="btn" href="alldatabases/data-table" onclick="" > <i class="icon icon-th"></i>
-        Data table
-      </a>
+      {% if config.datatable %}
+        {% if data_table or isSearch or databases %}
+        <a class="btn" href="alldatabases/data-table" onclick="" > <i class="icon icon-th"></i>
+          Data table
+        </a>
+        {% endif %}
       {% endif %}
 
       {% if user|has_group:'exporters' or user.is_superuser %}
@@ -120,7 +128,7 @@
         {% endif %}
       {% endif %}
       {% if request.user.is_superuser %}
-            {% if  api_token %}
+            {% if config.extra_information and api_token %}
                 <a class="btn" href="api-info"> <i class=" icon"></i>
                  <i class="icon-info-sign"></i> API Info
                 </a>
@@ -153,12 +161,13 @@
 
       </a>
       </li>
+      {% if config.private_links %}
       <li>
-
       <a class="publiclink" href="" id="publiclink_toolbar" onclick="return false;"> <i class="fa fa-share"></i>
         Create Private Link
       </a>
       </li>
+      {% endif %}
       <li class="divider"></li>
       <li>
       <a class="confirm-delete" href="" id="delete_list_toolbar" onclick="return false;"data-id="{{ fingerprint_id }}"  title="Remove Database"> <i class="icon-trash icon"></i>

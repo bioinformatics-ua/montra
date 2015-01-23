@@ -26,7 +26,7 @@
 							{% endif %}
 						{% endif %}
 						<span class="summary_content">
-						{% if t.value|trim == "" and user.is_authenticated and t.ttype != 'comment' %}
+						{% if config.Request_Answer and t.value|trim == "" and user.is_authenticated and t.ttype != 'comment' %}
 						    <div class="requestanswerbtn empty" data-question="{{t.id}}">
 						    	<button style="margin-top: -6px;margin-bottom: -6px;" class="btn input-block-level requestlabel depon_class">Request Answer</button>
 						    </div>
