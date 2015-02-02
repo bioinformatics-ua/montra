@@ -20,9 +20,18 @@ from django.core.management.base import BaseCommand, CommandError
 
 from django.contrib.auth.models import User
 
-from questionnaire.imports import ImportQuestionnaire
+from questionnaire.imports import ImportQuestionnaire, ImportQuestionnaireExcel
+
+from optparse import make_option
 
 class Command(BaseCommand):
+
+    option_list = BaseCommand.option_list + (
+        make_option('--similar',
+            dest='similar',
+            default=1,
+            help='Instead of exact match, analyse choice changes using an similarity approach'),
+        )
 
     args = '<file_path> <questionnaire_id>'
     help = 'Import the questionnaire from excel merging with an already existing questionnaire'
@@ -32,14 +41,23 @@ class Command(BaseCommand):
 
             iq = ImportQuestionnaire.factory('excel', args[0])
 
-            res = iq.import_questionnaire(merge=args[1])
+            if options['similar'] != 1:
+                print "Similarity mode"
+                res = iq.import_questionnaire(merge=args[1], mode=ImportQuestionnaireExcel.SIMILARITY_MODE, percentage=float(options['similar']))
 
-            print "RESUKT:"
+
+            else:
+                print "Exact match mode"
+
+                res = iq.import_questionnaire(merge=args[1])
+
+
+            print "RESULT:"
             print res
 
             print "-- Finished processing "+args[0]
 
         else:
             self.stdout.write('-- USAGE: \n    '+
-                'python manage.py merge_questionnaire <path_file> <questionnaire_id>'+
+                'python manage.py merge_questionnaire <path_file> <questionnaire_id> [--similar <percentage>]'+
                 '\n\n')

@@ -37,6 +37,8 @@ import datetime
 
 from django.db import transaction
 
+from Levenshtein import ratio
+
 """This class is used to import the fingerprint template
 """
 class ImportQuestionnaire(object):
@@ -94,9 +96,92 @@ class ImportQuestionnaireExcel(ImportQuestionnaire):
     QUESTION=0
     CATEGORY=1
 
+    # choice match mode
+    EXACT_MATCH=0
+    SIMILARITY_MODE=1
+
     def __init__(self, file_path):
         ImportQuestionnaire.__init__(self, file_path)
 
+
+    # this function implements the similarity algorithm, baed on a levenstein similarity algorithm
+    # the idea is this algorithm be dynamically defined, for now its static
+    def __isSimilar(self, comparing_option, options, percentage):
+
+        closest = 0
+        match = None
+
+        for option in options:
+            this_ratio = ratio(comparing_option,option)
+            #print "'%s' and '%s' is %r similar" %(comparing_option, option, this_ratio)
+            if this_ratio > closest and this_ratio > percentage:
+                closest = this_ratio
+                match = option
+
+        return (closest, match)
+
+    def __processChoices(self, row, question, list_aux, log, mode=EXACT_MATCH, match_percentage=0.75, debug=False):
+        _choices_array_aux=[]
+        i = 1
+
+        # get current questions if any
+        old_choices = list(Choice.objects.filter(question=question).values_list('value', flat=True))
+
+        #print old_choices
+
+        # first pass through, checking for already existing and new questions
+        for ch in list_aux:
+            # if we already have this one, do nothing
+            if mode==self.EXACT_MATCH:
+                if ch in old_choices:
+                    _choices_array_aux.append(ch)
+                    old_choices.remove(ch)
+                    #print "'%s' already on question, continuing" %(ch)
+                    continue
+
+            elif mode==self.SIMILARITY_MODE:
+
+                (closest, similar) = self.__isSimilar(ch, old_choices, match_percentage)
+
+                if similar != None:
+                    if closest < 1:
+                        print "Replacing '%r' which is %r similar to '%r' on question %r" % (similar, closest, ch, question.number)
+
+                    choice=Choice.objects.get(question=question, value=similar)
+                    choice.text_en = ch
+                    choice.value = ch
+
+                    if not debug:
+                        choice.save()
+
+                    _choices_array_aux.append(ch)
+                    old_choices.remove(similar)
+                    continue
+
+
+            # otherwise we create a new entry
+            print "Create new '%s'" %(ch)
+            try:
+                choice = Choice(question=question, sortid=i, text_en=ch, value=ch)
+                log += '\n%s - Choice created %s ' % (row, choice)
+                if not debug:
+                    choice.save()
+                _choices_array_aux.append(ch)
+
+                log += '\n%s - Choice saved %s ' % (row, choice)
+                i += 1
+            except:
+                log += "\n%s - Error to save Choice %s" % (row, choice)
+                self.writeLog(log)
+                raise
+
+        if len(old_choices)> 0:
+            print "REMOVED:"
+            print old_choices
+        # at last, we must remove the choices that dont appear in the new listing (considered removed)
+        Choice.objects.filter(question=question, value__in=old_choices).delete()
+
+        return _choices_array_aux
 
     def __processDisposition(self, disposition):
         if disposition == 'horizontal':
@@ -155,7 +240,7 @@ class ImportQuestionnaireExcel(ImportQuestionnaire):
 
 
     def __handleQuestion(self, type, row,type_Column, level_number_column, text_question_Column, _questions_rows,
-        _choices_array, qNumber, questionset, log, _checks, _debug, questionnaire):
+        _choices_array, qNumber, questionset, log, _checks, _debug, questionnaire, mode=EXACT_MATCH, percentage=0.75):
         try:
             slug = None
             text_en = None
@@ -351,25 +436,8 @@ class ImportQuestionnaireExcel(ImportQuestionnaire):
                     values_list = row[4]
                     if (values_list!=None and values_list.value!=None):
                         list_aux = values_list.value.split('|')
-                        i = 1
-                        old_choices = Choice.objects.filter(question=question)
-                        old_choices.delete()
 
-                        for ch in list_aux:
-                            try:
-                                choice = Choice(question=question, sortid=i, text_en=ch, value=ch)
-                                log += '\n%s - Choice created %s ' % (type_Column.row, choice)
-                                if not _debug:
-                                    choice.save()
-                                _choices_array_aux.append(ch)
-
-                                log += '\n%s - Choice saved %s ' % (type_Column.row, choice)
-                                i += 1
-                            except:
-                                log += "\n%s - Error to save Choice %s" % (type_Column.row, choice)
-                                self.writeLog(log)
-                                raise
-                        _choices_array[slug] = _choices_array_aux
+                        _choices_array[slug] = self.__processChoices(type_Column.row, question, list_aux, log, debug=_debug, mode=mode, match_percentage=percentage)
 
                 if dataType_column.value in ['choice-yesno', 'choice-yesnocomment',
                                                      'choice-yesnodontknow']:
@@ -381,7 +449,7 @@ class ImportQuestionnaireExcel(ImportQuestionnaire):
             self.writeLog(log)
             raise
     @transaction.commit_on_success
-    def import_questionnaire(self, merge=None):
+    def import_questionnaire(self, merge=None, mode=EXACT_MATCH, percentage=0.75):
         _debug = False
 
         qNumber = QuestionNumber()
@@ -492,13 +560,13 @@ class ImportQuestionnaireExcel(ImportQuestionnaire):
                     # Columns optional:  Help text/Description, Slug, Tooltip, Dependencies
                     elif str(type_Column.value) == "Category":
                         self.__handleQuestion(self.CATEGORY, row, type_Column, level_number_column, text_question_Column,
-                            _questions_rows, _choices_array, qNumber, questionset, log, _checks, _debug, questionnaire)
+                            _questions_rows, _choices_array, qNumber, questionset, log, _checks, _debug, questionnaire, mode=mode, percentage=percentage)
                     # Type = QUESTION
                     # Columns required:  Type, Text/Question, Level/Number, Data Type, Category, Stats
                     # Columns optional:  Value List, Help text/Description, Tooltip, Dependencies
                     else:
                         self.__handleQuestion(self.QUESTION, row, type_Column, level_number_column, text_question_Column,
-                            _questions_rows, _choices_array, qNumber, questionset, log, _checks, _debug, questionnaire)
+                            _questions_rows, _choices_array, qNumber, questionset, log, _checks, _debug, questionnaire, mode=mode, percentage=percentage)
 
         except:
             log += '\nError to save questionsets and questions of the questionnaire %s ' % questionnaire
