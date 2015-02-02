@@ -268,16 +268,16 @@ class ImportQuestionnaireExcel(ImportQuestionnaire):
                 question.number=str(questionNumber)
                 question.type=dataType_column.value
                 question.help_text=helpText
-                question.stats=True
-                question.category=False
+                question.stats=is_stats
+                question.category=is_category
                 question.tooltip=_tooltip
                 question.checks=_checks
                 question.visible_default=visible_default
 
             except Question.DoesNotExist:
                 question = Question(questionset=questionset, text_en=text_en, number=str(questionNumber),
-                                type=dataType_column.value, help_text=helpText, slug=slug, slug_fk=slug_db, stats=True,
-                                category=False, tooltip=_tooltip,
+                                type=dataType_column.value, help_text=helpText, slug=slug, slug_fk=slug_db, stats=is_stats,
+                                category=is_category, tooltip=_tooltip,
                                 checks=_checks, visible_default=visible_default,
                                 disposition=self.__processDisposition(row[11].value.lower()))
 
