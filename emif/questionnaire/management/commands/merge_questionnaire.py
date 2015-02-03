@@ -100,5 +100,5 @@ class Command(BaseCommand):
 
         else:
             self.stdout.write('-- USAGE: \n    '+
-                'python manage.py merge_questionnaire <path_file> <questionnaire_id> [--similar <percentage>]'+
+                'python manage.py merge_questionnaire <path_file> <questionnaire_id> [--similar=<percentage> --ignore=<percentage>]'+
                 '\n\n')
