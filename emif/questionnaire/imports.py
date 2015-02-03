@@ -234,16 +234,22 @@ class ImportQuestionnaireExcel(ImportQuestionnaire):
                 maybe_new.append(ch)
 
         # 3rd pass: if there's an boolean lambda infer function to non obvious cases dealing, run it
-        if infer_function != None and len(maybe_new) == 1 and len(old_choices) > 0:
-            for old in old_choices:
-                if infer_function(question.number, maybe_new[0], old) == True:
-                    print "Replacing '%r' which is user indicated similar to '%r' on question %r" % (old, maybe_new[0], question.number)
-                    __similarMap(question, old, maybe_new[0])
+        run = list(maybe_new)
+        if infer_function != None and (len(maybe_new) == 1 or len(maybe_new) == 2) and len(old_choices) > 0:
+            for new in run:
+                print "RUN for " + str(new)
+                if old_choices > 0:
+                    for old in old_choices:
+                        if infer_function(question.number, new, old) == True:
+                            print "Replacing '%r' which is user indicated similar to '%r' on question %r" % (old, new, question.number)
+                            __similarMap(question, old, new)
 
-                    maybe_new.remove(maybe_new[0])
+                            maybe_new.remove(new)
 
-                    #if we find a hit its done
-                    break
+                            #if we find a hit its done
+                            break
+                else:
+                    print "No more old choices, others must be new"
 
         for ch in maybe_new:
             # otherwise we create a new entry
