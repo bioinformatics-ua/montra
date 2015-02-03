@@ -32,7 +32,7 @@ from searchengine.search_indexes import convert_text_to_slug
 from searchengine.models import Slugs
 
 from questionnaire.utils import *
-from fingerprint.models import Answer
+from fingerprint.models import Answer, AnswerChange
 
 import datetime
 
@@ -125,89 +125,135 @@ class ImportQuestionnaireExcel(ImportQuestionnaire):
 
     def __handleAnswerChanges(self, question, change_map, debug=False):
         if len(change_map) > 0:
-            print "ANSWERS:"
+            #print "ANSWERS:"
 
-            answers = Answer.objects.filter(question=question)
-            for ans in answers:
-                response = choice_list(ans.data).values()
-
-                #print "BEFORE:"
-                #print ans.data
-
+            def __answerChange(data, change_map):
+                response = choice_list(data).values()
                 for res in response:
                     try:
                         res['key'] = change_map[res['key']]
                     except KeyError:
                         pass
 
-                #print "AFTER:"
-                #print serialize_list(response)
+                return serialize_list(response)
 
-                ans.data = serialize_list(response)
+            # Handle answer changes modifications
+            answers = Answer.objects.filter(question=question)
+            for ans in answers:
+                ans.data = __answerChange(ans.data, change_map)
+
                 if not debug:
                     ans.save()
 
+                # Update answer history
+                # For old values
+                ans_history = AnswerChange.objects.filter(answer=ans)
+                for hist in ans_history:
+                    hist.old_value = __answerChange(hist.old_value, change_map)
+                    hist.new_value = __answerChange(hist.new_value, change_map)
+
+                    if not debug:
+                        hist.save()
+
+            # Update dependencies too
+            '''print "UPDATE DEPENDENCIES FOR: %s" %(question.number)
+            for key, value in change_map:
+                print key
+                print value
+                print "--"
+                dependent_questions = Question.objects.filter(checks__contains='dependent="%s,%s"' % (question.number, key))
+                print "QUESTIONS DEPENDENT"
+                print dependent_questions
+            '''
             #raise Exception("CRAZY")
 
-    def __processChoices(self, row, question, list_aux, log, mode=EXACT_MATCH, match_percentage=0.75, debug=False):
-        _choices_array_aux=[]
+    def __processChoices(self, row, question, list_aux, log, mode=EXACT_MATCH, match_percentage=0.75, debug=False, infer_function=None):
+        #_choices_array_aux=[]
         i = 0
 
         # get current questions if any
         old_choices = list(Choice.objects.filter(question=question).values_list('value', flat=True))
 
         #print old_choices
-        change_map={}
+        change_map={}       # maps the changes to be made over the question
+        indexes_map = {}    # since ordering is absolute, on first passthrough i generate the sortid numbers
+        look_similar = []   # potential matches for 2nd pass similarity lookup
+        maybe_new = []      # for 3rd pass we may infer
 
-        # first pass through, checking for already existing and new questions
+        # 1st pass: we do a first pass through to remove exact matches (is the same on both approaches)
         for ch in list_aux:
             i+=1
-            # if we already have this one, do nothing
-            if mode==self.EXACT_MATCH:
-                if ch in old_choices:
-                    # Fixing sortid order
-                    choice=Choice.objects.get(question=question, value=similar)
-                    choice.sortid=i
-                    if not debug:
-                        choice.save()
+            indexes_map[ch] = i
 
-                    _choices_array_aux.append(ch)
-                    old_choices.remove(ch)
-                    #print "'%s' already on question, continuing" %(ch)
-                    continue
+            if ch in old_choices:
+                choice = Choice.objects.get(question=question, value=ch)
+                choice.sortid = i
+                if not debug:
+                    choice.save()
 
-            elif mode==self.SIMILARITY_MODE:
+                #_choices_array_aux.append(ch)
+                old_choices.remove(ch)
+
+            else:
+                look_similar.append(ch)
+
+
+        def __similarMap(question, similar, ch):
+            change_map[similar] = ch
+
+            choice=Choice.objects.get(question=question, value=similar)
+            choice.text_en = ch
+            choice.value = ch
+            choice.sortid=indexes_map[ch]
+
+
+            if not debug:
+                choice.save()
+
+            #_choices_array_aux.append(ch)
+            old_choices.remove(similar)
+
+        # 2nd pass: lets analyse the rest that are not exact matches
+        for ch in look_similar:
+            if mode==self.SIMILARITY_MODE:
 
                 (closest, similar) = self.__isSimilar(ch, old_choices, match_percentage)
-
+                # if considered similar
                 if similar != None:
                     if closest < 1:
                         print "Replacing '%r' which is %r similar to '%r' on question %r" % (similar, closest, ch, question.number)
 
-                        change_map[similar] = ch
+                    __similarMap(question, similar, ch)
 
-                    choice=Choice.objects.get(question=question, value=similar)
-                    choice.text_en = ch
-                    choice.value = ch
-                    choice.sortid=i
+                else:
+                    # maybe be new, to check on 3rd pass
+                    maybe_new.append(ch)
 
+            # if this is exact match mode, we skip this step
+            else:
+                maybe_new.append(ch)
 
-                    if not debug:
-                        choice.save()
+        # 3rd pass: if there's an boolean lambda infer function to non obvious cases dealing, run it
+        if infer_function != None and len(maybe_new) == 1 and len(old_choices) > 0:
+            for old in old_choices:
+                if infer_function(question.number, maybe_new[0], old) == True:
+                    print "Replacing '%r' which is user indicated similar to '%r' on question %r" % (old, maybe_new[0], question.number)
+                    __similarMap(question, old, maybe_new[0])
 
-                    _choices_array_aux.append(ch)
-                    old_choices.remove(similar)
-                    continue
+                    maybe_new.remove(maybe_new[0])
 
+                    #if we find a hit its done
+                    break
 
+        for ch in maybe_new:
             # otherwise we create a new entry
             print "Create new '%s'" %(ch)
             try:
-                choice = Choice(question=question, sortid=i, text_en=ch, value=ch)
+                choice = Choice(question=question, sortid=indexes_map[i], text_en=ch, value=ch)
                 log += '\n%s - Choice created %s ' % (row, choice)
                 if not debug:
                     choice.save()
-                _choices_array_aux.append(ch)
+                #_choices_array_aux.append(ch)
 
                 log += '\n%s - Choice saved %s ' % (row, choice)
             except:
@@ -224,7 +270,8 @@ class ImportQuestionnaireExcel(ImportQuestionnaire):
         if mode==self.SIMILARITY_MODE:
             self.__handleAnswerChanges(question, change_map, debug=debug)
 
-        return _choices_array_aux
+
+        return list_aux #_choices_array_aux
 
     def __processDisposition(self, disposition):
         if disposition == 'horizontal':
@@ -283,7 +330,7 @@ class ImportQuestionnaireExcel(ImportQuestionnaire):
 
 
     def __handleQuestion(self, type, row,type_Column, level_number_column, text_question_Column, _questions_rows,
-        _choices_array, qNumber, questionset, log, _checks, _debug, questionnaire, mode=EXACT_MATCH, percentage=0.75):
+        _choices_array, qNumber, questionset, log, _checks, _debug, questionnaire, mode=EXACT_MATCH, percentage=0.75, infer_function=None):
         try:
             slug = None
             text_en = None
@@ -480,7 +527,8 @@ class ImportQuestionnaireExcel(ImportQuestionnaire):
                     if (values_list!=None and values_list.value!=None):
                         list_aux = values_list.value.split('|')
 
-                        _choices_array[slug] = self.__processChoices(type_Column.row, question, list_aux, log, debug=_debug, mode=mode, match_percentage=percentage)
+                        _choices_array[slug] = self.__processChoices(type_Column.row, question, list_aux, log, debug=_debug,
+                            mode=mode, match_percentage=percentage, infer_function=infer_function)
 
                 if dataType_column.value in ['choice-yesno', 'choice-yesnocomment',
                                                      'choice-yesnodontknow']:
@@ -492,7 +540,7 @@ class ImportQuestionnaireExcel(ImportQuestionnaire):
             self.writeLog(log)
             raise
     @transaction.commit_on_success
-    def import_questionnaire(self, merge=None, mode=EXACT_MATCH, percentage=0.75):
+    def import_questionnaire(self, merge=None, mode=EXACT_MATCH, percentage=0.75, infer_function=None):
         _debug = False
 
         qNumber = QuestionNumber()
@@ -603,13 +651,15 @@ class ImportQuestionnaireExcel(ImportQuestionnaire):
                     # Columns optional:  Help text/Description, Slug, Tooltip, Dependencies
                     elif str(type_Column.value) == "Category":
                         self.__handleQuestion(self.CATEGORY, row, type_Column, level_number_column, text_question_Column,
-                            _questions_rows, _choices_array, qNumber, questionset, log, _checks, _debug, questionnaire, mode=mode, percentage=percentage)
+                            _questions_rows, _choices_array, qNumber, questionset, log, _checks, _debug,
+                            questionnaire, mode=mode, percentage=percentage, infer_function=infer_function)
                     # Type = QUESTION
                     # Columns required:  Type, Text/Question, Level/Number, Data Type, Category, Stats
                     # Columns optional:  Value List, Help text/Description, Tooltip, Dependencies
                     else:
                         self.__handleQuestion(self.QUESTION, row, type_Column, level_number_column, text_question_Column,
-                            _questions_rows, _choices_array, qNumber, questionset, log, _checks, _debug, questionnaire, mode=mode, percentage=percentage)
+                            _questions_rows, _choices_array, qNumber, questionset, log, _checks, _debug,
+                            questionnaire, mode=mode, percentage=percentage, infer_function=infer_function)
 
         except:
             log += '\nError to save questionsets and questions of the questionnaire %s ' % questionnaire

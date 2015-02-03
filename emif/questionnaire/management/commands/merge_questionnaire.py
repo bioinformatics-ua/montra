@@ -43,7 +43,22 @@ class Command(BaseCommand):
 
             if options['similar'] != 1:
                 print "Similarity mode"
-                res = iq.import_questionnaire(merge=args[1], mode=ImportQuestionnaireExcel.SIMILARITY_MODE, percentage=float(options['similar']))
+                def infer_function(question, new, old):
+                    input = None
+                    while not (input == 'y' or input == 'n'):
+                        print """The number of new choices missing processing for question %s is 1, there could be a non obvious match.\n
+
+                        Is '%s' a change of '%s' ? (y/n)
+                        """ % (question, new, old)
+                        input = raw_input()
+
+                    if input == 'y':
+                        return True
+
+                    return False
+
+                res = iq.import_questionnaire(merge=args[1], mode=ImportQuestionnaireExcel.SIMILARITY_MODE,
+                    percentage=float(options['similar']), infer_function=infer_function)
 
 
             else:
