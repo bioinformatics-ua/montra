@@ -292,7 +292,7 @@ def process_multiple_options(question, answer):
 
     return dumps(multiple)
 
-def __choice_list(value):
+def choice_list(value):
     choices = value.split('#')
 
     multiple_choices = {}
@@ -310,9 +310,22 @@ def __choice_list(value):
 
     return multiple_choices
 
+def serialize_list(choice_list):
+    tmp = ""
+
+    for choice in choice_list:
+        comment = choice['comment']
+
+        tmp +="#%s" %(choice['key'])
+        if comment != '':
+            tmp += '{%s}' % (comment)
+
+    return tmp
+
+
 @show_summary('choice','choice-freeform','choice-multiple', 'choice-multiple-freeform', 'choice-multiple-freeform-options')
 def show_summ(value):
-    multiple_choices = __choice_list(value).values()
+    multiple_choices = choice_list(value).values()
     #return value
     return render_to_string('questionnaire/choice_summary.html', {'choices':multiple_choices})
 
@@ -321,7 +334,7 @@ def show_summ(value):
 def show_flat(question, value):
 
     multiple_choices = []
-    ans_choices = __choice_list(value)
+    ans_choices = choice_list(value)
 
     for choice in question.choices():
         if choice.text in ans_choices:

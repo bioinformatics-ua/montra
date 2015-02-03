@@ -32,12 +32,15 @@ from searchengine.search_indexes import convert_text_to_slug
 from searchengine.models import Slugs
 
 from questionnaire.utils import *
+from fingerprint.models import Answer
 
 import datetime
 
 from django.db import transaction
 
 from Levenshtein import ratio
+
+from qprocessors.choice import choice_list, serialize_list
 
 """This class is used to import the fingerprint template
 """
@@ -120,20 +123,54 @@ class ImportQuestionnaireExcel(ImportQuestionnaire):
 
         return (closest, match)
 
+    def __handleAnswerChanges(self, question, change_map, debug=False):
+        if len(change_map) > 0:
+            print "ANSWERS:"
+
+            answers = Answer.objects.filter(question=question)
+            for ans in answers:
+                response = choice_list(ans.data).values()
+
+                #print "BEFORE:"
+                #print ans.data
+
+                for res in response:
+                    try:
+                        res['key'] = change_map[res['key']]
+                    except KeyError:
+                        pass
+
+                #print "AFTER:"
+                #print serialize_list(response)
+
+                ans.data = serialize_list(response)
+                if not debug:
+                    ans.save()
+
+            #raise Exception("CRAZY")
+
     def __processChoices(self, row, question, list_aux, log, mode=EXACT_MATCH, match_percentage=0.75, debug=False):
         _choices_array_aux=[]
-        i = 1
+        i = 0
 
         # get current questions if any
         old_choices = list(Choice.objects.filter(question=question).values_list('value', flat=True))
 
         #print old_choices
+        change_map={}
 
         # first pass through, checking for already existing and new questions
         for ch in list_aux:
+            i+=1
             # if we already have this one, do nothing
             if mode==self.EXACT_MATCH:
                 if ch in old_choices:
+                    # Fixing sortid order
+                    choice=Choice.objects.get(question=question, value=similar)
+                    choice.sortid=i
+                    if not debug:
+                        choice.save()
+
                     _choices_array_aux.append(ch)
                     old_choices.remove(ch)
                     #print "'%s' already on question, continuing" %(ch)
@@ -147,9 +184,13 @@ class ImportQuestionnaireExcel(ImportQuestionnaire):
                     if closest < 1:
                         print "Replacing '%r' which is %r similar to '%r' on question %r" % (similar, closest, ch, question.number)
 
+                        change_map[similar] = ch
+
                     choice=Choice.objects.get(question=question, value=similar)
                     choice.text_en = ch
                     choice.value = ch
+                    choice.sortid=i
+
 
                     if not debug:
                         choice.save()
@@ -169,7 +210,6 @@ class ImportQuestionnaireExcel(ImportQuestionnaire):
                 _choices_array_aux.append(ch)
 
                 log += '\n%s - Choice saved %s ' % (row, choice)
-                i += 1
             except:
                 log += "\n%s - Error to save Choice %s" % (row, choice)
                 self.writeLog(log)
@@ -180,6 +220,9 @@ class ImportQuestionnaireExcel(ImportQuestionnaire):
             print old_choices
         # at last, we must remove the choices that dont appear in the new listing (considered removed)
         Choice.objects.filter(question=question, value__in=old_choices).delete()
+
+        if mode==self.SIMILARITY_MODE:
+            self.__handleAnswerChanges(question, change_map, debug=debug)
 
         return _choices_array_aux
 
