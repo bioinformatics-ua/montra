@@ -24,6 +24,8 @@ from questionnaire.imports import ImportQuestionnaire, ImportQuestionnaireExcel
 
 from optparse import make_option
 
+from Levenshtein import ratio
+
 class Command(BaseCommand):
 
     option_list = BaseCommand.option_list + (
@@ -31,6 +33,10 @@ class Command(BaseCommand):
             dest='similar',
             default=1,
             help='Instead of exact match, analyse choice changes using an similarity approach'),
+            make_option('--ignore',
+            dest='ignore',
+            default=0.4,
+            help='When using a similar approach, ignore strings with proximity lower of 0.4')
         )
 
     args = '<file_path> <questionnaire_id>'
@@ -59,6 +65,12 @@ class Command(BaseCommand):
                         print "Not default mapping, manual input required"
 
                     input = None
+
+
+                    # Ignore low scores automatically
+                    if ratio(old, new) < float(options['ignore']):
+                        return False
+
                     while not (input == 'y' or input == 'n'):
                         print """The number of new choices missing processing for question %s is 1, there could be a non obvious match.\n
 

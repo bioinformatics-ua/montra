@@ -293,7 +293,11 @@ def process_multiple_options(question, answer):
     return dumps(multiple)
 
 def choice_list(value):
-    choices = value.split('#')
+    choices = ['']
+    try:
+        choices = value.split('#')
+    except:
+        pass
 
     multiple_choices = {}
 
