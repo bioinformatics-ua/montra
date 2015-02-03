@@ -249,7 +249,7 @@ class ImportQuestionnaireExcel(ImportQuestionnaire):
             # otherwise we create a new entry
             print "Create new '%s'" %(ch)
             try:
-                choice = Choice(question=question, sortid=indexes_map[i], text_en=ch, value=ch)
+                choice = Choice(question=question, sortid=indexes_map[ch], text_en=ch, value=ch)
                 log += '\n%s - Choice created %s ' % (row, choice)
                 if not debug:
                     choice.save()
