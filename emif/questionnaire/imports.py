@@ -235,7 +235,7 @@ class ImportQuestionnaireExcel(ImportQuestionnaire):
 
         # 3rd pass: if there's an boolean lambda infer function to non obvious cases dealing, run it
         run = list(maybe_new)
-        if infer_function != None and (len(maybe_new) == 1 or len(maybe_new) == 2) and len(old_choices) > 0:
+        if infer_function != None and len(maybe_new) > 0 and len(old_choices) > 0:
             for new in run:
                 print "RUN for " + str(new)
                 if old_choices > 0:

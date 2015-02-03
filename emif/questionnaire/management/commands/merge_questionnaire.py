@@ -44,6 +44,20 @@ class Command(BaseCommand):
             if options['similar'] != 1:
                 print "Similarity mode"
                 def infer_function(question, new, old):
+                    # default map translations that need no manual confirmation( this should go to a separate file later)
+                    default_map = {
+                        'Repeated collection(more than once)': 'Repeated collection (specify frequency and/or time interval) '
+                    }
+
+                    try:
+                        if default_map[old] == new:
+                            return True
+
+                        return False
+
+                    except KeyError:
+                        print "Not default mapping, manual input required"
+
                     input = None
                     while not (input == 'y' or input == 'n'):
                         print """The number of new choices missing processing for question %s is 1, there could be a non obvious match.\n
