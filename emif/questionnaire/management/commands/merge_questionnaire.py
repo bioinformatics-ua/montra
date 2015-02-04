@@ -52,11 +52,12 @@ class Command(BaseCommand):
                 def infer_function(question, new, old):
                     # default map translations that need no manual confirmation( this should go to a separate file later)
                     default_map = {
-                        'Repeated collection(more than once)': 'Repeated collection (specify frequency and/or time interval) '
+                        'Repeated collection(more than once)': 'Repeated collection (specify frequency and/or time interval) ',
+                        'Subgroup analyzed (eg. Dementia)': 'Subgroup analyzed (eg. Dementia, please specify subgroup)'
                     }
 
                     try:
-                        if default_map[old] == new:
+                        if ratio(unicode(default_map[old]), unicode(new)) > 0.97:
                             return True
 
                         return False
