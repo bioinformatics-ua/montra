@@ -1,4 +1,21 @@
 {% extends "base.html" %}
+{% comment %}
+# -*- coding: utf-8 -*-
+# Copyright (C) 2014 Universidade de Aveiro, DETI/IEETA, Bioinformatics Group - http://bioinformatics.ua.pt/
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+{% endcomment %}
 {% load markup questionnaire i18n %}
 
 {% block styleinclude %}
@@ -15,7 +32,7 @@
     {% for x in jsinclude %}
         <script type="text/javascript" src="{{ x }}"></script>
     {% endfor %}
-    
+
 
 
     {% if async_progress %}
@@ -47,15 +64,15 @@
     </div>
 
     <form name="qform" id="qform" action="{{ request.path }}" method="POST">
-    
+
         {% csrf_token %}
 
         <input type="hidden" name="questionset_id" value="{{ questionset.id }}" />
-    
+
         {% for question, qdict in qlist %}
         {% with errors|dictget:question.number as error %}
 
-            <div class="question type_{{ qdict.qtype }} {% if error %} error prepend-top{% endif %}{{ qdict.qnum_class }}{{ qdict.qalpha_class }}" id="qc_{{ question.number }}" {{qdict.checkstring|safe}}>                
+            <div class="question type_{{ qdict.qtype }} {% if error %} error prepend-top{% endif %}{{ qdict.qnum_class }}{{ qdict.qalpha_class }}" id="qc_{{ question.number }}" {{qdict.checkstring|safe}}>
                 {% if request.user.is_staff %}
                     <span class="pull-right">
                         <a href="/admin/questionnaire/question/{{ question.id }}/">
@@ -63,7 +80,7 @@
                         </a>
                     </span>
                 {% endif %}
-                    
+
                 {% if qdict.custom %}
                     {% if error %}
                         <div class="error">
@@ -73,7 +90,7 @@
                     {% include qdict.template %}
                 {% else %}
                     <div class="question-text {% if qdict.required %}required{% endif %} {% if error %}text-error{% endif %}">
-                        <span class="qnumber">{{ question.display_number }}.</span> 
+                        <span class="qnumber">{{ question.display_number }}.</span>
                         {{ question.text|safe }}
                     </div>
                     <div class="answer">
@@ -92,14 +109,14 @@
             {% endif %}
         {% endwith %}
         {% endfor %}
-    
-        
-            
+
+
+
             <div style="text-align: center;" class="well questionset-submit">
                 <input class="btn large primary" name="submit" type="submit" value="{% trans "Continue" %}" />
-                
+
             </div>
-            
+
             {% if questionset.prev %}
                 <a class="back-link pull-left" href="javascript:history.back();">{% trans "return to previous page" %}</a>
             {% endif %}
@@ -109,11 +126,11 @@
         {% for trigger in triggers %}
             addtrigger("{{trigger}}");
         {% endfor %}
-        
+
         {% for k,v in qvalues.items %}
             qvalues['{{ k|escapejs }}'] = '{{ v|escapejs }}';
         {% endfor %}
-        
+
         for(key in qvalues) {
             valchanged(key, qvalues[key], this);
         }

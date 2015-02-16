@@ -156,7 +156,7 @@
                 tagName;
 
             methods.destroy.call(this);
-            
+
             tagName = (typeof this.prop === 'function') ? this.prop('tagName') : this.attr('tagName');
 
             var $panel = tagName === 'UL' ? this : $('<ul></ul>').appendTo(this);

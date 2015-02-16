@@ -1,7 +1,6 @@
 /**********************************************************************
-# Copyright (C) 2014 Luís A. Bastião Silva and Universidade de Aveiro
-#
-# Authors: Luís A. Bastião Silva <bastiao@ua.pt>
+# -*- coding: utf-8 -*-
+# Copyright (C) 2014 Universidade de Aveiro, DETI/IEETA, Bioinformatics Group - http://bioinformatics.ua.pt/
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -15,17 +14,17 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-#
+
 ***********************************************************************/
 
 /***
-* This function will draw the graphs 
+* This function will draw the graphs
 * Should provide an abstractoin to the API's
 
-*/ 
-/* This should allow generic components 
+*/
+/* This should allow generic components
  * should decorate other class
-*/ 
+*/
 
 function Scale()
 {
@@ -42,7 +41,7 @@ function Filters()
 
 /** This class only works for documentation process
  ** Thus, you will know what kind of classes you have to implement.
- */ 
+ */
 function RepresentData(wrapper)
 {
 
@@ -65,7 +64,7 @@ function RepresentData(wrapper)
 
     var div='';
     var data='';
-   
+
     var methods = {
         init : function( options, _div, _data ) {
 
@@ -82,14 +81,14 @@ function RepresentData(wrapper)
             g.dataValues = data;
             g.init(div, data);
 
-            dataset = [[], 
-                 
+            dataset = [[],
+
                  ];
             w_g.translateData(_data);
 
 
             w_g.draw('#pc_chart_place', dataset);
-            
+
 
         },
 

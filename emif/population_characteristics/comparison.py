@@ -1,8 +1,5 @@
 # -*- coding: utf-8 -*-
-
-# Copyright (C) 2014 Luís A. Bastião Silva and Universidade de Aveiro
-#
-# Authors: Luís A. Bastião Silva <bastiao@ua.pt>
+# Copyright (C) 2014 Universidade de Aveiro, DETI/IEETA, Bioinformatics Group - http://bioinformatics.ua.pt/
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -16,15 +13,14 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-#
 
 from emif.settings import jerboa_collection, jerboa_aggregation_collection
 from pymongo.errors import OperationFailure
-from .parseJerboaFile import * 
-import json 
+from .parseJerboaFile import *
+import json
 
 from .conf_charts import *
-from .charts.rule_matcher import * 
+from .charts.rule_matcher import *
 
 import json
 
@@ -46,8 +42,8 @@ import os
 
 from django.conf import settings
 
-from .parseJerboaFile import * 
-from .services import * 
+from .parseJerboaFile import *
+from .services import *
 from docs_manager.storage_handler import *
 from population_characteristics.models import *
 
@@ -65,7 +61,7 @@ def handle_compare(request, template_name="compare_populations.html"):
 
     if request.POST:
         # Get the filters to apply.
-        
+
         filters = {}
         #print request.POST
         myRq = dict(request.POST.lists())
@@ -75,24 +71,24 @@ def handle_compare(request, template_name="compare_populations.html"):
                 continue
             filters[i[0:-2]] = myRq[i]
 
-        
+
         #print "Filters" + str(filters)
-        
-        
-        
+
+
+
 
     cp = ComparisonPopulation(None)
-    # Only hard coded for testing 
+    # Only hard coded for testing
     #fingerprint_ids = ["66a47f694ffb676bf7676dfde24900e6", "3dc3d622130eac4d092786afb9a0ec76", "2e303fd12bc5e5fd03a54651dd8d6334"]
     var = "Active patients"
     row = "Count"
     cp.get_variables(var, row, fingerprints_id=fingerprint_ids, filters=filters)
 
-    return render(request, template_name, {'request': request,  
+    return render(request, template_name, {'request': request,
         'owner_fingerprint':False,
         'compare': True,
         'fingerprint_ids' : fingerprint_ids,
-        'contains_population': True }) 
+        'contains_population': True })
 
 
 def handle_compare_values(request, var, row, fingerprint_id, revision, template_name="compare_populations.html"):
@@ -101,11 +97,11 @@ def handle_compare_values(request, var, row, fingerprint_id, revision, template_
     fingerprint_ids = []
     if request.POST:
         # Get the filters to apply.
-        
+
         filters = {}
         #print request.POST
         myRq = dict(request.POST.lists())
-        
+
         for i in myRq:
             if i == 'publickey':
                 continue
@@ -130,9 +126,9 @@ def handle_compare_values(request, var, row, fingerprint_id, revision, template_
         #print "----"
 
     cp = ComparisonPopulation(None)
-    # Only hard coded for testing 
+    # Only hard coded for testing
     #fingerprint_ids = ["66a47f694ffb676bf7676dfde24900e6", "3dc3d622130eac4d092786afb9a0ec76", "2e303fd12bc5e5fd03a54651dd8d6334"]
-    
+
     values = cp.get_variables(var, row, fingerprints_id=fingerprint_ids, filters=filters, revision=revision)
     data = {'values': values}
     response = JSONResponse(data, mimetype="application/json")
@@ -154,7 +150,7 @@ class ComparisonPopulation(object):
     """PopulationCharacteristic: This class controls the Jerboa File
     """
     def __init__(self, arg=None):
-        
+
         self.arg = arg
 
     # Get the list of fingerprints
@@ -163,7 +159,7 @@ class ComparisonPopulation(object):
         for fid in fingerprints_id:
             if fid != None and len(fid) > 0:
                 _filter_fp = {"fingerprint_id": fid}
-                
+
 
                 revision = '-1'
                 try:
@@ -181,21 +177,21 @@ class ComparisonPopulation(object):
 
 
     def get_variables(self, var, row, fingerprints_id=[], filters=[], revision=-1, vars_that_should_exists=[]):
-        
+
         # Sometimes there are rude files. According to Marius (from Erasmus MC)
         # This variable should exist always.
         vars_that_should_exists = ['Count']
 
-        # Get the Rule Matcher 
+        # Get the Rule Matcher
         mrules = RuleMatcher( comp=True)
         __filters = mrules.get_filter(var)
 
         c1 = mrules.get_chart(var)
 
-        dict_query = {'$or': self.__fingerprints_to_mongo_query(fingerprints_id), 
+        dict_query = {'$or': self.__fingerprints_to_mongo_query(fingerprints_id),
             'values.Var': c1.title.var}
 
-        
+
         for ve in vars_that_should_exists:
             dict_query['values.'+ve] = { "$exists" : True }
 
@@ -204,11 +200,11 @@ class ComparisonPopulation(object):
 
         #print "filters"
         #print filters
-        # Apply filters in the query 
+        # Apply filters in the query
         dict_query_general=[]
-        
+
         for ve in filters:
-            
+
             if  isinstance(filters[ve], list):
                 #if not "$or" in dict_query:
                 _or_dict_query = {}
@@ -216,16 +212,16 @@ class ComparisonPopulation(object):
                 for _aux in filters[ve]:
                     _or_dict_query2 = {ve: _aux}
                     _or_dict_query["$or"].append(_or_dict_query2)
-                dict_query_general.append(_or_dict_query)    
+                dict_query_general.append(_or_dict_query)
             else:
                 dict_query[ve] = filters[ve]
-                
-                
+
+
         if dict_query_general != []:
             dict_query["$and"]= dict_query_general
         #print dict_query
         values =  jerboa_aggregation_collection.find(dict_query )
-        
+
 
         results = []
 

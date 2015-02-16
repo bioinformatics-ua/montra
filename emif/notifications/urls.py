@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2014 Ricardo F. Gonçalves Ribeiro and Universidade de Aveiro
-#
-# Authors: Ricardo F. Gonçalves Ribeiro <ribeiro.r@ua.pt>
+# Copyright (C) 2014 Universidade de Aveiro, DETI/IEETA, Bioinformatics Group - http://bioinformatics.ua.pt/
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -15,13 +13,13 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-#
+
 from django.conf.urls.defaults import *
 from views import *
 
 urlpatterns = patterns('',
     # Notifications list for a user
-    url(r'^$', 'notifications.views.see_notifications_defer_all'),   
-    url(r'^(?P<source>[0-9]+)$', 'notifications.views.see_notifications_defer_page'),  
-    url(r'^(?P<source>[0-9]+)/(?P<page>[0-9]+)$', 'notifications.views.see_notifications'),  
+    url(r'^$', 'notifications.views.see_notifications_defer_all'),
+    url(r'^(?P<source>[0-9]+)$', 'notifications.views.see_notifications_defer_page'),
+    url(r'^(?P<source>[0-9]+)/(?P<page>[0-9]+)$', 'notifications.views.see_notifications'),
 )

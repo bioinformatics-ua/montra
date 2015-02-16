@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2014 Luís A. Bastião Silva and Universidade de Aveiro
-#
-# Authors: Luís A. Bastião Silva <bastiao@ua.pt>
+# Copyright (C) 2014 Universidade de Aveiro, DETI/IEETA, Bioinformatics Group - http://bioinformatics.ua.pt/
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -15,36 +13,35 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-#
 
-from population_characteristics.charts.operations import * 
+from population_characteristics.charts.operations import *
 from population_characteristics.charts.aggregation import *
 
 
 class ConfAggregations(object):
 
     def __init__(self):
-        # TODO 
+        # TODO
         pass
 
     def read_settings_from_file(self):
         # TODO
         pass
 
-    """ get the default settings to load 
+    """ get the default settings to load
     """
-    
+
     def get_main_settings(self):
 
         result = []
 
 
-        ### Overall Patient time per database 
+        ### Overall Patient time per database
         ###
         a = Aggregation()
 
         a.var = "Observation time in a year"
-        a.operation = Operation.SUM 
+        a.operation = Operation.SUM
         a.field_to_compute = "Count"
 
 
@@ -90,12 +87,12 @@ class ConfAggregations(object):
         result.append(a)
 
 
-        ### Overall Patient time per database (age groups) 
+        ### Overall Patient time per database (age groups)
         ###
         a = Aggregation()
 
         a.var = "Observation time in a year"
-        a.operation = Operation.SUM 
+        a.operation = Operation.SUM
         a.field_to_compute = "Count"
 
 
@@ -147,13 +144,13 @@ class ConfAggregations(object):
 
 
 
-        ### Overall Patient time per Location  
+        ### Overall Patient time per Location
         ###
 
         a = Aggregation()
 
         a.var = "Observation time in a year"
-        a.operation = Operation.SUM 
+        a.operation = Operation.SUM
         a.field_to_compute = "Count"
 
 
@@ -198,15 +195,15 @@ class ConfAggregations(object):
         result.append(a)
 
 
-        
 
 
-        ### Active Patients per database 
+
+        ### Active Patients per database
         ###
         a = Aggregation()
 
         a.var = "Active patients"
-        a.operation = Operation.SUM 
+        a.operation = Operation.SUM
         a.field_to_compute = "Count"
 
         af = AggregationField()
@@ -262,7 +259,7 @@ class ConfAggregations(object):
         a = Aggregation()
 
         a.var = "Observation time in a year"
-        a.operation = Operation.SUM 
+        a.operation = Operation.SUM
         a.field_to_compute = "Count"
 
 
@@ -310,7 +307,7 @@ class ConfAggregations(object):
         af3.value = 'Value2'
 
 
-        
+
         a.aggregation_fields = [af, af1, af2, af3]
         result.append(a)
 
