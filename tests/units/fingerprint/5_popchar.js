@@ -49,5 +49,42 @@ module.exports = {
       .click('#pc_comments_placeholder .delete_comment:first-child')
       .waitForElementNotPresent('#pc_comments_placeholder .delete_comment:first-child', 5000, 'Comment removed with success')
       .end();
-  }
+  },
+  "Export Population Characteristics chart as png": function(browser){
+    browser
+      .login(browser.globals.username, browser.globals.password)
+      .fingerprint(browser.globals.TUdatabase)
+      .click('[href="#populationcharacteristics"]')
+      .waitForElementVisible('#pc_chart_place', 5000, 'Loaded first chart.')
+      .click('.exportmychart a:first-child')
+      .click('#downloadpng')
+      .assert.chartDownload("#downloadpng", 'Has download attribute')
+      .pause(4000)
+      .end();
+  },
+  "Manipulate Population Characteristics tabular view": function(browser){
+    browser
+      .login(browser.globals.username, browser.globals.password)
+      .fingerprint(browser.globals.TUdatabase)
+      .click('[href="#populationcharacteristics"]')
+      .waitForElementVisible('#pc_chart_place', 5000, 'Loaded first chart.')
+      .click('#tabularlink')
+      .waitForElementVisible('#pc_tabular_place', 5000, 'Opened tabular view')
+      .assert.containsText(".sorting_1:first-child", "1990", "Table is showing")
+      .click('#tabular_table thead th:first-child')
+      .assert.containsText(".sorting_1:first-child", "2009", "Table is able to sort")
+      .end();
+  }/*,
+  "Export Population Characteristics chart in Tabular View": function(browser){
+    browser
+      .login(browser.globals.username, browser.globals.password)
+      .fingerprint(browser.globals.TUdatabase)
+      .click('[href="#populationcharacteristics"]')
+      .waitForElementVisible('#pc_chart_place', 5000, 'Loaded first chart.')
+      .click('#tabularlink')
+      .waitForElementVisible('#pc_tabular_place', 5000, 'Opened tabular view')
+      .click('#export_btns a:first-child')
+      ... <- i cant do anything with the flash container...
+      .end();
+  }*/
 };
