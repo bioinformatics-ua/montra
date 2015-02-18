@@ -1,9 +1,24 @@
+# -*- coding: utf-8 -*-
+# Copyright (C) 2014 Universidade de Aveiro, DETI/IEETA, Bioinformatics Group - http://bioinformatics.ua.pt/
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from Bio import Entrez
 import json
 
 class PubMedObject:
     #Objects
-    
+
     #fields
     journal = ''
     authors = []
@@ -19,7 +34,7 @@ class PubMedObject:
 
         Entrez.email = "tmgodinho@ua.pt"
         Entrez.tool = "test-tool"
-     
+
     #call this after downloading the object
     def fetch_info(self):
         handle = Entrez.efetch(db='pubmed', id=self.pmid, retmode='xml')
@@ -47,7 +62,7 @@ class PubMedObject:
                 pass
 
             try:
-                self.volume = record[0]["MedlineCitation"]["Article"]["Journal"]["JournalIssue"]["Volume"] 
+                self.volume = record[0]["MedlineCitation"]["Article"]["Journal"]["JournalIssue"]["Volume"]
             except Exception, e:
                 pass
 
@@ -60,10 +75,10 @@ class PubMedObject:
                 temp_authors = record[0]["MedlineCitation"]["Article"]["AuthorList"]
 
                 for author in temp_authors:
-                    self.authors.append( author["LastName"] +" " +author["Initials"]) 
+                    self.authors.append( author["LastName"] +" " +author["Initials"])
             except Exception, e:
                 pass
-                
+
             # print "Title: " + self.title
             # print "Authors: %s" % ', '.join(self.authors)
             # print "Journal: " + self.journal

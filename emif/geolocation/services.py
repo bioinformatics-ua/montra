@@ -1,9 +1,5 @@
 # -*- coding: utf-8 -*-
-
-# Copyright (C) 2013 Luís A. Bastião Silva and Universidade de Aveiro
-#
-# Authors: Luís A. Bastião Silva <bastiao@ua.pt>
-#          Ricardo Ribeiro       <ribeiro.r@ua.pt>
+# Copyright (C) 2014 Universidade de Aveiro, DETI/IEETA, Bioinformatics Group - http://bioinformatics.ua.pt/
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -17,18 +13,19 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 #
 # Adds a city to the internal database of cities with his location (if it doesnt exist yet)
 # receives as input a qlist
 
 from emif.models import City
-from geopy import geocoders 
+from geopy import geocoders
 
 def add_city(qlist_general):
     # iterate until we find the location field (City or location fields)
     for qs_aux, qlist in qlist_general:
         for question, qdict in qlist:
-            
+
             if question.text == 'Location' or question.text == 'City':
                 city_name = qdict['value'].lower()
                 # check if the city is on the db
@@ -62,7 +59,7 @@ def retrieve_geolocation(city_name):
     try:
         #g = geocoders.GeoNames(username='bastiao')
         g = geocoders.GoogleV3()
-        
+
         if g == None:
             return None
 

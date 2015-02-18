@@ -1,3 +1,18 @@
+# -*- coding: utf-8 -*-
+# Copyright (C) 2014 Universidade de Aveiro, DETI/IEETA, Bioinformatics Group - http://bioinformatics.ua.pt/
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from questionnaire.models import *
 from searchengine.models import *
 from django.shortcuts import render_to_response, get_object_or_404
@@ -14,8 +29,8 @@ for i in tempIDS:
 	q = questions[0]
 	choices = Choice.objects.filter(question=q, sortid=4).order_by('sortid')
 	if len(choices) == 0:
-		nCh = Choice(question=q, sortid=4, 
-			value="Repeated collection(Specify frequency and/or time interval)", 
+		nCh = Choice(question=q, sortid=4,
+			value="Repeated collection(Specify frequency and/or time interval)",
 			text_en="Repeated collection(Specify frequency and/or time interval)")
 		nCh.save()
 	else:
@@ -33,17 +48,17 @@ q = questions[0]
 q.type = "choice"
 choices = Choice.objects.filter(question=q).order_by('sortid')
 choiceArr = {}
-choiceArr[1] = Choice(question=q, sortid=1, 
-		value="Yes", 
+choiceArr[1] = Choice(question=q, sortid=1,
+		value="Yes",
 		text_en="Yes")
-choiceArr[2]=Choice(question=q, sortid=2, 
-		value="No", 
+choiceArr[2]=Choice(question=q, sortid=2,
+		value="No",
 		text_en="No")
-choiceArr[3]=Choice(question=q, sortid=3, 
-		value="Some", 
+choiceArr[3]=Choice(question=q, sortid=3,
+		value="Some",
 		text_en="Some")
-choiceArr[4]=Choice(question=q, sortid=4, 
-		value="Do not know", 
+choiceArr[4]=Choice(question=q, sortid=4,
+		value="Do not know",
 		text_en="Do not know")
 
 for c in choices:
@@ -87,7 +102,7 @@ for dic in tempIDS:
 def fix_question_6_01_01_0X():
 	questions = Question.objects.filter(id=6704)
 	q = questions[0]
-	
+
 	model_choices = Choice.objects.filter(question=q).order_by('sortid')
 	if len(model_choices) == 0:
 		return
@@ -97,12 +112,12 @@ def fix_question_6_01_01_0X():
 	to_fix_questions.append(questions[0])
 	questions = Question.objects.filter(id=6706)
 	to_fix_questions.append(questions[0])
-	
+
 	for q in to_fix_questions:
 		Choice.objects.filter(question=q).delete()
 		for ch in model_choices:
-			nChoice = Choice(question=q, sortid=ch.sortid, 
-				value=ch.value, 
+			nChoice = Choice(question=q, sortid=ch.sortid,
+				value=ch.value,
 				text_en=ch.text_en)
 			nChoice.save()
 
@@ -116,8 +131,8 @@ for i in tempIDS:
 	q = questions[0]
 	choices = Choice.objects.filter(question=q, sortid=3).order_by('sortid')
 	if len(choices) == 0:
-		nCh = Choice(question=q, sortid=3, 
-			value="Do not know", 
+		nCh = Choice(question=q, sortid=3,
+			value="Do not know",
 			text_en="Do not know")
 		nCh.save()
 	else:

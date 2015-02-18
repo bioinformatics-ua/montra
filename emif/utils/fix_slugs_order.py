@@ -1,8 +1,5 @@
 # -*- coding: utf-8 -*-
-
-# Copyright (C) 2014 Ricardo Ribeiro
-#
-# Authors: Ricardo Ribeiro <ribeiro.r@ua.pt>
+# Copyright (C) 2014 Universidade de Aveiro, DETI/IEETA, Bioinformatics Group - http://bioinformatics.ua.pt/
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -14,10 +11,8 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 #
-# You shoul d have received a copy of the GNU General Public License
+# You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-#
-
 from questionnaire.models import Questionnaire, QuestionSet, Question
 from searchengine.models import Slugs
 import sys

@@ -1,7 +1,6 @@
 /**********************************************************************
-# Copyright (C) 2014 Luís A. Bastião Silva and Universidade de Aveiro
-#
-# Authors: Luís A. Bastião Silva <bastiao@ua.pt>
+# -*- coding: utf-8 -*-
+# Copyright (C) 2014 Universidade de Aveiro, DETI/IEETA, Bioinformatics Group - http://bioinformatics.ua.pt/
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -15,7 +14,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-#
+
 ***********************************************************************/
 
 
@@ -23,37 +22,37 @@
 function GraphicChartD3(divArg, dataArg)
 {
   /** Passes the initial arguments required to start and d3
-  Also , this should be used to know if 
+  Also , this should be used to know if
   */
-  this.div = divArg; 
+  this.div = divArg;
   this.dataValues = dataArg;
   this.xscale = null ;
   this.yscale = null ;
   this.self = this;
   this.init = function(){
-    
+
     console.log('this in GraphCharD3'  + this);
   };
 
   this.translateData = function(objects){
-    
+
     console.log(objects);
-    /*** Lets translate our data model to the d3 support data model */ 
+    /*** Lets translate our data model to the d3 support data model */
     xscale = {'bins':5}
     xscale.bins = 25;
     var i = 1;
-    dataset = [[], 
-                 
+    dataset = [[],
+
                  ];
     objects.values.forEach(function(row){
       dataset[0].push({'xvalue':row.Value1, 'yvalue':parseInt(row.Count)});
-  
+
     });
-    
+
   };
 
   this.draw = function(div, dataset){
-    
+
       var margin = {top: 20, right: 20, bottom: 30, left: 60},
           width = 460 - margin.left - margin.right,
           height = 500 - margin.top - margin.bottom;
@@ -76,7 +75,7 @@ function GraphicChartD3(divArg, dataArg)
            var xAxis = null;
            var self = this;
     function zoom() {
-       
+
         svg.select(".xaxis").call(xAxis);
         svg.select(".yaxis").call(yAxis);
         svg.selectAll(".svg rect").attr("transform", "translate(" + d3.event.translate[0] + ",0)scale(" + d3.event.scale + ", 1)");
@@ -91,9 +90,9 @@ function GraphicChartD3(divArg, dataArg)
           .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
         svg.call(d3.behavior.zoom().on("zoom",  function () {
           zoom();
-        
+
     }));
-      
+
       dataset.forEach(function (data) {
         console.log("THIS IS MY DATA: " + data);
         console.log(data);
@@ -130,7 +129,7 @@ function GraphicChartD3(divArg, dataArg)
             .attr("dy", ".71em")
             .style("text-anchor", "end")
             .text("");
-            
+
         svg.selectAll(".bar")
             .data(data)
           .enter().append("rect")
@@ -144,7 +143,7 @@ function GraphicChartD3(divArg, dataArg)
 
 
 
-   }; 
+   };
 };
 
 

@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2014 Ricardo F. Gonçalves Ribeiro and Universidade de Aveiro
-#
-# Authors: Ricardo F. Gonçalves Ribeiro <ribeiro.r@ua.pt>
+# Copyright (C) 2014 Universidade de Aveiro, DETI/IEETA, Bioinformatics Group - http://bioinformatics.ua.pt/
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -15,7 +13,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-#
+
 
 from django.shortcuts import render
 from django.http import HttpResponse
@@ -36,7 +34,7 @@ def see_notifications(request, source, page, template_name='notifications.html')
 
     rows = define_rows(request)
 
-    notifications = Notification.objects.filter(destiny=request.user, type=Notification.SYSTEM, 
+    notifications = Notification.objects.filter(destiny=request.user, type=Notification.SYSTEM,
                                                 removed=False).order_by('-created_date')
 
     notifications_unread = notifications.filter(read=False)
@@ -64,7 +62,7 @@ def see_notifications(request, source, page, template_name='notifications.html')
             pager_unread =  myPaginator_unread.page(1)
 
         pager = myPaginator.page(1)
-        pager_read = myPaginator_read.page(1) 
+        pager_read = myPaginator_read.page(1)
     elif source == '2' :
         try:
             pager_read =  myPaginator_read.page(page)
@@ -72,10 +70,10 @@ def see_notifications(request, source, page, template_name='notifications.html')
             pager_read =  myPaginator_read.page(1)
 
         pager = myPaginator.page(1)
-        pager_unread = myPaginator_unread.page(1)          
+        pager_unread = myPaginator_unread.page(1)
 
-    return render(request, template_name, 
-        {   'request': request, 
+    return render(request, template_name,
+        {   'request': request,
             'notifications': pager,
             'notifications_unread': pager_unread,
             'notifications_read': pager_read,
