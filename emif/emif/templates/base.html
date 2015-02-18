@@ -75,7 +75,14 @@
         {% endcompress %}
 
         {% compress js %}
-
+        <script src="{{ STATIC_URL }}js/vendor/raven.js"></script>
+        <script type="application/javascript">
+            Raven.config('{{SENTRY_URL}}').install();
+            Raven.setUser({
+                email: '{{user.get_full_name}}',
+                username: '{{user.email}}'
+            });
+        </script>
         <script src="{{ STATIC_URL }}js/vendor/inheritance.js"></script>
         <script src="{{ STATIC_URL }}js/vendor/modernizr-2.6.2.min.js"></script>
         <script src="{{ STATIC_URL }}js/vendor/jquery-1.9.1.min.js"></script>
