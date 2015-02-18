@@ -1,3 +1,18 @@
+# -*- coding: utf-8 -*-
+# Copyright (C) 2014 Universidade de Aveiro, DETI/IEETA, Bioinformatics Group - http://bioinformatics.ua.pt/
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from questionnaire.models import *
 from searchengine.models import *
 from django.shortcuts import render_to_response, get_object_or_404
@@ -19,7 +34,7 @@ def q_5_02_04():
 		q = getQuestionObj(qset.id)
 		q.questionset = qset
 		q.number = desiredQN
-		q.text_en = "h2. Others"	
+		q.text_en = "h2. Others"
 		q.type = "choice-yesnodontknow"
 		q.help_text = "Specify each criteria in a separate line."
 		q.slug = "exclusion_criteria_other_5_02_04"
@@ -67,7 +82,7 @@ def q_7_03_10():
 		arr = Question.objects.filter(questionset=id, number=desiredQN)
 		for x in arr:
 			print "TAKE CARE: it has the question, it means that a overwriten will take place"
-			print x.number 
+			print x.number
 			return x
 
 		return Question()
@@ -134,7 +149,7 @@ def q_7_03_10():
 		updateSlug(question)
 
 	print "QUITTING"
-	
+
 def q_8_02_12():
 
 	desiredQN = "8.01.12"
@@ -150,7 +165,7 @@ def q_8_02_12():
 		q = getQuestionObj(qset.id)
 		q.questionset = qset
 		q.number = desiredQN
-		q.text_en = "h2. Specify any other scales"	
+		q.text_en = "h2. Specify any other scales"
 		q.type = "open-textfield"
 		q.help_text = "Specify each scale in a separate line. Try to follow the above questions when possible.<br>Example.  Collected, Version Cummings et al., 1994, Subgroup, Items score available."
 		q.slug = "Dementia_scales_other"
@@ -204,7 +219,7 @@ def q_16_01_01_10():
 		q = getQuestionObj(qset.id)
 		q.questionset = qset
 		q.number = desiredQN
-		q.text_en = "h2. Specify any other tests"	
+		q.text_en = "h2. Specify any other tests"
 		q.type = "open-textfield"
 		q.help_text = "Specify each test in a separate line. Try to follow the above questions when possible.<br>Example.  Collected, Version Cummings et al., 1994, Norms available, Routine, If subgroup specify subgroup, Repeated collection (yes/no), If different from study characteristics then specify frequency and/or time interval"
 		q.slug = "Specify_any_other_tests_16_01_01_10"
@@ -257,7 +272,7 @@ def q_16_01_02_08():
 		q = getQuestionObj(qset.id)
 		q.questionset = qset
 		q.number = desiredQN
-		q.text_en = "h2. Specify any other tests"	
+		q.text_en = "h2. Specify any other tests"
 		q.type = "open-textfield"
 		q.help_text = "Specify each test in a separate line. Try to follow the above questions when possible.<br>Example.  Collected, Version Cummings et al., 1994, Norms available, Routine, If subgroup specify subgroup, Repeated collection (yes/no), If different from study characteristics then specify frequency and/or time interval"
 		q.slug = "Specify_any_other_tests_16_01_02_08"
@@ -310,7 +325,7 @@ def q_16_01_02_08():
 		q = getQuestionObj(qset.id)
 		q.questionset = qset
 		q.number = desiredQN
-		q.text_en = "h2. Specify any other tests"	
+		q.text_en = "h2. Specify any other tests"
 		q.type = "open-textfield"
 		q.help_text = "Specify each test in a separate line. Try to follow the above questions when possible.<br>Example.  Collected, Version Cummings et al., 1994, Norms available, Routine, If subgroup specify subgroup, Repeated collection (yes/no), If different from study characteristics then specify frequency and/or time interval"
 		q.slug = "Specify_any_other_tests_16_01_02_08"
@@ -364,7 +379,7 @@ def q_16_01_03_06():
 		q = getQuestionObj(qset.id)
 		q.questionset = qset
 		q.number = desiredQN
-		q.text_en = "h2. Specify any other tests"	
+		q.text_en = "h2. Specify any other tests"
 		q.type = "open-textfield"
 		q.help_text = "Specify each test in a separate line. Try to follow the above questions when possible.<br>Example.  Collected, Version Cummings et al., 1994, Norms available, Routine, If subgroup specify subgroup, Repeated collection (yes/no), If different from study characteristics then specify frequency and/or time interval"
 		q.slug = "Specify_any_other_tests_16_01_03_06"
@@ -419,7 +434,7 @@ def q_16_01_04_06():
 		q = getQuestionObj(qset.id)
 		q.questionset = qset
 		q.number = desiredQN
-		q.text_en = "h2. Specify any other tests"	
+		q.text_en = "h2. Specify any other tests"
 		q.type = "open-textfield"
 		q.help_text = "Specify each test in a separate line. Try to follow the above questions when possible.<br>Example.  Collected, Version Cummings et al., 1994, Norms available, Routine, If subgroup specify subgroup, Repeated collection (yes/no), If different from study characteristics then specify frequency and/or time interval"
 		q.slug = "Specify_any_other_tests_16_01_04_06"
@@ -473,7 +488,7 @@ def q_16_01_05_06():
 		q = getQuestionObj(qset.id)
 		q.questionset = qset
 		q.number = desiredQN
-		q.text_en = "h2. Specify any other tests"	
+		q.text_en = "h2. Specify any other tests"
 		q.type = "open-textfield"
 		q.help_text = "Specify each test in a separate line. Try to follow the above questions when possible.<br>Example.  Collected, Version Cummings et al., 1994, Norms available, Routine, If subgroup specify subgroup, Repeated collection (yes/no), If different from study characteristics then specify frequency and/or time interval"
 		q.slug = "Specify_any_other_tests_16_01_05_06"
@@ -527,7 +542,7 @@ def q_16_01_06_05():
 		q = getQuestionObj(qset.id)
 		q.questionset = qset
 		q.number = desiredQN
-		q.text_en = "h2. Specify any other tests"	
+		q.text_en = "h2. Specify any other tests"
 		q.type = "open-textfield"
 		q.help_text = "Specify each test in a separate line. Try to follow the above questions when possible.<br>Example.  Collected, Version Cummings et al., 1994, Norms available, Routine, If subgroup specify subgroup, Repeated collection (yes/no), If different from study characteristics then specify frequency and/or time interval"
 		q.slug = "Specify_any_other_tests_16_01_06_05"
@@ -582,7 +597,7 @@ def q_16_01_07_07():
 		q = getQuestionObj(qset.id)
 		q.questionset = qset
 		q.number = desiredQN
-		q.text_en = "h2. Specify any other tests"	
+		q.text_en = "h2. Specify any other tests"
 		q.type = "open-textfield"
 		q.help_text = "Specify each test in a separate line. Try to follow the above questions when possible.<br>Example.  Collected, Version Cummings et al., 1994, Norms available, Routine, If subgroup specify subgroup, Repeated collection (yes/no), If different from study characteristics then specify frequency and/or time interval"
 		q.slug = "Specify_any_other_tests_16_01_07_07"
@@ -636,7 +651,7 @@ def q_16_01_08_04():
 		q = getQuestionObj(qset.id)
 		q.questionset = qset
 		q.number = desiredQN
-		q.text_en = "h2. Specify any other tests"	
+		q.text_en = "h2. Specify any other tests"
 		q.type = "open-textfield"
 		q.help_text = "Specify each test in a separate line. Try to follow the above questions when possible.<br>Example.  Collected, Version Cummings et al., 1994, Norms available, Routine, If subgroup specify subgroup, Repeated collection (yes/no), If different from study characteristics then specify frequency and/or time interval"
 		q.slug = "Specify_any_other_tests_16_01_08_04"
@@ -692,7 +707,7 @@ def q_9_01_06():
 		q = getQuestionObj(qset.id)
 		q.questionset = qset
 		q.number = desiredQN
-		q.text_en = "h2. Specify any other scales"	
+		q.text_en = "h2. Specify any other scales"
 		q.type = "open-textfield"
 		q.help_text = "Specify each scale in a separate line. Try to follow the above questions when possible.<br>Example.  Collected, Version Cummings et al., 1994, Subgroup, Items score available."
 		q.slug = "Specify_any_other_tests_9_01_06"
@@ -748,7 +763,7 @@ def q_11_01_10():
 		q = getQuestionObj(qset.id)
 		q.questionset = qset
 		q.number = desiredQN
-		q.text_en = "h2. Specify any other scales"	
+		q.text_en = "h2. Specify any other scales"
 		q.type = "open-textfield"
 		q.help_text = "Specify each scale in a separate line. Try to follow the above questions when possible.<br>Example.  Collected, Version Cummings et al., 1994, Subgroup, Items score available."
 		q.slug = "Specify_any_other_tests_11_01_10"
@@ -802,7 +817,7 @@ def q_12_01_10():
 		q = getQuestionObj(qset.id)
 		q.questionset = qset
 		q.number = desiredQN
-		q.text_en = "h2. Specify any other scales"	
+		q.text_en = "h2. Specify any other scales"
 		q.type = "open-textfield"
 		q.help_text = "Specify each scale in a separate line. Try to follow the above questions when possible.<br>Example.  Collected, Version Cummings et al., 1994, Subgroup, Items score available."
 		q.slug = "Specify_any_other_tests_12_01_10"
@@ -858,7 +873,7 @@ def q_15_01_06():
 		q = getQuestionObj(qset.id)
 		q.questionset = qset
 		q.number = desiredQN
-		q.text_en = "h2. Specify any other tests"	
+		q.text_en = "h2. Specify any other tests"
 		q.type = "open-textfield"
 		q.help_text = "Specify each test in a separate line. Try to follow the above questions when possible.<br>Example.  Collected, Version Cummings et al., 1994, Routine, If subgroup specify subgroup, Repeated collection (yes/no), If different from study characteristics then specify frequency and/or time interval"
 		q.slug = "Specify_any_other_tests_15_01_06"
@@ -913,7 +928,7 @@ def q_20_02_13():
 		q = getQuestionObj(qset.id)
 		q.questionset = qset
 		q.number = desiredQN
-		q.text_en = "h2. Specify other assessements"	
+		q.text_en = "h2. Specify other assessements"
 		q.type = "open-textfield"
 		q.help_text = "Specify other analytics of interests separated by line."
 		q.slug = "Specify_any_other_tests_20_01_02_13"
@@ -984,7 +999,7 @@ def q_18_01_08():
 		q = getQuestionObj(qset.id)
 		q.questionset = qset
 		q.number = desiredQN
-		q.text_en = "h2. Specify any others"	
+		q.text_en = "h2. Specify any others"
 		q.type = "open-textfield"
 		q.help_text = "Specify each examination in a separate line. Try to follow the above questions when possible.<br>Example.  Blood Pressure, Subgroup in participants with plasma and CSF, Repeated collection (more than once)."
 		q.slug = "Specify_any_other_examinations_18_01_08"

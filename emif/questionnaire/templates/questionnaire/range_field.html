@@ -1,4 +1,21 @@
 {% comment %}
+# -*- coding: utf-8 -*-
+# Copyright (C) 2014 Universidade de Aveiro, DETI/IEETA, Bioinformatics Group - http://bioinformatics.ua.pt/
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+{% endcomment %}
+{% comment %}
 ATTENTION: This IS NOT a FIELD QUESTIONNAIRE TYPE, ITS JUST THE range INPUT, to be REUSABLE enough on other questionnaire field types
 {% endcomment %}
 {% load i18n %}
@@ -17,17 +34,17 @@ ATTENTION: This IS NOT a FIELD QUESTIONNAIRE TYPE, ITS JUST THE range INPUT, to 
                         <td>From: </td>
                         <td><input id="from_{{ question.number|removedots }}" type="text"/></td>
                             <td><div class="checkbox">
-                            
+
                             <input style="margin-top: 5px;" id="anyfrom_{{ question.number|removedots }}" type="checkbox"> Any Value
-                            
+
                         </div></td>
                 </tr><tr>
                 <td>To: </td>
                 <td><input id="to_{{ question.number|removedots }}" type="text"/></td>
                     <td><div style="margin-top: 5px;" class="checkbox">
-                    
+
                     <input id="anyto_{{ question.number|removedots }}" type="checkbox"> Any Value
-                    
+
                 </div></td>
         </tr>
     </table>

@@ -1,8 +1,5 @@
 # -*- coding: utf-8 -*-
-
-# Copyright (C) 2013 Luís A. Bastião Silva and Universidade de Aveiro
-#
-# Authors: Luís A. Bastião Silva <bastiao@ua.pt>
+# Copyright (C) 2014 Universidade de Aveiro, DETI/IEETA, Bioinformatics Group - http://bioinformatics.ua.pt/
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -16,14 +13,11 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-#
-
-
 from questionnaire.models import *
 from django.shortcuts import render_to_response, get_object_or_404
 import sys
 
-id_questionnaire = 1 
+id_questionnaire = 1
 
 id_question = 889
 
@@ -41,7 +35,7 @@ def increment_value(number):
 
 	if (value==-1):
 		value = number.split(".")
-	
+
 	v1 = str(int(value[0])+1)
 	v2 = str(int(value[1]))
 
@@ -61,7 +55,7 @@ start = False
 for qs in qsets:
 	print "iterate questions"
 	expected = Question.objects.filter(questionset=qs.id).order_by('number')
-	
+
 	for q in expected:
 		if start:
 			q.number = increment_value(q.number)
@@ -70,5 +64,5 @@ for qs in qsets:
 			q.save()
 		if (q.id==id_question):
 			start = True
-		
+
 

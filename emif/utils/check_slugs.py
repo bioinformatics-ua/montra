@@ -1,8 +1,5 @@
 # -*- coding: utf-8 -*-
-
-# Copyright (C) 2013 Luís A. Bastião Silva and Universidade de Aveiro
-#
-# Authors: Luís A. Bastião Silva <bastiao@ua.pt>
+# Copyright (C) 2014 Universidade de Aveiro, DETI/IEETA, Bioinformatics Group - http://bioinformatics.ua.pt/
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -16,9 +13,6 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-#
-
-
 
 from django.http import HttpResponse, HttpResponseRedirect
 
@@ -30,11 +24,11 @@ from searchengine.models import *
 
 from django.conf import settings
 
-#### 
-#### The goal of this script is to verify if anything from the solr is missing mapping in 
+####
+#### The goal of this script is to verify if anything from the solr is missing mapping in
 #### the fingerprint template.
-#### ... 
-#### 
+#### ...
+####
 
 
 
@@ -61,11 +55,11 @@ for r in results:
     if (r.keys()==None):
         continue
     to_swap = False
-    for k in r.keys(): 
+    for k in r.keys():
         if k in ignore_keys:
             continue
         qu = get_object_or_404(Questionnaire, slug=r['type_t'])
         slugs = Slugs.objects.filter(slug1=k[0:-2])
         if (len(slugs)==0):
-            print "fingerprint id" + r['id'] 
+            print "fingerprint id" + r['id']
             print "problem in " + k[0:-2]

@@ -1,3 +1,20 @@
+/*
+# -*- coding: utf-8 -*-
+# Copyright (C) 2014 Universidade de Aveiro, DETI/IEETA, Bioinformatics Group - http://bioinformatics.ua.pt/
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
 /* question numbers are always bold, the whole question if it is required */
 .required, .qnumber {
     font-weight: bold;
@@ -29,7 +46,7 @@ div.input {
 
 /* ensure that all inputs have the same distance to the question */
 div.input input[type="text"], div.input textarea, div.input select {
-    margin: 10px 0 0 0;        
+    margin: 10px 0 0 0;
 }
 
 div.input span.add-on {
@@ -89,7 +106,7 @@ html, body {
 }
 
 .rangeinput label {
-    text-align: left; 
+    text-align: left;
     max-width: 40px;
     margin-left: 10px;
     padding-top: 4px;
@@ -100,22 +117,22 @@ html, body {
 }
 
 .rangeinput span.help-block {
-    clear: left; 
+    clear: left;
     margin-left: 35px;
 }
 
 input.sending {
     text-shadow: 0px 0px 5px white !important;
-    -webkit-transition: 0.3s linear all !important;  
+    -webkit-transition: 0.3s linear all !important;
        -moz-transition: 0.3s linear all !important;
          -o-transition: 0.3s linear all !important;
-            transition: 0.3s linear all !important;   
+            transition: 0.3s linear all !important;
 
 }
 
 .questionset-submit input:disabled {
-    -webkit-transition: 0.3s linear all !important;  
+    -webkit-transition: 0.3s linear all !important;
        -moz-transition: 0.3s linear all !important;
          -o-transition: 0.3s linear all !important;
-            transition: 0.3s linear all !important;   
+            transition: 0.3s linear all !important;
 }

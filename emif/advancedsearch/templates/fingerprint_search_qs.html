@@ -1,4 +1,19 @@
-
+<!-- # -*- coding: utf-8 -*-
+# Copyright (C) 2014 Universidade de Aveiro, DETI/IEETA, Bioinformatics Group - http://bioinformatics.ua.pt/
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#-->
 {% load extra_tags %}
 {% load markup questionnaire i18n %}
 
@@ -46,17 +61,17 @@
                     <!--<input class="btn large btn-primary" name="submit" type="submit" value="{% trans 'Save' %}" />-->
 
                 {% endif %}
-            </div>    
-        </div>    
+            </div>
+        </div>
 
     {% if questions_list.0.0.sortid != 0 and questions_list.0.0.sortid != 99 %}
         <div><a id="collapseall_qs_{{ questions_list.0.0.sortid }}"  class="btn pull-right" href="">Collapse all </a></div>
     {% endif %}
 
-    
+
     <div class="questionset-title" style="font-size:6px">
     <h3>
-    
+
     {{ questions_list.0.0.text|removeh1 }}
 
     </h3>
@@ -65,7 +80,7 @@
     {% if questions_list.0.0.help_text != "" %}
     <div class="clearfix">{{questions_list.0.0.help_text|safe}}</div>
     {% endif %}
-        
+
 
 
         {% csrf_token %}
@@ -159,9 +174,9 @@
                                     {% endif %}
                                     {% if not question.tooltip and question.help_text %}
                                         <div class="input">{{question.help_text|safe}}</div>
-                                    {% endif %} 
-                                    {% include qdict.template %}                                      
-                                    
+                                    {% endif %}
+                                    {% include qdict.template %}
+
                                     <div id="comments_{{question.number|removedots}}" style="display:none;margin-left:40px;">
                                      <a href="" class="span6" onclick="toggle_comments('{{question.number|removedots}}'); return false;"><i class="icon-comment-alt">&nbsp;</i> Comments</a>
                                     <textarea style=" background-color:#EEE;color: #000;" class="span6" name="comment_question_{{ question.number }}" cols="50" rows="5">{{qdict.comment}}</textarea>
@@ -179,7 +194,7 @@
                         </div> <!-- /question container -->
             {% endwith %}
 
-        {% endfor %} 
+        {% endfor %}
         <div class="well questionset-submit">
             <!-- Previous | Next buttons -->
             <div class="span5 text-center">
@@ -219,27 +234,27 @@
                 {% if questions_list.0.0.sortid == 99 %}
                     <!--<input class="btn large btn-primary" name="submit" type="submit" value="{% trans 'Save' %}" />-->
                 {% endif %}
-            </div>    
-        </div>                                        
+            </div>
+        </div>
 <script type="text/javascript">
 
     {% block scriptextra %}
 function add_triggers() {
-            
+
             {% for trigger in triggers %}
                 addtrigger("{{trigger}}");
             {% endfor %}
-            
+
             {% for k,v in qvalues.items %}
                 qvalues['question_{{ k|escapejs }}'] = '{{ v|escapejs }}';
             {% endfor %}
-            
+
             for(key in qvalues) {
                 initialvalchanged(key, qvalues[key], this);
             }
-            
+
 }
-             
+
 $(function(){
     tabindexer();
 
@@ -249,16 +264,16 @@ $(function(){
     });
     $(".accordion-group").on("hidden",".collapse",function() {
         $(this).css("overflow","hidden");
-    });    
-});    
-    
+    });
+});
+
 function tabindexer(){
     var index=1;
     $('input').each(function(){
         $(this).attr('tabindex',index++);
     });
-}    
-    
+}
+
 function toggle_comments(question_number)
 {
     console.log("q + "+ question_number);
@@ -287,9 +302,9 @@ function validate(question_number)
         $('#success_'+question_number).addClass("show");
         $('#success_'+question_number).removeClass("hide");
       }
-      
+
     });
-    
+
 
 
 }
@@ -308,7 +323,7 @@ function validate(question_number)
        collapseAll($("#collapseall_qs_{{ k.sortid }}"), div_id);
 
        });
-         
+
         {% endif %}
         {% endfor %}
 

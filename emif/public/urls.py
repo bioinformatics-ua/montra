@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2014 Ricardo F. Gonçalves Ribeiro and Universidade de Aveiro
-#
-# Authors: Ricardo F. Gonçalves Ribeiro <ribeiro.r@ua.pt>
+# Copyright (C) 2014 Universidade de Aveiro, DETI/IEETA, Bioinformatics Group - http://bioinformatics.ua.pt/
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -15,19 +13,18 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-#
 from django.conf.urls.defaults import *
 from views import *
 
 urlpatterns = patterns('',
-   
+
     # Public database info view
-    url(r'^fingerprint/(?P<fingerprintshare_id>[^/]+)$', 'public.views.fingerprint'),  
-    
+    url(r'^fingerprint/(?P<fingerprintshare_id>[^/]+)$', 'public.views.fingerprint'),
+
     # Public links create new
-    url(r'^fingerprint/create/(?P<fingerprint_id>[^/]+)$', 'public.views.fingerprint_create'),   
-    url(r'^fingerprint/delete/(?P<share_id>[^/]+)$', 'public.views.fingerprint_delete'),  
+    url(r'^fingerprint/create/(?P<fingerprint_id>[^/]+)$', 'public.views.fingerprint_create'),
+    url(r'^fingerprint/delete/(?P<share_id>[^/]+)$', 'public.views.fingerprint_delete'),
 
     # Public links listing
-    url(r'^fingerprint$', 'public.views.fingerprint_list'),   
+    url(r'^fingerprint$', 'public.views.fingerprint_list'),
 )

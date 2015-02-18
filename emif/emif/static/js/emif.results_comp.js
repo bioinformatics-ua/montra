@@ -1,3 +1,21 @@
+/*
+# -*- coding: utf-8 -*-
+# Copyright (C) 2014 Universidade de Aveiro, DETI/IEETA, Bioinformatics Group - http://bioinformatics.ua.pt/
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
+*/
 var match=true;
 var unmatch=true;
 var emptyrows=true;
@@ -10,17 +28,17 @@ function hasFilters(){
   if($('#searchfilter').val().trim() != '')
     return true;
 
-  // else 
+  // else
   return false;
 }
 
 $("#collapseall").bind('click',function(e)
-        { 
-          //e.preventDefault(); 
+        {
+          //e.preventDefault();
           //e.stopPropagation();
-          
+
           collapse_expand(this);
-            
+
           return false;
         });
 
@@ -38,24 +56,24 @@ function collapse_expand(context){
               $(context).html('<i class="icon-minus"></i>&nbsp; Collapse all');
               //change_name_collapse(true);
               $(".collapse:visible").collapse("show");
-          }  
+          }
 }
 function doublecheck_expansions(){
           context = $("#collapseall");
 
           if ($(context).text().indexOf('Collapse')!=-1)
           {
-              $(".collapse:visible").collapse("show"); 
+              $(".collapse:visible").collapse("show");
           }
           else
           {
               $(".collapse.in:visible").collapse("hide");
-          } 
+          }
 }
 function reset_empties(){
   $('#database_listings').show();
   $('#no_results').hide();
-    
+
 }
 
 
@@ -72,8 +90,8 @@ function reset_empties(){
     $.fn.delayKeyup = function(callback, ms){
         var timer = 0;
         $(this).keyup(function(e){
-            e.preventDefault(); 
-            e.stopPropagation();  
+            e.preventDefault();
+            e.stopPropagation();
 
             clearTimeout (timer);
             timer = setTimeout(callback, ms);
@@ -134,7 +152,7 @@ myFunc = function(name)
   current = current.replace("a_", "");
   current = current.split("_")[0];
   //console.log(this.parent);
-  
+
    $('div[id]').filter(function () {
     return /^collapse.*$/.test(this.id);
 }).each(function (name2) {
@@ -152,8 +170,8 @@ $("div[id^='collapse']").filter(function(){
     //console.log(this.id);
     //console.log(current);
     if (!this.id.indexOf(current))
-    { 
-      $('#'+this.id).collapse('toggle'); 
+    {
+      $('#'+this.id).collapse('toggle');
     };
 });
 
@@ -184,7 +202,7 @@ function DatabaseSelector(container, num_visible, options){
   this.showing = [];
   this.reference = null;
   this.dropdown_subcontainer = null;
-  this.visible = num_visible; 
+  this.visible = num_visible;
 
   // optional configurations
   this.configs =  $.extend({
@@ -227,12 +245,12 @@ DatabaseSelector.prototype = {
 
         this.showing.splice(index_old, 1,  new_fingerprint_id);
 
-      } 
+      }
       /* If the fingerprint is already showing and we just want to swap places */
       else if (index_new != -1 && index_list != null) {
         var temp = this.showing[index_old];
         this.showing[index_old] = this.showing[index_new];
-        this.showing[index_new] = temp;        
+        this.showing[index_new] = temp;
       }
 
       if(old_fingerprint_id == this.reference){
@@ -243,7 +261,7 @@ DatabaseSelector.prototype = {
       if(this.configs.select_callback){
         this.configs.select_callback();
       }
-    } 
+    }
 
   },
 
