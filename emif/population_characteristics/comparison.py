@@ -110,10 +110,7 @@ def handle_compare_values(request, var, row, fingerprint_id, revision, template_
             #    fingerprint_ids.append(i.replace("chks_", ""))
             #    continue
             if "fingerprint_i" in i:
-                fingerprints_transf = request.POST[i].replace("\n", "")
-                fps = fingerprints_transf.split(" ")
-                for fp in fps:
-                    fingerprint_ids.append(fp)
+                fingerprint_ids = request.POST.getlist(i)
                 continue
             filters[i[8:-3]] = myRq[i]
 
