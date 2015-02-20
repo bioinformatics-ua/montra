@@ -24,6 +24,8 @@ from django.utils import simplejson as json
 from parsers import parse_checks, ParseException
 from django.conf import settings
 from django.contrib.auth.models import User
+from django.dispatch import receiver
+from django.db.models.signals import post_save
 
 import json
 
@@ -517,3 +519,40 @@ class Choice(models.Model):
 
     class Meta:
         translate = ('text',)
+
+class QuestionnaireWizard(models.Model):
+    questionnaire = models.ForeignKey(Questionnaire)
+    user = models.ForeignKey(User)
+    removed = models.BooleanField(default=False)
+
+    @staticmethod
+    def all(user=None):
+        tmp = QuestionnaireWizard.objects.filter(removed=False)
+
+        if user != None:
+            tmp=tmp.filter(user=user)
+
+        return tmp
+
+    def remove(self):
+        self.removed=True
+        self.save()
+
+    def interest(self, interested):
+        if interested:
+            prof = self.user.emif_profile
+
+            prof.interests.add(self.questionnaire)
+            prof.save()
+
+        self.remove()
+
+
+@receiver(post_save, sender=Questionnaire)
+def __create_wizards(sender, instance, created, *args, **kwargs):
+    '''This method uses the post_save signal on Questionnaire to generate wizards to existing users
+    '''
+    if created:
+        for user in User.objects.all():
+            qw = QuestionnaireWizard(questionnaire=instance, user=user)
+            qw.save()
