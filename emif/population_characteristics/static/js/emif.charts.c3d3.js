@@ -83,6 +83,7 @@ function GraphicChartC3D3(divArg, dataArg)
             $.each(actualChart.filters, function(a){
 
               // Translate the fields (for now staticly hard coded for Gender)
+
               if (actualChart.filters[a]['translation']!=null && actualChart.filters[a]['show'])
               {
                 multivalue_stacked = actualChart.filters[a]['value'];
@@ -105,7 +106,7 @@ function GraphicChartC3D3(divArg, dataArg)
                 actualChart.filters[a]['comparable_values']==null &&
                 actualChart.filters[a]['values']!=null)
               {
-                console.log("chart filter");
+                //console.log("chart filter");
                 //console.log(actualChart.filters[a]);
                 //console.log(actualChart.filters[a]['values']);
                 multivalue_stacked = actualChart.filters[a]['value']
@@ -520,8 +521,6 @@ function GraphicChartC3D3(divArg, dataArg)
     chartConfigs.zoom.rescale = true;
 
     chartConfigs.padding.bottom = 5
-
-    console.log(chartConfigs);
 
     try{chart = c3.generate((chartConfigs));}
     catch(ex)

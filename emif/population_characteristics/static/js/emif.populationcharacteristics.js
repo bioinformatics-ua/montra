@@ -312,8 +312,7 @@ var stuff;
               }
             });
             //console.log('JSON_OUTPUT');
-            //console.log(JSON.stringify(JSON_OUTPUT));
-
+            actualChart.filters = filters_tmp;
 
             filter_dropdown = $(this).dyndropdown({
                     label: "Filter",
@@ -339,7 +338,6 @@ var stuff;
 
             filter_dropdown.setStructure(JSON.stringify(JSON_OUTPUT));
 
-            actualChart.filters = filters_tmp;
 
             var match=false;
 
@@ -460,7 +458,7 @@ var stuff;
 
 
             });
-
+            console.log('here');
             actualChart.filters = filters_tmp;
 
 
