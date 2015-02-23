@@ -86,6 +86,7 @@ function GraphicChartC3D3(divArg, dataArg)
               if (actualChart.filters[a]['translation']!=null && actualChart.filters[a]['show'])
               {
                 multivalue_stacked = actualChart.filters[a]['value'];
+
                 $.each(actualChart.filters[a]['translation'], function(tr) {
 
                     // Only the simple ones will be translated. ALL is ignored by default
@@ -99,7 +100,6 @@ function GraphicChartC3D3(divArg, dataArg)
 
 
                   });
-
               }
               else if (actualChart.filters[a]['comparable']==true &&
                 actualChart.filters[a]['comparable_values']==null &&
@@ -136,6 +136,7 @@ function GraphicChartC3D3(divArg, dataArg)
       }
 
     var _xValuesMV = {};
+
     objects.values.forEach(function(row){
 
       // Categorized means that the value of X is a string
@@ -340,7 +341,6 @@ function GraphicChartC3D3(divArg, dataArg)
 
     if (actualChart.y_axis.multivalue)
     {
-
       var arrX = datasetX.slice(0);
       var arrYs = datasetYs;
 
@@ -498,7 +498,6 @@ function GraphicChartC3D3(divArg, dataArg)
     chartConfigs.zoom.rescale = true;
 
     chartConfigs.padding.bottom = 5
-
 
     try{chart = c3.generate((chartConfigs));}
     catch(ex)

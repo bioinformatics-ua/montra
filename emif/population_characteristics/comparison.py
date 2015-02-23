@@ -188,7 +188,6 @@ class ComparisonPopulation(object):
         dict_query = {'$or': self.__fingerprints_to_mongo_query(fingerprints_id),
             'values.Var': c1.title.var}
 
-
         for ve in vars_that_should_exists:
             dict_query['values.'+ve] = { "$exists" : True }
 
@@ -216,9 +215,11 @@ class ComparisonPopulation(object):
 
         if dict_query_general != []:
             dict_query["$and"]= dict_query_general
-        #print dict_query
-        values =  jerboa_aggregation_collection.find(dict_query )
 
+
+        values = jerboa_aggregation_collection.find(dict_query )
+
+        print values.count()
 
         results = []
 
@@ -235,10 +236,10 @@ class ComparisonPopulation(object):
                     values[_v] = new_y
                     #print values[_v]
             return values
+
         values_app = None
+
         for v in values:
-
-
             if c1.y_axis.transformation != None:
                 try:
                     values_app = transform(c1.y_axis.var, c1.y_axis.transformation,v[u'values'])

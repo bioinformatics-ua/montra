@@ -1073,10 +1073,57 @@ class ConfCharts(object):
 
 
         #################################################
-        ### Total patient time in a year (stacked age group)
+        ### Birth date
         #################################################
 
+        c1 = Chart()
+        c1.uid = 2
+        c1.title = Title()
+        c1.title.operation = Operation.UNIQUE
+        c1.title.var = "Birth in year"
+        c1.title.fixed_title = "Birth Year"
+        c1.hint = "Birth year histogram"
+        c1.stacked = True
 
+        c1.x_axis = Axis()
+        c1.x_axis.operation = "unique"
+        c1.x_axis.var = "Value1"
+        c1.x_axis.label = 'Years'
+
+        c1.y_axis = Axis()
+        c1.y_axis.operation = "unique"
+        c1.y_axis.var = "Count"
+        c1.y_axis.label = 'Number of patients'
+        c1.y_axis.multivalue = True
+
+        fy3 = Filter()
+        fy3.name = 'Name1'
+        fy3.key = 'Name1'
+        fy3.value = 'YEAR'
+
+        c1.y_axis.static_filters = [fy3]
+
+        f2 = Filter()
+        f2.name = 'Gender'
+        f2.key = None
+        f2.value = 'Gender'
+        f2.translation = {'M': 'Male', 'F': 'Female', 'T': 'Total'}
+
+        f3 = Filter()
+        f3.name = None
+        f3.key = None
+        f3.value = "dbname_value"
+        f3.show = False
+        f3.comparable = True
+        f3.comparable_values = None
+
+        c1.filters = [f2, f3]
+
+        sc.charts.append(c1)
+
+        #################################################
+        ### Total patient time in a year (stacked age group)
+        #################################################
         c5 = Chart()
         c5.uid = 18
         c5.title = Title()

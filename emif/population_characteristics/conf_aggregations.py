@@ -312,5 +312,45 @@ class ConfAggregations(object):
         result.append(a)
 
 
+        ### Birth year per database
+        ###
+        a = Aggregation()
+
+        a.var = "Birth in year"
+        a.operation = Operation.SUM
+        a.field_to_compute = "Count"
+
+        fy2 = Filter()
+        fy2.name = 'Name1'
+        fy2.key = 'Name1'
+        fy2.value = 'YEAR'
+
+        a.static_filters = [fy2]
+
+        af = AggregationField()
+        af.ttype = "slug"
+        af.name = "database_name_t"
+        af.key = "dbname"
+        af.value = "dbname_value"
+
+        af2 = AggregationField()
+
+        af2.ttype = "tsv"
+        af2.name = None
+        af2.key = None
+        af2.value = 'Gender'
+        af2.exclusive = True
+
+        af1 = AggregationField()
+
+        af1.ttype = "tsv"
+        af1.name = 'YEAR'
+        af1.key = 'Name1'
+        af1.value = 'Value1'
+
+
+        a.aggregation_fields = [af, af2, af1]
+        result.append(a)
+
         return result
 
