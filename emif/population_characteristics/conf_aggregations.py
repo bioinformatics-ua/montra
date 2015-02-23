@@ -35,7 +35,7 @@ class ConfAggregations(object):
 
         result = []
 
-        """
+
         ### Overall Patient time per database
         ###
         a = Aggregation()
@@ -351,7 +351,7 @@ class ConfAggregations(object):
 
         a2.aggregation_fields = [af, af2, af1]
         result.append(a2)
-        """
+
         ### Age at start of year
         ###
         a3 = Aggregation()

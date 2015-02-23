@@ -156,8 +156,6 @@ class AggregationPopulationCharacteristics(object):
 
                         arr_values.append(af.values)
                     if arr_values!=[]:
-                        print "LENGTH:"
-                        print len(arr_values)
                         for combination in itertools.product(*arr_values, repeat=1):
 
                             # Discard combination

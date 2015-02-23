@@ -43,7 +43,6 @@ function PCDraw(actualChart,chartType, e)
     };
     this.draw = function(filters) {
 
-
       if (PAGE_TYPE==PC_NORMAL)
       {
         var PC = new PCAPI(null);
