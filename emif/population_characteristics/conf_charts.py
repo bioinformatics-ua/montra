@@ -1190,6 +1190,72 @@ class ConfCharts(object):
         sc.charts.append(c)
 
 
+
+        #################################################
+        ### Age Distribution at Start of Year
+        #################################################
+        c5 = Chart()
+        c5.uid = 18
+        c5.title = Title()
+        c5.title.operation = Operation.UNIQUE
+        c5.title.var = "Age at start of year"
+        c5.title.fixed_title = "Age Distribution at Start of Year"
+        c5.stacked = True
+        c5.x_axis = Axis()
+        c5.x_axis.operation = "unique"
+        c5.x_axis.var = "Value2"
+        c5.x_axis.label = "Age(years)"
+        c5.x_axis.categorized = True
+        c5.x_axis.sort_func = "int(k[c1.x_axis.var].split('-')[0])"
+
+        c5.y_axis = Axis()
+        c5.y_axis.operation = "unique"
+        c5.y_axis.var = "Count"
+        c5.y_axis.label = "Number of patients"
+        c5.y_axis.multivalue = True
+
+        fy2 = Filter()
+        fy2.name = 'Name2'
+        fy2.key = 'Name2'
+        fy2.value = 'AGE'
+
+        fy3 = Filter()
+        fy3.name = 'Name1'
+        fy3.key = 'Name1'
+        fy3.value = 'YEAR'
+
+        c5.y_axis.static_filters = [fy3,fy2]
+
+
+        f1 = Filter()
+        f1.name = 'Year'
+        f1.key = 'Name1'
+        f1.value = 'Value1'
+
+        f2 = Filter()
+        f2.name = 'Gender'
+        f2.key = None
+        f2.value = 'Gender'
+        f2.translation = {'M': 'Male', 'F': 'Female', 'T': 'Total'}
+
+
+        f3 = Filter()
+        f3.name = None
+        f3.key = None
+        f3.value = "dbname_value"
+        f3.show = False
+        f3.comparable = True
+        f3.comparable_values = None
+
+        f_year = Filter()
+        f_year.name = 'YEAR'
+        f_year.key = 'Name1'
+        f_year.value = 'Value1'
+
+        c5.filters = [f2, f_year, f3]
+
+        sc.charts.append(c5)
+
         return sc
 
 conf = ConfCharts()

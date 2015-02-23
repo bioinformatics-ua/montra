@@ -73,14 +73,11 @@ class AggregationPopulationCharacteristics(object):
         self.var_pre_process_dict = {}
         #print self.confs
         for c in self.confs:
-            print c.var
 
             if c.var in self.var_pre_process_dict:
                 self.var_pre_process_dict[c.var].append(c)
             else:
                 self.var_pre_process_dict[c.var] = [c]
-        print "var_pre_process_dict"
-        print self.var_pre_process_dict
 
         self.index_new_values = {}
 
@@ -141,12 +138,10 @@ class AggregationPopulationCharacteristics(object):
         return result
     # Agregate the entry
     def __aggregate_entry(self, entry):
-
         try:
 
             if entry['values']['Var'] in self.var_pre_process_dict:
                 # It is the type of we want to aggregate, so we need to do some calculations
-
                 for aggregation in self.var_pre_process_dict[entry['values']['Var']]:
                     # Get Aggregation Field
 
@@ -163,10 +158,11 @@ class AggregationPopulationCharacteristics(object):
                     if arr_values!=[]:
                         for combination in itertools.product(*arr_values, repeat=1):
 
-
                             # Discard combination
                             if not verify_if_combination_matches_aggregation_field(combination, aggregation, entry):
                                 continue
+
+                            #print (entry['values']['Var'],combination )
 
                             if (entry['values']['Var'],combination) in self.index_new_values:
                                 _entry = self.index_new_values[(entry['values']['Var'],combination)]
@@ -209,10 +205,6 @@ class AggregationPopulationCharacteristics(object):
             #else:
                 #print "no"
 
-
-
-
-
         except:
             print "Exception!!!!!!!"
             import traceback
@@ -253,6 +245,6 @@ class AggregationPopulationCharacteristics(object):
             import traceback
             traceback.print_exc()
         print "finishing aggregation"
-        pprint.pprint(self.index_new_values)
+        #pprint.pprint(self.index_new_values)
         return self.new_values
 
