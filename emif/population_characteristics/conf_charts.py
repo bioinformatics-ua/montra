@@ -1071,6 +1071,7 @@ class ConfCharts(object):
 
         c.filters = [f2]
 
+        sc.charts.append(c)
 
         #################################################
         ### Birth date
@@ -1186,11 +1187,6 @@ class ConfCharts(object):
 
         sc.charts.append(c5)
 
-
-        sc.charts.append(c)
-
-
-
         #################################################
         ### Age Distribution at Start of Year
         #################################################
@@ -1255,6 +1251,42 @@ class ConfCharts(object):
         c5.filters = [f2, f_year, f3]
 
         sc.charts.append(c5)
+
+        #################################################
+        ### All patients
+        #################################################
+        c = Chart()
+        c.uid = 134
+        c.title = Title()
+        c.title.operation = Operation.UNIQUE
+        c.title.var = "Age at patient start"
+        c.title.fixed_title = "Number of patients"
+        c.stacked = False
+        c.x_axis = Axis()
+        c.x_axis.operation = "unique"
+        c.x_axis.var = "dbname_value"
+        c.x_axis.categorized = True
+        c.x_axis.label = 'Databases'
+        c.y_axis = Axis()
+        c.y_axis.operation = "unique"
+        c.y_axis.var = "Count"
+        c.y_axis.label = 'Number of patients'
+        c.y_axis.multivalue = True
+
+
+        f2 = Filter()
+        f2.name = 'Gender'
+        f2.key = None
+        f2.value = 'Gender'
+        f2.translation = {'M': 'Male', 'F': 'Female', 'T': 'Total',  'ALL': 'Male/Female'}
+        f2.comparable = False
+        f2.comparable_values = ['M', 'F']
+
+
+        c.filters = [f2]
+
+        sc.charts.append(c)
+
 
         return sc
 

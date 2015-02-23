@@ -549,11 +549,16 @@ function GraphicChartC3D3(divArg, dataArg)
     var place = 0;
 
     for (var i=0; i< columns.length;i++) {
-            var row = columns[i][0];
+            var row = columns[i][0].trim();
 
             var drawLegend = function(row){
               /*legend.append('span').attr('data-id', row).attr('data-opacity', '1').attr('style', 'cursor: pointer;').html(
                 '<div style="display: inline-block; width: 10px; height: 10px; margin-left: 20px;" class="color_container"></div>&nbsp;'+row);*/
+              if(place == 0){
+                place=5.1*(row.length);
+              } else {
+                place=(5.1*(row.length))+30+place;
+              }
 
               var g = d3.select('.legend').insert('g').attr('transform','translate(-'+place+',0)');
 
@@ -561,7 +566,6 @@ function GraphicChartC3D3(divArg, dataArg)
               g.insert('rect').attr('class', 'color_container').attr('style', "cursor: pointer;")
               .attr('data-opacity', "1").attr('data-id', row).attr('width', '10').attr('height', '10');
 
-              place=(10*(row.length-1))+30+place;
             };
 
             if(row.toLowerCase() == 't'){
