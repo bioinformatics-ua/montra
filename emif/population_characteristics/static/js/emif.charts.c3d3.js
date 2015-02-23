@@ -94,7 +94,7 @@ function GraphicChartC3D3(divArg, dataArg)
                     {
 
                       datasetYs.push([tr]);
-                      multivalue_comp[tr] = datasetYs[datasetYs.length-1];
+                      multivalue_comp[tr] = {'original': datasetYs[datasetYs.length-1]};
 
                     }
 
@@ -105,16 +105,16 @@ function GraphicChartC3D3(divArg, dataArg)
                 actualChart.filters[a]['comparable_values']==null &&
                 actualChart.filters[a]['values']!=null)
               {
-                //console.log("chart filter");
+                console.log("chart filter");
                 //console.log(actualChart.filters[a]);
                 //console.log(actualChart.filters[a]['values']);
                 multivalue_stacked = actualChart.filters[a]['value']
                 $.each(actualChart.filters[a]['values'], function(tr) {
                     // Get the list of values
                     datasetYs.push([actualChart.filters[a]['values'][tr]]);
-                    multivalue_comp[actualChart.filters[a]['values'][tr]] = datasetYs[datasetYs.length-1];
+                    multivalue_comp[actualChart.filters[a]['values'][tr]] = {'original': datasetYs[datasetYs.length-1]};
                   });
-
+                  return false;
               };
 
             });
@@ -154,6 +154,8 @@ function GraphicChartC3D3(divArg, dataArg)
       else if (actualChart.y_axis.multivalue)
       {
 
+        //mapper[row['Value1']] =
+
         var k = 0;
         if (!_xValuesMV[row[actualChart.x_axis['var']]])
         {
@@ -167,7 +169,7 @@ function GraphicChartC3D3(divArg, dataArg)
             var _vv = parseFloat(row[actualChart.y_axis['var']]);
             _vv = +_vv || 0;
 
-            multivalue_comp[row[multivalue_stacked]].push(_vv);
+            multivalue_comp[row[multivalue_stacked]][row[actualChart.x_axis['var']]] = _vv;
             if (datasetYs[row[multivalue_stacked]]!=undefined)
             {
               datasetYs[row[multivalue_stacked]].push(_vv);
@@ -189,6 +191,26 @@ function GraphicChartC3D3(divArg, dataArg)
 
 
     });
+
+    for(db in multivalue_comp){
+      var this_db = multivalue_comp[db];
+      tmp = this_db['original'];
+      delete this_db['original'];
+
+      if(Object.keys(this_db).length == 0){
+        continue;
+      }
+      for(key in _xValuesMV){
+        var val = this_db[key];
+
+        if(val)
+          tmp.push(val);
+        else
+          tmp.push(0);
+      }
+      multivalue_comp[db] = tmp;
+    }
+
 
   };
 
@@ -498,6 +520,8 @@ function GraphicChartC3D3(divArg, dataArg)
     chartConfigs.zoom.rescale = true;
 
     chartConfigs.padding.bottom = 5
+
+    console.log(chartConfigs);
 
     try{chart = c3.generate((chartConfigs));}
     catch(ex)

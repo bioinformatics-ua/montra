@@ -256,6 +256,8 @@ class PopulationCharacteristic(object):
         values = sorted(values)
 
         _filter.values = values
+
+
         return filters
         return values
 

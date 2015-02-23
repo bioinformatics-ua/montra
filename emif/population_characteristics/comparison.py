@@ -127,6 +127,7 @@ def handle_compare_values(request, var, row, fingerprint_id, revision, template_
     #fingerprint_ids = ["66a47f694ffb676bf7676dfde24900e6", "3dc3d622130eac4d092786afb9a0ec76", "2e303fd12bc5e5fd03a54651dd8d6334"]
 
     values = cp.get_variables(var, row, fingerprints_id=fingerprint_ids, filters=filters, revision=revision)
+
     data = {'values': values}
     response = JSONResponse(data, mimetype="application/json")
     response['Content-Disposition'] = 'inline; filename=files.json'

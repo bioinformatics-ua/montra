@@ -470,14 +470,10 @@ var stuff;
                       e.preventDefault();
                       e.stopPropagation();
 
-                      console.log()
-
                       var charDraw = new PCDraw(actualChart, activeChart, null);
 
                       var str = e.target.id;
                       var filterType =str.substring(str.indexOf("_")+1,str.lastIndexOf("_"));
-
-                      console.log('filterType:'+filterType);
 
                       var _value = e.target.innerHTML.trim();
                       if (translationsBack.hasOwnProperty(_value))

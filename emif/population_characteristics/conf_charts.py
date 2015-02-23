@@ -1096,13 +1096,6 @@ class ConfCharts(object):
         c1.y_axis.label = 'Number of patients'
         c1.y_axis.multivalue = True
 
-        fy3 = Filter()
-        fy3.name = 'Name1'
-        fy3.key = 'Name1'
-        fy3.value = 'YEAR'
-
-        c1.y_axis.static_filters = [fy3]
-
         f2 = Filter()
         f2.name = 'Gender'
         f2.key = None
