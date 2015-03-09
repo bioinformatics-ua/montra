@@ -176,6 +176,8 @@ urlpatterns = patterns('',
     # Statistics
     url(r'^statistics', include('statistics.urls')),
 
+    # Developer app urls
+    url(r'^developer/', include('developer.urls')),
 )
 
 if settings.DEBUG:

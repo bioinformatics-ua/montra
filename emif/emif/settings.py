@@ -187,6 +187,7 @@ STATICFILES_DIRS = (
     os.path.abspath(PROJECT_DIR_ROOT + MIDDLE_DIR + 'public/static'),
     os.path.abspath(PROJECT_DIR_ROOT + MIDDLE_DIR + 'accounts/static'),
     os.path.abspath(PROJECT_DIR_ROOT + MIDDLE_DIR + 'dashboard/static'),
+    os.path.abspath(PROJECT_DIR_ROOT + MIDDLE_DIR + 'developer/static'),
 )
 
 # List of finder classes that know how to find static files in
@@ -249,6 +250,8 @@ TEMPLATE_DIRS = (
 
     os.path.abspath(PROJECT_DIR_ROOT + MIDDLE_DIR + 'notifications/templates'),
     os.path.abspath(PROJECT_DIR_ROOT + MIDDLE_DIR + 'accounts/templates'),
+    os.path.abspath(PROJECT_DIR_ROOT + MIDDLE_DIR + 'developer/templates'),
+
 )
 
 INSTALLED_APPS = (
@@ -335,7 +338,9 @@ INSTALLED_APPS = (
 
     # django-constance
     'constance.backends.database',
-    "constance"
+    "constance",
+
+    "developer"
 )
 
 CONSTANCE_BACKEND = 'constance.backends.database.DatabaseBackend'
