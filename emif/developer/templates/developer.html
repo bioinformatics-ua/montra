@@ -39,7 +39,24 @@
 {% endblock %}
 
 {% block content %}
+    <div class="row">
     <div class="span12">
+
+    {% if success != None %}
+    <div class="alert {% if success %}alert-success{% else %}alert-danger{%endif %}">
+        <button type="button" class="close" data-dismiss="alert">&times;</button>
+        {%if success %}
+            Plugin removed with success.
+        {% else %}
+            Plugin couldnt be removed. Please contact the administrator.
+        {% endif %}
+    </div>
+    {% endif %}
+    <form class="hide" method="POST" action="developer/" id="utility_form">
+        {% csrf_token %}
+        <div class="utility_content"></div>
+        <input id="utility_submit" type="submit" value="Go" />
+    </form>
     <table id="plugins" class="table table-bordered table-striped">
         <thead>
             <tr>
@@ -52,16 +69,20 @@
         </thead>
         <tbody>
         {% for plugin in plugins %}
-            <tr>
-                <td><a href="developer/{{plugin.slug}}">{{plugin.name }}</a></td>
+            <tr data-id="{{plugin.slug}}" data-name="{{plugin.name}}">
+                <td><a href="developer/{{plugin.slug}}">{{plugin.name}}</a></td>
                 <td>{{plugin.type_repr }}</td>
                 <td>{{plugin.create_date_repr }}</td>
                 <td>{{plugin.latest_update_repr }}</td>
-                <td><i class="fa fa-2x fa-times-circle"></i></td>
+                <td><a class="remove_plugin" style="color: black" href="javascript:void(0)">
+                    <i class="fa fa-2x fa-times-circle"></i>
+                    </a>
+                </td>
             </tr>
         {% endfor %}
         </tbody>
     </table>
+    </div>
     </div>
 {% endblock content %}
 

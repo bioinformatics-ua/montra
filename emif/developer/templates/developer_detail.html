@@ -19,6 +19,7 @@
 {% load url from future %}
 {% load extra_tags %}
 {% load django_bootstrap_breadcrumbs %}
+{% load crispy_forms_tags %}
 
 {% block styleinclude %}
 {% endblock %}
@@ -41,9 +42,28 @@
 {% endblock %}
 
 {% block content %}
- Hello world'detail
+
+<div class="row">
+    <div class="span12">
+        <form action="/your-name/" method="post">
+            {% csrf_token %}
+
+              <div class="control-group">
+                <div class="controls controls-row">
+                  <input class="span6" id="id-name" type="text" placeholder="Plugin name">
+                  <select id="id-type" class="span6">
+                            <option>
+                                    teste
+                            </option>
+                </select>
+                </div>
+              </div>
+            <input class="pull-right btn span4" type="submit" value="Save plugin" />
+        </form>
+    </div>
+</div>
+
 {% endblock content %}
 
 {% block scriptextraincludes %}
-    <script type="text/javascript" src="{{STATIC_URL}}js/emif.developer.js"></script>
 {% endblock %}

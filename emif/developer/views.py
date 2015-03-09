@@ -18,18 +18,35 @@ from django.views.generic import TemplateView
 from django.shortcuts import render, redirect
 
 from .models import *
+from django import forms
 
 class DeveloperListView(TemplateView):
     template_name = "developer.html"
 
-    def get(self, request):
+    def get(self, request, **kwargs):
+        success=None
+        try:
+            success = kwargs['success']
+        except KeyError:
+            pass
 
         return render(request, self.template_name,
             {
+                'developer': True,
                 'plugins': Plugin.all(owner=request.user),
                 'request': request,
-                'breadcrumb': True
+                'breadcrumb': True,
+                'success': success
             })
+
+    def post(self, request):
+        slug = request.POST.get('slug', None)
+
+        if slug != None:
+            success = Plugin.remove(slug)
+            return self.get(request, success=success)
+
+        return self.get(request)
 
 class DeveloperDetailView(TemplateView):
     template_name = "developer_detail.html"
@@ -43,10 +60,21 @@ class DeveloperDetailView(TemplateView):
                 'plugin': True,
             })
 
+
+
+class PluginForm(forms.ModelForm):
+    class Meta:
+        model = Plugin
+        fields = ['name', 'type']
+
 class DeveloperAddView(TemplateView):
-    template_name = "developer_detail.html"
+    template_name   = "developer_detail.html"
+    form_class      = PluginForm
+    success_url     = '/thanks/'
 
     def get(self, request):
+
+        new_plugin = PluginForm()
 
         return render(request, self.template_name,
             {

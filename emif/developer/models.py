@@ -64,6 +64,21 @@ class Plugin(models.Model):
         except PluginVersion.DoesNotExist:
             return None
 
+    @staticmethod
+    def remove(slug):
+        try:
+            plugin = Plugin.objects.get(slug=slug)
+
+            plugin.removed = True
+            plugin.save()
+
+            return True
+
+        except Plugin.DoesNotExist:
+            print "-- Error: Retrieving plugin"
+
+        return False
+
     class Meta:
         ordering = ['-latest_update']
 

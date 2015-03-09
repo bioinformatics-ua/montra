@@ -1004,3 +1004,23 @@ background: linear-gradient(to bottom, rgba(163,163,163,1) 0%, rgba(255,255,255,
 filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#a3a3a3', endColorstr='#ffffff', GradientType=0 );
 
 }
+
+.input-prepend.fill
+{
+    display: block;
+    position: relative;
+    height: 30px;
+
+}
+input.fill {
+        position: absolute;
+        left: 0px;
+        margin-right: 29px;
+        width: auto !important;
+    }
+.add-on.fill {
+    position: absolute;
+    width: 30px;
+    right: 0px;
+    z-index:100!important;
+}

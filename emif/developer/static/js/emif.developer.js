@@ -17,9 +17,30 @@
 */
 
 $(function(){
+    $('.remove_plugin').click(function(){
+        var tr   = $(this).parent().parent();
+        var id   = tr.data('id');
+        var name = tr.data('name');
+        bootbox.confirm('Are you sure you want to delete "'+name+'" ?',function(result){
+            console.log('result');
+            console.log(result);
+            if(result){
+                $('#utility_form > .utility_content').html('<input type="hidden" name="slug" value="'+id+'" />');
+                $('#utility_submit').click();
+            }
+
+        });
+    });
+
     $('#plugins').dataTable({
         "oLanguage": {
             "sEmptyTable": "No plugins found"
-        }
+        },
+        "aoColumnDefs" : [
+            {
+                'bSortable' : false,
+                'aTargets' : [4]
+            }
+        ]
     });
 });

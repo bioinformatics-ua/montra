@@ -44,8 +44,6 @@ class PluginAdmin(admin.ModelAdmin):
         PluginVersionInline,
     ]
     list_display = ['name', 'type', 'owner', 'approved', 'removed']
-    #search_fields = ['user__username','user__email','path']
-    #list_filter = ['user']
 
 
 admin.site.register(Plugin, PluginAdmin)
