@@ -43,7 +43,7 @@ class PluginAdmin(admin.ModelAdmin):
     inlines = [
         PluginVersionInline,
     ]
-    list_display = ['name', 'type', 'owner', 'approved', 'removed']
+    list_display = ['name', 'type', 'owner', 'removed']
 
 
 admin.site.register(Plugin, PluginAdmin)

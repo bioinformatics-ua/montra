@@ -16,6 +16,8 @@
 
 from django.views.generic import TemplateView
 from django.shortcuts import render, redirect
+from django.http import Http404, HttpResponseRedirect
+
 
 from .models import *
 from django import forms
@@ -51,16 +53,49 @@ class DeveloperListView(TemplateView):
 class DeveloperDetailView(TemplateView):
     template_name = "developer_detail.html"
 
-    def get(self, request, plugin_hash):
+    def get(self, request, plugin_hash, add=False, update=False):
+        plugin = None
+        try:
+            plugin = Plugin.objects.get(slug=plugin_hash)
+        except Plugin.DoesNotExist:
+            pass
 
         return render(request, self.template_name,
             {
                 'request': request,
                 'breadcrumb': True,
-                'plugin': True,
+                'plugin': plugin,
+                'plugin_types': Plugin.TYPES,
+                'add': add,
+                'update': update
+
             })
 
+class DeveloperPluginSaveView(TemplateView):
+    template_name = 'developer_detail.html'
+    def post(self, request):
+        plugin = None
 
+        plugin_hash = request.POST.get('plugin_hash', None)
+        name = request.POST.get('name', None)
+        type = request.POST.get('type', None)
+
+        # create
+        if plugin_hash == '':
+
+            plugin = Plugin.create(name, type, request.user)
+
+            if plugin != None:
+                return redirect('developer-detail', plugin_hash=plugin.slug)
+
+        # update
+        elif plugin_hash != None:
+            plugin = Plugin.update(plugin_hash, name, type, request.user)
+            if plugin != None:
+                return redirect('developer-detail', plugin_hash=plugin.slug)
+
+        # error request
+        raise Http404
 
 class PluginForm(forms.ModelForm):
     class Meta:
@@ -74,11 +109,26 @@ class DeveloperAddView(TemplateView):
 
     def get(self, request):
 
-        new_plugin = PluginForm()
+        return render(request, self.template_name,
+            {
+                'request': request,
+                'breadcrumb': True,
+                'plugin_types': Plugin.TYPES
+            })
+
+class DeveloperVersionView(TemplateView):
+    template_name   = "developer_version.html"
+
+    def get(self, request, plugin_hash):
+        plugin = None
+        try:
+            plugin = Plugin.objects.get(slug=plugin_hash)
+        except Plugin.DoesNotExist:
+            pass
 
         return render(request, self.template_name,
             {
                 'request': request,
-                'breadcrumb': True
+                'breadcrumb': True,
+                'plugin': plugin
             })
-

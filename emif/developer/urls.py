@@ -16,10 +16,20 @@
 from django.conf.urls.defaults import *
 from .views import *
 
+from .api import *
+
 urlpatterns = patterns('',
     # developer list view
     url(r'^$', DeveloperListView.as_view()),
     url(r'^add$', DeveloperAddView.as_view()),
-    url(r'^(?P<plugin_hash>[^/]+)$', DeveloperDetailView.as_view()),
+    url(r'^save/$', DeveloperPluginSaveView.as_view()),
+
+    url(r'^(?P<plugin_hash>[^/]+)$', DeveloperDetailView.as_view(), name='developer-detail'),
+    url(r'^(?P<plugin_hash>[^/]+)/add$', DeveloperVersionView.as_view(), name='developer-version'),
+
+
+    # API urls
+    url(r'^checkname/$', CheckNameView.as_view()),
+
 
 )
