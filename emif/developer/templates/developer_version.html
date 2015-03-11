@@ -35,7 +35,7 @@
         {% breadcrumb plugin.name "developer/"|add:plugin.slug %}
 
         {% if version %}
-            {% breadcrumb plugin.name version.version %}
+            {% breadcrumb version.version version.version %}
         {% else %}
             {% breadcrumb "Add new Version" "" %}
         {% endif %}
@@ -48,30 +48,49 @@
 {% block content %}
     <div class="row">
         <div class="span12">
-        <form class="form-horizontal">
-
+        <form class="form-horizontal" method="post">
+        {%csrf_token%}
             <h3>Version Details</h3>
             <div class="well">
                     <div class="control-group">
                         <label class="control-label" for="id-version">Version</label>
                         <div class="controls controls-row">
-                          <input class="span6" id="id-version" value="{{version.version}}"
+                          <input name="version" class="span6" id="id-version" value="{{version.version}}"
                           type="number" placeholder="Version number" />&nbsp;
                         </div>
                     </div>
                     <div class="control-group">
                         <label class="control-label" for="id-remote">Is Remote ?</label>
                         <div class="controls controls-row">
-                          <input id="id-remote" value="{{version.is_remote}}" type="checkbox" />&nbsp;
+                          <input name="is_remote" id="id-remote" value="{{version.is_remote}}" type="checkbox" />&nbsp;
                         </div>
                     </div>
                     <div id="remote_path" class="{% if not version.is_remote %}hide{%endif%} control-group">
                         <label class="control-label" for="id-remote">Path</label>
                         <div class="controls controls-row">
-                          <input class="span6" id="id-path" value="{{version.path}}" type="url" />&nbsp;
+                          <input class="span6" id="id-path" value="{% if not version.is_remote %}{{version.path}}{%endif%}" type="text" />&nbsp;
                         </div>
                     </div>
-                    <div class="local_editor {% if version.is_remote %}hide{%endif%}">LOCAL EDITOR</div>
+                    <div id="local_editor" class="{% if version.is_remote %}hide{%endif%}">
+                        <pre style="height: 300px; font-size: 14px;" id="editor">
+{% if version.is_remote or version.path == '' %}
+var confs = {
+            name: "New Global Widget",
+            width: 2,
+            height: 1,
+            x: 6,
+            y: 6
+};
+var plugin = function(self){
+        self.content = 'Hello world DUDE 2';
+};
+{% else %}
+{{version.path}}
+{%endif %}
+                        </pre>
+                        <input name="data" id="id-code" class="hide" type="text" />
+                    </div>
+
             </div>
             <button type="submit" id="save-plugin" class="pull-right btn btn-primary span3"
             type="submit" ><i class="fa fa-inverse fa-floppy-o"></i>&nbsp; Save Version </button>
@@ -81,7 +100,14 @@
             <h3>Live Preview</h3>
             <div class="well">
                 <center>
+                <div class="row" id="live-preview">
                     Write some code, or load it from the remote location, to try the widget live.
+                    <center>
+                    <iframe class="span11">
+                      <p>Your browser does not support iframes.</p>
+                    </iframe>
+                    </center>
+                </div>
                 </center>
             </div>
         </div>
@@ -89,5 +115,12 @@
 {% endblock content %}
 
 {% block scriptextraincludes %}
-    <script type="text/javascript" src="{{STATIC_URL}}/js/emif.developer_version.js" />
+    <script src="{{STATIC_URL}}js/vendor/ace.js" type="text/javascript" charset="utf-8"></script>
+    <script>
+        var editor = ace.edit("editor");
+        editor.setTheme("ace/theme/github");
+        editor.getSession().setMode("ace/mode/javascript");
+    </script>
+    <script type="text/javascript" src="{{STATIC_URL}}js/emif.developer_version.js" />
+
 {% endblock %}

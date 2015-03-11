@@ -139,6 +139,23 @@ class PluginVersion(models.Model):
 
         return tmp
 
+    @staticmethod
+    def update(plugin_hash, version_old, version_new, is_remote, data):
+        pv = None
+        p = Plugin.objects.get(slug=plugin_hash)
+        try:
+            pv = PluginVersion.all(plugin=p).get(version=version_old)
+
+            pv.version=version_new
+            pv.is_remote=is_remote
+            pv.path = data
+            pv.save()
+
+        except PluginVersion.DoesNotExist:
+            pass
+
+        return pv
+
     def __str__(self):
         return '%s : v.%r' % (self.plugin.name, self.version)
 

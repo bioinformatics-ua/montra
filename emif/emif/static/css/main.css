@@ -1024,3 +1024,7 @@ input.fill {
     right: 0px;
     z-index:100!important;
 }
+
+#live-preview iframe{
+  height: 400px;
+}

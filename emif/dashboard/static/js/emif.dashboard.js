@@ -53,6 +53,30 @@ $(function(){
 
     dashzone.register(new TagCloudWidget("tagcloud",  2, 1, 6, 6));
 
+    dashzone.register(new PlugShellWidget(
+        {
+            id: "helloworld",
+            name: "Hello plugin",
+            width: 2,
+            height: 1,
+            x: 6,
+            y: 6
+        }, function(self){
+        self.content = 'Hello world DUDE';
+    }));
+
+    dashzone.register(new PlugShellWidget(
+        {
+            id: "helloworld2",
+            name: "Hello plugin 2",
+            width: 2,
+            height: 1,
+            x: 6,
+            y: 6
+        }, function(self){
+        self.content = 'Hello world DUDE 2';
+    }));
+
     var any_configuration = dashzone.loadConfiguration();
 
     if(any_configuration == false){

@@ -119,16 +119,40 @@ class DeveloperAddView(TemplateView):
 class DeveloperVersionView(TemplateView):
     template_name   = "developer_version.html"
 
-    def get(self, request, plugin_hash):
-        plugin = None
+    def post(self, request, plugin_hash, version=None):
+        v = None
+
+        version_new = request.POST.get('version', None)
+        is_remote = request.POST.get('is_remote', None)
+        data = request.POST.get('data', None)
+
+        # consider a creation of version
+        if version == None:
+            v = PluginVersion.create(plugin_hash, version_new, is_remote, path, code)
+        # this is just an update
+        else:
+            v = PluginVersion.update(plugin_hash, version, version_new, is_remote, data)
+
+        return self.get(request, plugin_hash, v.version)
+
+    def get(self, request, plugin_hash, version=None):
+        plugin = version_obj = None
         try:
             plugin = Plugin.objects.get(slug=plugin_hash)
         except Plugin.DoesNotExist:
             pass
 
+        try:
+            version_obj = PluginVersion.all(plugin=plugin).get(version=version)
+        except PluginVersion.DoesNotExist:
+            pass
+
+        print version
+
         return render(request, self.template_name,
             {
                 'request': request,
                 'breadcrumb': True,
-                'plugin': plugin
+                'plugin': plugin,
+                'version': version_obj
             })

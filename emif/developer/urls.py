@@ -26,6 +26,7 @@ urlpatterns = patterns('',
 
     url(r'^(?P<plugin_hash>[^/]+)$', DeveloperDetailView.as_view(), name='developer-detail'),
     url(r'^(?P<plugin_hash>[^/]+)/add$', DeveloperVersionView.as_view(), name='developer-version'),
+    url(r'^(?P<plugin_hash>[^/]+)/(?P<version>[^/]+)$', DeveloperVersionView.as_view(), name='developer-version'),
 
 
     # API urls

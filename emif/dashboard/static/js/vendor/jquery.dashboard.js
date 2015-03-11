@@ -456,8 +456,9 @@ var DashboardWidget = function DashboardWidget(widgetname, header, width, height
         return true;
     },
     // public methods
-    serialize : function(){
-        return  '{'+
+    serialize : function(extra){
+        var extra = extra || {};
+        var tmp ='{'+
                     '"type": "'+this.constructor.name+'",'+
                     '"widgetname": "'+this.widgetname+'",'+
                     '"width": '+this.width+','+
@@ -465,17 +466,43 @@ var DashboardWidget = function DashboardWidget(widgetname, header, width, height
                     '"pos_x": '+this.pos_x+','+
                     '"pos_y": '+this.pos_y+','+
                     '"header": "'+this.header+'",'+
-                    '"content": "'+encodeURI(this.content)+'"'+
-                '}';
+                    '"content": "'+encodeURI(this.content)+'"';
+
+
+        for(var parameter in extra){
+            tmp += ',"'+parameter+'": "'+encodeURI(String(extra[parameter]))+'"';
+        }
+
+        tmp += '}';
+
+        return tmp;
     }, deserialize : function(json){
         this.widgetname = json.widgetname;
+        delete json.widgetname
         this.width = parseInt(json.width);
+        delete json.width;
         this.height = parseInt(json.height);
+        delete json.height;
         this.pos_x = parseInt(json.pos_x);
+        delete json.pos_x;
         this.pos_y = parseInt(json.pos_y);
+        delete json.pos_y;
         this.header = json.header;
+        delete json.header;
         this.content = decodeURI(json.content);
-    }, copy : function(){
+        delete json.content;
+
+        delete json.type;
+
+        for(var parameter in json){
+            this[parameter] = decodeURI(json[parameter]);
+        }
+
+        console.log(this);
+    },
+    copy : function(extra){
+
+        var extra = extra || {};
         var this_widget;
         var tryme = "this_widget = new "+this.constructor.name+"();";
         eval(tryme);
@@ -487,6 +514,10 @@ var DashboardWidget = function DashboardWidget(widgetname, header, width, height
         this_widget.pos_y = this.pos_y;
         this_widget.header = this.header;
         this_widget.content = this.content;
+
+        for(var parameter in extra){
+            this_widget[parameter] = extra[parameter];
+        }
 
         return this_widget;
     }
