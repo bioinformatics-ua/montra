@@ -44,6 +44,15 @@ var PlugShellWidget = function PlugShellWidget(confs, show){
     refresh: function(){
         PlugShellWidget._super.__refresh.apply(this);
     },
+    html: function(content){
+        this.content = content;
+    },
+    append: function(content){
+        if(this.content == undefined)
+            this.content = content;
+        else
+            this.content += content;
+    },
     copy: function(){
         return PlugShellWidget._super.copy.apply(this, [{
             show: this.show

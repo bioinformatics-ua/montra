@@ -110,7 +110,8 @@ $(function(){
         "bFilter": false,
         "oLanguage": {
             "sEmptyTable": "No versions found for this plugin"
-        }
+        },
+        "order": [[ 0, "desc" ]]
     });
 
     $("div.toolbar").html('<b>Custom tool bar! Text/images etc.</b>');

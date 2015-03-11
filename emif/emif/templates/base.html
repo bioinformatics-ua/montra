@@ -355,6 +355,9 @@
             <footer>
 
                 {% if user.is_authenticated %}
+                    {% if user|has_group:'developers' or user.is_staff %}
+                    <a href="developer">Developers</a> ·
+                    {% endif %}
                 <a href="bugreport">Bug Report</a> ·
                 <a href="controlversion/history">History</a> ·
                 {%endif%}

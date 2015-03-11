@@ -96,8 +96,8 @@
             <table id="versions" class="table table-bordered table-striped">
                 <thead>
                     <tr>
-                        <td>Version</td>
-                        <td>Script Location</td>
+                        <th>Version</th>
+                        <th>Script Location</th>
                         <th>Create Date</th>
                         <th>Latest Update</th>
                         <th>Submitted</th>
@@ -107,7 +107,7 @@
                 <tbody>
                 {% for version in plugin.versions %}
                     <tr>
-                        <td><a href="developer/{{plugin.slug}}/{{version.version}}/">{{version.version}}</a></td>
+                        <td><a href="developer/{{plugin.slug}}/{{version.version}}">{{version.version}}</a></td>
                         <td>
                             {% if version.is_remote %}Remote{%else%}Local{%endif%}
                         </td>

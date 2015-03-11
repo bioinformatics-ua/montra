@@ -119,7 +119,7 @@ class Plugin(models.Model):
 class PluginVersion(models.Model):
     plugin      = models.ForeignKey(Plugin)
     is_remote   = models.BooleanField(default=False)
-    path        = models.CharField(max_length=2000)
+    path        = models.TextField()
     version     = models.IntegerField()
 
     approved    = models.BooleanField(default=False)
@@ -140,15 +140,49 @@ class PluginVersion(models.Model):
         return tmp
 
     @staticmethod
+    def create(plugin_hash, version, is_remote, data):
+        pv = None
+        p = Plugin.objects.get(slug=plugin_hash)
+
+        pv = PluginVersion(plugin = p, is_remote = is_remote,
+            path = data, version = version)
+
+        pv.save()
+
+        return pv
+
+    @staticmethod
+    def submit(plugin_hash, version):
+        pv  = None
+        p   = Plugin.objects.get(slug=plugin_hash)
+
+        try:
+            pv = PluginVersion.all(plugin=p).get(version=version)
+
+            pv.submitted = True
+            pv.approved = False
+
+            pv.save()
+
+        except PluginVersion.DoesNotExist:
+            pass
+
+        return pv
+
+    @staticmethod
     def update(plugin_hash, version_old, version_new, is_remote, data):
         pv = None
         p = Plugin.objects.get(slug=plugin_hash)
         try:
             pv = PluginVersion.all(plugin=p).get(version=version_old)
 
-            pv.version=version_new
-            pv.is_remote=is_remote
+            pv.version = version_new
+            pv.is_remote = is_remote
             pv.path = data
+
+            pv.submitted = False
+            pv.approved = False
+
             pv.save()
 
         except PluginVersion.DoesNotExist:

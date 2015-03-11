@@ -247,8 +247,9 @@
                     private_funcs.__updateAllcoords();
 
                     var serialization = public_funcs.serialize();
-                    localStorage.setItem("dashboard_preferences", serialization);
-                    localStorage.setItem("__dashboard_version", __version);
+
+                    localStorage.setItem(self[0].id+"_preferences", serialization);
+                    localStorage.setItem(self[0].id+"__dashboard_version", __version);
 
                 } else {
                     console.error("Your browser doesn't support local storage!");
@@ -258,7 +259,7 @@
             },
             loadConfiguration: function(){
                 if(private_funcs.__supports_storage()){
-                    var stored_version = localStorage.getItem("__dashboard_version");
+                    var stored_version = localStorage.getItem(self[0].id+"__dashboard_version");
                     console.log("STORED VERSION: "+stored_version);
                     console.log("VERSION CURRENT: "+__version);
 
@@ -271,10 +272,8 @@
                     private_funcs.__init();
 
                     try{
-                        var parsed_configurations = JSON.parse(localStorage.getItem("dashboard_preferences"));
+                        var parsed_configurations = JSON.parse(localStorage.getItem(self[0].id+"_preferences"));
                         registered_widgets = private_funcs.__deepcopy(initial_widgets);
-
-                        console.log(registered_widgets);
 
                         for(var i=0;i<parsed_configurations.length;i++){
                             var this_widget;
@@ -337,7 +336,7 @@
                 }
             }, reset   : function(){
                 if(private_funcs.__supports_storage()){
-                    localStorage.removeItem("dashboard_preferences");
+                    localStorage.removeItem(self[0].id+"_preferences");
 
                     public_funcs.clear();
 

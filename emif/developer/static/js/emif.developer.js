@@ -41,6 +41,7 @@ $(function(){
                 'bSortable' : false,
                 'aTargets' : [4]
             }
-        ]
+        ],
+        "order": [[ 3, "desc" ]]
     });
 });

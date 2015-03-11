@@ -1026,5 +1026,12 @@ input.fill {
 }
 
 #live-preview iframe{
-  height: 400px;
+  height: 440px;
+  border: 0;
+}
+
+.far_from_sight{
+  position: absolute;
+  left: -19999px;
+  top: -19999px;
 }

@@ -48,79 +48,116 @@
 {% block content %}
     <div class="row">
         <div class="span12">
-        <form class="form-horizontal" method="post">
+        <div class="clearfix">
+        <form id="version-details" class="form-horizontal" method="post">
         {%csrf_token%}
             <h3>Version Details</h3>
             <div class="well">
                     <div class="control-group">
                         <label class="control-label" for="id-version">Version</label>
                         <div class="controls controls-row">
-                          <input name="version" class="span6" id="id-version" value="{{version.version}}"
+                          <input name="version" class="span6" id="id-version"
+                          value="{% if version %}{{version.version}}{% else %}{{next_version}}{%endif%}"
                           type="number" placeholder="Version number" />&nbsp;
                         </div>
                     </div>
-                    <div class="control-group">
+                    <div class="{% if plugin.type == 2 %}hide{%endif%} control-group">
                         <label class="control-label" for="id-remote">Is Remote ?</label>
                         <div class="controls controls-row">
-                          <input name="is_remote" id="id-remote" value="{{version.is_remote}}" type="checkbox" />&nbsp;
+                          <input name="is_remote" id="id-remote" {% if version.is_remote or plugin.type == 2 %}checked{% endif %} type="checkbox" />&nbsp;
                         </div>
                     </div>
-                    <div id="remote_path" class="{% if not version.is_remote %}hide{%endif%} control-group">
+                    <div id="remote_path" class="{% if not version.is_remote and plugin.type != 2 %}hide{%endif%} control-group">
                         <label class="control-label" for="id-remote">Path</label>
                         <div class="controls controls-row">
-                          <input class="span6" id="id-path" value="{% if not version.is_remote %}{{version.path}}{%endif%}" type="text" />&nbsp;
+                          <input class="span6" id="id-path" value="{% if version.is_remote %}{{version.path}}{%endif%}" type="text" />&nbsp;
                         </div>
                     </div>
+                    {% if plugin.type != 2 %}
                     <div id="local_editor" class="{% if version.is_remote %}hide{%endif%}">
                         <pre style="height: 300px; font-size: 14px;" id="editor">
 {% if version.is_remote or version.path == '' %}
-var confs = {
+confs = {
             name: "New Global Widget",
             width: 2,
             height: 1,
             x: 6,
             y: 6
 };
-var plugin = function(self){
-        self.content = 'Hello world DUDE 2';
+plugin = function(self){
+        self.html('Hello world DUDE 2');
+        self.refresh();
 };
 {% else %}
 {{version.path}}
 {%endif %}
                         </pre>
-                        <input name="data" id="id-code" class="hide" type="text" />
                     </div>
+                    {% endif %}
+                        <textarea name="data" id="id-code" class="hide"></textarea>
 
             </div>
-            <button type="submit" id="save-plugin" class="pull-right btn btn-primary span3"
-            type="submit" ><i class="fa fa-inverse fa-floppy-o"></i>&nbsp; Save Version </button>
+            <button type="submit" id="save-version" class="pull-right btn btn-primary span3"
+            type="submit" ><i class="fa fa-inverse fa-floppy-o"></i>&nbsp; Save & Refresh</button>
+
 
         </form>
-
+            {% if version.submitted %}
+                {% if version.approved %}
+                    <div class="row">
+                    <div class="span7 alert alert-success">
+                      <button type="button" class="close" data-dismiss="alert">&times;</button>
+                      This version is approved, any changes will undo this status.
+                    </div>
+                    </div>
+                {%else %}
+                    <div class="row">
+                    <div class="span7 alert">
+                      <button type="button" class="close" data-dismiss="alert">&times;</button>
+                      This version is submitted and waiting approval, any changes will undo this status.
+                    </div>
+                    </div>
+                {% endif %}
+            {% else %}
+                <form method="post">
+                    {% csrf_token %}
+                    <input name="submit" type="hidden" value="submit" />
+                    <button id="submit-version" class="pull-right btn span3"
+                    type="submit" ><i class="fa fa-paper-plane"></i>&nbsp; Submit to approval</button>
+                </form>
+            {% endif %}
+        </div>
+            <div class="clearfix">
             <h3>Live Preview</h3>
-            <div class="well">
                 <center>
-                <div class="row" id="live-preview">
+                <div id="live-preview">
+                    {% if not version %}
+                    <div class="well">
                     Write some code, or load it from the remote location, to try the widget live.
-                    <center>
-                    <iframe class="span11">
-                      <p>Your browser does not support iframes.</p>
+                    </div>
+                    {% else %}
+                    <div class="row">
+                    <iframe src="developer/live/{{plugin.slug}}/{{version.version}}" class="span12">
+                      <p>Your browser does not support the live preview.</p>
                     </iframe>
-                    </center>
+                    </div>
+                    {% endif %}
                 </div>
                 </center>
-            </div>
+                </div>
         </div>
     </div>
 {% endblock content %}
 
 {% block scriptextraincludes %}
+    {% if plugin.type != 2 %}
     <script src="{{STATIC_URL}}js/vendor/ace.js" type="text/javascript" charset="utf-8"></script>
     <script>
         var editor = ace.edit("editor");
         editor.setTheme("ace/theme/github");
         editor.getSession().setMode("ace/mode/javascript");
     </script>
+    {%endif%}
     <script type="text/javascript" src="{{STATIC_URL}}js/emif.developer_version.js" />
 
 {% endblock %}

@@ -122,20 +122,55 @@ class DeveloperVersionView(TemplateView):
     def post(self, request, plugin_hash, version=None):
         v = None
 
-        version_new = request.POST.get('version', None)
-        is_remote = request.POST.get('is_remote', None)
-        data = request.POST.get('data', None)
-
-        # consider a creation of version
-        if version == None:
-            v = PluginVersion.create(plugin_hash, version_new, is_remote, path, code)
-        # this is just an update
+        # if approval request
+        if request.POST.get('submit', None):
+            v = PluginVersion.submit(plugin_hash, version)
+        # if normal update
         else:
-            v = PluginVersion.update(plugin_hash, version, version_new, is_remote, data)
+            version_new = request.POST.get('version', None)
+            is_remote = request.POST.get('is_remote', False)
+            data = request.POST.get('data', None)
 
-        return self.get(request, plugin_hash, v.version)
+            if is_remote == 'on':
+                is_remote = True
+
+            # consider a creation of version
+            if version == None:
+                v = PluginVersion.create(plugin_hash, version_new, is_remote, data)
+            # this is just an update
+            else:
+                v = PluginVersion.update(plugin_hash, version, version_new, is_remote, data)
+
+        return redirect('developer-version', plugin_hash=v.plugin.slug, version=v.version)
 
     def get(self, request, plugin_hash, version=None):
+        plugin = version_obj = next_version = None
+        try:
+            plugin = Plugin.objects.get(slug=plugin_hash)
+        except Plugin.DoesNotExist:
+            pass
+
+        try:
+            version_obj = PluginVersion.all(plugin=plugin).get(version=version)
+        except PluginVersion.DoesNotExist:
+            try:
+                next_version = PluginVersion.all(plugin=plugin)[0].version + 1
+            except IndexError:
+                next_version = 1
+
+        return render(request, self.template_name,
+            {
+                'request': request,
+                'breadcrumb': True,
+                'plugin': plugin,
+                'version': version_obj,
+                'next_version': next_version,
+            })
+
+class DeveloperLiveView(TemplateView):
+    template_name   = "developer_live.html"
+
+    def get(self, request, plugin_hash, version):
         plugin = version_obj = None
         try:
             plugin = Plugin.objects.get(slug=plugin_hash)
@@ -146,8 +181,6 @@ class DeveloperVersionView(TemplateView):
             version_obj = PluginVersion.all(plugin=plugin).get(version=version)
         except PluginVersion.DoesNotExist:
             pass
-
-        print version
 
         return render(request, self.template_name,
             {
