@@ -45,7 +45,6 @@ function sandbox(id, data){
                     }
 };
 function checkIntegrity(closure){
-    console.log(typeof closure.confs == 'object');
     if(!closure.confs || !(typeof closure.confs == 'object'))
         throw 'You must specify a \'confs\' dictionary for the plugin.';
 

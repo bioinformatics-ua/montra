@@ -988,6 +988,21 @@ height: 4em;
   padding-top: 50px;
 }
 
+.docmenu.affix{
+  margin-top: -6px;
+  padding-top: 120px;
+}
+
+a.anchor{
+  display: block;
+  position: relative;
+  top: -200px;
+  visibility: hidden;
+}
+
+#apidocs p{
+  text-align: justify;
+}
 #summarynav.affix:after{
   height: 4px;
   width: 100%;

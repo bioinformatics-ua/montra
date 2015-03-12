@@ -24,6 +24,8 @@ urlpatterns = patterns('',
     url(r'^add$', DeveloperAddView.as_view()),
     url(r'^save/$', DeveloperPluginSaveView.as_view()),
 
+    url(r'^docs$', DeveloperDocsView.as_view()),
+
     url(r'^(?P<plugin_hash>[^/]+)$', DeveloperDetailView.as_view(), name='developer-detail'),
     url(r'^(?P<plugin_hash>[^/]+)/(?P<version>[0-9]+)$', DeveloperVersionView.as_view(), name='developer-version'),
     url(r'^(?P<plugin_hash>[^/]+)/add$', DeveloperVersionView.as_view(), name='developer-version-add'),

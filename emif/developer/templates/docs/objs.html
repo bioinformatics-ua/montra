@@ -1,0 +1,72 @@
+<div class="row clearfix">
+    <div class="docrow span3">
+        <ul  data-clamp=".docrow" class="docmenu nav nav-tabs nav-stacked">
+          <li><a href="developer/docs#self">self</a></li>
+          <li><a href="developer/docs#global">GlobalProxy</a></li>
+          <li><a href="developer/docs#fingerprint">FingerprintProxy</a></li>
+        </ul>
+    </div>
+    <div class="span9">
+    <h2>Available Objects for plugins</h2>
+        <p>Besides "normal" javascript, jquery and bootstrap 2.3.2 functions, there is a couple of objects available to the plugin development. This are detailed below.</p>
+        <hr />
+        <div class="clearfix">
+            <a name="self" class="anchor"></a><h3>self</h3>
+                <p>self is the parameter the plugin receives, and allows some control over the widget itself. It's possible through this parameter to control the widget content.</p>
+            <div class="span8">
+                <h4>.html(content)</h4>
+                    <p>Sets the plugin content, replacing any existing content.</p>
+
+                    <p><strong>Attention:</strong> if this is called through an asynchronous call(like a p.e. a promise), refresh() should be called in the end, to tell the plugin to refresh.</p>
+                <h4>.append(content)</h4>
+
+                    <p>Appends to the plugin  existing content.</p>
+                    <p><strong>Attention:</strong> if this is called through an asynchronous call(like a p.e. a promise), refresh() should be called in the end, to tell the plugin to refresh.</p>
+
+                <h4>.refresh()</h4>
+                <p>Tells the plugin to refresh itself, useful whenever there's new updates to the widget content, or on asynchronous calls.</p>
+            </div>
+
+        </div>
+        <hr />
+        <div class="clearfix">
+
+            <a name="global" class="anchor"></a><h3>GlobalProxy</h3>
+
+            <p>GlobalProxy is available on global plugins, and allows access to aggregated data over all databases, useful for generic dashboard widgets, like TagCloud.</p>
+
+            <div class="span8">
+                <h4>.databaseSchemas()</h4>
+                explanation
+                <h4>.getProfileInformation()</h4>
+                explanation
+                <h4>.getFingerprints(Schema)</h4>
+                explanation
+                <h4>.query(query, schema)</h4>
+                explanation
+                <h4>.advancedQuery(query, schema)</h4>
+                explanation
+                <h4>.getStore() - CRUD + File Upload/Retrieve</h4>
+            </div>
+
+        </div>
+        <hr />
+        <div class="clearfix">
+        <a name="fingerprint" class="anchor"></a><h3>FingerprintProxy</h3>
+
+        <p>FingerprintProxy allows access to a specific fingerprint data, useful for fingerprint-related widgets.</p>
+
+            <div class="span8">
+                <h4>.getFingerprintUID()</h4>
+                explanation
+                <h4>.getSchema()</h4>
+                explanation
+                <h4>.getAnswers()</h4>
+                explanation
+                <h4>.getStore(fingerprintID) - CRUD + File Upload/Retrieve</h4>
+                explanation
+            </div>
+        </div>
+    </div>
+
+</div>

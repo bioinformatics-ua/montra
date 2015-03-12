@@ -44,6 +44,9 @@
 {% endblock %}
 
 {% block content %}
+
+{%if user|has_group:'developers' or user.is_staff %}
+
 <form class="form-horizontal" id="save_plugin" action="developer/save/" method="post">
     <input name="plugin_hash" id="current_slug" class="hide" type="text" value="{{plugin.slug}}" />
     {% csrf_token %}
@@ -128,6 +131,11 @@
             {% endif %}
         </div>
     </div>
+    {% else %}
+
+    <center><h4>The access to this page is restricted to developers. To become a developer, please contact the platform administration.</h4></center>
+
+    {% endif %}
 {% endblock content %}
 
 {% block scriptextraincludes %}

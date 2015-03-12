@@ -35,6 +35,7 @@ class DeveloperListView(TemplateView):
         return render(request, self.template_name,
             {
                 'developer': True,
+                'plugin_add': True,
                 'plugins': Plugin.all(owner=request.user),
                 'request': request,
                 'breadcrumb': True,
@@ -56,7 +57,7 @@ class DeveloperDetailView(TemplateView):
     def get(self, request, plugin_hash, add=False, update=False):
         plugin = None
         try:
-            plugin = Plugin.objects.get(slug=plugin_hash)
+            plugin = Plugin.objects.get(slug=plugin_hash, owner=request.user)
         except Plugin.DoesNotExist:
             pass
 
@@ -67,7 +68,8 @@ class DeveloperDetailView(TemplateView):
                 'plugin': plugin,
                 'plugin_types': Plugin.TYPES,
                 'add': add,
-                'update': update
+                'update': update,
+                'developer': True
 
             })
 
@@ -113,7 +115,8 @@ class DeveloperAddView(TemplateView):
             {
                 'request': request,
                 'breadcrumb': True,
-                'plugin_types': Plugin.TYPES
+                'plugin_types': Plugin.TYPES,
+                'developer': True
             })
 
 class DeveloperVersionView(TemplateView):
@@ -146,7 +149,7 @@ class DeveloperVersionView(TemplateView):
     def get(self, request, plugin_hash, version=None):
         plugin = version_obj = next_version = None
         try:
-            plugin = Plugin.objects.get(slug=plugin_hash)
+            plugin = Plugin.objects.get(slug=plugin_hash, owner=request.user)
         except Plugin.DoesNotExist:
             pass
 
@@ -165,6 +168,7 @@ class DeveloperVersionView(TemplateView):
                 'plugin': plugin,
                 'version': version_obj,
                 'next_version': next_version,
+                'developer': True
             })
 
 class DeveloperLiveView(TemplateView):
@@ -188,4 +192,14 @@ class DeveloperLiveView(TemplateView):
                 'breadcrumb': True,
                 'plugin': plugin,
                 'version': version_obj
+            })
+
+class DeveloperDocsView(TemplateView):
+    template_name = "developer_docs.html"
+
+    def get(self, request):
+        return render(request, self.template_name,
+            {
+                'request': request,
+                'breadcrumb': True
             })

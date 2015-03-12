@@ -46,12 +46,19 @@
 {% endblock %}
 
 {% block content %}
+{%if user|has_group:'developers' or user.is_staff %}
+
     <div class="row">
         <div class="span12">
         <div class="clearfix">
         <form id="version-details" class="form-horizontal" method="post">
         {%csrf_token%}
-            <h3>Version Details</h3>
+            <div class="clearfix">
+            <h3 class="pull-left">Version Details</h3>
+            <a style="margin-top:20px;" title="See plugin documentation" target="_blank" class="pull-right" href="developer/docs">
+                <i class="fa fa-2x fa-question-circle"></i>
+            </a>
+            </div>
             <div class="well">
                     <div class="control-group">
                         <label class="control-label" for="id-version">Version</label>
@@ -147,6 +154,11 @@ plugin = function(self){
                 </div>
         </div>
     </div>
+    {% else %}
+
+    <center><h4>The access to this page is restricted to developers. To become a developer, please contact the platform administration.</h4></center>
+
+    {% endif %}
 {% endblock content %}
 
 {% block scriptextraincludes %}
