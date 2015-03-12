@@ -364,15 +364,15 @@
     };
 }(jQuery));
 
-var DashboardWidget = function DashboardWidget(widgetname, header, width, height, pos_x, pos_y) {
+var DashboardWidget = function DashboardWidget(widgetname, header, width, height, pos_x, pos_y, icon) {
         this.widgetname = widgetname;
-        this.width = width;
-        this.height = height;
-        this.pos_x = pos_x;
-        this.pos_y = pos_y;
-        this.header = header;
+        this.width = width || 2;
+        this.height = height || 1;
+        this.pos_x = pos_x || 1;
+        this.pos_y = pos_y || 1;
+        this.header = header || 'New plugin';
         this.content = "";
-        this.icon = '';
+        this.icon = icon || '';
         this.header_tooltip = null;
         this.header_style = '';
 
@@ -465,11 +465,18 @@ var DashboardWidget = function DashboardWidget(widgetname, header, width, height
                     '"pos_x": '+this.pos_x+','+
                     '"pos_y": '+this.pos_y+','+
                     '"header": "'+this.header+'",'+
+                    '"icon": "'+this.icon+'",'+
                     '"content": "'+encodeURI(this.content)+'"';
 
 
         for(var parameter in extra){
-            tmp += ',"'+parameter+'": "'+encodeURI(String(extra[parameter]))+'"';
+            var eparam = extra[parameter];
+
+            if(typeof eparam == 'function')
+                tmp += ',"'+parameter+'": "'+encodeURI(String(eparam))+'"';
+            else if(eparam instanceof Array){
+                tmp += ',"'+parameter+'": "'+encodeURI(JSON.stringify(eparam))+'"';
+            }
         }
 
         tmp += '}';
@@ -493,11 +500,13 @@ var DashboardWidget = function DashboardWidget(widgetname, header, width, height
 
         delete json.type;
 
+        this.icon = json.icon;
+        delete json.icon;
+
         for(var parameter in json){
             this[parameter] = decodeURI(json[parameter]);
         }
 
-        console.log(this);
     },
     copy : function(extra){
 
@@ -513,6 +522,7 @@ var DashboardWidget = function DashboardWidget(widgetname, header, width, height
         this_widget.pos_y = this.pos_y;
         this_widget.header = this.header;
         this_widget.content = this.content;
+        this_widget.icon = this.icon;
 
         for(var parameter in extra){
             this_widget[parameter] = extra[parameter];

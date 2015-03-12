@@ -30,6 +30,8 @@ def dashboard(request, template_name='dashboard.html'):
     if not request.user.is_authenticated():
         raise Http404
 
+
+
     return render(request, template_name, {'request': request, 'hide_add': True,
         'breadcrumb': True, 'dashboard': True })
 
