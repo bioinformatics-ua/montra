@@ -340,7 +340,9 @@ INSTALLED_APPS = (
     'constance.backends.database',
     "constance",
 
-    "developer"
+    "developer",
+
+    'django_ace',
 )
 
 CONSTANCE_BACKEND = 'constance.backends.database.DatabaseBackend'

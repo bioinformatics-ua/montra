@@ -92,6 +92,7 @@ function sandbox(id, data){
 };
 
 function registerShell(closure){
+    console.log('register');
     dashzone.register(
         new PlugShellWidget(
             closure.confs, closure.plugin

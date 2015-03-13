@@ -90,9 +90,14 @@
                         if(callback) callback(confs, plugin);
                     });
             {% else %}
-                    $.get('{{version.path|safe}}')
+                    $.ajax({
+                        url: '{{version.path|safe}}',
+                        method: 'GET',
+                        crossDomain: true,
+                        contentType: 'application/x-www-form-urlencoded; charset=UTF-8'
+                    })
                         .done(function(data){
-                            sandbox('{{plugin.slug}}', data);
+                            sandbox('{{version.plugin.slug}}', data);
 
                         })
                         .fail(function(data){

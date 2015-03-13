@@ -30,10 +30,12 @@ urlpatterns = patterns('',
     url(r'^(?P<plugin_hash>[^/]+)/(?P<version>[0-9]+)$', DeveloperVersionView.as_view(), name='developer-version'),
     url(r'^(?P<plugin_hash>[^/]+)/add$', DeveloperVersionView.as_view(), name='developer-version-add'),
 
-    #livre preview
+    #live preview
+    url(r'^live/(?P<version_id>[0-9]+)/$',
+        DeveloperLiveAdminView.as_view(), name='developer-live-admin'),
+
     url(r'^live/(?P<plugin_hash>[^/]+)/(?P<version>[0-9]+)$',
         DeveloperLiveView.as_view(), name='developer-live'),
-
 
     # API urls
     url(r'^checkname/$', CheckNameView.as_view()),

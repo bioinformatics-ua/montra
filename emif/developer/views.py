@@ -194,6 +194,34 @@ class DeveloperLiveView(TemplateView):
                 'version': version_obj
             })
 
+class DeveloperLiveAdminView(TemplateView):
+    template_name   = "developer_live.html"
+
+    def get(self, request, version_id):
+
+        if not self.request.user.is_staff:
+            raise Http404
+
+        version_obj = plugin =  None
+
+        try:
+            version_obj = PluginVersion.objects.get(id=version_id)
+        except PluginVersion.DoesNotExist:
+            pass
+
+        if version_obj:
+            plugin = version_obj.plugin
+
+        print version_obj
+
+        return render(request, self.template_name,
+            {
+                'request': request,
+                'breadcrumb': True,
+                'plugin': plugin,
+                'version': version_obj
+            })
+
 class DeveloperDocsView(TemplateView):
     template_name = "developer_docs.html"
 

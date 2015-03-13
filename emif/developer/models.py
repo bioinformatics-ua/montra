@@ -113,6 +113,12 @@ class Plugin(models.Model):
 
         return False
 
+    def __str__(self):
+        if self.name != None:
+            return self.name
+
+        return Undefined
+
     class Meta:
         ordering = ['-latest_update']
 
@@ -216,3 +222,4 @@ class PluginVersion(models.Model):
 
     class Meta:
         ordering = ['-version']
+        verbose_name_plural = "Plugin versions waiting for approval"

@@ -35,6 +35,7 @@ from django.utils import timezone
 import datetime
 
 from .models import *
+from django_ace import AceWidget
 
 class PluginVersionInline(admin.TabularInline):
     model = PluginVersion
@@ -45,5 +46,19 @@ class PluginAdmin(admin.ModelAdmin):
     ]
     list_display = ['name', 'type', 'owner', 'removed']
 
+class PluginVersionForm(forms.ModelForm):
+    path = forms.CharField(widget=AceWidget(mode='javascript', theme='github', width="90%"))
 
+
+class PluginVersionAdmin(admin.ModelAdmin):
+    form = PluginVersionForm
+    def queryset(self, request):
+
+        qs = super(PluginVersionAdmin, self).queryset(request)
+
+        return qs.filter(approved=False, submitted=True)
+
+    list_display = ['plugin', 'version', 'submitted', 'approved']
 admin.site.register(Plugin, PluginAdmin)
+admin.site.register(PluginVersion, PluginVersionAdmin)
+
