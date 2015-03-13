@@ -83,7 +83,7 @@
                     {% if plugin.type != 2 %}
                     <div id="local_editor" class="{% if version.is_remote %}hide{%endif%}">
                         <pre style="height: 300px; font-size: 14px;" id="editor">
-{% if version.is_remote or version.path == '' %}
+{% if not version or version.is_remote or version.path == '' %}
 confs = {
             name: "New Global Widget",
             width: 2,
@@ -92,7 +92,7 @@ confs = {
             y: 6
 };
 plugin = function(self){
-        self.html('Hello world DUDE 2');
+        self.html('Hello world');
         self.refresh();
 };
 {% else %}
