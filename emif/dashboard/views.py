@@ -25,13 +25,16 @@ from django.http import Http404
 
 from questionnaire.models import Questionnaire
 
+from developer.models import Plugin, PluginVersion
+
 def dashboard(request, template_name='dashboard.html'):
 
     if not request.user.is_authenticated():
         raise Http404
 
 
+    plugins = PluginVersion.all_valid(type=Plugin.GLOBAL)
 
     return render(request, template_name, {'request': request, 'hide_add': True,
-        'breadcrumb': True, 'dashboard': True })
+        'breadcrumb': True, 'dashboard': True, 'plugins': plugins })
 

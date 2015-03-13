@@ -70,4 +70,35 @@
 {% block content %}
     <div id="playground" style="margin-left: 0px;" class="span12">
     </div>
+
+
+{% endblock %}
+
+{% block scriptextra %}
+        $(function(){
+        arr_len = {{plugins|length}};
+
+        {% for version in plugins %}
+            {% if not version.is_remote %}
+
+                sandbox('{{version.plugin.slug}}',
+                    function(callback){
+                        var confs, plugin;
+
+                        {{version.path|safe}}
+
+                        if(callback) callback(confs, plugin);
+                    });
+            {% else %}
+                    $.get('{{version.path|safe}}')
+                        .done(function(data){
+                            sandbox('{{plugin.slug}}', data);
+
+                        })
+                        .fail(function(data){
+                            console.log("We couldn't obtain the remote plugin from url: '{{version.path|safe}}'");
+                        });
+            {%endif%}
+        {% endfor %}
+        });
 {% endblock %}

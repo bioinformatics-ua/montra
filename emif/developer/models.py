@@ -91,7 +91,7 @@ class Plugin(models.Model):
     # gets the file from the filesystem
     def getLatest(self):
         try:
-            return self.versions()[:1]
+            return self.versions().filter(approved=True)[:1]
         except PluginVersion.DoesNotExist:
             return None
 
@@ -131,11 +131,14 @@ class PluginVersion(models.Model):
     removed     = models.BooleanField(default=False)
 
     @staticmethod
-    def all(plugin=None):
+    def all(plugin=None, approved=None):
         tmp = PluginVersion.objects.filter(removed=False)
 
         if plugin != None:
             tmp = tmp.filter(plugin=plugin)
+
+        if approved != None:
+            tmp = tmp.filter(approved=True)
 
         return tmp
 
@@ -198,6 +201,17 @@ class PluginVersion(models.Model):
 
     def latest_update_repr(self):
         return self.latest_update.strftime("%Y-%m-%d %H:%M:%S")
+
+    @staticmethod
+    def all_valid(type=None):
+        all = None
+
+        all = PluginVersion.all(approved=True).order_by('plugin__id', '-version').distinct('plugin__id')
+
+        if type != None:
+            all = all.filter(plugin__type=type)
+
+        return all
 
 
     class Meta:

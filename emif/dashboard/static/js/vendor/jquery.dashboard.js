@@ -273,6 +273,7 @@
 
                     try{
                         var parsed_configurations = JSON.parse(localStorage.getItem(self[0].id+"_preferences"));
+
                         registered_widgets = private_funcs.__deepcopy(initial_widgets);
 
                         for(var i=0;i<parsed_configurations.length;i++){
@@ -465,7 +466,7 @@ var DashboardWidget = function DashboardWidget(widgetname, header, width, height
                     '"pos_x": '+this.pos_x+','+
                     '"pos_y": '+this.pos_y+','+
                     '"header": "'+this.header+'",'+
-                    '"icon": "'+this.icon+'",'+
+                    '"icon": "'+encodeURI(this.icon)+'",'+
                     '"content": "'+encodeURI(this.content)+'"';
 
 
@@ -500,7 +501,7 @@ var DashboardWidget = function DashboardWidget(widgetname, header, width, height
 
         delete json.type;
 
-        this.icon = json.icon;
+        this.icon = decodeURI(json.icon);
         delete json.icon;
 
         for(var parameter in json){
