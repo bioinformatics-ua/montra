@@ -155,6 +155,8 @@
 <script src="{{ STATIC_URL}}js/dataTables.bootstrap.js"></script>
 
 <script src="{{ STATIC_URL}}js/jquery.tabmanager.js"></script>
+<script src="{{ STATIC_URL}}js/widgets/widget.plug_shell.js"></script>
+
 
 {% endblock %}
 {% block breadcrumbs %}
@@ -512,5 +514,36 @@ function pushQsets(){
     {% endfor %}
     $('#set_container').append(containers.join(''));
 }
+        $(function(){
+        arr_len = {{plugins|length}};
+
+        {% for version in plugins %}
+            {% if not version.is_remote %}
+
+                sandbox('{{version.plugin.slug}}',
+                    function(callback){
+                        var confs, plugin;
+
+                        {{version.path|safe}}
+
+                        if(callback) callback(confs, plugin);
+                    });
+            {% else %}
+                    $.ajax({
+                        url: '{{version.path|safe}}',
+                        method: 'GET',
+                        crossDomain: true,
+                        contentType: 'application/x-www-form-urlencoded; charset=UTF-8'
+                    })
+                        .done(function(data){
+                            sandbox('{{version.plugin.slug}}', data);
+
+                        })
+                        .fail(function(data){
+                            console.log("We couldn't obtain the remote plugin from url: '{{version.path|safe}}'");
+                        });
+            {%endif%}
+        {% endfor %}
+        });
 {% endblock %}
 </script>

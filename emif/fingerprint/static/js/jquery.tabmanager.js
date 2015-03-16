@@ -26,7 +26,17 @@
 
         var sorthandle;
         var header = self.children('.nav');
+
+        if(header.length == 0){
+            header = $('<ul class="nav nav-tabs"></ul>').appendTo(self);
+            console.log(header);
+        }
+
         var bodies = self.children('.tab-content');
+
+        if(bodies.length == 0){
+            bodies = $('<div class="tab-content"></div>').appendTo(self);
+        }
 
         var settings = $.extend({
             showRegistry: null,
@@ -164,15 +174,27 @@
                     }
                 });
 
+                var first = false;
                 if(!inserted){
-                    console.log('inserted after')
                     header.append(to_insert);
+                    if(header.children('li').length == 1){
+                        $('#tab-'+id).addClass('active');
+                        first=true;
+                    }
                 }
 
+                var body_append =   '<div class="tab-pane ';
+
+                if(first)
+                    body_append += 'active';
+
+                body_append += '" id="'+id+'">\
+                                        '+body+'\
+                                    </div>';
+
                 bodies.append(
-                '<div class="tab-pane" id="'+id+'">\
-                '+body+'\
-                </div>');
+                    body_append
+                );
             },
             remove: function(id){
                 $('#tab-'+id, header).remove();
@@ -395,7 +417,7 @@ var TabWidget = function TabWidget(widgetname, header, pos, icon) {
         head += '</div>&nbsp;<div class="pull-left">&nbsp;&nbsp;'+this.header+
         '&nbsp;&nbsp;</div><div class="pull-right removewidget"><i class="icon-remove"></i></div>';
 
-        var body = '<div><div class="span12">'+this.content+'</div></div>';
+        var body = '<div><div class="tab-body span12">'+this.content+'</div></div>';
 
         // LOGIC TO INSERT WIDGET INTO THE LAYOUT
         tabcontrol.addLayoutTab(self.widgetname, head, body, this.pos);
@@ -403,11 +425,10 @@ var TabWidget = function TabWidget(widgetname, header, pos, icon) {
         $('#'+this.widgetname+" .dragtooltip").tooltip({'container': 'body'});
 
         $('#tab-'+this.widgetname+" .removewidget").click(function(){
-
             if(typeof bootbox !== 'undefined'){
                 bootbox.confirm("Are you sure you want to remove this tab ?", function(confirmation){
                     if (confirmation)
-                    parent.removeWidget(self.widgetname);
+                        parent.removeWidget(self.widgetname);
                 });
             } else {
                 var confirmation = confirm("Are you sure you want to remove this tab ?");
@@ -429,7 +450,7 @@ var TabWidget = function TabWidget(widgetname, header, pos, icon) {
     },
     __refresh    : function(){
         //console.log(this.content);
-        $('#'+this.widgetname+' .accordion-inner').html(this.content);
+        $('#'+this.widgetname+' .tab-body').html(this.content);
     },
     // private methods
     __validate : function(){

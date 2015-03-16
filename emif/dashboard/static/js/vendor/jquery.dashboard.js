@@ -422,7 +422,7 @@ var DashboardWidget = function DashboardWidget(widgetname, header, width, height
         }
 
     },
-    __refresh    : function(){
+    __refresh : function(){
         //console.log(this.content);
         $('#'+this.widgetname+' .accordion-inner').html(this.content);
     },

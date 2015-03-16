@@ -54,6 +54,8 @@ from accounts.models import EmifProfile
 
 from django.core.exceptions import PermissionDenied
 
+from developer.models import Plugin, PluginVersion
+
 def document_form_view_upload(request, fingerprint_id, template_name='documents_upload_form.html'):
     """Store the files at the backend
     """
@@ -242,6 +244,8 @@ def document_form_view(request, runcode, qs, activetab='summary', readOnly=False
     except FingerprintSubscription.DoesNotExist:
         pass
 
+    plugins = PluginVersion.all_valid(type=Plugin.DATABASE)
+
     return render(request, template_name,
         {'request': request, 'qsets': qsets, 'export_bd_answers': True,
         'apiinfo': apiinfo, 'fingerprint_id': runcode,
@@ -267,6 +271,7 @@ def document_form_view(request, runcode, qs, activetab='summary', readOnly=False
                     'public_key': public_key,
                     'hits': hits,
                     'subscription': subscription,
+                    'plugins': plugins
                     })
 
 

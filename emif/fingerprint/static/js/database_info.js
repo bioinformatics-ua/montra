@@ -654,6 +654,19 @@
      return not_loaded;
  }
 var tm;
+var loaded_arr = [];
+var arr_len;
+
+
+/* this may seem dumb, but we can only run the dashboard after all plugins finished loading
+event remote one's with external dependencies that could potentially take a bit.
+*/
+var tabFull = function(insert){
+    loaded_arr.push(insert);
+
+    if(arr_len == loaded_arr.length)
+        loadTab();
+}
 $(function(){
     tm = $('#tab-plug').tabmanager(
         {
@@ -671,9 +684,64 @@ $(function(){
     tm.register(new SimpleTextWidget("tester2",  'Mother Tab of testing 2', 1,
         "<strong>Hello world 2 :)</strong>"));
 
+});
+
+
+function sandbox(id, data){
+    var confs, plugin;
+    var self;
+
+    try {
+        if(typeof data === 'string'){
+            eval(data);
+            self = {confs: confs, plugin: plugin};
+        }
+        else{
+            data(function(confs, plugin){
+                self = {confs: confs, plugin: plugin};
+            })
+        }
+
+        if(checkIntegrity(self)){
+            self.confs.id = id;
+            registerShell(self);
+        }
+    } catch(exc){
+        console.error("The code contains one or several errors, and doesn't execute, please double check your code. Errors are available on console.");
+        console.error(exc);
+    }
+};
+
+function registerShell(closure){
+    console.log('register');
+    tm.register(
+        new PlugShellWidget(
+            closure.confs, closure.plugin
+        )
+    );
+
+    tabFull(closure.confs.id);
+}
+
+function checkIntegrity(closure){
+    if(!closure.confs || !(typeof closure.confs == 'object'))
+        throw 'You must specify a \'confs\' dictionary for the plugin.';
+
+    if(!closure.plugin || !(typeof closure.plugin == 'function'))
+        throw 'You must specify a \'plugin\' function for the plugin.';
+
+    return true;
+}
+
+function loadTab(){
+    console.log('load tab manager');
     var any_configuration = tm.loadConfiguration();
 
     if(any_configuration == false){
         tm.initial();
     }
-});
+
+    $('#tabreset').tooltip({
+        'container': 'body'
+    });
+}
