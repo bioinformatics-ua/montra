@@ -18,11 +18,25 @@
  */
 
 (function($) {
-    $.fn.dashboard = function(options) {
+    $.fn.tabmanager = function(options) {
         // This indicates plugin version, and allows to invalidate any existing caches
         var __version = "0.1";
 
         var self = this;
+
+        var sorthandle;
+        var header = self.children('.nav');
+
+        if(header.length == 0){
+            header = $('<ul class="nav nav-tabs"></ul>').appendTo(self);
+            console.log(header);
+        }
+
+        var bodies = self.children('.tab-content');
+
+        if(bodies.length == 0){
+            bodies = $('<div class="tab-content"></div>').appendTo(self);
+        }
 
         var settings = $.extend({
             showRegistry: null,
@@ -30,7 +44,6 @@
             initial: null
         }, options);
 
-        var gridster;
         var timer = 0;
 
         var initial_widgets = {};
@@ -42,89 +55,65 @@
         ];
 
         var private_funcs = {
-            __init: function() {
-                var width = (parseFloat($(self).width()) / 6) - 10;
-
-                var cols, rows;
-
-
-
-                if (width < 130) {
-                    width = (parseFloat($(self).width()) / 4) - 10;
-
-                    cols = 4;
-                    rows = 4;
-                } else {
-                    cols = 6;
-                    rows = 4;
-                }
-
-                gridster = $(".gridster > ul").gridster({
-                    widget_base_dimensions: [width, 200],
-                    widget_margins: [5, 5],
-                    helper: 'clone',
-                    max_cols: cols,
-                    max_rows: rows,
-                    min_cols: cols,
-                    min_rows: rows,
-                    resize: {
-                        enabled: true,
-                        max_size: [cols, rows],
-                        min_size: [2, 1],
-                        stop: function(e, ui, $widget) {
-                            console.log("invoking stop from resize");
-                            private_funcs.__clampHeight($widget);
-                            public_funcs.saveConfiguration();
-                        }
-                    },
-                    draggable: {
-                        handle: '.widget-header',
-                        stop: function(event, ui) {
-                            public_funcs.saveConfiguration();
-                        }
-                    },
-                }).data('gridster');
+            __loadExisting: function(){
+                console.log($(self).children());
+            },
+            __init: function(){
 
             },
             __delay: function(callback, ms) {
                     clearTimeout(timer);
                     timer = setTimeout(callback, ms);
             },
-            __clampHeight: function(context) {
-                $('[data-clampedheight]', context).each(function() {
-                    var elem = $(this);
-                    var parentPanel = elem.data('clampedheight');
-                    if (parentPanel) {
-                        var sideBarNavWidth = $(parentPanel).height() - 40 - parseInt(elem.css('paddingTop')) - parseInt(elem.css('paddingBottom')) - parseInt(elem.css('marginTop')) - parseInt(elem.css('marginBottom')) - parseInt(elem.css('borderTopWidth')) - parseInt(elem.css('borderBottomWidth'));
+            __renderRegistry: function(){
+                if(settings.showRegistry != null && settings.registryTarget != null){
+                    var target = $(settings.registryTarget);
 
-                        elem.css('height', sideBarNavWidth);
+                    var to_render = '<a class="btn dropdown-toggle" data-toggle="dropdown" href="#" id="add_list_toolbar"><i class="icon-retweet"></i> Add Tabs <span class="caret"></span></a>'+
+                    '<ul class="dropdown-menu">';
+
+                    var no_results = true;
+                    for (var key in registered_widgets) {
+                        if (registered_widgets.hasOwnProperty(key)) {
+                            if(private_funcs.__indexOf(key) == -1){
+                                to_render += '<li><a id="'+key+'" class="tabaddwidget" data-widgetname="'+key+'" href="javascript:void(0)">'+registered_widgets[key].header+'</a></li>';
+                                no_results=false;
+                            }
+                        }
+
                     }
 
-                });
-            }, __supports_storage: function () {
+                    if(no_results)
+                        to_render+='<li><a id="noresultswidget" href="javascript:void(0)">No more tabs available.</a></li>'
+                    to_render+='</ul>';
+
+                    target.html(to_render);
+
+                    $(".tabaddwidget",target).click(function(){
+                        var key = $(this).data('widgetname');
+                        public_funcs.addWidget(key);
+                    });
+
+
+                }
+            },
+            __supports_storage: function () {
               try {
                 return 'localStorage' in window && window['localStorage'] !== null;
               } catch (e) {
                 return false;
               }
             },
-            __updateAllcoords:  function(){
-                var this_widgets = gridster.$widgets;
-                for(var i=0;i<this_widgets.length;i++){
-                    private_funcs.__updatecoords($(this_widgets[i]));
-                }
-            },
-            __updatecoords: function(widget){
+            __updatecoords: function(identificator, pos){
                 for(var i=0;i<widgets.length;i++){
-                    if(widgets[i].widgetname == widget.attr('id')){
+                    if(widgets[i].widgetname == identificator){
                         // was using data set instead of jquery, but had to changed because of ie9 and ie10 support...
-                        widgets[i].width = parseInt($(widget[0]).attr('data-sizex'));
-                        widgets[i].height = parseInt($(widget[0]).attr('data-sizey'));
-                        widgets[i].pos_x = parseInt($(widget[0]).attr('data-col'));
-                        widgets[i].pos_y = parseInt($(widget[0]).attr('data-row'));
+                        widgets[i].pos = parseInt(pos);
                         break;
                     }
                 }
+
+                public_funcs.saveConfiguration();
             },
             __indexOf: function(widgetname){
                 for(var i=0;i<widgets.length;i++){
@@ -133,39 +122,7 @@
                 }
                 return -1;
             },
-            __renderRegistry: function(){
-                if(settings.showRegistry != null && settings.registryTarget != null){
-                    var target = $(settings.registryTarget);
-
-                    var to_render = '<a class="btn dropdown-toggle" data-toggle="dropdown" href="#" id="add_list_toolbar"><i class="icon-retweet"></i> Add Widgets <span class="caret"></span></a>'+
-                    '<ul class="dropdown-menu">';
-
-                    var no_results = true;
-                    for (var key in registered_widgets) {
-                        if (registered_widgets.hasOwnProperty(key)) {
-                            if(private_funcs.__indexOf(key) == -1){
-                                to_render += '<li><a id="'+key+'" class="dashboardaddwidget" data-widgetname="'+key+'" href="javascript:void(0)">'+registered_widgets[key].header+'</a></li>';
-                                no_results=false;
-                            }
-                        }
-
-                    }
-
-                    if(no_results)
-                        to_render+='<li><a id="noresultswidget" href="javascript:void(0)">No more widgets available.</a></li>'
-                    to_render+='</ul>';
-
-                    target.html(to_render);
-
-                    $(".dashboardaddwidget",target).click(function(){
-                        var key = $(this).data('widgetname');
-                        public_funcs.addWidget(key);
-                        private_funcs.__clampHeight($('#'+key));
-                    });
-
-
-                }
-            }, __deepcopy: function(dictionary){
+             __deepcopy: function(dictionary){
                 var copy = {}
                 for (var key in dictionary) {
                     if (dictionary.hasOwnProperty(key)) {
@@ -177,29 +134,101 @@
                 return copy;
 
             }
-
         };
 
+        var tabcontrol = {
+            init: function(){
+                header.children('li').addClass('dont-move');
+
+                sorthandle = header.sortable({
+                  items: "li:not(.dont-move)",
+                  //containment: "parent",
+                  //axis: "x",
+                  stop: function( event, ui ) {
+                    $(header).children('li').each(function(index, elem){
+                        var id = $(elem).data('id');
+                        private_funcs.__updatecoords(id, index);
+                    });
+                  }
+                });
+
+                sorthandle.disableSelection();
+            },
+            addLayoutTab: function(id, head, body, pos){
+
+                var inserted = false;
+                var to_insert = '<li data-pos="'+pos+'" data-id="'+id+'" id="tab-'+id+'">\
+                                    <a href="#'+id+'" data-toggle="tab">'+head+'</a>\
+                                </li>';
+
+                header.children('li').each(function(index, elem){
+                    var this_pos = $(elem).data('pos');
+                    if(!this_pos)
+                        return true;
+
+                    if(this_pos > pos){
+                        $(elem).before(to_insert);
+                        inserted = true;
+
+                        return false;
+                    }
+                });
+
+                var first = false;
+                if(!inserted){
+                    header.append(to_insert);
+                    if(header.children('li').length == 1){
+                        $('#tab-'+id).addClass('active');
+                        first=true;
+                    }
+                }
+
+                var body_append =   '<div class="tab-pane ';
+
+                if(first)
+                    body_append += 'active';
+
+                body_append += '" id="'+id+'">\
+                                        '+body+'\
+                                    </div>';
+
+                bodies.append(
+                    body_append
+                );
+            },
+            remove: function(id){
+                $('#tab-'+id, header).remove();
+                $('#'+id, bodies).remove();
+            },
+            destroy: function(){
+                for(var i=0;i<widgets.length;i++){
+                    tabcontrol.remove(widgets[i].widgetname);
+                }
+            }
+        }
+
         var public_funcs = {
+            order: function(){
+                console.log(sorthandle.toArray());
+            },
             addWidget: function(widgetname) {
+                console.log('add widget');
                 var widget = registered_widgets[widgetname];
 
-                if(widget instanceof DashboardWidget){
+                if(widget instanceof TabWidget){
                     if (widget.__validate() === true){
 
-                        widget.__init(gridster, public_funcs);
+                        widget.__init(tabcontrol, public_funcs);
                         widgets.push(widget);
-
-                        private_funcs.__clampHeight($('#'+widget.widgetname));
+                        console.log(widgets);
 
                         public_funcs.saveConfiguration();
-
                     }
 
                     private_funcs.__renderRegistry();
 
                 } else {
-                    console.error("You can only add DashboardWidget objects to this dashboard.");
+                    console.error("You can only add TabWidget objects to this tab placeholder.");
                 }
 
             },
@@ -213,26 +242,28 @@
                 try{
                     delete registered_widgets[widgetname];
                 } catch(err){
-                    console.error("Couldnt delete registered widget with name"+widgetname);
+                    console.error("Couldnt delete registered widget with name "+widgetname);
                 }
             },
             removeWidget: function(widgetname) {
+                console.log(widgetname);
                 for(var i=0;i<widgets.length;i++){
                     if(widgets[i].widgetname == widgetname){
                         widgets.splice(i,1);
                         break;
                     }
                 }
-
-                gridster.remove_widget.apply(gridster, $('#'+widgetname));
+                tabcontrol.remove(widgetname);
 
                 public_funcs.saveConfiguration();
                 private_funcs.__renderRegistry();
 
             },
             clear: function(){
+                for(var i=0;i<widgets.length;i++)
+                    tabcontrol.remove(widgets[i].widgetname);
+
                 widgets = [];
-                gridster.remove_all_widgets.apply(gridster);
 
                 public_funcs.saveConfiguration();
                 private_funcs.__renderRegistry();
@@ -244,12 +275,10 @@
             saveConfiguration: function(){
                 if(private_funcs.__supports_storage()){
 
-                    private_funcs.__updateAllcoords();
-
                     var serialization = public_funcs.serialize();
 
-                    localStorage.setItem(self[0].id+"_preferences", serialization);
-                    localStorage.setItem(self[0].id+"__dashboard_version", __version);
+                    localStorage.setItem(self[0].id+"__tabmanager_preferences", serialization);
+                    localStorage.setItem(self[0].id+"__tabmanager_version", __version);
 
                 } else {
                     console.error("Your browser doesn't support local storage!");
@@ -259,20 +288,21 @@
             },
             loadConfiguration: function(){
                 if(private_funcs.__supports_storage()){
-                    var stored_version = localStorage.getItem(self[0].id+"__dashboard_version");
+                    var stored_version = localStorage.getItem(self[0].id+"__tabmanager_version");
                     console.log("STORED VERSION: "+stored_version);
                     console.log("VERSION CURRENT: "+__version);
 
                     if(stored_version !== __version)
                         return false;
 
-                    gridster.destroy();
-                    $(self).html('<div class="gridster"><ul></ul></div>');
+                    tabcontrol.destroy();
+
                     widgets = [];
                     private_funcs.__init();
 
                     try{
-                        var parsed_configurations = JSON.parse(localStorage.getItem(self[0].id+"_preferences"));
+
+                        var parsed_configurations = JSON.parse(localStorage.getItem(self[0].id+"__tabmanager_preferences"));
 
                         registered_widgets = private_funcs.__deepcopy(initial_widgets);
 
@@ -289,8 +319,6 @@
 
                                 public_funcs.update(this_widget);
                                 public_funcs.addWidget(this_widget.widgetname);
-
-                                private_funcs.__clampHeight($('#'+this_widget.widgetname));
 
                             } catch(err){
                                 console.log(err);
@@ -327,6 +355,7 @@
 
                 return serialization;
             }, initial : function(){
+
                 if(settings.initial !== null && typeof(settings.initial) === 'function'){
                     registered_widgets = private_funcs.__deepcopy(initial_widgets);
 
@@ -337,7 +366,7 @@
                 }
             }, reset   : function(){
                 if(private_funcs.__supports_storage()){
-                    localStorage.removeItem(self[0].id+"_preferences");
+                    localStorage.removeItem(self[0].id+"__tabmanager_preferences");
 
                     public_funcs.clear();
 
@@ -346,7 +375,8 @@
             }
         };
 
-        $(self).html('<div class="gridster"><ul></ul></div>');
+        //$(self).html('<div class="gridster"><ul></ul></div>');
+        tabcontrol.init();
 
         private_funcs.__init();
 
@@ -354,7 +384,6 @@
 
         $(window).resize(function() {
             private_funcs.__delay(function() {
-                gridster.destroy();
 
                 private_funcs.__init();
 
@@ -365,47 +394,44 @@
     };
 }(jQuery));
 
-var DashboardWidget = function DashboardWidget(widgetname, header, width, height, pos_x, pos_y, icon) {
+var TabWidget = function TabWidget(widgetname, header, pos, icon) {
         this.widgetname = widgetname;
-        this.width = width || 2;
-        this.height = height || 1;
-        this.pos_x = pos_x || 1;
-        this.pos_y = pos_y || 1;
         this.header = header || 'New plugin';
+        this.pos = pos || 1;
         this.content = "";
         this.icon = icon || '';
         this.header_tooltip = null;
         this.header_style = '';
 
 }.addToPrototype({
-    __init  :   function(gridster, parent){
+    __init  :   function(tabcontrol, parent){
         var self = this;
 
-        var __widgetentry = '<li id="'+ this.widgetname+'"><div style="'+this.header_style+'" class="widget-header"><div title="Drag to change widget position" class="dragtooltip pull-left">';
+        var head = '<div title="Drag to change widget position" class="dragtooltip pull-left">';
 
         if(this.icon != undefined && this.icon.trim() != '')
-            __widgetentry += this.icon;
+            head += this.icon;
         else
-            __widgetentry += '<i class="icon-align-justify"></i>';
+            head += '<i class="icon-align-justify"></i>';
 
-        __widgetentry += '</div>'+this.header+
-        '<div class="pull-right removewidget"><i class="icon-remove"></i></div></div><div class="accordion-body"><div style="overflow-y:auto; height: auto;" data-clampedheight="#'+
-        this.widgetname+'" class="accordion-inner">'+this.content+'</div></div></li>';
+        head += '</div>&nbsp;<div class="pull-left">&nbsp;&nbsp;'+this.header+
+        '&nbsp;&nbsp;</div><div class="pull-right removewidget"><i class="icon-remove"></i></div>';
 
-        var widget = [__widgetentry, this.width, this.height, this.pos_x, this.pos_y];
+        var body = '<div><div class="tab-body span12">'+this.content+'</div></div>';
 
-        gridster.add_widget.apply(gridster, widget);
+        // LOGIC TO INSERT WIDGET INTO THE LAYOUT
+        tabcontrol.addLayoutTab(self.widgetname, head, body, this.pos);
 
         $('#'+this.widgetname+" .dragtooltip").tooltip({'container': 'body'});
 
-        $('#'+this.widgetname+" .removewidget").click(function(){
+        $('#tab-'+this.widgetname+" .removewidget").click(function(){
             if(typeof bootbox !== 'undefined'){
-                bootbox.confirm("Are you sure you want to remove this widget ?", function(confirmation){
+                bootbox.confirm("Are you sure you want to remove this tab ?", function(confirmation){
                     if (confirmation)
-                    parent.removeWidget(self.widgetname);
+                        parent.removeWidget(self.widgetname);
                 });
             } else {
-                var confirmation = confirm("Are you sure you want to remove this widget ?");
+                var confirmation = confirm("Are you sure you want to remove this tab ?");
                 if ( confirmation === true)
                     parent.removeWidget(self.widgetname);
             }
@@ -422,9 +448,9 @@ var DashboardWidget = function DashboardWidget(widgetname, header, width, height
         }
 
     },
-    __refresh : function(){
+    __refresh    : function(){
         //console.log(this.content);
-        $('#'+this.widgetname+' .accordion-inner').html(this.content);
+        $('#'+this.widgetname+' .tab-body').html(this.content);
     },
     // private methods
     __validate : function(){
@@ -436,20 +462,9 @@ var DashboardWidget = function DashboardWidget(widgetname, header, width, height
                 console.warn('Header on Dashboard must be a string');
                 return false;
         }
-        if (!(typeof this.width == 'number' || this.width instanceof Number)) {
-            console.warn('Width on Dashboard widget must be a number.');
-            return false;
-        }
-        if (!(typeof this.height == 'number' || this.height instanceof Number)) {
-            console.warn('Height on Dashboard widget must be a number.');
-            return false;
-        }
-        if (!(typeof this.pos_x == 'number' || this.pos_x instanceof Number)) {
-            console.warn('pos_x on Dashboard widget must be a number.');
-            return false;
-        }
-        if (!(typeof this.pos_y == 'number' || this.pos_y instanceof Number)) {
-            console.warn('pos_y on Dashboard widget must be a number.');
+
+        if (!(typeof this.pos == 'number' || this.pos instanceof Number)) {
+            console.warn('pos on Dashboard widget must be a number.');
             return false;
         }
 
@@ -461,10 +476,7 @@ var DashboardWidget = function DashboardWidget(widgetname, header, width, height
         var tmp ='{'+
                     '"type": "'+this.constructor.name+'",'+
                     '"widgetname": "'+this.widgetname+'",'+
-                    '"width": '+this.width+','+
-                    '"height": '+this.height+','+
-                    '"pos_x": '+this.pos_x+','+
-                    '"pos_y": '+this.pos_y+','+
+                    '"pos": '+this.pos+','+
                     '"header": "'+this.header+'",'+
                     '"icon": "'+encodeURI(this.icon)+'",'+
                     '"content": "'+encodeURI(this.content)+'"';
@@ -486,16 +498,13 @@ var DashboardWidget = function DashboardWidget(widgetname, header, width, height
     }, deserialize : function(json){
         this.widgetname = json.widgetname;
         delete json.widgetname
-        this.width = parseInt(json.width);
-        delete json.width;
-        this.height = parseInt(json.height);
-        delete json.height;
-        this.pos_x = parseInt(json.pos_x);
-        delete json.pos_x;
-        this.pos_y = parseInt(json.pos_y);
-        delete json.pos_y;
+
         this.header = json.header;
         delete json.header;
+
+        this.pos = parseInt(json.pos);
+        delete json.pos;
+
         this.content = decodeURI(json.content);
         delete json.content;
 
@@ -517,11 +526,10 @@ var DashboardWidget = function DashboardWidget(widgetname, header, width, height
         eval(tryme);
 
         this_widget.widgetname = this.widgetname;
-        this_widget.width = this.width;
-        this_widget.height = this.height;
-        this_widget.pos_x = this.pos_x;
-        this_widget.pos_y = this.pos_y;
         this_widget.header = this.header;
+
+        this_widget.pos = this.pos;
+
         this_widget.content = this.content;
         this_widget.icon = this.icon;
 
@@ -533,12 +541,12 @@ var DashboardWidget = function DashboardWidget(widgetname, header, width, height
     }
 });
 
-var SimpleTextWidget = function SimpleTextWidget(widgetname, header, content, width, height, pos_x, pos_y){
-    SimpleTextWidget._base.apply(this, [widgetname, header, width, height, pos_x, pos_y]);
+var SimpleTextWidget = function SimpleTextWidget(widgetname, header, pos, content){
+    SimpleTextWidget._base.apply(this, [widgetname, header, pos]);
 
     this.content = content;
 
-}.inherit(DashboardWidget).addToPrototype({
+}.inherit(TabWidget).addToPrototype({
     __validate : function(){
         //console.log();
         var success = SimpleTextWidget._super.__validate.apply(this);

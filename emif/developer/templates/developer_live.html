@@ -44,15 +44,14 @@
         <script src="{{ STATIC_URL }}js/vendor/bootbox.min.js"></script>
 
     <script src="{{ STATIC_URL}}js/vendor/jquery.gridster.min.js"></script>
-
-    <script src="{{ STATIC_URL}}js/vendor/jquery.dashboard.js"></script>
-
-    <script src="{{ STATIC_URL}}js/vendor/widgets/widget.plug_shell.js"></script>
-    <script src="{{ STATIC_URL}}js/emif.livepreview.js"></script>
 {% endblock %}
 
 {% block content %}
     {% if plugin.type == 0 %}
+    <script src="{{ STATIC_URL}}js/vendor/jquery.dashboard.js"></script>
+    <script src="{{ STATIC_URL}}js/vendor/widgets/widget.plug_shell.js"></script>
+    <script src="{{ STATIC_URL}}js/emif.livepreview.js"></script>
+
         <div id="playground_test" style="margin-left: 0px;">
             {% if not version.is_remote %}
             <script type="text/javascript">
@@ -83,7 +82,39 @@
         </div>
     {% endif %}
     {% if plugin.type == 1 %}
-        Fingerprint plugins previews are not available yet.
+    <script src="{{ STATIC_URL}}js/jquery.tabmanager.js"></script>
+    <script src="{{ STATIC_URL}}js/widgets/widget.plug_shell.js"></script>
+
+    <script src="{{ STATIC_URL}}js/emif.livepreview_fingerprint.js"></script>
+
+        <div id="playground_test" style="margin-left: 0px;">
+            {% if not version.is_remote %}
+            <script type="text/javascript">
+                console.log('LIVE PREVIEW FOR LOCAL FILE, fingerprint WIDGETS');
+                sandbox('{{plugin.slug}}',
+                    function(callback){
+                        var confs, plugin;
+
+                        {{version.path|safe}}
+
+                        if(callback) callback(confs, plugin);
+
+                    });
+            </script>
+            {% else %}
+                <script type="text/javascript">
+                    console.log('LIVE PREVIEW FOR REMOTE FILE, fingerprint WIDGETS')
+                    $.get('{{version.path|safe}}')
+                        .done(function(data){
+                            console.log(data);
+                            sandbox('{{plugin.slug}}', data);
+                        })
+                        .fail(function(data){
+                            codeError("We couldn't obtain the remote plugin from url: '{{version.path|safe}}'");
+                        });
+                </script>
+            {%endif%}
+        </div>
     {% endif %}
     {% if plugin.type == 2 %}
             <script type="text/javascript">
