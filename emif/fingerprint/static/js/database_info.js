@@ -653,3 +653,27 @@
 
      return not_loaded;
  }
+var tm;
+$(function(){
+    tm = $('#tab-plug').tabmanager(
+        {
+            showRegistry: true,
+            registryTarget: "#tabselectbox",
+            initial: function () {
+                tm.addWidget("tester");
+                tm.addWidget("tester2");
+            }
+        }
+    );
+    tm.register(new SimpleTextWidget("tester",  'Mother Tab of testing', 1,
+        "<strong>Hello world :)</strong>"));
+
+    tm.register(new SimpleTextWidget("tester2",  'Mother Tab of testing 2', 1,
+        "<strong>Hello world 2 :)</strong>"));
+
+    var any_configuration = tm.loadConfiguration();
+
+    if(any_configuration == false){
+        tm.initial();
+    }
+});
