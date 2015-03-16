@@ -40,5 +40,9 @@ urlpatterns = patterns('',
     # API urls
     url(r'^checkname/$', CheckNameView.as_view()),
 
-
+    # Globalproxy
+    url(r'^api/databaseSchemas/$', DatabaseSchemasView.as_view()),
+    url(r'^api/getProfileInformation/$', getProfileInformationView.as_view()),
+    url(r'^api/getFingerprints/$', getFingerprintsView.as_view()),
+    url(r'^api/getFingerprints/(?P<quest_slug>[^/]+)$', getFingerprintsView.as_view()),
 )

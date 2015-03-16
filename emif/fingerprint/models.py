@@ -14,6 +14,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from django.db import models
+from django.db.models import Q
 
 from django.core.validators import MaxLengthValidator
 
@@ -174,9 +175,16 @@ class Fingerprint(models.Model):
         return a != None
 
     @staticmethod
-    def valid():
+    def valid(questionnaire=None, owner=None):
 
-        return Fingerprint.objects.filter(removed=False)
+        tmp = Fingerprint.objects.filter(removed=False)
+        if questionnaire != None:
+            tmp = tmp.filter(questionnaire=questionnaire)
+
+        if owner != None:
+            tmp = tmp.filter(Q(owner=owner) | Q(shared = owner))
+
+        return tmp
 
     def setSubscription(self, user, value):
         try:

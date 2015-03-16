@@ -37,6 +37,124 @@ from rest_framework.parsers import JSONParser
 from rest_framework.permissions import AllowAny, IsAuthenticated
 
 from .models import *
+
+from questionnaire.models import Questionnaire
+from fingerprint.models import Fingerprint
+from accounts.models import Profile, EmifProfile
+
+############################################################
+##### Global Plugin - Web services
+############################################################
+
+class QuestionnaireSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Questionnaire
+        fields = ['slug','name']
+
+class GroupSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Group
+        fields = ['name']
+
+class UserSerializer(serializers.ModelSerializer):
+    groups = GroupSerializer(many=True)
+    class Meta:
+        model = User
+        exclude = ['id', 'password', 'username',
+        'user_permissions', 'is_superuser', 'is_staff', 'is_active']
+
+class ProfileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Profile
+        exclude = ['id', 'description']
+
+class EmifProfileSerializer(serializers.ModelSerializer):
+    user = UserSerializer()
+    interests = QuestionnaireSerializer(many=True)
+    profiles = ProfileSerializer(many=True)
+
+    class Meta:
+        model = EmifProfile
+        exclude = ['id', 'privacy']
+
+class FingerprintSerializer(serializers.ModelSerializer):
+    questionnaire = QuestionnaireSerializer()
+    owner = serializers.SerializerMethodField(method_name='get_owner')
+    shared = serializers.SerializerMethodField(method_name='get_shared')
+    name = serializers.SerializerMethodField(method_name='get_name')
+
+    def get_owner(self, obj):
+        return obj.owner
+
+    def get_shared(self, obj):
+        return obj.shared.all()
+
+    def get_name(self, obj):
+        return obj.findName()
+
+    class Meta:
+        model = Fingerprint
+        exclude = ['id', 'removed', 'description']
+
+## databaseSchemas()
+class DatabaseSchemasView(APIView):
+    authentication_classes = (SessionAuthentication, BasicAuthentication)
+    permission_classes = (IsAuthenticated,)
+    def get(self, request, *args, **kw):
+
+        if request.user.is_authenticated():
+            schemas = QuestionnaireSerializer(Questionnaire.objects.filter(disable='False'))
+
+            response = Response({'schemas': schemas.data}, status=status.HTTP_200_OK)
+
+        else:
+            response = Response({}, status=status.HTTP_403_FORBIDDEN)
+        return response
+
+## getProfileInformation()
+class getProfileInformationView(APIView):
+    authentication_classes = (SessionAuthentication, BasicAuthentication)
+    permission_classes = (IsAuthenticated,)
+    def get(self, request, *args, **kw):
+
+        if request.user.is_authenticated():
+            user = EmifProfileSerializer(request.user.emif_profile)
+
+            response = Response({'profile': user.data}, status=status.HTTP_200_OK)
+
+        else:
+            response = Response({}, status=status.HTTP_403_FORBIDDEN)
+        return response
+
+## getFingerprints()
+class getFingerprintsView(APIView):
+    authentication_classes = (SessionAuthentication, BasicAuthentication)
+    permission_classes = (IsAuthenticated,)
+    def get(self, request, quest_slug=None):
+
+        if request.user.is_authenticated():
+            q=None
+            if quest_slug:
+                try:
+                    q = Questionnaire.objects.get(slug=quest_slug)
+                except Questionnaire.DoesNotExist:
+                    return Response({}, status=status.HTTP_403_FORBIDDEN)
+
+            fingerprints = FingerprintSerializer(Fingerprint.valid(questionnaire=q, owner=request.user))
+
+            return Response({'fingerprints': fingerprints.data}, status=status.HTTP_200_OK)
+
+
+
+        return Response({}, status=status.HTTP_403_FORBIDDEN)
+
+############################################################
+
+
+
+
+
+
 ############################################################
 ##### Checks if a plugin can take a name - Web service
 ############################################################
