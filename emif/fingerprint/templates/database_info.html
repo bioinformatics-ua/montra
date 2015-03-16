@@ -198,7 +198,7 @@
                 <li class="{%if activetab == 'summary'%}active{%endif%}">
                     <a href="#metadata" data-toggle="tab"><i class="icon-list"></i>&nbsp; Fingerprint</a>
                 </li>
-                <!--{% if config.population_characteristics %}
+                {% if config.population_characteristics %}
                 <li class="{%if activetab == 'pc'%}active{%endif%}">
                     <a href="#populationcharacteristics" data-toggle="tab"><i class="icon-signal"></i>&nbsp; Population Characteristics</a>
                 </li>
@@ -227,7 +227,7 @@
                     <a href="#discussion" data-toggle="tab"><i class="fa fa-comment"></i> &nbsp; Discussion</a>
                 </li>
                 {% endif %}
-                -->
+
             </ul>
             <div style="margin-bottom: 50px;" class="tab-content">
                 <div class="tab-pane {%if activetab == 'summary'%}active{%endif%}" id="metadata">

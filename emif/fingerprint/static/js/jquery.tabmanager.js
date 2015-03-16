@@ -102,6 +102,8 @@
                         break;
                     }
                 }
+
+                public_funcs.saveConfiguration();
             },
             __indexOf: function(widgetname){
                 for(var i=0;i<widgets.length;i++){
@@ -131,14 +133,10 @@
                 sorthandle = header.sortable({
                   items: "li:not(.dont-move)",
                   //containment: "parent",
-                  axis: "x",
+                  //axis: "x",
                   stop: function( event, ui ) {
-                    console.log('Moved element in the list');
-
                     $(header).children('li').each(function(index, elem){
                         var id = $(elem).data('id');
-                        console.log('DATA ELEMENT '+id+ ' is in pos '+index);
-
                         private_funcs.__updatecoords(id, index);
                     });
                   }
@@ -148,10 +146,28 @@
             },
             addLayoutTab: function(id, head, body, pos){
 
-                header.append(
-                '<li data-id="'+id+'" id="tab-'+id+'">\
-                    <a href="#'+id+'" data-toggle="tab">'+head+'</a>\
-                </li>');
+                var inserted = false;
+                var to_insert = '<li data-pos="'+pos+'" data-id="'+id+'" id="tab-'+id+'">\
+                                    <a href="#'+id+'" data-toggle="tab">'+head+'</a>\
+                                </li>';
+
+                header.children('li').each(function(index, elem){
+                    var this_pos = $(elem).data('pos');
+                    if(!this_pos)
+                        return true;
+
+                    if(this_pos > pos){
+                        $(elem).before(to_insert);
+                        inserted = true;
+
+                        return false;
+                    }
+                });
+
+                if(!inserted){
+                    console.log('inserted after')
+                    header.append(to_insert);
+                }
 
                 bodies.append(
                 '<div class="tab-pane" id="'+id+'">\
@@ -161,6 +177,11 @@
             remove: function(id){
                 $('#tab-'+id, header).remove();
                 $('#'+id, bodies).remove();
+            },
+            destroy: function(){
+                for(var i=0;i<widgets.length;i++){
+                    tabcontrol.remove(widgets[i].widgetname);
+                }
             }
         }
 
@@ -169,6 +190,7 @@
                 console.log(sorthandle.toArray());
             },
             addWidget: function(widgetname) {
+                console.log('add widget');
                 var widget = registered_widgets[widgetname];
 
                 if(widget instanceof TabWidget){
@@ -176,6 +198,7 @@
 
                         widget.__init(tabcontrol, public_funcs);
                         widgets.push(widget);
+                        console.log(widgets);
 
                         public_funcs.saveConfiguration();
                     }
@@ -215,13 +238,10 @@
 
             },
             clear: function(){
-                var to_remove = [];
-
                 for(var i=0;i<widgets.length;i++)
-                    to_remove.push(widgets[i].widgetname);
+                    tabcontrol.remove(widgets[i].widgetname);
 
-                for(var i=0;i<to_remove.length;i++)
-                    public_funcs.removeWidget(to_remove[i]);
+                widgets = [];
 
                 public_funcs.saveConfiguration();
                 private_funcs.__renderRegistry();
@@ -235,7 +255,7 @@
 
                     var serialization = public_funcs.serialize();
 
-                    localStorage.setItem(self[0].id+"_tabmanager_preferences", serialization);
+                    localStorage.setItem(self[0].id+"__tabmanager_preferences", serialization);
                     localStorage.setItem(self[0].id+"__tabmanager_version", __version);
 
                 } else {
@@ -253,13 +273,14 @@
                     if(stored_version !== __version)
                         return false;
 
-                    public_funcs.clear();
+                    tabcontrol.destroy();
 
                     widgets = [];
                     private_funcs.__init();
 
                     try{
-                        var parsed_configurations = JSON.parse(localStorage.getItem(self[0].id+"_tabmanager_preferences"));
+
+                        var parsed_configurations = JSON.parse(localStorage.getItem(self[0].id+"__tabmanager_preferences"));
 
                         registered_widgets = private_funcs.__deepcopy(initial_widgets);
 
@@ -323,7 +344,7 @@
                 }
             }, reset   : function(){
                 if(private_funcs.__supports_storage()){
-                    localStorage.removeItem(self[0].id+"_tabmanager_preferences");
+                    localStorage.removeItem(self[0].id+"__tabmanager_preferences");
 
                     public_funcs.clear();
 
