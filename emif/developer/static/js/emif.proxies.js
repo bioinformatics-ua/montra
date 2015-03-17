@@ -1,12 +1,11 @@
 "use strict";
 
-
-
-var GlobalProxy = (
+var Requester = (
     function( window, undefined ) {
         var instance;
         var memoizer= {};
-        var __init__ = function() {
+
+        var __init__ = function(){
 
             var inCache = function(url){
                 var cache = memoizer[url];
@@ -18,35 +17,81 @@ var GlobalProxy = (
                 return undefined;
             };
 
-            var getRequest = function(url){
-                var cache = inCache(url);
-                    if(cache)
-                        return cache;
+            return {
+                getRequest: function(url){
+                    var cache = inCache(url);
+                        if(cache)
+                            return cache;
 
-                return Promise.resolve($.get(url).done(
-                    function(result){
-                        memoizer[url] = result;
-                        return result;
-                    }).fail(function(ex){
-                        return ex;
-                    })
-                );
+                    return Promise.resolve($.get(url).done(
+                        function(result){
+                            memoizer[url] = result;
+                            return result;
+                        }).fail(function(ex){
+                            return ex;
+                        })
+                    );
+                },
+                postRequest: function(url, data){
+                    data = data || {};
+
+                    var cache = inCache(url+JSON.stringify(data));
+                        if(cache)
+                            return cache;
+
+                    return Promise.resolve($.post(url, data).done(
+                        function(result){
+                            memoizer[url+JSON.stringify(data)] = result;
+                            return result;
+                        }).fail(function(ex){
+                            return ex;
+                        })
+                    );
+                }
             }
+        }
+        return {
+            getInstance : function() {
+                if( ! instance ) {
+                    instance = new __init__();
+                }
+                return instance;
+            }
+        };
+    }
+)(window);
+
+var GlobalProxy = (
+    function( window, undefined ) {
+        var instance;
+
+        var __init__ = function() {
+            var rq = Requester.getInstance();
 
             return {
                 databaseSchemas : function(){
-                    return getRequest('/developer/api/databaseSchemas/');
+                    return rq.getRequest('/developer/api/databaseSchemas/');
                 },
                 getProfileInformation : function(){
-                    return getRequest('/developer/api/getProfileInformation/');
+                    return rq.getRequest('/developer/api/getProfileInformation/');
                 },
                 getFingerprints: function(schema){
                     schema = schema || '';
 
-                    return getRequest('/developer/api/getFingerprints/'+schema);
+                    return rq.getRequest('/developer/api/getFingerprints/'+schema);
                 },
-                query: function(query, schema){
+                query: function(options){
+                    var settings = $.extend({
+                        'search': '',
+                        'rows': 10,
+                        'offset': 0,
+                        'sort_field': 'name',
+                        'sort_order': 'asc',
+                        'schema': null
+                    }, options);
 
+
+                    return rq.postRequest('/api/searchdatabases', settings);
                 },
                 advancedQuery: function(query, schema){
 

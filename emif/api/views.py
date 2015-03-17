@@ -168,15 +168,21 @@ class SearchDatabasesView(APIView):
         offset=0
         sort_field='name'
         sort_order='asc'
+        schema=None
 
         sortFilter = None
 
-        if request.user.is_authenticated() and (request.user.is_staff or request.user.emif_profile.has_group('exporters')):
+        if request.user.is_authenticated() and (
+                request.user.is_staff
+                or request.user.emif_profile.has_group('exporters')
+                or request.user.emif_profile.has_group('developers')
+            ):
             search = request.DATA.get('search', None)
             crows = request.DATA.get('rows', None)
             coffset = request.DATA.get('offset', None)
             csortf = request.DATA.get('sort_field', None)
             csorto = request.DATA.get('sort_order', None)
+            schema = request.DATA.get('schema', None)
 
             if search == None or len(search.strip()) == 0:
                 return Response({'status': 'Authenticated', 'method': 'POST', 'Error': 'Must specify a search text filter'}, status=status.HTTP_400_BAD_REQUEST)
@@ -196,15 +202,18 @@ class SearchDatabasesView(APIView):
             if sort_order != 'asc' and sort_order != 'desc':
                 return Response({'status': 'Authenticated', 'method': 'POST', 'Error': 'Available sort orders are "asc" and "desc"'}, status=status.HTTP_400_BAD_REQUEST)
 
+
             try:
                 sortFilter = sortmap[sort_field] + " " + sort_order
             except:
                 return Response({'status': 'Authenticated', 'method': 'POST', 'Error': 'sort_field can only be name, type_name, id, last_activity or date.'}, status=status.HTTP_400_BAD_REQUEST)
 
-
+            filter_value = ''
+            if schema != None:
+                filter_value = 'AND type_t: "%s"' % escapeSolrArg(schema)
 
             c = CoreEngine()
-            (list_databases,hits) = get_databases_from_solr_v2(request, "text_t:\"" +escapeSolrArg(search)+'"', sort=sortFilter, rows=rows, start=offset)
+            (list_databases,hits) = get_databases_from_solr_v2(request, 'text_t:"%s" %s' % (escapeSolrArg(search), filter_value), sort=sortFilter, rows=rows, start=offset)
 
             return Response({'link': {'status': 'Authenticated', 'method': 'POST'}, 'filters':{'search': search, 'rows': rows,
                 'offset':offset}, 'result': {'count': len(list_databases),
