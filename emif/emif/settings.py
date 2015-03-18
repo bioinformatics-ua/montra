@@ -81,7 +81,8 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     "emif.context_processors.baseurl",
     "emif.context_processors.profiles_processor",
     'constance.context_processors.config',
-    "emif.context_processors.globals"
+    "emif.context_processors.globals",
+    "emif.context_processors.thirdparty",
 )
 
 MANAGERS = ADMINS

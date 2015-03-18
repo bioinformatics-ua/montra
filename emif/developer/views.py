@@ -231,3 +231,22 @@ class DeveloperDocsView(TemplateView):
                 'request': request,
                 'breadcrumb': True
             })
+
+class DeveloperIframeView(TemplateView):
+    template_name = "developer_iframe.html"
+
+    def get(self, request, plugin_hash):
+        plugin = version = None
+        try:
+            plugin = Plugin.objects.get(slug=plugin_hash)
+            version = plugin.getLatest()
+        except Plugin.DoesNotExist:
+            pass
+
+        return render(request, self.template_name,
+            {
+                'request': request,
+                'breadcrumb': True,
+                'plugin': plugin,
+                'latest': version
+            })

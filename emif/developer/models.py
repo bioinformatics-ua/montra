@@ -91,7 +91,7 @@ class Plugin(models.Model):
     # gets the file from the filesystem
     def getLatest(self):
         try:
-            return self.versions().filter(approved=True)[:1]
+            return self.versions().filter(approved=True)[:1][0]
         except PluginVersion.DoesNotExist:
             return None
 
