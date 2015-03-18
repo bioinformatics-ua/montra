@@ -59,6 +59,14 @@ plugin = function(self){
                     Defines the preferential x coordinate for the plugin.
                     <h4>y <small>default: 1</small></h4>
                     Defines the preferential y coordinate for the plugin.
+                    <hr />
+
+                </div>
+                <h4>Fingerprint widget specific configurations:</h4>
+                <div class="span8">
+                    <h4>pos <small>default: next available</small></h4>
+                    Integer that defines the tab position of the plugin.
+                    <hr />
                 </div>
             </div>
         </div>
@@ -67,9 +75,9 @@ plugin = function(self){
         <a name="plugin" class="anchor"></a><h3>The plugin function</h3>
 
         <p>The plugin function is the heart of the plugin. Is on this function that the main heart of the application goes. This plugin function has access to a series of objects (detailed on the section "Available objects").</p>
-        <p>Besides that, it is possible to use jquery, bootstrap 2.3.2 styling and font-awesome 4.3 icons.</p>
+        <p>Besides that, it is possible to use jquery, bootstrap 2.3.2 styling and font-awesome 4.3 icons. There's also a promise polyfill to browsers than don't support it included.</p>
 
-        <p>If there is a need to use other external libraries, not included in the list, they can be included through the confs settings "extralibs" and "extracss, already aborded above.</p>
+        <p>If there is a need to use other external libraries, not included in the list, they can be included through the confs settings "extralibs" and "extracss", already aborded above.</p>
 
         </div>
         <hr />

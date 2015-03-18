@@ -8,7 +8,9 @@
     </div>
     <div class="span9">
     <h2>Available Objects for plugins</h2>
-        <p>Besides "normal" javascript, jquery and bootstrap 2.3.2 functions, there is a couple of objects available to the plugin development. This are detailed below.</p>
+        <p>Besides "normal" javascript, jquery and bootstrap 2.3.2 functions, there is a couple of singleton objects available to the plugin development. This are detailed below.</p>
+
+        <p><strong>Attention: </strong>All this singleton instances always take in consideration the context, namely the user. So the content returns can greatly differ from user to user. For example, getFingerprint() only will return user-owned fingerprints, and query(), only will show databases the user using the plugin will have permission to see.</p>
         <hr />
         <div class="clearfix">
             <a name="self" class="anchor"></a><h3>self</h3>
@@ -36,17 +38,41 @@
             <p>GlobalProxy is available on global plugins, and allows access to aggregated data over all databases, useful for generic dashboard widgets, like TagCloud.</p>
 
             <div class="span8">
+                <h4>.getInstance()</h4>
+
+                <p>Returns an instance of the GlobalProxy. Needed to be able to call all other methods. As the objects implements and Singleton pattern.</p>
+
                 <h4>.databaseSchemas()</h4>
-                explanation
+
+                <p>Returns a list of available database schemas.</p>
+
                 <h4>.getProfileInformation()</h4>
-                explanation
-                <h4>.getFingerprints(Schema)</h4>
-                explanation
-                <h4>.query(query, schema)</h4>
-                explanation
-                <h4>.advancedQuery(query, schema)</h4>
-                explanation
-                <h4>.getStore() - CRUD + File Upload/Retrieve</h4>
+
+                <p>Returns the profile information for the logged in user.</p>
+
+                <h4>.getFingerprints(schema)</h4>
+                <p>Returns a list of user owned databases.</p>
+                <p>If a schema slug is passed, only databases of a given type are returned.</p>
+
+                <h5>Defaults:</h5>
+                <pre><code class="language-javascript">schema=""</code></pre>
+
+
+                <h4>.query(options)</h4>
+
+                <p>Queries the database directory with the given options</p>
+
+
+                <h5>Defaults:</h5>
+                <pre><code class="language-javascript">
+options = {
+    'search': '',
+    'rows': 10,
+    'offset': 0,
+    'sort_field': 'name',
+    'sort_order': 'asc',
+    'schema': null
+};</code></pre>
             </div>
 
         </div>
@@ -57,15 +83,68 @@
         <p>FingerprintProxy allows access to a specific fingerprint data, useful for fingerprint-related widgets.</p>
 
             <div class="span8">
-                <h4>.getFingerprintUID()</h4>
-                explanation
-                <h4>.getSchema()</h4>
-                explanation
-                <h4>.getAnswers()</h4>
-                explanation
-                <h4>.getStore(fingerprintID) - CRUD + File Upload/Retrieve</h4>
-                explanation
+            <h4>.getInstance()</h4>
+
+            <p>Returns an instance of the FingerprintProxy. Needed to be able to call all other methods. As the objects implements and Singleton pattern.</p>
+
+            <h4>.getFingerprintUID()</h4>
+
+            <p>Returns useful information for the fingerprint currently in view.</p>
+
+            <h4>.getAnswers()</h4>
+
+            <p>Returns all database schema answers registered for the fingerprint currently in view.</p>
+
+            <a name="getStore" class="anchor"></a><h4>.getStore()</h4>
+
+            <p>Returns a <a href="developer/docs#datastore">DataStore</a> instance for the fingerprint currently in view.</p>
+
+            <p>The DataStore allows manipulation over several processed or extra data related to the fingerprint, such as extra key-value pairs, discussion and documents.</p>
+
             </div>
+        </div>
+        <hr />
+        <div class="clearfix">
+            <a name="datastore" class="anchor"></a><h3>DataStore</h3>
+
+            <p>Returned through the FingerprintProxy method <a href="developer/docs#getStore">getStore()</a>, this object allows manipulation over several processed or extra data related to the fingerprint, such as extra key-value pairs, discussion and documents.</p>
+
+            <h4>.getExtra()</h4>
+                <p>Returns a list of key-pair values associated with the fingerprint currently in view.</p>
+            <h4>.putExtra(values)</h4>
+                <p>Adds the given dictionary of key-value pairs to the existing key-pair values associated with the fingerprint currently in view, updating already existing keys and creating the new ones.</p>
+                <h5>Defaults:</h5>
+                <pre><code class="language-javascript">values = {}</code></pre>
+            <h4>.getDocuments()</h4>
+                <p>Returns a list with the latest versions of each document associated with the fingerprint currently in view.</p>
+            <h4>.downloadDocument(name, revision)</h4>
+                <p>Makes the user download a certain document given a name and revision, as an attachment.</p>
+<pre><code class="language-javascript">
+name = undefined;
+revision = undefined;
+</code></pre>
+            <h4>.putDocument(DOM_fileinput_id, options)</h4>
+                <p>Adds a given document to the fingerprint currently in view, adding as a new revision for existing documents, or simply creating a new document if it did not exist yet.</p>
+
+                <p>This method as the particularity of needing a reference to the DOM file input element that containing the files to be added, since for security concerns files must come from a real html element.</p>
+<pre><code class="language-javascript">
+DOM_fileinput_id = undefined;
+options = {
+    name: '',
+    description: ''
+}
+</code></pre>
+            <h4>.getPublications()</h4>
+                <p>Returns a list of pubmed publications associated with the fingerprint currently in view</p>
+            <h4>.getComments()</h4>
+                <p>Returns a list of discussion comments associated with the fingerprint currently in view.</p>
+            <h4>.putComment(options)</h4>
+                <p>Adds a discussion comment to the fingerprint currently in view.</p>
+<pre><code class="language-javascript">
+options = {
+    comment: ''
+}
+</code></pre>
         </div>
     </div>
 
