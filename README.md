@@ -48,6 +48,7 @@ EMIF Platform - Fingerprint Browser
         1)  sudo apt-get install postgresql
 
         2)  sudo su postgres
+            psql 
                 CREATE ROLE user superuser;
                 CREATE USER emif_dev;
                 GRANT user To emif_dev;
