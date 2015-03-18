@@ -22,9 +22,7 @@ from django.core.cache import cache
 
 from rest_framework import permissions
 from rest_framework import renderers
-from rest_framework.authentication import TokenAuthentication
-
-from rest_framework.authentication import SessionAuthentication, BasicAuthentication
+from rest_framework.authentication import TokenAuthentication, SessionAuthentication, BasicAuthentication
 
 from rest_framework.decorators import api_view, parser_classes
 from rest_framework.response import Response
@@ -36,65 +34,22 @@ from rest_framework.renderers import JSONRenderer
 from rest_framework.parsers import JSONParser
 from rest_framework.permissions import AllowAny, IsAuthenticated
 
-from .models import *
+from serializers import *
 
 from questionnaire.models import Questionnaire
 from fingerprint.models import Fingerprint
 from accounts.models import Profile, EmifProfile
+from docs_manager.models import FingerprintDocuments
+from docs_manager.views import list_fingerprint_files_aux, upload_document_aux
+
+# i lost almost an hour and still couldnt figure why the hell i cant import normally
+# the fingerprint api model...
+from django.db.models.loading import get_model
+FingerprintAPI = get_model('api', 'FingerprintAPI')
 
 ############################################################
 ##### Global Plugin - Web services
 ############################################################
-
-class QuestionnaireSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Questionnaire
-        fields = ['slug','name']
-
-class GroupSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Group
-        fields = ['name']
-
-class UserSerializer(serializers.ModelSerializer):
-    groups = GroupSerializer(many=True)
-    class Meta:
-        model = User
-        exclude = ['id', 'password', 'username',
-        'user_permissions', 'is_superuser', 'is_staff', 'is_active']
-
-class ProfileSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Profile
-        exclude = ['id', 'description']
-
-class EmifProfileSerializer(serializers.ModelSerializer):
-    user = UserSerializer()
-    interests = QuestionnaireSerializer(many=True)
-    profiles = ProfileSerializer(many=True)
-
-    class Meta:
-        model = EmifProfile
-        exclude = ['id', 'privacy']
-
-class FingerprintSerializer(serializers.ModelSerializer):
-    questionnaire = QuestionnaireSerializer()
-    owner = serializers.SerializerMethodField(method_name='get_owner')
-    shared = serializers.SerializerMethodField(method_name='get_shared')
-    name = serializers.SerializerMethodField(method_name='get_name')
-
-    def get_owner(self, obj):
-        return obj.owner
-
-    def get_shared(self, obj):
-        return obj.shared.all()
-
-    def get_name(self, obj):
-        return obj.findName()
-
-    class Meta:
-        model = Fingerprint
-        exclude = ['id', 'removed', 'description']
 
 ## databaseSchemas()
 class DatabaseSchemasView(APIView):
@@ -151,7 +106,109 @@ class getFingerprintsView(APIView):
 ############################################################
 
 
+############################################################
+##### Fingerprint Plugin - Web services
+############################################################
 
+class getFingerprintUIDView(APIView):
+    authentication_classes = (SessionAuthentication, BasicAuthentication)
+    permission_classes = (IsAuthenticated,)
+    def get(self, request, fingerprint=None):
+        f = None
+        if request.user.is_authenticated():
+            try:
+                f = Fingerprint.valid().get(fingerprint_hash=fingerprint)
+
+            except Fingerprint.DoesNotExist:
+                return Response({}, status=status.HTTP_403_FORBIDDEN)
+
+            return Response(
+                {
+                    'fingerprint': FingerprintSerializer(f).data
+                }, status=status.HTTP_200_OK)
+
+
+
+        return Response({}, status=status.HTTP_403_FORBIDDEN)
+
+class getAnswersView(APIView):
+    authentication_classes = (SessionAuthentication, BasicAuthentication)
+    permission_classes = (IsAuthenticated,)
+    def get(self, request, fingerprint=None):
+        f = None
+        if request.user.is_authenticated():
+            try:
+                f = Fingerprint.valid().get(fingerprint_hash=fingerprint)
+
+            except Fingerprint.DoesNotExist:
+                return Response({}, status=status.HTTP_403_FORBIDDEN)
+
+            return Response(
+                {
+                    'fingerprint': AnswerSerializer(f.answers(restriction=request.user)).data
+                }, status=status.HTTP_200_OK)
+
+
+
+        return Response({}, status=status.HTTP_403_FORBIDDEN)
+
+## store methods
+class getExtraView(APIView):
+    authentication_classes = (SessionAuthentication, BasicAuthentication)
+    permission_classes = (IsAuthenticated,)
+    def get(self, request, fingerprint=None):
+
+        if request.user.is_authenticated():
+            return Response(
+                {
+                    'api': FingerprintAPISerializer(
+                        FingerprintAPI.objects.filter(fingerprintID=fingerprint)
+                    ).data
+                }, status=status.HTTP_200_OK)
+
+
+
+        return Response({}, status=status.HTTP_403_FORBIDDEN)
+
+class getDocumentsView(APIView):
+    authentication_classes = (SessionAuthentication, BasicAuthentication)
+    permission_classes = (IsAuthenticated,)
+    def get(self, request, fingerprint=None):
+
+        if request.user.is_authenticated():
+
+            documents = list_fingerprint_files_aux(request, fingerprint)
+
+            print documents
+
+            return Response(
+                {
+                    'documents': documents
+                }, status=status.HTTP_200_OK)
+
+
+
+        return Response({}, status=status.HTTP_403_FORBIDDEN)
+
+class putDocumentsView(APIView):
+    authentication_classes = (SessionAuthentication, BasicAuthentication)
+    permission_classes = (IsAuthenticated,)
+    def post(self, request, fingerprint=None):
+
+        if request.user.is_authenticated():
+
+
+
+            return Response(
+                {
+                    'document': upload_document_aux(request, fingerprint)
+                }, status=status.HTTP_200_OK)
+
+
+
+        return Response({}, status=status.HTTP_403_FORBIDDEN)
+
+############################################################
 
 
 

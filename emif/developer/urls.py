@@ -14,9 +14,9 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from django.conf.urls.defaults import *
-from .views import *
+from views import *
 
-from .api import *
+from api import *
 
 urlpatterns = patterns('',
     # developer list view
@@ -45,4 +45,17 @@ urlpatterns = patterns('',
     url(r'^api/getProfileInformation/$', getProfileInformationView.as_view()),
     url(r'^api/getFingerprints/$', getFingerprintsView.as_view()),
     url(r'^api/getFingerprints/(?P<quest_slug>[^/]+)$', getFingerprintsView.as_view()),
+
+    # FingerprintProxy
+    url(r'^api/getFingerprintUID/(?P<fingerprint>[^/]+)$', getFingerprintUIDView.as_view()),
+    url(r'^api/getAnswers/(?P<fingerprint>[^/]+)$', getAnswersView.as_view()),
+
+    # datastore
+    url(r'^api/store/getExtra/(?P<fingerprint>[^/]+)$', getExtraView.as_view()),
+
+    url(r'^api/store/getDocuments/(?P<fingerprint>[^/]+)$', getDocumentsView.as_view()),
+    url(r'^api/store/putDocuments/(?P<fingerprint>[^/]+)$', putDocumentsView.as_view()),
+
+
+
 )

@@ -21,7 +21,6 @@ var __loadLibs = function(array,callback, i){
     if(!i)
         i=0;
     var lib = array[i];
-    console.log(i);
     if (lib.match(".js$")) {
         yepnope.injectJs(lib, function () {
               console.log("Loaded "+lib);
@@ -69,7 +68,7 @@ var PlugShellWidget = function PlugShellWidget(confs, show){
 
             if(typeof self.show === 'function'){
                 self.show(self);
-                self.refresh();
+                //self.refresh();
             }
         }
 

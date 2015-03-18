@@ -19,7 +19,7 @@ from django.shortcuts import render, redirect
 from django.http import Http404, HttpResponseRedirect
 
 
-from .models import *
+from models import *
 from django import forms
 
 class DeveloperListView(TemplateView):

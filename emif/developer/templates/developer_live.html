@@ -40,6 +40,8 @@
 
         <script src="{{ STATIC_URL }}js/vendor/inheritance.js"></script>
         <script src="{{ STATIC_URL }}js/vendor/jquery-1.9.1.min.js"></script>
+        <script src="{{ STATIC_URL }}js/vendor/jquery.bifrost.min.js"></script>
+
         <script src="{{ STATIC_URL }}js/vendor/jquery.cookie.js"></script>
 
         <script type="application/javascript">
@@ -93,7 +95,6 @@
                     console.log('LIVE PREVIEW FOR REMOTE FILE, GLOBAL WIDGETS')
                     $.get('{{version.path|safe}}')
                         .done(function(data){
-                            console.log(data);
                             sandbox('{{plugin.slug}}', data);
                         })
                         .fail(function(data){
@@ -112,6 +113,8 @@
         <div id="playground_test" style="margin-left: 0px;">
             {% if not version.is_remote %}
             <script type="text/javascript">
+                var global_fingerprint_id = '66a47f694ffb676bf7676dfde24900e6';
+
                 console.log('LIVE PREVIEW FOR LOCAL FILE, fingerprint WIDGETS');
                 sandbox('{{plugin.slug}}',
                     function(callback){

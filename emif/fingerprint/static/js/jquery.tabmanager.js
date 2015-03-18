@@ -29,7 +29,6 @@
 
         if(header.length == 0){
             header = $('<ul class="nav nav-tabs"></ul>').appendTo(self);
-            console.log(header);
         }
 
         var bodies = self.children('.tab-content');
@@ -212,7 +211,6 @@
                 console.log(sorthandle.toArray());
             },
             addWidget: function(widgetname) {
-                console.log('add widget');
                 var widget = registered_widgets[widgetname];
 
                 if(widget instanceof TabWidget){
@@ -220,7 +218,6 @@
 
                         widget.__init(tabcontrol, public_funcs);
                         widgets.push(widget);
-                        console.log(widgets);
 
                         public_funcs.saveConfiguration();
                     }
@@ -362,7 +359,7 @@
                     settings.initial();
 
                     public_funcs.saveConfiguration();
-                    public_funcs.loadConfiguration();
+                    //public_funcs.loadConfiguration();
                 }
             }, reset   : function(){
                 if(private_funcs.__supports_storage()){

@@ -69,7 +69,7 @@ var PlugShellWidget = function PlugShellWidget(confs, show){
 
             if(typeof self.show === 'function'){
                 self.show(self);
-                self.refresh();
+                //self.refresh();
             }
         }
 

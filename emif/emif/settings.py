@@ -294,6 +294,7 @@ INSTALLED_APPS = (
     'emif',
 
     'searchengine',
+    "developer",
     'api',
     'fingerprint',
     'control_version',
@@ -339,8 +340,6 @@ INSTALLED_APPS = (
     # django-constance
     'constance.backends.database',
     "constance",
-
-    "developer",
 
     'django_ace',
 )

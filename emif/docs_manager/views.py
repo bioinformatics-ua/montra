@@ -56,10 +56,7 @@ def get_revision():
     return r
 
 
-def upload_document(request, fingerprint_id, template_name='documents_upload_form.html'):
-    """Store the files at the backend
-    """
-
+def upload_document_aux(request, fingerprint_id):
     # compute revision
     revision = get_revision()
 
@@ -71,6 +68,9 @@ def upload_document(request, fingerprint_id, template_name='documents_upload_for
     # Run it for all the sent files (apply the persistence storage)
     path_file = None
     file_name = None
+
+    print request.FILES
+
     if request.FILES:
         for name, f in request.FILES.items():
             # Handle file
@@ -93,6 +93,14 @@ def upload_document(request, fingerprint_id, template_name='documents_upload_for
     fd.description = request.POST['pc_comments']
     fd.save()
 
+    return data
+
+def upload_document(request, fingerprint_id, template_name='documents_upload_form.html'):
+    """Store the files at the backend
+    """
+
+    data = upload_document_aux(request, fingerprint_id)
+
     response = JSONResponse(data, mimetype=response_mimetype(request))
     response['Content-Disposition'] = 'inline; filename=files.json'
     return response
@@ -104,11 +112,7 @@ def upload_file(request, fingerprint_id, template_name='documents_upload_form.ht
     return upload_document(request, fingerprint_id, template_name='documents_upload_form.html')
 
 
-def list_fingerprint_files(request, fingerprint):
-
-    if not hasFingerprintPermissions(request, fingerprint):
-        return HttpResponse("Access forbidden",status=403)
-
+def list_fingerprint_files_aux(request, fingerprint):
     # List the Jerboa files for a particular fingerprint
     jerboa_files = FingerprintDocuments.objects.filter(
             fingerprint_id=fingerprint,
@@ -137,7 +141,16 @@ def list_fingerprint_files(request, fingerprint):
                 }
         _data.append(_doc)
 
-    data = {'conf': _data}
+    return _data
+
+
+def list_fingerprint_files(request, fingerprint):
+
+    if not hasFingerprintPermissions(request, fingerprint):
+        return HttpResponse("Access forbidden",status=403)
+
+    data = {'conf': list_fingerprint_files_aux(request, fingerprint)}
+
     response = JSONResponse(data, mimetype=response_mimetype(request))
     response['Content-Disposition'] = 'inline; filename=files.json'
     return response
