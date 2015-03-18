@@ -59,15 +59,16 @@ var Requester = (
                         url: url,
                         type: "POST",
                         data: data,
-                        dataType: 'iframe json',
+                        dataType: dataType || 'json',
                     };
                     if(dataType){
                         configs.dataType = dataType
-                        data['csrfmiddlewaretoken'] = $.cookie('csrftoken');
                     }
 
                     if(files)
                         configs.fileInputs = files;
+
+                    data['csrfmiddlewaretoken'] = $.cookie('csrftoken');
 
                     return Promise.resolve($.ajax(configs).done(
                         function(result){
@@ -194,6 +195,20 @@ var DataStore = (
                         return rq.postRequest('/developer/api/store/putDocuments/'+hash+'?format=json',
                             data, 'iframe json', $('#'+DOM_fileinput_id).attr('name', 'file'))
                     }
+
+                },
+                getPublications: function(){
+                    return rq.getRequest('/developer/api/store/getPublications/'+hash)
+                },
+                getComments: function(){
+                    return rq.getRequest('/developer/api/store/getComments/'+hash)
+                },
+                putComment: function(options){
+                    var data = {
+                        comment: options.comment || ''
+                    };
+
+                    return rq.postRequest('/developer/api/store/putComment/'+hash, data)
 
                 }
             }

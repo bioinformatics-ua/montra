@@ -42,6 +42,13 @@ from accounts.models import Profile, EmifProfile
 from docs_manager.models import FingerprintDocuments
 from docs_manager.views import list_fingerprint_files_aux, upload_document_aux
 
+from django.contrib import comments
+from django.contrib.comments.models import Comment
+from django.contrib.contenttypes.models import ContentType
+from django.contrib.sites.models import Site
+
+from literature.views import getListPublications
+
 # i lost almost an hour and still couldnt figure why the hell i cant import normally
 # the fingerprint api model...
 from django.db.models.loading import get_model
@@ -186,8 +193,6 @@ class getDocumentsView(APIView):
                     'documents': documents
                 }, status=status.HTTP_200_OK)
 
-
-
         return Response({}, status=status.HTTP_403_FORBIDDEN)
 
 class putDocumentsView(APIView):
@@ -207,6 +212,84 @@ class putDocumentsView(APIView):
 
 
         return Response({}, status=status.HTTP_403_FORBIDDEN)
+
+class getPublicationsView(APIView):
+    authentication_classes = (SessionAuthentication, BasicAuthentication)
+    permission_classes = (IsAuthenticated,)
+    def get(self, request, fingerprint=None):
+
+        if request.user.is_authenticated():
+            try:
+                fp = Fingerprint.valid().get(fingerprint_hash=fingerprint)
+                pubs = getListPublications(fp)
+
+                return Response(
+                    {
+                        'publications': pubs
+                    }, status=status.HTTP_200_OK)
+
+            except Fingerprint.DoesNotExist:
+                pass
+
+        return Response({}, status=status.HTTP_403_FORBIDDEN)
+
+
+class getCommentsView(APIView):
+    authentication_classes = (SessionAuthentication, BasicAuthentication)
+    permission_classes = (IsAuthenticated,)
+    def get(self, request, fingerprint=None):
+
+        if request.user.is_authenticated():
+            try:
+                fp = Fingerprint.valid().get(fingerprint_hash=fingerprint)
+
+                comments = Comment.objects.filter(
+                    content_type__pk=ContentType.objects.get_for_model(fp).id,
+                    object_pk=fp.id
+                )
+
+                return Response(
+                    {
+                        'comments': CommentSerializer(comments).data
+                    }, status=status.HTTP_200_OK)
+
+            except Fingerprint.DoesNotExist:
+                pass
+
+        return Response({}, status=status.HTTP_403_FORBIDDEN)
+
+class putCommentView(APIView):
+    authentication_classes = (SessionAuthentication, BasicAuthentication)
+    permission_classes = (IsAuthenticated,)
+    def post(self, request, fingerprint=None):
+
+        if request.user.is_authenticated():
+
+            try:
+                fp = Fingerprint.valid().get(fingerprint_hash=fingerprint)
+
+                comment = Comment(
+                    content_object=fp,
+                    site = Site.objects.get_current(),
+                    user=request.user,
+                    user_name=(request.user.get_full_name() or request.user.email),
+                    user_email=request.user.email,
+                    user_url="",
+                    comment=request.POST['comment'],
+                    ip_address=request.META.get("REMOTE_ADDR", None)
+                )
+                comment.save()
+
+                return Response(
+                    {
+                        'comment': CommentSerializer(comment).data
+                    }, status=status.HTTP_200_OK)
+
+            except Fingerprint.DoesNotExist:
+                pass
+
+        return Response({}, status=status.HTTP_403_FORBIDDEN)
+
 
 ############################################################
 

@@ -24,6 +24,8 @@ from docs_manager.models import Document
 
 from django.db.models.loading import get_model
 
+from django.contrib.comments.models import Comment
+
 FingerprintAPI = get_model('api', 'FingerprintAPI')
 
 class QuestionnaireSerializer(serializers.ModelSerializer):
@@ -111,3 +113,9 @@ class DocumentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Document
         exclude = ['id', 'fingerprint_id', 'removed']
+
+class CommentSerializer(serializers.ModelSerializer):
+    pass
+    class Meta:
+        model = Comment
+        fields = ['user_name', 'user_email', 'comment', 'submit_date']

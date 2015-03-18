@@ -56,6 +56,11 @@ urlpatterns = patterns('',
     url(r'^api/store/getDocuments/(?P<fingerprint>[^/]+)$', getDocumentsView.as_view()),
     url(r'^api/store/putDocuments/(?P<fingerprint>[^/]+)$', putDocumentsView.as_view()),
 
+    url(r'^api/store/getPublications/(?P<fingerprint>[^/]+)$', getPublicationsView.as_view()),
+
+    url(r'^api/store/getComments/(?P<fingerprint>[^/]+)$', getCommentsView.as_view()),
+
+    url(r'^api/store/putComment/(?P<fingerprint>[^/]+)$', putCommentView.as_view()),
 
 
 )
