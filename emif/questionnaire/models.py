@@ -1,3 +1,18 @@
+# -*- coding: utf-8 -*-
+# Copyright (C) 2014 Universidade de Aveiro, DETI/IEETA, Bioinformatics Group - http://bioinformatics.ua.pt/
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from django.db import models
 from transmeta import TransMeta
 from django.utils.translation import ugettext_lazy as _
@@ -9,6 +24,8 @@ from django.utils import simplejson as json
 from parsers import parse_checks, ParseException
 from django.conf import settings
 from django.contrib.auth.models import User
+
+import json
 
 _numre = re.compile("(\d+)([a-z]+)", re.I)
 
@@ -393,6 +410,18 @@ class Question(models.Model):
     mlt_ignore = models.BooleanField(u"Ignore on More Like This", default=False)
     disposition = models.IntegerField(default=VERTICAL, choices=DISPOSITION_TYPES)
 
+    metadata = models.TextField(blank=True, null=True)
+
+    def meta(self):
+        if not hasattr(self, "__metadict"):
+            try:
+                self.__metadict = json.loads(self.metadata)
+            except:
+                print "-- ERROR: Couldn't parse json for question meta"
+                self.__metadict = {}
+
+        return self.__metadict
+
     def questionnaire(self):
         return self.questionset.questionnaire
 
@@ -487,4 +516,5 @@ class Choice(models.Model):
         return u'(%s) %d. %s' % (self.question.number, self.sortid, self.text)
 
     class Meta:
+        ordering = ('sortid',)
         translate = ('text',)

@@ -1,3 +1,20 @@
+/*
+# -*- coding: utf-8 -*-
+# Copyright (C) 2014 Universidade de Aveiro, DETI/IEETA, Bioinformatics Group - http://bioinformatics.ua.pt/
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
 var getPlacement = function($el) {
     var offset = $el.offset(),
         top = offset.top,
@@ -60,7 +77,7 @@ function replaceall(str, replace, with_this) {
 
 /***************** BEGIN - CHECK IF ANSWER IS FILLED IN *****************/
 /* Function to validate for fields of type 1 (see comments below)*/
-function validate1(element, id_answered, dirty_id_answered) {
+function validate1(element, id_answered, dirty_id_answered, self_validated) {
     /* Tip from: http://viralpatel.net/blogs/jquery-get-text-element-without-child-element/ */
 
     var just_question = $('#question_' + id_answered)
@@ -70,7 +87,7 @@ function validate1(element, id_answered, dirty_id_answered) {
     .end() //again go back to selected element
     .text().trim(); //get the text of element
     var result = true;
-    if ($(element).val() != "") {
+    if ( self_validated === 1 || ($(element).val() != "" && self_validated === undefined)) {
         //console.log('1 - #answered_'+id_answered);
         $('[id="answered_' + id_answered + '"]').show();
         $('[id="answered_' + id_answered + '"]').addClass("hasValue");
@@ -138,8 +155,6 @@ var advValidator = new Fingerprint_Validator();
 function validateById(id_answered, id_answered_aux) {
     var valueCounter = 0;
 
-
-
     /*
         - verify the type to each question and create a respective processment for each one
         TYPES:
@@ -152,7 +167,9 @@ function validateById(id_answered, id_answered_aux) {
     */
     var qc_id = $('[id="qc_' + id_answered + '"]');
 
-    if (qc_id.hasClass('type_open') || qc_id.hasClass('type_open-location') || qc_id.hasClass('type_email') || qc_id.hasClass('type_url') ||
+
+    if (qc_id.hasClass('type_open') || qc_id.hasClass('type_open-validated') ||  qc_id.hasClass('type_open-location')
+        || qc_id.hasClass('type_open') || qc_id.hasClass('type_email') || qc_id.hasClass('type_url') ||
         qc_id.hasClass('type_numeric')
         || qc_id.hasClass('type_open-button') || qc_id.hasClass('type_open-upload-image') || qc_id.hasClass('type_open-textfield') || qc_id.hasClass('type_publication')) {
         var myValue = $('[id="answered_' + id_answered_aux + '"]').parent().parent()[0].id;
@@ -165,7 +182,24 @@ function validateById(id_answered, id_answered_aux) {
 
             var val = $(':input[name="question_' + myValue.replace(/\./g, '\\.') + '"]');
 
-            var r = validate1(val, id_answered_aux, id_answered);
+            var self_validated;
+            if(qc_id.hasClass('type_open-validated')){
+                var inp = $(':input[name="question_' + id_answered + '"]');
+
+                var comp = inp.inputmask("isComplete");
+                if(comp){
+                    $('[id="answered_' + id_answered_aux + '"]').show();
+                    $('[id="answered_' + id_answered_aux + '"]').addClass("hasValue");
+
+                    self_validated = 1;
+                } else {
+                    $('[id="answered_' + id_answered_aux + '"]').hide();
+                    $('[id="answered_' + id_answered_aux + '"]').removeClass("hasValue");
+
+                    self_validated = -1;
+                }
+            }
+            var r = validate1(val, id_answered_aux, id_answered, self_validated);
             if (r)
                 valueCounter = 1;
             else
@@ -284,7 +318,7 @@ $(document).ready(function() {
     }
     advValidator.onInit();
 
-    $(document).on('change', '.answer input,.answer select,.answer textarea', function(e) {
+    $(document).on('change', '.answer input, .answer select,.answer textarea', function(e) {
         e.preventDefault();
 
         if($(this).hasClass('commentary')){
@@ -326,6 +360,7 @@ $(document).ready(function() {
         // Since were using name="" as selector, we dont need to do the escaping
         //id_answered = id_answered.replace('.','\\.');
         //id_answered = id_answered.replace(/\./g,'\\.');
+
 
         valueCounter = validateById(id_answered.trim(), id_answered_aux.trim());
 

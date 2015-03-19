@@ -1,5 +1,18 @@
-
-
+# -*- coding: utf-8 -*-
+# Copyright (C) 2014 Universidade de Aveiro, DETI/IEETA, Bioinformatics Group - http://bioinformatics.ua.pt/
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from django.http import HttpResponse, HttpResponseRedirect
 
 from questionnaire.models import *
@@ -32,7 +45,7 @@ for r in results:
     #pdb.set_trace()
     if (r.keys()==None):
         continue
-    for k in r.keys(): 
+    for k in r.keys():
         print k
         #print r[k]
         try:
@@ -40,11 +53,11 @@ for r in results:
                 slugs = Slugs.objects.filter(slug1=k[:-2])
                 to_append += slugs[0].question.text
         except Exception, e:
-            print e 
+            print e
             pass
     print to_append
     if len(to_append):
-        r['text_t'] += ' '+to_append 
+        r['text_t'] += ' '+to_append
         del r['_version_']
         docs.append(r)
         solr.delete(r['id'])

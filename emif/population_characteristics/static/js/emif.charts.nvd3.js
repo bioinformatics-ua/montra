@@ -1,7 +1,6 @@
 /**********************************************************************
-# Copyright (C) 2014 Luís A. Bastião Silva and Universidade de Aveiro
-#
-# Authors: Luís A. Bastião Silva <bastiao@ua.pt>
+# -*- coding: utf-8 -*-
+# Copyright (C) 2014 Universidade de Aveiro, DETI/IEETA, Bioinformatics Group - http://bioinformatics.ua.pt/
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -15,25 +14,25 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-#
+
 ***********************************************************************/
 function GraphicChartD3(divArg, dataArg)
 {
   /** Passes the initial arguments required to start and d3
-  Also , this should be used to know if 
+  Also , this should be used to know if
   */
-  var div = divArg; 
+  var div = divArg;
   var dataValues = dataArg;
   var self = this;
   this.init = function(){
-    
+
     console.log('this in GraphCharD3'  + this);
   };
 
   this.translate_data = function(objects){
-    
 
-    /*** Lets translate our data model to the d3 support data model */ 
+
+    /*** Lets translate our data model to the d3 support data model */
 
 
   };
@@ -46,20 +45,20 @@ function GraphicChartD3(divArg, dataArg)
                    .staggerLabels(false)
                    .tooltips(true)
                    .showValues(true)
-             
+
                d3.select('#chart svg')
                    .datum(exampleData())
                  .transition().duration(500)
                    .call(chart);
-             
+
                nv.utils.windowResize(chart.update);
-             
+
                return chart;
              });
-             
+
             $("#chart h1").append("Number of patients yearly")
-      
-   }; 
+
+   };
 };
 
 

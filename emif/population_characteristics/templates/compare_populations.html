@@ -1,7 +1,24 @@
-{% extends 'base.html' %} 
-{% load url from future %} 
-{% load extra_tags %} 
-{% load django_bootstrap_breadcrumbs %} 
+{% extends 'base.html' %}
+{% comment %}
+# -*- coding: utf-8 -*-
+# Copyright (C) 2014 Universidade de Aveiro, DETI/IEETA, Bioinformatics Group - http://bioinformatics.ua.pt/
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+{% endcomment %}
+{% load url from future %}
+{% load extra_tags %}
+{% load django_bootstrap_breadcrumbs %}
 
 {% block styleinclude %}
 
@@ -41,7 +58,7 @@
     }
     </style>
 
-{% endblock %} 
+{% endblock %}
 {% block headextra %}
 <script src="{{ STATIC_URL}}js/jquery.dyndropdown.js"></script>
 <!--[if gte IE 9]><!-->
@@ -50,34 +67,34 @@
 
 <script src="{{ STATIC_URL}}js/emif.populationcharacteristics.comments.js"></script>
 {% endblock %}
-{% block breadcrumbs %} 
-{{ block.super }} 
+{% block breadcrumbs %}
+{{ block.super }}
     {% if search_old %}
-        {% breadcrumb "Search" "resultsdiff/1" %} 
-        {% breadcrumb breadcrumb_name "databases" %} 
-    {% elif style == '1' %} 
-        {% breadcrumb "My Databases" "databases" %} 
-        {% breadcrumb breadcrumb_name "databases" %} 
-    {% else %} 
-        {% breadcrumb "All Databases" "alldatabases" %} 
-        {% breadcrumb breadcrumb_name "databases" %} 
+        {% breadcrumb "Search" "resultsdiff/1" %}
+        {% breadcrumb breadcrumb_name "databases" %}
+    {% elif style == '1' %}
+        {% breadcrumb "My Databases" "databases" %}
+        {% breadcrumb breadcrumb_name "databases" %}
+    {% else %}
+        {% breadcrumb "All Databases" "alldatabases" %}
+        {% breadcrumb breadcrumb_name "databases" %}
     {% endif %}
 
 {% endblock %}
 
-{% block toolbar %} 
-    {% include "reusable_blocks/menu_toolbar.html" with collapse=collapseall %} 
-{% endblock %} 
+{% block toolbar %}
+    {% include "reusable_blocks/menu_toolbar.html" with collapse=collapseall %}
+{% endblock %}
 
-{% block content %} 
+{% block content %}
     <script type="text/javascript">
     var global_fingerprint_id = 'COMPARE';
     var global_public_key = 'anything_works_since_we_are_logged';
     </script>
-    
+
 <div class="hide" id="fingerprints_store">
 {%for fp in fingerprint_ids%}
-{{fp}} 
+{{fp}}
 {%endfor%}
 </div>
 <div class="row-fluid">
@@ -85,7 +102,7 @@
 </div>
 
 
-{% endblock %} 
+{% endblock %}
 
 <div>
 {% block scriptextraincludes %}
@@ -104,7 +121,7 @@
 
     <script src="{{ STATIC_URL}}js/d3/d3.v3.min.js" charset="utf-8"></script>
     <script src="{{ STATIC_URL}}js/d3/d3.layout.cloud.js"></script>
-    <script src="{{ STATIC_URL}}js/c3.js"></script>   
+    <script src="{{ STATIC_URL}}js/c3.js"></script>
 <!--<![endif]-->
 
 

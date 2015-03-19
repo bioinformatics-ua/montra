@@ -1,3 +1,18 @@
+# -*- coding: utf-8 -*-
+# Copyright (C) 2014 Universidade de Aveiro, DETI/IEETA, Bioinformatics Group - http://bioinformatics.ua.pt/
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from questionnaire import *
 from django.conf import settings
 from django.utils.translation import ugettext as _
@@ -6,11 +21,11 @@ from django.utils.simplejson import dumps
 @question_proc('range')
 def question_range(request, question):
     cd = question.getcheckdict()
-    
+
     rmin, rmax = parse_range(cd)
     rstep = parse_step(cd)
     runit = cd.get('unit', '')
-    
+
     current = request.POST.get('question_%s' % question.number, rmin)
 
     return {
@@ -37,7 +52,7 @@ def process_range(question, answer):
     	ans = convert(answer['ANSWER'])
     except:
 	   raise AnswerException("Could not convert `%r`")
-    
+
     if ans > convert(rmax) or ans < convert(rmin):
         raise AnswerException(_(u"Out of range"))
 

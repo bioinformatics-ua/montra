@@ -629,16 +629,16 @@ margin-left: -20px;
 font-size: 20px;
 font-weight: 200;
 color: #777;
-text-shadow: 0 1px 0 #fff; text-decoration: none;" class="brand" href="#">EMIF Catalogue</a></center></td></tr>
+text-shadow: 0 1px 0 #fff; text-decoration: none;" class="brand" href="#">{{BRAND}}</a></center></td></tr>
         <tr><td style="padding: 25px; border: 1px solid #ddd;">
-            
+
         {% block email_content %}
         {% endblock %}
-        
+
         </td></tr>
 
     </table>
-                            
+
     </div>
     <hr style="margin: 20px 0;
 border: 0;
@@ -657,8 +657,8 @@ box-shadow: inset 0 1px 1px rgba(0,0,0,0.05);" class="well well-small">
 <table style="width: 100%; ">
         <tr>
             <td></td>
-            <td> <small>© EMIF Catalogue - {% now "d/m/Y H:i:s" %}</small></td>
-            <td style="text-align: right"><img style="width: 50px; height: 50px;" src="http://bioinformatics.ua.pt/emif/static/img/logo_emif_trans.png" /></td>
+            <td> <small>© {{BRAND}} - {% now "d/m/Y H:i:s" %}</small></td>
+            <td style="text-align: right"><img style="width: 50px; height: 50px;" src="http://bioinformatics.ua.pt/emif/static/{{BRAND_LOGO}}" /></td>
         </tr>
     </table>
     </div>

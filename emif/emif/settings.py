@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2013 Luís A. Bastião Silva and Universidade de Aveiro
-#
-# Authors: Luís A. Bastião Silva <bastiao@ua.pt>
+# Copyright (C) 2014 Universidade de Aveiro, DETI/IEETA, Bioinformatics Group - http://bioinformatics.ua.pt/
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -15,8 +13,6 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-#
-
 # Django settings for emif project.
 import os.path
 
@@ -30,6 +26,20 @@ DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
 SITE_NAME = "EMIF Catalogue"
+
+GLOBALS = {
+    'BRAND': "EMIF Catalogue",
+    # url based upon STATIC_URL
+    'BRAND_LOGO': "img/emif_logo_trans.png",
+    'COPYRIGHT': "© EMIF Catalogue v",
+    'FOOTER_EXTRA': """
+                    <!-- EXTRA HTML FOOTER CODE HERE -->
+                    <small id="supportability">This website is optimised to Safari, Chrome, Firefox, Opera and IE9+.
+                    <!--It runs in IE7-IE8, but it has low performance and no enhanced features.--></small>
+                   """
+}
+# Header and Footer Settings
+
 
 #BASE_URL = '/emif-dev/'
 # Note: When changing this to something not /, all is automatically changed on the links (except for links inside css files)
@@ -49,7 +59,6 @@ else:
 ADMINS = (
     ('Luis A. Bastiao Silva', 'bastiao@ua.pt'),
     ('José Luis Oliveira', 'jlo@ua.pt'),
-    ('Tiago Godinho', 'tmgodinho@ua.pt'),
     ('Ricardo Ribeiro', 'ribeiro.r@ua.pt'),
 )
 
@@ -69,7 +78,9 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     "django.contrib.messages.context_processors.messages",
     "emif.context_processors.debug",
     "emif.context_processors.baseurl",
-    "emif.context_processors.profiles_processor"
+    "emif.context_processors.profiles_processor",
+    'constance.context_processors.config',
+    "emif.context_processors.globals"
 )
 
 MANAGERS = ADMINS
@@ -320,7 +331,27 @@ INSTALLED_APPS = (
     "compressor",
 
     "raven.contrib.django.raven_compat",
+
+    # django-constance
+    'constance.backends.database',
+    "constance"
 )
+
+CONSTANCE_BACKEND = 'constance.backends.database.DatabaseBackend'
+
+CONSTANCE_CONFIG = {
+    'Request_Answer': (True, 'Controls whether we activate/deactivate the request answer functionality.'),
+    'population_characteristics': (True, 'Controls whether we activate/deactivate the Population Characteristics functionality.'),
+    'documents': (True, 'Controls whether we activate/deactivate the Documents functionality.'),
+    'literature': (True, 'Controls whether we activate/deactivate the Literature functionality.'),
+    'extra_information': (True, 'Controls whether we activate/deactivate the Extra Information functionality.'),
+    'discussion': (True, 'Controls whether we activate/deactivate the discussion functionality.'),
+    'newsletter': (True, 'Controls whether we activate/deactivate the newsletter functionality.'),
+    'private_links': (True, 'Controls whether we activate/deactivate the private links functionality.'),
+    'more_like_this': (True, 'Controls whether we activate/deactivate the more like this functionality.'),
+    'geolocation': (True, 'Controls whether we activate/deactivate the geolocation functionality.'),
+    'datatable': (True, 'Controls whether we activate/deactivate the datatable functionality.'),
+}
 
 # Userena settings
 

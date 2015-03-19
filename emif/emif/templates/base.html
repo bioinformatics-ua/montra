@@ -1,3 +1,19 @@
+<!-- # -*- coding: utf-8 -*-
+# Copyright (C) 2014 Universidade de Aveiro, DETI/IEETA, Bioinformatics Group - http://bioinformatics.ua.pt/
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#-->
 {% load url from future %}
 {% load extra_tags %}
 {% load django_bootstrap_breadcrumbs %}
@@ -19,7 +35,7 @@
         <!--<base id="base_link" href="{{ request.get_host }}">-->
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-        <title>{% block title %}EMIF Catalogue{% endblock title %}</title>
+        <title>{% block title %}{{BRAND}}{% endblock title %}</title>
         <meta name="description" content="EMIF Catalogue">
         <meta name="viewport" content="width=device-width">
         <link rel="shortcut icon" href="{{ STATIC_URL }}img/favicon.ico" type="image/x-icon" />
@@ -105,7 +121,7 @@
                 <div class="navbar navbar-fixed-top">
                     <div class="navbar-inner">
                         <div class="container">
-                            <a class="brand" href="">EMIF Catalogue</a>
+                            <a class="brand" href="">{{BRAND}}</a>
                         </div>
                     </div>
                 </div>
@@ -121,7 +137,7 @@
                             <span class="icon-bar"></span>
                             <span class="icon-bar"></span>
                             </a>
-                            <a class="brand" href="">EMIF Catalogue</a>
+                            <a class="brand" href="">{{BRAND}}</a>
                             {% if not readOnly %}
                             <div class="ui-widget nav-collapse collapse">
                                 {% if user.is_authenticated %}
@@ -171,10 +187,12 @@
                                                     <li>
                                                         <a href="alldatabases">All</a>
                                                     </li>
+                                                    {% if config.private_links %}
                                                     <li class="divider"></li>
                                                     <li>
                                                         <a href="public/fingerprint">Private Links</a>
                                                     </li>
+                                                    {% endif %}
                                                 </ul>
                                             </li>
 
@@ -333,7 +351,7 @@
             <div class="push"></div>
         </div>
         <div class="footer" class="row" style="clear: both; text-align:center">
-            <hr />
+            <hr style="margin:0px;"/>
             <footer>
 
                 {% if user.is_authenticated %}
@@ -343,7 +361,9 @@
                 <a href="feedback">Feedback</a> ·
                 <a href="faq">FAQ</a> ·
                 <a href="about">About</a><br />
-                <p>&copy; EMIF Catalogue v{% get_version %}<br/><small id="supportability">This website is optimised to Safari, Chrome, Firefox, Opera and IE9+. <!--It runs in IE7-IE8, but it has low performance and no enhanced features.--></small></p>
+                <p>{{COPYRIGHT}} v{% get_version %}<br/>
+                {{FOOTER_EXTRA|safe}}
+                </p>
             </footer>
         </div>
 

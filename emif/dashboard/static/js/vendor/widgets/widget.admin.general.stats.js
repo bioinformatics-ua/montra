@@ -1,8 +1,7 @@
 /*
     # -*- coding: utf-8 -*-
-    # Copyright (C) 2013 Luís A. Bastião Silva and Universidade de Aveiro
+    # Copyright (C) 2014 Universidade de Aveiro, DETI/IEETA, Bioinformatics Group - http://bioinformatics.ua.pt/
     #
-    # Authors: Luís A. Bastião Silva <bastiao@ua.pt>
     # This program is free software: you can redistribute it and/or modify
     # it under the terms of the GNU General Public License as published by
     # the Free Software Foundation, either version 3 of the License, or
@@ -17,7 +16,6 @@
     # along with this program.  If not, see <http://www.gnu.org/licenses/>.
     #
 */
-
 var FingerprintSchemasStatsWidget = function FingerprintSchemasStatsWidget(widgetname, width, height, pos_x, pos_y){
 
     FingerprintSchemasStatsWidget._base.apply(this, [widgetname, "Database Types - Statistics", width, height, pos_x, pos_y]);

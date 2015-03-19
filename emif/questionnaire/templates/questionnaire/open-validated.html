@@ -1,0 +1,93 @@
+{% comment %}
+# -*- coding: utf-8 -*-
+# Copyright (C) 2014 Universidade de Aveiro, DETI/IEETA, Bioinformatics Group - http://bioinformatics.ua.pt/
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+{% endcomment %}
+{% load i18n %}
+{% load extra_tags %}
+<div id='numeric_validator_{{question.number}}' class="clearfix control-group">
+
+        <div  id='self_validator_{{question.number}}' class="input-append span6 self_validator">
+            <input style="margin-left: 10px;" type="text" class="span6" size="60" id="question_{{ question.number }}" name="question_{{ question.number }}"
+            value="{{ qdict.value }}" />
+            <span title="{{question.meta.unit_desc}}" class="add-on tooltippable">{{question.meta.unit}}</span>
+        </div>
+            <span style="margin-left: 40px;" class="help-inline span6"></span>
+
+        {% if question.extra %}
+            <span class="help-block">{{ question.extra }}</span>
+        {% endif %}
+        <script type="text/javascript">
+            {% if qdict.value %}
+                    $('[id="answered_'+{{ question.number|removedots }}+'"]').show();
+            {% endif %}
+            var t_input = $('[id="question_{{ question.number }}"]');
+            var parent = $('[id="answer_{{ question.number }}"] .control-group');
+            var help = parent.find('.help-inline');
+
+            var onClear = function(){
+                console.log('clear');
+                t_input.change();
+                parent.addClass('error');
+                parent.removeClass('success');
+                help.text('Input is invalid');
+                t_input.data('filled', "-1")
+            }
+            var onComplete = function(){
+
+                t_input.change();
+                parent.removeClass('error');
+                parent.addClass('success');
+                help.text('Input is valid');
+                t_input.data('filled', "1")
+            }
+            {% if question.meta.base == 'date' %}
+                $('[id="question_{{ question.number }}"]').inputmask("date", {
+                    oncleared: onClear,
+                    oncomplete: onComplete,
+                    clearMaskOnLostFocus: true
+                });
+            {% elif question.meta.base == 'time' %}
+                $('[id="question_{{ question.number }}"]').inputmask("h:s:s", {
+                    oncleared: onClear,
+                    oncomplete: onComplete
+                });
+            {% elif question.meta.base == 'datetime' %}
+                $('[id="question_{{ question.number }}"]').inputmask("d/m/y h:s:s", {
+                    oncleared: onClear,
+                    oncomplete: onComplete
+                });
+            {% elif question.meta.base == 'range' %}
+                $('[id="question_{{ question.number }}"]').inputmask("[&]9{+}[.9{+}];[&]9{+}[.9{+}]", {
+                    definitions: {
+                        "&": {
+                            validator: "[\-+]",
+                            cardinality: 1,
+                            casing: "upper"
+                        }
+                    },
+                    onincomplete: onClear,
+                    oncomplete: onComplete
+                });
+            {% else %}
+                $('[id="question_{{ question.number }}"]').inputmask("Regex", {'regex': "{{question.meta.regex}}",
+                    oncleared: onClear,
+                    oncomplete: onComplete            });
+            {% endif %}
+
+        </script>
+
+    </div>
+
