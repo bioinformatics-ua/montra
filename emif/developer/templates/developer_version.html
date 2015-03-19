@@ -89,21 +89,17 @@
                     </div>
                     {% if plugin.type != 2 %}
                     <div id="local_editor" class="{% if version.is_remote %}hide{%endif%}">
-                        <pre style="height: 300px; font-size: 14px;" id="editor">
-{% if not version or version.is_remote or version.path == '' %}
+                        <pre style="height: 300px; font-size: 14px;" id="editor">{%if prev_code %}{{prev_code}}{% else %}{% if not version or version.is_remote or version.path == '' %}
 confs = {
-            name: "New Global Widget",
-            width: 2,
-            height: 1,
-            x: 6,
-            y: 6
+    name: "New widget",
 };
 plugin = function(self){
-        self.html('Hello world');
-        self.refresh();
+    self.html('Hello world');
+    self.refresh();
 };
-{% else %}
+    {% else %}
 {{version.path}}
+    {%endif %}
 {%endif %}
                         </pre>
                     </div>

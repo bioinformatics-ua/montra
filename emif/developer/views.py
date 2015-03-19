@@ -147,7 +147,7 @@ class DeveloperVersionView(TemplateView):
         return redirect('developer-version', plugin_hash=v.plugin.slug, version=v.version)
 
     def get(self, request, plugin_hash, version=None):
-        plugin = version_obj = next_version = None
+        plugin = version_obj = next_version = prev_code = None
         try:
             plugin = Plugin.objects.get(slug=plugin_hash, owner=request.user)
         except Plugin.DoesNotExist:
@@ -157,7 +157,9 @@ class DeveloperVersionView(TemplateView):
             version_obj = PluginVersion.all(plugin=plugin).get(version=version)
         except PluginVersion.DoesNotExist:
             try:
-                next_version = PluginVersion.all(plugin=plugin)[0].version + 1
+                prev_pv = PluginVersion.all(plugin=plugin)[0]
+                next_version = prev_pv.version + 1
+                prev_code = prev_pv.path
             except IndexError:
                 next_version = 1
 
@@ -172,6 +174,7 @@ class DeveloperVersionView(TemplateView):
                 'plugin': plugin,
                 'version': version_obj,
                 'next_version': next_version,
+                'prev_code':  prev_code,
                 'developer': True
             })
 
