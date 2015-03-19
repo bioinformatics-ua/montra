@@ -1,3 +1,18 @@
+# -*- coding: utf-8 -*-
+# Copyright (C) 2014 Universidade de Aveiro, DETI/IEETA, Bioinformatics Group - http://bioinformatics.ua.pt/
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from questionnaire.models import *
 from searchengine.models import *
 from django.shortcuts import render_to_response, get_object_or_404
@@ -16,7 +31,7 @@ BLACKLIST = ["If_yes_:_repeated_measurements",
 
 table = []
 cr = csv.reader(open("/tmp/output.csv","rb"))
-for row in cr:    
+for row in cr:
     r = {}
     r["id"] = row[0]
     r["slug1"] = row[1]
@@ -74,12 +89,12 @@ def check_mismatches(results):
 			docList.append(d)
 	return (l, docList)
 
-def check_same(value, fl="id"):	
+def check_same(value, fl="id"):
 	if fl == "id":
 		slugs = Slugs.objects.filter(id=value)
 	else:
 		slugs = Slugs.objects.filter(question=value)
-		
+
 	#print slug[:-2]
 	return len(slugs)
 
@@ -94,12 +109,12 @@ def compute_new_slug(oldslug):
 def delete_entry(doc, oldSlug):
 	del doc[oldSlug+"_t"]
 
-			
+
 def replace_entry(doc, oldSlug, newSlug):
 	k = newSlug.slug1+"_t"
 	doc[k] = doc[oldSlug+"_t"]
 	delete_entry(doc, oldSlug)
-	
+
 
 results = search_questionaire()
 (myL, fdocs) = check_mismatches(results)
@@ -167,5 +182,5 @@ print "Allready Replaced Slugs: "+str(replaced_slugs)
 solr.add(docToAdd)
 solr.optimize()
 
-				
+
 print "QUITTING"

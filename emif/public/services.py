@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2014 Ricardo F. Gonçalves Ribeiro and Universidade de Aveiro
-#
-# Authors: Ricardo F. Gonçalves Ribeiro <ribeiro.r@ua.pt>
+# Copyright (C) 2014 Universidade de Aveiro, DETI/IEETA, Bioinformatics Group - http://bioinformatics.ua.pt/
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -15,8 +13,6 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-#
-
 from fingerprint.models import Fingerprint
 
 from public.models import PublicFingerprintShare
@@ -27,11 +23,11 @@ from emif.settings import PUBLIC_LINK_MAX_VIEWS, PUBLIC_LINK_MAX_TIME
 import uuid
 
 def createFingerprintShare(fingerprint_id, user, description=None):
-    try: 
+    try:
         fingerprint = Fingerprint.objects.get(fingerprint_hash=fingerprint_id)
         expiration_date = timezone.now() + timedelta(hours=PUBLIC_LINK_MAX_TIME)
 
-        new_share = PublicFingerprintShare(fingerprint=fingerprint, user=user, 
+        new_share = PublicFingerprintShare(fingerprint=fingerprint, user=user,
             hash=uuid.uuid4(),
             expiration_date=expiration_date, remaining_views=PUBLIC_LINK_MAX_VIEWS, description=description)
 
@@ -44,7 +40,7 @@ def createFingerprintShare(fingerprint_id, user, description=None):
     return None
 
 def deleteFingerprintShare(share_id):
-    try: 
+    try:
         share = PublicFingerprintShare.objects.get(id=share_id)
 
         share.delete()
@@ -53,7 +49,7 @@ def deleteFingerprintShare(share_id):
     except Fingerprint.DoesNotExist:
         print "Impossible to delete a share that doesn't exist"
 
-    return False   
+    return False
 
 def shouldDelete(fingerprintshare):
 

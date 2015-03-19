@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2014 Ricardo F. Gonçalves Ribeiro and Universidade de Aveiro
-#
-# Authors: Ricardo F. Gonçalves Ribeiro <ribeiro.r@ua.pt>
+# Copyright (C) 2014 Universidade de Aveiro, DETI/IEETA, Bioinformatics Group - http://bioinformatics.ua.pt/
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -15,7 +13,6 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-#
 import hashlib
 
 from django.shortcuts import render
@@ -52,6 +49,7 @@ from accounts.models import EmifProfile, RestrictedUserDbs, RestrictedGroup
 
 from django.utils import timezone
 
+from constance import config
 
 def query_solr(request, page=1):
     if not request.POST:
@@ -704,6 +702,9 @@ def docs_api(request, template_name='docs/api.html'):
     return render(request, template_name, {'request': request, 'breadcrumb': True})
 
 def more_like_that(request, doc_id, mlt_query=None, page=1, template_name='more_like_this.html', force=False):
+
+    if not config.more_like_this:
+        raise Http404
     #first lets clean the query session log
     if 'query' in request.session:
         del request.session['query']
@@ -969,6 +970,10 @@ def create_auth_token(request, page=1, templateName='api-key.html', force=False)
     """
     Method to create token to authenticate when calls REST API
     """
+
+    if not config.extra_information:
+        raise Http404
+
     rows = define_rows(request)
     if request.POST and not force:
         page = request.POST["page"]

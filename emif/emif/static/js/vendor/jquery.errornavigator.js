@@ -1,5 +1,20 @@
 /*
- * Author: Ricardo Ribeiro <ribeiro.r@ua.pt> 
+# -*- coding: utf-8 -*-
+# Copyright (C) 2014 Universidade de Aveiro, DETI/IEETA, Bioinformatics Group - http://bioinformatics.ua.pt/
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
  */
 
 (function ( $ ) {
@@ -11,7 +26,7 @@
          var settings = $.extend({
             delete_color: "#000000"
         }, options );
-        
+
          var public_functions = {
             addError  : function(error){
                 errors.push(error);
@@ -26,18 +41,18 @@
                     // Slide to correct id
                     document.getElementById(errors[index]).scrollIntoView(true);
                     // Offset up(because of navbar)
-                    window.scrollBy(0,-50);   
+                    window.scrollBy(0,-50);
 
-                    public_functions.updatePager();   
+                    public_functions.updatePager();
 
                     if(index != 0)
-                        $("#prevError").attr("disabled", false);              
+                        $("#prevError").attr("disabled", false);
                 }
-                
+
                 if(index == errors.length-1){
                     $("#nextError").attr("disabled", true);
                 }
-                
+
             },
             prevError : function(){
                 if(index > 0){
@@ -46,11 +61,11 @@
                     // Slide to correct id
                     document.getElementById(errors[index]).scrollIntoView(true);
                     // Offset up(because of navbar)
-                    window.scrollBy(0,-50);  
+                    window.scrollBy(0,-50);
 
                     public_functions.updatePager();
 
-                    $("#nextError").attr("disabled", false);                  
+                    $("#nextError").attr("disabled", false);
                 }
 
                 if(index == 0){
@@ -85,7 +100,7 @@
 
                  });
 
-                $("#prevError").attr("disabled", true);  
+                $("#prevError").attr("disabled", true);
 
                 if(errors.length == 1){
                     $("#nextError").attr("disabled", true);

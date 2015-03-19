@@ -1,7 +1,6 @@
 /**********************************************************************
-# Copyright (C) 2014 Ricardo Ribeiro and Universidade de Aveiro
-#
-# Authors: Ricardo Ribeiro <ribeiro.r@ua.pt>
+# -*- coding: utf-8 -*-
+# Copyright (C) 2014 Universidade de Aveiro, DETI/IEETA, Bioinformatics Group - http://bioinformatics.ua.pt/
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -15,7 +14,6 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-#
 ***********************************************************************/
 
 (function ( $ ) {
@@ -138,7 +136,8 @@
          var self = this;
 
          var settings = $.extend({
-            'callback': undefined
+            'callback': undefined,
+            'empty_callback': undefined
         }, options );
 
         var render = __renderTable(c3conf);
@@ -150,7 +149,10 @@
 
         var trs = $('tbody tr', $(self) );
         if(trs.length == 0){
-            $('tbody', $(self) ).html('<tr><td colspan="'+(cv+1)+'"><center>There\'s no data available.</center></td></tr>');
+            $('tbody', $(self) ).html('<tr><td colspan="'+(cv+1)+'"><center>There is no data available.</center></td></tr>');
+            if(settings.empty_callback){
+                settings.empty_callback();
+            }
         }else {
             if(settings.callback){
                 settings.callback();

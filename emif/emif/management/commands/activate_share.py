@@ -1,6 +1,5 @@
-# Copyright (C) 2014 Ricardo Ribeiro and Universidade de Aveiro
-#
-# Authors: Ricardo Ribeiro <ribeiro.r@ua.pt>
+# -*- coding: utf-8 -*-
+# Copyright (C) 2014 Universidade de Aveiro, DETI/IEETA, Bioinformatics Group - http://bioinformatics.ua.pt/
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -15,7 +14,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
-
 from django.core.management.base import BaseCommand, CommandError
 from emif.models import SharePending
 from emif.utils import activate_user
@@ -35,7 +33,7 @@ class Command(BaseCommand):
         if len(args) == 2:
             try:
                 this_user = User.objects.get(email=args[0])
-                
+
                 users_pending = SharePending.objects.filter(user=this_user, db_id=args[1])
 
                 if(len(users_pending) >= 1):

@@ -1,8 +1,5 @@
 # -*- coding: utf-8 -*-
-
-# Copyright (C) 2014 Luís A. Bastião Silva and Universidade de Aveiro
-#
-# Authors: Luís A. Bastião Silva <bastiao@ua.pt>
+# Copyright (C) 2014 Universidade de Aveiro, DETI/IEETA, Bioinformatics Group - http://bioinformatics.ua.pt/
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -16,9 +13,6 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-#
-
-
 
 from django.http import HttpResponse, HttpResponseRedirect
 
@@ -46,7 +40,7 @@ def clean_str(value):
 
 
 for qs in qsets:
-    
+
     expected = qs.questions()
     for q in expected:
         if ":" in q.slug or ")" in q.slug or "/" in q.slug or "(" in q.slug or "-" in q.slug \
@@ -55,7 +49,7 @@ for qs in qsets:
 
             q.save()
             slugs = Slugs.objects.filter(question=q.pk)
-              
+
             for s in slugs:
                 s.slug1 = clean_str(s.slug1)
                 s.save()

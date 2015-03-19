@@ -1,8 +1,5 @@
 # -*- coding: utf-8 -*-
-
-# Copyright (C) 2014 Ricardo Ribeiro and Universidade de Aveiro
-#
-# Authors: Ricardo Ribeiro <ribeiro.r@ua.pt>
+# Copyright (C) 2014 Universidade de Aveiro, DETI/IEETA, Bioinformatics Group - http://bioinformatics.ua.pt/
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -16,9 +13,6 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-#
-
-
 from __future__ import absolute_import
 
 from celery import shared_task
@@ -53,6 +47,8 @@ from fingerprint.models import FingerprintHead, AnswerChange
 
 
 from django.db.models import Q
+
+from constance import config
 
 # This indexes the fingerprint using the celery, so the interface doesn't have to block
 @shared_task
@@ -99,7 +95,10 @@ def generate_newsmessages():
     # Operations
     print "start generating weekly newsletters messages"
 
-    if settings.DEBUG == False:
+    if not config.newsletter:
+        print 'Ignored, newsletter is disabled'
+
+    elif settings.DEBUG == False:
         fingerprints = Fingerprint.valid()
 
         newsletters = Newsletter.objects.all().exclude(slug='emif-catalogue-newsletter')
@@ -198,24 +197,27 @@ def generateWeekReport(fingerprint, newsletter):
         returnable['db_changes'] = None
     else:
         returnable['db_changes'] = render_to_string('subscriptions/fingerprint_changes.html', {
+                                        'base_url': settings.BASE_URL,
                                         'changes': FingerprintHead.mergeChanges(fh),
                                         'fingerprint': fingerprint.fingerprint_hash
                                     })
 
     discussion = Comment.objects.filter(object_pk = fingerprint.id, submit_date__gte = latest_check)
-    if len(discussion) == 0:
+    if not config.discussion or len(discussion) == 0:
         returnable['discussion'] = None
     else:
         returnable['discussion'] = render_to_string('subscriptions/discussion_changes.html', {
+                                        'base_url': settings.BASE_URL,
                                         'discussions': discussion,
                                         'fingerprint': fingerprint.fingerprint_hash
                                     })
 
     characteristic = Characteristic.objects.filter(created_date__gte = latest_check).order_by('-created_date')
-    if len(discussion) == 0:
+    if not config.population_characteristics or len(characteristic) == 0:
         returnable['characteristic'] = None
     else:
         returnable['characteristic'] = render_to_string('subscriptions/pop_changes.html', {
+                                        'base_url': settings.BASE_URL,
                                         'pop': characteristic
                                     })
 

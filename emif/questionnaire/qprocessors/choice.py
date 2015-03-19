@@ -1,3 +1,18 @@
+# -*- coding: utf-8 -*-
+# Copyright (C) 2014 Universidade de Aveiro, DETI/IEETA, Bioinformatics Group - http://bioinformatics.ua.pt/
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from questionnaire import *
 from django.utils.translation import ugettext as _, ungettext
 from django.utils.simplejson import dumps
@@ -292,8 +307,12 @@ def process_multiple_options(question, answer):
 
     return dumps(multiple)
 
-def __choice_list(value):
-    choices = value.split('#')
+def choice_list(value):
+    choices = ['']
+    try:
+        choices = value.split('#')
+    except:
+        pass
 
     multiple_choices = {}
 
@@ -310,9 +329,22 @@ def __choice_list(value):
 
     return multiple_choices
 
+def serialize_list(choice_list):
+    tmp = ""
+
+    for choice in choice_list:
+        comment = choice['comment']
+
+        tmp +="#%s" %(choice['key'])
+        if comment != '':
+            tmp += '{%s}' % (comment)
+
+    return tmp
+
+
 @show_summary('choice','choice-freeform','choice-multiple', 'choice-multiple-freeform', 'choice-multiple-freeform-options')
 def show_summ(value):
-    multiple_choices = __choice_list(value).values()
+    multiple_choices = choice_list(value).values()
     #return value
     return render_to_string('questionnaire/choice_summary.html', {'choices':multiple_choices})
 
@@ -321,7 +353,7 @@ def show_summ(value):
 def show_flat(question, value):
 
     multiple_choices = []
-    ans_choices = __choice_list(value)
+    ans_choices = choice_list(value)
 
     for choice in question.choices():
         if choice.text in ans_choices:

@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2014 Luís A. Bastião Silva and Universidade de Aveiro
-#
-# Authors: Luís A. Bastião Silva <bastiao@ua.pt>
+# Copyright (C) 2014 Universidade de Aveiro, DETI/IEETA, Bioinformatics Group - http://bioinformatics.ua.pt/
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -36,7 +34,7 @@ class HandleFile(object):
         """
         return self._handler_wrapper.handle_uploaded_file(f, revision=revision)
 
-        # Store the metadata   
+        # Store the metadata
 
 class FileSystemHandleFile(object):
     """Store the file in file system
@@ -45,7 +43,7 @@ class FileSystemHandleFile(object):
         pass
 
     def __get_path_abs(self, path):
-        # check if file exists 
+        # check if file exists
 
         # if the file exists...warning
         pass
@@ -53,7 +51,7 @@ class FileSystemHandleFile(object):
 
 
     def handle_uploaded_file(self, f, revision=""):
-        """Store the files in file disk 
+        """Store the files in file disk
         """
         full_name = revision+f.name
         with open(os.path.join(os.path.abspath(PATH_STORE_FILES), full_name),
@@ -69,7 +67,7 @@ class MongoDBHandleFile(object):
         pass
 
     def handle_uploaded_file(self, f,  revision=""):
-        """Store the files in file disk 
+        """Store the files in file disk
         """
         pass
 

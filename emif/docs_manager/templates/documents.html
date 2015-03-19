@@ -1,4 +1,19 @@
-
+<!-- # -*- coding: utf-8 -*-
+# Copyright (C) 2014 Universidade de Aveiro, DETI/IEETA, Bioinformatics Group - http://bioinformatics.ua.pt/
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#-->
 <style type="text/css">
 
 #fileupload{
@@ -8,7 +23,7 @@
 </style>
 
 <div id="doc_status">
-    
+
 </div>
 {% if owner_fingerprint %}
 <form id="fileupload" method="post" action="." enctype="multipart/form-data">
@@ -30,7 +45,7 @@
                     <input type="file" name="file" multiple>
                 </span>
             </fieldset>
-                
+
                 <!-- The loading indicator is shown during file processing -->
                 <span class="fileupload-loading"></span>
             <!-- The global progress information -->
@@ -46,10 +61,10 @@
         <!-- The table listing the files available for upload/download -->
         <table role="presentation" class="table table-striped"><tbody class="files"></tbody>
         </table>
-    </form> 
-    {% endif %}    
+    </form>
+    {% endif %}
         <!-- The container for the uploaded files -->
-    <!--<div class="row"> 
+    <!--<div class="row">
     <div id="files" class="span12 files"></div>
     </div>
     -->
@@ -59,11 +74,11 @@
     <!--tr class="">
         <td>
             <span class="preview">
-                
-                
+
+
             </span>
         </td>
-        
+
     </tr-->
 
     </tbody>
@@ -85,7 +100,7 @@
                     fillList(true);
                 {% else %}
                     fillList(false);
-                {% endif %}         
+                {% endif %}
             }
         );
     </script>

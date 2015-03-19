@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2014 Ricardo F. Gonçalves Ribeiro and Universidade de Aveiro
-#
-# Authors: Ricardo F. Gonçalves Ribeiro <ribeiro.r@ua.pt>
+# Copyright (C) 2014 Universidade de Aveiro, DETI/IEETA, Bioinformatics Group - http://bioinformatics.ua.pt/
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -16,7 +14,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
-
 ##
 #   See user history of queries
 ##
@@ -69,14 +66,14 @@ def history(request, source, page, page_rows=10, template_name='history.html'):
             page_rows = int(request.POST.get('paginator_rows', 10))
 
             request.session['paginator_rows'] = page_rows
-        except: 
+        except:
             pass
     else:
         try:
             page_rows = int(request.session['paginator_rows'])
         except:
             pass
-    
+
     simple_queries = QueryLog.objects.filter(user=request.user, removed = False).order_by('-created_date')
 
     myPaginator = Paginator(simple_queries, page_rows)
@@ -107,8 +104,8 @@ def resultsdiff_history(request, query_id, template_name='history.html'):
 
     # monkey patch answers into query
     request2 = RequestMonkeyPatch()
-    
-    request2.method = request.method    
+
+    request2.method = request.method
     query = None
     try:
         query = AdvancedQuery.objects.get(id=query_id)
@@ -145,8 +142,8 @@ def resultsdiff_historysimple(request, query_id, template_name='history.html'):
 
     # monkey patch answers into query
     request2 = RequestMonkeyPatch()
-    
-    request2.method = request.method    
+
+    request2.method = request.method
     query = None
     try:
         query = QueryLog.objects.get(id=query_id)
@@ -175,7 +172,7 @@ def resultsdiff_historysimple(request, query_id, template_name='history.html'):
 def remove(request, query_id):
     if not request.user.is_authenticated():
         raise Http404
-        
+
     try:
         query = AdvancedQuery.objects.get(id=query_id)
 
@@ -193,7 +190,7 @@ def remove(request, query_id):
 def removesimple(request, query_id):
     if not request.user.is_authenticated():
         raise Http404
-        
+
     try:
         query = QueryLog.objects.get(id=query_id)
 
@@ -211,7 +208,7 @@ def removesimple(request, query_id):
 def remove_all(request):
     if not request.user.is_authenticated():
         raise Http404
-        
+
     queries = AdvancedQuery.objects.filter(user=request.user)
 
     for query in queries:
@@ -225,7 +222,7 @@ def remove_all(request):
 def remove_allsimple(request):
     if not request.user.is_authenticated():
         raise Http404
-        
+
     queries = QueryLog.objects.filter(user=request.user)
 
     for query in queries:

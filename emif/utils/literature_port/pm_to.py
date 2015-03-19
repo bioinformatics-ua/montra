@@ -1,3 +1,18 @@
+# -*- coding: utf-8 -*-
+# Copyright (C) 2014 Universidade de Aveiro, DETI/IEETA, Bioinformatics Group - http://bioinformatics.ua.pt/
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from rest_framework import permissions
 from rest_framework import renderers
@@ -20,17 +35,17 @@ def pm_to(inFile, outFile):
     print "RUNNING"
     def get(pmid):
         results = dict()
-        
+
         if (pmid==None or pmid==''):
             results["pmid"] = ""
             results['authors'] = ""
             results['title'] =  ""
             results['pages'] =  ""
             results['year'] =  ""
-            results['journal'] = "" 
+            results['journal'] = ""
             results['volume'] =  ""
-            return results    
-        
+            return results
+
         doi_object = PubMedObject(pmid)
         request_status = doi_object.fetch_info()
 
@@ -49,7 +64,7 @@ def pm_to(inFile, outFile):
         results['title'] =  ""
         results['pages'] =  ""
         results['year'] =  ""
-        results['journal'] = "" 
+        results['journal'] = ""
         results['volume'] =  ""
 
         return results
@@ -63,11 +78,11 @@ def pm_to(inFile, outFile):
 
     retList = []
     MAX_COUNT = 10
-    
+
     outList = []
     for entry in idList:
         count = entry["count"]
-        if count > 0:    
+        if count > 0:
             res = get(entry["list"][0])
         else:
             res = get(None)

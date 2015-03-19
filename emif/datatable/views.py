@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2014 Ricardo F. Gonçalves Ribeiro and Universidade de Aveiro
-#
-# Authors: Ricardo F. Gonçalves Ribeiro <ribeiro.r@ua.pt>
+# Copyright (C) 2014 Universidade de Aveiro, DETI/IEETA, Bioinformatics Group - http://bioinformatics.ua.pt/
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -19,7 +17,7 @@
 import csv
 
 from django.shortcuts import render
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.core.urlresolvers import reverse
 from django.db import transaction
 from django.core.urlresolvers import *
@@ -36,6 +34,8 @@ from django.utils.html import strip_tags
 from accounts.models import RestrictedGroup, RestrictedUserDbs, EmifProfile
 
 import hashlib
+
+from constance import config
 
 def get_matrix_data(db_type, qset_post, user, flat=False):
 
@@ -101,6 +101,9 @@ def qs_data_table(request, template_name='qs_data_table.html'):
     return render(request, template_name, {'request': request,'hash': hashed, 'export_all_answers': True, 'breadcrumb': False, 'collapseall': False, 'geo': False, 'titles': titles, 'answers': answers})
 
 def all_databases_data_table(request, template_name='alldatabases_data_table.html'):
+
+    if not config.datatable:
+        raise Http404
     #dictionary of database types
     databases_types = {}
 

@@ -1,5 +1,20 @@
 /*
- * Author: Ricardo Ribeiro <ribeiro.r@ua.pt> 
+# -*- coding: utf-8 -*-
+# Copyright (C) 2014 Universidade de Aveiro, DETI/IEETA, Bioinformatics Group - http://bioinformatics.ua.pt/
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
  */
 
 (function ( $ ) {
@@ -33,37 +48,37 @@
         });
         this.focusout(function() {
           $( self ).parent().parent().css({'-webkit-box-shadow': 'inset 0 0px 0px rgba(0, 0, 0, 0), 0 0 0px #7ab5d3', '-moz-box-shadow': 'inset 0 0px 0px rgba(0, 0, 0, 0), 0 0 0px #7ab5d3', 'box-shadow': 'inset 0 0px 0px rgba(0, 0, 0, 0), 0 0 0px #7ab5d3'});
-        });     
+        });
         this.on('keyup', function(){
             console.log($(this).val());
             if($(this).val() == ''){
-                $(this).parent().children('.canclear_button').fadeTo(300, 0); 
+                $(this).parent().children('.canclear_button').fadeTo(300, 0);
             } else {
-                $(this).parent().children('.canclear_button').fadeTo(300, 1); 
+                $(this).parent().children('.canclear_button').fadeTo(300, 1);
             }
         });
         $(this).parent().children('.canclear_button').click(function(){
             $(self).val('');
-            $(this).fadeTo(300, 0); 
-        });    
+            $(this).fadeTo(300, 0);
+        });
         $(this).parent().children('.canclear_search').click(function(){
            $(this).closest('form').submit();
-        });  
+        });
 
         }
 
-        
+
         return this;
- 
+
     };
 /*
-/* (jQ addClass:) if input has value: 
+/* (jQ addClass:) if input has value:
 .clearable.x{
   background-position: right 5px center;
 }
 /* (jQ addClass:) if mouse is over the 'x' input area
 .clearable.onX{
   cursor:pointer;
-} 
+}
 */
 }( jQuery ));

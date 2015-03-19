@@ -1,6 +1,19 @@
 /**********************************************************************
+# -*- coding: utf-8 -*-
+# Copyright (C) 2014 Universidade de Aveiro, DETI/IEETA, Bioinformatics Group - http://bioinformatics.ua.pt/
 #
-# Author: Ricardo Ribeiro <ribeiro.r@ua.pt>
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 # */
 (function($) {
@@ -272,7 +285,7 @@
                     $('#boolrelwidget-basicblocks-out', self).fadeOut('fast');
                 }
 
-                // Drawing query itself(if any already)                
+                // Drawing query itself(if any already)
                 if (mastergroup && mastergroup.variables.length > 0) {
                     var big_box = [];
                     var i = 0;
@@ -362,7 +375,7 @@
                         }
                     }
 
-                    // Add 
+                    // Add
                     $(".boolrelwidget-query-delete", self).click(function() {
                         var removed = Number($(this).attr('id').replace('boolrelwidget-dl-', ''));
 
@@ -845,13 +858,13 @@
 }(jQuery));
 
 
-/*   
+/*
  *  Possible Boolean Operations Enumerable and validator
  *  Since i have to support IE7, BOOL['TYPE'] has to be used everywhere instead of BOOL.TYPE
  *  This must be because if we try a BOOL.TYPE that doesn't exist on ie 7 everything crashes (oh my life...)
  */
 var BOOL = {
-    // NOP   : { value: -1, name: "NOP"}, // No operation, means its a edge branch 
+    // NOP   : { value: -1, name: "NOP"}, // No operation, means its a edge branch
     AND: {
         value: 0,
         name: "AND"
@@ -863,7 +876,7 @@ var BOOL = {
     /*,
   XOR   : { value: 2, name: "XOR"},
   NOR   : { value: 3, name: "NOR"},
-  NAND  : { value: 4, name: "NOR"},  
+  NAND  : { value: 4, name: "NOR"},
 */
 };
 
@@ -877,7 +890,7 @@ function isBool(op) {
     return false;
 }
 
-/* Defining a unique counter of ids to attribute booleanVariable instances 
+/* Defining a unique counter of ids to attribute booleanVariable instances
  * (this is used to facilitate encountering nested references */
 
 var boolrelwidgetuniqueidcounter = 10000;
@@ -890,7 +903,7 @@ function BooleanTerminal(identificator, representation, value, deldelegate) {
     this.delete_delegate = null;
 
     if (identificator == null && representation == null && value == null) {
-        // nothing    
+        // nothing
     } else {
         if (!(typeof identificator == 'string' || identificator instanceof String)) {
             console.warn('Identificator on BooleanTerminal must be a string');
@@ -921,15 +934,15 @@ BooleanTerminal.prototype = {
     toQuery: function() {
         var suffix="]";
         if (this.id && this.val){
-            if(this.val.lastIndexOf("[") == 0 && 
+            if(this.val.lastIndexOf("[") == 0 &&
                 this.val.indexOf(suffix, this.val.length - suffix.length) !== -1)
                 return this.id + ": " + this.val.replace(/"/g, '\\"');
-            else 
+            else
                 return this.id + ': "' + this.val.replace(/"/g, '\\"') + '"';
         } else return '';
     },
     serialize: function() {
-        return 'T;;;;;' + encodeURI(this.id) + ';;;;;' + encodeURI(this.text) + ';;;;;' 
+        return 'T;;;;;' + encodeURI(this.id) + ';;;;;' + encodeURI(this.text) + ';;;;;'
         + encodeURI(this.val) + ';;;;;' + encodeURI(this.delete_delegate);
     },
     deserialize: function(str) {

@@ -1,3 +1,18 @@
+# -*- coding: utf-8 -*-
+# Copyright (C) 2014 Universidade de Aveiro, DETI/IEETA, Bioinformatics Group - http://bioinformatics.ua.pt/
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from questionnaire import *
 from django.utils.translation import ugettext as _
 from django.utils.simplejson import dumps
@@ -50,7 +65,7 @@ def question_yesno(request, question):
         'template' : 'questionnaire/choice-yesnocomment.html',
     }
 
-@question_proc('open', 'email', 'url', 'open-textfield', 'open-button', 'open-upload-image', 'comment')
+@question_proc('open', 'open-validated','email', 'url', 'open-textfield', 'open-button', 'open-upload-image', 'comment')
 def question_open(request, question):
     key = "question_%s" % question.number
     value = question.getcheckdict().get('default','')
@@ -83,7 +98,7 @@ def question_datepicker(request, question):
         'template' : 'questionnaire/datepicker.html',
     }
 
-@answer_proc('open', 'email', 'url' 'open-textfield', 'choice-yesno', 'choice-yesnocomment', 'choice-yesnodontknow',  'open-button', 'open-upload-image')
+@answer_proc('open', 'open-validated', 'email', 'url' 'open-textfield', 'choice-yesno', 'choice-yesnocomment', 'choice-yesnodontknow',  'open-button', 'open-upload-image')
 def process_simple(question, ansdict):
     checkdict = question.getcheckdict()
     required = question.getcheckdict().get('required', 0)
@@ -109,6 +124,7 @@ def process_simple(question, ansdict):
         return dumps([ans])
     return dumps([])
 add_type('open', 'Open Answer, single line [input]')
+add_type('open-validated', 'Open Validated Answer, single line validated with a regex[input]')
 add_type('open-button', 'Open Answer, single line [input] with a button to validate')
 add_type('open-upload-image', 'Upload Image')
 add_type('open-textfield', 'Open Answer, multi-line [textarea]')
@@ -138,6 +154,3 @@ def show_summ(value):
         return valueclean.replace('no', 'No')
 
     return value
-
-
-

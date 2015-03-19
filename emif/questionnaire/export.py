@@ -1,8 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2014 Luís A. Bastião Silva and Universidade de Aveiro
-#
-# Authors: Luís A. Bastião Silva    <bastiao@ua.pt>
-#          Ricardo Ribeiro          <ribeiro.r@ua.pt>
+# Copyright (C) 2014 Universidade de Aveiro, DETI/IEETA, Bioinformatics Group - http://bioinformatics.ua.pt/
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -16,7 +13,6 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-#
 
 from questionnaire.models import *
 
@@ -127,7 +123,11 @@ class ExportQuestionnaireExcel(ExportQuestionnaire):
     __validateyesno = DataValidation(type="list", formula1='"Yes, No"', allow_blank=True)
 
 
-    __validateqtype = DataValidation(type="list", formula1='"open, open-button, open-upload-image, open-textfield, choice-yesno, choice-yesnocomment, choice-yesnodontknow, comment, choice, choice-freeform, choice-multiple, choice-multiple-freeform, range, timeperiod, publication, sameas, custom, datepicker"', allow_blank=True)
+    __validateqtype = DataValidation(type="list", formula1='"open,open-button,open-upload-image,open-textfield,open-validated,choice-yesno,choice-yesnocomment,choice-yesnodontknow,comment,choice,choice-freeform,choice-multiple,choice-multiple-freeform,range,timeperiod,publication,sameas,custom,datepicker"', allow_blank=True)
+
+    __validatecstate = DataValidation(type="list", formula1='"visible"', allow_blank=True)
+
+    __validatedisp = DataValidation(type="list", formula1='"vertical, horizontal, dropdown"', allow_blank=True)
 
 
     def __init__(self, questionnaire, file_path):
@@ -138,9 +138,9 @@ class ExportQuestionnaireExcel(ExportQuestionnaire):
 
     def __boolean_to_string(self, value):
         if value == True:
-            return 'yes'
+            return 'Yes'
         elif value == False:
-            return 'no'
+            return 'No'
 
         return 'error'
 
@@ -157,22 +157,55 @@ class ExportQuestionnaireExcel(ExportQuestionnaire):
         _cell.style = self.__headerstyle
 
     def __setColumnSizes(self, ws, sizes):
-        columns = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K']
+        columns = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L']
 
         for i in xrange(len(columns)):
             ws.column_dimensions[columns[i]].width = sizes[i]
     def __getChoices(self, question):
         retstring = ""
 
-        choices = Choice.objects.filter(question=question)
+        if question.type == 'open-validated':
+            try:
+                return question.meta()['base']
+            except KeyError:
+                try:
+                    return question.meta()['regex']
+                except KeyError:
+                    return ""
 
-        for choice in choices:
-            retstring+=choice.value+'|'
+        else:
+            choices = Choice.objects.filter(question=question)
 
-        if(len(retstring) > 1):
-            return retstring[:-1]
+            for choice in choices:
+                retstring+=choice.value+'|'
+
+            if(len(retstring) > 1):
+                return retstring[:-1]
 
         return retstring
+
+    def __getHelp(self, question):
+        if question.type == 'open-validated':
+            unit = None
+            desc = None
+            try:
+                unit = question.meta()['unit']
+            except KeyError:
+                unit = ""
+            try:
+                desc = question.meta()['unit_desc']
+            except KeyError:
+                desc = ""
+
+            if question.help_text != '':
+                return "%s|%s|%s" % (unit, desc, question.help_text)
+            else:
+                if desc != '':
+                    return "%s|%s" % (unit, desc)
+
+                return unit
+
+        return question.help_text
 
     def __getChoiceNumber(self, parent, option):
         yesno_questions = ['choice-yesno','choice-yesnocomment','choice-yesnodontknow']
@@ -216,11 +249,30 @@ class ExportQuestionnaireExcel(ExportQuestionnaire):
             print "-- ERROR: Couldn't find a mapping for question "+str(question.number)
             return "error"
 
+    def __processDisposition(self, disposition):
+
+        if disposition == 0:
+            return 'vertical'
+        elif disposition == 1:
+            return 'horizontal'
+
+        elif disposition == 2:
+            return 'dropdown'
+
+        return ''
+
+    def __processCommentVisible(self, visible):
+
+        if visible:
+            return 'visible'
+
+        return ''
+
     def __addQuestion(self, line, ws, question):
         self.__number_map[question.number] = (question.slug, question)
 
         valid = re.search('(h[0-9])+\. (.*)', question.text_en, re.IGNORECASE)
-        choice_types = ['choice', 'choice-freeform', 'choice-multiple', 'choice-multiple-freeform', 'choice-multiple-freeform-options']
+        choice_types = ['open-validated', 'choice', 'choice-freeform', 'choice-multiple', 'choice-multiple-freeform', 'choice-multiple-freeform-options']
 
         if valid:
             level = str(valid.group(1))
@@ -243,15 +295,16 @@ class ExportQuestionnaireExcel(ExportQuestionnaire):
                     level,
                     question.type,
                     choices,
-                    question.help_text,
+                    self.__getHelp(question),
                     self.__boolean_to_string(question.tooltip),
                     question.slug_fk.slug1,
                     self.__processDependencies(question),
-                    '',
-                    '',
+                    self.__boolean_to_string(question.stats),
+                    self.__processCommentVisible(question.visible_default),
+                    self.__processDisposition(question.disposition)
                 ])
 
-            for row in ws.iter_rows('A'+str(line)+":k"+str(line)):
+            for row in ws.iter_rows('A'+str(line)+":L"+str(line)):
                 for cell in row:
                     self.__setDefaultStyle(cell)
 
@@ -282,8 +335,9 @@ class ExportQuestionnaireExcel(ExportQuestionnaire):
 
             ws.append(['QuestionSet', questionset.text_en.replace('h1. ',''),
                         questionset.sortid, '', '', questionset.help_text.replace('<br />', '\n'),
-                        self.__boolean_to_string(questionset.tooltip), '',
-                        '', '', '' ])
+                        self.__boolean_to_string(questionset.tooltip), questionset.heading,
+                        '', '', '','' ])
+
 
             for row in ws.iter_rows('A'+str(pointer)+":k"+str(pointer)):
                 for cell in row:
@@ -308,10 +362,14 @@ class ExportQuestionnaireExcel(ExportQuestionnaire):
         self.__validatetype.ranges.append('A3:A'+str(pointer))
         self.__validateqtype.ranges.append('D3:D'+str(pointer))
         self.__validateyesno.ranges.append('G3:G'+str(pointer))
+        self.__validatecstate.ranges.append('K3:K'+str(pointer))
+        self.__validatedisp.ranges.append('L3:L'+str(pointer))
 
         ws.add_data_validation(self.__validatetype)
         ws.add_data_validation(self.__validateyesno)
         ws.add_data_validation(self.__validateqtype)
+        ws.add_data_validation(self.__validatecstate)
+        ws.add_data_validation(self.__validatedisp)
 
         # Freezing first two rows
         ws.freeze_panes = ws.cell('A3')

@@ -1,7 +1,6 @@
-/**********************************************************************
-# Copyright (C) 2014 Luís A. Bastião Silva and Universidade de Aveiro
-#
-# Authors: Luís A. Bastião Silva <bastiao@ua.pt>
+/*
+# -*- coding: utf-8 -*-
+# Copyright (C) 2014 Universidade de Aveiro, DETI/IEETA, Bioinformatics Group - http://bioinformatics.ua.pt/
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -15,7 +14,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-#
+
 ***********************************************************************/
 
 /* Auxliar functions to calculate minimum and max */
@@ -197,6 +196,8 @@ function GraphicChartC3D3(divArg, dataArg)
   *
   */
   this.draw = function(div, dataset){
+    $('#comment_place').show();
+
     var findMin = function(possibilities, start){
       var pointer = 0;
       var max = possibilities.length;
@@ -496,8 +497,108 @@ function GraphicChartC3D3(divArg, dataArg)
 
     chartConfigs.zoom.rescale = true;
 
+    chartConfigs.padding.bottom = 5
+
+
+    try{chart = c3.generate((chartConfigs));}
+    catch(ex)
+    {
+      console.log(ex);
+      // Handle the shit here!
+      // Otherwise once you will be fucked up.
+    }
+    try{
+    if(chartConfigs.data.types['T'] === '')
+      chart.toggle('T');
+    } catch(ex){}
+
+    function toggle(id) {
+        chart.toggle(id);
+    }
+    var legend = d3.select('#pc_chart_place svg').insert('svg', '.chart')
+    .attr('class', 'legend').attr('style','font-size: 10px;').attr('height', '50')
+    .attr('viewBox', '0 0 50 50').attr('preserveAspectRatio', 'xMaxYMin meet');
+
+    var columns = chartConfigs.data.columns;
+
+    // Clean the legend container.
+    $(".color_container").html("");
+    // Draw legend manually
+    var place = 0;
+
+    for (var i=0; i< columns.length;i++) {
+            var row = columns[i][0];
+
+            var drawLegend = function(row){
+              /*legend.append('span').attr('data-id', row).attr('data-opacity', '1').attr('style', 'cursor: pointer;').html(
+                '<div style="display: inline-block; width: 10px; height: 10px; margin-left: 20px;" class="color_container"></div>&nbsp;'+row);*/
+
+              var g = d3.select('.legend').insert('g').attr('transform','translate(-'+place+',0)');
+
+              g.insert('text').attr('font-size',"10").attr('x',"15").attr('y', '9').text(row);
+              g.insert('rect').attr('class', 'color_container').attr('style', "cursor: pointer;")
+              .attr('data-opacity', "1").attr('data-id', row).attr('width', '10').attr('height', '10');
+
+              place=(10*(row.length-1))+30+place;
+            };
+
+            if(row.toLowerCase() == 't'){
+              if(chartConfigs.data.types['T'] !== '' && columns[i].length > 1){
+                drawLegend(row);
+              }
+            } else {
+              if(row.toLowerCase() != 'x' && columns[i].length > 1){
+                drawLegend(row);
+              }
+            }
+
+    }
+    d3.selectAll('.legend .color_container')
+    .each(function () {
+        var id = d3.select(this).attr('data-id');
+        var container = $(this);
+
+        var color;
+        try {
+          color = chart.color(id);
+        } catch(err){
+          color ="#83bd59";
+        }
+        container.data('color', color);
+        container.css('fill', color);
+    })
+    .on('mouseover', function () {
+        var id = d3.select(this).attr('data-id');
+        chart.focus(id);
+    })
+    .on('mouseout', function () {
+        var id = d3.select(this).attr('data-id');
+        chart.revert();
+    })
+    .on('click', function () {
+        var id = d3.select(this).attr('data-id');
+        var opacity = d3.select(this).attr('data-opacity');
+
+        if(opacity === '1'){
+          d3.select(this).attr('style','opacity: 0.5;cursor: pointer;').attr('data-opacity', '0.5');
+        } else {
+          d3.select(this).attr('style','opacity: 1;cursor: pointer;').attr('data-opacity', '1');
+        }
+        $(this).css('fill', $(this).data('color'));
+
+        chart.toggle(id);
+    });
+
+
+    if(!!window.HTMLCanvasElement){
+      $('.exportmychart').show();
+    }
 
     $('#pc_tabular_place').c3js_to_tabular(chartConfigs, {
+      empty_callback: function(){
+        $('#pc_chart_place').html("<center><h4>There is no data available.</h4></center>");
+        $('#comment_place').hide();
+      },
       callback: function(){
         var base = $('#base_link').attr('href');
 
@@ -550,87 +651,6 @@ function GraphicChartC3D3(divArg, dataArg)
 
       }
     });
-    chartConfigs.padding.bottom = 5
-
-
-    try{chart = c3.generate((chartConfigs));}
-    catch(ex)
-    {
-      console.log(ex);
-      // Handle the shit here!
-      // Otherwise once you will be fucked up.
-    }
-    try{
-    if(chartConfigs.data.types['T'] === '')
-      chart.toggle('T');
-    } catch(ex){}
-
-    function toggle(id) {
-        chart.toggle(id);
-    }
-    var legend = d3.select('#pc_chart_place').insert('div', '.chart').attr('class', 'legend').attr('style','position: absolute; top:0; right: 0;');
-
-    var columns = chartConfigs.data.columns;
-
-    // Clean the legend container.
-    $(".color_container").html("");
-    // Draw legend manually
-    for (var i=0; i< columns.length;i++) {
-            var row = columns[i][0];
-
-            var drawLegend = function(row){
-              legend.append('span').attr('data-id', row).attr('data-opacity', '1').attr('style', 'cursor: pointer;').html(
-                '<div style="display: inline-block; width: 10px; height: 10px; margin-left: 20px;" class="color_container"></div>&nbsp;'+row);
-            };
-
-            if(row.toLowerCase() == 't'){
-              if(chartConfigs.data.types['T'] !== '' && columns[i].length > 1){
-                drawLegend(row);
-              }
-            } else {
-              if(row.toLowerCase() != 'x' && columns[i].length > 1){
-                drawLegend(row);
-              }
-            }
-
-    }
-
-    d3.selectAll('.legend span')
-    .each(function () {
-        var id = d3.select(this).attr('data-id');
-        var container = $(d3.select(this)[0][0].children[0]);
-
-        var color;
-        try {
-          color = chart.color(id);
-        } catch(err){
-          color ="#83bd59";
-        }
-
-        container.css('background-color', color);
-    })
-    .on('mouseover', function () {
-        var id = d3.select(this).attr('data-id');
-        chart.focus(id);
-    })
-    .on('mouseout', function () {
-        var id = d3.select(this).attr('data-id');
-        chart.revert();
-    })
-    .on('click', function () {
-        var id = d3.select(this).attr('data-id');
-        var opacity = d3.select(this).attr('data-opacity');
-
-        if(opacity === '1'){
-          d3.select(this).attr('style','opacity: 0.5;cursor: pointer;').attr('data-opacity', '0.5');
-
-        } else {
-          d3.select(this).attr('style','opacity: 1;cursor: pointer;').attr('data-opacity', '1');
-        }
-
-        chart.toggle(id);
-    });
-
    };
 };
 

@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2014 Ricardo F. Gonçalves Ribeiro and Universidade de Aveiro
-#
-# Authors: Ricardo F. Gonçalves Ribeiro <ribeiro.r@ua.pt>
+# Copyright (C) 2014 Universidade de Aveiro, DETI/IEETA, Bioinformatics Group - http://bioinformatics.ua.pt/
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -15,14 +13,14 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-#
+
 from django.conf.urls.defaults import *
 from views import *
 
 urlpatterns = patterns('',
-   
+
     # Literature tab, on database info view
-    url(r'^(?P<fingerprint_id>[^/]+)/(?P<page>[0-9]+)$', 'literature.views.literature_database_info'), 
-    url(r'^(?P<fingerprint_id>[^/]+)$', 'literature.views.literature_database_info_initial'),    
+    url(r'^(?P<fingerprint_id>[^/]+)/(?P<page>[0-9]+)$', 'literature.views.literature_database_info'),
+    url(r'^(?P<fingerprint_id>[^/]+)$', 'literature.views.literature_database_info_initial'),
 
 )

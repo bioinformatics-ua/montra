@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2014 Ricardo F. Gonçalves Ribeiro and Universidade de Aveiro
-#
-# Authors: Ricardo F. Gonçalves Ribeiro <ribeiro.r@ua.pt>
+# Copyright (C) 2014 Universidade de Aveiro, DETI/IEETA, Bioinformatics Group - http://bioinformatics.ua.pt/
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -15,8 +13,6 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-#
-
 from django.shortcuts import render, render_to_response, redirect
 from django.db.models import Q
 
@@ -32,9 +28,11 @@ from django.http import Http404
 
 from population_characteristics.documents import document_form_view
 
+from constance import config
+
 def fingerprint_list(request, template_name='fingerprints.html', added=False):
 
-    if not request.user.is_authenticated():
+    if not config.private_links or not request.user.is_authenticated():
         raise Http404
 
     alink = request.session.get('created_public_link')

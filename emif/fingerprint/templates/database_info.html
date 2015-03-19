@@ -1,4 +1,21 @@
 {% extends 'base.html' %}
+{% comment %}
+# -*- coding: utf-8 -*-
+# Copyright (C) 2014 Universidade de Aveiro, DETI/IEETA, Bioinformatics Group - http://bioinformatics.ua.pt/
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+{% endcomment %}
 {% load url from future %}
 {% load extra_tags %}
 {% load django_bootstrap_breadcrumbs %}
@@ -58,6 +75,16 @@
 {% endblock %}
 
 {% block headextra %}
+<script src="{{ STATIC_URL}}js/vendor/FileSaver.js"></script>
+<script src="{{ STATIC_URL}}js/vendor/rgbcolor.js"></script>
+<script src="{{ STATIC_URL}}js/vendor/StackBlur.js"></script>
+<script src="{{ STATIC_URL}}js/vendor/canvg.js"></script>
+<script src="{{ STATIC_URL}}js/vendor/jspdf.js"></script>
+<script src="{{ STATIC_URL}}js/vendor/jspdf.plugin.addimage.js"></script>
+<script src="{{ STATIC_URL}}js/vendor/zlib.js"></script>
+<script src="{{ STATIC_URL}}js/vendor/png.js"></script>
+<script src="{{ STATIC_URL}}js/vendor/jspdf.plugin.png_support.js"></script>
+
 
 <script src="{{ STATIC_URL}}js/vendor/taskqueuer.js"></script>
 <script src="{{ STATIC_URL}}js/vendor/jquery.expander.min.js"></script>
@@ -167,23 +194,35 @@
                 <li class="{%if activetab == 'summary'%}active{%endif%}">
                     <a href="#metadata" data-toggle="tab"><i class="icon-list"></i>&nbsp; Fingerprint</a>
                 </li>
+                {% if config.population_characteristics %}
                 <li class="{%if activetab == 'pc'%}active{%endif%}">
                     <a href="#populationcharacteristics" data-toggle="tab"><i class="icon-signal"></i>&nbsp; Population Characteristics</a>
                 </li>
+                {% endif %}
+
+                {% if config.documents %}
                 <li  class="{%if activetab == 'docs'%}active{%endif%}">
                     <a href="#documents" data-toggle="tab"><i class="icon-folder-close"></i>&nbsp; Documents</a>
                 </li>
+                {% endif %}
 
+                {% if config.literature %}
                 <li class="{%if activetab == 'literature'%}active{%endif%}">
                     <a href="#literature" data-toggle="tab"><i class="icon-book"></i>&nbsp; Literature</a>
                 </li>
+                {% endif %}
 
+                {% if config.extra_information %}
                 <li  class="{%if activetab == 'extra'%}active{%endif%}">
                     <a href="#apiinfo" data-toggle="tab"><i class="icon-download-alt"></i> &nbsp; Extra Information</a>
                 </li>
+                {% endif %}
 
+                {% if config.discussion %}
                 <li  class="{%if activetab == 'discussion'%}active{%endif%}">
                     <a href="#discussion" data-toggle="tab"><i class="fa fa-comment"></i> &nbsp; Discussion</a>
+                </li>
+                {% endif %}
             </ul>
             <div style="margin-bottom: 50px;" class="tab-content">
                 <div class="tab-pane {%if activetab == 'summary'%}active{%endif%}" id="metadata">
@@ -215,25 +254,29 @@
 
 
                 </div>
+            {% if config.population_characteristics %}
+
             <div class="tab-pane {%if activetab == 'pc'%}active{%endif%}" id="populationcharacteristics" >
 
               {% include "population_characteristics.html" %}
 
           </div>
+          {% endif %}
 
-          <div class="tab-pane {%if activetab == 'docs'%}active{%endif%}" id="documents">
+        {% if config.documents %}
+        <div class="tab-pane {%if activetab == 'docs'%}active{%endif%}" id="documents">
 
             {% include "documents.html" %}
         </div>
+        {% endif %}
 
-
-
+        {% if config.literature %}
         <div class="tab-pane {%if activetab == 'literature'%}active{%endif%}" id="literature">
             <h4 class="loadingsection pull-center">Loading...</h4>
 
         </div>
-
-
+        {% endif %}
+        {% if config.extra_information %}
         <div class="tab-pane {%if activetab == 'extra'%}active{%endif%}" id="apiinfo">
             <div>
                 <a id="btn_pivot_table" class="btn pull-right hidden" href="">Pivot table</a>
@@ -248,6 +291,8 @@
             </div>
             <div class="span8"></div>
         </div>
+        {% endif %}
+        {% if config.discussion %}
         <div class="tab-pane {%if activetab == 'discussion'%}active{%endif%}" id="discussion">
             <div class="span8 offset2">
                 <div id="commentInserted" class="alert alert-success" style="display:none;">
@@ -304,6 +349,7 @@
                 </div>
             </div>
         </div>
+        {% endif %}
     </div>
 </div>
 </div>
@@ -434,6 +480,10 @@ $(function(){
     {% if isAdvanced %}
     initAdvSearchPlugin('{{request.session.serialization_query}}', '{{request.session.query_type}}', '{{request.session.query_id}}');
     {% endif %}
+
+    if('{{activetab}}' == 'pc'){
+        $('.graphTypes:first').click();
+    }
 
 });
 

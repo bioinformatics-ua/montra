@@ -211,7 +211,8 @@
         /*-- Basic Elements --*/
 
         // Define svgs
-        $$.svg = $$.selectChart.append("svg")
+        $$.svg = $$.selectChart.append('svg')
+            .attr('id',"main_chart")
             .style("overflow", "hidden")
             .on('mouseenter', function () { return config.onmouseover.call($$); })
             .on('mouseleave', function () { return config.onmouseout.call($$); });

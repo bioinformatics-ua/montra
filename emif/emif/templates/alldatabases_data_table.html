@@ -1,4 +1,21 @@
 {% extends 'base.html' %}
+{% comment %}
+# -*- coding: utf-8 -*-
+# Copyright (C) 2014 Universidade de Aveiro, DETI/IEETA, Bioinformatics Group - http://bioinformatics.ua.pt/
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+{% endcomment %}
 {% load url from future %}
 {% load extra_tags %}
 {% load django_bootstrap_breadcrumbs %}
@@ -37,9 +54,6 @@
 {% endblock %}
 
 {% block scriptextraincludes %}
-<script src="{{STATIC_URL}}js/vendor/jquery.tablesorter.min.js"></script>
-<script src="{{STATIC_URL}}js/vendor/jquery.tablesorter.widgets.js"></script>
-<!--script src="{{STATIC_URL}}js/vendor/jquery.stickytableheaders.min.js"></script-->
 <script src="{{STATIC_URL}}js/vendor/bootstrap-select.min.js"></script>
 
 <script src="{{STATIC_URL}}js/databases_datatable.js"></script>
@@ -119,7 +133,6 @@
 {% comment %}
   <a class="btn btn-large btn-success" href="advancedSearch/1">Add new database</a>
 {% endcomment %}
-</div>
 
 
 

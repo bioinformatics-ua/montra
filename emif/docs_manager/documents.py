@@ -1,8 +1,5 @@
 # -*- coding: utf-8 -*-
-
-# Copyright (C) 2014 Luís A. Bastião Silva and Universidade de Aveiro
-#
-# Authors: Luís A. Bastião Silva <bastiao@ua.pt>
+# Copyright (C) 2014 Universidade de Aveiro, DETI/IEETA, Bioinformatics Group - http://bioinformatics.ua.pt/
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -17,7 +14,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
-
 import json
 
 from django.http import HttpResponse
@@ -30,23 +26,23 @@ from django.contrib.auth.decorators import user_passes_test, login_required
 
 from emif.views import get_api_info
 from questionnaire.services import createqsets
- 
+
 from django.shortcuts import render
 
 import os
 
 from django.conf import settings
 
-from population_characteristics.parseJerboaFile import * 
-from population_characteristics.services import * 
+from population_characteristics.parseJerboaFile import *
+from population_characteristics.services import *
 from docs_manager.storage_handler import *
 
 
 def document_form_view_upload(request, template_name='documents_upload_form.html'):
-    """Store the files at the backend 
+    """Store the files at the backend
     """
 
-    # Create the backend to store the file 
+    # Create the backend to store the file
     fh = FileSystemHandleFile()
     g_fh = HandleFile(fh)
 
@@ -54,12 +50,12 @@ def document_form_view_upload(request, template_name='documents_upload_form.html
     # Run it for all the sent files (apply the persistence storage)
     if request.FILES:
         for name, f in request.FILES.items():
-            # Handle file 
+            # Handle file
             g_fh.handle_file(f)
-            
-            # Serialize the response 
+
+            # Serialize the response
             files.append(serialize(f))
-    
+
     data = {'files': files}
     response = JSONResponse(data, mimetype=response_mimetype(request))
     response['Content-Disposition'] = 'inline; filename=files.json'
@@ -68,14 +64,14 @@ def document_form_view_upload(request, template_name='documents_upload_form.html
 def jerboa_form_view_upload(request, template_name='documents_upload_form.html'):
     """ Upload files from Jerboa
     """
-    # TODO: for now it is only calling the documents 
+    # TODO: for now it is only calling the documents
     return document_form_view_upload(request, template_name='documents_upload_form.html')
 
 def parsejerboa(request, template_name='documents_upload_form.html'):
     """ Parse files from Jerboa
     """
     path_file = "C:/Users/lbastiao/Projects/TEST_DataProfile_v1.5.6b.txt"
-    #path_file = "/Volumes/EXT1/Dropbox/MAPi-Dropbox/EMIF/Jerboa/TEST_DataProfile_v1.5.6b.txt"  
+    #path_file = "/Volumes/EXT1/Dropbox/MAPi-Dropbox/EMIF/Jerboa/TEST_DataProfile_v1.5.6b.txt"
 
 
     _json = import_population_characteristics_data(filename=path_file)
@@ -101,12 +97,12 @@ def document_form_view(request, runcode, qs, template_name='documents_upload_for
         #print request.user.username
         if (owner == request.user.username):
             owner_fingerprint = True
-    
-    return render(request, template_name, 
-        {'request': request, 'qsets': qsets, 'export_bd_answers': True, 
+
+    return render(request, template_name,
+        {'request': request, 'qsets': qsets, 'export_bd_answers': True,
         'apiinfo': apiinfo, 'fingerprint_id': runcode,
                    'breadcrumb': True, 'breadcrumb_name': name.decode('ascii', 'ignore'),
-                    'style': qs, 'collapseall': False, 
+                    'style': qs, 'collapseall': False,
                     'owner_fingerprint':True,
                     'fingerprint_dump': True,
                     'contains_population': False,

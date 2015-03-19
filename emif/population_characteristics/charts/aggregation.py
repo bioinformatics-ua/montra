@@ -1,8 +1,5 @@
 # -*- coding: utf-8 -*-
-
-# Copyright (C) 2014 Luís A. Bastião Silva and Universidade de Aveiro
-#
-# Authors: Luís A. Bastião Silva <bastiao@ua.pt>
+# Copyright (C) 2014 Universidade de Aveiro, DETI/IEETA, Bioinformatics Group - http://bioinformatics.ua.pt/
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -16,12 +13,11 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-#
 
 import json
 
 from django.utils import simplejson
-from population_characteristics.charts.operations import * 
+from population_characteristics.charts.operations import *
 
 
 json.dumps = simplejson.dumps
@@ -38,7 +34,7 @@ class AggregationField:
         self.filters = []
         self.key = None
         self.value = None
-        self.values = None 
+        self.values = None
         self.exclusive = False
 
     def to_JSON(self):
@@ -51,10 +47,10 @@ class Aggregation(object):
         self.var = None
         self.key = None
         self.value = None
-        self.aggregation_fields = None 
-        self.operation = None # choose one of the operations 
+        self.aggregation_fields = None
+        self.operation = None # choose one of the operations
         self.field_to_compute = None
-        self.static_filters = None 
+        self.static_filters = None
 
     def to_JSON(self):
         return json.dumps(self, default=lambda o: o.__dict__, sort_keys=True, indent=4)

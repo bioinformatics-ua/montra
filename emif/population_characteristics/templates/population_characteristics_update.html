@@ -1,3 +1,20 @@
+{% comment %}
+# -*- coding: utf-8 -*-
+# Copyright (C) 2014 Universidade de Aveiro, DETI/IEETA, Bioinformatics Group - http://bioinformatics.ua.pt/
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+{% endcomment %}
 <div id="modal-updatepopchar" class="modal hide fade" style="display:none"  >
     <div class="modal-header">
         <a href="#" onclick="$('#modal-updatepopchar').modal('hide'); return false;" class="close">&times;</a>
@@ -9,7 +26,7 @@
                     <!-- Redirect browsers with JavaScript disabled to the origin page -->
                     <!--<noscript><input type="hidden" name="redirect" value="http://blueimp.github.io/jQuery-File-Upload/"></noscript>-->
                     <!-- The fileupload-buttonbar contains buttons to add/delete files and start/cancel the upload -->
-                    <div class="fileupload-buttonbar">                
+                    <div class="fileupload-buttonbar">
                             <fieldset>
 
                             <input placeholder="Name" size="255" class="span12" type="text" cols="100" name="pc_name" >
@@ -22,8 +39,8 @@
                                 <span>Add files...</span>
                                 <input type="file" name="file" multiple>
                             </div>
-                            
-                            
+
+
                             <!-- The loading indicator is shown during file processing -->
                             <span class="fileupload-loading"></span>
                             </fieldset>
@@ -38,8 +55,8 @@
                         </div>
                     </div>
                     <!-- The table listing the files available for upload/download -->
-                    
-                </form> 
+
+                </form>
                 <table class="table table-striped">
                   <tbody class="files" id="jerboafiles">
 

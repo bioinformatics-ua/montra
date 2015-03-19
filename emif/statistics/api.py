@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2013 Luís A. Bastião Silva and Universidade de Aveiro
+# Copyright (C) 2014 Universidade de Aveiro, DETI/IEETA, Bioinformatics Group - http://bioinformatics.ua.pt/
 #
-# Authors: Luís A. Bastião Silva <bastiao@ua.pt>
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
@@ -14,8 +13,6 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-#
-
 
 from django.http import HttpResponse
 

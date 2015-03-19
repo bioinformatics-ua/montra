@@ -1,4 +1,21 @@
 {% extends 'base.html' %}
+{% comment %}
+# -*- coding: utf-8 -*-
+# Copyright (C) 2014 Universidade de Aveiro, DETI/IEETA, Bioinformatics Group - http://bioinformatics.ua.pt/
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+{% endcomment %}
 {% load extra_tags %}
 {% load url from future %}
 {% load django_bootstrap_breadcrumbs %}
@@ -145,11 +162,7 @@
                  <input class="filter_input" id="last_update_filter" type="text" value="{{sort_params.last_update.filter}}" placeholder="Filter">
           </td>
            <td class="table_filter">
-              <select id="type_filter" class="selectpicker" def_value="{{sort_params.type.filter}}">
-                <option value="">None</option>
-                <option value="adcohort">AD Cohort</option>
-                <option value="observationaldatasources">Observational Data</option>
-              </select>
+              {% show_fingerprints_dropdown request.user sort_params %}
           </td>
           <td class="table_filter select_line">
             <div style="text-align: center;">

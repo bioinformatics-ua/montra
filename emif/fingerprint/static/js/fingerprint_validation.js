@@ -1,5 +1,20 @@
-
-
+/*
+# -*- coding: utf-8 -*-
+# Copyright (C) 2014 Universidade de Aveiro, DETI/IEETA, Bioinformatics Group - http://bioinformatics.ua.pt/
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
 function OpenButtonValidator(context){
     this.context = context;
     this.database_name = null;
@@ -9,7 +24,7 @@ OpenButtonValidator.prototype = {
         if(this.database_name == null){
             var question_number = $(dom).attr("id").replace("open-button_validator_", "question_")
             question_number = question_number.replace(".","\\.");
-            
+
             this.database_name = $('#'+question_number).val();
         }
     },
@@ -17,7 +32,7 @@ OpenButtonValidator.prototype = {
         var draw_validator = this.context.draw_validator;
         question_number = question_number.replace(".","\\.");
         var text = $(controllerDOM).val();
-        
+
         //getValidator
         var validator = $('[id="open-button_validator_'+question_number+'"]');
         //console.log(validator);
@@ -28,7 +43,7 @@ OpenButtonValidator.prototype = {
             return false;
         }
         if(text == this.database_name){
-            draw_validator(validator, true , "");       
+            draw_validator(validator, true , "");
             return true;
         }
 
@@ -38,7 +53,7 @@ OpenButtonValidator.prototype = {
             dataType: 'json',
             success: function(data) {
                   //console.log(data['contains'])
-                  
+
                   if (data['contains'] == false)
                   {
                     validated = true;
@@ -46,7 +61,7 @@ OpenButtonValidator.prototype = {
                   }else{
                     validated = false;
                     draw_validator(validator, validated, "Database Name already exists.");
-                  }     
+                  }
                 },
             data: {},
             async: false
@@ -68,11 +83,11 @@ function NumericValidator(context){
 }
 NumericValidator.prototype ={
     onInit : function(dom){
-        
+
     },
     validate : function(question_number, controllerDOM){
-        var draw_validator = this.context.draw_validator;        
-        question_number = question_number.replace(".","\\.");        
+        var draw_validator = this.context.draw_validator;
+        question_number = question_number.replace(".","\\.");
         var validator = $('[id="numeric_validator_'+question_number+'"]');
         //console.log(validator);
 
@@ -95,17 +110,40 @@ NumericValidator.prototype ={
     }
 }
 
+function SelfValidator(context){
+    this.context = context;
+}
+SelfValidator.prototype ={
+    onInit : function(dom){
+
+    },
+    validate : function(question_number, controllerDOM){
+        var draw_validator = this.context.draw_validator;
+        question_number = question_number.replace(".","\\.");
+        var validator = $('[id="self_validator_'+question_number+'"]');
+
+        console.log('validator self');
+        var success = validator.find('input').inputmask("isComplete");
+        console.log(success);
+
+        return success;
+    },
+    controllerDOM : function(validatorDOM){
+        return $("input", validatorDOM);
+    }
+}
+
 function EmailValidator(context){
     this.regex = /\S+@\S+\.\S/;
     this.context = context;
 }
 EmailValidator.prototype ={
     onInit : function(dom){
-        
+
     },
     validate : function(question_number, controllerDOM){
-        var draw_validator = this.context.draw_validator;        
-        question_number = question_number.replace(".","\\.");        
+        var draw_validator = this.context.draw_validator;
+        question_number = question_number.replace(".","\\.");
         var validator = $('[id="email_validator_'+question_number+'"]');
         //console.log(validator);
 
@@ -137,11 +175,11 @@ function UrlValidator(context){
 }
 UrlValidator.prototype ={
     onInit : function(dom){
-        
+
     },
     validate : function(question_number, controllerDOM){
-        var draw_validator = this.context.draw_validator;        
-        question_number = question_number.replace(".","\\.");        
+        var draw_validator = this.context.draw_validator;
+        question_number = question_number.replace(".","\\.");
         var validator = $('[id="url_validator_'+question_number+'"]');
         //console.log(validator);
 
@@ -164,8 +202,8 @@ UrlValidator.prototype ={
         return $("input", validatorDOM);
     }
 }
-/* To validate urls inside publication, 
- * in the future could be expanded to do other kinds of validations on publciations too 
+/* To validate urls inside publication,
+ * in the future could be expanded to do other kinds of validations on publciations too
  */
 function PublicationsValidator(context){
     /* I didnt make up this regex for url validation, Url validation well done is not trivial,
@@ -176,11 +214,11 @@ function PublicationsValidator(context){
 }
 PublicationsValidator.prototype ={
     onInit : function(dom){
-        
+
     },
     validate : function(question_number, controllerDOM){
-        var draw_validator = this.context.draw_validator;        
-        question_number = question_number.replace(".","\\.");        
+        var draw_validator = this.context.draw_validator;
+        question_number = question_number.replace(".","\\.");
         var validator = $('[id="url_validator_'+question_number+'"]');
         //console.log(validator);
         console.error('cDom:controllerDOM');
@@ -211,6 +249,7 @@ function Fingerprint_Validator(searchMode){
 
     this.validators["open-button"] = { n: "open-button_validator", v: this.fingerprint_name};
     this.validators["numeric"] = { n: "numeric_validator", v: new NumericValidator(this)};
+    this.validators["open-validated"] = { n: "self_validator", v: new SelfValidator(this)};
     this.validators["email"] = { n: "email_validator", v: new EmailValidator(this)};
     this.validators["url"] = { n: "url_validator", v: new UrlValidator(this)};
     this.validators["publication"] = { n: "publication", v: new PublicationsValidator(this)};
@@ -218,11 +257,11 @@ function Fingerprint_Validator(searchMode){
 Fingerprint_Validator.prototype ={
     onInit : function(){
         var self = this;
-        
+
         for( x in self.validators ){
-            $("."+self.validators[x].n).each(function(i, v) {        
+            $("."+self.validators[x].n).each(function(i, v) {
                 self.validators[x].v.onInit(v);
-            });    
+            });
         }
 
         $('[id^="qform"]').submit(function(evnt){
@@ -232,7 +271,7 @@ Fingerprint_Validator.prototype ={
     },
     reload : function(){
         this.onInit();
-    }, 
+    },
     validate : function (clas, questionNumber, controllerDOM){
         var validator = this.validators[clas];
         if(validator != undefined){
@@ -245,12 +284,12 @@ Fingerprint_Validator.prototype ={
             validator.removeClass("error");
             validator.addClass("success");
             $("span", validator).text(feedback_message);
-        } else {        
+        } else {
             validator.removeClass("success");
             validator.addClass("error");
             console.log($("span", validator));
             $("span", validator).text(feedback_message);
-        }   
+        }
     },
     setDatabase : function(db){
         this.fingerprint_name.setDatabase(db);
@@ -269,7 +308,7 @@ Fingerprint_Validator.prototype ={
                 //console.log(validator_id);
 
                 if( !self.validators[x].v.validate( validator_id, cDOM)){
-                    evnt.preventDefault();     
+                    evnt.preventDefault();
 
                     var qs_id = validator_id.split(".")[0];
 
@@ -279,7 +318,7 @@ Fingerprint_Validator.prototype ={
                 }
 
             });
-        return list;  
+        return list;
         }
     },
     validateFormContext: function(evnt, context){
@@ -288,16 +327,22 @@ Fingerprint_Validator.prototype ={
         list = [];
 
         for( x in self.validators ){
-
+                if (self.validators[x].n == 'self_validator'){
+                    console.log('context');
+                    console.log(context);
+                }
             $("."+self.validators[x].n, context).each(function(i, v) {
-
+                if (self.validators[x].n == 'self_validator'){
+                    console.log(i);
+                    console.log(v);
+                }
                 var cDOM = self.validators[x].v.controllerDOM(v);
                 var validator_id = $(v).attr("id");
                 validator_id= validator_id.replace(self.validators[x].n+"_", "");
 
                 if( !self.validators[x].v.validate( validator_id, cDOM)){
                     if(evnt)
-                        evnt.preventDefault();     
+                        evnt.preventDefault();
 
                     var qs_id = validator_id.split(".")[0];
 
@@ -308,15 +353,15 @@ Fingerprint_Validator.prototype ={
 
             });
         }
-        return list;  
+        return list;
 
-    },    
+    },
     searchMode: function(searchMode){
         if(searchMode == undefined || !searchMode){
             this.validators["open-button"] = { n: "open-button_validator", v: new OpenButtonValidator(this)};
             console.log("Fingerprint_Validator: SearchMode disabled");
         }else{
-            delete this.validators["open-button"];        
+            delete this.validators["open-button"];
             console.log("Fingerprint_Validator: SearchMode disabled");
         }
     }
