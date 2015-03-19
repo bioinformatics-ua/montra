@@ -3,7 +3,10 @@
 <div class="clearfix">
 
     <div class="input ui-widget">
-        <input type="text" class="span6" size="60" id="question_{{ question.number }}" name="question_{{ question.number }}" value="{{ qdict.value }}" />
+        <input type="text" class="span6"
+        size="60" id="question_{{ question.number }}"
+        name="question_{{ question.number }}"
+        value="{{ qdict.value }}" />
         {% if question.extra %}
             <span class="help-block">{{ question.extra }}</span>
         {% endif %}
@@ -37,6 +40,8 @@
                         },
                         select: function( event, ui ) {
                             t_input.val( ui.item.display_name );
+
+                            t_input.change();
 
                             return false;
                         }

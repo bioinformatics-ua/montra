@@ -65,7 +65,7 @@ def question_yesno(request, question):
         'template' : 'questionnaire/choice-yesnocomment.html',
     }
 
-@question_proc('open', 'open-validated','email', 'url', 'open-textfield', 'open-button', 'open-upload-image', 'comment')
+@question_proc('open', 'open-validated','email', 'url', 'open-textfield', 'open-location', 'open-button', 'open-upload-image', 'comment')
 def question_open(request, question):
     key = "question_%s" % question.number
     value = question.getcheckdict().get('default','')
