@@ -144,7 +144,7 @@
                     for (var key in registered_widgets) {
                         if (registered_widgets.hasOwnProperty(key)) {
                             if(private_funcs.__indexOf(key) == -1){
-                                to_render += '<li><a id="'+key+'" class="dashboardaddwidget" data-widgetname="'+key+'" href="javascript:void(0)">'+registered_widgets[key].header+'</a></li>';
+                                to_render += '<li><a id="key-'+key+'" class="dashboardaddwidget" data-widgetname="'+key+'" href="javascript:void(0)">'+registered_widgets[key].header+'</a></li>';
                                 no_results=false;
                             }
                         }
@@ -396,35 +396,40 @@ var DashboardWidget = function DashboardWidget(widgetname, header, width, height
 
         gridster.add_widget.apply(gridster, widget);
 
-        $('#'+this.widgetname+" .dragtooltip").tooltip({'container': 'body'});
-
-        $('#'+this.widgetname+" .removewidget").click(function(){
-            if(typeof bootbox !== 'undefined'){
-                bootbox.confirm("Are you sure you want to remove this widget ?", function(confirmation){
-                    if (confirmation)
-                    parent.removeWidget(self.widgetname);
-                });
-            } else {
-                var confirmation = confirm("Are you sure you want to remove this widget ?");
-                if ( confirmation === true)
-                    parent.removeWidget(self.widgetname);
-            }
-        });
-
-        if(self.header_tooltip != null){
-            $('#'+this.widgetname+' .widget-header').tooltip({
-                'trigger': 'hover',
-                'placement': 'top',
-                'title': self.header_tooltip,
-                'container': 'body',
-                'html': true
-            });
-        }
+        this.__baseevents(parent);
 
     },
     __refresh : function(){
         //console.log(this.content);
         $('#'+this.widgetname+' .accordion-inner').html(this.content);
+    },
+    __baseevents: function(parent){
+        var self=this;
+
+        $('#'+this.widgetname+" .dragtooltip").tooltip({'container': 'body'});
+
+                $('#'+this.widgetname+" .removewidget").click(function(){
+                    if(typeof bootbox !== 'undefined'){
+                        bootbox.confirm("Are you sure you want to remove this widget ?", function(confirmation){
+                            if (confirmation)
+                            parent.removeWidget(self.widgetname);
+                        });
+                    } else {
+                        var confirmation = confirm("Are you sure you want to remove this widget ?");
+                        if ( confirmation === true)
+                            parent.removeWidget(self.widgetname);
+                    }
+                });
+
+                if(self.header_tooltip != null){
+                    $('#'+this.widgetname+' .widget-header').tooltip({
+                        'trigger': 'hover',
+                        'placement': 'top',
+                        'title': self.header_tooltip,
+                        'container': 'body',
+                        'html': true
+                    });
+        }
     },
     // private methods
     __validate : function(){

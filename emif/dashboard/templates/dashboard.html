@@ -89,7 +89,9 @@
 
                         if(callback) callback(confs, plugin);
                     });
+
             {% else %}
+
                     $.ajax({
                         url: '{{version.path|safe}}',
                         method: 'GET',

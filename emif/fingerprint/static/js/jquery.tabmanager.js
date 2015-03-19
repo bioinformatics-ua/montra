@@ -75,7 +75,7 @@
                     for (var key in registered_widgets) {
                         if (registered_widgets.hasOwnProperty(key)) {
                             if(private_funcs.__indexOf(key) == -1){
-                                to_render += '<li><a id="'+key+'" class="tabaddwidget" data-widgetname="'+key+'" href="javascript:void(0)">'+registered_widgets[key].header+'</a></li>';
+                                to_render += '<li><a id="key-'+key+'" class="tabaddwidget" data-widgetname="'+key+'" href="javascript:void(0)">'+registered_widgets[key].header+'</a></li>';
                                 no_results=false;
                             }
                         }

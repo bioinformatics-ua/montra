@@ -64,12 +64,12 @@ var PlugShellWidget = function PlugShellWidget(confs, show){
         self.content = "<center><h3>Loading...</h3></center>";
 
         var go = function(){
-            PlugShellWidget._super.__init.apply(self, [gridster, parent]);
-
             if(typeof self.show === 'function'){
                 self.show(self);
                 //self.refresh();
             }
+
+            PlugShellWidget._super.__init.apply(self, [gridster, parent]);
         }
 
         var all_scripts = this.extracss.slice();
@@ -82,7 +82,6 @@ var PlugShellWidget = function PlugShellWidget(confs, show){
         }else {
             go();
         }
-
     },
     refresh: function(){
         PlugShellWidget._super.__refresh.apply(this);
