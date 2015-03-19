@@ -87,16 +87,16 @@ $(function(){
 });
 
 function handleQuickSearch(){
- $( ".search-query" ).autocomplete({
-source: "api/searchsuggestions",
-minLength: 2,
-open: function() {
-$( this ).removeClass( "ui-corner-all" ).addClass( "ui-corner-top" );
-},
-close: function() {
-$( this ).removeClass( "ui-corner-top" ).addClass( "ui-corner-all" );
-}
-});
+    $( ".search-query" ).autocomplete({
+    source: "api/searchsuggestions",
+    minLength: 2,
+    open: function() {
+    $( this ).removeClass( "ui-corner-all" ).addClass( "ui-corner-top" );
+    },
+    close: function() {
+    $( this ).removeClass( "ui-corner-top" ).addClass( "ui-corner-all" );
+    }
+    });
 }
 
 $(function() {
