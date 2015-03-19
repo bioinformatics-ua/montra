@@ -38,6 +38,7 @@ from serializers import *
 
 from questionnaire.models import Questionnaire
 from fingerprint.models import Fingerprint
+from developer.models import Plugin
 from accounts.models import Profile, EmifProfile
 from docs_manager.models import FingerprintDocuments
 from docs_manager.views import list_fingerprint_files_aux, upload_document_aux
