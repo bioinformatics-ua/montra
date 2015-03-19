@@ -259,11 +259,11 @@
                                             {% if thirdparty|length > 0 %}
                                             <li class="divider"></li>
                                             <li class="dropdown-submenu">
-                                                <a href="" onclick="return false;">Extensions</a>
+                                                <a href="" onclick="return false;">Applications</a>
                                                 <ul class="dropdown-menu">
                                                     {%for tp in thirdparty %}
                                                     <li>
-                                                        <a href="developer/tp/{{tp.plugin.slug}}">{{tp.plugin.name}}</a>
+                                                        <a href="apps/tp/{{tp.plugin.slug}}">{{tp.plugin.name}}</a>
                                                     </li>
                                                     {% endfor %}
                                                 </ul>

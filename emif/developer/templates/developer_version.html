@@ -63,12 +63,16 @@
             </a>
             </div>
             <div class="well">
+                    <input name="version" class="span6" id="id-version"
+                          value="{% if version %}{{version.version}}{% else %}{{next_version}}{%endif%}"
+                          type="hidden" placeholder="Version number"/>
                     <div class="control-group">
                         <label class="control-label" for="id-version">Version</label>
                         <div class="controls controls-row">
-                          <input name="version" class="span6" id="id-version"
+
+                          <input class="span6"
                           value="{% if version %}{{version.version}}{% else %}{{next_version}}{%endif%}"
-                          type="number" placeholder="Version number" />&nbsp;
+                          type="number" placeholder="Version number" disabled/>&nbsp;
                         </div>
                     </div>
                     <div class="{% if plugin.type == 2 %}hide{%endif%} control-group">
@@ -112,29 +116,32 @@ plugin = function(self){
 
 
         </form>
-            {% if version.submitted %}
-                {% if version.approved %}
-                    <div class="row">
-                    <div class="span7 alert alert-success">
-                      <button type="button" class="close" data-dismiss="alert">&times;</button>
-                      This version is approved, any changes will undo this status.
-                    </div>
-                    </div>
-                {%else %}
-                    <div class="row">
-                    <div class="span7 alert">
-                      <button type="button" class="close" data-dismiss="alert">&times;</button>
-                      This version is submitted and waiting approval, any changes will undo this status.
-                    </div>
-                    </div>
+            {% if version %}
+                {% if version.submitted %}
+                    {% if version.approved %}
+                        <div class="row">
+                        <div class="span7 alert alert-success">
+                          <button type="button" class="close" data-dismiss="alert">&times;</button>
+                          This version is approved, any changes will undo this status.
+                        </div>
+                        </div>
+                    {%else %}
+                        <div class="row">
+                        <div class="span7 alert">
+                          <button type="button" class="close" data-dismiss="alert">&times;</button>
+                          This version is submitted and waiting approval, any changes will undo this status.
+                        </div>
+                        </div>
+                    {% endif %}
+                {% else %}
+
+                    <form method="post">
+                        {% csrf_token %}
+                        <input name="submit" type="hidden" value="submit" />
+                        <button id="submit-version" class="pull-right btn span3"
+                        type="submit" ><i class="fa fa-paper-plane"></i>&nbsp; Submit to approval</button>
+                    </form>
                 {% endif %}
-            {% else %}
-                <form method="post">
-                    {% csrf_token %}
-                    <input name="submit" type="hidden" value="submit" />
-                    <button id="submit-version" class="pull-right btn span3"
-                    type="submit" ><i class="fa fa-paper-plane"></i>&nbsp; Submit to approval</button>
-                </form>
             {% endif %}
         </div>
             <div class="clearfix">

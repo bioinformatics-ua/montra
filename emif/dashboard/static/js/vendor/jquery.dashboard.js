@@ -20,7 +20,7 @@
 (function($) {
     $.fn.dashboard = function(options) {
         // This indicates plugin version, and allows to invalidate any existing caches
-        var __version = "0.1";
+        var __version = "0.2";
 
         var self = this;
 

@@ -162,6 +162,8 @@ class PluginVersion(models.Model):
 
     @staticmethod
     def submit(plugin_hash, version):
+        from developer.tasks import sendCommitEmails
+
         pv  = None
         p   = Plugin.objects.get(slug=plugin_hash)
 
@@ -170,6 +172,8 @@ class PluginVersion(models.Model):
 
             pv.submitted = True
             pv.approved = False
+
+            sendCommitEmails.apply_async([p, pv])
 
             pv.save()
 

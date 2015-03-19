@@ -28,7 +28,7 @@ from django.conf import settings
 
 from hitcount.views import update_hit_count_ajax
 
-
+from developer.views import DeveloperIframeView
 
 admin.site = AdminSitePlus()
 admin.autodiscover()
@@ -64,7 +64,7 @@ urlpatterns = patterns('',
 
     url(r'^addPost/(?P<questionnaire_id>[0-9]+)/(?P<sortid>[0-9]+)/(?P<saveid>[0-9]+)$', 'fingerprint.views.check_database_add_conditions'),
 
-
+    url(r'^apps/tp/(?P<plugin_hash>[^/]+)$', DeveloperIframeView.as_view(), name='developer-iframe'),
 
     # Database Edit
     url(r'^dbEdit/(?P<fingerprint_id>[^/]+)/(?P<questionnaire_id>[0-9]+)$', 'fingerprint.views.database_edit'),

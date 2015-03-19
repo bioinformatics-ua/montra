@@ -161,6 +161,10 @@ class DeveloperVersionView(TemplateView):
             except IndexError:
                 next_version = 1
 
+        except PluginVersion.MultipleObjectsReturned:
+
+            version_obj = PluginVersion.all(plugin=plugin).filter(version=version)[0]
+
         return render(request, self.template_name,
             {
                 'request': request,
