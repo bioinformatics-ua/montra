@@ -65,7 +65,7 @@ def question_yesno(request, question):
         'template' : 'questionnaire/choice-yesnocomment.html',
     }
 
-@question_proc('open', 'open-validated','email', 'url', 'open-textfield', 'open-button', 'open-upload-image', 'comment')
+@question_proc('open', 'open-validated','email', 'url', 'open-textfield', 'open-location', 'open-button', 'open-upload-image', 'comment')
 def question_open(request, question):
     key = "question_%s" % question.number
     value = question.getcheckdict().get('default','')
@@ -98,7 +98,8 @@ def question_datepicker(request, question):
         'template' : 'questionnaire/datepicker.html',
     }
 
-@answer_proc('open', 'open-validated', 'email', 'url' 'open-textfield', 'choice-yesno', 'choice-yesnocomment', 'choice-yesnodontknow',  'open-button', 'open-upload-image')
+
+@answer_proc('open', 'open-validated', 'email', 'url' 'open-textfield', 'choice-yesno', 'choice-yesnocomment', 'choice-yesnodontknow',  'open-button', 'open-upload-image', 'open-location')
 def process_simple(question, ansdict):
     checkdict = question.getcheckdict()
     required = question.getcheckdict().get('required', 0)
@@ -134,6 +135,7 @@ add_type('choice-yesnodontknow', 'Yes/No/Don\'t know Choice [radio]')
 add_type('datepicker', 'Date choice')
 add_type('email', 'Email Address [input]')
 add_type('url', 'Url Address [input]')
+add_type('open-location', 'Open Answer, with Location suggestion')
 
 
 

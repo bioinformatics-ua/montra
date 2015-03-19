@@ -53,8 +53,6 @@ def process_(question, ansdict):
     boo = regex.match(ans) == None
     boo2 = regex2.match(ans) == None
 
-    print("RESPOSTA:"+str(len(ans)))
-
     if ans != None and ans.lower() != 'none':
         if len(ans)!=0 and (boo and boo2):
             raise AnswerException(_(u'Must be a numeric field. ex: 1.000.000.000 = 1 Million'))
