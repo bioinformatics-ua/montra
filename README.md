@@ -191,6 +191,12 @@ EMIF Platform - Fingerprint Browser
 
 
 
+#### Update version
+
+```
+python manage.py update_version 0.7
+```
+
 
 #### Developers
 
