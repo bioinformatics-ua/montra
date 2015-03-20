@@ -99,6 +99,8 @@ function handleQuickSearch(){
             $( this ).removeClass( "ui-corner-top" ).addClass( "ui-corner-all" );
         }
     });
+
+    
 }
 
 function handleWizards(){
@@ -153,6 +155,7 @@ function handleWizards(){
                 }
             }]);
         }
+
     });
 }
 

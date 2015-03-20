@@ -518,6 +518,7 @@ class Choice(models.Model):
         return u'(%s) %d. %s' % (self.question.number, self.sortid, self.text)
 
     class Meta:
+        ordering = ('sortid',)
         translate = ('text',)
 
 class QuestionnaireWizard(models.Model):
