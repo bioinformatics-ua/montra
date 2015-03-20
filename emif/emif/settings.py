@@ -37,7 +37,7 @@ GLOBALS = {
                     <small id="supportability">This website is optimised to Safari, Chrome, Firefox, Opera and IE9+.
                     <!--It runs in IE7-IE8, but it has low performance and no enhanced features.--></small>
                    """,
-    'SENTRY_URL': 'DUMMY_URL_FILL_HERE'
+    'SENTRY_URL': ''
 
 }
 # Header and Footer Settings
@@ -82,7 +82,8 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     "emif.context_processors.baseurl",
     "emif.context_processors.profiles_processor",
     'constance.context_processors.config',
-    "emif.context_processors.globals"
+    "emif.context_processors.globals",
+    "emif.context_processors.thirdparty",
 )
 
 MANAGERS = ADMINS
@@ -188,6 +189,7 @@ STATICFILES_DIRS = (
     os.path.abspath(PROJECT_DIR_ROOT + MIDDLE_DIR + 'public/static'),
     os.path.abspath(PROJECT_DIR_ROOT + MIDDLE_DIR + 'accounts/static'),
     os.path.abspath(PROJECT_DIR_ROOT + MIDDLE_DIR + 'dashboard/static'),
+    os.path.abspath(PROJECT_DIR_ROOT + MIDDLE_DIR + 'developer/static'),
 )
 
 # List of finder classes that know how to find static files in
@@ -250,6 +252,8 @@ TEMPLATE_DIRS = (
 
     os.path.abspath(PROJECT_DIR_ROOT + MIDDLE_DIR + 'notifications/templates'),
     os.path.abspath(PROJECT_DIR_ROOT + MIDDLE_DIR + 'accounts/templates'),
+    os.path.abspath(PROJECT_DIR_ROOT + MIDDLE_DIR + 'developer/templates'),
+
 )
 
 INSTALLED_APPS = (
@@ -292,6 +296,7 @@ INSTALLED_APPS = (
     'emif',
 
     'searchengine',
+    "developer",
     'api',
     'fingerprint',
     'control_version',
@@ -336,7 +341,9 @@ INSTALLED_APPS = (
 
     # django-constance
     'constance.backends.database',
-    "constance"
+    "constance",
+
+    'django_ace',
 )
 
 CONSTANCE_BACKEND = 'constance.backends.database.DatabaseBackend'
@@ -638,4 +645,3 @@ try:
     from local_settings import *
 except:
     pass
-

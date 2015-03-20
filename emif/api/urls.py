@@ -18,27 +18,7 @@
 from django.conf.urls import patterns, url
 from rest_framework.urlpatterns import format_suffix_patterns
 
-from api.views import SearchView
-from api.views import SearchDatabasesView
-from api.views import EmailCheckView
-from api.views import RemovePermissionsView
-from api.views import PassOwnershipView
-from api.views import PopulationCheckView
-from api.views import GetFileView
-from api.views import DeleteFileView
-from api.views import MetaDataView
-from api.views import StatsView
-from api.views import ValidateView
-from api.views import PublicationsView
-from api.views import PopulationView
-from api.views import NotifyOwnerView
-from api.views import AddPublicLinkView
-from api.views import DeletePublicLinkView
-from api.views import SearchSuggestionsView
-from api.views import NotificationsView
-from api.views import ReadNotificationView
-from api.views import RemoveNotificationView
-from api.views import RequestAnswerView
+from api.views import *
 
 from api.views import ToggleSubscriptionView
 

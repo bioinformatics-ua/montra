@@ -352,7 +352,6 @@ VISIBILITY_CHOICES = (
 )
 ### This models, keeps the permissions for a questionset, relative to a fingerprint
 class QuestionSetPermissions(models.Model):
-
     id = models.AutoField(primary_key=True)
     fingerprint_id = models.CharField(max_length=32)
     qs = models.ForeignKey(QuestionSet)

@@ -14,6 +14,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from django.db import models
+from django.db.models import Q
 
 from django.core.validators import MaxLengthValidator
 
@@ -129,14 +130,6 @@ class Fingerprint(models.Model):
     def __unicode__(self):
         return self.fingerprint_hash
 
-    # def get_answers(self):
-    #     if answers:
-    #         return self.answers
-
-    #     answers = Answer.objects.filter(fingerprint_id=self.id)
-    #     print "ANSEWRS: "+str(len(anss))
-    #     return self.answers
-
     def __len__(self):
         return Answer.objects.filter(fingerprint_id=self.id).count()
 
@@ -152,11 +145,16 @@ class Fingerprint(models.Model):
             raise KeyError
         return a
 
+    ''' This breaks django-rest-framework serialization.
+        In all true, a fingerprint iterator shouldnt iterate
+        the answers at all, at least that is my opinion
+
     def __iter__(self):
         #answers = self.get_answers()
         anss = Answer.objects.filter(fingerprint_id=self.id).all()
         for a in anss:
             yield a
+    '''
 
     def keys(self):
         keys = Answer.objects.filter(fingerprint_id=self.id).all().values_list("question__slug_fk__slug1", flat=True)
@@ -173,10 +171,18 @@ class Fingerprint(models.Model):
             return False
         return a != None
 
-    @staticmethod
-    def valid():
 
-        return Fingerprint.objects.filter(removed=False)
+    @staticmethod
+    def valid(questionnaire=None, owner=None):
+
+        tmp = Fingerprint.objects.filter(removed=False)
+        if questionnaire != None:
+            tmp = tmp.filter(questionnaire=questionnaire)
+
+        if owner != None:
+            tmp = tmp.filter(Q(owner=owner) | Q(shared = owner))
+
+        return tmp
 
     def setSubscription(self, user, value):
         try:
@@ -300,6 +306,22 @@ class Fingerprint(models.Model):
 
         print "-- Committing to solr"
         c.index_fingerprints(indexes)
+
+    def answers(self, restriction=None):
+        answers = Answer.objects.filter(fingerprint_id=self).order_by('question__number')
+
+        if restriction:
+            # if the owner is the user looking at the request, we dont have any restrictions
+            if restriction in self.unique_users():
+                return answers
+
+            pqs = QuestionSetPermissions \
+                .objects.filter(fingerprint_id=self.fingerprint_hash, visibility=0) \
+                .values_list('qs__id', flat=True)
+
+            answers = answers.filter(question__questionset__id__in = pqs)
+
+        return answers
 
     def indexFingerprint(self, batch_mode=False):
         def is_if_yes_no(question):

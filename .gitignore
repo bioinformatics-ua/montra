@@ -30,3 +30,5 @@ fingerprints.pkl
 emif/CACHE
 
 tests/reports
+
+emif/emif/static/files

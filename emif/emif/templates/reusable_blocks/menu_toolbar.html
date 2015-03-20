@@ -33,7 +33,22 @@
         <button id="dashboardreset" title="Reset the dashboard widgets configuration to default original state. All personal preferences will be lost." onclick="dashzone.reset();" class="btn"><i class="fa fa-undo"></i> Reset</button>
 
       {% endif %}
+      {% if plugin_add %}
+        {%if user|has_group:'developers' or user.is_staff %}
+          <a class="btn" href="developer/add" id="developer_add">
+          <i class="fa fa-plus"></i>
+            Add Plugin
+          </a>
+        {% endif %}
+      {% endif %}
+      {% if developer %}
+        <a class="btn" href="developer/docs" id="developer_docs">
+        <i class="fa fa-question-circle"></i>
+          Developer Documentation
+        </a>
+      {% endif %}
       {% if fingerprint_dump %}
+      <div id="tabselectbox" class="btn btn-group"></div>
       {%if config.newsletter %}
         {% if not subscription %}
           <button id="dbsubscription" data-subscribed="false" class="btn"><i class="fa fa-at"></i> Subscribe</button>

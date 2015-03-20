@@ -95,8 +95,17 @@
         <script src="{{ STATIC_URL }}js/vendor/inheritance.js"></script>
         <script src="{{ STATIC_URL }}js/vendor/modernizr-2.6.2.min.js"></script>
 
+        <script src="{{ STATIC_URL }}js/vendor/jquery-1.9.1.min.js"></script>
+        <script src="{{ STATIC_URL }}js/vendor/jquery.bifrost.min.js"></script>
+
+
         <script src="{{ STATIC_URL }}js/vendor/jquery-ui-1.10.4.custom.min.js"></script>
         <script src="{{ STATIC_URL }}js/vendor/bootstrap.min.js"></script>
+
+        <script src="{{ STATIC_URL}}js/vendor/promise-6.1.0.min.js"></script>
+        <script src="{{ STATIC_URL}}js/vendor/promise-done-6.1.0.min.js"></script>
+        <script src="{{ STATIC_URL}}js/emif.proxies.js"></script>
+
         <script src="{{ STATIC_URL }}js/vendor/jquery.cookie.js"></script>
         <script src="{{ STATIC_URL }}js/vendor/jquery.canclear.js"></script>
         <script src="{{ STATIC_URL }}js/vendor/jquery.highlight.js"></script>
@@ -105,6 +114,7 @@
         <script src="{{ STATIC_URL }}js/vendor/bootbox.min.js"></script>
 
         <script src="{{ STATIC_URL }}js/vendor/typeahead.jquery.min.js"></script>
+
 
         <script type="application/javascript">
         // We need to configure this to be able to send requests by json with the csrftoken
@@ -264,6 +274,19 @@
                                                     <li><a tabindex="-1" href="advsearch/history">Search History</a></li>
                                                 </ul>
                                             </li>
+                                            {% if thirdparty|length > 0 %}
+                                            <li class="divider"></li>
+                                            <li class="dropdown-submenu">
+                                                <a href="" onclick="return false;">Applications</a>
+                                                <ul class="dropdown-menu">
+                                                    {%for tp in thirdparty %}
+                                                    <li>
+                                                        <a href="apps/tp/{{tp.plugin.slug}}">{{tp.plugin.name}}</a>
+                                                    </li>
+                                                    {% endfor %}
+                                                </ul>
+                                            </li>
+                                            {% endif %}
                                             {% comment %}
                                             <li class="divider"></li>
                                             <li>{% if request.user.is_superuser %}
@@ -371,6 +394,9 @@
             <footer>
 
                 {% if user.is_authenticated %}
+                    {% if user|has_group:'developers' or user.is_staff %}
+                    <a href="developer">Developers</a> ·
+                    {% endif %}
                 <a href="bugreport">Bug Report</a> ·
                 <a href="controlversion/history">History</a> ·
                 {%endif%}

@@ -1,0 +1,143 @@
+{% extends 'base.html' %}
+{% comment %}
+# -*- coding: utf-8 -*-
+# Copyright (C) 2014 Universidade de Aveiro, DETI/IEETA, Bioinformatics Group - http://bioinformatics.ua.pt/
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+{% endcomment %}
+{% load url from future %}
+{% load extra_tags %}
+{% load django_bootstrap_breadcrumbs %}
+{% load crispy_forms_tags %}
+
+{% block styleinclude %}
+    <link rel="stylesheet" href="{{ STATIC_URL }}css/dataTables.bootstrap.css">
+{% endblock %}
+
+{% block headextra %}
+    <script src="{{ STATIC_URL}}js/jquery.dataTables.js"></script>
+    <script src="{{ STATIC_URL}}js/dataTables.bootstrap.js"></script>
+{% endblock %}
+{% block breadcrumbs %}
+        {{ block.super }}
+        {% breadcrumb "Developer" "developer" %}
+        {% if plugin %}
+            {% breadcrumb plugin.name "" %}
+        {% else %}
+            {% breadcrumb "Add new Plugin" "" %}
+        {% endif %}
+{% endblock %}
+
+{% block toolbar %}
+    {% include "reusable_blocks/menu_toolbar.html" with collapse=collapseall %}
+{% endblock %}
+
+{% block content %}
+
+{%if user|has_group:'developers' or user.is_staff %}
+
+<form class="form-horizontal" id="save_plugin" action="developer/save/" method="post">
+    <input name="plugin_hash" id="current_slug" class="hide" type="text" value="{{plugin.slug}}" />
+    {% csrf_token %}
+    <div style="position: relative;" class="row">
+        <div class="span12">
+            <div class="clearfix">
+            <h3>Details</h3>
+            <div class="well">
+                  <div class="control-group">
+                    <label class="control-label" for="id-name">Name</label>
+                    <div class="controls controls-row">
+                      <input autocomplete="off" name="name" class="span6" id="id-name"
+                      value="{{plugin.name}}"
+                      type="text" placeholder="Plugin name" />&nbsp;
+                      <span id="id-name-icon">
+                        &nbsp;
+                      </span>
+                    </div>
+                  </div>
+                   <div class="control-group">
+                    <label class="control-label" for="id-type">Type</label>
+                    <div class="controls">
+                        <select name="type" id="id-type" class="span6">
+                                <option value="-1">-- Please select a plugin type</option>
+                            {% for type, representation in plugin_types %}
+                                <option value="{{type}}"
+                                {%if plugin.type == type%} selected{% endif %}
+                                >{{representation}}</option>
+                            {% endfor %}
+                        </select>
+                        <span id="id-type-icon">
+                            &nbsp;
+                        </span>
+                    </div>
+
+                  </div>
+            </div>
+            <button type="submit" id="save-plugin" class="pull-right btn btn-primary span3"
+            type="submit" ><i class="fa fa-inverse fa-floppy-o"></i>&nbsp; Save plugin </button>
+</form>
+            </div>
+            {% if plugin %}
+            <div class="clearfix">
+            <h3>Versions</h3>
+            <div style="position: absolute; right: 0;" class="pull-right">
+            <a class="btn span3" href="developer/{{plugin.slug}}/add">
+                <i class="fa fa-briefcase"></i> &nbsp;Add version
+            </a>
+            </div>
+            <table id="versions" class="table table-bordered table-striped">
+                <thead>
+                    <tr>
+                        <th>Version</th>
+                        <th>Script Location</th>
+                        <th>Create Date</th>
+                        <th>Latest Update</th>
+                        <th>Submitted</th>
+                        <th>Approved</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for version in plugin.versions %}
+                    <tr>
+                        <td><a href="developer/{{plugin.slug}}/{{version.version}}">{{version.version}}</a></td>
+                        <td>
+                            {% if version.is_remote %}Remote{%else%}Local{%endif%}
+                        </td>
+                        <td>{{version.create_date_repr}}</td>
+                        <td>{{version.latest_update_repr}}</td>
+                        <td class="text-center">
+                                <i class="fa fa-2x {% if version.submitted %}fa-check-square text-success{% else %} fa-minus-circle text-error{% endif %}" />
+                        </td>
+                        <td>
+                                <i class="fa fa-2x {% if version.approved %}fa-check-square text-success{% else %}fa-minus-circle text-error{% endif %}" />
+                        </td>
+
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    {% else %}
+
+    <center><h4>The access to this page is restricted to developers. To become a developer, please contact the platform administration.</h4></center>
+
+    {% endif %}
+{% endblock content %}
+
+{% block scriptextraincludes %}
+<script type="text/javascript" src="{{STATIC_URL}}/js/emif.developer_detail.js" />
+{% endblock %}

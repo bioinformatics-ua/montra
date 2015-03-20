@@ -152,6 +152,12 @@
 <script src="{{ STATIC_URL}}js/dataTables.tableTools.js"></script>
 <script src="{{ STATIC_URL}}js/dataTables.bootstrap.js"></script>
 
+<script src="{{ STATIC_URL}}js/dataTables.bootstrap.js"></script>
+
+<script src="{{ STATIC_URL}}js/jquery.tabmanager.js"></script>
+<script src="{{ STATIC_URL}}js/widgets/widget.plug_shell.js"></script>
+
+
 {% endblock %}
 {% block breadcrumbs %}
 
@@ -189,7 +195,7 @@
 
 <div style="margin-left: 0px;" class="span12">
     <div class="row-fluid">
-        <div class="tabbable">
+        <div id="tab-plug" class="tabbable">
             <ul id="summarynav" data-clamp=".tabbable" data-offset-top="500px" class="nav nav-tabs">
                 <li class="{%if activetab == 'summary'%}active{%endif%}">
                     <a href="#metadata" data-toggle="tab"><i class="icon-list"></i>&nbsp; Fingerprint</a>
@@ -223,6 +229,7 @@
                     <a href="#discussion" data-toggle="tab"><i class="fa fa-comment"></i> &nbsp; Discussion</a>
                 </li>
                 {% endif %}
+
             </ul>
             <div style="margin-bottom: 50px;" class="tab-content">
                 <div class="tab-pane {%if activetab == 'summary'%}active{%endif%}" id="metadata">
@@ -507,5 +514,36 @@ function pushQsets(){
     {% endfor %}
     $('#set_container').append(containers.join(''));
 }
+        $(function(){
+        arr_len = {{plugins|length}};
+
+        {% for version in plugins %}
+            {% if not version.is_remote %}
+
+                sandbox('{{version.plugin.slug}}',
+                    function(callback){
+                        var confs, plugin;
+
+                        {{version.path|safe}}
+
+                        if(callback) callback(confs, plugin);
+                    });
+            {% else %}
+                    $.ajax({
+                        url: '{{version.path|safe}}',
+                        method: 'GET',
+                        crossDomain: true,
+                        contentType: 'application/x-www-form-urlencoded; charset=UTF-8'
+                    })
+                        .done(function(data){
+                            sandbox('{{version.plugin.slug}}', data);
+
+                        })
+                        .fail(function(data){
+                            console.log("We couldn't obtain the remote plugin from url: '{{version.path|safe}}'");
+                        });
+            {%endif%}
+        {% endfor %}
+        });
 {% endblock %}
 </script>

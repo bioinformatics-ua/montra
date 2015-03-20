@@ -17,15 +17,25 @@
     #
 */
 var dashzone;
+var loaded_arr = [];
+var arr_len;
+
+
+/* this may seem dumb, but we can only run the dashboard after all plugins finished loading
+event remote one's with external dependencies that could potentially take a bit.
+*/
+var dashFull = function(insert){
+    loaded_arr.push(insert);
+
+    if(arr_len == loaded_arr.length)
+        loadDash();
+}
 $(function(){
     dashzone = $("#playground").dashboard(
         {
             showRegistry: true,
             registryTarget: "#dashboardselectbox",
             initial: function () {
-
-                dashzone.register(new RecommendationsWidget("recommendations",  2, 1, 6, 6));
-
                 dashzone.addWidget("feed");
                 dashzone.addWidget("actions");
                 dashzone.addWidget("userstats");
@@ -37,6 +47,7 @@ $(function(){
 
 
     // Registering plugins on dashboard
+    dashzone.register(new RecommendationsWidget("recommendations",  2, 1, 6, 6));
     dashzone.register(new FeedWidget("feed", 4, 2, 1, 1));
     dashzone.register(new CommonActionsWidget("actions", 2, 2, 5, 2));
     dashzone.register(new UserStatsWidget("userstats",  2, 1, 5, 3));
@@ -53,6 +64,56 @@ $(function(){
 
     dashzone.register(new TagCloudWidget("tagcloud",  2, 1, 6, 6));
 
+});
+
+function sandbox(id, data){
+    var confs, plugin;
+    var self;
+
+    try {
+        if(typeof data === 'string'){
+            eval(data);
+            self = {confs: confs, plugin: plugin};
+        }
+        else{
+            data(function(confs, plugin){
+                self = {confs: confs, plugin: plugin};
+            })
+        }
+
+        if(checkIntegrity(self)){
+            self.confs.id = id;
+            registerShell(self);
+        }
+    } catch(exc){
+        console.error("The code contains one or several errors, and doesn't execute, please double check your code. Errors are available on console.");
+        console.error(exc);
+    }
+};
+
+function registerShell(closure){
+    console.log('register');
+    dashzone.register(
+        new PlugShellWidget(
+            closure.confs, closure.plugin
+        )
+    );
+
+    dashFull(closure.confs.id);
+}
+
+function checkIntegrity(closure){
+    if(!closure.confs || !(typeof closure.confs == 'object'))
+        throw 'You must specify a \'confs\' dictionary for the plugin.';
+
+    if(!closure.plugin || !(typeof closure.plugin == 'function'))
+        throw 'You must specify a \'plugin\' function for the plugin.';
+
+    return true;
+}
+
+function loadDash(){
+    console.log('loaddash');
     var any_configuration = dashzone.loadConfiguration();
 
     if(any_configuration == false){
@@ -62,5 +123,4 @@ $(function(){
     $('#dashboardreset').tooltip({
         'container': 'body'
     });
-});
-
+}

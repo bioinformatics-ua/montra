@@ -62,10 +62,49 @@
     <script src="{{ STATIC_URL}}js/vendor/widgets/widget.mostviewedfingerprint.js"></script>
     <script src="{{ STATIC_URL}}js/vendor/widgets/widget.recommendations.js"></script>
     <script src="{{ STATIC_URL}}js/vendor/widgets/widget.tagcloud.js"></script>
+    <script src="{{ STATIC_URL}}js/vendor/widgets/widget.plug_shell.js"></script>
     <script src="{{ STATIC_URL}}js/emif.dashboard.js"></script>
 {% endblock %}
 
 {% block content %}
     <div id="playground" style="margin-left: 0px;" class="span12">
     </div>
+
+
+{% endblock %}
+
+{% block scriptextra %}
+        $(function(){
+        arr_len = {{plugins|length}};
+
+        {% for version in plugins %}
+            {% if not version.is_remote %}
+
+                sandbox('{{version.plugin.slug}}',
+                    function(callback){
+                        var confs, plugin;
+
+                        {{version.path|safe}}
+
+                        if(callback) callback(confs, plugin);
+                    });
+
+            {% else %}
+
+                    $.ajax({
+                        url: '{{version.path|safe}}',
+                        method: 'GET',
+                        crossDomain: true,
+                        contentType: 'application/x-www-form-urlencoded; charset=UTF-8'
+                    })
+                        .done(function(data){
+                            sandbox('{{version.plugin.slug}}', data);
+
+                        })
+                        .fail(function(data){
+                            console.log("We couldn't obtain the remote plugin from url: '{{version.path|safe}}'");
+                        });
+            {%endif%}
+        {% endfor %}
+        });
 {% endblock %}

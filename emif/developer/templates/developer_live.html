@@ -1,0 +1,149 @@
+{% comment %}
+# -*- coding: utf-8 -*-
+# Copyright (C) 2014 Universidade de Aveiro, DETI/IEETA, Bioinformatics Group - http://bioinformatics.ua.pt/
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+{% endcomment %}
+{% load url from future %}
+{% load extra_tags %}
+
+{% block styleinclude %}
+<link href='{{ STATIC_URL }}css/opensans.css' rel='stylesheet' type='text/css'>
+        <link href='{{ STATIC_URL }}css/abel.css' rel='stylesheet' type='text/css'>
+
+        <link rel="stylesheet" href="{{ STATIC_URL }}css/bootstrap.min.css">
+
+        <link rel="stylesheet" href="{{ STATIC_URL }}css/vendor/jquery-ui-1.10.4.custom.min.css">
+        <link rel="stylesheet" href="{{ STATIC_URL }}css/main.css" />
+        <link rel="stylesheet" href="{{ STATIC_URL }}font-awesome/css/font-awesome.min.css">
+        <link href="{{ STATIC_URL }}font-awesome-4.2.0/css/font-awesome.min.css" rel="stylesheet">
+
+
+    <link rel="stylesheet" href="{{ STATIC_URL}}css/vendor/jquery.gridster.css" />
+
+    <link rel="stylesheet" href="{{ STATIC_URL}}css/emif.dashboard.css" />
+{% endblock %}
+
+{% block headextra %}
+        <script src="{{ STATIC_URL }}js/vendor/yepnope.js"></script>
+
+        <script src="{{ STATIC_URL }}js/vendor/inheritance.js"></script>
+        <script src="{{ STATIC_URL }}js/vendor/jquery-1.9.1.min.js"></script>
+        <script src="{{ STATIC_URL }}js/vendor/jquery.bifrost.min.js"></script>
+
+        <script src="{{ STATIC_URL }}js/vendor/jquery.cookie.js"></script>
+
+        <script type="application/javascript">
+            // We need to configure this to be able to send requests by json with the csrftoken
+            var csrftoken = $.cookie('csrftoken');
+            function csrfSafeMethod(method) {
+                // these HTTP methods do not require CSRF protection
+                return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+            }
+            $.ajaxSetup({
+                crossDomain: false, // obviates need for sameOrigin test
+                beforeSend: function(xhr, settings) {
+                    if (!csrfSafeMethod(settings.type)) {
+                    xhr.setRequestHeader("X-CSRFToken", csrftoken);
+                    }
+                }
+            });
+        </script>
+
+        <script src="{{ STATIC_URL }}js/vendor/jquery-ui-1.10.4.custom.min.js"></script>
+        <script src="{{ STATIC_URL }}js/vendor/bootbox.min.js"></script>
+
+    <script src="{{ STATIC_URL}}js/vendor/jquery.gridster.min.js"></script>
+
+    <script src="{{ STATIC_URL}}js/emif.proxies.js"></script>
+
+{% endblock %}
+
+{% block content %}
+    {% if plugin.type == 0 %}
+    <script src="{{ STATIC_URL}}js/vendor/jquery.dashboard.js"></script>
+    <script src="{{ STATIC_URL}}js/vendor/widgets/widget.plug_shell.js"></script>
+    <script src="{{ STATIC_URL}}js/emif.livepreview.js"></script>
+
+        <div id="playground_test" style="margin-left: 0px;">
+            {% if not version.is_remote %}
+            <script type="text/javascript">
+                console.log('LIVE PREVIEW FOR LOCAL FILE, GLOBAL WIDGETS');
+                sandbox('{{plugin.slug}}',
+                    function(callback){
+                        var confs, plugin;
+
+                        {{version.path|safe}}
+
+                        if(callback) callback(confs, plugin);
+
+                    });
+            </script>
+            {% else %}
+                <script type="text/javascript">
+                    console.log('LIVE PREVIEW FOR REMOTE FILE, GLOBAL WIDGETS')
+                    $.get('{{version.path|safe}}')
+                        .done(function(data){
+                            sandbox('{{plugin.slug}}', data);
+                        })
+                        .fail(function(data){
+                            codeError("We couldn't obtain the remote plugin from url: '{{version.path|safe}}'");
+                        });
+                </script>
+            {%endif%}
+        </div>
+    {% endif %}
+    {% if plugin.type == 1 %}
+    <script src="{{ STATIC_URL}}js/jquery.tabmanager.js"></script>
+    <script src="{{ STATIC_URL}}js/widgets/widget.plug_shell.js"></script>
+
+    <script src="{{ STATIC_URL}}js/emif.livepreview_fingerprint.js"></script>
+
+        <div id="playground_test" style="margin-left: 0px;">
+            {% if not version.is_remote %}
+            <script type="text/javascript">
+                var global_fingerprint_id = '66a47f694ffb676bf7676dfde24900e6';
+
+                console.log('LIVE PREVIEW FOR LOCAL FILE, fingerprint WIDGETS');
+                sandbox('{{plugin.slug}}',
+                    function(callback){
+                        var confs, plugin;
+
+                        {{version.path|safe}}
+
+                        if(callback) callback(confs, plugin);
+
+                    });
+            </script>
+            {% else %}
+                <script type="text/javascript">
+                    console.log('LIVE PREVIEW FOR REMOTE FILE, fingerprint WIDGETS')
+                    $.get('{{version.path|safe}}')
+                        .done(function(data){
+                            console.log(data);
+                            sandbox('{{plugin.slug}}', data);
+                        })
+                        .fail(function(data){
+                            codeError("We couldn't obtain the remote plugin from url: '{{version.path|safe}}'");
+                        });
+                </script>
+            {%endif%}
+        </div>
+    {% endif %}
+    {% if plugin.type == 2 %}
+            <script type="text/javascript">
+                window.location.replace('{{version.path|safe}}');
+            </script>
+    {% endif %}
+{% endblock %}

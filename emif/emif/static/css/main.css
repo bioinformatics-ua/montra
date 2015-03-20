@@ -992,6 +992,21 @@ height: 4em;
   padding-top: 50px;
 }
 
+.docmenu.affix{
+  margin-top: -6px;
+  padding-top: 120px;
+}
+
+a.anchor{
+  display: block;
+  position: relative;
+  top: -200px;
+  visibility: hidden;
+}
+
+#apidocs p{
+  text-align: justify;
+}
 #summarynav.affix:after{
   height: 4px;
   width: 100%;
@@ -1007,4 +1022,53 @@ background: -ms-linear-gradient(top, rgba(163,163,163,1) 0%, rgba(255,255,255,0)
 background: linear-gradient(to bottom, rgba(163,163,163,1) 0%, rgba(255,255,255,0) 100%);
 filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#a3a3a3', endColorstr='#ffffff', GradientType=0 );
 
+}
+
+.input-prepend.fill
+{
+    display: block;
+    position: relative;
+    height: 30px;
+
+}
+input.fill {
+        position: absolute;
+        left: 0px;
+        margin-right: 29px;
+        width: auto !important;
+    }
+.add-on.fill {
+    position: absolute;
+    width: 30px;
+    right: 0px;
+    z-index:100!important;
+}
+
+#live-preview iframe{
+  height: 440px;
+  border: 0;
+}
+
+.far_from_sight{
+  position: absolute;
+  left: -19999px;
+  top: -19999px;
+}
+
+#summarynav.nav-tabs>li>a {
+  border: 1px solid rgb(229, 229, 229);
+  background-color: rgb(250, 250, 250);
+  color: grey;
+}
+
+#summarynav.nav-tabs>.active>a, #summarynav.nav-tabs>.active>a:hover, #summarynav.nav-tabs>.active>a:focus {
+  color: #08c;
+  cursor: default;
+  background-color: #FFF;
+  border-bottom: 0px;
+}
+
+#tframe
+{
+   background: url('data:image/svg+xml;charset=utf-8,<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 100% 100%"><text fill="%23000000" x="50%" y="50%" font-family="\'Helvetica Neue\', sans-serif" font-size="24" text-anchor="middle">Loading, please wait...</text></svg>') 0px 0px no-repeat;
 }
