@@ -190,6 +190,20 @@ EMIF Platform - Fingerprint Browser
         python manage.py runserver 0.0.0.0:8000
 
 
+#### Integrate Sentry
+
+Put in settings.py:
+
+* Sentry url must be specified in settings.py globals, on parameter "SENTRY_URL"
+
+* Also:
+
+```
+RAVEN_CONFIG = {
+    'dsn': 'http://hash@host:port/id',
+}
+```
+
 
 
 #### Developers
