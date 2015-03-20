@@ -209,6 +209,8 @@ class PopulationCharacteristic(object):
             #print _filter.value
             #print dict_query
             if comp:
+                print dict_query
+                print 'values.' + _filter.value
                 values =  jerboa_aggregation_collection.find( dict_query ).distinct('values.' + _filter.value )#
             else:
                 values =  jerboa_collection.find( dict_query ).distinct('values.' + _filter.value )#
@@ -254,6 +256,8 @@ class PopulationCharacteristic(object):
         values = sorted(values)
 
         _filter.values = values
+
+
         return filters
         return values
 

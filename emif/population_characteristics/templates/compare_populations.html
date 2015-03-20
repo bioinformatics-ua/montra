@@ -57,7 +57,9 @@
 
     }
     </style>
+<link rel="stylesheet" href="{{ STATIC_URL }}css/dataTables.tableTools.css">
 
+<link rel="stylesheet" href="{{ STATIC_URL }}css/dataTables.bootstrap.css">
 {% endblock %}
 {% block headextra %}
 <script src="{{ STATIC_URL}}js/jquery.dyndropdown.js"></script>
@@ -66,6 +68,11 @@
 <script src="{{ STATIC_URL}}js/emif.charts.draw.js"></script>
 
 <script src="{{ STATIC_URL}}js/emif.populationcharacteristics.comments.js"></script>
+
+<script src="{{ STATIC_URL}}js/jquery.dataTables.js"></script>
+<script src="{{ STATIC_URL}}js/dataTables.tableTools.js"></script>
+<script src="{{ STATIC_URL}}js/dataTables.bootstrap.js"></script>
+
 {% endblock %}
 {% block breadcrumbs %}
 {{ block.super }}
@@ -90,13 +97,11 @@
     <script type="text/javascript">
     var global_fingerprint_id = 'COMPARE';
     var global_public_key = 'anything_works_since_we_are_logged';
+    var fingerprint_store = [];
+    var db_name = "Fingerprint Comparison";
+    {%for fp in fingerprint_ids%}fingerprint_store.push('{{fp}}');{%endfor%}
     </script>
 
-<div class="hide" id="fingerprints_store">
-{%for fp in fingerprint_ids%}
-{{fp}}
-{%endfor%}
-</div>
 <div class="row-fluid">
 {% include "population_characteristics.html" %}
 </div>
@@ -107,6 +112,7 @@
 <div>
 {% block scriptextraincludes %}
 <!--[if gte IE 9]><!-->
+<script src="{{ STATIC_URL}}js/emif.c3js.tabular.js"></script>
 <script src="{{ STATIC_URL}}js/emif.charts.c3d3.js"></script>
 <script src="{{ STATIC_URL}}js/emif.charts.d3.js"></script>
 
@@ -131,6 +137,11 @@
 <script src="{{ STATIC_URL}}js/emif.populationcharacteristics.charts.js"></script>
 
 <script src="{{ STATIC_URL}}js/emif.populationcharacteristics.js"></script>
+<script type="text/javascript">
+    $(function(){
+        $('.graphTypes:first').click();
+    });
+</script>
 <!--<![endif]-->
 
 {% endblock %}
