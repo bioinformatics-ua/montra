@@ -37,7 +37,7 @@ GLOBALS = {
                     <small id="supportability">This website is optimised to Safari, Chrome, Firefox, Opera and IE9+.
                     <!--It runs in IE7-IE8, but it has low performance and no enhanced features.--></small>
                    """,
-    'SENTRY_URL': 'DUMMY_URL_FILL_HERE'
+    'SENTRY_URL': ''
 
 }
 # Header and Footer Settings
