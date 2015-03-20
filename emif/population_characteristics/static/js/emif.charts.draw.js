@@ -43,7 +43,6 @@ function PCDraw(actualChart,chartType, e)
     };
     this.draw = function(filters) {
 
-
       if (PAGE_TYPE==PC_NORMAL)
       {
         var PC = new PCAPI(null);
@@ -68,11 +67,7 @@ function PCDraw(actualChart,chartType, e)
 
         if (PAGE_TYPE==PC_COMPARE)
         {
-
-
-          filters['fingerprint_ids'] = $("#fingerprints_store").text();
-
-
+          filters['fingerprint_ids'] = fingerprint_store;
         }
         valuesFromGraph = PC.getValuesRowWithFilters(this.actualChart.title.fixed_title,
           this.actualChart.y_axis['var'],fingerprintID, revision, filters );

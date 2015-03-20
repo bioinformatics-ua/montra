@@ -312,8 +312,7 @@ var stuff;
               }
             });
             //console.log('JSON_OUTPUT');
-            //console.log(JSON.stringify(JSON_OUTPUT));
-
+            actualChart.filters = filters_tmp;
 
             filter_dropdown = $(this).dyndropdown({
                     label: "Filter",
@@ -339,7 +338,6 @@ var stuff;
 
             filter_dropdown.setStructure(JSON.stringify(JSON_OUTPUT));
 
-            actualChart.filters = filters_tmp;
 
             var match=false;
 
@@ -460,7 +458,7 @@ var stuff;
 
 
             });
-
+            console.log('here');
             actualChart.filters = filters_tmp;
 
 
@@ -470,14 +468,10 @@ var stuff;
                       e.preventDefault();
                       e.stopPropagation();
 
-                      console.log()
-
                       var charDraw = new PCDraw(actualChart, activeChart, null);
 
                       var str = e.target.id;
                       var filterType =str.substring(str.indexOf("_")+1,str.lastIndexOf("_"));
-
-                      console.log('filterType:'+filterType);
 
                       var _value = e.target.innerHTML.trim();
                       if (translationsBack.hasOwnProperty(_value))

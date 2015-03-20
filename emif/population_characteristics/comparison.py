@@ -110,10 +110,7 @@ def handle_compare_values(request, var, row, fingerprint_id, revision, template_
             #    fingerprint_ids.append(i.replace("chks_", ""))
             #    continue
             if "fingerprint_i" in i:
-                fingerprints_transf = request.POST[i].replace("\n", "")
-                fps = fingerprints_transf.split(" ")
-                for fp in fps:
-                    fingerprint_ids.append(fp)
+                fingerprint_ids = request.POST.getlist(i)
                 continue
             filters[i[8:-3]] = myRq[i]
 
@@ -130,6 +127,7 @@ def handle_compare_values(request, var, row, fingerprint_id, revision, template_
     #fingerprint_ids = ["66a47f694ffb676bf7676dfde24900e6", "3dc3d622130eac4d092786afb9a0ec76", "2e303fd12bc5e5fd03a54651dd8d6334"]
 
     values = cp.get_variables(var, row, fingerprints_id=fingerprint_ids, filters=filters, revision=revision)
+
     data = {'values': values}
     response = JSONResponse(data, mimetype="application/json")
     response['Content-Disposition'] = 'inline; filename=files.json'
@@ -191,7 +189,6 @@ class ComparisonPopulation(object):
         dict_query = {'$or': self.__fingerprints_to_mongo_query(fingerprints_id),
             'values.Var': c1.title.var}
 
-
         for ve in vars_that_should_exists:
             dict_query['values.'+ve] = { "$exists" : True }
 
@@ -219,9 +216,11 @@ class ComparisonPopulation(object):
 
         if dict_query_general != []:
             dict_query["$and"]= dict_query_general
-        #print dict_query
-        values =  jerboa_aggregation_collection.find(dict_query )
 
+
+        values = jerboa_aggregation_collection.find(dict_query )
+
+        print values.count()
 
         results = []
 
@@ -238,10 +237,10 @@ class ComparisonPopulation(object):
                     values[_v] = new_y
                     #print values[_v]
             return values
+
         values_app = None
+
         for v in values:
-
-
             if c1.y_axis.transformation != None:
                 try:
                     values_app = transform(c1.y_axis.var, c1.y_axis.transformation,v[u'values'])

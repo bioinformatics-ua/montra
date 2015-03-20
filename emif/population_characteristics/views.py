@@ -141,7 +141,14 @@ def filters(request, var, fingerprint_id, template_name='documents_upload_form.h
     if not hasFingerprintPermissions(request, fingerprint_id):
         return HttpResponse("Access forbidden",status=403)
 
-    pc = PopulationCharacteristic(Fingerprint.objects.get(fingerprint_hash=fingerprint_id).questionnaire.id)
+    qid = None
+    if fingerprint_id != 'COMPARE':
+        try:
+            qid = Fingerprint.objects.get(fingerprint_hash=fingerprint_id).questionnaire.id
+        except Fingerprint.DoesNotExist:
+            pass
+
+    pc = PopulationCharacteristic(qid)
     values = pc.filters(var, fingerprint_id)
     _values = []
     for v in values:

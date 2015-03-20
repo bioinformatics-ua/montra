@@ -419,7 +419,7 @@ class Question(models.Model):
             try:
                 self.__metadict = json.loads(self.metadata)
             except:
-                print "-- ERROR: Couldn't parse json for question meta"
+                #print "-- ERROR: Couldn't parse json for question meta"
                 self.__metadict = {}
 
         return self.__metadict
