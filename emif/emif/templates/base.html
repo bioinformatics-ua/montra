@@ -84,11 +84,13 @@
         <script src="{{ STATIC_URL }}js/vendor/raven_plugins/jquery.js"></script>
 
         <script type="application/javascript">
+            {% if SENTRY_URL != "" %}
             Raven.config('{{SENTRY_URL}}').install();
             Raven.setUser({
                 email: '{{user.get_full_name}}',
                 username: '{{user.email}}'
             });
+            {%  endif %}
         </script>
         <script src="{{ STATIC_URL }}js/vendor/inheritance.js"></script>
         <script src="{{ STATIC_URL }}js/vendor/modernizr-2.6.2.min.js"></script>
