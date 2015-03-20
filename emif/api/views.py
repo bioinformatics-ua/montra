@@ -1058,9 +1058,10 @@ class SearchSuggestionsView(APIView):
 
             result = []
 
-            if len(phrase) > 0:
 
-                solrlink = 'http://' +settings.SOLR_HOST+ ':'+ settings.SOLR_PORT+settings.SOLR_PATH+ '/suggestions/select?q=query_autocomplete:('+urllib.quote(phrase.replace('"',''))+')&fq=user_id:'+str(request.user.id)+'&wt=json'
+
+            if len(phrase) > 0:
+                solrlink = 'http://' +settings.SOLR_HOST+ ':'+ settings.SOLR_PORT+settings.SOLR_PATH+ '/suggestions/select?q=query_autocomplete:('+urllib.quote(phrase.replace('"','').replace(':', '\:'))+')&fq=user_id:'+str(request.user.id)+'&wt=json'
 
                 facets = json.load(urllib2.urlopen(solrlink))['facet_counts']['facet_fields']['query']
 
