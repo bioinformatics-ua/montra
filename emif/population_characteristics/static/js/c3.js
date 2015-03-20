@@ -3597,7 +3597,11 @@
 
         if(config.tooltip_format_percentage){
             for (i = 0; i < d.length; i++) {
-                total += d[i].value;
+                try {
+                    total += d[i].value;
+                } catch(ex){
+                    total += 0;
+                }
             }
             colspan=3;
         }

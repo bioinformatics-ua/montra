@@ -102,7 +102,9 @@ def document_form_view_upload(request, fingerprint_id, template_name='documents_
     data_jerboa = pc.submit_new_revision(request.user, fingerprint_id, revision, path_file)
 
 
-    aggregation.apply_async([fingerprint_id, data_jerboa])
+    #aggregation.apply_async([fingerprint_id, data_jerboa])
+    aggregation(fingerprint_id, data_jerboa)
+
     response = JSONResponse(data, mimetype=response_mimetype(request))
     response['Content-Disposition'] = 'inline; filename=files.json'
     return response

@@ -36,7 +36,9 @@ GLOBALS = {
                     <!-- EXTRA HTML FOOTER CODE HERE -->
                     <small id="supportability">This website is optimised to Safari, Chrome, Firefox, Opera and IE9+.
                     <!--It runs in IE7-IE8, but it has low performance and no enhanced features.--></small>
-                   """
+                   """,
+    'SENTRY_URL': 'DUMMY_URL_FILL_HERE'
+
 }
 # Header and Footer Settings
 
@@ -59,7 +61,6 @@ else:
 ADMINS = (
     ('Luis A. Bastiao Silva', 'bastiao@ua.pt'),
     ('José Luis Oliveira', 'jlo@ua.pt'),
-    ('Tiago Godinho', 'tmgodinho@ua.pt'),
     ('Ricardo Ribeiro', 'ribeiro.r@ua.pt'),
 )
 
@@ -526,11 +527,13 @@ LOGIN_EXEMPT_URLS = (
 
     r'^docsmanager/docfiles/(?P<fingerprint>[^/]+)/$',
     r'^api/getfile',
+    r'^controlversion/github_event$',
 
 )
 
 #Pages that wont be logged into user history
 DONTLOG_URLS = (
+    r'^controlversion/github_event$',
     r'^fingerprintqs/(?P<runcode>[^/]+)/(?P<qsid>[0-9]+)/$',
     r'^api/(?P<anything>[^/]*)',
     r'^docsmanager/uploadfile/(?P<fingerprint_id>[^/]+)/$',

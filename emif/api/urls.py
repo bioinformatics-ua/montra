@@ -28,6 +28,8 @@ from public.api import *
 
 from statistics.api import *
 
+from questionnaire.api import *
+
 urlpatterns = patterns('api.views',
     url(r'^root/$', 'api_root'),
     url(r'^emailcheck$', EmailCheckView.as_view(), name='emailcheck'),
@@ -74,13 +76,11 @@ urlpatterns = patterns('api.views',
 
     url(r'^topnavigators$', TopNavigatorsView.as_view(), name='topnavigators'),
 
-
-
-
     url(r'statistics/(?P<fingerprint_schema_id>[^/]+)/(?P<operation>[^/]+)/(?P<ttype>[^/]+)/(?P<ttype2>[^/]+)/$', \
         FingerprintSchemas.as_view(), name='databasesglobal'),
 
-
+    # questionnaire api services
+    url(r'^wizards$', QuestionnaireWizardView.as_view(), name='wizards'),
 
 
 )

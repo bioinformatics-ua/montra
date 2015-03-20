@@ -123,7 +123,7 @@ class ExportQuestionnaireExcel(ExportQuestionnaire):
     __validateyesno = DataValidation(type="list", formula1='"Yes, No"', allow_blank=True)
 
 
-    __validateqtype = DataValidation(type="list", formula1='"open,open-button,open-upload-image,open-textfield,open-validated,choice-yesno,choice-yesnocomment,choice-yesnodontknow,comment,choice,choice-freeform,choice-multiple,choice-multiple-freeform,range,timeperiod,publication,sameas,custom,datepicker"', allow_blank=True)
+    __validateqtype = DataValidation(type="list", formula1='"open,open-button,open-upload-image,open-textfield,open-location,open-validated,choice-yesno,choice-yesnocomment,choice-yesnodontknow,comment,choice,choice-freeform,choice-multiple,choice-multiple-freeform,range,timeperiod,publication,sameas,custom,datepicker"', allow_blank=True)
 
     __validatecstate = DataValidation(type="list", formula1='"visible"', allow_blank=True)
 

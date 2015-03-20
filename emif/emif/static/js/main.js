@@ -84,19 +84,79 @@ $(function(){
     }
 
     handleQuickSearch();
+
+    handleWizards();
 });
 
 function handleQuickSearch(){
- $( ".search-query" ).autocomplete({
-source: "api/searchsuggestions",
-minLength: 2,
-open: function() {
-$( this ).removeClass( "ui-corner-all" ).addClass( "ui-corner-top" );
-},
-close: function() {
-$( this ).removeClass( "ui-corner-top" ).addClass( "ui-corner-all" );
+    $( ".search-query" ).autocomplete({
+        source: "api/searchsuggestions",
+        minLength: 2,
+        open: function() {
+            $( this ).removeClass( "ui-corner-all" ).addClass( "ui-corner-top" );
+        },
+        close: function() {
+            $( this ).removeClass( "ui-corner-top" ).addClass( "ui-corner-all" );
+        }
+    });
+
+    
 }
-});
+
+function handleWizards(){
+    $.get("api/wizards", function(data) {
+        console.log("Loading wizards, if any");
+        wizards = data.wizards;
+        wizards_len = wizards.length;
+        if (wizards && wizards_len != 0) {
+            line = "";
+
+            for(var i=0;i<wizards_len;i++){
+                line += '<tr>\
+                            <td>'+wizards[i].name+'</td>\
+                            <td class="pull-center">\
+                                <input type="radio" name="'+wizards[i].id+'" value="0" checked />\
+                            </td>\
+                            <td class="pull-center"><input type="radio" name="'+wizards[i].id+'" value="1" />\
+                            </td>\
+                        </tr>';
+            }
+
+            bootbox.dialog('<div class="modal-header">\
+                                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>\
+                                <h3>New questionnaire types</h3>\
+                            </div>\
+                            <div class="medium-margin">\
+                                <p>New questionnaire types have been created. Below it is possible to add them to the user preferences.</p>\
+                                <form id="wizard_form">\
+                                    <table class="table">\
+                                        <thead>\
+                                        <tr>\
+                                            <th>Questionnaire Type</th>\
+                                            <th class="pull-center">Ignore</th>\
+                                            <th class="pull-center">Interested</th>\
+                                        </tr>\
+                                        </thead>\
+                                        <tbody>\
+                                        '+line+'</tbody>\
+                                    </table>\
+                                </form>\
+                            </div>', [{
+                "label" : "Save new interests",
+                "class" : "btn-success",
+                "callback": function() {
+                    $.post('api/wizards', $('#wizard_form').serialize())
+                        .done(function(data) {
+                            console.log(data.success);
+                        })
+                        .fail(function(data) {
+                            bootbox.alert('Could not save preferences for new questionnary types, please try again. If the problem persists contact the administrator.')
+                        })
+                }
+            }]);
+        }
+
+    });
 }
 
 $(function() {

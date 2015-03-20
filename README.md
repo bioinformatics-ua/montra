@@ -40,7 +40,7 @@ EMIF Platform - Fingerprint Browser
         
         sudo apt-get -y install solr-tomcat
 
-        Go to folder /conf/solr/ and copy all the files to the solr default core configuration 
+        Go to folder emif-fb-root/conf/solr/ and copy all the files to the solr default core configuration 
 
 
 6.  Install and Configure PostgreSQL
@@ -48,6 +48,7 @@ EMIF Platform - Fingerprint Browser
         1)  sudo apt-get install postgresql
 
         2)  sudo su postgres
+            psql 
                 CREATE ROLE user superuser;
                 CREATE USER emif_dev;
                 GRANT user To emif_dev;
@@ -188,6 +189,20 @@ EMIF Platform - Fingerprint Browser
     4) Start Django
         python manage.py runserver 0.0.0.0:8000
 
+
+#### Integrate Sentry
+
+Put in settings.py:
+
+* Sentry url must be specified in settings.py globals, on parameter "SENTRY_URL"
+
+* Also:
+
+```
+RAVEN_CONFIG = {
+    'dsn': 'http://hash@host:port/id',
+}
+```
 
 
 
