@@ -31,7 +31,7 @@ GLOBALS = {
     'BRAND': "EMIF Catalogue",
     # url based upon STATIC_URL
     'BRAND_LOGO': "img/emif_logo_trans.png",
-    'COPYRIGHT': "© EMIF Catalogue v",
+    'COPYRIGHT': "© EMIF Catalogue",
     'FOOTER_EXTRA': """
                     <!-- EXTRA HTML FOOTER CODE HERE -->
                     <small id="supportability">This website is optimised to Safari, Chrome, Firefox, Opera and IE9+.
@@ -46,8 +46,8 @@ GLOBALS = {
 # for this files we must change it manually (or serve them as dinamic files), this problem only ocurrs on IE
 # so if changing to something that not /, we should also change on file /static/css/bootstrap_ie_compatibility.css all relative # paths. This is necessary because i cant use django template variables inside a considered static file.
 BASE_URL = '/'
-VERSION = '0.3.1'
-VERSION_DATE = '2014.Feb.08'
+VERSION = '1.0'
+VERSION_DATE = '2015.Mar.22 - 21:03UTC'
 PROJECT_DIR_ROOT = '/projects/emif-dev/'
 
 if DEBUG:
