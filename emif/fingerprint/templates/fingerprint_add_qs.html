@@ -1,3 +1,8 @@
+{% load extra_tags %}
+{% load markup questionnaire i18n %}
+{% setglobal h1_already 0 %}
+{% setglobal h1_last 0 %}
+
 {% comment %}
 # -*- coding: utf-8 -*-
 # Copyright (C) 2014 Universidade de Aveiro, DETI/IEETA, Bioinformatics Group - http://bioinformatics.ua.pt/
@@ -16,10 +21,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 {% endcomment %}
 
-{% load extra_tags %}
-{% load markup questionnaire i18n %}
-{% setglobal h1_already 0 %}
-{% setglobal h1_last 0 %}
+
 {% if not readonly %}
 <form name="qform{{ questions_list.0.0.sortid }}" id="qform{{ questions_list.0.0.sortid }}" action="addPost/{{questionset.questionnaire.pk}}/1/{{questions_list.0.0.sortid}}" method="POST" enctype="multipart/form-data">
 {% else %}
