@@ -191,7 +191,7 @@ class LastUsersView(APIView):
             users = User.objects.all().order_by('-last_login')[:10]
 
             for user in users:
-                last_users.append(user.get_full_name())
+                last_users.append({'user': user.get_full_name(), 'last_login': user.last_login.strftime("%Y-%m-%d %H:%M:%S")})
 
             response = Response({'lastusers': last_users}, status=status.HTTP_200_OK)
 

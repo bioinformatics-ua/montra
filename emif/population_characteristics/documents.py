@@ -153,6 +153,7 @@ def document_form_view(request, runcode, qs, activetab='summary', readOnly=False
     template_name='documents_upload_form.html'):
 
     h = None
+
     if "query" in request.session and "highlight_results" in request.session:
         h = request.session["highlight_results"]
     qsets, name, db_owners, fingerprint_ttype = createqsets(runcode, highlights=h)
@@ -164,9 +165,9 @@ def document_form_view(request, runcode, qs, activetab='summary', readOnly=False
         if (not request.user.is_anonymous()):
             eprofile = EmifProfile.objects.get(user=request.user)
 
-        if eprofile.restricted == True:
-            if not eprofile.has_permission(runcode):
-                raise PermissionDenied
+            if eprofile.restricted == True:
+                if not eprofile.has_permission(runcode):
+                    raise PermissionDenied
 
 
     except EmifProfile.DoesNotExist:
