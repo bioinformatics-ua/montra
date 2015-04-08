@@ -127,7 +127,9 @@ class DeveloperVersionView(TemplateView):
 
         # if approval request
         if request.POST.get('submit', None):
-            v = PluginVersion.submit(plugin_hash, version)
+            desc = request.POST.get('description', None)
+
+            v = PluginVersion.submit(plugin_hash, version, desc)
         # if normal update
         else:
             version_new = request.POST.get('version', None)

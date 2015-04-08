@@ -132,7 +132,7 @@ class PluginVersion(models.Model):
 
     approved    = models.BooleanField(default=False)
     submitted   = models.BooleanField(default=False)
-
+    submitted_desc = models.TextField(null=True)
     create_date     = models.DateTimeField(auto_now_add=True)
     latest_update   = models.DateTimeField(auto_now=True)
 
@@ -163,7 +163,7 @@ class PluginVersion(models.Model):
         return pv
 
     @staticmethod
-    def submit(plugin_hash, version):
+    def submit(plugin_hash, version, desc):
         from developer.tasks import sendCommitEmails
 
         pv  = None
@@ -174,6 +174,7 @@ class PluginVersion(models.Model):
 
             pv.submitted = True
             pv.approved = False
+            pv.submitted_desc = desc
 
             sendCommitEmails.apply_async([p, pv])
 
