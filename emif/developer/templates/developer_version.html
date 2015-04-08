@@ -93,9 +93,9 @@
 confs = {
     name: "New widget",
 };
-plugin = function(self){
-    self.html('Hello world');
-    self.refresh();
+plugin = function(sdk){
+    sdk.html('Hello world');
+    sdk.refresh();
 };
     {% else %}
 {{version.path}}
