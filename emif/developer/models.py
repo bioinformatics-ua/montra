@@ -22,10 +22,12 @@ class Plugin(models.Model):
     GLOBAL      = 0
     DATABASE    = 1
     THIRD_PARTY = 2
+    FULL_FLEDGED= 3
 
     TYPES = [
                 (GLOBAL,        'Global plugin, for the main dashboard'),
                 (DATABASE,      'Database related plugin, for the database view'),
+                (FULL_FLEDGED,  'Full-fledged application widget'),
                 (THIRD_PARTY,   'Third party full-fledged applications')
             ]
 
