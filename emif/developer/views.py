@@ -22,6 +22,12 @@ from django.http import Http404, HttpResponseRedirect
 from models import *
 from django import forms
 
+from django.conf import settings
+
+FPATH = settings.PROJECT_DIR_ROOT  + 'emif/static/files/'
+
+import uuid
+
 class DeveloperListView(TemplateView):
     template_name = "developer.html"
 
@@ -176,6 +182,94 @@ class DeveloperVersionView(TemplateView):
                 'next_version': next_version,
                 'prev_code':  prev_code,
                 'developer': True
+            })
+
+class DeveloperDepsView(TemplateView):
+    template_name   = "developer_deps.html"
+
+    def post(self, request, plugin_hash, version):
+
+        plugin = version_obj = next_version = prev_code = deps = None
+        try:
+            plugin = Plugin.objects.get(slug=plugin_hash, owner=request.user)
+        except Plugin.DoesNotExist:
+            pass
+
+        try:
+            version_obj = PluginVersion.all(plugin=plugin).get(version=version)
+
+        except PluginVersion.DoesNotExist:
+            pass
+        except PluginVersion.MultipleObjectsReturned:
+            version_obj = PluginVersion.all(plugin=plugin).filter(version=version)[0]
+
+        if plugin != None and version_obj != None:
+            fdir = '%s%s/%d/' % (FPATH, plugin.slug, version_obj.version)
+            fdir_pub = '%s/%d/' % (plugin.slug, version_obj.version)
+            # create folder if doesnt exist:
+            if not os.path.exists(fdir):
+                os.makedirs(fdir)
+
+            # Create new files (are always new since its a new revision)
+            if request.FILES:
+                for f in request.FILES.getlist('files'):
+                    # Handle file
+                    r = str(uuid.uuid1()).replace('-','')
+                    fname = os.path.join(fdir, '%s_%s' % (r, f.name))
+                    fname_pub = os.path.join(fdir_pub, '%s_%s' % (r, f.name))
+
+                    with open(fname, 'wb+') as destination:
+                        for chunk in f.chunks():
+                            destination.write(chunk)
+
+                    vd = VersionDep(
+                            pluginversion=version_obj,
+                            revision=r,
+                            path=fname_pub,
+                            filename=f.name,
+                            size=f.size
+                        )
+                    vd.save()
+
+
+        return self.get(request, plugin_hash=plugin_hash, version=version)
+
+    def get(self, request, plugin_hash, version):
+        plugin = version_obj = next_version = prev_code = deps = None
+        try:
+            plugin = Plugin.objects.get(slug=plugin_hash, owner=request.user)
+        except Plugin.DoesNotExist:
+            pass
+
+        try:
+            version_obj = PluginVersion.all(plugin=plugin).get(version=version)
+
+            deps = VersionDep.unique(version=version_obj)
+
+        except PluginVersion.DoesNotExist:
+            try:
+                prev_pv = PluginVersion.all(plugin=plugin)[0]
+                next_version = prev_pv.version + 1
+                prev_code = prev_pv.path
+            except IndexError:
+                next_version = 1
+
+        except PluginVersion.MultipleObjectsReturned:
+
+            version_obj = PluginVersion.all(plugin=plugin).filter(version=version)[0]
+
+
+        return render(request, self.template_name,
+            {
+                'request': request,
+                'breadcrumb': True,
+                'plugin': plugin,
+                'version': version_obj,
+                'next_version': next_version,
+                'prev_code':  prev_code,
+                'developer': True,
+                'dependencies': deps,
+                'parent': 'developer/%s/%s' %(str(plugin.slug), str(version_obj.version))
             })
 
 class DeveloperLiveView(TemplateView):

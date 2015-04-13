@@ -17,6 +17,8 @@ from django.db import models
 from django.contrib.auth.models import User
 import os
 
+from django.db.models import Max
+
 # There are three types of plugins:
 class Plugin(models.Model):
     GLOBAL      = 0
@@ -45,7 +47,10 @@ class Plugin(models.Model):
         return self.latest_update.strftime("%Y-%m-%d %H:%M:%S")
 
     def type_repr(self):
-        return dict(self.TYPES)[self.type]
+        try:
+            return dict(self.TYPES)[self.type]
+        except KeyError:
+            return "TYPE ERROR"
 
     @staticmethod
     def __generateSlug(name):
@@ -227,3 +232,35 @@ class PluginVersion(models.Model):
     class Meta:
         ordering = ['-version']
         verbose_name_plural = "Plugin versions waiting for approval"
+
+
+# Upload dependencies
+class VersionDep(models.Model):
+    pluginversion = models.ForeignKey(PluginVersion)
+    created_date = models.DateTimeField(auto_now_add=True)
+    latest_date = models.DateTimeField(auto_now=True)
+    revision = models.CharField(max_length=255)
+    path = models.CharField(max_length=255)
+    filename = models.CharField(max_length=255)
+    size = models.FloatField(default=0)
+    removed = models.BooleanField()
+
+    @staticmethod
+    def all(version=None):
+        tmp = VersionDep.objects.filter(removed=False)
+
+        if version != None:
+            tmp = tmp.filter(pluginversion=version)
+
+        return tmp
+
+    @staticmethod
+    def unique(version=None):
+        version_deps = VersionDep.all(version=version)
+
+        deps = version_deps.values('filename').annotate(latest=Max('latest_date'))
+        uniquedeps = []
+        for file in deps:
+            uniquedeps.append(version_deps.get(filename = file['filename'], latest_date = file['latest']))
+
+        return uniquedeps
