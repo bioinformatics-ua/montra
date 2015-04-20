@@ -17,7 +17,7 @@ All terminal commands can be executed, but whenever we use something between '<'
 
 1.  Install packages
 
-        $ 	sudo apt-get install git python-pip curl mongodb postgresql rabbitmq-server libxml2-dev libxslt1-dev python-dev libpython-dev build-essential libyaml-dev
+        $ 	sudo apt-get install git python-pip curl mongodb postgresql rabbitmq-server libxml2-dev libxslt1-dev python-dev libpython-dev build-essential libyaml-dev postgres-server-dev-9.4
 
 2. Checkout of the source code
 
