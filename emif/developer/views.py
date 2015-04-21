@@ -28,6 +28,9 @@ FPATH = settings.PROJECT_DIR_ROOT  + 'emif/static/files/'
 
 import uuid
 
+from zipfile import ZipFile, ZipExtFile
+import shutil
+
 class DeveloperListView(TemplateView):
     template_name = "developer.html"
 
@@ -187,6 +190,31 @@ class DeveloperVersionView(TemplateView):
 class DeveloperDepsView(TemplateView):
     template_name   = "developer_deps.html"
 
+    def handleFile(self, version_obj, fdir, fdir_pub, f):
+        r = str(uuid.uuid1()).replace('-','')
+        fname = os.path.join(fdir, '%s_%s' % (r, f.name))
+        fname_pub = os.path.join(fdir_pub, '%s_%s' % (r, f.name))
+
+        size = None
+        if isinstance(f, ZipExtFile):
+            output = file(fname, "wb+")
+            shutil.copyfileobj(f, output)
+            size = os.path.getsize(fname)
+        else:
+            with open(fname, 'wb+') as destination:
+                for chunk in f.chunks():
+                    destination.write(chunk)
+            size = f.size
+
+        vd = VersionDep(
+                pluginversion=version_obj,
+                revision=r,
+                path=fname_pub,
+                filename=f.name,
+                size=size
+            )
+        vd.save()
+
     def post(self, request, plugin_hash, version):
 
         plugin = version_obj = next_version = prev_code = deps = None
@@ -210,26 +238,27 @@ class DeveloperDepsView(TemplateView):
             if not os.path.exists(fdir):
                 os.makedirs(fdir)
 
+
             # Create new files (are always new since its a new revision)
             if request.FILES:
                 for f in request.FILES.getlist('files'):
                     # Handle file
-                    r = str(uuid.uuid1()).replace('-','')
-                    fname = os.path.join(fdir, '%s_%s' % (r, f.name))
-                    fname_pub = os.path.join(fdir_pub, '%s_%s' % (r, f.name))
+                    if f.content_type == 'application/zip':
 
-                    with open(fname, 'wb+') as destination:
-                        for chunk in f.chunks():
-                            destination.write(chunk)
+                        with ZipFile(f) as zip_file:
+                            for member in zip_file.namelist():
+                                filename = os.path.basename(member)
+                                # skip directories
+                                if not filename:
+                                    continue
 
-                    vd = VersionDep(
-                            pluginversion=version_obj,
-                            revision=r,
-                            path=fname_pub,
-                            filename=f.name,
-                            size=f.size
-                        )
-                    vd.save()
+                                # copy file (taken from zipfile's extract)
+                                source = zip_file.open(member)
+                                with source:
+                                    self.handleFile(version_obj, fdir, fdir_pub, source)
+
+                    else:
+                        self.handleFile(version_obj, fdir, fdir_pub, f)
 
 
         return self.get(request, plugin_hash=plugin_hash, version=version)
@@ -271,6 +300,7 @@ class DeveloperDepsView(TemplateView):
                 'dependencies': deps,
                 'parent': 'developer/%s/%s' %(str(plugin.slug), str(version_obj.version))
             })
+
 
 class DeveloperLiveView(TemplateView):
     template_name   = "developer_live.html"
