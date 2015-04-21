@@ -45,4 +45,23 @@ $(function(){
 
     });
 
+    $('#submit-version').click(function(){
+        var desc = $('#approval_desc').val();
+        console.log(desc);
+
+        bootbox.confirm('<div class="form"><div class="control-group"><div class="controls">\
+            <textarea id="descriptionapp" class="fullwidth" rows="8" \
+            placeholder="Write a submission description if deemed necessary.">'+
+            desc+'</textarea>\
+            </div></div></div>'
+        , function(result) {
+          if (result) {
+            console.log('hey ho');
+            $('#approval_desc').val($('#descriptionapp').val());
+
+            $('#submit_me').click();
+          }
+        });
+    });
+
 });

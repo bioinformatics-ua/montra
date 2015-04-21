@@ -146,4 +146,37 @@
                 window.location.replace('{{version.path|safe}}');
             </script>
     {% endif %}
+    {% if plugin.type == 3 %}
+    <script src="{{ STATIC_URL}}js/emif.globalwidget.js"></script>
+    <script src="{{ STATIC_URL}}js/widget/widget.globalplug_shell.js"></script>
+    <script src="{{ STATIC_URL}}js/emif.livepreview_global.js"></script>
+
+        <div id="playground_test" style="margin-left: 0px;">
+            {% if not version.is_remote %}
+            <script type="text/javascript">
+                console.log('LIVE PREVIEW FOR LOCAL FILE, GLOBAL WIDGETS');
+                sandbox('{{plugin.slug}}',
+                    function(callback){
+                        var confs, plugin;
+
+                        {{version.path|safe}}
+
+                        if(callback) callback(confs, plugin);
+
+                    });
+            </script>
+            {% else %}
+                <script type="text/javascript">
+                    console.log('LIVE PREVIEW FOR REMOTE FILE, GLOBAL WIDGETS')
+                    $.get('{{version.path|safe}}')
+                        .done(function(data){
+                            sandbox('{{plugin.slug}}', data);
+                        })
+                        .fail(function(data){
+                            codeError("We couldn't obtain the remote plugin from url: '{{version.path|safe}}'");
+                        });
+                </script>
+            {%endif%}
+        </div>
+    {% endif %}
 {% endblock %}

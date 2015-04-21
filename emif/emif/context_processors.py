@@ -54,4 +54,7 @@ def globals(request):
     return settings.GLOBALS
 
 def thirdparty(request):
-    return { 'thirdparty': PluginVersion.all_valid(type=Plugin.THIRD_PARTY)}
+    return {
+        'thirdparty': PluginVersion.all_valid(type=Plugin.THIRD_PARTY),
+        'globalwidgets': PluginVersion.all_valid(type=Plugin.FULL_FLEDGED)
+        }
