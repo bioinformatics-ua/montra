@@ -27,9 +27,9 @@
 
                 {% if questions_list.0.0.prev %}
                     {% if aqid %}
-                        <a href="advancedSearch/{{ questionset.questionnaire.pk }}/{{ questions_list.0.0.prev.sortid }}" class="btn large primary" onclick="questionsets_handle('qs_{{ questions_list.0.0.prev.sortid }}', '{{questionset.questionnaire.pk}}', '{{aqid}}', QsType.SEARCH);  return false;"><i class="icon-chevron-left"></i>&nbsp; {% trans "Previous" %}</a>
+                        <a href="advancedSearch/{{ questionset.questionnaire.pk }}/{{ questions_list.0.0.prev.sortid }}" class="btn large primary" onclick="questionsets_handle(getPrevSet(), '{{questionset.questionnaire.pk}}', '{{aqid}}', QsType.SEARCH);  return false;"><i class="icon-chevron-left"></i>&nbsp; {% trans "Previous" %}</a>
                     {% else %}
-                        <a href="advancedSearch/{{ questionset.questionnaire.pk }}/{{ questions_list.0.0.prev.sortid }}" class="btn large primary" onclick="questionsets_handle('qs_{{ questions_list.0.0.prev.sortid }}', '{{questionset.questionnaire.pk}}', null, QsType.SEARCH);  return false;"><i class="icon-chevron-left"></i>&nbsp; {% trans "Previous" %}</a>
+                        <a href="advancedSearch/{{ questionset.questionnaire.pk }}/{{ questions_list.0.0.prev.sortid }}" class="btn large primary" onclick="questionsets_handle(getPrevSet(), '{{questionset.questionnaire.pk}}', null, QsType.SEARCH);  return false;"><i class="icon-chevron-left"></i>&nbsp; {% trans "Previous" %}</a>
                     {% endif %}
                 {% endif %}
                 {% if questions_list.0.0.prev and questions_list.0.0.next %}
@@ -37,9 +37,9 @@
                 {% endif %}
                 {% if questions_list.0.0.next and questions_list.0.0.next.sortid != 99 %}
                     {% if aqid %}
-                        <a href="advancedSearch/{{ questionset.questionnaire.pk }}/{{ questions_list.0.0.next.sortid }}" class="btn large primary" onclick="questionsets_handle('qs_{{ questions_list.0.0.next.sortid }}', '{{questionset.questionnaire.pk}}', '{{aqid}}', QsType.SEARCH);  return false;">{% trans "Next" %} &nbsp;<i class="icon-chevron-right"></i></a>
+                        <a href="advancedSearch/{{ questionset.questionnaire.pk }}/{{ questions_list.0.0.next.sortid }}" class="btn large primary" onclick="questionsets_handle(getNextSet(), '{{questionset.questionnaire.pk}}', '{{aqid}}', QsType.SEARCH);  return false;">{% trans "Next" %} &nbsp;<i class="icon-chevron-right"></i></a>
                     {% else %}
-                        <a href="advancedSearch/{{ questionset.questionnaire.pk }}/{{ questions_list.0.0.next.sortid }}" class="btn large primary" onclick="questionsets_handle('qs_{{ questions_list.0.0.next.sortid }}', '{{questionset.questionnaire.pk}}', null, QsType.SEARCH);  return false;">{% trans "Next" %} &nbsp;<i class="icon-chevron-right"></i></a>
+                        <a href="advancedSearch/{{ questionset.questionnaire.pk }}/{{ questions_list.0.0.next.sortid }}" class="btn large primary" onclick="questionsets_handle(getNextSet(), '{{questionset.questionnaire.pk}}', null, QsType.SEARCH);  return false;">{% trans "Next" %} &nbsp;<i class="icon-chevron-right"></i></a>
                     {% endif %}
                 {% endif %}
 
@@ -202,9 +202,9 @@
 
                 {% if questions_list.0.0.prev %}
                     {% if aqid %}
-                        <a href="advancedSearch/{{ questionset.questionnaire.pk }}/{{ questions_list.0.0.prev.sortid }}" class="btn large primary" onclick="questionsets_handle('qs_{{ questions_list.0.0.prev.sortid }}', '{{questionset.questionnaire.pk}}', '{{aqid}}', QsType.SEARCH);  return false;"><i class="icon-chevron-left"></i>&nbsp; {% trans "Previous" %}</a>
+                        <a href="advancedSearch/{{ questionset.questionnaire.pk }}/{{ questions_list.0.0.prev.sortid }}" class="btn large primary" onclick="questionsets_handle(getPrevSet(), '{{questionset.questionnaire.pk}}', '{{aqid}}', QsType.SEARCH);  return false;"><i class="icon-chevron-left"></i>&nbsp; {% trans "Previous" %}</a>
                     {% else %}
-                        <a href="advancedSearch/{{ questionset.questionnaire.pk }}/{{ questions_list.0.0.prev.sortid }}" class="btn large primary" onclick="questionsets_handle('qs_{{ questions_list.0.0.prev.sortid }}', '{{questionset.questionnaire.pk}}', null, QsType.SEARCH);  return false;"><i class="icon-chevron-left"></i>&nbsp; {% trans "Previous" %}</a>
+                        <a href="advancedSearch/{{ questionset.questionnaire.pk }}/{{ questions_list.0.0.prev.sortid }}" class="btn large primary" onclick="questionsets_handle(getPrevSet(), '{{questionset.questionnaire.pk}}', null, QsType.SEARCH);  return false;"><i class="icon-chevron-left"></i>&nbsp; {% trans "Previous" %}</a>
                     {% endif %}
                 {% endif %}
                 {% if questions_list.0.0.prev and questions_list.0.0.next %}
@@ -212,9 +212,9 @@
                 {% endif %}
                 {% if questions_list.0.0.next and questions_list.0.0.next.sortid != 99 %}
                     {% if aqid %}
-                        <a href="advancedSearch/{{ questionset.questionnaire.pk }}/{{ questions_list.0.0.next.sortid }}" class="btn large primary" onclick="questionsets_handle('qs_{{ questions_list.0.0.next.sortid }}', '{{questionset.questionnaire.pk}}', '{{aqid}}', QsType.SEARCH);  return false;">{% trans "Next" %} &nbsp;<i class="icon-chevron-right"></i></a>
+                        <a href="advancedSearch/{{ questionset.questionnaire.pk }}/{{ questions_list.0.0.next.sortid }}" class="btn large primary" onclick="questionsets_handle(getNextSet(), '{{questionset.questionnaire.pk}}', '{{aqid}}', QsType.SEARCH);  return false;">{% trans "Next" %} &nbsp;<i class="icon-chevron-right"></i></a>
                     {% else %}
-                        <a href="advancedSearch/{{ questionset.questionnaire.pk }}/{{ questions_list.0.0.next.sortid }}" class="btn large primary" onclick="questionsets_handle('qs_{{ questions_list.0.0.next.sortid }}', '{{questionset.questionnaire.pk}}', null, QsType.SEARCH);  return false;">{% trans "Next" %} &nbsp;<i class="icon-chevron-right"></i></a>
+                        <a href="advancedSearch/{{ questionset.questionnaire.pk }}/{{ questions_list.0.0.next.sortid }}" class="btn large primary" onclick="questionsets_handle(getNextSet(), '{{questionset.questionnaire.pk}}', null, QsType.SEARCH);  return false;">{% trans "Next" %} &nbsp;<i class="icon-chevron-right"></i></a>
                     {% endif %}
                 {% endif %}
 
