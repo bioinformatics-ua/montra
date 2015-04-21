@@ -287,8 +287,10 @@
                                                         {% endfor %}
 
                                                 {% endif %}
-                                                {% if globalwidget|length > 0%}
-                                                    <li class="divider"></li>
+                                                {% if globalwidgets|length > 0%}
+                                                    {% if thirdparty|length > 0 %}
+                                                        <li class="divider"></li>
+                                                    {% endif %}
                                                     {%for tp in globalwidgets %}
                                                     <li>
                                                         <a href="apps/gp/{{tp.plugin.slug}}">{{tp.plugin.name}}</a>
