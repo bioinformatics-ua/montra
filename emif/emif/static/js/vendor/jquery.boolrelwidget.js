@@ -179,6 +179,7 @@
             getBooleanIndex: function(element) {
 
                 var i = 0;
+                console.log(basic_blocks);
                 for (i = 0; i < basic_blocks.length; i++) {
                     // We must check this is a "empty" container with only one element (the one we want).
                     if (basic_blocks[i].containsOnly(element))
@@ -192,11 +193,17 @@
                 if (!(Object.prototype.toString.call(list) === '[object Array]')) {
                     console.warn('Tried to pass a list which is not a list');
                 }
+                console.log(list);
+
                 var i = 0;
                 for (i = 0; i < list.length; i++) {
                     // We must check this is a "empty" container with only one element (the one we want).
-                    if (list[i].containsOnly(element))
-                        return i;
+                    if(list[i] instanceof BooleanGroup)
+                        if (list[i].containsOnly(element))
+                            return i;
+                    else
+                        if(list[i] === element)
+                            return i;
                 }
                 return -1;
             },
@@ -705,6 +712,7 @@
                 funcs.setCookie('boolrelwidget-panel-open', 'false');
             },
             addExpandedContainer: function(container) {
+                console.log('ADD EXPANDED CONTAINER');
                 if (this.getIndex(expanded_containers, container) == -1) {
                     expanded_containers.push(container);
                 } else {
@@ -712,6 +720,7 @@
                 }
             },
             removeExpandedContainer: function(container) {
+
                 var index = this.getIndex(expanded_containers, container);
                 if (index != -1) {
                     expanded_containers.splice(index, 1);

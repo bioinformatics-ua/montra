@@ -314,7 +314,10 @@ $(document).ready(function() {
     });
 
     function endsWith(str, suffix) {
-        return str.indexOf(suffix, str.length - suffix.length) !== -1;
+        if(str)
+            return str.indexOf(suffix, str.length - suffix.length) !== -1;
+
+        return false;
     }
     advValidator.onInit();
 
@@ -337,6 +340,9 @@ $(document).ready(function() {
             return false;
 
         var el = e.target;
+
+        if(!el.id)
+            return;
 
         var id_answered = el.id.split("_")[1];
         var id_answered_aux = el.id.split("_")[1].replace(/\./g, '');

@@ -359,6 +359,16 @@ function initQsEnv(fingerprint_id, q_id, sortid, mode) {
     }
 
 }
+function getPrevSet(){
+    var prev_id = $('.nav-pills .active').prev('[id^="li_qs"]').attr('id');
+    if(prev_id)
+        return prev_id.replace('li_','');
+}
+function getNextSet(){
+    var next_id = $('.nav-pills .active + li').attr('id');
+    if(next_id)
+        return next_id.replace('li_','');
+}
 
 function questionsets_handle(id_questionset, fingerprint_id, q_id, mode) {
     if (!e) var e = window.event;
