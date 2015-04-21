@@ -135,7 +135,7 @@ plugin = function(sdk){
                         {% csrf_token %}
                         <input name="submit" type="hidden" value="submit" />
                         <input id="approval_desc" name="description" type="hidden"
-                        value="{{version.submitted_desc}}" />
+                        value="{% if version.submitted_desc %}{{version.submitted_desc}}{% endif %}" />
                         <button id="submit_me" class="hide"
                         type="submit" ></button>
                     </form>
