@@ -38,7 +38,7 @@ from serializers import *
 
 from questionnaire.models import Questionnaire
 from fingerprint.models import Fingerprint
-from developer.models import Plugin
+from developer.models import Plugin, PluginVersion, VersionDep
 from accounts.models import Profile, EmifProfile
 from docs_manager.models import FingerprintDocuments
 from docs_manager.views import list_fingerprint_files_aux, upload_document_aux
@@ -319,6 +319,48 @@ class CheckNameView(APIView):
 
                 except Plugin.DoesNotExist:
                     success = True
+
+            response = Response({'success': success}, status=status.HTTP_200_OK)
+
+        else:
+            response = Response({}, status=status.HTTP_403_FORBIDDEN)
+        return response
+
+############################################################
+##### Logical Deletes a plugin dependency - Web service
+############################################################
+class DeleteDepView(APIView):
+    authentication_classes = (SessionAuthentication, BasicAuthentication)
+    permission_classes = (IsAuthenticated,)
+    def post(self, request, *args, **kw):
+
+        if request.user.is_authenticated():
+            success=False
+
+            filename = request.POST.get('filename', None)
+            pluginversion = int(request.POST.get('pluginversion', None))
+
+            if filename != None and pluginversion != None:
+                try:
+                    pluginversion = PluginVersion.objects.get(id=pluginversion)
+
+                    try:
+                        file_versions = VersionDep.objects\
+                            .filter(pluginversion=pluginversion,
+                                    filename=filename
+                            )
+
+                        for version in file_versions:
+                            version.removed=True
+                            version.save()
+
+                        success=True
+
+                    except VersionDep.DoesNotExist:
+                        success = False
+
+                except PluginVersion.DoesNotExist:
+                    success=False
 
             response = Response({'success': success}, status=status.HTTP_200_OK)
 
