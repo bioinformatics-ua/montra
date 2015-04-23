@@ -17,7 +17,7 @@ All terminal commands can be executed, but whenever we use something between '<'
 
 1.  Install packages
 
-        $ 	sudo apt-get install git python-pip curl mongodb postgresql rabbitmq-server libxml2-dev libxslt1-dev python-dev libpython-dev build-essential libyaml-dev postgres-server-dev-9.4
+        $ 	sudo apt-get install git python-pip curl mongodb postgresql rabbitmq-server libxml2-dev libxslt1-dev python-dev libpython-dev build-essential libyaml-dev postgres-server-dev-9.4 solr-tomcat
 
 2. Checkout of the source code
 
@@ -25,8 +25,7 @@ All terminal commands can be executed, but whenever we use something between '<'
 		$ 	cd <your_path>/EMIF-ROOT
         $ 	git clone -b master https://github.com/bioinformatics-ua/emif-fb.git
 
-	If you're a developer, you can change branch to dev ( see  [DevelopmentCycle](https://github.com/bioinformatics-ua/emif-fb/wiki/DevelopmentCycle "DevelopmentCycle") )
-
+	If you're a developer, you can change branch to dev ( see  [DevelopmentCycle](https://github.com/bioinformatics-ua/emif-fb/wiki/DevelopmentCycle "Development Cycle") )
 3.  Install virtualenv
 
         $ 	sudo pip install virtualenv
@@ -65,25 +64,11 @@ All terminal commands can be executed, but whenever we use something between '<'
     
         chmod 600 ~/.pgpass   
 
-9.  Install and Configure Apache-solr
-        
-	1. Install JDK and JRE:
-		
-			$ 	sudo apt-get update
-			$	sudo apt-get install default-jre default-jdk
+9.  Configure Apache-solr
 	
-	2. Download and install SOLR
-			
-			$ 	cd /opt
-			$	wget http://archive.apache.org/dist/lucene/solr/4.7.2/solr-4.7.2.tgz
-			$	tar -xvf solr-4.7.2.tgz
-			$	cp -R solr-4.7.2/example /opt/solr
-			$	cd /opt/solr
-		
-	3. Go to folder emif-fb-root/conf/solr/ and copy all the files to the solr default core configuration 
+	Go to folder `<your_path>/EMIF-ROOT/emif-fb/conf/solr/collection1` and copy all the files to the solr default core configuration ( by default `/usr/share/solr/conf` )
 
-			$	cp -r <your_path>/EMIF-ROOT/emif-fb/confs/solr/suggestions /opt/solr/confs/
-			$	cp -r <your_path>/EMIF-ROOT/emif-fb/confs/solr/collections/* /opt/solr/example/confs/
+			$	sudo cp -r <your_path>/EMIF-ROOT/emif-fb/confs/solr/collection1/* /usr/share/solr/conf
 
 10. Create a script file:
 
@@ -102,23 +87,33 @@ All terminal commands can be executed, but whenever we use something between '<'
 	
 	4. Run the script
 	
-			$	sh <your_path>/EMIF-ROOT/emif-fb/confs/<script_name>.sh
+			$	sudo sh <your_path>/EMIF-ROOT/emif-fb/confs/<script_name>.sh
 
+11. Change file settings.py
+
+		DATABASES = {
+    		'default': {
+				...
+                'NAME': '<your_postgres_user>', # Or path to database file if using sqlite3.
+        		'USER': '<your_postgres_user>', # Not used with sqlite3.
+        		'PASSWORD': '<your_postgres_pass>', # Not used with sqlite3.
+	       		...
+    		},
+		}
  
-11. Run Apache-solr as service
+12. Run Apache-solr as service
 
-	Go to solr folder and Run:
+		$	sudo service tomcat6 start
 
-		$	java -jar /opt/solr/example/start.jar
+13. Open a new terminal window/tab and run celery
 
-12. Open a new terminal window/tab and run celery
-
+		$	cd <your_path>/EMIF-ROOT/emif-fb/emif
 		$	celery --app=emif.tasks worker -l debug -B
 
 13. Run
 
         $	python manage.py syncdb
-		$	python manage.py import-questionnaire <path_to_fingerprint_schema>
+		$	python manage.py import_questionnaire <path_to_fingerprint_schema>
         $	python manage.py migrate
 		$	cat <your_path>/EMIF-ROOT/emif-fb/confs/newsletter/newsletter_templates.sql | python manage.py dbshell
         $	python manage.py runserver 0.0.0.0:8000
@@ -155,9 +150,9 @@ All terminal commands can be executed, but whenever we use something between '<'
 
 
 ### Start the virtual environment and development (always)
-1. Go to solr folder and Run:
+1. Start solr-tomcat
 
-		$	java -jar /opt/solr/example/start.jar
+		$	sudo service tomcat6 start
 
 2. Start MongoDB
 
@@ -172,6 +167,11 @@ All terminal commands can be executed, but whenever we use something between '<'
 3. Activate the virtual environments
 
    		$	source <your_path>/EMIF-ROOT/emif/bin/activate
+
+4. Open a new terminal window/tab and run celery
+
+		$	cd <your_path>/EMIF-ROOT/emif-fb/emif
+		$	celery --app=emif.tasks worker -l debug -B
 
 4.	Start Django
 
