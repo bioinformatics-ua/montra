@@ -103,11 +103,9 @@ All terminal commands can be executed, but whenever we use something between '<'
  
 12. Run Apache-solr as service
 
-	Go to solr folder and Run:
-
 		$	sudo service tomcat6 start
 
-12. Open a new terminal window/tab and run celery
+13. Open a new terminal window/tab and run celery
 
 		$	cd <your_path>/EMIF-ROOT/emif-fb/emif
 		$	celery --app=emif.tasks worker -l debug -B
@@ -152,9 +150,9 @@ All terminal commands can be executed, but whenever we use something between '<'
 
 
 ### Start the virtual environment and development (always)
-1. Go to solr folder and Run:
+1. Start solr-tomcat
 
-		$	java -jar /opt/solr/example/start.jar
+		$	sudo service tomcat6 start
 
 2. Start MongoDB
 
@@ -169,6 +167,11 @@ All terminal commands can be executed, but whenever we use something between '<'
 3. Activate the virtual environments
 
    		$	source <your_path>/EMIF-ROOT/emif/bin/activate
+
+4. Open a new terminal window/tab and run celery
+
+		$	cd <your_path>/EMIF-ROOT/emif-fb/emif
+		$	celery --app=emif.tasks worker -l debug -B
 
 4.	Start Django
 
