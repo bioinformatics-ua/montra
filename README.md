@@ -7,21 +7,30 @@ This project is being used in the EMIF Platform and it is also know as Fingerpri
 
 Some of the Available features:
 
-* Regular user
+For Regular user:
+
+
 * Accounting management (users, databases, workspaces)
 * Database management
 * Submission and edition (with the former questionary)
 * Simple search
 * Advanced search
 * Results comparison
-* Admin
-* Questions/fingerprints
-* User
-* Templates
-* Templates definition by XLSX
 * Dashboard 
 * Population Characteristics
 * RESTful API
+
+
+For admin:
+
+* Questions/fingerprints
+* Templates
+* Templates definition by XLSX
+
+For developers:
+
+* RESTful API
+* Plugin based architecture: new modules are possible to include 
 
 
 
