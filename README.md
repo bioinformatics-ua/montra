@@ -1,9 +1,28 @@
-emif-fb
+Catalogue - Fingerprint Browser 
 =======
 
 [![Join the chat at https://gitter.im/bioinformatics-ua/emif-fb](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/bioinformatics-ua/emif-fb?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
-EMIF Platform - Fingerprint Browser 
+This project is being used in the EMIF Platform and it is also know as Fingerprint Browser in the EMIF community.
+
+Some of the Available features:
+
+* Regular user
+* Accounting management (users, databases, workspaces)
+* Database management
+* Submission and edition (with the former questionary)
+* Simple search
+* Advanced search
+* Results comparison
+* Admin
+* Questions/fingerprints
+* User
+* Templates
+* Templates definition by XLSX
+* Dashboard 
+* Population Characteristics
+* RESTful API
+
 
 
 ----------
