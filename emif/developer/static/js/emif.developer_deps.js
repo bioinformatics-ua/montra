@@ -38,11 +38,38 @@ $(function(){
             event.preventDefault();
             event.stopPropagation();
 
-            bootbox.alert('You must choose files to be uploaded first!');
+            bootbox.confirm('You must choose files to be uploaded first!');
 
             return false;
         }
 
+    });
+    $('.deletedep').click(function(event){
+        var self = $(this);
+
+        var filename = self.data('filename');
+        var pluginversion = self.data('pluginversion');
+
+        bootbox.confirm('Are you sure you want to delete \''+filename+'\'', function(result){
+            if(result === true){
+                $.post('developer/deletedep/', {
+                    filename: filename,
+                    pluginversion: pluginversion
+                })
+                .done(function(result) {
+                    if(result.success){
+                        self.closest('tr').remove();
+                    }
+                    else{
+                        bootbox.alert("Couldn't remove the dependency.");
+                    }
+
+                })
+                .fail(function() {
+                    bootbox.alert("Couldn't remove the dependency.");
+                });
+            }
+        });
     });
     if(hasFlash())
         $('.copy-button').each(function (i){

@@ -40,6 +40,8 @@ urlpatterns = patterns('',
 
     # API urls
     url(r'^checkname/$', CheckNameView.as_view()),
+    url(r'^deletedep/$', DeleteDepView.as_view()),
+
 
     # Globalproxy
     url(r'^api/databaseSchemas/$', DatabaseSchemasView.as_view()),
