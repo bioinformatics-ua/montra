@@ -1,5 +1,5 @@
 {% load url from future %}
 
 {% for url, name in idps %}
-    <li><a href="{% url 'djangosaml2.views.login' %}?idp={{ url }}{% if came_from %}&next={{ came_from }}{% endif %}">{{ name }}</a></li>
+    <li><a href="{% url 'djangosaml2.views.login' %}?idp={{ url }}&next=/">{{ name }}</a></li>
 {% endfor %}

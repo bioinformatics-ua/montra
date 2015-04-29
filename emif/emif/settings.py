@@ -55,7 +55,7 @@ VERSION = '1.0'
 VERSION_DATE = '2015.Mar.22 - 21:03UTC'
 PROJECT_DIR_ROOT = '/projects/emif-dev/'
 
-XMLSEC_BIN = '/usr/local/bin/xmlsec1'
+XMLSEC_BIN = '/usr/bin/xmlsec1'
 IDP_SERVICES = [
     path.join(BASEDIR, 'remote_metadata.xml'),
     path.join(BASEDIR, 'testshib.xml')
