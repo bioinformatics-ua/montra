@@ -55,7 +55,7 @@ VERSION = '1.0'
 VERSION_DATE = '2015.Mar.22 - 21:03UTC'
 PROJECT_DIR_ROOT = '/projects/emif-dev/'
 
-XMLSEC_BIN = '/usr/bin/xmlsec1'
+XMLSEC_BIN = '/usr/local/bin/xmlsec1'
 IDP_SERVICES = [
     path.join(BASEDIR, 'remote_metadata.xml'),
     path.join(BASEDIR, 'testshib.xml')
@@ -71,8 +71,8 @@ else:
 
 ADMINS = (
     ('Luis A. Bastiao Silva', 'bastiao@ua.pt'),
-    ('José Luis Oliveira', 'jlo@ua.pt'),
-    ('Tiago Godinho', 'tmgodinho@ua.pt'),
+#    ('José Luis Oliveira', 'jlo@ua.pt'),
+#    ('Tiago Godinho', 'tmgodinho@ua.pt'),
     ('Ricardo Ribeiro', 'ribeiro.r@ua.pt'),
 )
 
@@ -609,7 +609,7 @@ JENKINS_TASKS = (
 #Pages that do not require login
 LOGIN_EXEMPT_URLS = (
     r'^$',
-    r'^index_beta$',
+    r'^indexbeta$',
     r'^saml2$',
     r'^saml2/login',
     r'^saml2/metadata',

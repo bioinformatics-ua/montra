@@ -49,7 +49,7 @@ urlpatterns = patterns('',
 
     url(r'^index$', 'emif.views.index', name="home"),
 
-    url(r'^index_beta$', 'emif.views.index_beta', name="home_beta"),
+    url(r'^indexbeta$', 'emif.views.index_beta', name="home_beta"),
 
     url(r'^about$', 'emif.views.about'),
 
