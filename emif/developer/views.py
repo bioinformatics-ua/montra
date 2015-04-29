@@ -28,6 +28,9 @@ FPATH = settings.PROJECT_DIR_ROOT  + 'emif/static/files/'
 
 import uuid
 
+import rarfile
+import zipfile
+
 from zipfile import ZipFile, ZipExtFile
 import shutil
 
@@ -196,7 +199,11 @@ class DeveloperDepsView(TemplateView):
         fname_pub = os.path.join(fdir_pub, '%s_%s' % (r, f.name))
 
         size = None
-        if isinstance(f, ZipExtFile):
+        if isinstance(f, rarfile.RarExtFile):
+            output = file(fname, "wb+")
+            shutil.copyfileobj(f, output)
+            size = os.path.getsize(fname)
+        elif isinstance(f, ZipExtFile):
             output = file(fname, "wb+")
             shutil.copyfileobj(f, output)
             size = os.path.getsize(fname)
@@ -243,11 +250,24 @@ class DeveloperDepsView(TemplateView):
             if request.FILES:
                 for f in request.FILES.getlist('files'):
                     # Handle file
-                    if f.content_type == 'application/zip':
-
+                    if zipfile.is_zipfile(f):
                         with ZipFile(f) as zip_file:
                             for member in zip_file.namelist():
                                 filename = os.path.basename(member)
+                                # skip directories
+                                if not filename:
+                                    continue
+
+                                # copy file (taken from zipfile's extract)
+                                source = zip_file.open(member)
+                                with source:
+                                    self.handleFile(version_obj, fdir, fdir_pub, source)
+
+                    elif rarfile.is_rarfile(f):
+
+                        with rarfile.RarFile(f) as zip_file:
+                            for member in zip_file.infolist():
+                                filename = member.filename
                                 # skip directories
                                 if not filename:
                                     continue
