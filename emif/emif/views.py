@@ -103,6 +103,9 @@ def index(request, template_name='index_new.html'):
     else:
         return render(request, template_name, {'request': request, 'referal': referal})
 
+def index_beta(request, template_name='index_beta.html'):
+    return index(request, template_name=template_name)
+
 def about(request, template_name='about.html'):
     return render(request, template_name, {'request': request, 'breadcrumb': True})
 
