@@ -312,7 +312,7 @@ class CheckNameView(APIView):
 
             if name != None:
                 try:
-                    plugin = Plugin.all().get(name__iexact=name)
+                    plugin = Plugin.all(owner=request.user).get(name__iexact=name)
 
                     if plugin.slug == slug:
                         success = True
