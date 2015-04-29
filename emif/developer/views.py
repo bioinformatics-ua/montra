@@ -139,7 +139,9 @@ class DeveloperVersionView(TemplateView):
 
         # if approval request
         if request.POST.get('submit', None):
-            v = PluginVersion.submit(plugin_hash, version)
+            desc = request.POST.get('description', None)
+
+            v = PluginVersion.submit(plugin_hash, version, desc)
         # if normal update
         else:
             version_new = request.POST.get('version', None)
@@ -385,6 +387,25 @@ class DeveloperDocsView(TemplateView):
 
 class DeveloperIframeView(TemplateView):
     template_name = "developer_iframe.html"
+
+    def get(self, request, plugin_hash):
+        plugin = version = None
+        try:
+            plugin = Plugin.objects.get(slug=plugin_hash)
+            version = plugin.getLatest()
+        except Plugin.DoesNotExist:
+            pass
+
+        return render(request, self.template_name,
+            {
+                'request': request,
+                'breadcrumb': True,
+                'plugin': plugin,
+                'latest': version
+            })
+
+class DeveloperGlobalView(TemplateView):
+    template_name = "developer_global.html"
 
     def get(self, request, plugin_hash):
         plugin = version = None

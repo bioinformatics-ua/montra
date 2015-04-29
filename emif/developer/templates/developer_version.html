@@ -99,9 +99,9 @@
 confs = {
     name: "New widget",
 };
-plugin = function(self){
-    self.html('Hello world');
-    self.refresh();
+plugin = function(sdk){
+    sdk.html('Hello world');
+    sdk.refresh();
 };
     {% else %}
 {{version.path}}
@@ -137,12 +137,16 @@ plugin = function(self){
                     {% endif %}
                 {% else %}
 
-                    <form method="post">
+                    <form id="approval_form" method="post">
                         {% csrf_token %}
                         <input name="submit" type="hidden" value="submit" />
-                        <button id="submit-version" class="pull-right btn span3"
-                        type="submit" ><i class="fa fa-paper-plane"></i>&nbsp; Submit to approval</button>
+                        <input id="approval_desc" name="description" type="hidden"
+                        value="{% if version.submitted_desc %}{{version.submitted_desc}}{% endif %}" />
+                        <button id="submit_me" class="hide"
+                        type="submit" ></button>
                     </form>
+                    <button id="submit-version" class="pull-right btn span3"
+                        type="submit" ><i class="fa fa-paper-plane"></i>&nbsp; Submit to approval</button>
                 {% endif %}
             {% endif %}
         </div>

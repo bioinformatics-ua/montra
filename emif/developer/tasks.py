@@ -32,16 +32,24 @@ def sendCommitEmails(p, pv):
     for admin in adict:
         emails.append(adict[admin])
 
-    print emails
-
+    desc = ""
+    if pv.submitted_desc:
+        desc = """
+            The following description was added:\n
+                "
+                %s
+                " """ % (pv.submitted_desc)
     # sent email to admin and developer about plugin
     try:
         send_custom_mail('EMIF Catalogue: Plugin %s v.%s submitted for approval' % (p.name, pv.version),
             """Dear Colleague,\n
-                    A new plugin version %s for plugin %s has been submitted for approval on the platform <a href="http://bioinformatics.ua.pt/emif">EMIF Catalogue</a>. \n\n
+                    A new plugin version %s for plugin %s has been submitted for approval on the platform <a href="http://bioinformatics.ua.pt/emif">EMIF Catalogue</a>.
+
+                    %s
+
                     The system administrators will review and approve it as soon as possible.\n
                     \n\n
                     \n\nSincerely,\nEMIF Catalogue
-            """ %(pv.version, p.name), settings.DEFAULT_FROM_EMAIL, emails)
+            """ %(pv.version, p.name, desc), settings.DEFAULT_FROM_EMAIL, emails)
     except:
         print "Couldn't send email for commit approval"

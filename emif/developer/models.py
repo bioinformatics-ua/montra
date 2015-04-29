@@ -24,10 +24,12 @@ class Plugin(models.Model):
     GLOBAL      = 0
     DATABASE    = 1
     THIRD_PARTY = 2
+    FULL_FLEDGED= 3
 
     TYPES = [
                 (GLOBAL,        'Global plugin, for the main dashboard'),
                 (DATABASE,      'Database related plugin, for the database view'),
+                (FULL_FLEDGED,  'Full-fledged application widget'),
                 (THIRD_PARTY,   'Third party full-fledged applications')
             ]
 
@@ -135,7 +137,7 @@ class PluginVersion(models.Model):
 
     approved    = models.BooleanField(default=False)
     submitted   = models.BooleanField(default=False)
-
+    submitted_desc = models.TextField(null=True)
     create_date     = models.DateTimeField(auto_now_add=True)
     latest_update   = models.DateTimeField(auto_now=True)
 
@@ -166,7 +168,7 @@ class PluginVersion(models.Model):
         return pv
 
     @staticmethod
-    def submit(plugin_hash, version):
+    def submit(plugin_hash, version, desc):
         from developer.tasks import sendCommitEmails
 
         pv  = None
@@ -177,6 +179,7 @@ class PluginVersion(models.Model):
 
             pv.submitted = True
             pv.approved = False
+            pv.submitted_desc = desc
 
             sendCommitEmails.apply_async([p, pv])
 

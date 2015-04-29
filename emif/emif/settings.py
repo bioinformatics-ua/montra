@@ -641,7 +641,14 @@ NEWSLETTER_DAY='friday'
 NEWSLETTER_HOUR = 3
 NEWSLETTER_MIN = 0
 
+
+
 try:
     from local_settings import *
 except:
     pass
+
+FIXTURE_DIRS = (
+    os.path.abspath('%s%s/emif/fixtures' % (PROJECT_DIR_ROOT,MIDDLE_DIR)),
+)
+
