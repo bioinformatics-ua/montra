@@ -25,7 +25,10 @@ from saml2 import saml
 import saml2
 
 
-BASEDIR = path.dirname(path.abspath(__file__))
+# well i need to do this trick to be able to refere above project root so i can have config files outside the project
+BASEDIR = os.path.abspath(os.path.join(path.dirname(path.abspath(__file__)), '../../'))
+
+print BASEDIR
 
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
@@ -57,8 +60,8 @@ PROJECT_DIR_ROOT = '/projects/emif-dev/'
 
 XMLSEC_BIN = '/usr/bin/xmlsec1'
 IDP_SERVICES = [
-    path.join(BASEDIR, 'remote_metadata.xml'),
-    path.join(BASEDIR, 'testshib.xml')
+    path.join(BASEDIR, 'confs/sso/idps/openidp.xml'),
+    path.join(BASEDIR, 'confs/sso/idps/testshib.xml')
 ]
 
 if DEBUG:
@@ -403,7 +406,7 @@ SAML_CONFIG = {
     'entityid': IDP_URL+'saml2/metadata',
 
     # directory with attribute mapping
-    'attribute_map_dir': path.join(BASEDIR, 'attributemaps'),
+    'attribute_map_dir': path.join(BASEDIR, 'confs/sso/attributemaps'),
 
     # this block states what services we provide
     'service': {
@@ -447,8 +450,8 @@ SAML_CONFIG = {
   'debug': 1,
 
   # certificate
-  'key_file': path.join(BASEDIR, 'sp.key'),  # private part
-  'cert_file': path.join(BASEDIR, 'sp.crt'),  # public part
+  'key_file': path.join(BASEDIR, 'confs/sso/certificates/sp.key'),  # private part
+  'cert_file': path.join(BASEDIR, 'confs/sso/certificates/sp.crt'),  # public part
 
   # own metadata settings
   'contact_person': [

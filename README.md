@@ -145,7 +145,7 @@ All terminal commands can be executed, but whenever we use something between '<'
 
         $   celery --app=emif.tasks worker -l debug -B
 
-13. Create sp.key and sp.crt files on emif/emif/ being them respectively the private key and the public certificate for all comunication originating from third-party IDP's to our SP endpoint
+13. Create sp.key and sp.crt files on confs/certificates being them respectively the private key and the public certificate for all comunication originating from third-party IDP's to our SP endpoint
 
 14. The SP endpoint for IDPS uses xmlsec (which is installed through this readme). By default the path to this binary is '/usr/bin/xmlsec1'. If the path on the system is different it should be defined through the variable 'XMLSEC_BIN' on emif/emif/settings.py, otherwise it's okay to leave the default value.
 
