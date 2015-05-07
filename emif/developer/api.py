@@ -187,8 +187,6 @@ class getDocumentsView(APIView):
 
             documents = list_fingerprint_files_aux(request, fingerprint)
 
-            print documents
-
             return Response(
                 {
                     'documents': documents

@@ -34,6 +34,8 @@ import zipfile
 from zipfile import ZipFile, ZipExtFile
 import shutil
 
+from django.http import HttpResponse
+
 class DeveloperListView(TemplateView):
     template_name = "developer.html"
 
@@ -422,3 +424,27 @@ class DeveloperGlobalView(TemplateView):
                 'plugin': plugin,
                 'latest': version
             })
+
+if settings.DEBUG:
+    PATH_STORE_FILES = settings.PROJECT_DIR_ROOT  + 'emif/static/files/'
+else:
+    PATH_STORE_FILES = settings.PROJECT_DIR_ROOT  + settings.MIDDLE_DIR +'static/files/'
+
+class DeveloperFileView(TemplateView):
+    template_name = "developer_global.html"
+
+    def get(self, request, plugin_hash, version, filename):
+        vd = None
+        try:
+            p   = Plugin.objects.get(slug=plugin_hash)
+            pv  = PluginVersion.objects.get(plugin=p, version=version)
+            vd  = VersionDep.objects.filter(filename=filename, pluginversion=pv)[0]
+
+        except Plugin.DoesNotExist, PluginVersion.DoesNotExist:
+            return HttpResponse('NO CONTENT', status=204)
+
+        file = open(os.path.join(PATH_STORE_FILES, vd.path), 'r')
+
+        print file
+
+        return HttpResponse(file)

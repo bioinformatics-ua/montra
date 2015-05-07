@@ -79,7 +79,7 @@
                                 {% for dep in dependencies %}
                                     <tr>
                                         <td>
-                                            <a href="{{ STATIC_URL }}files/{{dep.path}}">
+                                            <a href="developer/file/{{dep.pluginversion.plugin.slug}}/{{dep.pluginversion.version}}/{{dep.filename}}">
                                                 {{dep.filename}}
                                             </a>
                                         </td>
@@ -91,7 +91,8 @@
                                         </td>
                                         <td>
                                             <div class="btn-group">
-                                                <button class="copy-button btn btn-small" data-clipboard-text="{{ STATIC_URL }}files/{{dep.path}}" title="Click to copy to clipboard."><i class="fa fa-clipboard"></i></button>
+                                                <button class="copy-button btn btn-small"
+                                                data-clipboard-text="developer/file/{{dep.pluginversion.plugin.slug}}/{{dep.pluginversion.version}}/{{dep.filename}}" title="Click to copy to clipboard."><i class="fa fa-clipboard"></i></button>
                                             </div>
 
                                             <div class="pull-right">

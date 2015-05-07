@@ -66,4 +66,8 @@ urlpatterns = patterns('',
     url(r'^api/store/putComment/(?P<fingerprint>[^/]+)$', putCommentView.as_view()),
 
 
+    # fast links to dependency latest revision
+    url(r'^file/(?P<plugin_hash>[^/]+)/(?P<version>[0-9]+)/(?P<filename>[^/]+)$',
+        DeveloperFileView.as_view(), name='developer-file'),
+
 )

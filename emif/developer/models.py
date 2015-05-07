@@ -248,6 +248,9 @@ class VersionDep(models.Model):
     size = models.FloatField(default=0)
     removed = models.BooleanField()
 
+    class Meta:
+        ordering = ['-latest_date']
+
     @staticmethod
     def all(version=None):
         tmp = VersionDep.objects.filter(removed=False)
