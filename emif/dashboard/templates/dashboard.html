@@ -43,12 +43,15 @@
 
         <script type="text/javascript">
             var is_staff = true;
-            var hasExtra{% if config.extra_information %} = true{% endif %};
-            var hasPrivate{% if config.private_links %} = true{% endif %};
-            var hasGeo{% if config.geolocation %} = true{% endif %};
-            var hasDatatable{% if config.datatable %} = true{% endif %};
         </script>
     {% endif %}
+    <script type="text/javascript">
+        var is_staff = false;
+        var hasExtra{% if config.extra_information %} = true{% endif %};
+        var hasPrivate{% if config.private_links %} = true{% endif %};
+        var hasGeo{% if config.geolocation %} = true{% endif %};
+        var hasDatatable{% if config.datatable %} = true{% endif %};
+    </script>
 {% endblock %}
 
 {% block headextra %}
