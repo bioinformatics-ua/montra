@@ -224,8 +224,8 @@ MIDDLEWARE_CLASSES = (
     # 'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'emif.middleware.LoginRequiredMiddleware',
     'emif.interceptor.NavigationInterceptor',
-    'johnny.middleware.LocalStoreClearMiddleware',
-    'johnny.middleware.QueryCacheMiddleware',
+    #'johnny.middleware.LocalStoreClearMiddleware',
+    #'johnny.middleware.QueryCacheMiddleware',
 )
 
 ROOT_URLCONF = 'emif.urls'
