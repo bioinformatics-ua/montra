@@ -21,10 +21,11 @@ from django.core.urlresolvers import reverse
 from django.core.cache import cache
 from django.contrib.auth.decorators import permission_required
 from django.contrib import messages
-from django.shortcuts import render_to_response, get_object_or_404
+from django.shortcuts import render_to_response, get_object_or_404, render, redirect
 from django.db import transaction
 from django.conf import settings
 import datetime
+from django.views.generic import TemplateView
 
 from django.utils import translation
 from django.utils.translation import ugettext_lazy as _
@@ -52,6 +53,7 @@ import re
 from openpyxl import load_workbook
 
 from django.template.defaultfilters import slugify
+from questionnaire.imports import ImportQuestionnaire
 
 def r2r(tpl, request, **contextdict):
     "Shortcut to use RequestContext instead of Context in templates"
@@ -322,3 +324,28 @@ def dep_check(expr, runinfo, answerdict):
     if check_answer.startswith("!"):
         return check_answer[1:].strip() != actual_answer.strip()
     return check_answer.strip() == actual_answer.strip()
+
+
+class ImportQuestionnaireView(TemplateView):
+    template_name = "questionnaire_import.html"
+
+    def get(self, request, message=None):
+        if(not (request.user.is_superuser or request.user.groups.filter(name='importers').exists())):
+            return HttpResponse('Forbidden', 403)
+
+        return render(request, self.template_name,
+            {
+                'request': request,
+                'message': message,
+                'breadcrumb': True,
+            })
+
+    def post(self, request):
+        try:
+            print request.FILES
+            #iq = ImportQuestionnaire.factory('excel', request.DATA)
+            #iq.import_questionnaire()
+            return self.get(request, message="Questionnaire imported, to import another questionnaire please add it below.")
+        except:
+            return self.get(request, message="Error importing questionnaire, please try again later, or contact the administrator.")
+

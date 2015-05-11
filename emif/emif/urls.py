@@ -176,6 +176,9 @@ urlpatterns = patterns('',
     # Statistics
     url(r'^statistics', include('statistics.urls')),
 
+
+    #questionnaires
+    url(r'questionnaire/', include('questionnaire.urls')),
 )
 
 if settings.DEBUG:

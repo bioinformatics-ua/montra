@@ -248,6 +248,12 @@
                                                     <li><a tabindex="-1" href="advsearch/history">Search History</a></li>
                                                 </ul>
                                             </li>
+                                            <li class="divider"></li>
+                                            {% if request.user|has_group:'importers' or request.user.is_superuser %}
+                                            <li>
+                                                <a href="questionnaire/import">Import Questionnaire</a>
+                                            </li>
+                                            {% endif %}
                                             {% comment %}
                                             <li class="divider"></li>
                                             <li>{% if request.user.is_superuser %}
