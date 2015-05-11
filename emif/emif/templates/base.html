@@ -140,7 +140,7 @@
                             <a class="brand" href="">{{BRAND}}</a>
                             {% if not readOnly %}
                             <div class="ui-widget nav-collapse collapse">
-                                {% if user.is_authenticated %}
+                                {% if user.is_authenticated and user.is_active %}
                                 <ul class="nav" style="margin-right: 0 !important;">
                                     <li id="search_li" class="pull-left">
                                         <form id="quicksearch" class="navbar-search pull-left" method="POST" action="resultsdiff/1">{% csrf_token %}
@@ -157,7 +157,7 @@
                                 <div class="pull-right">
                                 <ul id="usernav" class="nav">
 
-                                    {% if request.user.is_authenticated %}
+                                    {% if request.user.is_authenticated and user.is_active %}
                                     <li id="li_notifications" style="padding-right: 5px;" class="dropdown">
                                         <a href="" class="dropdown-toggle" data-toggle="dropdown">
                                         <i id="notification_env" class="fa fa-envelope"></i>&nbsp;<span id="notification_badge" class="depon_class inlinebadge">99</span>
@@ -329,27 +329,35 @@
                     </div>
                 </div>
                 <div style="padding-top: 60px;" class="container">
-                    <div data-clamp=".container" id="topnavigator">
-                    <div>
-                    {% if breadcrumb %}
-                    {% block breadcrumbs %}
-                    {% breadcrumb "Home" "home" %}
-                    {% endblock %}
-                    <div class="pull-left">
-                        {% render_breadcrumbs %}
-                    </div>
+                    {% if user.is_authenticated and user.is_active %}
+                        <div data-clamp=".container" id="topnavigator">
+                        <div>
+                        {% if breadcrumb %}
+                        {% block breadcrumbs %}
+                        {% breadcrumb "Home" "home" %}
+                        {% endblock %}
+                        <div class="pull-left">
+                            {% render_breadcrumbs %}
+                        </div>
+                        {% endif %}
+                        <div class="pull-right">
+                            {% block toolbar %} {% endblock %}
+                        </div>
+                        </div>
+                        </div>
                     {% endif %}
-                    <div class="pull-right">
-                        {% block toolbar %} {% endblock %}
-                    </div>
-                    </div>
-                    </div>
 
 
 <div style="display: none; z-index: 2000; position:fixed; bottom:20px; right: 20px;" class="alert alert-info" id="exporting-message">Databases of the current view are being exported, please wait.</div>
-                    {% block content %}
+                    {% if user.is_authenticated and not user.is_active %}
+                        <p class="lead" style="text-align:center;"><i class="fa fa-lock fa-5x"></i></p>
+                        <p class="lead" style="text-align:center;">It seems your account is not active.</p>
+                        <p class="lead" style="text-align:center;">This may be due to a administrator block. Please contact the administration with any doubts.</p>
+                    {% else %}
+                        {% block content %}
 
-                    {% endblock %}
+                        {% endblock %}
+                    {% endif%}
 
                 </div>
             </div>

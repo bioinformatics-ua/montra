@@ -33,6 +33,9 @@ from accounts.models import Profile
 
 from newsletter.models import Newsletter, Subscription
 
+from djangosaml2.conf import config_settings_loader
+from djangosaml2.utils import available_idps
+
 register = template.Library()
 
 
@@ -433,3 +436,11 @@ def slogan():
 def has_group(user, group_name):
     group = Group.objects.get(name=group_name)
     return True if group in user.groups.all() else False
+
+@register.simple_tag
+def idps_dropdown():
+    return render_to_string('reusable_blocks/idp_dropdowns.html',
+        {
+            "idps": available_idps(config_settings_loader()).items(),
+            "base": settings.BASE_URL
+        })

@@ -32,3 +32,5 @@ emif/CACHE
 tests/reports
 
 emif/emif/static/files
+confs/sso/certificates/sp.crt
+confs/sso/certificates/sp.key

@@ -140,11 +140,11 @@ var FeedWidget = function FeedWidget(widgetname, width, height, pos_x, pos_y){
                 'placement': 'bottom',
                 'html': 'true',
                 'title': 'Database Subscription',
-                'content': '<div style="text-align: justify; text-justify: inter-word;">Sometimes there is interest on a database, and the user would possibly be interested in knowing about new information regarding the database, when it changes. '+
-                '<br /><br />With database subscription is possible to subscribe, allowing in this manner to follow up on any new updates regarding the database.'+
-                '<br /><br />By default, each user is subscribed to all the owned or shared databases.</div>'+
-                '<br /><br />It is possible to subscribe a database, by opening a database, and on the top menu clicking "Subscribe".'+
-                '<br /><br />Subscriptions will be available on the dashboard, under the History widget, but also through the weekly newsletter.',
+                'content': '<div style="text-align: justify; text-justify: inter-word;"><h3>What are Database Subscriptions?</h3>Sometimes there is interest on a database, and users would possibly be interested in knowing about new information regarding the databases, when they change. '+
+                ' With database subscriptions is possible to subscribe, allowing in this manner to follow up on any new updates regarding the databases.'+
+                ' By default, each user is subscribed to all the owned or shared databases.</div>'+
+                '<h3>How to subscribe a database ?</h3>It is possible to subscribe a database, by:<ol><li> Opening a database</li><li>On the top menu clicking "Subscribe"</li></ol>'+
+                '<h3>Where are the subscription updates?</h3>Subscriptions will be available on several places:<ol><li>On the dashboard, under the History widget</li><li>Through the weekly newsletter sent to user emails</li></ol>',
 
                 'template': '<div class="popover popover-medium"><div class="arrow"></div><div class="popover-inner"><h3 class="popover-title"></h3><div class="popover-content"><p></p></div></div></div>'
 

@@ -114,8 +114,12 @@ class ContactForm(forms.Form):
     topic = forms.CharField()
 
 @receiver(signup_complete)
-def add_invited(user, sender, **kwargs):
+def invited_event(sender, **kwargs):
+    add_invited(sender)
 
+
+def add_invited(user):
+    print "ADD INVITED SUBSCRIPTIONS"
     ## Add to subscription list
 
     # get newsletter
