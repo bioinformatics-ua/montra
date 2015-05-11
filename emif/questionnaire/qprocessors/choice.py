@@ -224,8 +224,7 @@ def question_multiple_options(request, question):
         except:
             pass
 
-
-        if key in request.POST or (val!=None and (choice.value in val)) or \
+        if key in request.POST or (val!=None and (choice.value in val.split('#'))) or \
           (request.method == 'GET' and choice.value in defaults):
             _tmp_v = get_aux_text(val,choice.value, _aux )
             if _tmp_v == None or _tmp_v == '':

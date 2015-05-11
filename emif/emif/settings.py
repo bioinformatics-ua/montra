@@ -241,8 +241,8 @@ MIDDLEWARE_CLASSES = (
     'emif.middleware.LoginRequiredMiddleware',
     'emif.middleware.ProfileRequiredMiddleware',
     'emif.interceptor.NavigationInterceptor',
-    'johnny.middleware.LocalStoreClearMiddleware',
-    'johnny.middleware.QueryCacheMiddleware',
+    #'johnny.middleware.LocalStoreClearMiddleware',
+    #'johnny.middleware.QueryCacheMiddleware',
 )
 
 ROOT_URLCONF = 'emif.urls'

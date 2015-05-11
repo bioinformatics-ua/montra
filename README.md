@@ -83,9 +83,9 @@ All terminal commands can be executed, but whenever we use something between '<'
             $   sudo chmod a+x <your_mongodb_path>/db
             $   mongod --dbpath <your_mongodb_path>
 
-    2. Run mongod as root:
-
-            $   sudo /mongod --dbpath <your_mongodb_path>
+   	2. Run mongod as root:
+		
+			$	sudo mongod --dbpath <your_mongodb_path>
 
 7. Create '~/.pgpass' file and insert:
 
@@ -149,21 +149,28 @@ All terminal commands can be executed, but whenever we use something between '<'
 
 14. The SP endpoint for IDPS uses xmlsec (which is installed through this readme). By default the path to this binary is '/usr/bin/xmlsec1'. If the path on the system is different it should be defined through the variable 'XMLSEC_BIN' on emif/emif/settings.py, otherwise it's okay to leave the default value.
 
+15. Sync Database
 
-15. Run
+        $	python manage.py syncdb
+		$	python manage.py import_questionnaire <path_to_fingerprint_schema>
+        $	python manage.py migrate
+		$	cat <your_path>/EMIF-ROOT/emif-fb/confs/newsletter/newsletter_templates.sql | python manage.py dbshell
 
-        $   python manage.py syncdb
-        $   python manage.py import-questionnaire <path_to_fingerprint_schema>
-        $   python manage.py migrate
-        $   cat <your_path>/EMIF-ROOT/emif-fb/confs/newsletter/newsletter_templates.sql | python manage.py dbshell
-        $   python manage.py runserver 0.0.0.0:8000
+16. (Optional/Temporary) Support Developer Group
 
+		$	python manage.py shell
+		>>> import utils.developer_group 
+		>>> quit()
 
-16. Create a folder to documents population characteristic
+17. Run Server
+
+        $	python manage.py runserver 0.0.0.0:8000
+
+17. Create a folder to documents population characteristic
 
         mkdir -p <your_path>/EMIF-ROOT/emif/static/files/
 
-17. Open browser and write
+18. Open browser and write
 
         localhost:8000
 
@@ -207,13 +214,13 @@ All terminal commands can be executed, but whenever we use something between '<'
 
     else
 
-        $   sudo /mongod --dbpath <your_mongodb_path>
+   		$	sudo mongod --dbpath <your_mongodb_path>
 
 3. Activate the virtual environments
 
-        $   source <your_path>/EMIF-ROOT/emif/bin/activate
+   		$	source <your_path>/EMIF-ROOT/emif/bin/activate
 
-4.  Start Django
+4.	Start Django
 
         $   python manage.py runserver 0.0.0.0:8000
 
