@@ -1,0 +1,5 @@
+{% load url from future %}
+
+{% for url, name in idps %}
+    <li><a href="{% url 'djangosaml2.views.login' %}?idp={{ url }}&next=/">{{ name }}</a></li>
+{% endfor %}
