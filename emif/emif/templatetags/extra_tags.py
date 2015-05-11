@@ -441,5 +441,6 @@ def has_group(user, group_name):
 def idps_dropdown():
     return render_to_string('reusable_blocks/idp_dropdowns.html',
         {
-            "idps": available_idps(config_settings_loader()).items()
+            "idps": available_idps(config_settings_loader()).items(),
+            "base": settings.BASE_URL
         })
