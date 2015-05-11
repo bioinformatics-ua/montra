@@ -34,7 +34,7 @@ from rest_framework import serializers
 from rest_framework.views import APIView
 from rest_framework import status
 from rest_framework.renderers import JSONRenderer
-from rest_framework.parsers import JSONParser
+from rest_framework.parsers import JSONParser, FileUploadParser
 from django.utils import simplejson
 from django.conf import settings
 
@@ -1194,3 +1194,40 @@ def validate_and_get(user, data):
         result['error'] = "No fingerprintID detected"
 
     return result
+
+
+############################################################
+##### New Questionnaire Types - Web service
+############################################################
+
+class QuestionnaireImportView(APIView):
+    authentication_classes = (TokenAuthentication,SessionAuthentication, BasicAuthentication,)
+    permission_classes = (IsAuthenticated,)
+    parser_classes = (FileUploadParser,)
+
+    @transaction.commit_on_success
+    def put(self, request, filename, format=None):
+        # If authenticated
+        if request.auth or request.user.is_authenticated():
+            user = request.user
+            result = {}
+
+            if user.is_superuser or user.groups.filter(name='importers').exists():
+
+                print request.FILES
+                print request.DATA
+
+                result['status'] = 'authenticated'
+                result['method'] = 'POST'
+                result['user'] = str(user)
+            else:
+                result['status'] = 'forbidden'
+                result['method'] = 'POST'
+                result['user'] = str(user)
+
+        # NOT authenticated
+        else:
+            result = {'status': 'NOT authenticated', 'method': 'POST'}
+
+        response = Response(result, status=status.HTTP_200_OK)
+        return response
