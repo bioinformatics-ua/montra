@@ -54,6 +54,7 @@ from openpyxl import load_workbook
 
 from django.template.defaultfilters import slugify
 from questionnaire.imports import ImportQuestionnaire
+import tempfile
 
 def r2r(tpl, request, **contextdict):
     "Shortcut to use RequestContext instead of Context in templates"
@@ -329,23 +330,25 @@ def dep_check(expr, runinfo, answerdict):
 class ImportQuestionnaireView(TemplateView):
     template_name = "questionnaire_import.html"
 
-    def get(self, request, message=None):
+    def get(self, request, success_message=None, error_message=None):
         if(not (request.user.is_superuser or request.user.groups.filter(name='importers').exists())):
             return HttpResponse('Forbidden', 403)
 
         return render(request, self.template_name,
             {
                 'request': request,
-                'message': message,
+                'success_message': success_message,
+                'error_message': error_message,
                 'breadcrumb': True,
             })
 
     def post(self, request):
         try:
-            print request.FILES
-            #iq = ImportQuestionnaire.factory('excel', request.DATA)
-            #iq.import_questionnaire()
-            return self.get(request, message="Questionnaire imported, to import another questionnaire please add it below.")
+            uploaded_file = request.FILES['file']
+
+            iq = ImportQuestionnaire.factory('excel', uploaded_file)
+            iq.import_questionnaire()
+            return self.get(request, success_message="Questionnaire imported, to import another questionnaire please add it below.")
         except:
-            return self.get(request, message="Error importing questionnaire, please try again later, or contact the administrator.")
+            return self.get(request, error_message="Error importing questionnaire. Make sure you are importing a xlsx file with a questionnaire schema. If the problem persists please try again later, or contact the administrator.")
 

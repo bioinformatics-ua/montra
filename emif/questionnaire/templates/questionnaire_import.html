@@ -39,15 +39,20 @@
 
 <div class="clearfix row">
     <div class="span12">
-        {% if message %}
-        <div class="alert alert-info">
-          {{message}}
+        {% if success_message %}
+        <div class="alert alert-success">
+          {{success_message}}
         </div>
         {% endif %}
-        <form method="POST" enctype="multipart/form-data">
+        {% if error_message %}
+        <div class="alert alert-danger">
+          {{error_message}}
+        </div>
+        {% endif %}
+        <form action="questionnaire/import" method="post" enctype="multipart/form-data">
             {% csrf_token %}
-            <input class="span6" type="file" />
-            <button class="btn btn-success">Import Questionnaire</button>
+            <input name="file" class="span6" type="file" />
+            <input type="submit" class="btn btn-success" value="Import Questionnaire" />
             <div><strong>Attention:</strong> Dependending on file size, and schema complexity for the questionnaire. This process can take a while, please be patient.</div>
         </form>
     </div>
