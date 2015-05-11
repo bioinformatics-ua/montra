@@ -54,7 +54,7 @@ All terminal commands can be executed, but whenever we use something between '<'
 
 	2. Run mongod as root:
 		
-			$	sudo /mongod --dbpath <your_mongodb_path>
+			$	sudo mongod --dbpath <your_mongodb_path>
 
 7. Create '~/.pgpass' file and insert:
 
@@ -110,20 +110,30 @@ All terminal commands can be executed, but whenever we use something between '<'
 		$	cd <your_path>/EMIF-ROOT/emif-fb/emif
 		$	celery --app=emif.tasks worker -l debug -B
 
-13. Run
+
+
+14. Sync Database
 
         $	python manage.py syncdb
 		$	python manage.py import_questionnaire <path_to_fingerprint_schema>
         $	python manage.py migrate
 		$	cat <your_path>/EMIF-ROOT/emif-fb/confs/newsletter/newsletter_templates.sql | python manage.py dbshell
-        $	python manage.py runserver 0.0.0.0:8000
-      
 
-14. Create a folder to documents population characteristic
+15. (Optional/Temporary) Support Developer Group
+
+		$	python manage.py shell
+		>>> import utils.developer_group 
+		>>> quit()
+
+16. Run Server
+
+        $	python manage.py runserver 0.0.0.0:8000
+
+17. Create a folder to documents population characteristic
 
         mkdir -p <your_path>/EMIF-ROOT/emif/static/files/
 
-17. Open browser and write
+18. Open browser and write
 
         localhost:8000
 
@@ -162,16 +172,11 @@ All terminal commands can be executed, but whenever we use something between '<'
 
 	else
 
-   		$	sudo /mongod --dbpath <your_mongodb_path>
+   		$	sudo mongod --dbpath <your_mongodb_path>
 
 3. Activate the virtual environments
 
    		$	source <your_path>/EMIF-ROOT/emif/bin/activate
-
-4. Open a new terminal window/tab and run celery
-
-		$	cd <your_path>/EMIF-ROOT/emif-fb/emif
-		$	celery --app=emif.tasks worker -l debug -B
 
 4.	Start Django
 
