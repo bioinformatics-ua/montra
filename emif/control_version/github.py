@@ -21,14 +21,6 @@ from django.conf import settings
 from emif.utils import send_custom_mail
 
 
-"""
-Put this variables in settings.py or local_settings.py
-GITHUB_USERNAME='bastiao'
-GITHUB_PASSWD='GOFUCKYOURSELF'
-GITHUB_ACCOUNT='bioinformatics-ua'
-GITHUB_REPO='emif-fb'
-"""
-
 def feedback_thankyou(request, template_name='feedback_thankyou.html'):
     return render(request, template_name, {'request': request, 'breadcrumb': True})
 
