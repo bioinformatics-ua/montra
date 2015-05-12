@@ -22,6 +22,20 @@ from django.http import Http404, HttpResponseRedirect
 from models import *
 from django import forms
 
+from django.conf import settings
+
+FPATH = settings.PROJECT_DIR_ROOT  + 'emif/static/files/'
+
+import uuid
+
+import rarfile
+import zipfile
+
+from zipfile import ZipFile, ZipExtFile
+import shutil
+
+from django.http import HttpResponse
+
 class DeveloperListView(TemplateView):
     template_name = "developer.html"
 
@@ -180,6 +194,138 @@ class DeveloperVersionView(TemplateView):
                 'developer': True
             })
 
+class DeveloperDepsView(TemplateView):
+    template_name   = "developer_deps.html"
+
+    def handleFile(self, version_obj, fdir, fdir_pub, f):
+        r = str(uuid.uuid1()).replace('-','')
+        fname = os.path.join(fdir, '%s_%s' % (r, f.name))
+        fname_pub = os.path.join(fdir_pub, '%s_%s' % (r, f.name))
+
+        size = None
+        if isinstance(f, rarfile.RarExtFile):
+            output = file(fname, "wb+")
+            shutil.copyfileobj(f, output)
+            size = os.path.getsize(fname)
+        elif isinstance(f, ZipExtFile):
+            output = file(fname, "wb+")
+            shutil.copyfileobj(f, output)
+            size = os.path.getsize(fname)
+        else:
+            with open(fname, 'wb+') as destination:
+                for chunk in f.chunks():
+                    destination.write(chunk)
+            size = f.size
+
+        vd = VersionDep(
+                pluginversion=version_obj,
+                revision=r,
+                path=fname_pub,
+                filename=f.name,
+                size=size
+            )
+        vd.save()
+
+    def post(self, request, plugin_hash, version):
+
+        plugin = version_obj = next_version = prev_code = deps = None
+        try:
+            plugin = Plugin.objects.get(slug=plugin_hash, owner=request.user)
+        except Plugin.DoesNotExist:
+            pass
+
+        try:
+            version_obj = PluginVersion.all(plugin=plugin).get(version=version)
+
+        except PluginVersion.DoesNotExist:
+            pass
+        except PluginVersion.MultipleObjectsReturned:
+            version_obj = PluginVersion.all(plugin=plugin).filter(version=version)[0]
+
+        if plugin != None and version_obj != None:
+            fdir = '%s%s/%d/' % (FPATH, plugin.slug, version_obj.version)
+            fdir_pub = '%s/%d/' % (plugin.slug, version_obj.version)
+            # create folder if doesnt exist:
+            if not os.path.exists(fdir):
+                os.makedirs(fdir)
+
+
+            # Create new files (are always new since its a new revision)
+            if request.FILES:
+                for f in request.FILES.getlist('files'):
+                    # Handle file
+                    if zipfile.is_zipfile(f):
+                        with ZipFile(f) as zip_file:
+                            for member in zip_file.namelist():
+                                filename = os.path.basename(member)
+                                # skip directories
+                                if not filename:
+                                    continue
+
+                                # copy file (taken from zipfile's extract)
+                                source = zip_file.open(member)
+                                with source:
+                                    self.handleFile(version_obj, fdir, fdir_pub, source)
+
+                    elif rarfile.is_rarfile(f):
+
+                        with rarfile.RarFile(f) as zip_file:
+                            for member in zip_file.infolist():
+                                filename = member.filename
+                                # skip directories
+                                if not filename:
+                                    continue
+
+                                # copy file (taken from zipfile's extract)
+                                source = zip_file.open(member)
+                                with source:
+                                    self.handleFile(version_obj, fdir, fdir_pub, source)
+
+                    else:
+                        self.handleFile(version_obj, fdir, fdir_pub, f)
+
+
+        return self.get(request, plugin_hash=plugin_hash, version=version)
+
+    def get(self, request, plugin_hash, version):
+        plugin = version_obj = next_version = prev_code = deps = None
+        try:
+            plugin = Plugin.objects.get(slug=plugin_hash, owner=request.user)
+        except Plugin.DoesNotExist:
+            pass
+
+        try:
+            version_obj = PluginVersion.all(plugin=plugin).get(version=version)
+
+            deps = VersionDep.unique(version=version_obj)
+
+        except PluginVersion.DoesNotExist:
+            try:
+                prev_pv = PluginVersion.all(plugin=plugin)[0]
+                next_version = prev_pv.version + 1
+                prev_code = prev_pv.path
+            except IndexError:
+                next_version = 1
+
+        except PluginVersion.MultipleObjectsReturned:
+
+            version_obj = PluginVersion.all(plugin=plugin).filter(version=version)[0]
+
+
+        return render(request, self.template_name,
+            {
+                'request': request,
+                'breadcrumb': True,
+                'plugin': plugin,
+                'version': version_obj,
+                'next_version': next_version,
+                'prev_code':  prev_code,
+                'developer': True,
+                'dependencies': deps,
+                'parent': 'developer/%s/%s' %(str(plugin.slug), str(version_obj.version))
+            })
+
+
 class DeveloperLiveView(TemplateView):
     template_name   = "developer_live.html"
 
@@ -278,3 +424,27 @@ class DeveloperGlobalView(TemplateView):
                 'plugin': plugin,
                 'latest': version
             })
+
+if settings.DEBUG:
+    PATH_STORE_FILES = settings.PROJECT_DIR_ROOT  + 'emif/static/files/'
+else:
+    PATH_STORE_FILES = settings.PROJECT_DIR_ROOT  + settings.MIDDLE_DIR +'static/files/'
+
+class DeveloperFileView(TemplateView):
+    template_name = "developer_global.html"
+
+    def get(self, request, plugin_hash, version, filename):
+        vd = None
+        try:
+            p   = Plugin.objects.get(slug=plugin_hash)
+            pv  = PluginVersion.objects.get(plugin=p, version=version)
+            vd  = VersionDep.objects.filter(filename=filename, pluginversion=pv)[0]
+
+        except Plugin.DoesNotExist, PluginVersion.DoesNotExist:
+            return HttpResponse('NO CONTENT', status=204)
+
+        file = open(os.path.join(PATH_STORE_FILES, vd.path), 'r')
+
+        print file
+
+        return HttpResponse(file)

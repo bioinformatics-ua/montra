@@ -28,6 +28,7 @@ urlpatterns = patterns('',
 
     url(r'^(?P<plugin_hash>[^/]+)$', DeveloperDetailView.as_view(), name='developer-detail'),
     url(r'^(?P<plugin_hash>[^/]+)/(?P<version>[0-9]+)$', DeveloperVersionView.as_view(), name='developer-version'),
+    url(r'^(?P<plugin_hash>[^/]+)/(?P<version>[0-9]+)/deps$', DeveloperDepsView.as_view(), name='developer-deps'),
     url(r'^(?P<plugin_hash>[^/]+)/add$', DeveloperVersionView.as_view(), name='developer-version-add'),
 
     #live preview
@@ -39,6 +40,8 @@ urlpatterns = patterns('',
 
     # API urls
     url(r'^checkname/$', CheckNameView.as_view()),
+    url(r'^deletedep/$', DeleteDepView.as_view()),
+
 
     # Globalproxy
     url(r'^api/databaseSchemas/$', DatabaseSchemasView.as_view()),
@@ -62,5 +65,9 @@ urlpatterns = patterns('',
 
     url(r'^api/store/putComment/(?P<fingerprint>[^/]+)$', putCommentView.as_view()),
 
+
+    # fast links to dependency latest revision
+    url(r'^file/(?P<plugin_hash>[^/]+)/(?P<version>[0-9]+)/(?P<filename>[^/]+)$',
+        DeveloperFileView.as_view(), name='developer-file'),
 
 )
