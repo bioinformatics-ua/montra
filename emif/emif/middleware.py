@@ -15,7 +15,10 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from django.http import HttpResponseRedirect
 from django.conf import settings
+from django.core.urlresolvers import reverse
 from re import compile
+
+from accounts.models import EmifProfile
 
 EXEMPT_URLS = None
 
@@ -49,3 +52,26 @@ class LoginRequiredMiddleware:
             path = request.path_info.lstrip('/')
             if not any(m.match(path) for m in EXEMPT_URLS):
                 return HttpResponseRedirect(settings.LOGIN_URL+'?ref='+path)
+
+class ProfileRequiredMiddleware:
+    """
+    Middleware that requires a user to have a profile, if the user is logged and doesnt
+    have a emifprofile with interests, we always redirect to the profile edit page.
+    """
+    def process_request(self, request):
+        assert hasattr(request, 'user'), "The Profile Required middleware\
+ requires authentication middleware to be installed. Edit your\
+ MIDDLEWARE_CLASSES setting to insert\
+ 'django.contrib.auth.middlware.AuthenticationMiddleware'. If that doesn't\
+ work, ensure your TEMPLATE_CONTEXT_PROCESSORS setting includes\
+ 'django.core.context_processors.auth'."
+        if request.user.is_authenticated():
+
+            pf = request.user.emif_profile
+            intcount = pf.interests.all().count()
+
+            path = request.path
+            rev = reverse('prof_edit')
+
+            if intcount == 0 and '/api' not in path and path != rev:
+                return HttpResponseRedirect(rev)
