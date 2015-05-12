@@ -212,11 +212,13 @@
                 </li>
                 {% endif %}
 
+                {% comment %}
                 {% if config.literature %}
                 <li class="{%if activetab == 'literature'%}active{%endif%}">
                     <a href="#literature" data-toggle="tab"><i class="icon-book"></i>&nbsp; Literature</a>
                 </li>
                 {% endif %}
+                {% endcomment %}
 
                 {% if config.extra_information %}
                 <li  class="{%if activetab == 'extra'%}active{%endif%}">
@@ -277,12 +279,14 @@
         </div>
         {% endif %}
 
+        {% comment %}
         {% if config.literature %}
         <div class="tab-pane {%if activetab == 'literature'%}active{%endif%}" id="literature">
             <h4 class="loadingsection pull-center">Loading...</h4>
 
         </div>
         {% endif %}
+        {% endcomment %}
         {% if config.extra_information %}
         <div class="tab-pane {%if activetab == 'extra'%}active{%endif%}" id="apiinfo">
             <div>

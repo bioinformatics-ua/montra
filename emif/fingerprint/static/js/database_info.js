@@ -462,7 +462,7 @@
       * On tab change, to literature tab, lazy load literature tab
       */
      $(document).on('shown', 'a[data-toggle="tab"]', function(e) {
-         if ($(e.target).text().toLowerCase().indexOf('literature') != -1) {
+         /*if ($(e.target).text().toLowerCase().indexOf('literature') != -1) {
              // if not loaded yet
              if ($('#literature').find('.loadingsection').length != 0) {
                  console.log("Loading literature, since it was not loaded yet.");
@@ -485,7 +485,7 @@
 
              }
 
-         }
+         }*/
      });
      /**
       *  Setup show hide button event
@@ -673,6 +673,7 @@ $(function(){
             showRegistry: true,
             registryTarget: "#tabselectbox",
             initial: function () {
+                tm.addWidget("literature");
             }
         }
     );

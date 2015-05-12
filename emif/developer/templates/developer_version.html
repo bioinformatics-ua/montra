@@ -30,6 +30,8 @@
     <script src="{{ STATIC_URL}}js/dataTables.bootstrap.js"></script>
 
     <script src="{{ STATIC_URL}}js/emif.proxies.js"></script>
+    <script src="{{STATIC_URL}}js/vendor/iframeResizer.js"></script>
+
 
 {% endblock %}
 {% block breadcrumbs %}
@@ -95,19 +97,14 @@
                     </div>
                     {% if plugin.type != 2 %}
                     <div id="local_editor" class="{% if version.is_remote %}hide{%endif%}">
-                        <pre style="height: 300px; font-size: 14px;" id="editor">{%if prev_code %}{{prev_code}}{% else %}{% if not version or version.is_remote or version.path == '' %}
+                        <div style="height: 300px; font-size: 14px;" id="editor">{%if prev_code %}{{prev_code}}{% else %}{% if not version or version.is_remote or version.path == '' %}
 confs = {
     name: "New widget",
 };
 plugin = function(sdk){
     sdk.html('Hello world');
     sdk.refresh();
-};
-    {% else %}
-{{version.path}}
-    {%endif %}
-{%endif %}
-                        </pre>
+};{% else %}{{version.path}}{%endif %}{%endif %}</div>
                     </div>
                     {% endif %}
                         <textarea name="data" id="id-code" class="hide"></textarea>
@@ -160,7 +157,7 @@ plugin = function(sdk){
                     </div>
                     {% else %}
                     <div class="row">
-                    <iframe src="developer/live/{{plugin.slug}}/{{version.version}}" class="span12">
+                    <iframe src="developer/live/{{plugin.slug}}/{{version.version}}" class="span12" scrolling="no">
                       <p>Your browser does not support the live preview.</p>
                     </iframe>
                     </div>
@@ -184,6 +181,7 @@ plugin = function(sdk){
         var editor = ace.edit("editor");
         editor.setTheme("ace/theme/github");
         editor.getSession().setMode("ace/mode/javascript");
+        editor.$blockScrolling = Infinity;
     </script>
     {%endif%}
     <script type="text/javascript" src="{{STATIC_URL}}js/emif.developer_version.js" />
