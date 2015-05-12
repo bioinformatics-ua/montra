@@ -274,15 +274,33 @@
                                                     <li><a tabindex="-1" href="advsearch/history">Search History</a></li>
                                                 </ul>
                                             </li>
-                                            {% if thirdparty|length > 0 or globalwidgets|length > 0 %}
+                                            {% comment %}
                                             <li class="divider"></li>
-                                                <li class="dropdown-submenu">
-                                                    <a href="" onclick="return false;">Applications</a>
-                                                    <ul class="dropdown-menu">
+                                            <li>{% if request.user.is_superuser %}
+                                                <a href="import-questionnaire">Import Questionnaire</a>
+                                                {% endif %}
+                                            </li>
+                                            {% endcomment %}
+                                        </ul>
+                                    </li>
+                                    {% if thirdparty|length > 0 or globalwidgets|length > 0 %}
+                                    {% endif %}
+                                    <li id="li_notifications" style="padding-right: 5px;" class="dropdown">
+                                        <a href="" class="dropdown-toggle" data-toggle="dropdown">
+                                        <i id="notification_env" class="fa fa-puzzle-piece"></i> <b class="caret"></b>
+                                        </a>
+<ul class="dropdown-menu">
                                                 {% if thirdparty|length > 0%}
                                                         {%for tp in thirdparty %}
                                                         <li>
-                                                            <a href="apps/tp/{{tp.plugin.slug}}">{{tp.plugin.name}}</a>
+
+                                                            <a href="apps/tp/{{tp.plugin.slug}}">
+                                                            {%if tp.plugin.icon %}
+                                                                <img style="max-width: 14px; max-height: 14px;" src="{{tp.plugin.icon.url}}" />
+                                                            {% else %}
+                                                                <i class="fa fa-picture-o"></i>
+                                                            {% endif %}&nbsp;
+                                                            {{tp.plugin.name}}</a>
                                                         </li>
                                                         {% endfor %}
 
@@ -293,21 +311,17 @@
                                                     {% endif %}
                                                     {%for tp in globalwidgets %}
                                                     <li>
-                                                        <a href="apps/gp/{{tp.plugin.slug}}">{{tp.plugin.name}}</a>
+                                                        <a href="apps/gp/{{tp.plugin.slug}}">
+                                                        {%if tp.plugin.icon %}
+                                                                <img style="max-width: 14px; max-height: 14px;" src="{{tp.plugin.icon.url}}" />
+                                                            {% else %}
+                                                                <i class="fa fa-picture-o"></i>
+                                                            {% endif %}&nbsp;
+                                                            {{tp.plugin.name}}</a>
                                                     </li>
                                                     {% endfor %}
                                                 {% endif %}
                                                     </ul>
-                                                </li>
-                                            {% endif %}
-                                            {% comment %}
-                                            <li class="divider"></li>
-                                            <li>{% if request.user.is_superuser %}
-                                                <a href="import-questionnaire">Import Questionnaire</a>
-                                                {% endif %}
-                                            </li>
-                                            {% endcomment %}
-                                        </ul>
                                     </li>
                                     {% endif %}
                                     {% block headerlogin %}

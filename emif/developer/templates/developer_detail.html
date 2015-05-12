@@ -47,18 +47,34 @@
 
 {%if user|has_group:'developers' or user.is_staff %}
 
-<form class="form-horizontal" id="save_plugin" action="developer/save/" method="post">
+<form class="form-horizontal" id="save_plugin" action="developer/save/" method="post" enctype="multipart/form-data">
     <input name="plugin_hash" id="current_slug" class="hide" type="text" value="{{plugin.slug}}" />
     {% csrf_token %}
     <div style="position: relative;" class="row">
         <div class="span12">
             <div class="clearfix">
             <h3>Details</h3>
+            {% if error %}
+            <div class="alert alert-error">
+                <button type="button" class="close" data-dismiss="alert">×</button>
+                <strong>Error: </strong> {{error}}
+            </div>
+            {% endif %}
             <div class="well">
-                  <div class="control-group">
+            <table>
+            <tr>
+            <td>
+                {% if plugin.icon %}
+                    <img style="max-width: 120px; max-height: 120px;" src="{{plugin.icon.url}}" />
+                {% else %}
+                    <i style="font-size: 9em" class="fa fa-picture-o"></i>
+                {% endif %}<br />
+            </td>
+            <td>
+                  <div style="margin-left: -100px;" class="control-group">
                     <label class="control-label" for="id-name">Name</label>
                     <div class="controls controls-row">
-                      <input autocomplete="off" name="name" class="span6" id="id-name"
+                      <input autocomplete="off" name="name" class="span5" id="id-name"
                       value="{{plugin.name}}"
                       type="text" placeholder="Plugin name" />&nbsp;
                       <span id="id-name-icon">
@@ -66,10 +82,10 @@
                       </span>
                     </div>
                   </div>
-                   <div class="control-group">
+                   <div style="margin-left: -100px;" class="control-group">
                     <label class="control-label" for="id-type">Type</label>
                     <div class="controls">
-                        <select name="type" id="id-type" class="span6">
+                        <select name="type" id="id-type" class="span5">
                                 <option value="-1">-- Please select a plugin type</option>
                             {% for type, representation in plugin_types %}
                                 <option value="{{type}}"
@@ -81,8 +97,24 @@
                             &nbsp;
                         </span>
                     </div>
-
                   </div>
+                  <div style="margin-left: -100px;" class="control-group">
+                    <label class="control-label" for="id-type">Icon</label>
+                    <div class="controls">
+                        <div class="btn-group pull-left">
+                            <input class="span5 form-control" readonly="" type="text" />
+                                <span class="btn btn-primary btn-file">
+                                    <i class="fa fa-folder-open"></i><input name="icon" id="depuploader" type="file">
+                                </span>
+                        </div>
+                    </div>
+                  </div>
+
+
+
+            </td>
+            </tr></table>
+
             </div>
             <button type="submit" id="save-plugin" class="pull-right btn btn-primary span3"
             type="submit" ><i class="fa fa-inverse fa-floppy-o"></i>&nbsp; Save plugin </button>
