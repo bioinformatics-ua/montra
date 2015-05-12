@@ -61,7 +61,13 @@
             <a style="margin-top:20px;" title="See plugin documentation" target="_blank" class="pull-right" href="developer/docs">
                 <i class="fa fa-2x fa-question-circle"></i>
             </a>
+            {% if version %}
+            <a style="margin-top:20px; margin-right:20px" title="Local resources manager" class="pull-right" href="developer/{{plugin.slug}}/{{version.version}}/deps">
+                <i class="fa fa-2x fa-files-o"></i>
+            </a>
+            {% endif %}
             </div>
+
             <div class="well">
                     <input name="version" class="span6" id="id-version"
                           value="{% if version %}{{version.version}}{% else %}{{next_version}}{%endif%}"

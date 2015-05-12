@@ -70,4 +70,5 @@ raven==5.1.1
 django-constance[database]==1.0.1
 django-ace==1.0.2
 python-Levenshtein==0.12.0
+rarfile==2.7
 cssselect==0.9.1

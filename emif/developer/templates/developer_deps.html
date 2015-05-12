@@ -1,0 +1,124 @@
+{% extends 'base.html' %}
+{% comment %}
+# -*- coding: utf-8 -*-
+# Copyright (C) 2014 Universidade de Aveiro, DETI/IEETA, Bioinformatics Group - http://bioinformatics.ua.pt/
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+{% endcomment %}
+{% load url from future %}
+{% load extra_tags %}
+{% load django_bootstrap_breadcrumbs %}
+{% load crispy_forms_tags %}
+
+{% block styleinclude %}
+    <link rel="stylesheet" href="{{ STATIC_URL }}css/dataTables.bootstrap.css">
+{% endblock %}
+
+{% block headextra %}
+    <script src="{{ STATIC_URL}}js/jquery.dataTables.js"></script>
+    <script src="{{ STATIC_URL}}js/dataTables.bootstrap.js"></script>
+    <script src="{{ STATIC_URL }}js/vendor/ZeroClipboard.js"></script>
+{% endblock %}
+{% block breadcrumbs %}
+        {{ block.super }}
+        {% breadcrumb "Developer" "developer" %}
+        {% breadcrumb plugin.name "developer/"|add:plugin.slug %}
+        {% breadcrumb version.version parent %}
+        {% breadcrumb "Resources" "" %}
+{% endblock %}
+
+{% block toolbar %}
+    {% include "reusable_blocks/menu_toolbar.html" with collapse=collapseall %}
+{% endblock %}
+
+{% block content %}
+{%if user|has_group:'developers' or user.is_staff %}
+
+    <div class="row">
+        <div class="span12">
+        <div class="clearfix">
+        <form enctype="multipart/form-data" id="version-details" class="form-horizontal" method="post">
+        {%csrf_token%}
+            <div class="clearfix">
+            <h3 class="pull-left">Add/Update Dependency</h3>
+            </div>
+            <div class="btn-group pull-left">
+                <input type="text" class="span6 form-control" readonly>
+                    <span class="btn btn-primary btn-file">
+                        <i class="fa fa-folder-open"></i> Browse <input name="files" type="file" id="depuploader" multiple />
+                    </span>
+            </div>
+            <button type="submit" id="save-dep" class="pull-right btn btn-primary span3"
+            type="submit" ><i class="fa fa-upload"></i>&nbsp; Upload</button>
+        </form>
+        </div>
+            <div class="clearfix">
+            <h3>Current Dependencies</h3>
+                    <div id="dependencies">
+                        <table class="table table-bordered table-striped" id="deps">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Last Update</th>
+                                    <th>Size</th>
+                                    <th style="width: 115px;"></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for dep in dependencies %}
+                                    <tr>
+                                        <td>
+                                            <a href="developer/file/{{dep.pluginversion.plugin.slug}}/{{dep.pluginversion.version}}/{{dep.filename}}">
+                                                {{dep.filename}}
+                                            </a>
+                                        </td>
+                                        <td>
+                                            {{dep.latest_update}}
+                                        </td>
+                                        <td>
+                                            {{dep.size|scaleunit}}
+                                        </td>
+                                        <td>
+                                            <div class="btn-group">
+                                                <button class="copy-button btn btn-small"
+                                                data-clipboard-text="developer/file/{{dep.pluginversion.plugin.slug}}/{{dep.pluginversion.version}}/{{dep.filename}}" title="Click to copy to clipboard."><i class="fa fa-clipboard"></i></button>
+                                            </div>
+
+                                            <div class="pull-right">
+                                                <button
+                                                    data-pluginversion="{{dep.pluginversion.id}}"
+                                                    data-filename="{{dep.filename}}"
+                                                    class="deletedep btn btn-small btn-danger">
+                                                    <i class="fa fa-times"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+        </div>
+    </div>
+    {% else %}
+
+    <center><h4>The access to this page is restricted to developers. To become a developer, please contact the platform administration.</h4></center>
+
+    {% endif %}
+{% endblock content %}
+
+{% block scriptextraincludes %}
+    <script type="text/javascript" src="{{STATIC_URL}}js/emif.developer_deps.js" />
+{% endblock %}
