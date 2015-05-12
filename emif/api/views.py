@@ -34,7 +34,7 @@ from rest_framework import serializers
 from rest_framework.views import APIView
 from rest_framework import status
 from rest_framework.renderers import JSONRenderer
-from rest_framework.parsers import JSONParser
+from rest_framework.parsers import JSONParser, FileUploadParser, BaseParser
 from django.utils import simplejson
 from django.conf import settings
 
@@ -83,6 +83,10 @@ from public.utils import hasFingerprintPermissions
 
 import urllib2
 import urllib
+import tempfile
+from django.core.files import File as DjangoFile
+from questionnaire.imports import ImportQuestionnaire
+
 
 class JSONResponse(HttpResponse):
     """
@@ -1194,3 +1198,56 @@ def validate_and_get(user, data):
         result['error'] = "No fingerprintID detected"
 
     return result
+
+
+############################################################
+##### New Questionnaire Types - Web service
+############################################################
+class BinaryParser(BaseParser):
+    """
+      Binary file parser.
+    """
+    media_type = '*/*'
+
+    def parse(self, stream, media_type=None, parser_context=None):
+        """
+            Returns a django file object from a stream-like binary object
+        """
+        print "PARSE BINARY"
+        tmp = tempfile.NamedTemporaryFile()
+
+        for chunk in iter((lambda:stream.read(2048)),''):
+            tmp.write(chunk)
+
+        return DjangoFile(tmp)
+class QuestionnaireImportView(APIView):
+    authentication_classes = (TokenAuthentication, SessionAuthentication, BasicAuthentication,)
+    permission_classes = (IsAuthenticated,)
+    parser_classes = (BinaryParser,)
+
+    @transaction.commit_on_success
+    def put(self, request):
+        # If authenticated
+        if request.auth or request.user.is_authenticated():
+            user = request.user
+            result = {}
+
+            if user.is_superuser or user.groups.filter(name='importers').exists():
+
+                iq = ImportQuestionnaire.factory('excel', request.DATA)
+                iq.import_questionnaire()
+
+                result['status'] = 'authenticated'
+                result['method'] = 'POST'
+                result['user'] = str(user)
+            else:
+                result['status'] = 'forbidden'
+                result['method'] = 'POST'
+                result['user'] = str(user)
+
+        # NOT authenticated
+        else:
+            result = {'status': 'NOT authenticated', 'method': 'POST'}
+
+        response = Response(result, status=status.HTTP_200_OK)
+        return response

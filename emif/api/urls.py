@@ -39,6 +39,7 @@ from api.views import NotificationsView
 from api.views import ReadNotificationView
 from api.views import RemoveNotificationView
 from api.views import RequestAnswerView
+from api.views import QuestionnaireImportView
 
 from api.views import ToggleSubscriptionView
 
@@ -101,6 +102,8 @@ urlpatterns = patterns('api.views',
         FingerprintSchemas.as_view(), name='databasesglobal'),
 
 
+    # questionnaire import webservice
+    url(r'^importquestionnaire$', QuestionnaireImportView.as_view(), name='importquestionnaire'),
 
 
 )

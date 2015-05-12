@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+{% comment %}
+# -*- coding: utf-8 -*-
+# Copyright (C) 2014 Universidade de Aveiro, DETI/IEETA, Bioinformatics Group - http://bioinformatics.ua.pt/
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+{% endcomment %}
+{% load url from future %}
+{% load extra_tags %}
+{% load django_bootstrap_breadcrumbs %}
+
+{% block styleinclude %}
+{% endblock %}
+
+{% block headextra %}
+{% endblock %}
+{% block breadcrumbs %}
+        {{ block.super }}
+        {% breadcrumb "Import Questionnaire" "" %}
+
+{% endblock %}
+
+{% block toolbar %}
+    {% include "reusable_blocks/menu_toolbar.html" with collapse=collapseall %}
+{% endblock %}
+
+{% block content %}
+
+<div class="clearfix row">
+    <div class="span12">
+        {% if success_message %}
+        <div class="alert alert-success">
+          {{success_message}}
+        </div>
+        {% endif %}
+        {% if error_message %}
+        <div class="alert alert-danger">
+          {{error_message}}
+        </div>
+        {% endif %}
+        <form action="questionnaire/import" method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <input name="file" class="span6" type="file" />
+            <input type="submit" class="btn btn-success" value="Import Questionnaire" />
+            <div><strong>Attention:</strong> Dependending on file size, and schema complexity for the questionnaire. This process can take a while, please be patient.</div>
+        </form>
+    </div>
+</div>
+
+{% endblock content %}
+
+{% block scriptextraincludes %}
+{% endblock %}
