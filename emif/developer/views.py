@@ -155,6 +155,11 @@ class DeveloperVersionView(TemplateView):
             desc = request.POST.get('description', None)
 
             v = PluginVersion.submit(plugin_hash, version, desc)
+
+            # superuser doesnt need approval
+            if request.user.is_superuser:
+                v.approved = True
+                v.save()
         # if normal update
         else:
             version_new = request.POST.get('version', None)

@@ -212,26 +212,6 @@
                 </li>
                 {% endif %}
 
-                {% comment %}
-                {% if config.literature %}
-                <li class="{%if activetab == 'literature'%}active{%endif%}">
-                    <a href="#literature" data-toggle="tab"><i class="icon-book"></i>&nbsp; Literature</a>
-                </li>
-                {% endif %}
-                {% endcomment %}
-
-                {% if config.extra_information %}
-                <li  class="{%if activetab == 'extra'%}active{%endif%}">
-                    <a href="#apiinfo" data-toggle="tab"><i class="icon-download-alt"></i> &nbsp; Extra Information</a>
-                </li>
-                {% endif %}
-
-                {% if config.discussion %}
-                <li  class="{%if activetab == 'discussion'%}active{%endif%}">
-                    <a href="#discussion" data-toggle="tab"><i class="fa fa-comment"></i> &nbsp; Discussion</a>
-                </li>
-                {% endif %}
-
             </ul>
             <div style="margin-bottom: 50px;" class="tab-content">
                 <div class="tab-pane {%if activetab == 'summary'%}active{%endif%}" id="metadata">
@@ -276,89 +256,6 @@
         <div class="tab-pane {%if activetab == 'docs'%}active{%endif%}" id="documents">
 
             {% include "documents.html" %}
-        </div>
-        {% endif %}
-
-        {% comment %}
-        {% if config.literature %}
-        <div class="tab-pane {%if activetab == 'literature'%}active{%endif%}" id="literature">
-            <h4 class="loadingsection pull-center">Loading...</h4>
-
-        </div>
-        {% endif %}
-        {% endcomment %}
-        {% if config.extra_information %}
-        <div class="tab-pane {%if activetab == 'extra'%}active{%endif%}" id="apiinfo">
-            <div>
-                <a id="btn_pivot_table" class="btn pull-right hidden" href="">Pivot table</a>
-            </div>
-            <div class="">
-                <div id="chart" class="span4" style="display:none;"></div>
-
-                <div  class='span10' id="pivot_table_extra_information">
-
-                </div>
-
-            </div>
-            <div class="span8"></div>
-        </div>
-        {% endif %}
-        {% if config.discussion %}
-        <div class="tab-pane {%if activetab == 'discussion'%}active{%endif%}" id="discussion">
-            <div class="span8 offset2">
-                <div id="commentInserted" class="alert alert-success" style="display:none;">
-                    <button type="button" class="close" data-dismiss="alert">&times;</button>
-                    <strong>Comment sent!</strong> Your comment was posted successfully.
-                </div>
-                <div id="fillForm" class="alert" style="display:none;">
-                    <button type="button" class="close" data-dismiss="alert" >&times;</button>
-                    <strong><i class="fa fa-arrow-circle-o-down"></i></strong>&nbsp;You need to insert some words here
-                </div>
-                {% get_comment_count for fingerprint.fingerprint fingerprint_pk as comment_count %}
-
-                <center>
-                {% if comment_count == 0 %}
-                    <p>No comments yet.</p>
-                {% else %}
-                    <span id="comments_total">{{ comment_count }}</span> comment{{ comment_count|pluralize }}
-                {% endif %}
-                </center>
-                {% if not readOnly %}
-
-                    {% if user.is_authenticated %}
-                    {% get_comment_form for fingerprint.fingerprint fingerprint_pk as form %}
-
-                    <form class="span12" id="comment_form" action="{% comment_form_target %}" method="POST">
-                        <fieldset>
-                            {% csrf_token %}
-                            <textarea id="id_comment" rows="5" name="comment" class="span12" placeholder="Insert your comment or question here..." autofocus></textarea>
-                            {{ form.content_type }}
-                            {{ form.object_pk }}
-                            {{ form.timestamp }}
-                            {{ form.security_hash }}
-                            <br />
-                            <!--<input type="hidden" name="next" value="{{request.get_full_path}}" />-->
-                            <button style="margin-left:0px;" id="submit_button" class="span12 btn btn-primary" type="submit"  data-loading-text="Sending comment...">Post comment</button>
-                        </fieldset>
-                    </form>
-                    {% else %}
-                    <p>Please <a href="{% url 'auth_login' %}">log in</a> to leave a comment.</p>
-                    {% endif %}
-                {% endif %}
-                <div class="clearfix span12">
-                {% get_comment_list for fingerprint.fingerprint fingerprint_pk as comment_list %}
-                <div id="newComments"></div>
-                {% for comment in comment_list reversed%}
-                <div id="comment_{{ comment.id }}">
-                    <blockquote>
-                        <p style="font-size: 16px">{{ comment.comment }}</p>
-                        <small>{{ comment.name }} posted on {{ comment.submit_date }}</small>
-                    </blockquote>
-                </div>
-                {% empty %}
-                {% endfor %}
-                </div>
-            </div>
         </div>
         {% endif %}
     </div>
@@ -415,7 +312,6 @@
 
     <script src="{{ STATIC_URL}}js/database_info.js"></script>
     <script src="{{ STATIC_URL }}js/emif.database.delete.js"></script>
-    <script src="{{ STATIC_URL}}js/emif.discussion.js"></script>
 
     <!--[if gte IE 9]><!-->
     <script src="{{ STATIC_URL}}js/emif.populationcharacteristics.charts.js"></script>
@@ -485,8 +381,6 @@ $(function(){
     {% get_hit_count_javascript for fingerprint %}
 
     initDatabaseInfo('{{apiinfo|safe}}');
-
-    bindPostCommentHandler('{{ request.user.first_name }}', '{{ request.user.last_name }}', '{{ request.user.username }}', '{{owners}}', '{{fingerprint_id}}', '{{breadcrumb_name}}');
 
     {% if isAdvanced %}
     initAdvSearchPlugin('{{request.session.serialization_query}}', '{{request.session.query_type}}', '{{request.session.query_id}}');
