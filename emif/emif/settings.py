@@ -630,6 +630,7 @@ LOGIN_EXEMPT_URLS = (
     r'^api/metadata',
     r'^api/search',
     r'^api-token-auth-create/',
+    r'^api/importquestionnaire$',
     r'^import-questionnaire',
     r'^delete-questionnaire',
     r'^bootstrap_ie_compatibility',
