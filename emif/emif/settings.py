@@ -743,12 +743,12 @@ REDIRECT_DATACUSTODIAN = 'dashboard.views.dashboard'
 REDIRECT_RESEARCHER = 'dashboard.views.dashboard'
 
 
+
 # MEMCACHED
 CACHES = {
     'default' : dict(
-        BACKEND = 'johnny.backends.memcached.MemcachedCache',
-        LOCATION = ['127.0.0.1:11211'],
-        JOHNNY_CACHE = True,
+        BACKEND = 'django.core.cache.backends.memcached.MemcachedCache',
+        LOCATION = ['127.0.0.1:11211']
     )
 }
 
