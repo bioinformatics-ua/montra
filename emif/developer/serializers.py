@@ -66,7 +66,7 @@ class FingerprintSerializer(serializers.ModelSerializer):
     name = serializers.SerializerMethodField(method_name='get_name')
 
     def get_owner(self, obj):
-        return obj.owner
+        return obj.owner.email
 
     def get_shared(self, obj):
         return obj.shared.all()
