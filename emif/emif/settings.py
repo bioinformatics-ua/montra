@@ -20,7 +20,15 @@ import sys
 reload(sys)
 sys.setdefaultencoding('utf-8')
 
+from os import path
+from saml2 import saml
+import saml2
 
+
+# well i need to do this trick to be able to refere above project root so i can have config files outside the project
+BASEDIR = os.path.abspath(os.path.join(path.dirname(path.abspath(__file__)), '../../'))
+
+print BASEDIR
 
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
@@ -52,11 +60,19 @@ VERSION = '1.0'
 VERSION_DATE = '2015.Mar.22 - 21:03UTC'
 PROJECT_DIR_ROOT = '/projects/emif-dev/'
 
+XMLSEC_BIN = '/usr/bin/xmlsec1'
+IDP_SERVICES = [
+    path.join(BASEDIR, 'confs/sso/idps/openidp.xml'),
+    path.join(BASEDIR, 'confs/sso/idps/testshib.xml')
+]
+
 if DEBUG:
     PROJECT_DIR_ROOT = "./"
     MIDDLE_DIR = ""
+    IDP_URL = "http://localhost:8000/"
 else:
     MIDDLE_DIR = "/emif/"
+    IDP_URL = BASE_URL
 
 ADMINS = (
     ('Luis A. Bastiao Silva', 'bastiao@ua.pt'),
@@ -226,9 +242,10 @@ MIDDLEWARE_CLASSES = (
     # Uncomment the next line for simple clickjacking protection:
     # 'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'emif.middleware.LoginRequiredMiddleware',
+    'emif.middleware.ProfileRequiredMiddleware',
     'emif.interceptor.NavigationInterceptor',
-    'johnny.middleware.LocalStoreClearMiddleware',
-    'johnny.middleware.QueryCacheMiddleware',
+    #'johnny.middleware.LocalStoreClearMiddleware',
+    #'johnny.middleware.QueryCacheMiddleware',
 )
 
 ROOT_URLCONF = 'emif.urls'
@@ -344,6 +361,7 @@ INSTALLED_APPS = (
     "constance",
 
     'django_ace',
+    "djangosaml2"
 )
 
 CONSTANCE_BACKEND = 'constance.backends.database.DatabaseBackend'
@@ -368,7 +386,12 @@ AUTHENTICATION_BACKENDS = (
     'userena.backends.UserenaAuthenticationBackend',
     'guardian.backends.ObjectPermissionBackend',
     'django.contrib.auth.backends.ModelBackend',
+    'djangosaml2.backends.Saml2Backend',
 )
+
+LOGIN_URL = '/saml2/login/'
+
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 
 # Email backend settings
 # EMAIL_BACKEND = 'django.core.mail.backends.dummy.EmailBackend'
@@ -381,6 +404,88 @@ ANONYMOUS_USER_ID = -1
 
 AUTH_PROFILE_MODULE = 'accounts.EmifProfile'
 
+
+SAML_CONFIG = {
+    # full path to the xmlsec1 binary programm
+    'xmlsec_binary': XMLSEC_BIN,
+
+    # your entity id, usually your subdomain plus the url to the metadata view
+    'entityid': IDP_URL+'saml2/metadata',
+
+    # directory with attribute mapping
+    'attribute_map_dir': path.join(BASEDIR, 'confs/sso/attributemaps'),
+
+    # this block states what services we provide
+    'service': {
+         # we are just a lonely SP
+        'sp' : {
+            'name': 'Emif Catalogue SP',
+            'name_id_format': saml.NAMEID_FORMAT_TRANSIENT,
+            'endpoints': {
+                # url and binding to the assetion consumer service view
+                # do not change the binding or service name
+                'assertion_consumer_service': [
+                    (IDP_URL+'saml2/acs/',
+                        saml2.BINDING_HTTP_POST),
+                    ],
+                    # url and binding to the single logout service view
+                    # do not change the binding or service name
+                    'single_logout_service': [
+                        (IDP_URL+'saml2/ls/',
+                            saml2.BINDING_HTTP_REDIRECT),
+                        (IDP_URL+'saml2/ls/post',
+                            saml2.BINDING_HTTP_POST)
+                        ],
+
+
+                },
+
+           # attributes that this project need to identify a user
+          'required_attributes': ['uid'],
+
+           # attributes that may be useful to have but not required
+          'optional_attributes': ['eduPersonAffiliation'],
+          },
+      },
+
+  # where the remote metadata is stored
+  'metadata': {
+      'local': IDP_SERVICES,
+      },
+
+  # set to 1 to output debugging information
+  'debug': 1,
+
+  # certificate
+  'key_file': path.join(BASEDIR, 'confs/sso/certificates/sp.key'),  # private part
+  'cert_file': path.join(BASEDIR, 'confs/sso/certificates/sp.crt'),  # public part
+
+  # own metadata settings
+  'contact_person': [
+      {'given_name': 'José Luis',
+       'sur_name': 'Oliveira',
+       'company': 'DETI/IEETA',
+       'email_address': 'jlo@ua.pt',
+       'contact_type': 'administrative'},
+      ],
+  # you can set multilanguage information here
+  'organization': {
+      'name': [('EMIF Catalogue', 'en')],
+      'display_name': [('EMIF Catalogue', 'en')],
+      'url': [('http://bioinformatics.ua.pt/emif', 'en')],
+      },
+  'valid_for': 24,  # how long is our metadata valid
+}
+
+SAML_DJANGO_USER_MAIN_ATTRIBUTE = 'email'
+SAML_USE_NAME_ID_AS_USERNAME = False
+SAML_CREATE_UNKNOWN_USER = True
+SAML_ATTRIBUTE_MAPPING = {
+    'mail': ('email', 'username' ),
+    'eduPersonPrincipalName': ('email', 'username'),
+    'givenName': ('first_name', ),
+    'sn': ('last_name', ),
+}
 
 #Userena settings
 USERENA_ACTIVATION_REQUIRED = True
@@ -421,13 +526,28 @@ LOGGING = {
             'level': 'DEBUG',
             'filters': ['require_debug_false'],
             'class': 'django.utils.log.AdminEmailHandler'
-        }
+        },
+        'console': {
+            'class': 'logging.StreamHandler',
+        },
     },
     'loggers': {
         'django.request': {
             'handlers': ['mail_admins'],
             'level': 'DEBUG',
             'propagate': True,
+        },
+        'saml2.response': {
+            'handlers': ['console'],
+            'level': os.getenv('DEBUG'),
+        },
+        'djangosaml2': {
+            'handlers': ['console'],
+            'level': os.getenv('DEBUG'),
+        },
+        "saml2.mdstore": {
+            'handlers': ['console'],
+            'level': os.getenv('DEBUG'),
         },
     }
 }
@@ -499,6 +619,12 @@ JENKINS_TASKS = (
 #Pages that do not require login
 LOGIN_EXEMPT_URLS = (
     r'^$',
+    r'^indexbeta$',
+    r'^saml2$',
+    r'^saml2/login',
+    r'^saml2/metadata',
+    r'^saml2/acs',
+    r'^saml2/ls',
     r'^about',
     r'^feedback',
     r'^faq',
@@ -511,6 +637,7 @@ LOGIN_EXEMPT_URLS = (
     r'^api/metadata',
     r'^api/search',
     r'^api-token-auth-create/',
+    r'^api/importquestionnaire$',
     r'^import-questionnaire',
     r'^delete-questionnaire',
     r'^bootstrap_ie_compatibility',

@@ -46,7 +46,10 @@ urlpatterns = patterns('',
 
     # Index page
     url(r'^$', 'emif.views.index', name="home"),
+
     url(r'^index$', 'emif.views.index', name="home"),
+
+    url(r'^indexbeta$', 'emif.views.index_beta', name="home_beta"),
 
     url(r'^about$', 'emif.views.about'),
 
@@ -179,6 +182,12 @@ urlpatterns = patterns('',
 
     # Developer app urls
     url(r'^developer/', include('developer.urls')),
+
+    # SSO
+    (r'^saml2/', include('djangosaml2.urls')),
+    
+    #questionnaires
+    url(r'questionnaire/', include('questionnaire.urls')),
 )
 
 if settings.DEBUG:

@@ -54,7 +54,11 @@ from accounts.models import EmifProfile
 
 from django.core.exceptions import PermissionDenied
 
+
 from developer.models import Plugin, PluginVersion
+
+from django.http import Http404
+
 
 def document_form_view_upload(request, fingerprint_id, template_name='documents_upload_form.html'):
     """Store the files at the backend
@@ -156,6 +160,17 @@ def document_form_view(request, runcode, qs, activetab='summary', readOnly=False
 
     if "query" in request.session and "highlight_results" in request.session:
         h = request.session["highlight_results"]
+
+    # GET fingerprint primary key (for comments)
+    fingerprint = None
+
+    try:
+        fingerprint = Fingerprint.objects.get(fingerprint_hash=runcode)
+        fingerprint_pk = fingerprint.id
+    except:
+        fingerprint_pk = 0
+        raise Http404
+
     qsets, name, db_owners, fingerprint_ttype = createqsets(runcode, highlights=h)
 
     if fingerprint_ttype == "":
@@ -202,14 +217,6 @@ def document_form_view(request, runcode, qs, activetab='summary', readOnly=False
         isAdvanced = False
 
     qsets = attachPermissions(runcode, qsets)
-    # GET fingerprint primary key (for comments)
-    fingerprint = None
-
-    try:
-        fingerprint = Fingerprint.objects.get(fingerprint_hash=runcode)
-        fingerprint_pk = fingerprint.id
-    except:
-        fingerprint_pk = 0
 
     jerboa_files = Characteristic.objects.filter(fingerprint_id=runcode).order_by('-latest_date')
 

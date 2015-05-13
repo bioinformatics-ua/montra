@@ -18,9 +18,8 @@
 from django.conf.urls import patterns, url
 from rest_framework.urlpatterns import format_suffix_patterns
 
-from api.views import *
 
-from api.views import ToggleSubscriptionView
+from api.views import *
 
 from dashboard.api import *
 
@@ -81,6 +80,9 @@ urlpatterns = patterns('api.views',
 
     # questionnaire api services
     url(r'^wizards$', QuestionnaireWizardView.as_view(), name='wizards'),
+
+    # questionnaire import webservice
+    url(r'^importquestionnaire$', QuestionnaireImportView.as_view(), name='importquestionnaire'),
 
 
 )
