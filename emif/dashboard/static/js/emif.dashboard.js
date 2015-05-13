@@ -29,7 +29,7 @@ var dashFull = function(insert){
 
     if(arr_len == loaded_arr.length)
         loadDash();
-}
+};
 $(function(){
     dashzone = $("#playground").dashboard(
         {
@@ -78,7 +78,7 @@ function sandbox(id, data){
         else{
             data(function(confs, plugin){
                 self = {confs: confs, plugin: plugin};
-            })
+            });
         }
 
         if(checkIntegrity(self)){
@@ -89,7 +89,7 @@ function sandbox(id, data){
         console.error("The code contains one or several errors, and doesn't execute, please double check your code. Errors are available on console.");
         console.error(exc);
     }
-};
+}
 
 function registerShell(closure){
     console.log('register');

@@ -446,7 +446,6 @@ var TabWidget = function TabWidget(widgetname, header, pos, icon) {
 
     },
     __refresh    : function(){
-        //console.log(this.content);
         $('#'+this.widgetname+' .tab-body').html(this.content);
     },
     // private methods
