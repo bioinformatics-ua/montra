@@ -40,13 +40,9 @@
         <script src="{{ STATIC_URL}}js/vendor/widgets/widget.admin.topusers.js"></script>
         <script src="{{ STATIC_URL}}js/vendor/widgets/widget.admin.topnavigators.js"></script>
         <script src="{{ STATIC_URL}}js/vendor/widgets/widget.admin.general.stats.js"></script>
-
-        <script type="text/javascript">
-            var is_staff = true;
-        </script>
     {% endif %}
     <script type="text/javascript">
-        var is_staff = false;
+        var is_staff{% if user.is_staff %}=true{%endif%};
         var hasExtra{% if config.extra_information %} = true{% endif %};
         var hasPrivate{% if config.private_links %} = true{% endif %};
         var hasGeo{% if config.geolocation %} = true{% endif %};
