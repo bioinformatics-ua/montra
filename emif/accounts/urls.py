@@ -48,7 +48,7 @@ urlpatterns = patterns('',
         name='userena_signout'),
 
     # Edit Profile
-    url(r'^profile_edit/$', 'accounts.views.profile_edit'),
+    url(r'^profile_edit/$', 'accounts.views.profile_edit', name='prof_edit'),
 
     # Reset password
     url(r'^password/reset/$',

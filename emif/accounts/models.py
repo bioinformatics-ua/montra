@@ -37,6 +37,13 @@ from fingerprint.models import Fingerprint
 
 from django.db.models import Count
 
+from django.dispatch import receiver
+from djangosaml2.signals import pre_user_save
+
+from django.conf import settings
+
+from emif.models import add_invited
+
 class Profile(models.Model):
     name = models.CharField(unique=True, max_length=60, verbose_name=_('Name'))
     description = models.TextField(blank=True, null=True, verbose_name=_('Description'), validators=[MaxLengthValidator(600)])
@@ -324,4 +331,15 @@ class NavigationHistory(models.Model):
     path = models.TextField()
     date = models.DateTimeField(auto_now_add=True)
 
+@receiver(pre_user_save)
+def custom_update_user(sender, attributes, user_modified, **kwargs):
+    try:
+        pf = sender.emif_profile
+    except EmifProfile.DoesNotExist:
+        pf = EmifProfile(user=sender)
+        pf.save()
+        add_invited(sender)
+        print "AFTER ADD INVITED"
 
+    if user_modified:
+        return True  # I modified the user object
