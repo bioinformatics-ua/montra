@@ -274,6 +274,7 @@
                                                     <li><a tabindex="-1" href="advsearch/history">Search History</a></li>
                                                 </ul>
                                             </li>
+
                                             {% if thirdparty|length > 0 or globalwidgets|length > 0 %}
                                             <li class="divider"></li>
                                                 <li class="dropdown-submenu">
@@ -300,13 +301,16 @@
                                                     </ul>
                                                 </li>
                                             {% endif %}
-                                            {% comment %}
+
+                                            {% if request.user|has_group:'importers' or request.user.is_superuser %}
+
                                             <li class="divider"></li>
-                                            <li>{% if request.user.is_superuser %}
-                                                <a href="import-questionnaire">Import Questionnaire</a>
-                                                {% endif %}
+                                            <li>
+                                                <a href="questionnaire/import">Import Questionnaire</a>
                                             </li>
-                                            {% endcomment %}
+                                            {% endif %}
+
+
                                         </ul>
                                     </li>
                                     {% endif %}

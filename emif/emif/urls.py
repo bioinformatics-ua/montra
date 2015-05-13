@@ -185,6 +185,9 @@ urlpatterns = patterns('',
 
     # SSO
     (r'^saml2/', include('djangosaml2.urls')),
+    
+    #questionnaires
+    url(r'questionnaire/', include('questionnaire.urls')),
 )
 
 if settings.DEBUG:
