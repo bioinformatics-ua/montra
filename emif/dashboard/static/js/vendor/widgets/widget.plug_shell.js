@@ -88,6 +88,9 @@ var PlugShellWidget = function PlugShellWidget(confs, show){
         }
     },
     refresh: function(){
+        PlugShellWidget._super.__refresh.apply(this);
+    },
+    container: function(){
         return '#'+this.widgetname+' .accordion-inner';
     },
     html: function(content){
