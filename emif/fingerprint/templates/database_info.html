@@ -190,7 +190,7 @@
 <div style="margin-left: 0px;" class="span12">
     <div class="row-fluid">
         <div class="tabbable">
-            <ul id="summarynav" data-clamp=".tabbable" data-offset-top="500px" class="nav nav-tabs">
+            <ul id="summarynav" style="" data-clamp=".tabbable" class="nav nav-tabs">
                 <li class="{%if activetab == 'summary'%}active{%endif%}">
                     <a href="#metadata" data-toggle="tab"><i class="icon-list"></i>&nbsp; Fingerprint</a>
                 </li>
@@ -224,7 +224,7 @@
                 </li>
                 {% endif %}
             </ul>
-            <div style="margin-bottom: 50px;" class="tab-content">
+            <div style="margin-top: 50px; margin-bottom: 50px;" class="tab-content">
                 <div class="tab-pane {%if activetab == 'summary'%}active{%endif%}" id="metadata">
                     <div>
                         {% if owner_fingerprint or user.is_staff %}
