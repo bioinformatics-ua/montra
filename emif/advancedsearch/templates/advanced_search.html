@@ -271,7 +271,7 @@ function load_questionnary(){
 
         console.log( "Loading questionnary by parts, we have {{questionset.questionnaire.questionsets.count}} sets");
 
-        var threadpool = new ThreadPool(20);
+        var threadpool = new TaskQueuer(20);
         parts_missing = {{ questionset.questionnaire.questionsets.count }};
 
 

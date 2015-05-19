@@ -120,7 +120,6 @@ var freeTextHandle = function(reference, other){
     return 0;
 };
 var handleComment = function(){
-    console.log('cai here');
     return -3;
 };
 
@@ -295,7 +294,6 @@ comparetable_two = function(table1, table2) {
                     result = compare_cell(table2, $(this).data('qid'), response.context);
                     if (result.value == -3){
                         // do nothing
-                        console.log('cai here');
 
                     } else if (result.value == 1) {
                         //console.log($('#' + table2));

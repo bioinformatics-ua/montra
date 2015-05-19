@@ -201,7 +201,7 @@ function CounterTasker(ui, questionnaireId) {
 
      */
     this.run = function() {
-        var threadpool = new ThreadPool(this.POLL_MAX);
+        var threadpool = new TaskQueuer(this.POLL_MAX);
         var core = new CounterCore(this.questionnaireId);
 
         function count(_core, qId, _ui) {
