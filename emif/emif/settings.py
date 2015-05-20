@@ -56,8 +56,8 @@ GLOBALS = {
 # for this files we must change it manually (or serve them as dinamic files), this problem only ocurrs on IE
 # so if changing to something that not /, we should also change on file /static/css/bootstrap_ie_compatibility.css all relative # paths. This is necessary because i cant use django template variables inside a considered static file.
 BASE_URL = '/'
-VERSION = '1.0'
-VERSION_DATE = '2015.Mar.22 - 21:03UTC'
+VERSION = '1.2'
+VERSION_DATE = '2015.May.13 - 01:35UTC'
 PROJECT_DIR_ROOT = '/projects/emif-dev/'
 
 XMLSEC_BIN = '/usr/bin/xmlsec1'

@@ -552,7 +552,16 @@ class QuestionnaireWizard(models.Model):
 def __create_wizards(sender, instance, created, *args, **kwargs):
     '''This method uses the post_save signal on Questionnaire to generate wizards to existing users
     '''
+    from accounts.models import EmifProfile
+
     if created:
         for user in User.objects.all():
-            qw = QuestionnaireWizard(questionnaire=instance, user=user)
-            qw.save()
+            try:
+                pf = user.emif_profile
+                intcount = pf.interests.all().count()
+
+                if intcount > 0:
+                    qw = QuestionnaireWizard(questionnaire=instance, user=user)
+                    qw.save()
+            except EmifProfile.DoesNotExist:
+                pass

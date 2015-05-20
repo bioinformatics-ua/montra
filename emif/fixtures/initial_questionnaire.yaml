@@ -1,20 +1,3 @@
-# Profile
-- pk: 0
-  fields: {name: "Data Custodian", description: "Data custodian description"}
-  model: accounts.Profile
-
-- pk: 1
-  fields: {name: "Researcher", description: "Researcher description"}
-  model: accounts.Profile
-
-# Emif Profile
-- pk: 1
-  fields: {privacy: "Registered", user: 1, country: "PT", organization: "IEETA",
-    profiles: [0,1], 
-    interests: [1,2]
-    }
-  model: accounts.EmifProfile
-
 # Slugs
 - pk: 0
   fields: {slug1: "literature_papers", description: "Could you provide a list of peer-reviewed papers based on your data base covering the last 3 years?"}
@@ -151,12 +134,12 @@ Would you be able to create such a table for the population of in your database?
   model: searchengine.slugs
 
 
-# Questionnaire 
+# Questionnaire
 - pk: 1
   fields: {name: "Observational data sources", disable: False, redirect_url: /, slug: 'observationaldatasources'}
   model: questionnaire.questionnaire
 
-# Question Sets 
+# Question Sets
 - pk: 0
   fields: {checks: 'required', heading: q0_Intro, questionnaire: 1, sortid: 0, text_en: h1. EMIF Questionnaire Databases }
   model: questionnaire.questionset
@@ -207,7 +190,7 @@ Would you be able to create such a table for the population of in your database?
   type: open, slug_fk: 29, stats: False}
   model: questionnaire.question
 
-# Location 
+# Location
 - pk: 24
   fields: {checks: 'required', extra_en: '', number: '1b', questionset: 1,
  text_en: 'Location',
@@ -803,7 +786,7 @@ Would you be able to create such a table for the population of in your database?
   model: questionnaire.questionnaire
 
 
-# Question Sets 
+# Question Sets
 - pk: 7
   fields: {checks: 'required', heading: cohort_q0_Intro, questionnaire: 2, sortid: 0, text_en: h1. Research Cohorts Questionnaire }
   model: questionnaire.questionset
@@ -860,7 +843,7 @@ Would you be able to create such a table for the population of in your database?
   stats: False}
   model: questionnaire.question
 
-# Location 
+# Location
 - pk: 53
   fields: {checks: 'required', extra_en: '', number: '1b', questionset: 8,
  text_en: 'Location',
@@ -988,7 +971,7 @@ Would you be able to create such a table for the population of in your database?
 
 
 
-# # Question Sets 
+# # Question Sets
 # - pk: 14
 #   fields: {checks: 'required', heading: observ_q0_Intro, questionnaire: 3, sortid: 0, text_en: h1. Observational Questionnaire }
 #   model: questionnaire.questionset
@@ -1045,7 +1028,7 @@ Would you be able to create such a table for the population of in your database?
 #   type: open, slug: 'institution_name'}
 #   model: questionnaire.question
 
-# # Location 
+# # Location
 # - pk: 153
 #   fields: {checks: 'required', extra_en: '', number: '1b', questionset: 8,
 #  text_en: 'Location',
