@@ -96,8 +96,12 @@ class ExportQuestionnaireCSVPlain(ExportQuestionnaire):
                 result += self.get_tabs(_level)
                 result += str(q.number)  + " " + self.clean(q.text) +"\n"
 
+        f = None
+        if isinstance(file_path, file):
+            f = file_path
+        else:
+            f = open(self.file_path, 'w')
 
-        f = open(self.file_path, 'w')
         f.write(result)
         f.close()
 

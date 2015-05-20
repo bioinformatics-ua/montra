@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+{% comment %}
+# -*- coding: utf-8 -*-
+# Copyright (C) 2014 Universidade de Aveiro, DETI/IEETA, Bioinformatics Group - http://bioinformatics.ua.pt/
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+{% endcomment %}
+{% load url from future %}
+{% load extra_tags %}
+{% load django_bootstrap_breadcrumbs %}
+
+{% block styleinclude %}
+    <link rel="stylesheet" href="{{ STATIC_URL }}css/dataTables.bootstrap.css">
+{% endblock %}
+
+{% block headextra %}
+    <script src="{{ STATIC_URL}}js/jquery.dataTables.js"></script>
+    <script src="{{ STATIC_URL}}js/dataTables.bootstrap.js"></script>
+{% endblock %}
+
+{% block breadcrumbs %}
+        {{ block.super }}
+        {% breadcrumb "Questionnaire Schemas" "" %}
+{% endblock %}
+
+{% block toolbar %}
+    {% include "reusable_blocks/menu_toolbar.html" with collapse=collapseall %}
+{% endblock %}
+
+{% block content %}
+    <div class="row">
+    <div class="span12">
+
+    {%if user|has_group:'importers' or user.is_staff %}
+    <div class="well well-small"><center>Please be patient during the export schema process, as it may take a couple minutes for complex schemas.</center></div>
+    <table id="schemas" class="table table-bordered table-striped">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th style="width: 200px;">&nbsp;</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for schema in schemas %}
+            <tr>
+                <td>{{schema.name}}</td>
+                <td><center><a class="export_schema btn btn-success" href="questionnaire/export/{{schema.id}}">
+                    <i class="fa fa-download"></i> Export Schema XLSX
+                    </a></center>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    {% else %}
+
+    <center><h4>The access to this page is restricted to importers. To become a importer, please contact the platform administration.</h4></center>
+
+    {% endif %}
+    </div>
+    </div>
+{% endblock content %}
+
+{% block scriptextraincludes %}
+    <script type="text/javascript" src="{{STATIC_URL}}js/emif.export_questionnaire.js"></script>
+{% endblock %}

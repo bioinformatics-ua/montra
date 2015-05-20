@@ -307,6 +307,13 @@
                                                 <a href="questionnaire/import">Import Questionnaire</a>
                                             </li>
                                             {% endif %}
+                                            {% if request.user|has_group:'importers' or request.user.is_superuser %}
+
+                                            <li class="divider"></li>
+                                            <li>
+                                                <a href="questionnaire/export">Export Questionnaire</a>
+                                            </li>
+                                            {% endif %}
 
 
                                         </ul>
