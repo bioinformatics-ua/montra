@@ -9,21 +9,21 @@
     </div>
     <div class="span9">
     <h2>The plugin structure</h2>
-        <p>Below follows some basic directions on how to develop a plugin, and the absolute essentials for the to work on the EMIF Catalogue plugin platform.</p>
+        <p>The following sections provide some basic directions on how to develop a plugin and the absolute essentials for it to work on the EMIF Catalogue plugin platform.</p>
         <hr />
         <div class="clearfix">
             <a name="example" class="anchor"></a><h3>Basic Example</h3>
-                <p>At heart, a plugin for EMIF Catalogue is very simple. Only needed two mandatory things in it's structure, a confs dictionary and a plugin function, that receives a self parameter.</p>
+                <p>Fundamentally, a plugin for EMIF Catalogue is very simple. Only two mandatory things are needed in it's structure, a confs dictionary and a plugin function that receives a self-referencing 'sdk' parameter.</p>
 
-                <p>Below follows the typical, hello_word plugin.</p>
+                <p>Below follows the typical hello_word plugin.</p>
             <div class="span8">
                 <pre><code class="language-javascript">
 confs = {
     'name': 'Test plugin'
 };
-plugin = function(self){
-    self.html('Hello world');
-    self.refresh();
+plugin = function(sdk){
+    sdk.html('Hello world');
+    sdk.refresh();
 };
                 </code></pre>
             </div>
@@ -34,7 +34,7 @@ plugin = function(self){
 
             <a name="confs" class="anchor"></a><h3>The confs dictionary</h3>
 
-            <p>The confs dictionary is the place that allows specification of the widget configurations. Settings such as the display name, the widget icon, and the preferential position and size are defined in this array. Below follows a list of all the parameters available.</p>
+            <p>The confs dictionary is the place that stores the specifications of the widget configurations. Settings such as the display name, the widget icon, and the preferred position and size are defined in this array. Next follows a list of all the available parameters.</p>
 
             <div class="span8">
                 <h4>name <small>default: "New Plugin"</small></h4>
@@ -44,21 +44,21 @@ plugin = function(self){
                 A string that defines the icon for the plugin.
 
                 <h4>extracss <small>default: []</small></h4>
-                An array of strings, that defines some extra css urls that should be loaded to be able to execute the plugin.
+                An array of strings, defining some extra css URLs that should be loaded to execute the plugin.
 
                 <h4>extralibs <small>default: []</small></h4>
-                An array of strings, that defines some extra javascript library urls that should be loaded to be able to execute the plugin.
+                An array of strings, defining some extra javascript library URLs that should be loaded to execute the plugin.
 
                 <h4>Global widget specific configurations:</h4>
                 <div class="span8">
                     <h4>width <small>default: 2</small></h4>
-                    Defines the preferential width for the plugin.
+                    Defines the preferred width for the plugin.
                     <h4>height <small>default: 1</small></h4>
-                    Defines the preferential height for the plugin.
+                    Defines the preferred height for the plugin.
                     <h4>x <small>default: 1</small></h4>
-                    Defines the preferential x coordinate for the plugin.
+                    Defines the preferred x coordinate for the plugin.
                     <h4>y <small>default: 1</small></h4>
-                    Defines the preferential y coordinate for the plugin.
+                    Defines the preferred y coordinate for the plugin.
                     <hr />
 
                 </div>
@@ -74,10 +74,10 @@ plugin = function(self){
         <div class="clearfix">
         <a name="plugin" class="anchor"></a><h3>The plugin function</h3>
 
-        <p>The plugin function is the heart of the plugin. Is on this function that the main heart of the application goes. This plugin function has access to a series of objects (detailed on the section "Available objects").</p>
-        <p>Besides that, it is possible to use jquery, bootstrap 2.3.2 styling and font-awesome 4.3 icons. There's also a promise polyfill to browsers than don't support it included.</p>
+        <p>The plugin function is the heart of the plugin. This has access to a series of objects (detailed on the section "Available objects").</p>
+        <p>Moreover, it is possible to use jquery, bootstrap 2.3.2 styling and font-awesome 4.3 icons. There is also a promise polyfill to browsers than don't support it.</p>
 
-        <p>If there is a need to use other external libraries, not included in the list, they can be included through the confs settings "extralibs" and "extracss", already aborded above.</p>
+        <p>If there is a need to use other external libraries, not included in the list, they can be encompassed through the confs settings "extralibs" and "extracss", already approchead above.</p>
 
         </div>
         <hr />
