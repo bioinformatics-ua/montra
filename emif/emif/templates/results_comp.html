@@ -369,7 +369,7 @@ function compareDbsSelected(initial){
         }
       }
 
-  var threadpool = new ThreadPool(20);
+  var threadpool = new TaskQueuer(20);
   var priority=1;
       var thread;
       {%for fingerprint_id, content in results.items|slice:":1" %}
