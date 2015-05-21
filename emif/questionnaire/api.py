@@ -55,7 +55,8 @@ class QuestionnaireWizardView(APIView):
             types = QuestionnaireWizard.all(user=request.user)
 
             for wizard in types:
-                wiz.append({'id': wizard.id, 'name': wizard.questionnaire.name})
+                if not wizard.questionnaire.disable:
+                    wiz.append({'id': wizard.id, 'name': wizard.questionnaire.name})
 
             response = Response({'wizards': wiz}, status=status.HTTP_200_OK)
 
