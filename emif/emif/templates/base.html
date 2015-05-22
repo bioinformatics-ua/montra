@@ -251,6 +251,15 @@
                                                 <a href="questionnaire/import">Import Questionnaire</a>
                                             </li>
                                             {% endif %}
+
+                                            {% if request.user|has_group:'importers' or request.user.is_superuser %}
+
+                                            <li class="divider"></li>
+                                            <li>
+                                                <a href="questionnaire/export">Export Questionnaire</a>
+                                            </li>
+                                            {% endif %}
+
                                         </ul>
                                     </li>
                                     {% if thirdparty|length > 0 or globalwidgets|length > 0 %}
@@ -262,6 +271,7 @@
                                             {% if thirdparty|length > 0%}
                                                 {%for tp in thirdparty %}
                                                     <li>
+
 
                                                         <a href="apps/tp/{{tp.plugin.slug}}">
                                                         {%if tp.plugin.icon %}
