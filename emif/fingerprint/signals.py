@@ -22,13 +22,14 @@ from accounts.models import EmifProfile, RestrictedUserDbs
 
 def fingerprint_updated(sender, **kwargs):
     fingerprint = kwargs['instance']
+    created = kwargs['created']
 
-    if fingerprint.findName() != 'Unnamed':
+    if created:
         fingerprint.setSubscription(fingerprint.owner, True)
 
-    # We also check if the fingerprint was added by a restricted user,
-    # if it was we must add this fingerprint to the restricted user, otherwise he wouldnt have access to his own database
-    RestrictedUserDbs.get_or_create(fingerprint.owner, fingerprint)
+        # We also check if the fingerprint was added by a restricted user,
+        # if it was we must add this fingerprint to the restricted user, otherwise he wouldnt have access to his own database
+        RestrictedUserDbs.get_or_create(fingerprint.owner, fingerprint)
 
 post_save.connect(fingerprint_updated, sender=Fingerprint)
 
