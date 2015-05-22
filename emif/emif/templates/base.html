@@ -425,8 +425,11 @@
         {% endblock %}
         <script type="text/javascript">
         var _gaq = _gaq || [];
-        _gaq.push(['_setAccount', 'UA-38876251-1']);
-        _gaq.push(['_trackPageview']);
+
+        {% for attr in GOOGLE_ANALYTICS %}
+            _gaq.push({{attr|safe}});
+        {% endfor %}
+
         (function() {
         var ga = document.createElement('script');
         ga.type = 'text/javascript';
