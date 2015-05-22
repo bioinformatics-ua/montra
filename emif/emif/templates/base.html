@@ -79,9 +79,22 @@
 
         <script src="{{ STATIC_URL }}js/vendor/raven.js"></script>
 
+        {% if SENTRY_URL != "" %}
         <script src="{{ STATIC_URL }}js/vendor/raven_plugins/native.js"></script>
         <script src="{{ STATIC_URL }}js/vendor/raven_plugins/console.js"></script>
         <script src="{{ STATIC_URL }}js/vendor/raven_plugins/jquery.js"></script>
+        {% endif %}
+
+        <script type="application/javascript">
+            {% if SENTRY_URL != "" %}
+            Raven.config('{{SENTRY_URL}}').install();
+            Raven.setUser({
+                email: '{{user.get_full_name}}',
+                username: '{{user.email}}'
+            });
+            {%  endif %}
+        </script>
+
         <script src="{{ STATIC_URL }}js/vendor/inheritance.js"></script>
         <script src="{{ STATIC_URL }}js/vendor/modernizr-2.6.2.min.js"></script>
 
@@ -129,15 +142,6 @@
         {% block headextra %}
         {% endblock %}
         {% endcompress %}
-        <script type="application/javascript">
-            {% if SENTRY_URL != "" %}
-            Raven.config('{{SENTRY_URL}}').install();
-            Raven.setUser({
-                email: '{{user.get_full_name}}',
-                username: '{{user.email}}'
-            });
-            {%  endif %}
-        </script>
     </head>
     <body>
         <div class="wrapper">

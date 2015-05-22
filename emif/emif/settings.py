@@ -46,7 +46,6 @@ GLOBALS = {
                     <!--It runs in IE7-IE8, but it has low performance and no enhanced features.--></small>
                    """,
     'SENTRY_URL': ''
-
 }
 # Header and Footer Settings
 
@@ -764,7 +763,10 @@ HITCOUNT_KEEP_HIT_ACTIVE = { 'days': 1 }
 # Django-Compressor activation
 COMPRESS_ENABLED = False
 COMPRESS_OFFLINE = False
-
+COMPRESS_OFFLINE_CONTEXT = {
+    'SENTRY_URL': GLOBALS['SENTRY_URL'],
+    'STATIC_URL': STATIC_URL
+}
 
 # Periodic user updates newsletter settings
 NEWSLETTER_DAY='friday'
