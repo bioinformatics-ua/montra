@@ -17,7 +17,6 @@
 {% endcomment %}
 {% load url from future %}
 {% load extra_tags %}
-
 {% block styleinclude %}
 <link href='{{ STATIC_URL }}css/opensans.css' rel='stylesheet' type='text/css'>
         <link href='{{ STATIC_URL }}css/abel.css' rel='stylesheet' type='text/css'>
@@ -36,6 +35,8 @@
 {% endblock %}
 
 {% block headextra %}
+        <base id="base_link" href="{{ BASE_URL }}">
+
         <script src="{{ STATIC_URL }}js/vendor/yepnope.js"></script>
 
         <script src="{{ STATIC_URL }}js/vendor/inheritance.js"></script>
@@ -43,6 +44,7 @@
         <script src="{{ STATIC_URL }}js/vendor/jquery.bifrost.min.js"></script>
 
         <script src="{{ STATIC_URL }}js/vendor/jquery.cookie.js"></script>
+        <script src="{{ STATIC_URL }}js/vendor/bootstrap.js"></script>
 
         <script type="application/javascript">
             // We need to configure this to be able to send requests by json with the csrftoken
@@ -67,6 +69,7 @@
     <script src="{{ STATIC_URL}}js/vendor/jquery.gridster.min.js"></script>
 
     <script src="{{ STATIC_URL}}js/emif.proxies.js"></script>
+    <script src="{{STATIC_URL}}js/vendor/iframeResizer.contentWindow.js"></script>
 
 {% endblock %}
 

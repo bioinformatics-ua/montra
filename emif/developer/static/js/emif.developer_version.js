@@ -1,4 +1,6 @@
+
 $(function(){
+    iFrameResize({heightCalculationMethod: 'lowestElement'});
 
     $('#id-remote').click(function(){
         console.log(this.checked);

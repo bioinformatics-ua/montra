@@ -39,9 +39,9 @@ $(function(){
         "aoColumnDefs" : [
             {
                 'bSortable' : false,
-                'aTargets' : [4]
+                'aTargets' : [5,0]
             }
         ],
-        "order": [[ 3, "desc" ]]
+        "order": [[ 4, "desc" ]]
     });
 });

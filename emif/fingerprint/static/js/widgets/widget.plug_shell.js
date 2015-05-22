@@ -16,12 +16,16 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 */
+var base_url = $('#base_link').attr('href')+'static/';
 
 var __loadLibs = function(array,callback, i){
     if(!i)
         i=0;
     var lib = array[i];
     console.log(i);
+    if(lib.indexOf('{{STATIC_URL}}') != -1){
+        lib = lib.replace('{{STATIC_URL}}', base_url);
+    }
     if (lib.match(".js$")) {
         yepnope.injectJs(lib, function () {
               console.log("Loaded "+lib);
@@ -86,7 +90,7 @@ var PlugShellWidget = function PlugShellWidget(confs, show){
 
     },
     refresh: function(){
-        PlugShellWidget._super.__refresh.apply(this);
+        return PlugShellWidget._super.__refresh.apply(this);
     },
     html: function(content){
         this.content = content;
@@ -96,6 +100,9 @@ var PlugShellWidget = function PlugShellWidget(confs, show){
             this.content = content;
         else
             this.content += content;
+    },
+    container: function(){
+        return '#'+this.widgetname+' .tab-body';
     },
     copy: function(){
         return PlugShellWidget._super.copy.apply(this, [{

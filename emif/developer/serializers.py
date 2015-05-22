@@ -115,7 +115,11 @@ class DocumentSerializer(serializers.ModelSerializer):
         exclude = ['id', 'fingerprint_id', 'removed']
 
 class CommentSerializer(serializers.ModelSerializer):
-    pass
+    submit_date = serializers.SerializerMethodField(method_name='getDate')
+
+    def getDate(self, obj):
+        return obj.submit_date.strftime("%Y-%m-%d %H:%M:%S")
+
     class Meta:
         model = Comment
         fields = ['user_name', 'user_email', 'comment', 'submit_date']

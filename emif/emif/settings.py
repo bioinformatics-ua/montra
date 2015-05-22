@@ -187,8 +187,11 @@ else:
 
 # URL prefix for static files.
 # Example: "http://media.lawrence.com/static/"
-STATIC_URL = BASE_URL+'static/'
 
+STATIC_URL = BASE_URL+'static/'
+MEDIA_ROOT = STATIC_ROOT+'media/'
+
+MEDIA_URL = 'static/media/'
 
 # Additional locations of static files
 STATICFILES_DIRS = (
