@@ -1077,7 +1077,7 @@ input.fill {
   position: relative;
   overflow: hidden;
 }
-#version-details .btn-file input[type=file] {
+.btn-file input[type=file]{
   position: absolute;
   top: 0;
   right: 0;

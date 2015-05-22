@@ -18,6 +18,15 @@ from django.contrib.auth.models import User
 import os
 
 from django.db.models import Max
+from django_resized import ResizedImageField
+
+from django.conf import settings
+
+def iconHash(instance, filename):
+    ''' Callable to be called by the ImageField, this renames the file to the generic hash
+        so we avoid collisions
+    '''
+    return '.{0}icons/{1}'.format(settings.MEDIA_URL, instance.slug)
 
 # There are three types of plugins:
 class Plugin(models.Model):
@@ -37,6 +46,7 @@ class Plugin(models.Model):
     slug = models.CharField(max_length=100, unique=True)
     type = models.IntegerField(choices=TYPES, default=GLOBAL)
     owner= models.ForeignKey(User)
+    icon = ResizedImageField(size=[200, 200], upload_to=iconHash, null=True)
     create_date     = models.DateTimeField(auto_now_add=True)
     latest_update   = models.DateTimeField(auto_now=True)
 
@@ -59,23 +69,28 @@ class Plugin(models.Model):
         return os.urandom(16).encode('hex');
 
     @staticmethod
-    def create(name, type, owner):
+    def create(name, type, owner, icon):
         slug = Plugin.__generateSlug(name)
-
-        p = Plugin(name=name, type=type, slug=slug, owner=owner)
+        if(icon != None):
+            p = Plugin(name=name, type=type, slug=slug, owner=owner, icon=icon)
+        else:
+            p = Plugin(name=name, type=type, slug=slug, owner=owner)
         p.save()
 
         return p
 
     @staticmethod
-    def update(slug, name, type, owner):
+    def update(slug, name, type, owner, icon):
 
         try:
             p = Plugin.objects.get(slug=slug)
 
-            p.name=name;
-            p.type=type;
-            p.owner=owner;
+            p.name=name
+            p.type=type
+            p.owner=owner
+
+            if icon != None:
+                p.icon = icon
 
             p.save()
 

@@ -75,6 +75,10 @@ class DeveloperDetailView(TemplateView):
         except Plugin.DoesNotExist:
             pass
 
+        error = request.session.get('error', None)
+        if error:
+            del request.session['error']
+
         return render(request, self.template_name,
             {
                 'request': request,
@@ -83,6 +87,7 @@ class DeveloperDetailView(TemplateView):
                 'plugin_types': Plugin.TYPES,
                 'add': add,
                 'update': update,
+                'error': error,
                 'developer': True
 
             })
@@ -95,20 +100,26 @@ class DeveloperPluginSaveView(TemplateView):
         plugin_hash = request.POST.get('plugin_hash', None)
         name = request.POST.get('name', None)
         type = request.POST.get('type', None)
+        icon = request.FILES.get('icon', None)
 
-        # create
-        if plugin_hash == '':
+        try:
+            # create
+            if plugin_hash == '':
 
-            plugin = Plugin.create(name, type, request.user)
+                plugin = Plugin.create(name, type, request.user, icon)
 
-            if plugin != None:
-                return redirect('developer-detail', plugin_hash=plugin.slug)
+                if plugin != None:
+                    return redirect('developer-detail', plugin_hash=plugin.slug)
 
-        # update
-        elif plugin_hash != None:
-            plugin = Plugin.update(plugin_hash, name, type, request.user)
-            if plugin != None:
-                return redirect('developer-detail', plugin_hash=plugin.slug)
+            # update
+            elif plugin_hash != None:
+                plugin = Plugin.update(plugin_hash, name, type, request.user, icon)
+                if plugin != None:
+                    return redirect('developer-detail', plugin_hash=plugin.slug)
+        except IOError:
+            raise
+            request.session['error'] = "Can't save the file choosen as icon (the icon must be a jpeg or a png image)."
+            return redirect('developer-detail', plugin_hash=plugin_hash)
 
         # error request
         raise Http404
@@ -144,6 +155,11 @@ class DeveloperVersionView(TemplateView):
             desc = request.POST.get('description', None)
 
             v = PluginVersion.submit(plugin_hash, version, desc)
+
+            # superuser doesnt need approval
+            if request.user.is_superuser:
+                v.approved = True
+                v.save()
         # if normal update
         else:
             version_new = request.POST.get('version', None)

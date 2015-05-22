@@ -40,7 +40,6 @@ pysolr==3.0.6
 github3.py==1.0.0a1
 django-jenkins
 -e git://github.com/bioinformatics-ua/django-userena.git#egg=userena
-PIL==1.1.7
 geopy==0.96.2
 openpyxl==2.1.1
 requests==2.4.3
@@ -72,4 +71,7 @@ django-ace==1.0.2
 python-Levenshtein==0.12.0
 rarfile==2.7
 cssselect==0.9.1
+django-resized==0.3.5
+pillow==2.8.1
 djangosaml2==0.13.0
+
