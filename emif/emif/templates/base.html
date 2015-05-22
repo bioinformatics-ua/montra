@@ -372,7 +372,7 @@
                 </div>
                 <div style="padding-top: 60px;" class="container">
                     {% if user.is_authenticated and user.is_active %}
-                        <div data-clamp=".container" id="topnavigator">
+                        <div style="position: fixed; top: 65px;" data-clamp=".container" id="topnavigator">
                         <div>
                         {% if breadcrumb %}
                         {% block breadcrumbs %}
@@ -382,11 +382,12 @@
                             {% render_breadcrumbs %}
                         </div>
                         {% endif %}
-                        <div class="pull-right">
+                        <div class="toolbar pull-right">
                             {% block toolbar %} {% endblock %}
                         </div>
                         </div>
                         </div>
+                        <div style="margin-top: 60px"></div>
                     {% endif %}
 
 <div style="display: none; z-index: 2000; position:fixed; bottom:20px; right: 20px;" class="alert alert-info" id="exporting-message">Databases of the current view are being exported, please wait.</div>

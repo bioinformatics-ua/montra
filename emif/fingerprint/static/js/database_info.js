@@ -307,8 +307,16 @@
          }
      });
 
-    $('#topnavigator').affix();
-    $('#summarynav').affix();
+    var sm = $('#summarynav');
+    setInterval(function() {
+        var offset = $(window).scrollTop();
+
+        if(offset > 0){
+            sm.addClass('summarynav_affixed');
+        } else {
+            sm.removeClass('summarynav_affixed');
+        }
+    }, 250);
 
  }
 
