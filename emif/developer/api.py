@@ -66,7 +66,7 @@ class DatabaseSchemasView(APIView):
     def get(self, request, *args, **kw):
 
         if request.user.is_authenticated():
-            schemas = QuestionnaireSerializer(Questionnaire.objects.filter(disable='False'))
+            schemas = QuestionnaireSerializer(Questionnaire.objects.filter(disable='False'), many=True)
 
             response = Response({'schemas': schemas.data}, status=status.HTTP_200_OK)
 
@@ -103,7 +103,7 @@ class getFingerprintsView(APIView):
                 except Questionnaire.DoesNotExist:
                     return Response({}, status=status.HTTP_403_FORBIDDEN)
 
-            fingerprints = FingerprintSerializer(Fingerprint.valid(questionnaire=q, owner=request.user))
+            fingerprints = FingerprintSerializer(Fingerprint.valid(questionnaire=q, owner=request.user), many=True)
 
             return Response({'fingerprints': fingerprints.data}, status=status.HTTP_200_OK)
 
@@ -153,7 +153,7 @@ class getAnswersView(APIView):
 
             return Response(
                 {
-                    'fingerprint': AnswerSerializer(f.answers(restriction=request.user)).data
+                    'fingerprint': AnswerSerializer(f.answers(restriction=request.user), many=True).data
                 }, status=status.HTTP_200_OK)
 
 
@@ -167,10 +167,12 @@ class getExtraView(APIView):
     def get(self, request, fingerprint=None):
 
         if request.user.is_authenticated():
+            print fingerprint
+            print type(fingerprint)
             return Response(
                 {
                     'api': FingerprintAPISerializer(
-                        FingerprintAPI.objects.filter(fingerprintID=fingerprint)
+                        FingerprintAPI.objects.filter(fingerprintID=fingerprint), many=True
                     ).data
                 }, status=status.HTTP_200_OK)
 
@@ -245,11 +247,11 @@ class getCommentsView(APIView):
                 comments = Comment.objects.filter(
                     content_type__pk=ContentType.objects.get_for_model(fp).id,
                     object_pk=fp.id
-                )
+                ).order_by('-id')
 
                 return Response(
                     {
-                        'comments': CommentSerializer(comments).data
+                        'comments': CommentSerializer(comments, many=True).data
                     }, status=status.HTTP_200_OK)
 
             except Fingerprint.DoesNotExist:

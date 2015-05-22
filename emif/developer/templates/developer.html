@@ -62,6 +62,7 @@
     <table id="plugins" class="table table-bordered table-striped">
         <thead>
             <tr>
+                <th style="width: 24px;"></th>
                 <th style="width: 35%;">Name</th>
                 <th>Type</th>
                 <th>Create Date</th>
@@ -72,6 +73,13 @@
         <tbody>
         {% for plugin in plugins %}
             <tr data-id="{{plugin.slug}}" data-name="{{plugin.name}}">
+                <td>
+                    {%if plugin.icon %}
+                        <img style="max-width: 24px; max-height: 24px;" src="{{plugin.icon.url}}" />
+                    {% else %}
+                        <i style="font-size: 24px;" class="fa fa-picture-o"></i>
+                    {% endif %}
+                </td>
                 <td><a href="developer/{{plugin.slug}}">{{plugin.name}}</a></td>
                 <td>{{plugin.type_repr }}</td>
                 <td>{{plugin.create_date_repr }}</td>

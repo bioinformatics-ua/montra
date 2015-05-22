@@ -45,8 +45,11 @@ GLOBALS = {
                     <small id="supportability">This website is optimised to Safari, Chrome, Firefox, Opera and IE9+.
                     <!--It runs in IE7-IE8, but it has low performance and no enhanced features.--></small>
                    """,
-    'SENTRY_URL': ''
-
+    'SENTRY_URL': '',
+    'GOOGLE_ANALYTICS': [
+        ['_setAccount', 'UA-38876251-1'],
+        ['_trackPageview']
+    ]
 }
 # Header and Footer Settings
 
@@ -187,8 +190,11 @@ else:
 
 # URL prefix for static files.
 # Example: "http://media.lawrence.com/static/"
-STATIC_URL = BASE_URL+'static/'
 
+STATIC_URL = BASE_URL+'static/'
+MEDIA_ROOT = STATIC_ROOT+'media/'
+
+MEDIA_URL = 'static/media/'
 
 # Additional locations of static files
 STATICFILES_DIRS = (
@@ -761,7 +767,10 @@ HITCOUNT_KEEP_HIT_ACTIVE = { 'days': 1 }
 # Django-Compressor activation
 COMPRESS_ENABLED = False
 COMPRESS_OFFLINE = False
-
+COMPRESS_OFFLINE_CONTEXT = {
+    'SENTRY_URL': GLOBALS['SENTRY_URL'],
+    'STATIC_URL': STATIC_URL
+}
 
 # Periodic user updates newsletter settings
 NEWSLETTER_DAY='friday'

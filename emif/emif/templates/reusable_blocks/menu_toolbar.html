@@ -50,6 +50,7 @@
       {% endif %}
       {% if fingerprint_dump %}
       <div id="tabselectbox" class="btn btn-group"></div>
+      <button id="tabmanagerreset" title="Reset the tab widgets configuration to default original state. All personal preferences will be lost." onclick="tm.reset();" class="btn"><i class="fa fa-undo"></i> Reset</button>
       {%if config.newsletter %}
         {% if not subscription %}
           <button id="dbsubscription" data-subscribed="false" class="btn"><i class="fa fa-at"></i> Subscribe</button>
