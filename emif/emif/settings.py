@@ -28,8 +28,6 @@ import saml2
 # well i need to do this trick to be able to refere above project root so i can have config files outside the project
 BASEDIR = os.path.abspath(os.path.join(path.dirname(path.abspath(__file__)), '../../'))
 
-print BASEDIR
-
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
@@ -106,17 +104,6 @@ DATABASE_PATH_SQLITE3 = "emif.db"
 if not DEBUG:
     DATABASE_PATH_SQLITE3 = PROJECT_DIR_ROOT + "emif/" + DATABASE_PATH_SQLITE3
 
-'''DATABASES = {
-    'default': {
-    'ENGINE': 'django.db.backends.sqlite3', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
-    'NAME': DATABASE_PATH_SQLITE3,                      # Or path to database file if using sqlite3.
-    'USER': '',                      # Not used with sqlite3.
-    'PASSWORD': '',                  # Not used with sqlite3.
-    'HOST': '',                      # Set to empty string for localhost. Not used with sqlite3.
-    'PORT': '',                      # Set to empty string for default. Not used with sqlite3.
-    }
-}
-'''
 DATABASES = {
     'default': {
         #        'ENGINE': 'django.db.backends.mysql', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
@@ -175,34 +162,7 @@ MEDIA_URL = ''
 # in apps' "static/" subdirectories and in STATICFILES_DIRS.
 # Example: "/home/media/media.lawrence.com/static/"
 
-if DEBUG:
-    STATIC_ROOT = ''
-else:
-    STATIC_ROOT = PROJECT_DIR_ROOT + 'emif/emif/collected-static'
 
-
-
-# URL prefix for static files.
-# Example: "http://media.lawrence.com/static/"
-STATIC_URL = BASE_URL+'static/'
-
-
-# Additional locations of static files
-STATICFILES_DIRS = (
-    # Put strings here, like "/home/html/static" or "C:/www/django/static".
-    # Always use forward slashes, even on Windows.
-    # Don't forget to use absolute paths, not relative paths.
-    os.path.abspath(PROJECT_DIR_ROOT + MIDDLE_DIR + 'emif/static'),
-    os.path.abspath(PROJECT_DIR_ROOT + MIDDLE_DIR + 'questionnaire/static/'),
-    os.path.abspath(PROJECT_DIR_ROOT + MIDDLE_DIR + 'fingerprint/static/'),
-    os.path.abspath(PROJECT_DIR_ROOT + MIDDLE_DIR + 'population_characteristics/static'),
-    os.path.abspath(PROJECT_DIR_ROOT + MIDDLE_DIR + 'literature/static'),
-    os.path.abspath(PROJECT_DIR_ROOT + MIDDLE_DIR + 'docs_manager/static'),
-    os.path.abspath(PROJECT_DIR_ROOT + MIDDLE_DIR + 'advancedsearch/static'),
-    os.path.abspath(PROJECT_DIR_ROOT + MIDDLE_DIR + 'public/static'),
-    os.path.abspath(PROJECT_DIR_ROOT + MIDDLE_DIR + 'accounts/static'),
-    os.path.abspath(PROJECT_DIR_ROOT + MIDDLE_DIR + 'dashboard/static'),
-)
 
 # List of finder classes that know how to find static files in
 # various locations.
@@ -249,23 +209,6 @@ ROOT_URLCONF = 'emif.urls'
 # Python dotted path to the WSGI application used by Django's runserver.
 WSGI_APPLICATION = 'emif.wsgi.application'
 
-TEMPLATE_DIRS = (
-    # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
-    # Always use forward slashes, even on Windows.
-    # Don't forget to use absolute paths, not relative paths.
-    os.path.abspath(PROJECT_DIR_ROOT + MIDDLE_DIR + 'apps/seantis-questionnaire/questionnaire/templates'),
-    os.path.abspath(PROJECT_DIR_ROOT + MIDDLE_DIR + 'emif/templates'),
-    os.path.abspath(PROJECT_DIR_ROOT + MIDDLE_DIR + 'population_characteristics/templates'),
-    os.path.abspath(PROJECT_DIR_ROOT + MIDDLE_DIR + 'literature/templates'),
-    os.path.abspath(PROJECT_DIR_ROOT + MIDDLE_DIR + 'control_version/templates'),
-    os.path.abspath(PROJECT_DIR_ROOT + MIDDLE_DIR + 'docs_manager/templates'),
-    os.path.abspath(PROJECT_DIR_ROOT + MIDDLE_DIR + 'advancedsearch/templates'),
-    os.path.abspath(PROJECT_DIR_ROOT + MIDDLE_DIR + 'public/templates'),
-    os.path.abspath(PROJECT_DIR_ROOT + MIDDLE_DIR + 'dashboard/templates'),
-
-    os.path.abspath(PROJECT_DIR_ROOT + MIDDLE_DIR + 'notifications/templates'),
-    os.path.abspath(PROJECT_DIR_ROOT + MIDDLE_DIR + 'accounts/templates'),
-)
 
 INSTALLED_APPS = (
     'django.contrib.auth',
@@ -396,109 +339,6 @@ ANONYMOUS_USER_ID = -1
 
 AUTH_PROFILE_MODULE = 'accounts.EmifProfile'
 
-
-SAML_CONFIG = {
-    # full path to the xmlsec1 binary programm
-    'xmlsec_binary': XMLSEC_BIN,
-
-    # your entity id, usually your subdomain plus the url to the metadata view
-    'entityid': IDP_URL+'saml2/metadata',
-
-    # directory with attribute mapping
-    'attribute_map_dir': path.join(BASEDIR, 'confs/sso/attributemaps'),
-
-    # this block states what services we provide
-    'service': {
-         # we are just a lonely SP
-        'sp' : {
-            'name': 'Emif Catalogue SP',
-            'name_id_format': saml.NAMEID_FORMAT_TRANSIENT,
-            'endpoints': {
-                # url and binding to the assetion consumer service view
-                # do not change the binding or service name
-                'assertion_consumer_service': [
-                    (IDP_URL+'saml2/acs/',
-                        saml2.BINDING_HTTP_POST),
-                    ],
-                    # url and binding to the single logout service view
-                    # do not change the binding or service name
-                    'single_logout_service': [
-                        (IDP_URL+'saml2/ls/',
-                            saml2.BINDING_HTTP_REDIRECT),
-                        (IDP_URL+'saml2/ls/post',
-                            saml2.BINDING_HTTP_POST)
-                        ],
-
-
-                },
-
-           # attributes that this project need to identify a user
-          'required_attributes': ['uid'],
-
-           # attributes that may be useful to have but not required
-          'optional_attributes': ['eduPersonAffiliation'],
-          },
-      },
-
-  # where the remote metadata is stored
-  'metadata': {
-      'local': IDP_SERVICES,
-      },
-
-  # set to 1 to output debugging information
-  'debug': 1,
-
-  # certificate
-  'key_file': path.join(BASEDIR, 'confs/sso/certificates/sp.key'),  # private part
-  'cert_file': path.join(BASEDIR, 'confs/sso/certificates/sp.crt'),  # public part
-
-  # own metadata settings
-  'contact_person': [
-      {'given_name': 'José Luis',
-       'sur_name': 'Oliveira',
-       'company': 'DETI/IEETA',
-       'email_address': 'jlo@ua.pt',
-       'contact_type': 'administrative'},
-      ],
-  # you can set multilanguage information here
-  'organization': {
-      'name': [('EMIF Catalogue', 'en')],
-      'display_name': [('EMIF Catalogue', 'en')],
-      'url': [('http://bioinformatics.ua.pt/emif', 'en')],
-      },
-  'valid_for': 24,  # how long is our metadata valid
-}
-
-SAML_DJANGO_USER_MAIN_ATTRIBUTE = 'email'
-SAML_USE_NAME_ID_AS_USERNAME = False
-SAML_CREATE_UNKNOWN_USER = True
-SAML_ATTRIBUTE_MAPPING = {
-    'mail': ('email', 'username' ),
-    'eduPersonPrincipalName': ('email', 'username'),
-    'givenName': ('first_name', ),
-    'sn': ('last_name', ),
-}
-
-#Userena settings
-USERENA_ACTIVATION_REQUIRED = True
-USERENA_SIGNIN_AFTER_SIGNUP = False
-USERENA_WITHOUT_USERNAMES = True
-USERENA_DISABLE_PROFILE_LIST = True
-USERENA_USE_MESSAGES = False
-USERENA_REDIRECT_ON_SIGNOUT = BASE_URL
-USERENA_SIGNIN_REDIRECT_BASE = BASE_URL
-USERENA_SIGNIN_REDIRECT_URL = BASE_URL + 'dashboard'
-USERENA_MODERATE_REGISTRATION = True                    #True - need admin approval (activation)
-USERENA_ACTIVATION_REJECTED = 'ACTIVATION_REJECTED'
-USERENA_PENDING_MODERATION = 'PENDING_MODERATION'
-USERENA_ACTIVATED = 'ALREADY_ACTIVATED'
-USERENA_REMEMBER_ME_DAYS = ('a day', 1)
-USERENA_HTML_EMAIL = True
-USERENA_USE_PLAIN_TEMPLATE = False
-
-LOGIN_REDIRECT_URL = USERENA_SIGNIN_REDIRECT_URL
-LOGIN_URL = BASE_URL + ''
-LOGOUT_URL = BASE_URL + 'accounts/signout/'
 
 # A sample logging configuration. The only tangible logging
 # performed by this configuration is to send an email to
@@ -763,3 +603,153 @@ try:
 except:
     pass
 
+
+if DEBUG:
+    STATIC_ROOT = ''
+else:
+    STATIC_ROOT = PROJECT_DIR_ROOT + 'emif/emif/collected-static'
+
+
+
+# URL prefix for static files.
+# Example: "http://media.lawrence.com/static/"
+STATIC_URL = BASE_URL+'static/'
+
+
+# Additional locations of static files
+STATICFILES_DIRS = (
+    # Put strings here, like "/home/html/static" or "C:/www/django/static".
+    # Always use forward slashes, even on Windows.
+    # Don't forget to use absolute paths, not relative paths.
+    os.path.abspath(PROJECT_DIR_ROOT + MIDDLE_DIR + 'emif/static'),
+    os.path.abspath(PROJECT_DIR_ROOT + MIDDLE_DIR + 'questionnaire/static/'),
+    os.path.abspath(PROJECT_DIR_ROOT + MIDDLE_DIR + 'fingerprint/static/'),
+    os.path.abspath(PROJECT_DIR_ROOT + MIDDLE_DIR + 'population_characteristics/static'),
+    os.path.abspath(PROJECT_DIR_ROOT + MIDDLE_DIR + 'literature/static'),
+    os.path.abspath(PROJECT_DIR_ROOT + MIDDLE_DIR + 'docs_manager/static'),
+    os.path.abspath(PROJECT_DIR_ROOT + MIDDLE_DIR + 'advancedsearch/static'),
+    os.path.abspath(PROJECT_DIR_ROOT + MIDDLE_DIR + 'public/static'),
+    os.path.abspath(PROJECT_DIR_ROOT + MIDDLE_DIR + 'accounts/static'),
+    os.path.abspath(PROJECT_DIR_ROOT + MIDDLE_DIR + 'dashboard/static'),
+)
+
+TEMPLATE_DIRS = (
+    # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
+    # Always use forward slashes, even on Windows.
+    # Don't forget to use absolute paths, not relative paths.
+    os.path.abspath(PROJECT_DIR_ROOT + MIDDLE_DIR + 'apps/seantis-questionnaire/questionnaire/templates'),
+    os.path.abspath(PROJECT_DIR_ROOT + MIDDLE_DIR + 'emif/templates'),
+    os.path.abspath(PROJECT_DIR_ROOT + MIDDLE_DIR + 'population_characteristics/templates'),
+    os.path.abspath(PROJECT_DIR_ROOT + MIDDLE_DIR + 'literature/templates'),
+    os.path.abspath(PROJECT_DIR_ROOT + MIDDLE_DIR + 'control_version/templates'),
+    os.path.abspath(PROJECT_DIR_ROOT + MIDDLE_DIR + 'docs_manager/templates'),
+    os.path.abspath(PROJECT_DIR_ROOT + MIDDLE_DIR + 'advancedsearch/templates'),
+    os.path.abspath(PROJECT_DIR_ROOT + MIDDLE_DIR + 'public/templates'),
+    os.path.abspath(PROJECT_DIR_ROOT + MIDDLE_DIR + 'dashboard/templates'),
+
+    os.path.abspath(PROJECT_DIR_ROOT + MIDDLE_DIR + 'notifications/templates'),
+    os.path.abspath(PROJECT_DIR_ROOT + MIDDLE_DIR + 'accounts/templates'),
+)
+
+#Userena settings
+USERENA_ACTIVATION_REQUIRED = True
+USERENA_SIGNIN_AFTER_SIGNUP = False
+USERENA_WITHOUT_USERNAMES = True
+USERENA_DISABLE_PROFILE_LIST = True
+USERENA_USE_MESSAGES = False
+USERENA_REDIRECT_ON_SIGNOUT = BASE_URL
+USERENA_SIGNIN_REDIRECT_BASE = BASE_URL
+USERENA_SIGNIN_REDIRECT_URL = BASE_URL + 'dashboard'
+USERENA_MODERATE_REGISTRATION = True                    #True - need admin approval (activation)
+USERENA_ACTIVATION_REJECTED = 'ACTIVATION_REJECTED'
+USERENA_PENDING_MODERATION = 'PENDING_MODERATION'
+USERENA_ACTIVATED = 'ALREADY_ACTIVATED'
+USERENA_REMEMBER_ME_DAYS = ('a day', 1)
+USERENA_HTML_EMAIL = True
+USERENA_USE_PLAIN_TEMPLATE = False
+
+LOGIN_REDIRECT_URL = USERENA_SIGNIN_REDIRECT_URL
+LOGIN_URL = BASE_URL + ''
+LOGOUT_URL = BASE_URL + 'accounts/signout/'
+
+SAML_CONFIG = {
+    # full path to the xmlsec1 binary programm
+    'xmlsec_binary': XMLSEC_BIN,
+
+    # your entity id, usually your subdomain plus the url to the metadata view
+    'entityid': IDP_URL+'saml2/metadata',
+
+    # directory with attribute mapping
+    'attribute_map_dir': path.join(BASEDIR, 'confs/sso/attributemaps'),
+
+    # this block states what services we provide
+    'service': {
+         # we are just a lonely SP
+        'sp' : {
+            'name': 'Emif Catalogue SP',
+            'name_id_format': saml.NAMEID_FORMAT_TRANSIENT,
+            'endpoints': {
+                # url and binding to the assetion consumer service view
+                # do not change the binding or service name
+                'assertion_consumer_service': [
+                    (IDP_URL+'saml2/acs/',
+                        saml2.BINDING_HTTP_POST),
+                    ],
+                    # url and binding to the single logout service view
+                    # do not change the binding or service name
+                    'single_logout_service': [
+                        (IDP_URL+'saml2/ls/',
+                            saml2.BINDING_HTTP_REDIRECT),
+                        (IDP_URL+'saml2/ls/post',
+                            saml2.BINDING_HTTP_POST)
+                        ],
+
+
+                },
+
+           # attributes that this project need to identify a user
+          'required_attributes': ['uid'],
+
+           # attributes that may be useful to have but not required
+          'optional_attributes': ['eduPersonAffiliation'],
+          },
+      },
+
+  # where the remote metadata is stored
+  'metadata': {
+      'local': IDP_SERVICES,
+      },
+
+  # set to 1 to output debugging information
+  'debug': 1,
+
+  # certificate
+  'key_file': path.join(BASEDIR, 'confs/sso/certificates/sp.key'),  # private part
+  'cert_file': path.join(BASEDIR, 'confs/sso/certificates/sp.crt'),  # public part
+
+  # own metadata settings
+  'contact_person': [
+      {'given_name': 'José Luis',
+       'sur_name': 'Oliveira',
+       'company': 'DETI/IEETA',
+       'email_address': 'jlo@ua.pt',
+       'contact_type': 'administrative'},
+      ],
+  # you can set multilanguage information here
+  'organization': {
+      'name': [('EMIF Catalogue', 'en')],
+      'display_name': [('EMIF Catalogue', 'en')],
+      'url': [('http://bioinformatics.ua.pt/emif', 'en')],
+      },
+  'valid_for': 24,  # how long is our metadata valid
+}
+
+SAML_DJANGO_USER_MAIN_ATTRIBUTE = 'email'
+SAML_USE_NAME_ID_AS_USERNAME = False
+SAML_CREATE_UNKNOWN_USER = True
+SAML_ATTRIBUTE_MAPPING = {
+    'mail': ('email', 'username' ),
+    'eduPersonPrincipalName': ('email', 'username'),
+    'givenName': ('first_name', ),
+    'sn': ('last_name', ),
+}
