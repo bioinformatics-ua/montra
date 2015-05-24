@@ -28,7 +28,7 @@ django-transmeta==0.6.9
 docutils==0.10
 easy-thumbnails==1.2
 pep8==1.4.1
-pymongo==2.4.2
+pymongo==2.8.1
 pyparsing==1.5.6
 pytz==2012j
 textile==2.1.5

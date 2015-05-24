@@ -544,6 +544,8 @@ MONGO_EMIF = {
     'DB_NAME': 'emif_mongo',
     'HOST': 'localhost',
     'PORT': 27017,
+    'USER': '',
+    'PASS' : '',
     'COLLECTION': 'jerboa_files'
 }
 
@@ -562,7 +564,6 @@ CACHES = {
     )
 }
 
-JOHNNY_MIDDLEWARE_KEY_PREFIX='emif_'
 
 PUBLIC_LINK_MAX_VIEWS = 50; # number of views
 PUBLIC_LINK_MAX_TIME = 24*30; # hours
@@ -615,7 +616,10 @@ import sys
 
 from pymongo import MongoClient
 try:
-    client = MongoClient(MONGO_EMIF['HOST'], MONGO_EMIF['PORT'])
+    if  MONGO_EMIF['USER'] != '' and  MONGO_EMIF['PASS']:
+        client = MongoClient('mongodb://' + MONGO_EMIF['USER'] + ':' + MONGO_EMIF['PASS'] + '@'+MONGO_EMIF['HOST'] + ':' +str(MONGO_EMIF['PORT']))
+    else:
+        client = MongoClient('mongodb://' + MONGO_EMIF['HOST'] + ':' +str(MONGO_EMIF['PORT']))
     # db_name_mongo = MONGO_EMIF['DB_NAME']
     # db_mongo = client.db_name_mongo
     db_mongo = client.emif_mongo
