@@ -547,33 +547,6 @@ MONGO_EMIF = {
     'COLLECTION': 'jerboa_files'
 }
 
-#CONNECT MONGODB
-#===============
-
-# Connect on MongoDB Database
-# from pymongo.connection import Connection
-from pymongo.errors import ConnectionFailure
-import sys
-# try:
-#     connection = Connection(MONGO_EMIF['HOST'], MONGO_EMIF['PORT'])
-#     DBCON = connection[MONGO_EMIF['DB_NAME']]
-# except ConnectionFailure, e:
-#     sys.stderr.write("Could not connect to MongoDB: %s" % e)
-#     sys.exit(1)
-
-
-from pymongo import MongoClient
-try:
-    client = MongoClient(MONGO_EMIF['HOST'], MONGO_EMIF['PORT'])
-    # db_name_mongo = MONGO_EMIF['DB_NAME']
-    # db_mongo = client.db_name_mongo
-    db_mongo = client.emif_mongo
-    # jerboa_collection = db_mongo.MONGO_EMIF['COLLECTION']
-    jerboa_collection = db_mongo.jerboa_files
-    jerboa_aggregation_collection = db_mongo.jerboa_aggregation
-except ConnectionFailure, e:
-    sys.stderr.write("Could not connect to MongoDB: %s" % e)
-    sys.exit(1)
 
 # REDIRECT USER ACCORDING TO PROFILE
 REDIRECT_DATACUSTODIAN = 'dashboard.views.dashboard'
@@ -630,6 +603,28 @@ if DEBUG:
 else:
     STATIC_ROOT = PROJECT_DIR_ROOT + 'emif/emif/collected-static'
 
+
+
+#CONNECT MONGODB
+#===============
+
+# Connect on MongoDB Database
+from pymongo.errors import ConnectionFailure
+import sys
+
+
+from pymongo import MongoClient
+try:
+    client = MongoClient(MONGO_EMIF['HOST'], MONGO_EMIF['PORT'])
+    # db_name_mongo = MONGO_EMIF['DB_NAME']
+    # db_mongo = client.db_name_mongo
+    db_mongo = client.emif_mongo
+    # jerboa_collection = db_mongo.MONGO_EMIF['COLLECTION']
+    jerboa_collection = db_mongo.jerboa_files
+    jerboa_aggregation_collection = db_mongo.jerboa_aggregation
+except ConnectionFailure, e:
+    sys.stderr.write("Could not connect to MongoDB: %s" % e)
+    sys.exit(1)
 
 
 # URL prefix for static files.
