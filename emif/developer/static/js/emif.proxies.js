@@ -16,6 +16,8 @@
     # You should have received a copy of the GNU General Public License
     # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
+var base = $('#base_link').attr('href');
+
 var Requester = (
     function( window, undefined ) {
         var instance;
@@ -102,15 +104,15 @@ var GlobalProxy = (
 
             return {
                 databaseSchemas : function(){
-                    return rq.getRequest('/developer/api/databaseSchemas/');
+                    return rq.getRequest(base+'developer/api/databaseSchemas/');
                 },
                 getProfileInformation : function(){
-                    return rq.getRequest('/developer/api/getProfileInformation/');
+                    return rq.getRequest(base+'developer/api/getProfileInformation/');
                 },
                 getFingerprints: function(schema){
                     schema = schema || '';
 
-                    return rq.getRequest('/developer/api/getFingerprints/'+schema);
+                    return rq.getRequest(base+'developer/api/getFingerprints/'+schema);
                 },
                 query: function(options){
                     var settings = $.extend({
@@ -150,7 +152,7 @@ var DataStore = (
 
             return {
                 getExtra: function(){
-                    return rq.getRequest('/developer/api/store/getExtra/'+hash)
+                    return rq.getRequest(base+'developer/api/store/getExtra/'+hash)
                 },
                 putExtra: function(values){
                     var data = {
@@ -161,7 +163,7 @@ var DataStore = (
                     return rq.postRequest('/api/metadata', data)
                 },
                 getDocuments: function(){
-                    return rq.getRequest('/developer/api/store/getDocuments/'+hash)
+                    return rq.getRequest(base+'developer/api/store/getDocuments/'+hash)
                 },
 
                 /* This doesnt make the document available for the plugin,
@@ -192,23 +194,23 @@ var DataStore = (
                             'pc_name': options.name || '',
                             'pc_comments': options.description || ''
                         }
-                        return rq.postRequest('/developer/api/store/putDocuments/'+hash+'?format=json',
+                        return rq.postRequest(base+'developer/api/store/putDocuments/'+hash+'?format=json',
                             data, 'iframe json', $('#'+DOM_fileinput_id).attr('name', 'file'))
                     }
 
                 },
                 getPublications: function(){
-                    return rq.getRequest('/developer/api/store/getPublications/'+hash)
+                    return rq.getRequest(base+'developer/api/store/getPublications/'+hash)
                 },
                 getComments: function(){
-                    return rq.getRequest('/developer/api/store/getComments/'+hash)
+                    return rq.getRequest(base+'developer/api/store/getComments/'+hash)
                 },
                 putComment: function(options){
                     var data = {
                         comment: options.comment || ''
                     };
 
-                    return rq.postRequest('/developer/api/store/putComment/'+hash, data)
+                    return rq.postRequest(base+'developer/api/store/putComment/'+hash, data)
 
                 }
             }
@@ -233,10 +235,10 @@ var FingerprintProxy = (
 
             return {
                 getFingerprintUID: function(){
-                    return rq.getRequest('/developer/api/getFingerprintUID/'+hash)
+                    return rq.getRequest(base+'developer/api/getFingerprintUID/'+hash)
                 },
                 getAnswers: function(){
-                    return rq.getRequest('/developer/api/getAnswers/'+hash)
+                    return rq.getRequest(base+'developer/api/getAnswers/'+hash)
                 },
                 getStore: function(){
                     return DataStore.getInstance(hash)
