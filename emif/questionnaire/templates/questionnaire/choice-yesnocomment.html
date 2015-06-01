@@ -39,7 +39,11 @@
                 <!-- yes -->
                 <li>
                     <label>
-                        <input type="radio" id="question_{{ question.number }}_yes" name="question_{{ question.number }}" value="yes" onClick="valchanged('question_{{ question.number }}', this.value, this);" {% ifequal qdict.value "yes" %} checked{% endifequal %} />
+                        <span class="custom-radio">
+                          <input type="radio" id="question_{{ question.number }}_yes" name="question_{{ question.number }}" value="yes" onClick="valchanged('question_{{ question.number }}', this.value, this);" {% ifequal qdict.value "yes" %} checked{% endifequal %} />
+                          <span class="box"><span class="tick"></span></span>
+                        </span>
+
                         <span>{% trans "Yes" %}</span>
                     </label>
                 </li>
@@ -47,7 +51,10 @@
                 <!-- no -->
                 <li>
                     <label>
-                        <input type="radio" id="question_{{ question.number }}_no" name="question_{{ question.number }}" value="no" onClick="valchanged('question_{{ question.number }}', this.value, this);" {% ifequal qdict.value "no" %} checked {% endifequal %} />
+                        <span class="custom-radio">
+                          <input  type="radio" id="question_{{ question.number }}_no" name="question_{{ question.number }}" value="no" onClick="valchanged('question_{{ question.number }}', this.value, this);" {% ifequal qdict.value "no" %} checked {% endifequal %} />
+                          <span class="box"><span class="tick"></span></span>
+                        </span>
                         <span>{% trans "No" %}</span>
                     </label>
                 </li>
@@ -56,7 +63,10 @@
                 {% if qdict.hasdontknow %}
                 <li>
                     <label>
-                        <input type="radio" id="question_{{ question.number }}_dontknow" name="question_{{ question.number }}" value="dontknow" onClick="valchanged('question_{{ question.number }}', this.value, this);" {% ifequal qdict.value "dontknow" %} checked {% endifequal %} />
+                        <span class="custom-radio">
+                          <input  type="radio" id="question_{{ question.number }}_dontknow" name="question_{{ question.number }}" value="dontknow" onClick="valchanged('question_{{ question.number }}', this.value, this);" {% ifequal qdict.value "dontknow" %} checked {% endifequal %} />
+                          <span class="box"><span class="tick"></span></span>
+                        </span>
                         <span>{% trans "Don't Know" %}</span>
                     </label>
                 </li>

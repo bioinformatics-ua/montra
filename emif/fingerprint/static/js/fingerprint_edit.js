@@ -19,10 +19,20 @@
 if ( $("#edit_db_inputs").val() == '1' ) {
     console.log('INITIAL VAL == 1');
    // console.log($("#edit_db_inputs").val());
-    $('[id^="qform"] input').prop("disabled", true);
+    var vinputs = $('[id^="qform"] input');
+    vinputs.prop("disabled", true);
+    vinputs.css('color', 'rgb(0, 136, 204)');
+    var vtarea = $('[id^="qform"] textarea');
+    vtarea.attr("disabled","disabled");
+    vtarea.css('color', 'rgb(0, 136, 204)');
+    $('.checkbox-label').css('color', 'rgb(0, 136, 204)');
 
-    $('[id^="qform"] textarea').attr("disabled","disabled");
-
+    var sbox = $('input[type="checkbox"]:checked').parent();
+    sbox.next().css('color', 'rgb(0, 136, 204)');
+    sbox.find('.tick').addClass('tick_disabled');
+        var rbox = $('input[type="radio"]:checked').parent();
+        rbox.next().css('color', 'rgb(0, 136, 204)');
+        rbox.find('.tick').addClass('tick_radio_disabled');
 }
 
 function edit_db_option(){
@@ -43,9 +53,21 @@ function edit_db_option(){
 function edit_db_option_enforce(){
     if ( $("#edit_db_inputs").val() == '1' ) {
         console.log('ENFORCE 1');
-        $('[id^="qform"] input').prop("disabled", true);
+        var vinputs = $('[id^="qform"] input');
+        vinputs.prop("disabled", true);
+        vinputs.css('color', 'rgb(0, 136, 204)');
+        var vtarea = $('[id^="qform"] textarea');
+        vtarea.attr("disabled","disabled");
+        vtarea.css('color', 'rgb(0, 136, 204)');
 
-    $('[id^="qform"] textarea').attr("disabled","disabled");
+        var sbox = $('input[type="checkbox"]:checked').parent();
+        sbox.next().css('color', 'rgb(0, 136, 204)');
+        sbox.find('.tick').addClass('tick_disabled');
+        var rbox = $('input[type="radio"]:checked').parent();
+        rbox.next().css('color', 'rgb(0, 136, 204)');
+        rbox.find('.tick').addClass('tick_radio_disabled');
+
+
     } else if ( $("#edit_db_inputs").val() == '0' ) {
         console.log('ENFORCE 0');
 

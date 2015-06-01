@@ -48,7 +48,11 @@
             {% for sel, choice in qdict.choices %}
                 <li>
                     <label>
-                        <input type="radio" id="question_{{ question.number }}_{{ forloop.counter }}" name="question_{{ question.number }}" onClick="valchanged('question_{{ question.number }}', this.value, this)" value="{{ choice.value }}"{% if sel %} checked {% endif %} />
+                        <span class="custom-radio">
+                          <input  type="radio" id="question_{{ question.number }}_{{ forloop.counter }}" name="question_{{ question.number }}" onClick="valchanged('question_{{ question.number }}', this.value, this)" value="{{ choice.value }}"{% if sel %} checked {% endif %} />
+                          <span class="box"><span class="tick"></span></span>
+                        </span>
+
                         <span>{{ choice.text }}</span>
                     </label>
                 </li>
