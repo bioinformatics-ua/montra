@@ -22,8 +22,9 @@
 			<table id="t2_{{qs.sortid}}" class="table table-bordered  table-hover">
 				<thead>
 					<tr>
-						<th>Tag</th>
-						<th>Value</th>
+						<th style="width:65px;">Nr.</th>
+						<th>Question</th>
+						<th>Answer</th>
 						<!--th class="commented"><i class="icon-comment"></i></th-->
 					</tr>
 				</thead>
@@ -31,11 +32,15 @@
 					{% for t in qs.list_ordered_tags %}
 					<tr>
 						{% if t.ttype == 'comment' %}
+							<td class="selected-sorter tooltipped" title="{{ t.number|removehs }}"><center><small>{{ t.number|removehs }}</small></center></td>
+
 							<td colspan="2" class="selected-sorter tooltipped" title="{{ t.tag|removehs|safe }}">
-								<div class="pull-left"><strong><small>{{ t.number|removehs }} - {{ t.tag|removehs|safe }}</small></strong></div>
+								<div class="pull-left"><strong><small> {{ t.tag|removehs|safe }}</small></strong></div>
 						{% else %}
+							<td class="tooltipped" title="{{ t.number|removehs }}"><center><small>{{ t.number|removehs }}</small></center></td>
+
 							<td class="tooltipped" title="{{ t.tag|removehs|safe }}">
-								{{ t.number|removehs }} - {{ t.tag|removehs|safe }}
+								{{ t.tag|removehs|safe }}
 							</td>
 							{% if t.ttype|captioned %}
 							<td class="value_content captioned_content" style="white-space: normal;" data-title="{{ t.value|force_escape }}">
