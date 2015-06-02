@@ -7,6 +7,20 @@ def checkRecentChanges():
 
     counter = 0
     empty_count = 0
+
+    def arrayWithoutComms(l):
+        tmp = []
+        comms = 0
+        nocomms = 0
+        for elem in l:
+            if not '{' in elem:
+                tmp.append(elem)
+                nocomms+=1
+            else:
+                comms+=1
+
+        return (tmp, comms, nocomms)
+
     for q in qsts:
         if q.type in ['choice-multiple', 'choice-multiple-freeform-options']:
             ans = Answer.objects.filter(question=q)
@@ -26,14 +40,19 @@ def checkRecentChanges():
                                 new_opts = []
 
                             if len(prev_opts) > len(new_opts):
-                                counter+=1
-                                print " Possible data losses for question %s - %s - %r" % (q.number, q.questionset.questionnaire.name, a.fingerprint_id)
 
-                                print "Old: %s" %lu.old_value
-                                print "New: %s" %lu.new_value
-                                print "--"
-                                if lu.new_value == None or lu.new_value == '':
-                                    empty_count+=1
+                                (old_nocom, old_comms, old_nocomms) = arrayWithoutComms(prev_opts)
+                                (new_nocom, new_comms, new_nocomms) = arrayWithoutComms(new_opts)
+
+                                if old_comms > 0 and new_comms == 0:
+                                    counter+=1
+                                    print " Possible data losses for question %s - %s - %r" % (q.number, q.questionset.questionnaire.name, a.fingerprint_id)
+
+                                    print "Old: %s" %lu.old_value
+                                    print "New: %s" %lu.new_value
+                                    print "--"
+                                    if lu.new_value == None or lu.new_value == '':
+                                        empty_count+=1
 
     print "--"
     print "Found %d possible data losses" % counter
