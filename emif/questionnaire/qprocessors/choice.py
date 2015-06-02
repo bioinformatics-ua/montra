@@ -227,7 +227,7 @@ def question_multiple_options(request, question):
     cd = question.getcheckdict()
     val = ''
     try:
-        val = request.POST.get(key, '')
+        val = request.POST.get(key, '').split("||")[0]
     except:
         pass
     defaults = cd.get('default','').split(',')
@@ -249,13 +249,17 @@ def question_multiple_options(request, question):
         except:
             pass
 
-        print "THE VAL IS:"
-        print val
-        print "--"
-        highlighted_val = val.split('#')[0]
+        def checkPartialIn(part, l):
+            for elem in l:
+                if part in elem:
+                    return True
+
+            return False
+
+        #highlighted_val = val.split('#')[0]
         val = re.sub('<[^<]+?>', '', val)
 
-        if key in request.POST or (val!=None and (choice.value in val.split('#'))) or \
+        if key in request.POST or (val!=None and checkPartialIn(choice.value, val.split('#')[1:])) or \
           (request.method == 'GET' and choice.value in defaults):
             _tmp_v = get_aux_text(val,choice.value, _aux )
             if _tmp_v == None or _tmp_v == '':
@@ -294,6 +298,7 @@ def question_multiple_options(request, question):
 
         else:
             extras.append( (key, '',) )
+
 
     return {
         "choices": choices,

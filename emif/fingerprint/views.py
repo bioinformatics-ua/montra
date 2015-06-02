@@ -303,11 +303,12 @@ def render_one_questionset(request, q_id, qs_id, errors={}, aqid=None, fingerpri
 
                 slug = this_q.slug_fk.slug1
                 #print slug
-                if rHighlights != None and slug+'_t' in rHighlights:
-                    #print "HAS HIGHLIGHTS ANSWERS"
-                    #print rHighlights[slug+'_t'][0].encode('utf-8')
-                    #print "--"
-                    value = rHighlights[slug+'_t'][0].encode('utf-8')
+                if readonly:
+                    if rHighlights != None and slug+'_t' in rHighlights:
+                        #print "HAS HIGHLIGHTS ANSWERS"
+                        #print rHighlights[slug+'_t'][0].encode('utf-8')
+                        #print "--"
+                        value = rHighlights[slug+'_t'][0].encode('utf-8')
 
                 request2.get_post()['question_%s' % this_q.number] = value
 

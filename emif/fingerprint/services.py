@@ -219,6 +219,7 @@ def getAnswerValue(question, qdict):
             #import pdb
             #pdb.set_trace()
             choices = qdict['choices']
+
             qv = ""
             try:
                 qv = qdict['qvalue']
@@ -241,12 +242,11 @@ def getAnswerValue(question, qdict):
 
                 elif len(choices[0])==4:
                     for choice, unk, checked, _aux  in choices:
-                        if checked == " checked":
+                        if checked != "":
                             if _aux != "":
                                 value = value + "#" + choice.value + "{" + _aux +"}"
                             else:
                                 value = value + "#" + choice.value
-
 
                 elif len(choices[0])==2:
                     for checked, choice  in choices:
