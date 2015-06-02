@@ -175,8 +175,6 @@ def saveFingerprintAnswers(qlist_general, fingerprint_id, questionnaire, user, e
         calculateFillPercentage.delay(fingerprint)
 
         return checkMandatoryAnswers(fingerprint)
-
-
         # format for answers : Answer(question=question, data=data, comment=comment, fingerprint_id=fingerprint_id)
 
 def getComment(question, extra_fields):
@@ -210,6 +208,7 @@ def getAnswerValue(question, qdict):
         choices = None
         value = None
         choices_txt = None
+
         if qdict.has_key('value'):
             value = qdict['value']
 
@@ -223,6 +222,9 @@ def getAnswerValue(question, qdict):
             qv = ""
             try:
                 qv = qdict['qvalue']
+
+                if qv == '_entry_':
+                    qv += qdict['opt']
 
             except:
                 # raise
@@ -433,7 +435,6 @@ def setNewPermissions(request, fingerprint_id, identification):
     return False
 
 def extract_answers(request2, questionnaire_id, question_set, qs_list):
-
 
     question_set2 = question_set
     request = request2

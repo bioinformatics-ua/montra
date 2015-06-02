@@ -276,12 +276,38 @@ def render_one_questionset(request, q_id, qs_id, errors={}, aqid=None, fingerpri
 
             request2.method = request.method
 
+            h = None
+            rHighlights = None
+            qhighlights = None
+
+            if "query" in request.session and "highlight_results" in request.session:
+                h = request.session["highlight_results"]
+
+            if h != None:
+                if "results" in h and fingerprint_id in h["results"]:
+                    rHighlights = h["results"][fingerprint_id]
+                if "questions" in h:
+                    qhighlights = h["questions"]
+
+            #print "SHOULD HIGHLIgHT"
+            #for high in rHighlights:
+            #    print high
+            #print "------ END SHOULD HIGHLIGHT"
+            #print "---- SLUGS"
             for answer in this_answers:
                 this_q  = answer.question
                 value   = answer.data
 
                 if "[" in str(value):
                     value = str(value).replace("]", "").replace("[", "")
+
+                slug = this_q.slug_fk.slug1
+                #print slug
+                if rHighlights != None and slug+'_t' in rHighlights:
+                    #print "HAS HIGHLIGHTS ANSWERS"
+                    #print rHighlights[slug+'_t'][0].encode('utf-8')
+                    #print "--"
+                    value = rHighlights[slug+'_t'][0].encode('utf-8')
 
                 request2.get_post()['question_%s' % this_q.number] = value
 
@@ -509,7 +535,7 @@ def check_database_add_conditions(request, questionnaire_id, sortid, saveid,
                 setNewPermissions(request2, fingerprint_id, sortid)
 
             # new version that just serializes the created fingerprint object (this eventually can be done using celery)
-            indexFingerprintCelery.delay(fingerprint_id)
+            #indexFingerprintCelery.delay(fingerprint_id)
 
     return HttpResponse(simplejson.dumps({'success': 'true'}),
                                     mimetype='application/json')

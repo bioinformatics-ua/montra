@@ -23,12 +23,21 @@
     <div class="pull-left" >
       {% if question.slug_fk.slug1 == "database_name" %}
           <div id='open-button_validator_{{question.number}}' class="control-group open-button_validator">
-            <input type="text" class="span6" size="50" id="question_{{ question.number }}" name="question_{{ question.number }}" value="{{ qdict.value }}" />
+
+            {% if readonly %}
+              <div class="span6 fake_input fake_input_disabled" id="question_{{ question.number }}" name="question_{{ question.number }}">{{ qdict.value|safe }}</div>
+            {% else %}
+                <input type="text" class="span6" size="50" id="question_{{ question.number }}" name="question_{{ question.number }}" value="{{ qdict.value }}" />
+            {% endif %}
             <span class="help-inline"></span>
           </div>
 
       {% else %}
-          <input type="text" class=" " size="50" id="question_{{ question.number }}" name="question_{{ question.number }}" value="{{ qdict.value }}" />
+          {% if readonly %}
+              <div class="span6 fake_input fake_input_disabled" id="question_{{ question.number }}" name="question_{{ question.number }}">{{ qdict.value|safe }}</div>
+            {% else %}
+                <input type="text" class="span6" size="50" id="question_{{ question.number }}" name="question_{{ question.number }}" value="{{ qdict.value }}" />
+            {% endif %}
       {% endif %}
       {% if question.extra %}
       <span class="help-block">{{ question.extra }}</span>

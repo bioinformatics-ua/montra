@@ -27,7 +27,7 @@ def question_choice(request, question):
     hasValue = False
     cd = question.getcheckdict()
     key = "question_%s" % question.number
-    key2 = "question_%s_comment" % question.number
+    key2 = "question_%s_opt" % question.number
     val = None
     if key in request.POST:
         val = request.POST[key]
@@ -39,21 +39,36 @@ def question_choice(request, question):
         val = val.split("#")[0]
 
     for choice in question.choices():
-        choices.append( ( choice.value == val, choice, ) )
+        cleanval=None
+        if val != None:
+            cleanval=re.sub('<[^<]+?>', '', val)
+        if choice.value == cleanval:
+            choices.append((val , choice,))
+        else:
+            choices.append((None, choice,))
+
         hasValue = hasValue or choice.value == val
 
     #print "hasValue: "+str(hasValue)
-
+    comm=''
     if question.type == 'choice-freeform':
-        jstriggers.append('question_%s_comment' % question.number)
+        jstriggers.append('question_%s_opt' % question.number)
+        if val != None and val.startswith('_entry_') and len(val) > 7:
+            comm = val[7:]
+            val = '_entry_'
+        else:
+            print "CAI NO ELSE"
+            comm = request.POST.get(key2, "")
+
+
 
     return {
         'choices'   : choices,
-        'sel_entry' : val == '_entry_',
+        'sel_entry' : val != None and val.startswith('_entry_'),
         'qvalue'    : val or '',
         'required'  : True,
         'hasValue'  : hasValue,
-        'comment'   : request.POST.get(key2, ""),
+        'opt'   : comm,
         'jstriggers': jstriggers,
     }
 
@@ -61,18 +76,27 @@ def question_choice(request, question):
 def process_choice(question, answer):
     required = question.getcheckdict().get('required', 0)
 
+
     opt = answer['ANSWER'] or ''
+    if question.type == 'choice-freeform':
+        print "__ANSWER"
+        print opt
+        print "--"
+
     if not opt and required:
         raise AnswerException(_(u'You must select an option'))
-    if opt == '_entry_' and question.type == 'choice-freeform':
-        opt = answer.get('comment','')
+    if opt.startswith('_entry_') and question.type == 'choice-freeform':
+        if len(opt) > 7:
+            opt = opt[7:]
+        else:
+            opt = answer['question_%s_opt' % question.number]
         if not opt:
             raise AnswerException(_(u'Field cannot be blank'))
-        return dumps([[opt]])
     else:
         valid = [c.value for c in question.choices()]
         if opt not in valid and required:
             raise AnswerException(_(u'Invalid option!'))
+
     return dumps([opt])
 add_type('choice', 'Choice [radio]')
 add_type('choice-freeform', 'Choice with a freeform option [radio]')
@@ -88,7 +112,8 @@ def question_multiple(request, question):
     val = ''
     hasValue = False
     try:
-        val = request.POST.get(key, '')
+        val = request.POST.get(key, '').sub('<[^<]+?>')
+        print val
     except:
         pass
     defaults = cd.get('default','').split(',')
@@ -224,12 +249,18 @@ def question_multiple_options(request, question):
         except:
             pass
 
+        print "THE VAL IS:"
+        print val
+        print "--"
+        highlighted_val = val.split('#')[0]
+        val = re.sub('<[^<]+?>', '', val)
+
         if key in request.POST or (val!=None and (choice.value in val.split('#'))) or \
           (request.method == 'GET' and choice.value in defaults):
             _tmp_v = get_aux_text(val,choice.value, _aux )
             if _tmp_v == None or _tmp_v == '':
                 _tmp_v = _aux
-            choices.append( (choice, key, ' checked',_tmp_v) )
+            choices.append( (choice, key, highlighted_val,_tmp_v) )
             hasValue = hasValue or True
 
         else:
@@ -332,6 +363,10 @@ def choice_list(value):
         else:
             multiple_choices[choice] = {'key': choice, 'comment': ''}
 
+    if value.startswith('_entry_'):
+        other_val = value[7:]
+        multiple_choices['Other'] = {'key': 'Other', 'comment': other_val}
+
     return multiple_choices
 
 def serialize_list(choice_list):
@@ -349,9 +384,9 @@ def serialize_list(choice_list):
 
     return tmp
 
-
 @show_summary('choice','choice-freeform','choice-multiple', 'choice-multiple-freeform', 'choice-multiple-freeform-options')
 def show_summ(value):
+    print value
     multiple_choices = choice_list(value).values()
     #return value
     return render_to_string('questionnaire/choice_summary.html', {'choices':multiple_choices})

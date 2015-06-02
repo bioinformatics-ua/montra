@@ -25,7 +25,7 @@
             <li>
                 <label>
                     <span class="custom-radio">
-                      <input onClick="valchanged('question_{{ question.number }}', this.value, this)" type="radio" id="question_{{ question.number }}_{{ forloop.counter }}" name="question_{{ question.number }}" value="{{ choice.value|trim|esc }}" {% if sel %} checked {% endif %} />
+                      <input onClick="valchanged('question_{{ question.number }}', this.value, this)" type="radio" id="question_{{ question.number }}_{{ forloop.counter }}" name="question_{{ question.number }}" value="{{ choice.value|trim|striptags }}" {% if sel %} checked {% endif %} />
                       <span class="box"><span class="tick"></span></span>
                     </span>
 
@@ -41,14 +41,12 @@
         </ul>
     </div>
     <div class="input">
-        <input onClick="valchanged('question_{{ question.number }}', '_entry_', this);" type="radio" id="question_{{ question.number }}_entry" name="question_{{ question.number }}" value="_entry_" {% if qdict.sel_entry %} checked {% endif %} />
-
-        <span class="custom-checkbox">
+        <span class="custom-radio">
             <input onClick="valchanged('question_{{ question.number }}', '_entry_', this);" type="radio" id="question_{{ question.number }}_entry" name="question_{{ question.number }}" value="_entry_" {% if qdict.sel_entry %} checked {% endif %} />
             <span class="box"><span class="tick"></span></span>
         </span>
+        <input id="question_{{ question.number }}_comment" checks="dep_check('question_{{ question.number }},_entry_')" type="text" name="question_{{ question.number }}_opt" value="{{ qdict.opt|striptags }}" />
 
-        <input id="question_{{ question.number }}_comment" checks="dep_check('question_{{ question.number }},_entry_')" type="input" name="question_{{ question.number }}_comment" value="{{ qdict.comment }}" />
         {% if question.extra %}
             <span class="help-block">{{ question.extra }}</span>
         {% endif %}

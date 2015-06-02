@@ -45,6 +45,8 @@ import datetime
 
 from questionnaire.models import Questionnaire, QuestionSet
 
+import re
+
 logger = logging.getLogger()
 
 def generate_hash():
@@ -497,7 +499,7 @@ def generateFreeText(d):
 
     for q in d:
         if(q.endswith('_t') and q not in dont_index and d[q] != None and len(d[q]) > 0):
-            freetext += (d[q] + ' ')
+            freetext += (re.sub('[#_{}]',' ', d[q]) + ' ')
 
     return freetext.strip()
 
@@ -518,6 +520,6 @@ def generateMltText(d):
 
     for q in d:
         if(q.endswith('_t') and not q.startswith('comment_') and q not in dont_index and d[q] != None and len(d[q]) > 0):
-            freetext += (d[q] + ' ')
+            freetext += (re.sub('[#_{}]',' ', d[q]) + ' ')
 
     return freetext.strip()

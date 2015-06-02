@@ -74,7 +74,7 @@ div.input {
 }
 
 /* ensure that all inputs have the same distance to the question */
-div.input input[type="text"], div.input textarea, div.input select {
+div.input input[type="text"], div.input textarea, div.input select, div.input .fake_input {
     margin: 10px 0 0 0;
 }
 
@@ -83,7 +83,7 @@ div.input span.add-on {
     border-right: none;
 }
 
-ul.inputs-list input[type="text"] {
+ul.inputs-list input[type="text"], ul.inputs-list .fake_input {
     margin: 5px 0;
 }
 
@@ -1184,4 +1184,57 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#a3a3a3', end
   left: 1px;
   top: -5px;
   zoom: 1;
+}
+
+.fake_input{
+  float: none;
+  display: inline-block;
+  padding: 4px;
+  font-size: 13px;
+  line-height: 18px;
+  color: #555555;
+  border: 1px solid #ccc;
+  -webkit-border-radius: 3px;
+  -moz-border-radius: 3px;
+  border-radius: 3px;
+  margin-left: 0;
+  min-height: 18px;
+}
+
+.fake_input_disabled{
+  cursor: not-allowed;
+  background-color: #eee;
+  color: rgb(0, 136, 204);
+}
+
+.fake_input.span6 {
+  width: 446px;
+}
+
+@media (max-width: 979px) and (min-width: 768px){
+  .fake_input.span6 {
+    width: 338px;
+  }
+}
+
+@media (min-width: 1200px){
+  .fake_input.span6 {
+    width: 556px;
+  }
+}
+
+@media (max-width: 767px){
+  .fake_input.span6 {
+    display: block;
+    width: 100%;
+    min-height: 30px;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+  }
+}
+
+.fake_caret {
+  margin-top: 7px;
+  margin-right: 3px;
 }
