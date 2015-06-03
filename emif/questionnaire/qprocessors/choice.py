@@ -224,7 +224,14 @@ def question_multiple_options(request, question):
         except:
             pass
 
-        if key in request.POST or (val!=None and (choice.value in val.split('#'))) or \
+        def checkPartialIn(part, l):
+            for elem in l:
+                if part == elem.split('{')[0]:
+                    return True
+
+            return False
+
+        if key in request.POST or (val!=None and checkPartialIn(choice.value,val.split('#'))) or \
           (request.method == 'GET' and choice.value in defaults):
             _tmp_v = get_aux_text(val,choice.value, _aux )
             if _tmp_v == None or _tmp_v == '':
