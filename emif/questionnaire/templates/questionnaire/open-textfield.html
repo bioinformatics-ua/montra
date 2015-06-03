@@ -19,7 +19,12 @@
 {% load extra_tags %}
 <div class="clearfix">
     <div class="input">
-        <textarea class="span6" id="question_{{ question.number }}" name="question_{{ question.number }}" cols="50" rows="5">{{qdict.value}}</textarea>
+        {% if readonly %}
+            <div class="span6 fake_input fake_input_disabled" id="question_{{ question.number }}" name="question_{{ question.number }}" cols="50" rows="5">{{ qdict.value|safe }}</div>
+        {% else %}
+            <textarea class="span6" id="question_{{ question.number }}" name="question_{{ question.number }}" cols="50" rows="5">{{qdict.value}}</textarea>
+        {% endif %}
+
         {% if question.extra %}
             <span class="help-block">{{ question.extra }}</span>
         {% endif %}

@@ -25,11 +25,17 @@
             <li>
                 <label>
                     <span class="custom-checkbox">
-                      <input onClick="valchanged('question_{{ question.number }}_{{ choice.value|trim|esc }}', this.checked, this);" type="checkbox" id="{{ key }}" name="{{ key }}" value="{{ choice.value|trim }}" {{ checked }}/>
+                      <input onClick="valchanged('question_{{ question.number }}_{{ choice.value|trim|esc }}', this.checked, this);" type="checkbox" id="{{ key }}" name="{{ key }}" value="{{ choice.value|trim }}" {% if checked %}checked{% endif %}/>
                       <span class="box"><span class="tick"></span></span>
                     </span>
 
-                    <span class="checkbox-label">{{ choice.text|trim }}</span>
+                    <span class="checkbox-label">
+                        {%if readonly and checked %}
+                            {{ checked|safe }}
+                        {% else %}
+                            {{ choice.text|trim }}
+                        {% endif %}
+                    </span>
                 </label>
             </li>
             {% if checked %}
@@ -45,7 +51,11 @@
                 {% if not forloop.last or not forloop.first %}
                     <b>{{ forloop.counter }}.</b>
                 {% endif %}
-                <input type="text" class="span6" name="{{ key }}" size="50" value="{{ value }}" />
+                {% if readonly %}
+                    <div class="span6 fake_input fake_input_disabled" name="{{ key }}" size="50">{{ value|safe }}</div>
+                {% else %}
+                    <input type="text" class="span6" name="{{ key }}" size="50" value="{{ value }}" />
+                {% endif %}
             </li>
             {% endfor %}
         {% endif %}

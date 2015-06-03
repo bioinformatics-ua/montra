@@ -19,9 +19,15 @@
 {% load extra_tags %}
 <div id='numeric_validator_{{question.number}}' class="clearfix control-group">
 
-        <div  id='self_validator_{{question.number}}' class="input-append span6 self_validator">
-            <input style="margin-left: 10px;" type="text" class="span6" size="60" id="question_{{ question.number }}" name="question_{{ question.number }}"
-            value="{{ qdict.value }}" />
+        <div id='self_validator_{{question.number}}' class="input-append span6 self_validator">
+
+
+            {% if readonly %}
+              <div style="margin-left: 10px;" class="span6 fake_input fake_input_disabled" id="question_{{ question.number }}" name="question_{{ question.number }}">{{ qdict.value|safe }}</div>
+            {% else %}
+                <input style="margin-left: 10px;" type="text" class="span6" size="60" id="question_{{ question.number }}" name="question_{{ question.number }}" value="{{ qdict.value }}" />
+            {% endif %}
+
             <span title="{{question.meta.unit_desc}}" class="add-on tooltippable">{{question.meta.unit}}</span>
         </div>
             <span style="margin-left: 40px;" class="help-inline span6"></span>

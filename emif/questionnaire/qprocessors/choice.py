@@ -38,10 +38,11 @@ def question_choice(request, question):
     if val != None and val != '' and "#" in val:
         val = val.split("#")[0]
 
+    cleanval=None
+    if val != None:
+        cleanval=re.sub('<[^<]+?>', '', val)
+
     for choice in question.choices():
-        cleanval=None
-        if val != None:
-            cleanval=re.sub('<[^<]+?>', '', val)
         if choice.value == cleanval:
             choices.append((val , choice,))
         else:
@@ -53,8 +54,8 @@ def question_choice(request, question):
     comm=''
     if question.type == 'choice-freeform':
         jstriggers.append('question_%s_opt' % question.number)
-        if val != None and val.startswith('_entry_') and len(val) > 7:
-            comm = val[7:]
+        if val != None and val.startswith('_entry_') and len(val) > 8:
+            comm = val[8:]
             val = '_entry_'
         else:
             print "CAI NO ELSE"
@@ -78,16 +79,12 @@ def process_choice(question, answer):
 
 
     opt = answer['ANSWER'] or ''
-    if question.type == 'choice-freeform':
-        print "__ANSWER"
-        print opt
-        print "--"
 
     if not opt and required:
         raise AnswerException(_(u'You must select an option'))
     if opt.startswith('_entry_') and question.type == 'choice-freeform':
-        if len(opt) > 7:
-            opt = opt[7:]
+        if len(opt) > 8:
+            opt = opt[8:]
         else:
             opt = answer['question_%s_opt' % question.number]
         if not opt:
@@ -112,21 +109,39 @@ def question_multiple(request, question):
     val = ''
     hasValue = False
     try:
-        val = request.POST.get(key, '').sub('<[^<]+?>')
-        print val
+        val = request.POST.get(key, '')
+
+    except:
+        pass
+
+    try:
+        val = request.POST.get(key, '').split("||")[0]
     except:
         pass
     defaults = cd.get('default','').split(',')
+
+    highlighted_val = val.split('#')
+
+    clean_map = {}
+    for elem in highlighted_val:
+        elem = elem.split('{')[0]
+        clean_map[re.sub('<[^<]+?>', '', elem)] = elem
+    dval = val
+
+    val = re.sub('<[^<]+?>', '', val)
+
     for choice in question.choices():
         counter += 1
         key = "question_%s_multiple_%d" % (question.number, choice.sortid)
 
+
         if key in request.POST or (val!=None and val != '' and (choice.value in val)) or \
           (request.method == 'GET' and choice.value in defaults):
-            choices.append( (choice, key, ' checked',) )
+            choices.append( (choice, key, clean_map.get(choice.value, None),) )
             hasValue = hasValue or True
         else:
             choices.append( (choice, key, '',) )
+
     extracount = int(cd.get('extracount', 0))
     if not extracount and question.type == 'choice-multiple-freeform':
         extracount = 1
@@ -232,6 +247,14 @@ def question_multiple_options(request, question):
         pass
     defaults = cd.get('default','').split(',')
 
+    highlighted_val = val.split('#')
+
+    clean_map = {}
+    for elem in highlighted_val:
+        elem = elem.split('{')[0]
+        clean_map[re.sub('<[^<]+?>', '', elem)] = elem
+    dval = val
+
     for choice in question.choices():
         counter += 1
 
@@ -251,24 +274,24 @@ def question_multiple_options(request, question):
 
         def checkPartialIn(part, l):
             for elem in l:
-                if part in elem:
+                if part == elem.split('{')[0]:
                     return True
 
             return False
 
-        #highlighted_val = val.split('#')[0]
         val = re.sub('<[^<]+?>', '', val)
 
         if key in request.POST or (val!=None and checkPartialIn(choice.value, val.split('#')[1:])) or \
           (request.method == 'GET' and choice.value in defaults):
-            _tmp_v = get_aux_text(val,choice.value, _aux )
+            _tmp_v = get_aux_text(dval,choice.value, _aux )
             if _tmp_v == None or _tmp_v == '':
                 _tmp_v = _aux
-            choices.append( (choice, key, highlighted_val,_tmp_v) )
+
+            choices.append( (choice, key, clean_map.get(choice.value, None),_tmp_v) )
             hasValue = hasValue or True
 
         else:
-            _tmp_v = get_aux_text(val,choice.value, _aux )
+            _tmp_v = get_aux_text(dval,choice.value, _aux )
             if _tmp_v == None or _tmp_v == '':
                 _tmp_v = _aux
             choices.append( (choice, key, '',_tmp_v) )
@@ -353,16 +376,18 @@ def choice_list(value):
 
     for choice in choices[1:]:
 
+        if '||' in choice:
+            values = choice.split('||')
+            key = 'Other' #values[0]
+            comment = values[1]
+
+            multiple_choices[key] = {'key': key, 'comment': comment}
+            choice = values[0]
+
         if '{' in choice and '}' in choice:
             values = choice.split('{')
             key = values[0]
             comment = values[1].replace('}', '')
-
-            multiple_choices[key] = {'key': key, 'comment': comment}
-        elif '||' in choice:
-            values = choice.split('||')
-            key = 'Other' #values[0]
-            comment = values[1]
 
             multiple_choices[key] = {'key': key, 'comment': comment}
         else:

@@ -457,6 +457,8 @@ function questionsets_handle(id_questionset, fingerprint_id, q_id, mode) {
                         else{
                             if (mode == QsType.EDIT)
                                 History.pushState(null, null, findPath(mode)+ fingerprint_id +"/" + q_id + "/" + obj.id.replace("qs_", ""));
+                            else if(mode == QsType.VIEW)
+                                History.pushState(null, null, findPath(mode)+ fingerprint_id +"/" + q_id + "/" + obj.id.replace("qs_", ""));
                             else
                                 History.pushState(null, null, findPath(mode) + q_id + "/" + obj.id.replace("qs_", ""));
                         }

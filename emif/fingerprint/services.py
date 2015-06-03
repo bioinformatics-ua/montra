@@ -204,6 +204,9 @@ def checkMandatoryAnswers(fingerprint):
 
 def getAnswerValue(question, qdict):
 
+    if question.number == '4.06':
+        print "-- Q 4.06"
+        print qdict
     try:
         choices = None
         value = None
@@ -212,8 +215,8 @@ def getAnswerValue(question, qdict):
         if qdict.has_key('value'):
             value = qdict['value']
 
-            #if "yes" in qdict['value']:
-            #    appending_text += question.text
+        elif qdict.has_key('current'):
+            value = qdict['current']
 
         elif qdict.has_key('choices'):
             #import pdb
@@ -225,7 +228,7 @@ def getAnswerValue(question, qdict):
                 qv = qdict['qvalue']
 
                 if qv == '_entry_':
-                    qv += qdict['opt']
+                    qv += ' ' + str(qdict['opt'])
 
             except:
                 # raise
@@ -237,7 +240,7 @@ def getAnswerValue(question, qdict):
             try:
                 if len(choices[0])==3:
                     for choice, unk, checked  in choices:
-                        if checked == " checked":
+                        if checked != "":
                             value = value + "#" + choice.value
 
                 elif len(choices[0])==4:

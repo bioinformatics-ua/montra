@@ -29,7 +29,13 @@
                       <span class="box"><span class="tick"></span></span>
                     </span>
 
-                    <span>{{ choice.text|trim }}</span>
+                    <span>
+                        {% if readonly and sel %}
+                            {{ sel|safe }}
+                        {% else %}
+                            {{ choice.text|trim }}
+                        {% endif %}
+                    </span>
                 </label>
             </li>
             {% if sel %}
@@ -45,7 +51,12 @@
             <input onClick="valchanged('question_{{ question.number }}', '_entry_', this);" type="radio" id="question_{{ question.number }}_entry" name="question_{{ question.number }}" value="_entry_" {% if qdict.sel_entry %} checked {% endif %} />
             <span class="box"><span class="tick"></span></span>
         </span>
-        <input id="question_{{ question.number }}_comment" checks="dep_check('question_{{ question.number }},_entry_')" type="text" name="question_{{ question.number }}_opt" value="{{ qdict.opt|striptags }}" />
+
+        {% if readonly %}
+            <div style="display: inline-block !important;" class="span3 fake_input fake_input_disabled" id="question_{{ question.number }}_opt" checks="dep_check('question_{{ question.number }},_entry_')" type="text" name="question_{{ question.number }}_opt">{{ qdict.opt|safe }}</div>
+        {% else %}
+            <input id="question_{{ question.number }}_opt" checks="dep_check('question_{{ question.number }},_entry_')" type="text" name="question_{{ question.number }}_opt" value="{{ qdict.opt|striptags }}" />
+        {% endif %}
 
         {% if question.extra %}
             <span class="help-block">{{ question.extra }}</span>
