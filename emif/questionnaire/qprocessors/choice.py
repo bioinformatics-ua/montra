@@ -226,7 +226,7 @@ def question_multiple_options(request, question):
 
         def checkPartialIn(part, l):
             for elem in l:
-                if part in elem:
+                if part == elem.split('{')[0]:
                     return True
 
             return False
