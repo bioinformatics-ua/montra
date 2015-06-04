@@ -134,7 +134,7 @@ It was not possible to save this questionnary. Please try again in a few seconds
 
     <ul class="nav nav-list nav-pills nav-stacked ">
       <li class="nav-header">Step-by-Step</li>
-      {% for qs, answered, total_count, percentage, requests in questionsets %}
+      {% for qs, answered, total_count, percentage, requests, highlight in questionsets %}
 
       <li{% if questionset.text == qs.text %} class="active" {% endif %} id="li_qs_{{qs.sortid}}">
         <!--<a href="q2/{{runinfo.random}}/{{ qs.sortid }}">
@@ -148,6 +148,9 @@ It was not possible to save this questionnary. Please try again in a few seconds
           <table class="fullwidth">
             <tr>
               <td style="width: 80%; font-size: 93%;">
+              {% if highlight%}
+                <img style="margin-left:-32px;" title="This section has search keywords" class="markered pull-left" src="{{ STATIC_URL}}img/marker.png" />
+              {% endif %}
               {% if config.Request_Answer and requests|length > 0  and not readonly %}
                 <div style="margin-left:-32px; color: black;" class="pull-left">
                 <i title="Some users requested questions on this section to be filled." class="tooltippable fa fa-bell"></i>

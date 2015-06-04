@@ -71,6 +71,28 @@ def delete_fingerprint(request, id):
 def database_edit_dl(request, fingerprint_id, questionnaire_id, sort_id, template_name="database_edit.html"):
     return database_edit(request, fingerprint_id, questionnaire_id, sort_id=sort_id, template_name=template_name)
 
+def getHighlightedList(request, highlightMap, questionnaire_id, fingerprint_id):
+
+    h = None
+    rHighlights = None
+    qhighlights = None
+
+    if "query" in request.session and "highlight_results" in request.session:
+        h = request.session["highlight_results"]
+
+    if h != None:
+        if "results" in h and fingerprint_id in h["results"]:
+            rHighlights = h["results"][fingerprint_id]
+
+            for tag in rHighlights:
+                print tag[:-2]
+                try:
+                    q = Question.objects.get(slug_fk__slug1=tag[:-2], questionset__questionnaire__id=questionnaire_id)
+                    highlightMap[q.questionset.id] = True
+                except Question.DoesNotExist:
+                    pass
+
+    return highlightMap
 
 def database_edit(request, fingerprint_id, questionnaire_id, sort_id=1, template_name="database_edit.html", readonly=False):
 
@@ -102,9 +124,17 @@ def database_edit(request, fingerprint_id, questionnaire_id, sort_id=1, template
 
         qscs = QuestionSetCompletion.objects.filter(fingerprint=this_fingerprint).order_by('questionset')
 
+        highlightMap = {}
+        for qsc in qscs:
+            highlightMap[qsc.questionset.id] = False
+
+        if readonly:
+            highlightMap = getHighlightedList(request, highlightMap, questionnaire_id, fingerprint_id)
+
         for qsc in qscs:
             questionset_requests = requests.filter(question__questionset=qsc.questionset)
-            qreturned.append([qsc.questionset, qsc.answered, qsc.possible, int(qsc.fill), questionset_requests])
+            qreturned.append([qsc.questionset, qsc.answered, qsc.possible, int(qsc.fill), questionset_requests, highlightMap[qsc.questionset.id]])
+
 
 
         r = r2r(template_name, request,
