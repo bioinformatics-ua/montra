@@ -19,6 +19,7 @@
 {% load extra_tags %}
 {% load markup questionnaire i18n %}
 {% load django_bootstrap_breadcrumbs %}
+{% load hitcount_tags %}
 
 {% block breadcrumbs %}
     {{ block.super }}
@@ -125,9 +126,17 @@ Saving... please don't close this questionnary yet.</div>
 It was not possible to save this questionnary. Please try again in a few seconds.</div>
 
 <div style="margin-bottom: 60px;"></div>
+<div class="percentagebar">
 <hr style="margin-bottom: 0px;">
 <div id="globalprogress" style="margin-top: -1px; background-color: #8CCC72; height: 5px; width: {{globalprogress}}%;">&nbsp;</div>
-<br />
+{% if readonly %}
+  <small>
+    <strong>Hits: </strong>{{hits}} &nbsp;&nbsp;
+    <strong>Unique Views: </strong> {% get_hit_count for fingerprint %} &nbsp;&nbsp;
+    <strong>Filled:</strong> {{globalprogress|floatformat}} %
+  </small>
+{% endif %}
+</div>
 <div class="row">
 <div class="span3">
   <div class="qslist well" style="max-width: 340px; padding: 8px 0;">
@@ -231,6 +240,14 @@ $(function(){
   {% else %}
     initQsEnv("{{fingerprint_id}}","{{q_id}}","{{questionset.sortid}}", QsType.VIEW);
   {% endif %}
+
+  $('.percentagebar').scrollToFixed(
+    {
+      marginTop: 100,
+      preFixed: function() { $(this).append('<div class="shadowappend"></div>'); },
+      postFixed: function() { $(this).find('.shadowappend').remove(); },
+    });
+
 });
 //questionsets_handle(qs_0);
 function initialCounterSetup(){
