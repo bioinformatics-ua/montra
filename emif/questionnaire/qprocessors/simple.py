@@ -154,3 +154,10 @@ def show_summ(value):
         return valueclean.replace('no', 'No')
 
     return value
+
+@show_summary('open-textfield')
+def show_summ_textfield(value):
+    if value != None:
+        value = re.sub('\n','<br />',value.strip())
+    return value
+

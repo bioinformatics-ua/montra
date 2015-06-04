@@ -76,49 +76,54 @@
 
             redrawIndicator(start, end);
 
-            $(".publication_details").popover({trigger: "hover", html: "true",
-                template: "<div class="popover popover-small"><div class="arrow"></div><div class="popover-inner"><h3 class="popover-title"></h3><div class="popover-content"><p></p></div></div></div>"
-            });
+            $(".publication_details").popover(
+                {
+                    trigger: "hover",
+                    html: "true",
+                    template: '<div class="popover popover-small"><div class="arrow"></div><div class="popover-inner"><h3 class="popover-title"></h3><div class="popover-content"><p></p></div></div></div>'
+                }
+            );
         }
         function drawPublication(publication){
-            var line = "<li class="publication_details" data-container="body" data-toggle="popover" data-placement="left" data-content=\"<div style="text-align:justify;"><div class="well well-small"><small><strong>"+publication.titlec+"</strong></small></div>";
+            var line = '<li class="publication_details" data-container="body" data-toggle="popover" data-placement="left" data-content=\'';
+
+            var dcontainer = '<div style="text-align:justify;"><div class="well well-small"><small><strong>'+publication.titlec+'</strong></small></div>';
 
                 if( publication.authors != ""){
 
                     authors = publication.authors.split(",");
 
-                    line += "<table><tr><td style=\"vertical-align: top;\"><small><strong>Authors: </strong></small></td><td><small>";
+                    dcontainer += '<table><tr><td style="vertical-align: top;"><small><strong>Authors: </strong></small></td><td><small>';
 
                         for( var i = 0; i< authors.length;i=i+3){
-                            line += authors[i];
+                            dcontainer += authors[i];
                             if(i+1<authors.length)
-                                line += ", "+authors[i+1];
+                                dcontainer += ", "+authors[i+1];
                             if(i+2<authors.length)
-                                line += ", "+authors[i+2];
-                            line += "<br />";
+                                dcontainer += ", "+authors[i+2];
+                            dcontainer += "<br />";
                         }
 
-                    line += "</small></td></tr></table>";
+                    dcontainer += "</small></td></tr></table>";
                 }
                 if( publication.journal != ""){
-                    line += "<small><strong>Journal: </strong>"+publication.journal+"</small><br />";
+                    dcontainer += "<small><strong>Journal: </strong>"+publication.journal+"</small><br />";
                 }
                 if( publication.volume != ""){
-                    line += "<small><strong>Volume: </strong>"+publication.volume+"</small>&nbsp;";
+                    dcontainer += "<small><strong>Volume: </strong>"+publication.volume+"</small>&nbsp;";
                 }
                 if( publication.pages != ""){
-                    line += "<small><strong>Pages: </strong>"+publication.pages+"</small><br />";
+                    dcontainer += "<small><strong>Pages: </strong>"+publication.pages+"</small><br />";
                 }
                 if( publication.year != ""){
-                    line += "<small><strong>Year: </strong>"+publication.year+"</small><br />";
+                    dcontainer += "<small><strong>Year: </strong>"+publication.year+"</small><br />";
                 }
                 if( publication.link != ""){
-                    line += "<small><strong>Url: </strong><a href=\""+publication.linkc+"\">"+publication.link+"</a></small><br />";
+                    dcontainer += '<small><strong>Url: </strong><a href="'+publication.linkc+'">'+publication.link+'</a></small><br />';
                 }
+                dcontainer += '</div>';
 
-                line += "</div>\">"+publication.title+"</li>";
-
-                return line;
+                return line+dcontainer.replace(/'/g, "\\'")+'\'>'+publication.title+"</li>";
         }
 
         $(function (){

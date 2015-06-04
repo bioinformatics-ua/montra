@@ -18,9 +18,9 @@
 {% load extra_tags %}
 {% if choices|length > 0 %}
 <div>
-    <ul style="list-style-type: none; margin:0px;">
+    <ul>
         {% for choice in choices %}
-        <li>{{choice.key|safe}}{%if choice.comment and choice.comment != ''%}: {{choice.comment|safe}}{% endif %}</li>
+        <li>{{choice.key|safe}}{%if choice.comment and choice.comment != ''%}: <i>{{choice.comment|safe}}{% endif %}</i></li>
         {% endfor %}
     </ul>
 </div>

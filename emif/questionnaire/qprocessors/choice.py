@@ -330,6 +330,12 @@ def choice_list(value):
             comment = values[1].replace('}', '')
 
             multiple_choices[key] = {'key': key, 'comment': comment}
+        elif '||' in choice:
+            values = choice.split('||')
+            key = 'Other' #values[0]
+            comment = values[1]
+
+            multiple_choices[key] = {'key': key, 'comment': comment}
         else:
             multiple_choices[choice] = {'key': choice, 'comment': ''}
 
@@ -344,6 +350,9 @@ def serialize_list(choice_list):
         tmp +="#%s" %(choice['key'])
         if comment != '':
             tmp += '{%s}' % (comment)
+
+
+
 
     return tmp
 
