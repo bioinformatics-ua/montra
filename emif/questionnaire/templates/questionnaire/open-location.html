@@ -17,7 +17,7 @@
         {% endif %}
             <script type="text/javascript">
                 {% if qdict.value %}
-                $('[id="answered_'+{{ question.number|removedots }}+'"]').show();
+                    markAnswered('{{ question.number|removedots }}');
                 {% endif %}
                 $(function(){
                     var cache = {};
