@@ -387,7 +387,7 @@
                         </div>
                         </div>
                         </div>
-                        {% include "reusable_blocks/modals.html" with collapse=collapseall %}%}
+                        {% include "reusable_blocks/modals.html" with collapse=collapseall %}
                         <div style="margin-top: 60px"></div>
                     {% endif %}
 
@@ -437,7 +437,7 @@
         {% endblock %}
         <script type="text/javascript">
         var _gaq = _gaq || [];
-        
+
         {% for attr in GOOGLE_ANALYTICS %}
             _gaq.push({{attr|safe}});
         {% endfor %}
