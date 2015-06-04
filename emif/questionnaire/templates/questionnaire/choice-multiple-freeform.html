@@ -40,7 +40,7 @@
             </li>
             {% if checked %}
             <script type="text/javascript">
-                $('[id="answered_'+{{ question.number|removedots }}+'"]').show();
+                markAnswered('{{ question.number|removedots }}');
             </script>
             {% endif %}
         {% endfor %}

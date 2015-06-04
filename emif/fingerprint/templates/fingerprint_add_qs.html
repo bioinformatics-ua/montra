@@ -146,13 +146,18 @@
     <span class="pull-right">
     <a href="#" onclick="toggle_comments('{{question.number|removedots}}'); return false;">
     <span id="commentary_{{question.id}}">
-    <i class="{% if qdict.comment %} icon-comment {% else %} icon-comment-alt {% endif %}">&nbsp;</i>
+    <i title="Click to open comments" class="{% if qdict.comment %} icon-comment {% else %} icon-comment-alt {% endif %} tooltippable">&nbsp;</i>
     </span>
     </a>
     </span>
     <span class="pull-right answered hide " id="answered_{{ question.number|removedots }}">
-    <i class="icon-check green">&nbsp;</i>
+    <i class="icon-check green tooltippable" title="This question has an answer">&nbsp;</i>
     </span>
+    {% if readonly %}
+        <span class="pull-right" id="request_{{ question.number|removedots }}">
+        <i title="Request answer" data-question="{{question.id}}" class="fa fa-hand-o-up tooltippable requestlabel"></i>&nbsp;
+        </span>
+    {% endif %}
     {% if config.Request_Answer and answer_requests|length > 0 %}
         {% ans_requested question answer_requests %}
     {% endif %}
@@ -202,13 +207,18 @@
             {% endif %}
             <span class="pull-right">
             <a href="#" onclick="toggle_comments('{{question.number|removedots}}'); return false;">
-            <span id="commentary_{{question.id}}"><i class="{% if qdict.comment %} icon-comment {% else %} icon-comment-alt {% endif %}">&nbsp;</i>
+            <span id="commentary_{{question.id}}"><i title="Click to open comments" class="{% if qdict.comment %} icon-comment {% else %} icon-comment-alt {% endif %} tooltippable">&nbsp;</i>
             </span>
             </a>
             </span>
             <span class="pull-right answered hide" id="answered_{{ question.number|removedots }}">
-            <i class="icon-check green">&nbsp;</i>
+            <i title="This question has an answer" class="icon-check green tooltippable">&nbsp;</i>
             </span>
+            {% if readonly %}
+                <span class="pull-right" id="request_{{ question.number|removedots }}">
+                <i title="Request answer" class="fa fa-hand-o-up tooltippable requestlabel"></i>&nbsp;
+                </span>
+            {% endif %}
             {% if config.Request_Answer and answer_requests|length > 0 %}
                 {% ans_requested question answer_requests %}
             {% endif %}
@@ -427,6 +437,13 @@ $(function(){
     });
 
     $('.questionset-submit', context).scrollToFixed( { bottom: -10, limit: $('.questionset-submit', context).offset().top } );
+
+    $('.requestlabel', context).click(function(e){
+            var answer = $(this).data("question");
+
+            askForAnswer(answer);
+
+    });
 
 });
 

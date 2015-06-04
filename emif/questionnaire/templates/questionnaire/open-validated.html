@@ -37,7 +37,7 @@
         {% endif %}
         <script type="text/javascript">
             {% if qdict.value %}
-                    $('[id="answered_'+{{ question.number|removedots }}+'"]').show();
+                markAnswered('{{ question.number|removedots }}');
             {% endif %}
             var t_input = $('[id="question_{{ question.number }}"]');
             var parent = $('[id="answer_{{ question.number }}"] .control-group');

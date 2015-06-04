@@ -93,7 +93,8 @@
             <!-- comment -->
             {% if qdict.value %}
                 <script type="text/javascript">
-                    $('[id="answered_'+{{ question.number|removedots }}+'"]').show();
+                    markAnswered('{{ question.number|removedots }}');
+
                     valchanged('question_{{ question.number }}','{{ qdict.value }}', this);
                 </script>
             {% endif %}

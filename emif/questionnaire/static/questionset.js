@@ -528,3 +528,8 @@ function setupHideEmpties(id, mode){
         answers.addClass('database_listing_away');
     }
 }
+
+function markAnswered(question){
+    $('[id="request_'+question+'"]').hide();
+    $('[id="answered_'+question+'"]').show();
+}

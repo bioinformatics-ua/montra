@@ -37,7 +37,8 @@
                     <option value="{{ choice.value }}" {% if sel %} selected="true" {% endif %} id="question_{{ question.number }}_{{ forloop.counter }}">{{ choice.text }}</option>
                     {% if sel %}
                         <script type="text/javascript">
-                            $('[id="answered_'+{{ question.number|removedots }}+'"]').show();
+                            markAnswered('{{ question.number|removedots }}');
+
                             valchanged('question_{{ question.number }}','{{ choice.value }}', this);
                         </script>
                     {% endif %}
@@ -76,7 +77,7 @@
                 </li>
                 {% if sel %}
                 <script type="text/javascript">
-                    $('[id="answered_'+{{ question.number|removedots }}+'"]').show();
+                    markAnswered('{{ question.number|removedots }}');
                     valchanged('question_{{ question.number }}','{{ choice.value }}', this);
                 </script>
                 {% endif %}

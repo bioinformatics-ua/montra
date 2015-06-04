@@ -123,7 +123,8 @@ function checkNaN(check_this) {
 {% else %}
     {% if qdict.value %}
         <script type="text/javascript">
-            $('[id="answered_'+{{ question.number|removedots }}+'"]').show();
+            markAnswered('{{ question.number|removedots }}');
+
         </script>
     {% endif %}
     <div class="input">
@@ -148,7 +149,7 @@ function checkNaN(check_this) {
         {% endif %}
         {% if qdict.value %}
             <script type="text/javascript">
-                $('[id="answered_'+{{ question.number|removedots }}+'"]').show();
+                markAnswered('{{ question.number|removedots }}');
             </script>
         {% endif %}
             <script type="text/javascript">

@@ -189,6 +189,7 @@ It was not possible to save this questionnary. Please try again in a few seconds
 {% endblock %}
 
 {% block scriptextraincludes %}
+
 <script src="{{ STATIC_URL}}js/emif.fingerprint.counter.js"></script>
 
 <!-- Fix later -->
@@ -201,6 +202,7 @@ It was not possible to save this questionnary. Please try again in a few seconds
 
 <script type="text/javascript">
 {% block scriptextra %}
+var global_fingerprint_id = '{{fingerprint_id}}';
 
 {% if not readonly %}
 this_mode = QsType.EDIT;
