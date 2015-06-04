@@ -204,15 +204,20 @@ def checkMandatoryAnswers(fingerprint):
 
 def getAnswerValue(question, qdict):
 
-    if question.number == '4.06':
-        print "-- Q 4.06"
-        print qdict
     try:
         choices = None
         value = None
         choices_txt = None
 
-        if qdict.has_key('value'):
+        if qdict.has_key('timeperiods'):
+            value = qdict['value']
+
+            for key, repres, used in qdict['timeperiods']:
+                print key
+                print used
+                if used==True:
+                    value += '#%s'%key
+        elif qdict.has_key('value'):
             value = qdict['value']
 
         elif qdict.has_key('current'):

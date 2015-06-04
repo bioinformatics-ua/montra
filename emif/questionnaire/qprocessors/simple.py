@@ -49,10 +49,6 @@ def question_yesno(request, question):
         elif cd.get('required-dontknow'):
             checks = ' checks="dep_check(\'question_%s,dontknow\')"' % question.number
 
-    if question.type == 'choice-yesnodontknow':
-        print "YESNODONTKNOW"
-        print val
-
     return {
         'required' : True,
         'checks' : checks,
@@ -66,7 +62,7 @@ def question_yesno(request, question):
         'template' : 'questionnaire/choice-yesno.html',
     }
 
-@question_proc('open', 'open-validated','email', 'url', 'open-textfield', 'open-button', 'open-upload-image', 'comment')
+@question_proc('open', 'open-validated','email', 'url', 'open-textfield', 'open-button', 'comment')
 def question_open(request, question):
     key = "question_%s" % question.number
     value = question.getcheckdict().get('default','')
@@ -90,8 +86,6 @@ def question_datepicker(request, question):
         #print 'MATCH'
         value = value+'-01-01'
 
-    #print "VALOR:["+value+"]"
-
     return {
         'required' : question.getcheckdict().get('required', False),
         'value' : value,
@@ -99,7 +93,7 @@ def question_datepicker(request, question):
         'template' : 'questionnaire/datepicker.html',
     }
 
-@answer_proc('open', 'open-validated', 'email', 'url' 'open-textfield', 'choice-yesno', 'choice-yesnodontknow',  'open-button', 'open-upload-image')
+@answer_proc('open', 'open-validated', 'email', 'url' 'open-textfield', 'choice-yesno', 'choice-yesnodontknow',  'open-button')
 def process_simple(question, ansdict):
     checkdict = question.getcheckdict()
     required = question.getcheckdict().get('required', 0)
@@ -119,7 +113,6 @@ def process_simple(question, ansdict):
 add_type('open', 'Open Answer, single line [input]')
 add_type('open-validated', 'Open Validated Answer, single line validated with a regex[input]')
 add_type('open-button', 'Open Answer, single line [input] with a button to validate')
-add_type('open-upload-image', 'Upload Image')
 add_type('open-textfield', 'Open Answer, multi-line [textarea]')
 add_type('choice-yesno', 'Yes/No Choice [radio]')
 add_type('choice-yesnodontknow', 'Yes/No/Don\'t know Choice [radio]')

@@ -28,9 +28,6 @@ def question_range(request, question):
 
     current = request.POST.get('question_%s' % question.number)
 
-    print "RANGE HANDLER"
-    print current
-    print "--"
     return {
         'required' : True,
         'rmin' : rmin,
@@ -50,10 +47,6 @@ def process_range(question, answer):
 
     convert = range_type(rmin, rmax, rstep)
 
-    print "RANGE ANS"
-    print answer['ANSWER']
-    print rmax
-    print rmin
     try:
     	ans = convert(answer['ANSWER'])
     except:

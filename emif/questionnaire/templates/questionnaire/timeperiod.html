@@ -19,12 +19,31 @@
 {% load extra_tags %}
 <div class="clearfix">
     <div class="input">
-        <input type="text" class="span2" id="question_{{ question.number }}" name="question_{{ question.number }}" size="10" value="{{ qdict.value }}" />
-        <select class="span2" name="question_{{ question.number }}_unit">
-        {% for val, desc, sel in qdict.timeperiods %}
-            <option value="{{ val }}"{% if sel %} selected="selected"{% endif %}>{{ desc }}</option>
-        {% endfor %}
-        </select>
+        <input type="hidden" class="span2" id="question_{{ question.number }}" name="question_{{ question.number }}" size="10" value="{{ qdict.value }}" />
+
+        {% if readonly %}
+                <div class="span2 fake_input fake_input_disabled" id="question_{{ question.number }}_period" size="10">{{ qdict.value|safe }}</div>
+
+                <div class="span2 fake_input fake_input_disabled" id="question_{{ question.number }}_unit">
+                        {% if sel and readonly %}
+                            {{sel|safe}}
+                        {% endif %}
+                        {% for val, desc, sel in qdict.timeperiods %}
+                            {% if sel %}
+                                {{sel|safe}}
+                            {% endif %}
+                        {% endfor %}
+                    <div class="pull-right caret fake_caret"></div>
+                </div>
+
+        {% else %}
+            <input type="text" class="span2" id="question_{{ question.number }}_period" size="10" value="{{ qdict.value }}" />
+            <select class="span2" id="question_{{ question.number }}_unit">
+            {% for val, desc, sel in qdict.timeperiods %}
+                <option value="{{ val }}"{% if sel %} selected="selected"{% endif %}>{{ desc }}</option>
+            {% endfor %}
+            </select>
+        {% endif %}
         {% if question.extra %}
             <span class="help-block">{{ question.extra }}</span>
         {% endif %}
@@ -33,5 +52,23 @@
                 $('[id="answered_'+{{ question.number|removedots }}+'"]').show();
             </script>
         {% endif %}
+
+        <script type="text/javascript">
+            $(function(){
+                var out = $('[id="question_{{ question.number }}"]');
+                var period = $('[id="question_{{ question.number }}_period"]');
+                var unit = $('[id="question_{{ question.number }}_unit"]');
+
+                var handleChange = function(){
+                    out.val(period.val()+'#'+unit.val());
+                }
+
+                handleChange();
+
+                period.change(handleChange);
+                unit.change(handleChange);
+
+            });
+        </script>
     </div>
 </div>
