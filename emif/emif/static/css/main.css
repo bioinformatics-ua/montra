@@ -1003,13 +1003,11 @@ height: 4em;
 }
 
 
-#summarynav.affix:after{
-
-&.affix-bottom {
+.affix-bottom {
     position: absolute;
     bottom: 490px;
 }
-&.affix {
+.affix {
     top: 65px;
     position: fixed;
 }
@@ -1118,6 +1116,8 @@ input.fill {
 #version-details input[readonly] {
   background-color: white !important;
   cursor: text !important;
+}
+
 .custom-checkbox {
   position: relative;
   display: inline-block;
