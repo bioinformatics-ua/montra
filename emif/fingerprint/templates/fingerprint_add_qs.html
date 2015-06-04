@@ -45,6 +45,7 @@
             <li><a id="hide_filled_{{ questions_list.0.0.sortid }}" href="javascript:void(0);"><i class="icon-ok icon-white active"></i> Show Filled Questions</a></li>
           </ul></div>
       <a id="collapseall_qs_{{ questions_list.0.0.sortid }}"  class="btn" href="#">Collapse all </a>
+      {% if not readonly %}
       <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
         Permissions
         <span class="caret"></span>
@@ -104,6 +105,7 @@
             </tr>
         </table>
       </ul>
+      {% endif %}
     </div>
     {% endif %}
 

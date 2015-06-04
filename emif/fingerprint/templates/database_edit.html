@@ -148,11 +148,11 @@ It was not possible to save this questionnary. Please try again in a few seconds
           <table class="fullwidth">
             <tr>
               <td style="width: 80%; font-size: 93%;">
-              {% if config.Request_Answer and requests|length > 0 %}
-              <div style="margin-left:-32px; color: black;" class="pull-left">
-              <i title="Some users requested questions on this section to be filled." class="tooltippable fa fa-bell"></i>
-              </div>
-            {% endif %}
+              {% if config.Request_Answer and requests|length > 0  and not readonly %}
+                <div style="margin-left:-32px; color: black;" class="pull-left">
+                <i title="Some users requested questions on this section to be filled." class="tooltippable fa fa-bell"></i>
+                </div>
+              {% endif %}
               {% if qs.sortid != 0 and qs.sortid != 99 %}{{ qs.sortid }}. {% endif %}{{ qs.text|removeh1 }}
               {% if qs.sortid != 0 and qs.sortid != 99 %}
                 <span id="counter0_{{ qs.sortid }}"> ({{answered}}/{{total_count}})</span>
