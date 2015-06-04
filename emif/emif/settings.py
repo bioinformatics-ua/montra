@@ -42,7 +42,12 @@ GLOBALS = {
                     <!-- EXTRA HTML FOOTER CODE HERE -->
                     <small id="supportability">This website is optimised to Safari, Chrome, Firefox, Opera and IE9+.
                     <!--It runs in IE7-IE8, but it has low performance and no enhanced features.--></small>
-                   """
+                   """,
+    'SENTRY_URL': '',
+    'GOOGLE_ANALYTICS': [
+        ['_setAccount', 'UA-38876251-1'],
+        ['_trackPageview']
+    ]
 }
 # Header and Footer Settings
 
@@ -94,7 +99,8 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     "emif.context_processors.baseurl",
     "emif.context_processors.profiles_processor",
     'constance.context_processors.config',
-    "emif.context_processors.globals"
+    "emif.context_processors.globals",
+    "emif.context_processors.thirdparty",
 )
 
 MANAGERS = ADMINS
@@ -250,6 +256,7 @@ INSTALLED_APPS = (
     'emif',
 
     'searchengine',
+    "developer",
     'api',
     'fingerprint',
     'control_version',
@@ -296,6 +303,7 @@ INSTALLED_APPS = (
     'constance.backends.database',
     "constance",
 
+    'django_ace',
     "djangosaml2"
 )
 
@@ -486,11 +494,13 @@ LOGIN_EXEMPT_URLS = (
 
     r'^docsmanager/docfiles/(?P<fingerprint>[^/]+)/$',
     r'^api/getfile',
+    r'^controlversion/github_event$',
 
 )
 
 #Pages that wont be logged into user history
 DONTLOG_URLS = (
+    r'^controlversion/github_event$',
     r'^fingerprintqs/(?P<runcode>[^/]+)/(?P<qsid>[0-9]+)/$',
     r'^api/(?P<anything>[^/]*)',
     r'^docsmanager/uploadfile/(?P<fingerprint_id>[^/]+)/$',
@@ -545,11 +555,12 @@ REDIRECT_DATACUSTODIAN = 'dashboard.views.dashboard'
 REDIRECT_RESEARCHER = 'dashboard.views.dashboard'
 
 
+
 # MEMCACHED
 CACHES = {
     'default' : dict(
         BACKEND = 'django.core.cache.backends.memcached.MemcachedCache',
-        LOCATION = ['127.0.0.1:11211'],
+        LOCATION = ['127.0.0.1:11211']
     )
 }
 
@@ -561,20 +572,31 @@ PUBLIC_LINK_MAX_TIME = 24*30; # hours
 # Unique views definitions
 HITCOUNT_KEEP_HIT_ACTIVE = { 'days': 1 }
 
+
+
+
 # Django-Compressor activation
 COMPRESS_ENABLED = False
 COMPRESS_OFFLINE = False
-
 
 # Periodic user updates newsletter settings
 NEWSLETTER_DAY='friday'
 NEWSLETTER_HOUR = 3
 NEWSLETTER_MIN = 0
 
+
 try:
     from local_settings import *
 except:
     pass
+
+
+
+
+FIXTURE_DIRS = (
+    os.path.abspath('%s%s/emif/fixtures' % (PROJECT_DIR_ROOT,MIDDLE_DIR)),
+)
+
 
 
 if DEBUG:
@@ -612,6 +634,13 @@ except ConnectionFailure, e:
 # URL prefix for static files.
 # Example: "http://media.lawrence.com/static/"
 STATIC_URL = BASE_URL+'static/'
+
+
+COMPRESS_OFFLINE_CONTEXT = {
+    'SENTRY_URL': GLOBALS['SENTRY_URL'],
+    'STATIC_URL': STATIC_URL,
+    'GOOGLE_ANALYTICS': GLOBALS['GOOGLE_ANALYTICS']
+}
 
 
 # Additional locations of static files
@@ -751,3 +780,4 @@ SAML_ATTRIBUTE_MAPPING = {
     'givenName': ('first_name', ),
     'sn': ('last_name', ),
 }
+

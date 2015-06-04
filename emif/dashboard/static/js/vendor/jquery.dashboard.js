@@ -20,7 +20,7 @@
 (function($) {
     $.fn.dashboard = function(options) {
         // This indicates plugin version, and allows to invalidate any existing caches
-        var __version = "0.1";
+        var __version = "0.2";
 
         var self = this;
 
@@ -144,7 +144,7 @@
                     for (var key in registered_widgets) {
                         if (registered_widgets.hasOwnProperty(key)) {
                             if(private_funcs.__indexOf(key) == -1){
-                                to_render += '<li><a id="'+key+'" class="dashboardaddwidget" data-widgetname="'+key+'" href="javascript:void(0)">'+registered_widgets[key].header+'</a></li>';
+                                to_render += '<li><a id="key-'+key+'" class="dashboardaddwidget" data-widgetname="'+key+'" href="javascript:void(0)">'+registered_widgets[key].header+'</a></li>';
                                 no_results=false;
                             }
                         }
@@ -247,8 +247,9 @@
                     private_funcs.__updateAllcoords();
 
                     var serialization = public_funcs.serialize();
-                    localStorage.setItem("dashboard_preferences", serialization);
-                    localStorage.setItem("__dashboard_version", __version);
+
+                    localStorage.setItem(self[0].id+"_preferences", serialization);
+                    localStorage.setItem(self[0].id+"__dashboard_version", __version);
 
                 } else {
                     console.error("Your browser doesn't support local storage!");
@@ -258,7 +259,7 @@
             },
             loadConfiguration: function(){
                 if(private_funcs.__supports_storage()){
-                    var stored_version = localStorage.getItem("__dashboard_version");
+                    var stored_version = localStorage.getItem(self[0].id+"__dashboard_version");
                     console.log("STORED VERSION: "+stored_version);
                     console.log("VERSION CURRENT: "+__version);
 
@@ -271,10 +272,9 @@
                     private_funcs.__init();
 
                     try{
-                        var parsed_configurations = JSON.parse(localStorage.getItem("dashboard_preferences"));
-                        registered_widgets = private_funcs.__deepcopy(initial_widgets);
+                        var parsed_configurations = JSON.parse(localStorage.getItem(self[0].id+"_preferences"));
 
-                        console.log(registered_widgets);
+                        registered_widgets = private_funcs.__deepcopy(initial_widgets);
 
                         for(var i=0;i<parsed_configurations.length;i++){
                             var this_widget;
@@ -337,7 +337,7 @@
                 }
             }, reset   : function(){
                 if(private_funcs.__supports_storage()){
-                    localStorage.removeItem("dashboard_preferences");
+                    localStorage.removeItem(self[0].id+"_preferences");
 
                     public_funcs.clear();
 
@@ -365,15 +365,15 @@
     };
 }(jQuery));
 
-var DashboardWidget = function DashboardWidget(widgetname, header, width, height, pos_x, pos_y) {
+var DashboardWidget = function DashboardWidget(widgetname, header, width, height, pos_x, pos_y, icon) {
         this.widgetname = widgetname;
-        this.width = width;
-        this.height = height;
-        this.pos_x = pos_x;
-        this.pos_y = pos_y;
-        this.header = header;
+        this.width = width || 2;
+        this.height = height || 1;
+        this.pos_x = pos_x || 1;
+        this.pos_y = pos_y || 1;
+        this.header = header || 'New plugin';
         this.content = "";
-        this.icon = '';
+        this.icon = icon || '';
         this.header_tooltip = null;
         this.header_style = '';
 
@@ -396,35 +396,40 @@ var DashboardWidget = function DashboardWidget(widgetname, header, width, height
 
         gridster.add_widget.apply(gridster, widget);
 
-        $('#'+this.widgetname+" .dragtooltip").tooltip({'container': 'body'});
-
-        $('#'+this.widgetname+" .removewidget").click(function(){
-            if(typeof bootbox !== 'undefined'){
-                bootbox.confirm("Are you sure you want to remove this widget ?", function(confirmation){
-                    if (confirmation)
-                    parent.removeWidget(self.widgetname);
-                });
-            } else {
-                var confirmation = confirm("Are you sure you want to remove this widget ?");
-                if ( confirmation === true)
-                    parent.removeWidget(self.widgetname);
-            }
-        });
-
-        if(self.header_tooltip != null){
-            $('#'+this.widgetname+' .widget-header').tooltip({
-                'trigger': 'hover',
-                'placement': 'top',
-                'title': self.header_tooltip,
-                'container': 'body',
-                'html': true
-            });
-        }
+        this.__baseevents(parent);
 
     },
-    __refresh    : function(){
+    __refresh : function(){
         //console.log(this.content);
         $('#'+this.widgetname+' .accordion-inner').html(this.content);
+    },
+    __baseevents: function(parent){
+        var self=this;
+
+        $('#'+this.widgetname+" .dragtooltip").tooltip({'container': 'body'});
+
+                $('#'+this.widgetname+" .removewidget").click(function(){
+                    if(typeof bootbox !== 'undefined'){
+                        bootbox.confirm("Are you sure you want to remove this widget ?", function(confirmation){
+                            if (confirmation)
+                            parent.removeWidget(self.widgetname);
+                        });
+                    } else {
+                        var confirmation = confirm("Are you sure you want to remove this widget ?");
+                        if ( confirmation === true)
+                            parent.removeWidget(self.widgetname);
+                    }
+                });
+
+                if(self.header_tooltip != null){
+                    $('#'+this.widgetname+' .widget-header').tooltip({
+                        'trigger': 'hover',
+                        'placement': 'top',
+                        'title': self.header_tooltip,
+                        'container': 'body',
+                        'html': true
+                    });
+        }
     },
     // private methods
     __validate : function(){
@@ -456,8 +461,9 @@ var DashboardWidget = function DashboardWidget(widgetname, header, width, height
         return true;
     },
     // public methods
-    serialize : function(){
-        return  '{'+
+    serialize : function(extra){
+        var extra = extra || {};
+        var tmp ='{'+
                     '"type": "'+this.constructor.name+'",'+
                     '"widgetname": "'+this.widgetname+'",'+
                     '"width": '+this.width+','+
@@ -465,17 +471,52 @@ var DashboardWidget = function DashboardWidget(widgetname, header, width, height
                     '"pos_x": '+this.pos_x+','+
                     '"pos_y": '+this.pos_y+','+
                     '"header": "'+this.header+'",'+
-                    '"content": "'+encodeURI(this.content)+'"'+
-                '}';
+                    '"icon": "'+encodeURI(this.icon)+'",'+
+                    '"content": "'+encodeURI(this.content)+'"';
+
+
+        for(var parameter in extra){
+            var eparam = extra[parameter];
+
+            if(typeof eparam == 'function')
+                tmp += ',"'+parameter+'": "'+encodeURI(String(eparam))+'"';
+            else if(eparam instanceof Array){
+                tmp += ',"'+parameter+'": "'+encodeURI(JSON.stringify(eparam))+'"';
+            }
+        }
+
+        tmp += '}';
+
+        return tmp;
     }, deserialize : function(json){
         this.widgetname = json.widgetname;
+        delete json.widgetname
         this.width = parseInt(json.width);
+        delete json.width;
         this.height = parseInt(json.height);
+        delete json.height;
         this.pos_x = parseInt(json.pos_x);
+        delete json.pos_x;
         this.pos_y = parseInt(json.pos_y);
+        delete json.pos_y;
         this.header = json.header;
+        delete json.header;
         this.content = decodeURI(json.content);
-    }, copy : function(){
+        delete json.content;
+
+        delete json.type;
+
+        this.icon = decodeURI(json.icon);
+        delete json.icon;
+
+        for(var parameter in json){
+            this[parameter] = decodeURI(json[parameter]);
+        }
+
+    },
+    copy : function(extra){
+
+        var extra = extra || {};
         var this_widget;
         var tryme = "this_widget = new "+this.constructor.name+"();";
         eval(tryme);
@@ -487,6 +528,11 @@ var DashboardWidget = function DashboardWidget(widgetname, header, width, height
         this_widget.pos_y = this.pos_y;
         this_widget.header = this.header;
         this_widget.content = this.content;
+        this_widget.icon = this.icon;
+
+        for(var parameter in extra){
+            this_widget[parameter] = extra[parameter];
+        }
 
         return this_widget;
     }

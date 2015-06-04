@@ -2,7 +2,7 @@
   "src_folders" : ["tests/units"],
   "output_folder" : "tests/reports",
   "custom_commands_path" : "tests/commands",
-  "custom_assertions_path" : "",
+  "custom_assertions_path" : "tests/assertions",
   "selenium" : {
     "start_process" : false,
     "server_path" : "",

@@ -24,6 +24,8 @@ from django.utils import simplejson as json
 from parsers import parse_checks, ParseException
 from django.conf import settings
 from django.contrib.auth.models import User
+from django.dispatch import receiver
+from django.db.models.signals import post_save
 
 import json
 
@@ -350,7 +352,6 @@ VISIBILITY_CHOICES = (
 )
 ### This models, keeps the permissions for a questionset, relative to a fingerprint
 class QuestionSetPermissions(models.Model):
-
     id = models.AutoField(primary_key=True)
     fingerprint_id = models.CharField(max_length=32)
     qs = models.ForeignKey(QuestionSet)
@@ -417,7 +418,7 @@ class Question(models.Model):
             try:
                 self.__metadict = json.loads(self.metadata)
             except:
-                print "-- ERROR: Couldn't parse json for question meta"
+                #print "-- ERROR: Couldn't parse json for question meta"
                 self.__metadict = {}
 
         return self.__metadict
@@ -518,3 +519,49 @@ class Choice(models.Model):
     class Meta:
         ordering = ('sortid',)
         translate = ('text',)
+
+class QuestionnaireWizard(models.Model):
+    questionnaire = models.ForeignKey(Questionnaire)
+    user = models.ForeignKey(User)
+    removed = models.BooleanField(default=False)
+
+    @staticmethod
+    def all(user=None):
+        tmp = QuestionnaireWizard.objects.filter(removed=False)
+
+        if user != None:
+            tmp=tmp.filter(user=user)
+
+        return tmp
+
+    def remove(self):
+        self.removed=True
+        self.save()
+
+    def interest(self, interested):
+        if interested:
+            prof = self.user.emif_profile
+
+            prof.interests.add(self.questionnaire)
+            prof.save()
+
+        self.remove()
+
+
+@receiver(post_save, sender=Questionnaire)
+def __create_wizards(sender, instance, created, *args, **kwargs):
+    '''This method uses the post_save signal on Questionnaire to generate wizards to existing users
+    '''
+    from accounts.models import EmifProfile
+
+    if created:
+        for user in User.objects.all():
+            try:
+                pf = user.emif_profile
+                intcount = pf.interests.all().count()
+
+                if intcount > 0:
+                    qw = QuestionnaireWizard(questionnaire=instance, user=user)
+                    qw.save()
+            except EmifProfile.DoesNotExist:
+                pass

@@ -1,0 +1,107 @@
+{% extends 'base.html' %}
+{% comment %}
+# -*- coding: utf-8 -*-
+# Copyright (C) 2014 Universidade de Aveiro, DETI/IEETA, Bioinformatics Group - http://bioinformatics.ua.pt/
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+{% endcomment %}
+{% load url from future %}
+{% load extra_tags %}
+{% load django_bootstrap_breadcrumbs %}
+
+{% block styleinclude %}
+    <link rel="stylesheet" href="{{ STATIC_URL }}css/dataTables.bootstrap.css">
+{% endblock %}
+
+{% block headextra %}
+    <script src="{{ STATIC_URL}}js/jquery.dataTables.js"></script>
+    <script src="{{ STATIC_URL}}js/dataTables.bootstrap.js"></script>
+{% endblock %}
+
+{% block breadcrumbs %}
+        {{ block.super }}
+        {% breadcrumb "Developer" "" %}
+{% endblock %}
+
+{% block toolbar %}
+    {% include "reusable_blocks/menu_toolbar.html" with collapse=collapseall %}
+{% endblock %}
+
+{% block content %}
+    <div class="row">
+    <div class="span12">
+
+    {%if user|has_group:'developers' or user.is_staff %}
+
+    {% if success != None %}
+    <div class="alert {% if success %}alert-success{% else %}alert-danger{%endif %}">
+        <button type="button" class="close" data-dismiss="alert">&times;</button>
+        {%if success %}
+            Plugin removed with success.
+        {% else %}
+            Plugin couldnt be removed. Please contact the administrator.
+        {% endif %}
+    </div>
+    {% endif %}
+    <form class="hide" method="POST" action="developer/" id="utility_form">
+        {% csrf_token %}
+        <div class="utility_content"></div>
+        <input id="utility_submit" type="submit" value="Go" />
+    </form>
+    <table id="plugins" class="table table-bordered table-striped">
+        <thead>
+            <tr>
+                <th style="width: 24px;"></th>
+                <th style="width: 35%;">Name</th>
+                <th>Type</th>
+                <th>Create Date</th>
+                <th>Latest Update</th>
+                <th>&nbsp;</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for plugin in plugins %}
+            <tr data-id="{{plugin.slug}}" data-name="{{plugin.name}}">
+                <td>
+                    {%if plugin.icon %}
+                        <img style="max-width: 24px; max-height: 24px;" src="{{plugin.icon.url}}" />
+                    {% else %}
+                        <i style="font-size: 24px;" class="fa fa-picture-o"></i>
+                    {% endif %}
+                </td>
+                <td><a href="developer/{{plugin.slug}}">{{plugin.name}}</a></td>
+                <td>{{plugin.type_repr }}</td>
+                <td>{{plugin.create_date_repr }}</td>
+                <td>{{plugin.latest_update_repr }}</td>
+                <td><a class="remove_plugin" style="color: black" href="javascript:void(0)">
+                    <i class="fa fa-2x fa-times-circle"></i>
+                    </a>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    {% else %}
+
+    <center><h4>The access to this page is restricted to developers. To become a developer, please contact the platform administration.</h4></center>
+
+    {% endif %}
+    </div>
+    </div>
+{% endblock content %}
+
+{% block scriptextraincludes %}
+    <script type="text/javascript" src="{{STATIC_URL}}js/emif.developer.js"></script>
+{% endblock %}

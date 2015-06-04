@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+{% comment %}
+# -*- coding: utf-8 -*-
+# Copyright (C) 2014 Universidade de Aveiro, DETI/IEETA, Bioinformatics Group - http://bioinformatics.ua.pt/
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either latest 3 of the License, or
+# (at your option) any later latest.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+{% endcomment %}
+{% load url from future %}
+{% load extra_tags %}
+{% load django_bootstrap_breadcrumbs %}
+
+{% block styleinclude %}
+    <link rel="stylesheet" href="{{ STATIC_URL }}css/dataTables.bootstrap.css">
+    <link rel="stylesheet" href="{{ STATIC_URL}}css/vendor/jquery.gridster.css" />
+    <link rel="stylesheet" href="{{ STATIC_URL}}css/emif.dashboard.css" />
+
+{% endblock %}
+
+{% block headextra %}
+    <script src="{{ STATIC_URL}}js/jquery.dataTables.js"></script>
+    <script src="{{ STATIC_URL}}js/dataTables.bootstrap.js"></script>
+    <script src="{{ STATIC_URL}}js/emif.globalwidget.js"></script>
+    <script src="{{ STATIC_URL}}js/widget/widget.globalplug_shell.js"></script>
+    <script src="{{ STATIC_URL}}js/emif.livepreview_global.js"></script>
+{% endblock %}
+
+{% block breadcrumbs %}
+        {{ block.super }}
+        {% breadcrumb plugin.name plugin.slug %}
+{% endblock %}
+
+{% block toolbar %}
+    {% include "reusable_blocks/menu_toolbar.html" with collapse=collapseall %}
+{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div id="playground_test" class="span12">
+            {% if not latest.is_remote %}
+            <script type="text/javascript">
+                console.log('LIVE PREVIEW FOR LOCAL FILE, GLOBAL WIDGETS');
+                console.log('{{plugin.slug}}');
+                sandbox('{{plugin.slug}}',
+                    function(callback){
+                        var confs, plugin;
+
+                        {{latest.path|safe}}
+
+                        if(callback) callback(confs, plugin);
+
+                    });
+            </script>
+            {% else %}
+                <script type="text/javascript">
+                    console.log('LIVE PREVIEW FOR REMOTE FILE, GLOBAL WIDGETS')
+                    $.get('{{latest.path|safe}}')
+                        .done(function(data){
+                            sandbox('{{plugin.slug}}', data);
+                        })
+                        .fail(function(data){
+                            codeError("We couldn't obtain the remote plugin from url: '{{latest.path|safe}}'");
+                        });
+                </script>
+            {%endif%}
+        </div>
+    </div>
+{% endblock content %}

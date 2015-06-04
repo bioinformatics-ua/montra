@@ -134,14 +134,12 @@ def question_multiple(request, question):
         counter += 1
         key = "question_%s_multiple_%d" % (question.number, choice.sortid)
 
-
         if key in request.POST or (val!=None and val != '' and (choice.value in val)) or \
           (request.method == 'GET' and choice.value in defaults):
             choices.append( (choice, key, clean_map.get(choice.value, None),) )
             hasValue = hasValue or True
         else:
             choices.append( (choice, key, '',) )
-
     extracount = int(cd.get('extracount', 0))
     if not extracount and question.type == 'choice-multiple-freeform':
         extracount = 1
@@ -280,13 +278,11 @@ def question_multiple_options(request, question):
             return False
 
         val = re.sub('<[^<]+?>', '', val)
-
         if key in request.POST or (val!=None and checkPartialIn(choice.value, val.split('#')[1:])) or \
           (request.method == 'GET' and choice.value in defaults):
             _tmp_v = get_aux_text(dval,choice.value, _aux )
             if _tmp_v == None or _tmp_v == '':
                 _tmp_v = _aux
-
             choices.append( (choice, key, clean_map.get(choice.value, None),_tmp_v) )
             hasValue = hasValue or True
 
@@ -321,7 +317,6 @@ def question_multiple_options(request, question):
 
         else:
             extras.append( (key, '',) )
-
 
     return {
         "choices": choices,
@@ -416,7 +411,6 @@ def serialize_list(choice_list):
 
 @show_summary('choice','choice-freeform','choice-multiple', 'choice-multiple-freeform', 'choice-multiple-freeform-options')
 def show_summ(value):
-    print value
     multiple_choices = choice_list(value).values()
     #return value
     return render_to_string('questionnaire/choice_summary.html', {'choices':multiple_choices})

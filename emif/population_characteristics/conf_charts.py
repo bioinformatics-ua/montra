@@ -1071,12 +1071,53 @@ class ConfCharts(object):
 
         c.filters = [f2]
 
+        sc.charts.append(c)
+
+        #################################################
+        ### Birth date
+        #################################################
+
+        c1 = Chart()
+        c1.uid = 2
+        c1.title = Title()
+        c1.title.operation = Operation.UNIQUE
+        c1.title.var = "Birth in year"
+        c1.title.fixed_title = "Birth Year"
+        c1.hint = "Birth year histogram"
+        c1.stacked = True
+
+        c1.x_axis = Axis()
+        c1.x_axis.operation = "unique"
+        c1.x_axis.var = "Value1"
+        c1.x_axis.label = 'Years'
+
+        c1.y_axis = Axis()
+        c1.y_axis.operation = "unique"
+        c1.y_axis.var = "Count"
+        c1.y_axis.label = 'Number of patients'
+        c1.y_axis.multivalue = True
+
+        f2 = Filter()
+        f2.name = 'Gender'
+        f2.key = None
+        f2.value = 'Gender'
+        f2.translation = {'M': 'Male', 'F': 'Female', 'T': 'Total'}
+
+        f3 = Filter()
+        f3.name = None
+        f3.key = None
+        f3.value = "dbname_value"
+        f3.show = False
+        f3.comparable = True
+        f3.comparable_values = None
+
+        c1.filters = [f2, f3]
+
+        sc.charts.append(c1)
 
         #################################################
         ### Total patient time in a year (stacked age group)
         #################################################
-
-
         c5 = Chart()
         c5.uid = 18
         c5.title = Title()
@@ -1146,6 +1187,103 @@ class ConfCharts(object):
 
         sc.charts.append(c5)
 
+        #################################################
+        ### Age Distribution at Start of Year
+        #################################################
+        c5 = Chart()
+        c5.uid = 18
+        c5.title = Title()
+        c5.title.operation = Operation.UNIQUE
+        c5.title.var = "Age at start of year"
+        c5.title.fixed_title = "Age Distribution at Start of Year"
+        c5.stacked = True
+        c5.x_axis = Axis()
+        c5.x_axis.operation = "unique"
+        c5.x_axis.var = "Value2"
+        c5.x_axis.label = "Age(years)"
+        c5.x_axis.categorized = True
+        c5.x_axis.sort_func = "int(k[c1.x_axis.var].split('-')[0])"
+
+        c5.y_axis = Axis()
+        c5.y_axis.operation = "unique"
+        c5.y_axis.var = "Count"
+        c5.y_axis.label = "Number of patients"
+        c5.y_axis.multivalue = True
+
+        fy2 = Filter()
+        fy2.name = 'Name2'
+        fy2.key = 'Name2'
+        fy2.value = 'AGE'
+
+        fy3 = Filter()
+        fy3.name = 'Name1'
+        fy3.key = 'Name1'
+        fy3.value = 'YEAR'
+
+        c5.y_axis.static_filters = [fy3,fy2]
+
+
+        f1 = Filter()
+        f1.name = 'Year'
+        f1.key = 'Name1'
+        f1.value = 'Value1'
+
+        f2 = Filter()
+        f2.name = 'Gender'
+        f2.key = None
+        f2.value = 'Gender'
+        f2.translation = {'M': 'Male', 'F': 'Female', 'T': 'Total'}
+
+
+        f3 = Filter()
+        f3.name = None
+        f3.key = None
+        f3.value = "dbname_value"
+        f3.show = False
+        f3.comparable = True
+        f3.comparable_values = None
+
+        f_year = Filter()
+        f_year.name = 'YEAR'
+        f_year.key = 'Name1'
+        f_year.value = 'Value1'
+
+        c5.filters = [f2, f_year, f3]
+
+        sc.charts.append(c5)
+
+        #################################################
+        ### All patients
+        #################################################
+        c = Chart()
+        c.uid = 134
+        c.title = Title()
+        c.title.operation = Operation.UNIQUE
+        c.title.var = "Age at patient start"
+        c.title.fixed_title = "Number of patients"
+        c.stacked = False
+        c.x_axis = Axis()
+        c.x_axis.operation = "unique"
+        c.x_axis.var = "dbname_value"
+        c.x_axis.categorized = True
+        c.x_axis.label = 'Databases'
+        c.y_axis = Axis()
+        c.y_axis.operation = "unique"
+        c.y_axis.var = "Count"
+        c.y_axis.label = 'Number of patients'
+        c.y_axis.multivalue = True
+
+
+        f2 = Filter()
+        f2.name = 'Gender'
+        f2.key = None
+        f2.value = 'Gender'
+        f2.translation = {'M': 'Male', 'F': 'Female', 'T': 'Total',  'ALL': 'Male/Female'}
+        f2.comparable = False
+        f2.comparable_values = ['M', 'F']
+
+
+        c.filters = [f2]
 
         sc.charts.append(c)
 

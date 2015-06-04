@@ -16,6 +16,7 @@
 from django.conf import settings
 
 from accounts.models import EmifProfile, Profile
+from developer.models import Plugin, PluginVersion
 
 def debug(context):
   return {'DEBUG': settings.DEBUG}
@@ -51,3 +52,9 @@ def profiles_processor(request):
 
 def globals(request):
     return settings.GLOBALS
+
+def thirdparty(request):
+    return {
+        'thirdparty': PluginVersion.all_valid(type=Plugin.THIRD_PARTY),
+        'globalwidgets': PluginVersion.all_valid(type=Plugin.FULL_FLEDGED)
+        }
