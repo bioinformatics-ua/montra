@@ -33,6 +33,10 @@ For developers:
 * Plugin based architecture: new modules are possible to include
 
 
+## Install 
+
+Please use docker: https://github.com/bioinformatics-ua/catalogue-docker
+
 
 
 ----------
