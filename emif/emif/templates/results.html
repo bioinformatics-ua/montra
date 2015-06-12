@@ -42,7 +42,7 @@
 
 {% block styleinclude %}
 <link rel="stylesheet" href="{{STATIC_URL}}css/theme.blue.css">
-<link rel="stylesheet" href="{{ STATIC_URL }}css/vendor/jquery.boolrelwidget.css"></script>
+<link rel="stylesheet" href="{{ STATIC_URL }}css/vendor/jquery.boolrelwidget.css">
 {% endblock %}
 
 
@@ -54,7 +54,7 @@
 <script src="{{ STATIC_URL }}js/paginator-sorter.js"></script>
 <script src="{{ STATIC_URL }}js/emif.results.js"></script>
 <script src="{{ STATIC_URL }}js/emif.comparison_populations.js"></script>
-<script src="{{ STATIC_URL }}js/vendor/jquery.knob.js"
+<script src="{{ STATIC_URL }}js/vendor/jquery.knob.js"></script>
 
 {% endblock %}
 
@@ -256,7 +256,6 @@
 
   {% if page_obj != None %}
     {% include "reusable_blocks/post_paginator.html" %}
-
 {% endif %}
 {% endblock %}
 
