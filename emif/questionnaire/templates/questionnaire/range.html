@@ -19,15 +19,30 @@
 {% load extra_tags %}
 <div class="clearfix rangeinput">
     <div class="input">
-        <input id="question_{{ question.number }}" name="question_{{ question.number }}" type="range" min="{{ qdict.rmin }}" max="{{ qdict.rmax }}" step="{{ qdict.rstep }}" value="{{ qdict.current }}" />
+        <input id="question_{{ question.number }}" name="question_{{ question.number }}" type="text" value="{{ qdict.current }}" />
+
+        <span style="margin-left: 10px;" id="question_{{ question.number }}_label" class="range_label" data-unit="{{ qdict.runit }}"> {{ qdict.current|safe }} {{ qdict.runit }}</span>
     </div>
-    <label data-unit="{{ qdict.runit }}">{{ qdict.runit }}</label>
     {% if question.extra %}
         <span class="help-block">{{ question.extra }}</span>
     {% endif %}
     {% if qdict.current %}
+        <link rel="stylesheet" href="{{ STATIC_URL }}css/vendor/bootstrap-slider.css">
+        <script src="{{ STATIC_URL }}js/vendor/bootstrap-slider.js"></script>
         <script type="text/javascript">
-            $('[id="answered_'+{{ question.number|removedots }}+'"]').show();
+            markAnswered('{{ question.number|removedots }}');
+
+            var mySlider = $('[id="question_{{ question.number }}"]').bootstrapSlider({
+                // initial options object
+                value: {{ qdict.current|striptags }},
+                step: {{ qdict.rstep }},
+                min: {{ qdict.rmin }},
+                max: {{ qdict.rmax }},
+                {% if readonly %}enabled: false,{% endif %}
+                tooltip: 'hide'
+            }).on("slide", function(slideEvt) {
+                $('[id="question_{{ question.number }}_label"]').text(slideEvt.value);
+            });
         </script>
     {% endif %}
 </div>

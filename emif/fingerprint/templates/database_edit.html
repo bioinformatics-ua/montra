@@ -19,6 +19,7 @@
 {% load extra_tags %}
 {% load markup questionnaire i18n %}
 {% load django_bootstrap_breadcrumbs %}
+{% load hitcount_tags %}
 
 {% block breadcrumbs %}
     {{ block.super }}
@@ -125,16 +126,24 @@ Saving... please don't close this questionnary yet.</div>
 It was not possible to save this questionnary. Please try again in a few seconds.</div>
 
 <div style="margin-bottom: 60px;"></div>
+<div class="percentagebar">
 <hr style="margin-bottom: 0px;">
 <div id="globalprogress" style="margin-top: -1px; background-color: #8CCC72; height: 5px; width: {{globalprogress}}%;">&nbsp;</div>
-<br />
+{% if readonly %}
+  <small>
+    <strong>Hits: </strong>{{hits}} &nbsp;&nbsp;
+    <strong>Unique Views: </strong> {% get_hit_count for fingerprint %} &nbsp;&nbsp;
+    <strong>Filled:</strong> {{globalprogress|floatformat}} %
+  </small>
+{% endif %}
+</div>
 <div class="row">
 <div class="span3">
   <div class="qslist well" style="max-width: 340px; padding: 8px 0;">
 
     <ul class="nav nav-list nav-pills nav-stacked ">
       <li class="nav-header">Step-by-Step</li>
-      {% for qs, answered, total_count, percentage, requests in questionsets %}
+      {% for qs, answered, total_count, percentage, requests, highlight in questionsets %}
 
       <li{% if questionset.text == qs.text %} class="active" {% endif %} id="li_qs_{{qs.sortid}}">
         <!--<a href="q2/{{runinfo.random}}/{{ qs.sortid }}">
@@ -148,6 +157,9 @@ It was not possible to save this questionnary. Please try again in a few seconds
           <table class="fullwidth">
             <tr>
               <td style="width: 80%; font-size: 93%;">
+              {% if highlight%}
+                <img style="margin-left:-32px;" title="This section has search keywords" class="markered pull-left" src="{{ STATIC_URL}}img/marker.png" />
+              {% endif %}
               {% if config.Request_Answer and requests|length > 0  and not readonly %}
                 <div style="margin-left:-32px; color: black;" class="pull-left">
                 <i title="Some users requested questions on this section to be filled." class="tooltippable fa fa-bell"></i>
@@ -186,6 +198,7 @@ It was not possible to save this questionnary. Please try again in a few seconds
 {% endblock %}
 
 {% block scriptextraincludes %}
+
 <script src="{{ STATIC_URL}}js/emif.fingerprint.counter.js"></script>
 
 <!-- Fix later -->
@@ -198,6 +211,7 @@ It was not possible to save this questionnary. Please try again in a few seconds
 
 <script type="text/javascript">
 {% block scriptextra %}
+var global_fingerprint_id = '{{fingerprint_id}}';
 
 {% if not readonly %}
 this_mode = QsType.EDIT;
@@ -226,6 +240,14 @@ $(function(){
   {% else %}
     initQsEnv("{{fingerprint_id}}","{{q_id}}","{{questionset.sortid}}", QsType.VIEW);
   {% endif %}
+
+  $('.percentagebar').scrollToFixed(
+    {
+      marginTop: 100,
+      preFixed: function() { $(this).append('<div class="shadowappend"></div>'); },
+      postFixed: function() { $(this).find('.shadowappend').remove(); },
+    });
+
 });
 //questionsets_handle(qs_0);
 function initialCounterSetup(){

@@ -19,7 +19,7 @@ from django.utils.simplejson import dumps
 
 import re
 
-@question_proc('choice-yesno','choice-yesnocomment','choice-yesnodontknow')
+@question_proc('choice-yesno','choice-yesnodontknow')
 def question_yesno(request, question):
     key = "question_%s" % question.number
     key2 = "question_%s_comment" % question.number
@@ -29,10 +29,7 @@ def question_yesno(request, question):
     cd = question.getcheckdict()
     jstriggers = []
     hasValue = False
-    if qtype == 'choice-yesnocomment':
-        hascomment = True
-    else:
-        hascomment = False
+    hascomment = False
     if qtype == 'choice-yesnodontknow' or 'dontknow' in cd:
         hasdontknow = True
     else:
@@ -62,10 +59,10 @@ def question_yesno(request, question):
         'hasdontknow' : hasdontknow,
         'comment' : cmt,
         'jstriggers' : jstriggers,
-        'template' : 'questionnaire/choice-yesnocomment.html',
+        'template' : 'questionnaire/choice-yesno.html',
     }
 
-@question_proc('open', 'open-validated','email', 'url', 'open-textfield', 'open-location', 'open-button', 'open-upload-image', 'comment')
+@question_proc('open', 'open-validated','email', 'url', 'open-textfield', 'open-location', 'open-button', 'comment')
 def question_open(request, question):
     key = "question_%s" % question.number
     value = question.getcheckdict().get('default','')
@@ -89,8 +86,6 @@ def question_datepicker(request, question):
         #print 'MATCH'
         value = value+'-01-01'
 
-    #print "VALOR:["+value+"]"
-
     return {
         'required' : question.getcheckdict().get('required', False),
         'value' : value,
@@ -98,8 +93,7 @@ def question_datepicker(request, question):
         'template' : 'questionnaire/datepicker.html',
     }
 
-
-@answer_proc('open', 'open-validated', 'email', 'url' 'open-textfield', 'choice-yesno', 'choice-yesnocomment', 'choice-yesnodontknow',  'open-button', 'open-upload-image', 'open-location')
+@answer_proc('open', 'open-validated', 'email', 'url' 'open-textfield', 'choice-yesno', 'choice-yesnodontknow',  'open-button', 'open-location')
 def process_simple(question, ansdict):
     checkdict = question.getcheckdict()
     required = question.getcheckdict().get('required', 0)
@@ -108,14 +102,6 @@ def process_simple(question, ansdict):
     if qtype.startswith('choice-yesno'):
         if ans not in ('yes','no','dontknow') and required:
             raise AnswerException(_(u'You must select an option'))
-        if qtype == 'choice-yesnocomment' \
-        and len(ansdict.get('comment','').strip()) == 0:
-            if checkdict.get('required', False):
-                raise AnswerException(_(u'Field cannot be blank'))
-            if checkdict.get('required-yes', False) and ans == 'yes':
-                raise AnswerException(_(u'Field cannot be blank'))
-            if checkdict.get('required-no', False) and ans == 'no':
-                raise AnswerException(_(u'Field cannot be blank'))
     else:
         if not ans.strip() and checkdict.get('required', False):
            raise AnswerException(_(u'Field cannot be blank'))
@@ -127,10 +113,8 @@ def process_simple(question, ansdict):
 add_type('open', 'Open Answer, single line [input]')
 add_type('open-validated', 'Open Validated Answer, single line validated with a regex[input]')
 add_type('open-button', 'Open Answer, single line [input] with a button to validate')
-add_type('open-upload-image', 'Upload Image')
 add_type('open-textfield', 'Open Answer, multi-line [textarea]')
 add_type('choice-yesno', 'Yes/No Choice [radio]')
-add_type('choice-yesnocomment', 'Yes/No Choice with optional comment [radio, input]')
 add_type('choice-yesnodontknow', 'Yes/No/Don\'t know Choice [radio]')
 add_type('datepicker', 'Date choice')
 add_type('email', 'Email Address [input]')

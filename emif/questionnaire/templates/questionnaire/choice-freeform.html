@@ -25,30 +25,39 @@
             <li>
                 <label>
                     <span class="custom-radio">
-                      <input onClick="valchanged('question_{{ question.number }}', this.value, this)" type="radio" id="question_{{ question.number }}_{{ forloop.counter }}" name="question_{{ question.number }}" value="{{ choice.value|trim|esc }}" {% if sel %} checked {% endif %} />
+                      <input onClick="valchanged('question_{{ question.number }}', this.value, this)" type="radio" id="question_{{ question.number }}_{{ forloop.counter }}" name="question_{{ question.number }}" value="{{ choice.value|trim|striptags }}" {% if sel %} checked {% endif %} />
                       <span class="box"><span class="tick"></span></span>
                     </span>
 
-                    <span>{{ choice.text|trim }}</span>
+                    <span>
+                        {% if readonly and sel %}
+                            {{ sel|safe }}
+                        {% else %}
+                            {{ choice.text|trim }}
+                        {% endif %}
+                    </span>
                 </label>
             </li>
             {% if sel %}
             <script type="text/javascript">
-                $('[id="answered_'+{{ question.number|removedots }}+'"]').show();
+                markAnswered('{{ question.number|removedots }}');
             </script>
             {% endif %}
         {% endfor %}
         </ul>
     </div>
     <div class="input">
-        <input onClick="valchanged('question_{{ question.number }}', '_entry_', this);" type="radio" id="question_{{ question.number }}_entry" name="question_{{ question.number }}" value="_entry_" {% if qdict.sel_entry %} checked {% endif %} />
-
-        <span class="custom-checkbox">
+        <span class="custom-radio">
             <input onClick="valchanged('question_{{ question.number }}', '_entry_', this);" type="radio" id="question_{{ question.number }}_entry" name="question_{{ question.number }}" value="_entry_" {% if qdict.sel_entry %} checked {% endif %} />
             <span class="box"><span class="tick"></span></span>
         </span>
 
-        <input id="question_{{ question.number }}_comment" checks="dep_check('question_{{ question.number }},_entry_')" type="input" name="question_{{ question.number }}_comment" value="{{ qdict.comment }}" />
+        {% if readonly %}
+            <div style="display: inline-block !important;" class="span3 fake_input fake_input_disabled" id="question_{{ question.number }}_opt" checks="dep_check('question_{{ question.number }},_entry_')" type="text" name="question_{{ question.number }}_opt">{{ qdict.opt|safe }}</div>
+        {% else %}
+            <input id="question_{{ question.number }}_opt" checks="dep_check('question_{{ question.number }},_entry_')" type="text" name="question_{{ question.number }}_opt" value="{{ qdict.opt|striptags }}" />
+        {% endif %}
+
         {% if question.extra %}
             <span class="help-block">{{ question.extra }}</span>
         {% endif %}

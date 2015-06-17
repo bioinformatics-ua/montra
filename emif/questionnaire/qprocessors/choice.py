@@ -27,7 +27,7 @@ def question_choice(request, question):
     hasValue = False
     cd = question.getcheckdict()
     key = "question_%s" % question.number
-    key2 = "question_%s_comment" % question.number
+    key2 = "question_%s_opt" % question.number
     val = None
     if key in request.POST:
         val = request.POST[key]
@@ -38,22 +38,38 @@ def question_choice(request, question):
     if val != None and val != '' and "#" in val:
         val = val.split("#")[0]
 
+    cleanval=None
+    if val != None:
+        cleanval=re.sub('<[^<]+?>', '', val)
+
     for choice in question.choices():
-        choices.append( ( choice.value == val, choice, ) )
+        if choice.value == cleanval:
+            choices.append((val , choice,))
+        else:
+            choices.append((None, choice,))
+
         hasValue = hasValue or choice.value == val
 
     #print "hasValue: "+str(hasValue)
-
+    comm=''
     if question.type == 'choice-freeform':
-        jstriggers.append('question_%s_comment' % question.number)
+        jstriggers.append('question_%s_opt' % question.number)
+        if val != None and val.startswith('_entry_') and len(val) > 8:
+            comm = val[8:]
+            val = '_entry_'
+        else:
+            print "CAI NO ELSE"
+            comm = request.POST.get(key2, "")
+
+
 
     return {
         'choices'   : choices,
-        'sel_entry' : val == '_entry_',
+        'sel_entry' : val != None and val.startswith('_entry_'),
         'qvalue'    : val or '',
         'required'  : True,
         'hasValue'  : hasValue,
-        'comment'   : request.POST.get(key2, ""),
+        'opt'   : comm,
         'jstriggers': jstriggers,
     }
 
@@ -61,18 +77,23 @@ def question_choice(request, question):
 def process_choice(question, answer):
     required = question.getcheckdict().get('required', 0)
 
+
     opt = answer['ANSWER'] or ''
+
     if not opt and required:
         raise AnswerException(_(u'You must select an option'))
-    if opt == '_entry_' and question.type == 'choice-freeform':
-        opt = answer.get('comment','')
+    if opt.startswith('_entry_') and question.type == 'choice-freeform':
+        if len(opt) > 8:
+            opt = opt[8:]
+        else:
+            opt = answer['question_%s_opt' % question.number]
         if not opt:
             raise AnswerException(_(u'Field cannot be blank'))
-        return dumps([[opt]])
     else:
         valid = [c.value for c in question.choices()]
         if opt not in valid and required:
             raise AnswerException(_(u'Invalid option!'))
+
     return dumps([opt])
 add_type('choice', 'Choice [radio]')
 add_type('choice-freeform', 'Choice with a freeform option [radio]')
@@ -89,16 +110,33 @@ def question_multiple(request, question):
     hasValue = False
     try:
         val = request.POST.get(key, '')
+
+    except:
+        pass
+
+    try:
+        val = request.POST.get(key, '').split("||")[0]
     except:
         pass
     defaults = cd.get('default','').split(',')
+
+    highlighted_val = val.split('#')
+
+    clean_map = {}
+    for elem in highlighted_val:
+        elem = elem.split('{')[0]
+        clean_map[re.sub('<[^<]+?>', '', elem)] = elem
+    dval = val
+
+    val = re.sub('<[^<]+?>', '', val)
+
     for choice in question.choices():
         counter += 1
         key = "question_%s_multiple_%d" % (question.number, choice.sortid)
 
         if key in request.POST or (val!=None and val != '' and (choice.value in val)) or \
           (request.method == 'GET' and choice.value in defaults):
-            choices.append( (choice, key, ' checked',) )
+            choices.append( (choice, key, clean_map.get(choice.value, None),) )
             hasValue = hasValue or True
         else:
             choices.append( (choice, key, '',) )
@@ -202,10 +240,18 @@ def question_multiple_options(request, question):
     cd = question.getcheckdict()
     val = ''
     try:
-        val = request.POST.get(key, '')
+        val = request.POST.get(key, '').split("||")[0]
     except:
         pass
     defaults = cd.get('default','').split(',')
+
+    highlighted_val = val.split('#')
+
+    clean_map = {}
+    for elem in highlighted_val:
+        elem = elem.split('{')[0]
+        clean_map[re.sub('<[^<]+?>', '', elem)] = elem
+    dval = val
 
     for choice in question.choices():
         counter += 1
@@ -231,16 +277,17 @@ def question_multiple_options(request, question):
 
             return False
 
-        if key in request.POST or (val!=None and checkPartialIn(choice.value,val.split('#'))) or \
+        val = re.sub('<[^<]+?>', '', val)
+        if key in request.POST or (val!=None and checkPartialIn(choice.value, val.split('#')[1:])) or \
           (request.method == 'GET' and choice.value in defaults):
-            _tmp_v = get_aux_text(val,choice.value, _aux )
+            _tmp_v = get_aux_text(dval,choice.value, _aux )
             if _tmp_v == None or _tmp_v == '':
                 _tmp_v = _aux
-            choices.append( (choice, key, ' checked',_tmp_v) )
+            choices.append( (choice, key, clean_map.get(choice.value, None),_tmp_v) )
             hasValue = hasValue or True
 
         else:
-            _tmp_v = get_aux_text(val,choice.value, _aux )
+            _tmp_v = get_aux_text(dval,choice.value, _aux )
             if _tmp_v == None or _tmp_v == '':
                 _tmp_v = _aux
             choices.append( (choice, key, '',_tmp_v) )
@@ -324,20 +371,26 @@ def choice_list(value):
 
     for choice in choices[1:]:
 
+        if '||' in choice:
+            values = choice.split('||')
+            key = 'Other' #values[0]
+            comment = values[1]
+
+            multiple_choices[key] = {'key': key, 'comment': comment}
+            choice = values[0]
+
         if '{' in choice and '}' in choice:
             values = choice.split('{')
             key = values[0]
             comment = values[1].replace('}', '')
 
             multiple_choices[key] = {'key': key, 'comment': comment}
-        elif '||' in choice:
-            values = choice.split('||')
-            key = 'Other' #values[0]
-            comment = values[1]
-
-            multiple_choices[key] = {'key': key, 'comment': comment}
         else:
             multiple_choices[choice] = {'key': choice, 'comment': ''}
+
+    if value.startswith('_entry_'):
+        other_val = value[7:]
+        multiple_choices['Other'] = {'key': 'Other', 'comment': other_val}
 
     return multiple_choices
 
@@ -355,7 +408,6 @@ def serialize_list(choice_list):
 
 
     return tmp
-
 
 @show_summary('choice','choice-freeform','choice-multiple', 'choice-multiple-freeform', 'choice-multiple-freeform-options')
 def show_summ(value):

@@ -3,16 +3,21 @@
 <div class="clearfix">
 
     <div class="input ui-widget">
-        <input type="text" class="span6"
-        size="60" id="question_{{ question.number }}"
-        name="question_{{ question.number }}"
-        value="{{ qdict.value }}" />
+        {% if readonly %}
+            <div class="span6 fake_input fake_input_disabled" id="question_{{ question.number }}" name="question_{{ question.number }}">{{ qdict.value|safe }}</div>
+        {% else %}
+            <input type="text" class="span6"
+            size="60" id="question_{{ question.number }}"
+            name="question_{{ question.number }}"
+            value="{{ qdict.value }}" />
+        {% endif %}
+
         {% if question.extra %}
             <span class="help-block">{{ question.extra }}</span>
         {% endif %}
             <script type="text/javascript">
                 {% if qdict.value %}
-                $('[id="answered_'+{{ question.number|removedots }}+'"]').show();
+                    markAnswered('{{ question.number|removedots }}');
                 {% endif %}
                 $(function(){
                     var cache = {};

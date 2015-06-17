@@ -26,7 +26,7 @@ def question_range(request, question):
     rstep = parse_step(cd)
     runit = cd.get('unit', '')
 
-    current = request.POST.get('question_%s' % question.number, rmin)
+    current = request.POST.get('question_%s' % question.number)
 
     return {
         'required' : True,
@@ -35,8 +35,7 @@ def question_range(request, question):
         'rstep' : rstep,
         'runit' : runit,
         'current' : current,
-        'hasValue': current!="",
-        'jsinclude' : [settings.STATIC_URL+'range.js']
+        'hasValue': current!=""
     }
 
 @answer_proc('range')
@@ -58,7 +57,7 @@ def process_range(question, answer):
 
     return dumps([ans])
 
-add_type('range', 'Range of numbers [select]')
+add_type('range', 'Ranged slide with custom step size[select]')
 
 def parse_range(checkdict):
     "Given a checkdict for a range widget return the min and max string values."
