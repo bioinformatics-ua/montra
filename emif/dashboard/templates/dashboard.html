@@ -30,8 +30,12 @@
 
 {% block styleinclude %}
     <link rel="stylesheet" href="{{ STATIC_URL}}css/vendor/jquery.gridster.css" />
-
     <link rel="stylesheet" href="{{ STATIC_URL}}css/emif.dashboard.css" />
+    <link rel="stylesheet" href="{{ STATIC_URL}}js/vendor/jquery-jvectormap-2.0.2.css">
+    <!--
+    <link rel="import" href="{{ STATIC_URL}}js/vendor/vector-map.html">
+	<link rel="import" href="{{ STATIC_URL}}js/vendor/filter-box.html">
+    -->
 {% endblock %}
 
 {% block uncompressed_js %}
@@ -55,6 +59,12 @@
 {% block headextra %}
     <script src="{{ STATIC_URL}}js/vendor/jquery.gridster.min.js"></script>
     <script src="{{ STATIC_URL}}js/vendor/jquery.tagcloud.js"></script>
+    <!--jsMapsApi + maps + jvectormap-->
+	<script src="{{ STATIC_URL}}js/vendor/webcomponents-lite.js"></script>
+
+    <script src="{{ STATIC_URL}}js/vendor/jquery-jvectormap-2.0.2.min.js"></script>
+    <script src="{{ STATIC_URL}}js/vendor/jsMapsApi.js"></script>
+    <script src="{{ STATIC_URL}}js/vendor/maps.js"></script>
 
     <script src="{{ STATIC_URL}}js/vendor/jquery.dashboard.js"></script>
     <script src="{{ STATIC_URL}}js/vendor/widgets/widget.commonactions.js"></script>
@@ -63,6 +73,7 @@
     <script src="{{ STATIC_URL}}js/vendor/widgets/widget.mostviewed.js"></script>
     <script src="{{ STATIC_URL}}js/vendor/widgets/widget.mostviewedfingerprint.js"></script>
     <script src="{{ STATIC_URL}}js/vendor/widgets/widget.recommendations.js"></script>
+    <script src="{{ STATIC_URL}}js/vendor/widgets/widget.vectormap.js"></script>
     <script src="{{ STATIC_URL}}js/vendor/widgets/widget.tagcloud.js"></script>
     <script src="{{ STATIC_URL}}js/vendor/widgets/widget.plug_shell.js"></script>
     <script src="{{ STATIC_URL}}js/emif.dashboard.js"></script>
@@ -71,8 +82,6 @@
 {% block content %}
     <div id="playground" style="margin-left: 0px;" class="span12">
     </div>
-
-
 {% endblock %}
 
 {% block scriptextra %}

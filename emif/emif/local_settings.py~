@@ -1,0 +1,45 @@
+import os
+
+DEBUG = False
+
+PROJECT_DIR_ROOT = '/projecto/catalogue/'
+
+MIDDLE_DIR = "emif/"
+
+#BASE_URL = 'http://' + os.environ.get('PUBLIC_IP', '') + '/' + os.environ.get('BASE_DIR', '') + '/'
+BASE_URL = '/'
+SECRET_KEY = os.environ.get('DOCKER_SECRET', '+g93fk44)x+s%7-$7hb23@saom=#+7@n6lstr8-p7x8z$3#_f9')
+
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql_psycopg2', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
+        'NAME': os.environ.get('DOCKER_POSTGRES_DB', 'emif_dev'), # Or path to database file if using sqlite3.
+        'USER': os.environ.get('DOCKER_POSTGRES_USER', 'emif_dev'), # Not used with sqlite3.
+        'PASSWORD': os.environ.get('DOCKER_POSTGRES_PASS', 'emif_dev'), # Not used with sqlite3.
+        'HOST': os.environ.get('DOCKER_POSTGRES_HOST', 'localhost'), # Set to empty string for localhost. Not used with sqlite3.
+        'PORT': os.environ.get('DOCKER_POSTGRES_PORT', '5432'), # Set to empty string for default. Not used with sqlite3.
+        'AUTOCOMMIT': True,
+        'autocommit': True,
+        'OPTIONS': {
+            'autocommit': True,
+        },
+    },
+}
+
+MONGO_EMIF = {
+    'DB_NAME': 'emif_mongo',
+    'HOST': os.environ.get('MONGODBHOST', 'localhost'),
+    'PORT': os.environ.get('MONGODBPORT', '27017'),
+    'USER': os.environ.get('MONGODBUSER', ''),
+    'PASS' : os.environ.get('MONGODBPASS', ''),
+    'COLLECTION': 'jerboa_files'
+}
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_USE_TLS = os.environ.get('EMAIL_USE_TLS', True)
+EMAIL_HOST = os.environ.get('EMAIL_HOST', 'smtp.gmail.com')
+EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', 'admin@example.com')
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', 'password_here')
+EMAIL_PORT = os.environ.get('EMAIL_PORT', 587)
+DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', "admin@example.com")
+

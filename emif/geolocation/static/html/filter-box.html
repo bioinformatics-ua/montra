@@ -1,0 +1,77 @@
+<link href="../bower_components/polymer/polymer.html" rel="import">
+<!--Bootstrap Dropdown Checkbox-->
+<link rel="stylesheet" href="../lib/bootstrap-dropdown-checkbox/bootstrap-dropdown-checkbox.css">
+<script type="text/javascript" src="../lib/bootstrap-dropdown-checkbox/bootstrap-dropdown-checkbox.js"></script>
+<!--id - name of the custom component-->
+<dom-module id="filter-box">
+	<template>
+		<button id='show'>Show/Hide filters</button>
+		<h3>Filters</h3>
+	</template>
+</dom-module>
+<script type="text/javascript">
+	// element registration
+	Polymer({
+		// name of the element
+		is: "filter-box",
+		//Lifecycle callbacks
+		attached: function() {
+			var filtersBox = this;
+			var jsonFilters = this.filters;
+			var filterType = this.type;
+			var associatedMap = this.map;
+			var id = this.id;
+
+			$("button").click(function() {
+				$('filter-box#'+id).children().not('button#show').slideToggle("slow");
+			});
+
+			if(!id)
+			{
+				console.error('You must associate an id with this filter box');
+				return;
+			}
+
+			if(!associatedMap)
+			{
+				console.error('You must associate the filters with a map!');
+				return;
+			}
+			// check if the corresponding id exists
+
+			// check if all the mandatory fields are present
+			if (!jsonFilters) {
+				console.error('You must input a JSON with the filters');
+				return;
+			}
+
+			$.when($.getJSON(jsonFilters)).then(function(jsonFilters) {
+				var fBox = new FiltersBox(id, associatedMap, filterType);
+				fBox.readFiltersFromJSON(jsonFilters);
+				switch (filterType) {
+					case 'input':
+						fBox.createFiltersBoxWithEnumeration();
+						break;
+					case 'checkboxes':
+						fBox.createFiltersBoxCheckboxes();
+						break;
+				}
+			});
+		},
+		properties: {
+			// declare properties for the element's public API
+			filters: {
+				type: String,
+				value: ''
+			},
+			type: {
+				type: String,
+				value: 'input'
+			},
+			map: {
+				type: String,
+				value: ''
+			}
+		}
+	});
+</script>

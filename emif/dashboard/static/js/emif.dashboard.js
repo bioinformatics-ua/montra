@@ -42,6 +42,7 @@ $(function(){
                 //dashzone.addWidget("mostviewed");
                 dashzone.addWidget("mostviewedfingerprint");
                 dashzone.addWidget("tagcloud");
+                dashzone.addWidget("vectormap");
             }
         });
 

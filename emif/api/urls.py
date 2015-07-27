@@ -66,6 +66,7 @@ urlpatterns = patterns('api.views',
     url(r'^lastusers$', LastUsersView.as_view(), name='lastusers'),
     url(r'^feed$', FeedView.as_view(), name='feed'),
     url(r'^tagcloud$', TagCloudView.as_view(), name='tagcloud'),
+    url(r'^vectormap$', VectorMapView.as_view(), name='vectormap'),
 
     # private links api services
     url(r'^plinkemails$', PrivateLinkEmailView.as_view(), name='plinkemails'),

@@ -231,6 +231,8 @@ INSTALLED_APPS = (
     'django.contrib.admin',
     'django.contrib.admindocs',
 
+    'geolocation',
+
 
 
     # Questionnaires
@@ -658,6 +660,7 @@ STATICFILES_DIRS = (
     os.path.abspath(PROJECT_DIR_ROOT + MIDDLE_DIR + 'public/static'),
     os.path.abspath(PROJECT_DIR_ROOT + MIDDLE_DIR + 'accounts/static'),
     os.path.abspath(PROJECT_DIR_ROOT + MIDDLE_DIR + 'dashboard/static'),
+    os.path.abspath(PROJECT_DIR_ROOT + MIDDLE_DIR + 'geolocation/static'),
 )
 
 TEMPLATE_DIRS = (
@@ -780,4 +783,3 @@ SAML_ATTRIBUTE_MAPPING = {
     'givenName': ('first_name', ),
     'sn': ('last_name', ),
 }
-
