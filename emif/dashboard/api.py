@@ -470,6 +470,8 @@ class TagCloudView(APIView):
 ##### Vector Map - Web service
 ############################################################
 
+from geolocation.services import get_locations
+
 class VectorMapView(APIView):
     authentication_classes = (SessionAuthentication, BasicAuthentication)
     permission_classes = (IsAuthenticated,)
@@ -478,107 +480,15 @@ class VectorMapView(APIView):
     def get(self, request, *args, **kw):
 
         if request.user.is_authenticated():
-
-            query = None
-            isAdvanced = False
-            if(request.session.get('isAdvanced') == True):
-                query = request.session.get('query')
-                if query == None:
-                    query = "*:*"
-
-                isAdvanced = True
-            else:
-                if(request.session.get('query') != None):
-                    query = "'"+re.sub("['\"']","\\'",request.session.get('query'))+"'"
-                    query = "text_t:"+query
-
-                else:
-                    query = "*:*"
-
-            #print "query@" + query
-            list_databases = get_databases_from_solr(request, query)
-
-            list_locations = []
-            _long_lats = []
-            # since the geolocation is now adding the locations, we no longer need to look it up when showing,
-            # we rather get it directly
-            db_list = {}
-            questionnaires_ids = {}
-            qqs = Questionnaire.objects.all()
-
-            for q in qqs:
-                questionnaires_ids[q.slug] = (q.pk, q.name)
-            for database in list_databases:
-
-                if database.location.find(".")!= -1:
-                    _loc = database.location.split(".")[0]
-                else:
-                    _loc = database.location
-
-                city=None
-                g = geocoders.GeoNames(username='bastiao')
-
-                if _loc!= None and g != None and len(_loc)>1:
-                    try:
-                        city = City.objects.filter(name=_loc.lower())[0]
-
-                    # if dont have this city on the db
-                    except:
-                        print "-- Error: The city " + _loc + " doesnt exist on the database. Maybe too much requests were being made when it happened ? Trying again..."
-
-                        #obtain lat and longitude
-                        city = retrieve_geolocation(_loc.lower())
-
-                        if city != None:
-                            #print city
-
-                            city.save()
-
-                        else:
-                            print "-- Error: retrieving geolocation"
-                            continue
-
-                    _long_lats.append(str(city.lat) + ", " + str(city.long))
-
-                    import pdb
-                    #pdb.set_trace()
-                    def __cleanvalue(v):
-                        return v.encode('ascii', 'ignore').strip().replace('\n', ' ').replace('\r', ' ')
-
-                    def db_ready(database, city):
-                        return {    'name': database.name,
-                                    'location': __cleanvalue(database.location),
-                                    'institution': __cleanvalue(database.institution),
-                                    'contact': __cleanvalue(database.email_contact),
-                                    'number_patients': __cleanvalue(database.number_patients),
-                                    'ttype': __cleanvalue(database.type_name),
-                                    'id' : database.id,
-                                    'admin_name': __cleanvalue(database.admin_name),
-                                    'admin_address': __cleanvalue(database.admin_address),
-                                    'admin_email': __cleanvalue(database.admin_email),
-                                    'admin_phone': __cleanvalue(database.admin_phone),
-                                    'scien_name': __cleanvalue(database.scien_name),
-                                    'scien_address': __cleanvalue(database.scien_address),
-                                    'scien_email': __cleanvalue(database.scien_email),
-                                    'scien_phone': __cleanvalue(database.scien_phone),
-                                    'tec_name': __cleanvalue(database.tec_name),
-                                    'tec_address': __cleanvalue(database.tec_address),
-                                    'tec_email': __cleanvalue(database.tec_email),
-                                    'tec_phone': __cleanvalue(database.tec_phone),
-                                    'lat' : str(city.lat),
-                                    'long': str(city.long),
-                                }
-
-                    if((city.lat, city.long) in db_list):
-                        db_list[(city.lat, city.long)].append(db_ready(database, city))
-                    else:
-                        db_list[(city.lat, city.long)] = [db_ready(database, city)]
-                list_locations.append(_loc)
+            # invoke to service to retrieve the locations
+            locations_info = get_locations(request)
+            markers = locations_info['lats_longs']
+            print markers
 
             # pass information on the Response ('tags')
             response = Response(
-            {'markers': _long_lats,
-            'locations': list_locations},
+                {'markers': markers,
+                'locations': locations_info['list_cities']},
             status=status.HTTP_200_OK)
         else:
             response = Response({}, status=status.HTTP_403_FORBIDDEN)
