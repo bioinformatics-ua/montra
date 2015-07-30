@@ -1,0 +1,100 @@
+<link href="../bower_components/polymer/polymer.html" rel="import">
+<!--id - name of the custom component-->
+<dom-module id="vector-map">
+	<style>
+		/* CSS rules for the custom element */
+		head {
+			height: 100%;
+		}
+
+		.dropdown {
+			margin-bottom: 10px;
+		}
+
+		.btn {
+			width: 120px;
+		}
+
+		form {
+			display: inline-block;
+		}
+	</style>
+</dom-module>
+<script>
+	// element registration
+	Polymer({
+		// name of the element
+		is: "vector-map",
+		//Lifecycle callbacks
+		attached: function() {
+			// attr containing the json file with the markers and countries
+			var vMap = this;
+			var jsonFile = this.countries;
+			var id = this.id;
+			if(!id)
+				return console.error('You must input an id to be associated with the map!');
+
+			if(this.markers)
+				jsonFile = this.markers;
+
+
+			// check if all the mandatory fields are present
+			if (!jsonFile)
+				return console.error('You must input a json file!');
+
+			// get the json file (Ajax request)
+			$.when($.getJSON(jsonFile)).then(function(jsonFile) {
+				minRadius = +vMap.min_radius;
+				maxRadius = +vMap.max_radius;
+				minColor = vMap.min_color;
+				maxColor = vMap.max_color;
+				backgroundColor = vMap.background_color;
+				// get the map type (world, europe, usa, etc)
+				mapType = vMap.map_type;
+				if(vMap.markers)
+					dataType = 'markers';
+				else if(vMap.countries)
+					dataType = 'countries';
+
+				// create a new VectorialMap
+				vectorMap = new VectorialMap();
+				vectorMap.createMap(jsonFile, minRadius, maxRadius, vMap.id, minColor, maxColor, mapType, backgroundColor, dataType, id);
+			});
+		},
+		properties: {
+			// declare properties for the element's public API
+			map_type: {
+				type: String,
+				value: 'world_mill_en'
+			},
+			min_radius: {
+				type: Number,
+				value: 2
+			},
+			max_radius: {
+				type: Number,
+				value: 10
+			},
+			min_color: {
+				type: String,
+				value: "#C8EEFF"
+			},
+			max_color: {
+				type: String,
+				value: "#0071A4"
+			},
+			markers: {
+				type: String,
+				value: ''
+			},
+			countries: {
+				type: String,
+				value: ''
+			},
+			background_color: {
+				type: String,
+				value: '#666666'
+			}
+		}
+	});
+</script>
