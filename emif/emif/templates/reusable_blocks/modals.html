@@ -474,3 +474,26 @@ function toggleSubscription(context){
           });
 }
 </script>
+
+<!-- **********************************************************************
+***** Model to delete the fingerprint. It will show a window to confirm the
+***** deletion of the fingerprint
+ ***************************************************************************-->
+
+
+<div id="modal-from-dom" class="modal hide fade" style="display:none"  >
+    <div class="modal-header">
+        <a href="#" onclick="$('#modal-from-dom').modal('hide'); return false;" class="close">&times;</a>
+         <h3>Delete Fingerprint</h3>
+    </div>
+    <div class="modal-body">
+        <p>You are removing the database fingerprint <strong>'<span id="db-name">{{breadcrumb_name}}</span>'</strong>. This procedure is irreversible.</p>
+        <p>Do you want to proceed?</p>
+        <p id="debug-url"></p>
+    </div>
+    <div class="modal-footer">
+        <a id="delete_fingerprint" href="rm/ref" class="btn btn-danger">Yes</a>
+        <!-- <a href="delete.php?some=param&ref=" class="btn danger">Yes 2</a> -->
+        <a href="#" onclick="$('#modal-from-dom').modal('hide'); return false;" class="btn btn-secondary">Cancel</a>
+    </div>
+</div>
