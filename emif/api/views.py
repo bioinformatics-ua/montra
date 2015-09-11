@@ -228,11 +228,11 @@ class EmailCheckView(APIView):
         email = request.POST.get('email', '')
         valid = False
 
+        username = None
+        fullname = ""
         # Verify if it is a valid email
         if not (email == None or email==''):
             # Verify if it is a valid user name
-            username = None
-            fullname = ""
             try:
                 username = User.objects.get(email__exact=email)
                 fullname=username.get_full_name()
