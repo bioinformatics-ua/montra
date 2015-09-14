@@ -108,6 +108,13 @@ def trim(value):
 
     return value
 
+@register.filter(name='removequotes')
+@stringfilter
+def removequotes(value):
+    value = value.replace('"', '&quot;')
+
+    return value
+
 @register.filter(name='esc')
 @stringfilter
 def esc(value):

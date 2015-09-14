@@ -25,6 +25,7 @@
     <ul class="publications_container">
     </ul>
     <div class="summary_paginator pagination"></div>
+
 <script type="text/javascript">
 
         var publications = [];
@@ -127,10 +128,10 @@
         }
 
         $(function (){
-            {% for pub in pubs%}
+            {% for pub in pubs %}
                     publications.push({
-                        titlec: "{{pub.title}}",
-                        title: "{{pub.title|safe}}",
+                        titlec: "{{pub.title|removequotes}}",
+                        title: "{{pub.title|removequotes|safe}}",
                         authors: "{{pub.authors}}" ,
                         journal: "{{pub.journal}}",
                         volume: "{{pub.volume}}",
@@ -158,5 +159,5 @@
         </script>
 </div>
 {% else %}
-    There's no publications associated.
+    There are no publications associated.
 {% endif %}
