@@ -478,17 +478,39 @@ class VectorMapView(APIView):
 
     # GET
     def get(self, request, *args, **kw):
-
         if request.user.is_authenticated():
             # invoke to service to retrieve the locations
             locations_info = get_locations(request)
+
+            # --------------------------------------------------
+            # markers
             markers = locations_info['lats_longs']
-            print markers
+
+            # build the JSON array
+            markersAux = {};
+            markersAux["count"] = 80.00;
+            markersAux["country"] = 'RU';
+            markersAux["latitude"] = -20;
+            markersAux["longitude"] = 21;
+            markersAux["icon"] = "blue";
+
+            markersAuxAttributes = {};
+            markersAuxAttributes["gender"]='M';
+            markersAuxAttributes["year"]='2005';
+            markersAux["attributes"]=markersAuxAttributes;
+
+            markersArray = []
+            markersArray.append(markersAux)
+            # --------------------------------------------------
+            # countries
+            
+            # --------------------------------------------------
+
+            # also return an object with the countries?
 
             # pass information on the Response ('tags')
             response = Response(
-                {'markers': markers,
-                'locations': locations_info['list_cities']},
+                markersArray,
             status=status.HTTP_200_OK)
         else:
             response = Response({}, status=status.HTTP_403_FORBIDDEN)
