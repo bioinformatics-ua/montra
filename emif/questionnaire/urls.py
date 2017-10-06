@@ -20,5 +20,7 @@ from views import *
 urlpatterns = patterns('',
 
     # Literature tab, on database info view
-    url(r'^import$', ImportQuestionnaireView.as_view())
+    url(r'^import$', ImportQuestionnaireView.as_view()),
+    url(r'^export$', ExportQuestionnaireView.as_view()),
+    url(r'^export/(?P<questionnaire_id>[0-9]+)$', ExportQuestionnaireAttachView.as_view())
 )

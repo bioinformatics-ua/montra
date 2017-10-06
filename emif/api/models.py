@@ -18,11 +18,8 @@
 from django.contrib.auth.models import User
 from django.db import models
 
-from django.db.models.fields import *
-
-
 class FingerprintAPI(models.Model):
-    id = AutoField(primary_key=True)
+    id = models.AutoField(primary_key=True)
     fingerprintID = models.CharField(max_length=255, unique=False, blank=False, null=False)
     user = models.ForeignKey(User, unique=False, blank=False, null=False)
     field = models.TextField()

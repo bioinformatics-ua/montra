@@ -1,0 +1,189 @@
+{% extends 'base.html' %}
+{% comment %}
+# -*- coding: utf-8 -*-
+# Copyright (C) 2014 Universidade de Aveiro, DETI/IEETA, Bioinformatics Group - http://bioinformatics.ua.pt/
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+{% endcomment %}
+{% load url from future %}
+{% load extra_tags %}
+{% load django_bootstrap_breadcrumbs %}
+{% load crispy_forms_tags %}
+
+{% block styleinclude %}
+    <link rel="stylesheet" href="{{ STATIC_URL }}css/dataTables.bootstrap.css">
+{% endblock %}
+
+{% block headextra %}
+    <script src="{{ STATIC_URL}}js/jquery.dataTables.js"></script>
+    <script src="{{ STATIC_URL}}js/dataTables.bootstrap.js"></script>
+
+    <script src="{{ STATIC_URL}}js/emif.proxies.js"></script>
+    <script src="{{STATIC_URL}}js/vendor/iframeResizer.js"></script>
+
+
+{% endblock %}
+{% block breadcrumbs %}
+        {{ block.super }}
+        {% breadcrumb "Developer" "developer" %}
+        {% breadcrumb plugin.name "developer/"|add:plugin.slug %}
+
+        {% if version %}
+            {% breadcrumb version.version version.version %}
+        {% else %}
+            {% breadcrumb "Add new Version" "" %}
+        {% endif %}
+{% endblock %}
+
+{% block toolbar %}
+    {% include "reusable_blocks/menu_toolbar.html" with collapse=collapseall %}
+{% endblock %}
+
+{% block content %}
+{%if user|has_group:'developers' or user.is_staff %}
+
+    <div class="row">
+        <div class="span12">
+        <div class="clearfix">
+        <form id="version-details" class="form-horizontal" method="post">
+        {%csrf_token%}
+            <div class="clearfix">
+            <h3 class="pull-left">Version Details</h3>
+            <a style="margin-top:20px;" title="See plugin documentation" target="_blank" class="pull-right" href="developer/docs">
+                <i class="fa fa-2x fa-question-circle"></i>
+            </a>
+            {% if version %}
+            <a style="margin-top:20px; margin-right:20px" title="Local resources manager" class="pull-right" href="developer/{{plugin.slug}}/{{version.version}}/deps">
+                <i class="fa fa-2x fa-files-o"></i>
+            </a>
+            {% endif %}
+            </div>
+
+            <div class="well">
+                    <input name="version" class="span6" id="id-version"
+                          value="{% if version %}{{version.version}}{% else %}{{next_version}}{%endif%}"
+                          type="hidden" placeholder="Version number"/>
+                    <div class="control-group">
+                        <label class="control-label" for="id-version">Version</label>
+                        <div class="controls controls-row">
+
+                          <input class="span6"
+                          value="{% if version %}{{version.version}}{% else %}{{next_version}}{%endif%}"
+                          type="number" placeholder="Version number" disabled/>&nbsp;
+                        </div>
+                    </div>
+                    <div class="{% if plugin.type == 2 %}hide{%endif%} control-group">
+                        <label class="control-label" for="id-remote">Is Remote ?</label>
+                        <div class="controls controls-row">
+                          <input name="is_remote" id="id-remote" {% if version.is_remote or plugin.type == 2 %}checked{% endif %} type="checkbox" />&nbsp;
+                        </div>
+                    </div>
+                    <div id="remote_path" class="{% if not version.is_remote and plugin.type != 2 %}hide{%endif%} control-group">
+                        <label class="control-label" for="id-remote">Path</label>
+                        <div class="controls controls-row">
+                          <input class="span6" id="id-path" value="{% if version.is_remote %}{{version.path}}{%endif%}" type="text" />&nbsp;
+                        </div>
+                    </div>
+                    {% if plugin.type != 2 %}
+                    <div id="local_editor" class="{% if version.is_remote %}hide{%endif%}">
+                        <div style="height: 300px; font-size: 14px;" id="editor">{%if prev_code %}{{prev_code}}{% else %}{% if not version or version.is_remote or version.path == '' %}
+confs = {
+    name: "New widget",
+};
+plugin = function(sdk){
+    sdk.html('Hello world');
+    sdk.refresh();
+};{% else %}{{version.path}}{%endif %}{%endif %}</div>
+                    </div>
+                    {% endif %}
+                        <textarea name="data" id="id-code" class="hide"></textarea>
+
+            </div>
+            <button type="submit" id="save-version" class="pull-right btn btn-primary span3"
+            type="submit" ><i class="fa fa-inverse fa-floppy-o"></i>&nbsp; Save & Refresh</button>
+
+
+        </form>
+            {% if version %}
+                {% if version.submitted %}
+                    {% if version.approved %}
+                        <div class="row">
+                        <div class="span7 alert alert-success">
+                          <button type="button" class="close" data-dismiss="alert">&times;</button>
+                          This version is approved, any changes will undo this status.
+                        </div>
+                        </div>
+                    {%else %}
+                        <div class="row">
+                        <div class="span7 alert">
+                          <button type="button" class="close" data-dismiss="alert">&times;</button>
+                          This version is submitted and waiting approval, any changes will undo this status.
+                        </div>
+                        </div>
+                    {% endif %}
+                {% else %}
+
+                    <form id="approval_form" method="post">
+                        {% csrf_token %}
+                        <input name="submit" type="hidden" value="submit" />
+                        <input id="approval_desc" name="description" type="hidden"
+                        value="{% if version.submitted_desc %}{{version.submitted_desc}}{% endif %}" />
+                        <button id="submit_me" class="hide"
+                        type="submit" ></button>
+                    </form>
+                    <button id="submit-version" class="pull-right btn span3"
+                        type="submit" ><i class="fa fa-paper-plane"></i>&nbsp; Submit to approval</button>
+                {% endif %}
+            {% endif %}
+        </div>
+            <div class="clearfix">
+            <h3>Live Preview</h3>
+                <center>
+                <div id="live-preview">
+                    {% if not version %}
+                    <div class="well">
+                    Write some code, or load it from the remote location, to try the widget live.
+                    </div>
+                    {% else %}
+                    <div class="row">
+                    <iframe src="developer/live/{{plugin.slug}}/{{version.version}}" class="span12" scrolling="no">
+                      <p>Your browser does not support the live preview.</p>
+                    </iframe>
+                    </div>
+                    {% endif %}
+                </div>
+                </center>
+                </div>
+        </div>
+    </div>
+    {% else %}
+
+    <center><h4>The access to this page is restricted to developers. To become a developer, please contact the platform administration.</h4></center>
+
+    {% endif %}
+{% endblock content %}
+
+{% block scriptextraincludes %}
+    {% if plugin.type != 2 %}
+    <script src="{{STATIC_URL}}js/vendor/ace.js" type="text/javascript" charset="utf-8"></script>
+    <script>
+        var editor = ace.edit("editor");
+        editor.setTheme("ace/theme/github");
+        editor.getSession().setMode("ace/mode/javascript");
+        editor.$blockScrolling = Infinity;
+    </script>
+    {%endif%}
+    <script type="text/javascript" src="{{STATIC_URL}}js/emif.developer_version.js" />
+
+{% endblock %}

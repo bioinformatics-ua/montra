@@ -1,4 +1,4 @@
-Montra
+Catalogue - Fingerprint Browser
 =======
 
 [![Join the chat at https://gitter.im/bioinformatics-ua/emif-fb](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/bioinformatics-ua/emif-fb?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
@@ -26,7 +26,6 @@ For admin:
 * Questions/fingerprints
 * Templates
 * Templates definition by XLSX
-* Automatic generate a Information System from the template that allow users to CRUD resources
 
 For developers:
 
@@ -37,6 +36,7 @@ For developers:
 ## Install 
 
 Please use docker: https://github.com/bioinformatics-ua/catalogue-docker
+
 
 
 ----------
@@ -272,24 +272,23 @@ python manage.py update_version 0.7
 ```
 
 
-#### Project Leader
-
- * José Luis Oliveira <jlo@ua.pt>
-
-
 #### Developers
 
  * Luís A. Bastião Silva <bastiao@ua.pt>
+ * Ricardo Ribeiro <ribeiro.r@ua.pt>
+
 
 #### Lead developer
 
 * Luís A. Bastião Silva <bastiao@ua.pt> (since 2013 until now)
 
+#### Project Leader
+
+ * José Luis Oliveira <jlo@ua.pt>
 
 
 #### Past Developers
 
- * Ricardo Ribeiro <ribeiro.r@ua.pt>
  * Rui Mendes <ruidamendes@ua.pt>
  * José Melo <melojms@gmail.com>
  * Tiago Godinho <tmgodinho@ua.pt>

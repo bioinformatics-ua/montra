@@ -21,17 +21,29 @@
 <div class="clearfix">
     <div class="input">
         {% if question.disposition == question.DROPDOWN %}
+            {% if readonly %}
+                <div class="span6 fake_input fake_input_disabled" id="question_{{ question.number }}" name="question_{{ question.number }}">
+                    {% for sel, choice in qdict.choices %}
+                        {% if sel and readonly %}
+                            {{sel|safe}}
+                        {% endif %}
+                    {% endfor %}
+                    <div class="pull-right caret fake_caret"></div>
+                </div>
+            {% else %}
             <select id="question_{{ question.number }}" class="span6" onChange="valchanged('question_{{ question.number }}', this.value, this);" name="question_{{ question.number }}">
                 <option></option>
                 {% for sel, choice in qdict.choices %}
                     <option value="{{ choice.value }}" {% if sel %} selected="true" {% endif %} id="question_{{ question.number }}_{{ forloop.counter }}">{{ choice.text }}</option>
                     {% if sel %}
                         <script type="text/javascript">
-                            $('[id="answered_'+{{ question.number|removedots }}+'"]').show();
+                            markAnswered('{{ question.number|removedots }}');
+
                             valchanged('question_{{ question.number }}','{{ choice.value }}', this);
                         </script>
                     {% endif %}
                 {% endfor %}
+            {% endif %}
                 {% if question.extra %}
                     <span class="help-block">{{ question.extra }}</span>
                 {% endif %}
@@ -53,12 +65,19 @@
                           <span class="box"><span class="tick"></span></span>
                         </span>
 
-                        <span>{{ choice.text }}</span>
+                        <span>
+                            {% if sel and readonly   %}
+                                {{sel|safe}}
+                            {% else %}
+                                {{ choice.text }}
+                            {% endif %}
+
+                        </span>
                     </label>
                 </li>
                 {% if sel %}
                 <script type="text/javascript">
-                    $('[id="answered_'+{{ question.number|removedots }}+'"]').show();
+                    markAnswered('{{ question.number|removedots }}');
                     valchanged('question_{{ question.number }}','{{ choice.value }}', this);
                 </script>
                 {% endif %}

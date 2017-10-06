@@ -1,0 +1,94 @@
+<div class="row clearfix">
+    <div class="docrow span3">
+        <ul  data-clamp=".docrow" class="docmenu nav nav-tabs nav-stacked">
+          <li><a href="developer/docs#example">Basic Example</a></li>
+          <li><a href="developer/docs#confs">The confs dictionary</a></li>
+          <li><a href="developer/docs#plugin">The plugin function</a></li>
+          <li><a href="developer/docs#more">More Examples</a></li>
+        </ul>
+    </div>
+    <div class="span9">
+    <h2>The plugin structure</h2>
+        <p>The following sections provide some basic directions on how to develop a plugin and the absolute essentials for it to work on the EMIF Catalogue plugin platform.</p>
+        <hr />
+        <div class="clearfix">
+            <a name="example" class="anchor"></a><h3>Basic Example</h3>
+                <p>Fundamentally, a plugin for EMIF Catalogue is very simple. Only two mandatory things are needed in it's structure, a confs dictionary and a plugin function that receives a self-referencing 'sdk' parameter.</p>
+
+                <p>Below follows the typical hello_word plugin.</p>
+            <div class="span8">
+                <pre><code class="language-javascript">
+confs = {
+    'name': 'Test plugin'
+};
+plugin = function(sdk){
+    sdk.html('Hello world');
+    sdk.refresh();
+};
+                </code></pre>
+            </div>
+
+        </div>
+        <hr />
+        <div class="clearfix">
+
+            <a name="confs" class="anchor"></a><h3>The confs dictionary</h3>
+
+            <p>The confs dictionary is the place that stores the specifications of the widget configurations. Settings such as the display name, the widget icon, and the preferred position and size are defined in this array. Next follows a list of all the available parameters.</p>
+
+            <div class="span8">
+                <h4>name <small>default: "New Plugin"</small></h4>
+                A string that defines the display name for the plugin.
+
+                <h4>icon <small>default: undefined</small></h4>
+                A string that defines the icon for the plugin.
+
+                <h4>extracss <small>default: []</small></h4>
+                An array of strings, defining some extra css URLs that should be loaded to execute the plugin.
+
+                <h4>extralibs <small>default: []</small></h4>
+                An array of strings, defining some extra javascript library URLs that should be loaded to execute the plugin.
+
+                <h4>Global widget specific configurations:</h4>
+                <div class="span8">
+                    <h4>width <small>default: 2</small></h4>
+                    Defines the preferred width for the plugin.
+                    <h4>height <small>default: 1</small></h4>
+                    Defines the preferred height for the plugin.
+                    <h4>x <small>default: 1</small></h4>
+                    Defines the preferred x coordinate for the plugin.
+                    <h4>y <small>default: 1</small></h4>
+                    Defines the preferred y coordinate for the plugin.
+                    <hr />
+
+                </div>
+                <h4>Fingerprint widget specific configurations:</h4>
+                <div class="span8">
+                    <h4>pos <small>default: next available</small></h4>
+                    Integer that defines the tab position of the plugin.
+                    <hr />
+                </div>
+            </div>
+        </div>
+        <hr />
+        <div class="clearfix">
+        <a name="plugin" class="anchor"></a><h3>The plugin function</h3>
+
+        <p>The plugin function is the heart of the plugin. This has access to a series of objects (detailed on the section "Available objects").</p>
+        <p>Moreover, it is possible to use jquery, bootstrap 2.3.2 styling and font-awesome 4.3 icons. There is also a promise polyfill to browsers than don't support it.</p>
+
+        <p>If there is a need to use other external libraries, not included in the list, they can be encompassed through the confs settings "extralibs" and "extracss", already approchead above.</p>
+
+        </div>
+        <hr />
+        <div class="clearfix">
+        <a name="more" class="anchor"></a><h3>More Examples</h3>
+
+        <p>Several more examples are available on the github repository for the EMIF Platform.</p>
+
+        <p>Please check them out <a href="https://github.com/bioinformatics-ua/catalogue/tree/master/dev/plugin-examples">here</a>.</p>
+
+        </div>
+    </div>
+
+</div>

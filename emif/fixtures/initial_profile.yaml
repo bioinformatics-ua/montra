@@ -1,0 +1,9 @@
+# Profile
+- pk: 0
+  fields: {name: "Data Custodian", description: "Data custodian description"}
+  model: accounts.Profile
+
+- pk: 1
+  fields: {name: "Researcher", description: "Researcher description"}
+  model: accounts.Profile
+

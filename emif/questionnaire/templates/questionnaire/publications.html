@@ -75,7 +75,7 @@
 
     {% if qdict.value %}
         <script type="text/javascript">
-            $('[id="answered_'+{{ question.number|removedots }}+'"]').show();
+            markAnswered('{{ question.number|removedots }}');
         </script>
     {% endif %}
     </div>
@@ -447,7 +447,12 @@ function PublicationWidget ()
     }
     function cleanUp(stuff){
         if(stuff){
-            return  stuff.replace(/<(?:.|\n)*?>/gm, '');
+            // lets remove this if readonly
+            {% if readonly %}
+                return  stuff;
+            {% else %}
+                return  stuff.replace(/<(?:.|\n)*?>/gm, '');
+            {% endif %}
         }
 
         return stuff;
@@ -464,7 +469,7 @@ function PublicationWidget ()
     {
         var _value = pw{{ question.number|removedots }}.stringfy();
         //$("#question_{{ question.number }}").val(JSON.stringify(_value));
-        document.getElementById("question_{{ question.number }}").value = JSON.stringify(_value);
+        document.getElementById("question_{{ question.number }}").value = JSON.stringify(_value).replace(/(<([^>]+)>)/ig,"");
 
     };
     this.loadInformation = function()
@@ -473,8 +478,6 @@ function PublicationWidget ()
         var _aux = document.getElementById("question_{{ question.number }}").value ;
         if (_aux===undefined || _aux=="")
             return;
-
-        console.log(_aux);
 
         if (_aux[0] != "[")
         {
@@ -671,7 +674,6 @@ function showPublicationPage(pageNumber){
         end = publications_counter;
     }
 
-    console.log("start:"+start+" end: "+end);
     for(var i=start;i<end;i++){
         $('#'+publication_ids[i]).removeAttr("style");
     }

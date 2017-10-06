@@ -83,9 +83,11 @@ function GraphicChartC3D3(divArg, dataArg)
             $.each(actualChart.filters, function(a){
 
               // Translate the fields (for now staticly hard coded for Gender)
+
               if (actualChart.filters[a]['translation']!=null && actualChart.filters[a]['show'])
               {
                 multivalue_stacked = actualChart.filters[a]['value'];
+
                 $.each(actualChart.filters[a]['translation'], function(tr) {
 
                     // Only the simple ones will be translated. ALL is ignored by default
@@ -93,13 +95,12 @@ function GraphicChartC3D3(divArg, dataArg)
                     {
 
                       datasetYs.push([tr]);
-                      multivalue_comp[tr] = datasetYs[datasetYs.length-1];
+                      multivalue_comp[tr] = {'original': datasetYs[datasetYs.length-1]};
 
                     }
 
 
                   });
-
               }
               else if (actualChart.filters[a]['comparable']==true &&
                 actualChart.filters[a]['comparable_values']==null &&
@@ -112,9 +113,9 @@ function GraphicChartC3D3(divArg, dataArg)
                 $.each(actualChart.filters[a]['values'], function(tr) {
                     // Get the list of values
                     datasetYs.push([actualChart.filters[a]['values'][tr]]);
-                    multivalue_comp[actualChart.filters[a]['values'][tr]] = datasetYs[datasetYs.length-1];
+                    multivalue_comp[actualChart.filters[a]['values'][tr]] = {'original': datasetYs[datasetYs.length-1]};
                   });
-
+                  return false;
               };
 
             });
@@ -136,6 +137,7 @@ function GraphicChartC3D3(divArg, dataArg)
       }
 
     var _xValuesMV = {};
+
     objects.values.forEach(function(row){
 
       // Categorized means that the value of X is a string
@@ -153,6 +155,8 @@ function GraphicChartC3D3(divArg, dataArg)
       else if (actualChart.y_axis.multivalue)
       {
 
+        //mapper[row['Value1']] =
+
         var k = 0;
         if (!_xValuesMV[row[actualChart.x_axis['var']]])
         {
@@ -166,7 +170,7 @@ function GraphicChartC3D3(divArg, dataArg)
             var _vv = parseFloat(row[actualChart.y_axis['var']]);
             _vv = +_vv || 0;
 
-            multivalue_comp[row[multivalue_stacked]].push(_vv);
+            multivalue_comp[row[multivalue_stacked]][row[actualChart.x_axis['var']]] = _vv;
             if (datasetYs[row[multivalue_stacked]]!=undefined)
             {
               datasetYs[row[multivalue_stacked]].push(_vv);
@@ -188,6 +192,26 @@ function GraphicChartC3D3(divArg, dataArg)
 
 
     });
+
+    for(db in multivalue_comp){
+      var this_db = multivalue_comp[db];
+      tmp = this_db['original'];
+      delete this_db['original'];
+
+      if(Object.keys(this_db).length == 0){
+        continue;
+      }
+      for(key in _xValuesMV){
+        var val = this_db[key];
+
+        if(val)
+          tmp.push(val);
+        else
+          tmp.push(0);
+      }
+      multivalue_comp[db] = tmp;
+    }
+
 
   };
 
@@ -340,7 +364,6 @@ function GraphicChartC3D3(divArg, dataArg)
 
     if (actualChart.y_axis.multivalue)
     {
-
       var arrX = datasetX.slice(0);
       var arrYs = datasetYs;
 
@@ -499,7 +522,6 @@ function GraphicChartC3D3(divArg, dataArg)
 
     chartConfigs.padding.bottom = 5
 
-
     try{chart = c3.generate((chartConfigs));}
     catch(ex)
     {
@@ -527,11 +549,16 @@ function GraphicChartC3D3(divArg, dataArg)
     var place = 0;
 
     for (var i=0; i< columns.length;i++) {
-            var row = columns[i][0];
+            var row = columns[i][0].trim();
 
             var drawLegend = function(row){
               /*legend.append('span').attr('data-id', row).attr('data-opacity', '1').attr('style', 'cursor: pointer;').html(
                 '<div style="display: inline-block; width: 10px; height: 10px; margin-left: 20px;" class="color_container"></div>&nbsp;'+row);*/
+              if(place == 0){
+                place=5.1*(row.length);
+              } else {
+                place=(5.1*(row.length))+30+place;
+              }
 
               var g = d3.select('.legend').insert('g').attr('transform','translate(-'+place+',0)');
 
@@ -539,7 +566,6 @@ function GraphicChartC3D3(divArg, dataArg)
               g.insert('rect').attr('class', 'color_container').attr('style', "cursor: pointer;")
               .attr('data-opacity', "1").attr('data-id', row).attr('width', '10').attr('height', '10');
 
-              place=(10*(row.length-1))+30+place;
             };
 
             if(row.toLowerCase() == 't'){

@@ -70,6 +70,10 @@ clone_questionnaires.short_description = "Clone selected questionnaires"
 class QuestionnaireAdmin(admin.ModelAdmin):
     actions = [clone_questionnaires]
 
+class QuestionnaireWizardAdmin(admin.ModelAdmin):
+    list_display = ['questionnaire', 'user', 'removed']
+
 admin.site.register(Questionnaire, QuestionnaireAdmin)
 admin.site.register(Question, QuestionAdmin)
 admin.site.register(QuestionSet, QuestionSetAdmin)
+admin.site.register(QuestionnaireWizard, QuestionnaireWizardAdmin)

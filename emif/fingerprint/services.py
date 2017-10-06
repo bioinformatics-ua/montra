@@ -175,8 +175,6 @@ def saveFingerprintAnswers(qlist_general, fingerprint_id, questionnaire, user, e
         calculateFillPercentage.delay(fingerprint)
 
         return checkMandatoryAnswers(fingerprint)
-
-
         # format for answers : Answer(question=question, data=data, comment=comment, fingerprint_id=fingerprint_id)
 
 def getComment(question, extra_fields):
@@ -210,19 +208,32 @@ def getAnswerValue(question, qdict):
         choices = None
         value = None
         choices_txt = None
-        if qdict.has_key('value'):
+
+        if qdict.has_key('timeperiods'):
             value = qdict['value']
 
-            #if "yes" in qdict['value']:
-            #    appending_text += question.text
+            for key, repres, used in qdict['timeperiods']:
+                print key
+                print used
+                if used==True:
+                    value += '#%s'%key
+        elif qdict.has_key('value'):
+            value = qdict['value']
+
+        elif qdict.has_key('current'):
+            value = qdict['current']
 
         elif qdict.has_key('choices'):
             #import pdb
             #pdb.set_trace()
             choices = qdict['choices']
+
             qv = ""
             try:
                 qv = qdict['qvalue']
+
+                if qv == '_entry_':
+                    qv += ' ' + str(qdict['opt'])
 
             except:
                 # raise
@@ -234,17 +245,16 @@ def getAnswerValue(question, qdict):
             try:
                 if len(choices[0])==3:
                     for choice, unk, checked  in choices:
-                        if checked == " checked":
+                        if checked != "":
                             value = value + "#" + choice.value
 
                 elif len(choices[0])==4:
                     for choice, unk, checked, _aux  in choices:
-                        if checked == " checked":
+                        if checked != "":
                             if _aux != "":
                                 value = value + "#" + choice.value + "{" + _aux +"}"
                             else:
                                 value = value + "#" + choice.value
-
 
                 elif len(choices[0])==2:
                     for checked, choice  in choices:
@@ -433,7 +443,6 @@ def setNewPermissions(request, fingerprint_id, identification):
     return False
 
 def extract_answers(request2, questionnaire_id, question_set, qs_list):
-
 
     question_set2 = question_set
     request = request2

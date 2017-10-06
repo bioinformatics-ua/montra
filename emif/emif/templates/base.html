@@ -15,11 +15,11 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #-->
 {% load url from future %}
+{% load compress %}
 {% load extra_tags %}
 {% load django_bootstrap_breadcrumbs %}
 {% load staticfiles %}
 {% with STATIC_URL=STATIC_URL BASE_URL=BASE_URL %}
-{% load compress %}
 
 <!DOCTYPE html>
 <!--[if lt IE 7]>      <html class="no-js ns lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
@@ -75,12 +75,40 @@
         {% endcompress %}
 
         {% compress js %}
+        <script src="{{ STATIC_URL }}js/vendor/jquery-1.9.1.min.js"></script>
+
+        <script src="{{ STATIC_URL }}js/vendor/raven.js"></script>
+
+        {% if SENTRY_URL != "" %}
+        <script src="{{ STATIC_URL }}js/vendor/raven_plugins/native.js"></script>
+        <script src="{{ STATIC_URL }}js/vendor/raven_plugins/console.js"></script>
+        <script src="{{ STATIC_URL }}js/vendor/raven_plugins/jquery.js"></script>
+        {% endif %}
+
+        <script type="application/javascript">
+            {% if SENTRY_URL != "" %}
+            Raven.config('{{SENTRY_URL}}').install();
+            Raven.setUser({
+                email: '{{user.get_full_name}}',
+                username: '{{user.email}}'
+            });
+            {%  endif %}
+        </script>
 
         <script src="{{ STATIC_URL }}js/vendor/inheritance.js"></script>
         <script src="{{ STATIC_URL }}js/vendor/modernizr-2.6.2.min.js"></script>
+
         <script src="{{ STATIC_URL }}js/vendor/jquery-1.9.1.min.js"></script>
+        <script src="{{ STATIC_URL }}js/vendor/jquery.bifrost.min.js"></script>
+
+
         <script src="{{ STATIC_URL }}js/vendor/jquery-ui-1.10.4.custom.min.js"></script>
         <script src="{{ STATIC_URL }}js/vendor/bootstrap.min.js"></script>
+
+        <script src="{{ STATIC_URL}}js/vendor/promise-6.1.0.min.js"></script>
+        <script src="{{ STATIC_URL}}js/vendor/promise-done-6.1.0.min.js"></script>
+        <script src="{{ STATIC_URL}}js/emif.proxies.js"></script>
+
         <script src="{{ STATIC_URL }}js/vendor/jquery.cookie.js"></script>
         <script src="{{ STATIC_URL }}js/vendor/jquery.canclear.js"></script>
         <script src="{{ STATIC_URL }}js/vendor/jquery.highlight.js"></script>
@@ -89,6 +117,7 @@
         <script src="{{ STATIC_URL }}js/vendor/bootbox.min.js"></script>
 
         <script src="{{ STATIC_URL }}js/vendor/typeahead.jquery.min.js"></script>
+        <script src="{{ STATIC_URL }}js/vendor/jquery-scrolltofixed.js"></script>
 
         <script type="application/javascript">
         // We need to configure this to be able to send requests by json with the csrftoken
@@ -113,7 +142,6 @@
         {% block headextra %}
         {% endblock %}
         {% endcompress %}
-
     </head>
     <body>
         <div class="wrapper">
@@ -196,37 +224,6 @@
                                                 </ul>
                                             </li>
 
-                                            {% comment %}
-                                            <li>
-                                                <a href="databases">Edit Databases</a>
-                                            </li>
-                                            <li>
-                                                <a href="databases">Query History</a>
-                                            </li>
-                                            <li>
-                                                <a href="databases">Timeline</a>
-                                            </li>
-                                            {% endcomment %}
-
-                                            {% comment %}
-                                            {% if request.user.is_superuser %}
-                                            <li class="divider"></li>
-                                            <li class="dropdown-submenu">
-                                                <a href="" onclick="return false;">Statistics</a>
-                                                <ul class="dropdown-menu">
-                                                    {% show_fingerprints_for_statistics %}
-                                                </ul>
-                                            </li>
-                                            {% endif %}
-                                            {% endcomment %}
-
-                                            {% comment %}
-                                            <li class="divider"></li>
-                                            <li>
-                                                <a href="databases">Subscribe interests</a>
-                                            </li>
-                                            {% endcomment %}
-
                                             <li class="divider"></li>
                                             {% if profiles|isDataCustodian %}
                                             <li class="dropdown-submenu">
@@ -248,7 +245,6 @@
                                                     <li><a tabindex="-1" href="advsearch/history">Search History</a></li>
                                                 </ul>
                                             </li>
-
                                             {% if request.user|has_group:'importers' or request.user.is_superuser %}
                                             <li class="divider"></li>
                                             <li>
@@ -256,8 +252,59 @@
                                             </li>
                                             {% endif %}
 
+                                            {% if request.user|has_group:'importers' or request.user.is_superuser %}
+
+                                            <li class="divider"></li>
+                                            <li>
+                                                <a href="questionnaire/export">Export Questionnaire</a>
+                                            </li>
+                                            {% endif %}
+
                                         </ul>
                                     </li>
+                                    {% if thirdparty|length > 0 or globalwidgets|length > 0 %}
+                                    <li id="li_notifications" style="padding-right: 5px;" class="dropdown">
+                                        <a href="" class="dropdown-toggle" data-toggle="dropdown">
+                                            <i id="notification_env" class="fa fa-puzzle-piece"></i> <b class="caret"></b>
+                                        </a>
+                                        <ul class="dropdown-menu">
+                                            {% if thirdparty|length > 0%}
+                                                {%for tp in thirdparty %}
+                                                    <li>
+
+
+                                                        <a href="apps/tp/{{tp.plugin.slug}}">
+                                                        {%if tp.plugin.icon %}
+                                                            <img style="max-width: 14px; max-height: 14px;" src="{{tp.plugin.icon.url}}" />
+                                                        {% else %}
+                                                            <i class="fa fa-picture-o"></i>
+                                                        {% endif %}&nbsp;
+                                                        {{tp.plugin.name}}
+                                                        </a>
+                                                    </li>
+                                                    {% endfor %}
+                                            {% endif %}
+                                            {% if globalwidgets|length > 0%}
+                                                {% if thirdparty|length > 0 %}
+                                                    <li class="divider"></li>
+                                                {% endif %}
+                                                {%for tp in globalwidgets %}
+                                                <li>
+                                                    <a href="apps/gp/{{tp.plugin.slug}}">
+                                                    {%if tp.plugin.icon %}
+                                                            <img style="max-width: 14px; max-height: 14px;" src="{{tp.plugin.icon.url}}" />
+                                                        {% else %}
+                                                            <i class="fa fa-picture-o"></i>
+                                                        {% endif %}&nbsp;
+                                                        {{tp.plugin.name}}
+                                                    </a>
+                                                </li>
+                                                {% endfor %}
+                                            {% endif %}
+                                        </ul>
+                                    </li>
+                                    {% endif %}
+
                                     {% endif %}
                                     {% block headerlogin %}
                                     {% if not user.is_authenticated %}
@@ -344,7 +391,6 @@
                         <div style="margin-top: 60px"></div>
                     {% endif %}
 
-
 <div style="display: none; z-index: 2000; position:fixed; bottom:20px; right: 20px;" class="alert alert-info" id="exporting-message">Databases of the current view are being exported, please wait.</div>
                     {% if user.is_authenticated and not user.is_active %}
                         <p class="lead" style="text-align:center;"><i class="fa fa-lock fa-5x"></i></p>
@@ -366,6 +412,9 @@
             <footer>
 
                 {% if user.is_authenticated %}
+                    {% if user|has_group:'developers' or user.is_staff %}
+                    <a href="developer">Developers</a> ·
+                    {% endif %}
                 <a href="bugreport">Bug Report</a> ·
                 <a href="controlversion/history">History</a> ·
                 {%endif%}
@@ -388,8 +437,11 @@
         {% endblock %}
         <script type="text/javascript">
         var _gaq = _gaq || [];
-        _gaq.push(['_setAccount', 'UA-38876251-1']);
-        _gaq.push(['_trackPageview']);
+
+        {% for attr in GOOGLE_ANALYTICS %}
+            _gaq.push({{attr|safe}});
+        {% endfor %}
+
         (function() {
         var ga = document.createElement('script');
         ga.type = 'text/javascript';

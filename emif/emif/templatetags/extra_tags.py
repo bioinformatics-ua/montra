@@ -33,12 +33,13 @@ from accounts.models import Profile
 
 from newsletter.models import Newsletter, Subscription
 
+
+import math
 from djangosaml2.conf import config_settings_loader
 from djangosaml2.utils import available_idps
 
+
 register = template.Library()
-
-
 
 
 @register.filter(name='removeh1')
@@ -60,10 +61,22 @@ def escapedots(value):
 
 
 @register.filter(name='replaceplicas')
+
 @stringfilter
 def replaceplicas(value):
     return value.replace('"',"'")
 
+@register.filter(name='scaleunit')
+def scaleunit(value):
+
+    sizes = ['bytes', 'Kb', 'Mb', 'Gb', 'Tb']
+
+    if (value == 0):
+        return '0 byte'
+
+    i = int(math.floor(math.log(value) / math.log(1024)))
+
+    return "%d %s" % (round(value/ math.pow(1024, i), 2), sizes[i])
 
 
 @register.filter(name='removehs')

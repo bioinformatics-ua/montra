@@ -54,7 +54,11 @@ from accounts.models import EmifProfile
 
 from django.core.exceptions import PermissionDenied
 
+
+from developer.models import Plugin, PluginVersion
+
 from django.http import Http404
+
 
 def document_form_view_upload(request, fingerprint_id, template_name='documents_upload_form.html'):
     """Store the files at the backend
@@ -102,7 +106,9 @@ def document_form_view_upload(request, fingerprint_id, template_name='documents_
     data_jerboa = pc.submit_new_revision(request.user, fingerprint_id, revision, path_file)
 
 
-    aggregation.apply_async([fingerprint_id, data_jerboa])
+    #aggregation.apply_async([fingerprint_id, data_jerboa])
+    aggregation(fingerprint_id, data_jerboa)
+
     response = JSONResponse(data, mimetype=response_mimetype(request))
     response['Content-Disposition'] = 'inline; filename=files.json'
     return response
@@ -248,6 +254,8 @@ def document_form_view(request, runcode, qs, activetab='summary', readOnly=False
     except FingerprintSubscription.DoesNotExist:
         pass
 
+    plugins = PluginVersion.all_valid(type=Plugin.DATABASE)
+
     return render(request, template_name,
         {'request': request, 'qsets': qsets, 'export_bd_answers': True,
         'apiinfo': apiinfo, 'fingerprint_id': runcode,
@@ -273,6 +281,7 @@ def document_form_view(request, runcode, qs, activetab='summary', readOnly=False
                     'public_key': public_key,
                     'hits': hits,
                     'subscription': subscription,
+                    'plugins': plugins
                     })
 
 

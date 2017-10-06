@@ -146,13 +146,18 @@
     <span class="pull-right">
     <a href="#" onclick="toggle_comments('{{question.number|removedots}}'); return false;">
     <span id="commentary_{{question.id}}">
-    <i class="{% if qdict.comment %} icon-comment {% else %} icon-comment-alt {% endif %}">&nbsp;</i>
+    <i title="Click to open comments" class="{% if qdict.comment %} icon-comment {% else %} icon-comment-alt {% endif %} tooltippable">&nbsp;</i>
     </span>
     </a>
     </span>
     <span class="pull-right answered hide " id="answered_{{ question.number|removedots }}">
-    <i class="icon-check green">&nbsp;</i>
+    <i class="icon-check green tooltippable" title="This question has an answer">&nbsp;</i>
     </span>
+    {% if readonly %}
+        <span class="pull-right" id="request_{{ question.number|removedots }}">
+        <i title="Request answer" data-question="{{question.id}}" class="fa fa-hand-o-up tooltippable requestlabel"></i>&nbsp;
+        </span>
+    {% endif %}
     {% if config.Request_Answer and answer_requests|length > 0 %}
         {% ans_requested question answer_requests %}
     {% endif %}
@@ -202,13 +207,18 @@
             {% endif %}
             <span class="pull-right">
             <a href="#" onclick="toggle_comments('{{question.number|removedots}}'); return false;">
-            <span id="commentary_{{question.id}}"><i class="{% if qdict.comment %} icon-comment {% else %} icon-comment-alt {% endif %}">&nbsp;</i>
+            <span id="commentary_{{question.id}}"><i title="Click to open comments" class="{% if qdict.comment %} icon-comment {% else %} icon-comment-alt {% endif %} tooltippable">&nbsp;</i>
             </span>
             </a>
             </span>
             <span class="pull-right answered hide" id="answered_{{ question.number|removedots }}">
-            <i class="icon-check green">&nbsp;</i>
+            <i title="This question has an answer" class="icon-check green tooltippable">&nbsp;</i>
             </span>
+            {% if readonly %}
+                <span class="pull-right" id="request_{{ question.number|removedots }}">
+                <i title="Request answer" class="fa fa-hand-o-up tooltippable requestlabel"></i>&nbsp;
+                </span>
+            {% endif %}
             {% if config.Request_Answer and answer_requests|length > 0 %}
                 {% ans_requested question answer_requests %}
             {% endif %}
@@ -267,24 +277,26 @@
 <!--{% if questions_list.0.0.sortid != 99 and questions_list.0.0.sortid != 0%}-->
 <!--<span>* Required</span>-->
 <!--{% endif  %}-->
-<div class="well questionset-submit">
+<!--div style="height: 50px;">&nbsp;</div>
+<div data-clamp="#qform{{ questions_list.0.0.sortid }}" style="position: fixed; bottom: -15px" class="well well-small questionset-submit">-->
+<div data-clamp="#qform{{ questions_list.0.0.sortid }}" class="well questionset-submit">
     <!-- Previous | Next buttons -->
     <div class="span5 text-center">
         <!-- If Questionset is not the first (Introduction) or the final (Thank you) -->
         {% if questions_list.0.0.prev %}
-        <a href="add/{{ questionset.questionnaire.pk }}/{{ questions_list.0.0.prev.sortid }}" class="btn large primary" onclick="questionsets_handle('qs_{{ questions_list.0.0.prev.sortid }}', '{{fingerprint_id}}', '{{questionset.questionnaire.pk}}', this_mode);  return false;">{% trans "Previous" %}</a>
+        <a href="add/{{ questionset.questionnaire.pk }}/{{ questions_list.0.0.prev.sortid }}" class="btn large primary" onclick="questionsets_handle('qs_{{ questions_list.0.0.prev.sortid }}', '{{fingerprint_id}}', '{{questionset.questionnaire.pk}}', this_mode);  return false;"><i class="icon-chevron-left"></i> {% trans "Previous" %}</a>
         {% endif %}
         {% if questions_list.0.0.prev and questions_list.0.0.next %}
         {% endif %}
         {% if questions_list.0.0.next %}
-        <a href="add/{{ questionset.questionnaire.pk }}/{{ questions_list.0.0.next.sortid }}" class="btn large primary" onclick="questionsets_handle('qs_{{ questions_list.0.0.next.sortid }}', '{{fingerprint_id}}', '{{questionset.questionnaire.pk}}', this_mode);  return false;">{% trans "Next" %}</a>
+        <a href="add/{{ questionset.questionnaire.pk }}/{{ questions_list.0.0.next.sortid }}" class="btn large primary" onclick="questionsets_handle('qs_{{ questions_list.0.0.next.sortid }}', '{{fingerprint_id}}', '{{questionset.questionnaire.pk}}', this_mode);  return false;">{% trans "Next" %} <i class="icon-chevron-right"></i></a>
         {% endif %}
         <!-- First Questionset - Introduction -->
     </div>
     <div class="span2 text-right">
         {% if not readonly %}
             {% if questions_list.0.0.sortid != 0 and questions_list.0.0.sortid != 99 %}
-            <input class="btn large btn-primary" name="submit" type="submit" value="{% trans 'Save' %}"/>
+            <button class="btn large btn-primary" name="submit" type="submit"><i class="fa fa-floppy-o"></i> {% trans 'Save' %}</button>
             {% endif %}
             {% if questions_list.0.0.sortid == 0 %}
             {% endif %}
@@ -366,6 +378,8 @@ collapseAll($("#collapseall_qs_{{ k.sortid }}"), div_id);
 {% endif %}
 {% endfor %}
 $(function(){
+    var context = $('#qs_{{questions_list.0.0.sortid}}');
+
     add_triggers{{ questions_list.0.0.sortid }}();
     setsaveqs("qform{{ questions_list.0.0.sortid }}", '{{fingerprint_id}}', '{{questionset.questionnaire.pk}}', this_mode);
     $('.dropdown-menu').on('click', function(e) {
@@ -374,7 +388,7 @@ $(function(){
         }
     });
 
-    $('.tooltippable', $('#qs_{{questions_list.0.0.sortid}}')).tooltip({container:'body'});
+    $('.tooltippable', context).tooltip({container:'body'});
 
     var showPopover = function () {
         var isVisible = $(this).data('popover').tip().hasClass('in');
@@ -385,7 +399,7 @@ $(function(){
         $(this).popover('hide');
     };
 
-    $('.popoverable', $('#qs_{{questions_list.0.0.sortid}}')).popover(
+    $('.popoverable', context).popover(
         {
             placement: 'left',
             container:'body',
@@ -402,13 +416,36 @@ $(function(){
             setupHideEmpties({{questions_list.0.0.sortid}}, 'filled');
         });
 
-    $('.answer input,.answer select,.answer textarea', $('#qs_{{questions_list.0.0.sortid}}')).each(function(index){
+    $('.answer input,.answer select,.answer textarea', context).each(function(index){
         if($(this).attr('type') =='radio'){
             $('[name="'+$(this).attr('name')+'"]').data('old', $('[name="'+$(this).attr('name')+'"]:checked').val());
         } else {
             $(this).data('old', $(this).val());
         }
     });
+    $('[data-clamp]', context).each(function () {
+        var elem = $(this);
+        var parentPanel = elem.data('clamp');
+
+        var resizeFn = function () {
+            var sideBarNavWidth = $(parentPanel).width() - parseInt(elem.css('paddingLeft')) - parseInt(elem.css('paddingRight')) - parseInt(elem.css('marginLeft')) - parseInt(elem.css('marginRight')) - parseInt(elem.css('borderLeftWidth')) - parseInt(elem.css('borderRightWidth'));
+            elem.css('width', sideBarNavWidth);
+        };
+
+        resizeFn();
+        $(window).resize(resizeFn);
+    });
+
+    $('.questionset-submit', context).scrollToFixed( { bottom: -10, limit: $('.questionset-submit', context).offset().top } );
+
+    $('.requestlabel', context).click(function(e){
+            var answer = $(this).data("question");
+
+            askForAnswer(answer);
+
+    });
+
 });
+
 {% endblock %}
 </script>

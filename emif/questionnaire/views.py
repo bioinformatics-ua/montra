@@ -54,7 +54,9 @@ from openpyxl import load_workbook
 
 from django.template.defaultfilters import slugify
 from questionnaire.imports import ImportQuestionnaire
-import tempfile
+from questionnaire.export import ExportQuestionnaire
+import tempfile, csv, cStringIO, codecs
+from django.core.servers.basehttp import FileWrapper
 
 def r2r(tpl, request, **contextdict):
     "Shortcut to use RequestContext instead of Context in templates"
@@ -105,8 +107,7 @@ def export_csv(request, qid): # questionnaire_id
     answers for all subjects.
     """
     #print "export_csv"
-    import tempfile, csv, cStringIO, codecs
-    from django.core.servers.basehttp import FileWrapper
+
     #print qid
     class UnicodeWriter:
         """
@@ -352,3 +353,37 @@ class ImportQuestionnaireView(TemplateView):
         except:
             return self.get(request, error_message="Error importing questionnaire. Make sure you are importing a xlsx file with a questionnaire schema. If the problem persists please try again later, or contact the administrator.")
 
+class ExportQuestionnaireView(TemplateView):
+    template_name = "questionnaire_export.html"
+
+    def get(self, request):
+        if(not (request.user.is_superuser or request.user.groups.filter(name='importers').exists())):
+            return HttpResponse('Forbidden', 403)
+
+        return render(request, self.template_name,
+            {
+                'request': request,
+                'schemas': Questionnaire.objects.all(),
+                'breadcrumb': True,
+            })
+
+
+class ExportQuestionnaireAttachView(TemplateView):
+    template_name = "questionnaire_export.html"
+
+    def get(self, request, questionnaire_id):
+        if(not (request.user.is_superuser or request.user.groups.filter(name='importers').exists())):
+            return HttpResponse('Forbidden', 403)
+
+        fd = tempfile.TemporaryFile()
+
+        questionnaire = get_object_or_404(Questionnaire, pk=int(questionnaire_id))
+
+        exporter = ExportQuestionnaire.factory("excel", questionnaire, fd)
+        exporter.export()
+
+        response = HttpResponse(FileWrapper(fd), mimetype="application/vnd.ms-excel")
+        response['Content-Length'] = fd.tell()
+        response['Content-Disposition'] = 'attachment; filename="%s.xlsx"' % questionnaire.name
+        fd.seek(0)
+        return response

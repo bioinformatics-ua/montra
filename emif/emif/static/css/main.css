@@ -74,7 +74,7 @@ div.input {
 }
 
 /* ensure that all inputs have the same distance to the question */
-div.input input[type="text"], div.input textarea, div.input select {
+div.input input[type="text"], div.input textarea, div.input select, div.input .fake_input {
     margin: 10px 0 0 0;
 }
 
@@ -83,7 +83,7 @@ div.input span.add-on {
     border-right: none;
 }
 
-ul.inputs-list input[type="text"] {
+ul.inputs-list input[type="text"], ul.inputs-list .fake_input {
     margin: 5px 0;
 }
 
@@ -99,7 +99,7 @@ div.error {
 }
 
 .questionset-submit {
-    margin-top: 60px;
+    /*margin-top: 60px;*/
 }
 
 #languages {
@@ -234,7 +234,7 @@ div .tooltip {
 }
 
 .pull-center {
-    text-align:center;
+    text-align:center !important;
 }
 
 .fa-green {
@@ -385,6 +385,9 @@ box-shadow: inset 0 3px 8px rgba(0,0,0,0.125);
 }
 .small-margin{
   margin: 5px;
+}
+.medium-margin{
+  margin: 15px;
 }
 .select_checkbox_container{
   width: 300px; max-height: 400px; overflow: scroll; list-style: none;
@@ -931,9 +934,10 @@ height: 4em;
 }
 
 .ui-autocomplete{
-  width: 409px !important;
   z-index: 9999 !important;
-  top: 37px !important;
+  /*
+  width: 409px !important;
+  top: 37px !important;*/
 }
 
 .progressbar_back{
@@ -998,30 +1002,120 @@ height: 4em;
   background-color: white;
 }
 
-&.affix-bottom {
+
+.affix-bottom {
     position: absolute;
     bottom: 490px;
 }
-&.affix {
+.affix {
     top: 65px;
     position: fixed;
 }
 
 .summarynav_affixed:after{
+
   height: 4px;
   width: 100%;
   margin-top: 38px;
   position: absolute;
 
-background: rgba(163,163,163,1);
-background: -moz-linear-gradient(top, rgba(163,163,163,1) 0%, rgba(255,255,255,0) 100%);
-background: -webkit-gradient(left top, left bottom, color-stop(0%, rgba(163,163,163,1)), color-stop(100%, rgba(255,255,255,0)));
-background: -webkit-linear-gradient(top, rgba(163,163,163,1) 0%, rgba(255,255,255,0) 100%);
-background: -o-linear-gradient(top, rgba(163,163,163,1) 0%, rgba(255,255,255,0) 100%);
-background: -ms-linear-gradient(top, rgba(163,163,163,1) 0%, rgba(255,255,255,0) 100%);
-background: linear-gradient(to bottom, rgba(163,163,163,1) 0%, rgba(255,255,255,0) 100%);
-filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#a3a3a3', endColorstr='#ffffff', GradientType=0 );
+    background: rgba(163,163,163,1);
+    background: -moz-linear-gradient(top, rgba(163,163,163,1) 0%, rgba(255,255,255,0) 100%);
+    background: -webkit-gradient(left top, left bottom, color-stop(0%, rgba(163,163,163,1)), color-stop(100%, rgba(255,255,255,0)));
+    background: -webkit-linear-gradient(top, rgba(163,163,163,1) 0%, rgba(255,255,255,0) 100%);
+    background: -o-linear-gradient(top, rgba(163,163,163,1) 0%, rgba(255,255,255,0) 100%);
+    background: -ms-linear-gradient(top, rgba(163,163,163,1) 0%, rgba(255,255,255,0) 100%);
+    background: linear-gradient(to bottom, rgba(163,163,163,1) 0%, rgba(255,255,255,0) 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#a3a3a3', endColorstr='#ffffff', GradientType=0 );
+}
 
+
+.docmenu.affix{
+  margin-top: -6px;
+  padding-top: 120px;
+}
+
+a.anchor{
+  display: block;
+  position: relative;
+  top: -200px;
+  visibility: hidden;
+}
+
+#apidocs p{
+  text-align: justify;
+}
+
+.input-prepend.fill
+{
+    display: block;
+    position: relative;
+    height: 30px;
+
+}
+input.fill {
+        position: absolute;
+        left: 0px;
+        margin-right: 29px;
+        width: auto !important;
+    }
+.add-on.fill {
+    position: absolute;
+    width: 30px;
+    right: 0px;
+    z-index:100!important;
+}
+
+#live-preview iframe{
+  height: 440px;
+  border: 0;
+}
+
+.far_from_sight{
+  position: absolute;
+  left: -19999px;
+  top: -19999px;
+}
+
+#summarynav.nav-tabs>li>a {
+  border: 1px solid rgb(229, 229, 229);
+  background-color: rgb(250, 250, 250);
+  color: grey;
+}
+
+#summarynav.nav-tabs>.active>a, #summarynav.nav-tabs>.active>a:hover, #summarynav.nav-tabs>.active>a:focus {
+  color: #08c;
+  cursor: default;
+  background-color: #FFF;
+  border-bottom: 0px;
+}
+
+#tframe
+{
+   background: url('data:image/svg+xml;charset=utf-8,<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 100% 100%"><text fill="%23000000" x="50%" y="50%" font-family="\'Helvetica Neue\', sans-serif" font-size="24" text-anchor="middle">Loading, please wait...</text></svg>') 0px 0px no-repeat;
+}
+
+#version-details .btn-file {
+  position: relative;
+  overflow: hidden;
+}
+.btn-file input[type=file]{
+  position: absolute;
+  top: 0;
+  right: 0;
+  min-width: 100%;
+  min-height: 100%;
+  font-size: 100px;
+  text-align: right;
+  filter: alpha(opacity=0);
+  opacity: 0;
+  background: red;
+  cursor: inherit;
+  display: block;
+}
+#version-details input[readonly] {
+  background-color: white !important;
+  cursor: text !important;
 }
 
 .custom-checkbox {
@@ -1184,4 +1278,75 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#a3a3a3', end
   left: 1px;
   top: -5px;
   zoom: 1;
+}
+
+.fake_input{
+  float: none;
+  display: inline-block;
+  padding: 4px;
+  font-size: 13px;
+  line-height: 20px;
+  color: #555555;
+  border: 1px solid #ccc;
+  -webkit-border-radius: 3px;
+  -moz-border-radius: 3px;
+  border-radius: 3px;
+  margin-left: 0;
+  min-height: 18px;
+}
+
+.fake_input_disabled{
+  cursor: not-allowed;
+  background-color: #eee;
+  color: rgb(0, 136, 204);
+}
+
+.fake_input.span6 {
+  width: 446px;
+}
+
+@media (max-width: 979px) and (min-width: 768px){
+  .fake_input.span6 {
+    width: 338px;
+  }
+}
+
+@media (min-width: 1200px){
+  .fake_input.span6 {
+    width: 556px;
+  }
+}
+
+@media (max-width: 767px){
+  .fake_input.span6 {
+    display: block;
+    width: 100%;
+    min-height: 30px;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+  }
+}
+
+.fake_caret {
+  margin-top: 7px;
+  margin-right: 3px;
+}
+
+.percentagebar{
+  background-color: white;
+}
+
+.shadowappend{
+  height: 4px;
+  width: 100%;
+  position: absolute;
+  background: rgba(163,163,163,1);
+  background: -moz-linear-gradient(top, rgba(163,163,163,1) 0%, rgba(255,255,255,0) 100%);
+  background: -webkit-gradient(left top, left bottom, color-stop(0%, rgba(163,163,163,1)), color-stop(100%, rgba(255,255,255,0)));
+  background: -webkit-linear-gradient(top, rgba(163,163,163,1) 0%, rgba(255,255,255,0) 100%);
+  background: -o-linear-gradient(top, rgba(163,163,163,1) 0%, rgba(255,255,255,0) 100%);
+  background: -ms-linear-gradient(top, rgba(163,163,163,1) 0%, rgba(255,255,255,0) 100%);
+  background: linear-gradient(to bottom, rgba(163,163,163,1) 0%, rgba(255,255,255,0) 100%);
+  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#a3a3a3', endColorstr='#ffffff', GradientType=0 );
 }

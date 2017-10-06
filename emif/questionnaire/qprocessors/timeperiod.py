@@ -15,6 +15,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from questionnaire import *
 from django.utils.translation import ugettext as _, ugettext_lazy
+import re
 
 perioddict = {
     "second" : ugettext_lazy("second(s)"),
@@ -37,14 +38,26 @@ def question_timeperiod(request, question):
     if not units:
         units = ["day","week","month","year"]
 
-    key1 = "question_%s" % question.number
-    key2 = "question_%s_unit" % question.number
-    value = request.POST.get(key1, '')
-    unitselected = request.POST.get(key2, units[0])
+    key = "question_%s" % question.number
 
+    vals = request.POST.get(key, '').split('#')
+
+    value = vals[0]
+    unitselected = None
+    cleanunit = None
+    try:
+        unitselected = vals[1]
+        cleanunit = re.sub('<[^<]+?>', '', unitselected)
+    except IndexError:
+        pass
     for x in units:
         if x in perioddict:
-            timeperiods.append( (x, unicode(perioddict[x]), unitselected==x) )
+            carry=None
+            if cleanunit==x:
+                carry = unicode(perioddict[x])
+                if 'highlight' in unitselected:
+                    carry = '<span class="highlight">'+carry+'</span>'
+            timeperiods.append( (x, unicode(perioddict[x]), carry) )
     return {
         "required" : "required" in cd,
         "timeperiods" : timeperiods,
@@ -54,15 +67,17 @@ def question_timeperiod(request, question):
 
 @answer_proc('timeperiod')
 def process_timeperiod(question, answer):
-    if not answer['ANSWER'] or not answer.has_key('unit'):
+    parts = answer['ANSWER'].split('#')
+
+    if not answer['ANSWER'] or len(parts) < 2:
         raise AnswerException(_(u"Invalid time period"))
-    period = answer['ANSWER'].strip()
+    period = parts[0].strip()
     if period:
         try:
             period = str(int(period))
         except ValueError:
             raise AnswerException(_(u"Time period must be a whole number"))
-    unit = answer['unit']
+    unit = parts[1]
     checkdict = question.getcheckdict()
     if checkdict and 'units' in checkdict:
         units = checkdict['units'].split(',')
@@ -76,3 +91,23 @@ def process_timeperiod(question, answer):
 
 add_type('timeperiod', 'Time Period [input, select]')
 
+@show_summary('timeperiod')
+def show_summ_timeperiod(value):
+    tmp=""
+    parts = value.split('#')
+
+    if len(parts) == 2:
+        tmp+= " %s"%parts[0]
+        carry = ""
+        try:
+            unit = parts[1]
+            cleanunit = re.sub('<[^<]+?>', '', unit)
+            carry = unicode(perioddict[cleanunit])
+            if 'highlight' in unit:
+                carry = '<span class="highlight">'+carry+'</span>'
+        except:
+            pass
+
+        tmp += carry
+
+    return tmp

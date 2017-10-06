@@ -1,0 +1,103 @@
+{% comment %}
+# -*- coding: utf-8 -*-
+# Copyright (C) 2014 Universidade de Aveiro, DETI/IEETA, Bioinformatics Group - http://bioinformatics.ua.pt/
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+{% endcomment %}
+{% load i18n %}
+{% load extra_tags %}
+<div class="clearfix">
+    <div class="input">
+        {% if question.disposition == question.DROPDOWN %}
+        <select id="question_{{ question.number }}" class="span6" onChange="valchanged('question_{{ question.number }}', this.value, this);" name="question_{{ question.number }}">
+            <option></option>
+            <option value="yes" {% ifequal qdict.value|striptags "yes" %} selected="true" {% endifequal %} id="question_{{ question.number }}_yes">Yes</option>
+            <option {% ifequal qdict.value|striptags "no" %} selected="true" {% endifequal %}  value="no" id="question_{{ question.number }}_no">No</option>
+            {% if qdict.hasdontknow %}
+            <option {% ifequal qdict.value|striptags "dontknow" %} selected="true" {% endifequal %}  value="dontknow" id="question_{{ question.number }}_dontknow">Don't Know</option>
+            {%endif%}
+        </select>
+        {% else %}
+    {% if not readonly %}
+    <div class="pull-right">
+    <button onclick="clear_selection('question_nr_{{ question.number }}', '{{ question.number }}. {{ question.text|removehs }}');" class="btn btn-small" type="button">Clear Selection</button>
+    </div>
+    {% endif %}
+            <ul class="inputs-list unstyled {%if question.disposition == question.HORIZONTAL %} inline {% endif %}">
+
+                <!-- yes -->
+                <li>
+                    <label>
+                        <span class="custom-radio">
+                          <input type="radio" id="question_{{ question.number }}_yes" name="question_{{ question.number }}" value="yes" onClick="valchanged('question_{{ question.number }}', this.value, this);" {% ifequal qdict.value|striptags "yes" %} checked{% endifequal %} />
+                          <span class="box"><span class="tick"></span></span>
+                        </span>
+
+                        <span>
+                            {%if "yes" in qdict.value|striptags and qdict.value|striptags|length = 3 and 'highlight' in qdict.value %}
+                                <span class="highlight">Yes</span>
+                            {% else %}
+                                Yes
+                            {% endif %}
+                        </span>
+                    </label>
+                </li>
+
+                <!-- no -->
+                <li>
+                    <label>
+                        <span class="custom-radio">
+                          <input  type="radio" id="question_{{ question.number }}_no" name="question_{{ question.number }}" value="no" onClick="valchanged('question_{{ question.number }}', this.value, this);" {% ifequal qdict.value|striptags "no" %} checked {% endifequal %} />
+                          <span class="box"><span class="tick"></span></span>
+                        </span>
+                        <span>
+                            {%if "no" in qdict.value|striptags and qdict.value|striptags|length = 2 and 'highlight' in qdict.value %}
+                                <span class="highlight">No</span>
+                            {% else %}
+                                No
+                            {% endif %}
+                        </span>
+                    </label>
+                </li>
+
+                <!-- don't know -->
+                {% if qdict.hasdontknow %}
+                <li>
+                    <label>
+                        <span class="custom-radio">
+                          <input  type="radio" id="question_{{ question.number }}_dontknow" name="question_{{ question.number }}" value="dontknow" onClick="valchanged('question_{{ question.number }}', this.value, this);" {% ifequal qdict.value|striptags "dontknow" %} checked {% endifequal %} />
+                          <span class="box"><span class="tick"></span></span>
+                        </span>
+                        <span>
+                            {%if "dontknow" in qdict.value|striptags and qdict.value|striptags|length = 8 and 'highlight' in qdict.value %}
+                                <span class="highlight">Don't Know</span>
+                            {% else %}
+                                Don't Know
+                            {% endif %}
+                        </span>
+                    </label>
+                </li>
+                {% endif %}
+            {% endif %}
+            <!-- comment -->
+            {% if qdict.value %}
+                <script type="text/javascript">
+                    markAnswered('{{ question.number|removedots }}');
+
+                    valchanged('question_{{ question.number }}','{{ qdict.value }}', this);
+                </script>
+            {% endif %}
+        </ul>
+    </div>
+</div>

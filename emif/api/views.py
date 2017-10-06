@@ -47,7 +47,7 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 # Import Search Engine
 
 from searchengine.search_indexes import CoreEngine
-from api.models import *
+from models import *
 
 # Import pubmed object
 from utils.pubmed import PubMedObject
@@ -172,15 +172,21 @@ class SearchDatabasesView(APIView):
         offset=0
         sort_field='name'
         sort_order='asc'
+        schema=None
 
         sortFilter = None
 
-        if request.user.is_authenticated() and (request.user.is_staff or request.user.emif_profile.has_group('exporters')):
+        if request.user.is_authenticated() and (
+                request.user.is_staff
+                or request.user.emif_profile.has_group('exporters')
+                or request.user.emif_profile.has_group('developers')
+            ):
             search = request.DATA.get('search', None)
             crows = request.DATA.get('rows', None)
             coffset = request.DATA.get('offset', None)
             csortf = request.DATA.get('sort_field', None)
             csorto = request.DATA.get('sort_order', None)
+            schema = request.DATA.get('schema', None)
 
             if search == None or len(search.strip()) == 0:
                 return Response({'status': 'Authenticated', 'method': 'POST', 'Error': 'Must specify a search text filter'}, status=status.HTTP_400_BAD_REQUEST)
@@ -200,15 +206,18 @@ class SearchDatabasesView(APIView):
             if sort_order != 'asc' and sort_order != 'desc':
                 return Response({'status': 'Authenticated', 'method': 'POST', 'Error': 'Available sort orders are "asc" and "desc"'}, status=status.HTTP_400_BAD_REQUEST)
 
+
             try:
                 sortFilter = sortmap[sort_field] + " " + sort_order
             except:
                 return Response({'status': 'Authenticated', 'method': 'POST', 'Error': 'sort_field can only be name, type_name, id, last_activity or date.'}, status=status.HTTP_400_BAD_REQUEST)
 
-
+            filter_value = ''
+            if schema != None:
+                filter_value = 'AND type_t: "%s"' % escapeSolrArg(schema)
 
             c = CoreEngine()
-            (list_databases,hits) = get_databases_from_solr_v2(request, "text_t:\"" +escapeSolrArg(search)+'"', sort=sortFilter, rows=rows, start=offset)
+            (list_databases,hits) = get_databases_from_solr_v2(request, 'text_t:"%s" %s' % (escapeSolrArg(search), filter_value), sort=sortFilter, rows=rows, start=offset)
 
             return Response({'link': {'status': 'Authenticated', 'method': 'POST'}, 'filters':{'search': search, 'rows': rows,
                 'offset':offset}, 'result': {'count': len(list_databases),
@@ -552,7 +561,7 @@ class MetaDataView(APIView):
     def post(self, request, *args, **kw):
 
         # If authenticated
-        if request.auth:
+        if request.auth or request.user.is_authenticated():
             user = request.user
             data = request.DATA
             result = validate_and_save(user, data)
@@ -1092,16 +1101,16 @@ def validate_fingerprint(user, fingerprintID):
     :param user:
     :param fingerprintID:
     """
+    try:
+        fp = Fingerprint.valid().get(fingerprint_hash=fingerprintID)
 
-    result = False
-    c = CoreEngine()
-    results = c.search_fingerprint('user_t:' + '"' + user.username + '"')
+        if user in fp.unique_users():
+            return True
 
-    for r in results:
-        if fingerprintID == r['id']:
-            result = True
-            break
-    return result
+    except Fingerprint.DoesNotExist:
+        pass
+
+    return False
 
 
 def validate_and_save(user, data):
@@ -1120,15 +1129,19 @@ def validate_and_save(user, data):
         # Verify if fingerprint belongs to user
         if validate_fingerprint(user, fingerprintID):
             if 'values' in data.keys():
-                for f in data['values']:
+                dvalues = data['values']
+                if isinstance(dvalues, basestring):
+                    dvalues = json.loads(dvalues)
+
+                for f in dvalues:
                     # Check if field already exists
                     if FingerprintAPI.objects.filter(fingerprintID=fingerprintID, field=f):
                         try:
-                            fp = FingerprintAPI.objects.get(fingerprintID=fingerprintID, field=f)
-                            if str(fp.value) != str(data['values'][f]):
+                            fp = FingerprintAPI.objects.filter(fingerprintID=fingerprintID, field=f)[0]
+                            if str(fp.value) != str(dvalues[f]):
                                 # Update value
-                                fp.value += ' ' + data['values'][f]
-                                fields_text = data['values'][f]
+                                fp.value += ' ' + dvalues[f]
+                                fields_text = dvalues[f]
                                 fp.save()
                                 result[f] = "Updated successfully"
                             else:
@@ -1140,9 +1153,9 @@ def validate_and_save(user, data):
                     else:
                         try:
                             fingerprint = FingerprintAPI(fingerprintID=fingerprintID, field=f,
-                                                         value=data['values'][f], user=user)
+                                                         value=dvalues[f], user=user)
                             # Create new field-value
-                            fields_text += ' ' + data['values'][f]
+                            fields_text += ' ' + dvalues[f]
                             fingerprint.save()
                             result[f] = "Created successfully"
                         except:
@@ -1160,7 +1173,7 @@ def validate_and_save(user, data):
         result['error'] = "No fingerprintID detected"
 
 
-    c = CoreEngine()
+    '''c = CoreEngine()
     results = c.search_fingerprint("id:" + fingerprintID)
     _aux = None
     for r in results:
@@ -1171,6 +1184,7 @@ def validate_and_save(user, data):
     if (_aux!=None):
         _aux['text_t']  = _aux['text_t'] + fields_text
         c.index_fingerprint_as_json(_aux)
+    '''
 
     return result
 

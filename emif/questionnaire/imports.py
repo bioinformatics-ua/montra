@@ -327,7 +327,7 @@ class ImportQuestionnaireExcel(ImportQuestionnaire):
 
             return choices
 
-        elif question.type in ['choice-yesno', 'choice-yesnocomment', 'choice-yesnodontknow']:
+        elif question.type in ['choice-yesno', 'choice-yesnodontknow']:
             return ['yes', 'no', 'dontknow']
 
         return []
@@ -534,7 +534,7 @@ class ImportQuestionnaireExcel(ImportQuestionnaire):
                         _choices_array[slug] = self.__processChoices(type_Column.row, question, list_aux, log, debug=_debug,
                             mode=mode, match_percentage=percentage, infer_function=infer_function)
 
-                if dataType_column.value in ['choice-yesno', 'choice-yesnocomment',
+                if dataType_column.value in ['choice-yesno',
                                                      'choice-yesnodontknow']:
                     _choices_array[slug] = ['yes', 'no', 'dontknow']
 
