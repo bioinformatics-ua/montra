@@ -35,9 +35,6 @@ For developers:
 
 ## Install 
 
-
-
-----------
 ##For Development
 
 #### Note
