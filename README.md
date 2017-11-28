@@ -35,8 +35,6 @@ For developers:
 
 ## Install 
 
-Please use docker: https://github.com/bioinformatics-ua/catalogue-docker
-
 
 
 ----------
